@@ -1,0 +1,76 @@
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-05-04 12:24:53
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-05-17 14:53:57
+*/
+
+/* Global Styles */
+
+
+.flex-column {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.flex-row {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+/* Registration Page Styles */
+
+.welcome-header {
+	height: 20rem;
+	top: 10rem;
+}
+
+.name-form-group {
+	top: 20rem;
+}
+
+.registration-background {
+	opacity: .3;
+    overflow: hidden !important;
+    z-index: -10;
+    margin-bottom: -110rem;
+}
+
+#register-button {
+	position: relative;
+}
+
+/* Creation Page Styles */
+
+.creation-page {
+	top: 20rem;
+}
+
+
+/* Override bootstrap default styles*/
+
+body {
+	/*overflow: hidden;*/
+}
+
+input {
+	border-radius: 3px !important;
+}	
+
+.btn-success {
+	background-color: #2A692A !important;
+	border-color: #2A692A !important;
+
+}
+
+.form-group {
+	margin-bottom: 4rem !important;
+}
+
+.form-control {
+	border: 2px solid #999  !important;
+}

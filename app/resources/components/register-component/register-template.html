@@ -1,0 +1,19 @@
+<div class="container-fluid">
+	<div class="registration-background flex-row">
+		<img src="resources/images/registrationBackground.png">
+	</div>
+	<div class="flex-column">
+		<h1 class="welcome-header col-sm-12 text-center">Welcome to ValueCharts</h1>
+		<form class="form-horizontal">
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 col-sm-offset-1 control-label" for="name-input">Please Enter Your Name</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" id="name-input" ng-model="nameInput" placeholder="name">
+				</div>
+			</div>
+			<div class="form-group text-center">
+				<button class="btn btn-success btn-lg" ng-click="registerUser(nameInput)" id="register-button">Continue</button>
+			</div>
+		</form>
+	</div>
+</div>
