@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Angular 2 QuickStart</title>
+		<title>ValueCharts</title>
 		<meta charset="UTF-8">
+		<meta name="author" content="amishkin">
+		<!-- Bootstrap requires this for automatic device scaling to work properly -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="styles.css">
-		<!-- 1. Load libraries -->
-		<!-- Polyfill(s) for older browsers -->
+		<!-- Load Style Sheets -->
+		<link rel="stylesheet" href="resources/styles/main.css">
+		<link rel="stylesheet" href="vendors/bootstrap/dist/css/bootstrap.css">
+		<base href="/">
+
+		<!--  Load Style Sheets -->
+		<style type="text/css"></style>
+		<!--  Load JavaScript libraries -->
+		<!-- Polyfill(s) for browsers that do not meet ES6 -->
 		<script src="node_modules/es6-shim/es6-shim.min.js"></script>
 		<script src="node_modules/zone.js/dist/zone.js"></script>
 		<script src="node_modules/reflect-metadata/Reflect.js"></script>
 		<script src="node_modules/systemjs/dist/system.src.js"></script>
-		<!-- 2. Configure SystemJS -->
+		
+		<!--  Configure SystemJS -->
 		<script src="systemjs.config.js"></script>
 		<script>
 			System.import('app').catch(function(err){ console.error(err); });
@@ -19,6 +28,6 @@
 	</head>
 	<!-- 3. Display the application -->
 	<body>
-		<my-app>Loading...</my-app>
+		<root>Loading...</root>
 	</body>
 </html>

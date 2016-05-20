@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-19 14:38:57
+* @Last Modified time: 2016-05-19 16:32:05
 */
 
 // =========================================================================================================================================
@@ -36,6 +36,7 @@
 		'@angular/http',
 		'@angular/platform-browser',
 		'@angular/platform-browser-dynamic',
+		'@angular/router',
 		'@angular/router-deprecated',
 		'@angular/testing',
 		'@angular/upgrade',
