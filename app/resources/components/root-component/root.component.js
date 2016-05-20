@@ -28,7 +28,7 @@ var RootComponent = (function () {
         router_1.Routes([
             { path: '/register', component: register_component_1.RegisterComponent },
             { path: '/create', component: create_component_1.CreateComponent },
-            { path: '*', component: register_component_1.RegisterComponent },
+            { path: '*', component: register_component_1.RegisterComponent }
         ]), 
         __metadata('design:paramtypes', [router_1.Router])
     ], RootComponent);
