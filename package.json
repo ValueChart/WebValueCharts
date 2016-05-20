@@ -1,16 +1,16 @@
 {
-	"name": "web-value-charts",
-	"version": "0.0.1",
-	"description": "A web implementation of ValueCharts",
-	"main": "index.js",
-	"author": "aaronpmishkin",
+  "name": "web-value-charts",
+  "version": "0.0.1",
+  "description": "A web implementation of ValueCharts",
+  "main": "index.js",
+  "author": "aaronpmishkin",
   "scripts": {
-  	"postinstall": "typings install",
-  	"start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
-  	"lite": "lite-server",
-  	"tsc": "tsc",
-  	"tsc:w": "tsc -w",
- 		"typings": "typings"
+    "postinstall": "typings install",
+    "start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
+    "lite": "lite-server",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "typings": "typings"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "concurrently": "^2.0.0",
+    "connect-history-api-fallback": "^1.2.0",
     "lite-server": "^2.2.0",
     "typescript": "^1.8.10",
     "typings": "^1.0.4"
