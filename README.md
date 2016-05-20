@@ -1,26 +1,15 @@
-# vc-prototype
-Small prototype of D3 based value charts.
+# Web ValueCharts
 
+Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of visualizations and interactive techniques intended to support decision-makers in preferential choice. More information about ValueCharts can be found [here](http://www.cs.ubc.ca/group/iui/VALUECHARTS/)
 
-#### To Run:
+### Checking Out the Project
 
-cd to the directory that the repo was cloned to. Then:
+You must have git installed to checkout the project. Once you have git:
 
-  npm install
-  
-  cd public
-  
-  bower install
-  
-  cd ..
-  
-  gulp serve
-  
-Note that you must have node and npm installed globally on your machine, as well as bower. If you done have bower installed, then:
+cd to the desired parent directory. Then:
 
-  npm install bower -g
-  
-The node runtime can be installed from:
+git clone https://github.com/ValueChart/WebValueCharts.git
 
-https://nodejs.org/en/
-  
+### Installing Dependencies, Building, and Running the Project:
+
+Please see the [Wiki](https://github.com/ValueChart/WebValueCharts/wiki)
