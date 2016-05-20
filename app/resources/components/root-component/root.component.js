@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var register_component_1 = require('../register-component/register.component');
+var create_component_1 = require('../create-component/create.component');
 var RootComponent = (function () {
     function RootComponent(_router) {
         this._router = _router;
@@ -26,7 +27,8 @@ var RootComponent = (function () {
         }),
         router_1.Routes([
             { path: '/register', component: register_component_1.RegisterComponent },
-            { path: '*', component: register_component_1.RegisterComponent } // useAsDefault: true - coming soon...
+            { path: '/create', component: create_component_1.CreateComponent },
+            { path: '*', component: register_component_1.RegisterComponent },
         ]), 
         __metadata('design:paramtypes', [router_1.Router])
     ], RootComponent);

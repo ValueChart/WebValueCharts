@@ -9,19 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var router_1 = require('@angular/router');
-var RegisterComponent = (function () {
-    function RegisterComponent() {
+var CreateComponent = (function () {
+    function CreateComponent() {
     }
-    RegisterComponent = __decorate([
+    CreateComponent = __decorate([
         core_1.Component({
-            selector: 'register',
-            templateUrl: 'app/resources/components/register-component/register.template.html',
-            directives: [router_1.ROUTER_DIRECTIVES]
+            selector: 'create',
+            templateUrl: 'app/resources/components/create-component/create.template.html'
         }), 
         __metadata('design:paramtypes', [])
-    ], RegisterComponent);
-    return RegisterComponent;
+    ], CreateComponent);
+    return CreateComponent;
 }());
-exports.RegisterComponent = RegisterComponent;
-//# sourceMappingURL=register.component.js.map
+exports.CreateComponent = CreateComponent;
+//# sourceMappingURL=create.component.js.map
