@@ -1,3 +1,9 @@
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-05-24 09:56:10
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-05-24 11:18:48
+*/
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
