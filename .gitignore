@@ -48,4 +48,12 @@ app/vendors
 ### Typings ###
 typings
 
+### Generated Mapping Files ###
+**/*.map
 
+### Generated JS Files ###
+
+app/resources/components/**/*.js
+app/resources/model/*.js
+app/main.js
+test/**/*.js
