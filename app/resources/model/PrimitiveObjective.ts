@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-24 17:19:44
+* @Last Modified time: 2016-05-24 17:44:10
 */
 
 import { Objective } from './Objective';
@@ -11,10 +11,10 @@ import { Domain } from './Domain';
 
 export class PrimitiveObjective implements Objective {
 
+	public objectiveType: string;
 	private name: string;
 	private description: string;
 	private color: string;
-
 	private domain: Domain;
 
 	constructor(name: string, description: string, domain: Domain) {
