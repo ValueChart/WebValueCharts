@@ -10,8 +10,7 @@
     "lite": "lite-server",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "typings": "typings",
-    "test": "karma run karma.conf.js"
+    "typings": "typings"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
