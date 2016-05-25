@@ -2,14 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-24 17:19:44
+* @Last Modified time: 2016-05-25 09:19:19
 */
 "use strict";
 var PrimitiveObjective = (function () {
-    function PrimitiveObjective(name, description, domain) {
+    function PrimitiveObjective(name, description) {
         this.name = name;
         this.description = description;
-        this.domain = domain;
     }
     PrimitiveObjective.prototype.getName = function () {
         return this.name;

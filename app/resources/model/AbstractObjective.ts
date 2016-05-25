@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-24 17:47:44
+* @Last Modified time: 2016-05-25 09:50:52
 */
 
-import { Objective } from './Objective';
-import { Domain } from './Domain';
+import { Objective } 	from './Objective';
+import { Domain } 		from './Domain';
 
 
 export class AbstractObjective implements Objective {
@@ -20,6 +20,7 @@ export class AbstractObjective implements Objective {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'abstract';
+		this.subObjectives = [];
 	}
 
 	getName(): string {
@@ -54,11 +55,11 @@ export class AbstractObjective implements Objective {
 	}
 
 	getAllSubObjectives(): Objective[] {
-		var subObjectives = [];
+		var subObjectives: Objective[]  = [];
 		this.subObjectives.forEach((objective: Objective) => {
 			subObjectives.push(objective);
 			if (objective.objectiveType === 'abstract') {
-				Array.prototype.push.apply(subObjectives, getAllSubObjectives(objective));
+				Array.prototype.push.apply(subObjectives, (<AbstractObjective> objective).getAllSubObjectives());
 			}
 		});
 		return subObjectives;
