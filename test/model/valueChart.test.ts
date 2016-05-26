@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 17:16:03
+* @Last Modified time: 2016-05-26 13:02:55
 */
 
 
@@ -11,7 +11,7 @@ import { Alternative } 			from '../../app/resources/model/Alternative';
 import { User } 				from '../../app/resources/model/User';
 import { Objective } 			from '../../app/resources/model/Objective';
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
-import { AbstractObjective } 			from '../../app/resources/model/AbstractObjective';
+import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective';
 
 
 declare var expect: any;
