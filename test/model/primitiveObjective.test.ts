@@ -2,20 +2,24 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 13:53:48
+* @Last Modified time: 2016-05-27 15:00:34
 */
 
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
 import { DiscreteDomain } 		from '../../app/resources/model/DiscreteDomain';
+import { ContinuousDomain } 		from '../../app/resources/model/ContinuousDomain';
+
 
 declare var expect: any;
 
 describe('PrimitiveObjective', () => {
 	var primitiveObjective: PrimitiveObjective;
 	var discreteDomain: DiscreteDomain;
+	var continuousDomain: ContinuousDomain;
 
 	before(function() {
 		discreteDomain = new DiscreteDomain(false);
+		continuousDomain = new ContinuousDomain(10, 20);
 	});
 
 	describe('#constructor(name: string, description: string)', () => {
@@ -32,6 +36,10 @@ describe('PrimitiveObjective', () => {
 
 	describe('#setDomain()', () => {
 
+		beforeEach(function() {
+			primitiveObjective = new PrimitiveObjective('TestObjective', 'A description goes here');
+		})
+
 		it('should have a domain when the domain is set', () => {
 			primitiveObjective.setDomain(discreteDomain);
 			expect(primitiveObjective.getDomain()).to.deep.equal(discreteDomain);
@@ -40,18 +48,22 @@ describe('PrimitiveObjective', () => {
 
 	describe('#getDomainType()', () => {
 
+		beforeEach(function() {
+			primitiveObjective = new PrimitiveObjective('TestObjective', 'A description goes here');
+		})
+
 		context('when domain is discrete', () => {
 			it('should have a domain type: "discrete"', () => {
+				primitiveObjective.setDomain(discreteDomain);
 				expect(primitiveObjective.getDomainType()).to.equal('discrete');
 			});
 		});
 
 		context('when domain is continuous', () => {
 			it('should have a domain type: "continuous"', () => {
-				// TODO: Fill test in when implementing ContinuousDomain
+				primitiveObjective.setDomain(continuousDomain);
+				expect(primitiveObjective.getDomainType()).to.equal('continuous');
 			});
 		});
 	});
-
-
 });
