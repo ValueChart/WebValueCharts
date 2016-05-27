@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 15:47:51
+* @Last Modified time: 2016-05-27 10:00:05
 */
 
 // Import DiscreteDomain, the class to be tested.
@@ -20,7 +20,7 @@ describe('DiscreteDomain', () => {
 	// This declares the test suite for the getElements method of DiscreteDomain. # will be used before method names by convention...
 	describe('#getElements()', () => {
 		
-		// This runs before all of the it() functions within the describe/context function are executed (NOT before the context functions).
+		// This runs once before any of the it() functions within the describe/context function are executed (NOT before the context functions).
 		before(function() {
 			discreteDomain = new DiscreteDomain(false);
 		});
