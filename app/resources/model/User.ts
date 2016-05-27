@@ -2,18 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 10:28:21
+* @Last Modified time: 2016-05-27 16:10:39
 */
 
 import { WeightMap } 			from './WeightMap';
-import { ValueFunctionMap }		from './ValueFunctionMap';
+import { ScoreFunctionMap }		from './ScoreFunctionMap';
 
 
 export class User {
 
 	private username: string;
 	private weightMap: WeightMap; 
-	private valueFunctionMap: ValueFunctionMap; 
+	private scoreFunctionMap: ScoreFunctionMap; 
 
 	constructor(username: string) {
 		this.username = username;
@@ -27,12 +27,12 @@ export class User {
 		this.username = username;
 	}
 
-	getValueFunctionMap(): ValueFunctionMap {
-		return this.valueFunctionMap;
+	getScoreFunctionMap(): ScoreFunctionMap {
+		return this.scoreFunctionMap;
 	}
 
-	setValueFunctionMap(valueFunctionMap: ValueFunctionMap): void {
-		this.valueFunctionMap = valueFunctionMap;
+	setScoreFunctionMap(scoreFunctionMap: ScoreFunctionMap): void {
+		this.scoreFunctionMap = scoreFunctionMap;
 	}
 
 	getWeightMap(): WeightMap {
