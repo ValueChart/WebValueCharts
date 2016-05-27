@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 14:27:46
+* @Last Modified time: 2016-05-27 15:52:48
 */
 
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
-import { PrimitiveObjective } 			from '../../app/resources/model/PrimitiveObjective';
+import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
 
 declare var expect: any;
 
@@ -37,27 +37,27 @@ describe('WeightMap', () => {
 
 	describe('#getObjectiveWeight', () => {
 
-		context('when there are no objectives in the WeightMap', () => {
-			it('should return undefined for any objective', () => {
+		context('when there are no Objective-weights pairs in the WeightMap', () => {
+			it('should return undefined for any Objective', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.be.undefined;
 				expect(weightMap.getObjectiveWeight(elevation)).to.be.undefined;
 				expect(weightMap.getObjectiveWeight(temperature)).to.be.undefined;
 			});
 		});
 
-		context('when there are objectives in the WeightMap', () => {
+		context('when there are Objective-weights pairs in the WeightMap', () => {
 			
 			before(function() {
 				weightMap.setObjectiveWeight(weather, 2);
 				weightMap.setObjectiveWeight(humidity, 1);
 			});
 
-			it('should return undefined for an objective that is not in the WeightMap', () => {
+			it('should return undefined for an Objective that is not in the WeightMap', () => {
 				expect(weightMap.getObjectiveWeight(distance)).to.be.undefined;
 				expect(weightMap.getObjectiveWeight(elevation)).to.be.undefined;
 			});
 
-			it('should return a (unormalized) weight for an objective that is in the WeightMap', () => {
+			it('should return a (unormalized) weight for an Objective that is in the WeightMap', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(2);
 				expect(weightMap.getObjectiveWeight(humidity)).to.equal(1);
 			});
@@ -66,12 +66,14 @@ describe('WeightMap', () => {
 
 	describe('#setObjectiveWeight(objective: PrimitiveObjective, weight: number)', () => {
 
-		before(function() {
-			weightMap = new WeightMap();
-		});
 
-		context('when the objective has not been assigned a weight yet', () => {
-			it('should insert the objective into the map, and assign it a weight at the same time', () => {
+		context('when the map is empty', () => {
+
+			before(function() {
+				weightMap = new WeightMap();
+			});
+
+			it('should insert the Objective into the map, and assign it a weight at the same time', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.be.undefined;
 				weightMap.setObjectiveWeight(weather, 0.5);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
@@ -81,33 +83,33 @@ describe('WeightMap', () => {
 		context('when the map is not empty', () => {
 
 			before(function() {
+				weightMap = new WeightMap();
 				weightMap.setObjectiveWeight(weather, 0.5);
 			});
 
-			it('should insert the objective into the map without affecting the other objectives', () => {
-				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
+			it('should insert the Objective-weight pair into the map without affecting the other Objective-weight pairs', () => {
 				weightMap.setObjectiveWeight(distance, 10);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
 			});
 		});
 
-		context('when the objective is already mapped to another weight', () => {
+		context('when the Objective is already mapped to a weight', () => {
 
 			before(function() {
+				weightMap = new WeightMap();
 				weightMap.setObjectiveWeight(weather, 0.5);
 				weightMap.setObjectiveWeight(distance, 10);
 			});
 
 			it('should overwrite the old weight with the new one', () => {
-				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
 				weightMap.setObjectiveWeight(weather, 3);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 			});
 		});
 	});
 
-	describe('#removeObjectiveWeight(objective: PrimitiveObjective)', () => {
+	describe('#removeObjectiveWeight(Objective: PrimitiveObjective)', () => {
 
 		beforeEach(function() {
 			weightMap = new WeightMap();
@@ -115,7 +117,7 @@ describe('WeightMap', () => {
 			weightMap.setObjectiveWeight(distance, 10);
 		});
 
-		context('when the objective weight to remove is not part of the WeightMap', () => {
+		context('when the Objective-weight pair to remove is in the WeightMap', () => {
 			it('should not do anything', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
@@ -125,8 +127,8 @@ describe('WeightMap', () => {
 			});
 		});
 
-		context('when the objective weight to remove is part of the WeightMap', () => {
-			it('should remove the objective weight', () => {
+		context('when the Objective-weight pair to remove is in the WeightMap', () => {
+			it('should remove the Objective weight', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
 				weightMap.removeObjectiveWeight(distance);
@@ -148,13 +150,13 @@ describe('WeightMap', () => {
 			weightMap.setObjectiveWeight(humidity, 2);
 		});
 
-		context('when the desired order is the same as the order objectives were mapped in', () => {
+		context('when the desired order is the same as the order Objective-weight pairs are in', () => {
 
 			before(function() {
 				objectiveOrder = [weather, distance, elevation, temperature, humidity];
 			});
 
-			it('should retrieve the weights in the same order as the ordered array of objectives', () => {
+			it('should retrieve the weights in the same order as the ordered array of Objectives given', () => {
 				orderedWeights = weightMap.getObjectiveWeights(objectiveOrder);
 				expect(orderedWeights).to.have.length(5);
 				expect(orderedWeights[0]).to.equal(3); // This should be the weight for weather.
@@ -166,13 +168,13 @@ describe('WeightMap', () => {
 		});
 
 
-		context('when the desired order is the same as the order objectives were mapped in', () => {
+		context('when the desired order is NOT the same as the order objective-weight pairs are in', () => {
 
 			before(function() {
 				objectiveOrder = [temperature, distance, humidity, weather, elevation];
 			});
 
-			it('should retrieve the weights in the same order as the ordered array of objectives given', () => {
+			it('should retrieve the weights in the same order as the ordered array of Objectives given', () => {
 				orderedWeights = weightMap.getObjectiveWeights(objectiveOrder);
 
 				expect(orderedWeights).to.have.length(5);
@@ -205,7 +207,7 @@ describe('WeightMap', () => {
 				weightTotal = 3 + 5 + 2 + 1 + 2;
 			});
 
-			it('should retrieve the normalized weights in the same order as the ordered array of objectives', () => {
+			it('should retrieve the normalized weights in the same order as the ordered array of Objectives', () => {
 				normalizedWeights = weightMap.getNormalizedWeights(objectiveOrder);
 				expect(normalizedWeights).to.have.length(5);
 
@@ -231,7 +233,7 @@ describe('WeightMap', () => {
 				objectiveOrder = [temperature, distance, humidity, weather, elevation];
 			});
 
-			it('should retrieve the normalized weights in the same order as the ordered array of objectives given', () => {
+			it('should retrieve the normalized weights in the same order as the ordered array of Objectives given', () => {
 				normalizedWeights = weightMap.getNormalizedWeights(objectiveOrder);
 
 				expect(normalizedWeights).to.have.length(5);
@@ -256,7 +258,7 @@ describe('WeightMap', () => {
 				weightTotal = 0.05 + 0.1 + 0.2 + 0.3 + 0.2;
 			});
 
-			it('should retrieve the normalized weights in the same order as the ordered array of objectives given', () => {
+			it('should retrieve the normalized weights in the same order as the ordered array of Objectives given', () => {
 				normalizedWeights = weightMap.getNormalizedWeights(objectiveOrder);
 
 				expect(normalizedWeights).to.have.length(5);
