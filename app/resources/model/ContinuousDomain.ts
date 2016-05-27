@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:27:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 09:56:44
+* @Last Modified time: 2016-05-27 10:25:09
 */
 
 
@@ -21,7 +21,7 @@ export class ContinuousDomain implements Domain {
 		this.type = 'continuous';
 	}
 
-	setRange(minValue: number, maxValue: number) {
+	setRange(minValue: number, maxValue: number): void {
 		this.minValue = minValue;
 		this.maxValue = maxValue;
 	}
