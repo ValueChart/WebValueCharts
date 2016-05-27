@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-26 13:02:55
+* @Last Modified time: 2016-05-27 14:16:39
 */
 
 
@@ -50,9 +50,9 @@ describe('ValueChart', () => {
 
 		context('when there are no Alternatives', () => {
 			it('should not remove a Alternative', () => {
-				expect(valueChart.getAlternatives()).to.have.length(0);
+				expect(valueChart.getAlternatives()).to.be.empty;;
 				valueChart.removeAlternative(alternativeOne);
-				expect(valueChart.getAlternatives()).to.have.length(0);
+				expect(valueChart.getAlternatives()).to.be.empty;;
 			});
 		});
 
@@ -73,7 +73,7 @@ describe('ValueChart', () => {
 				expect(valueChart.getAlternatives()).to.have.length(2);
 				valueChart.removeAlternative(alternativeTwo);
 				expect(valueChart.getAlternatives()).to.have.length(1);
-				expect(valueChart.getAlternatives()[0].getName()).to.equal('AlternativeOne');
+				expect(valueChart.getAlternatives()[0]).to.deep.equal(alternativeOne);
 			});
 		});
 	});
@@ -88,9 +88,9 @@ describe('ValueChart', () => {
 
 		context('when there are no Objectives', () => {
 			it('should not remove a Objective', () => {
-				expect(valueChart.getObjectives()).to.have.length(0);
+				expect(valueChart.getObjectives()).to.be.empty;;
 				valueChart.removeObjective(objectiveOne);
-				expect(valueChart.getObjectives()).to.have.length(0);
+				expect(valueChart.getObjectives()).to.be.empty;;
 			});
 		});
 
@@ -111,7 +111,7 @@ describe('ValueChart', () => {
 				expect(valueChart.getObjectives()).to.have.length(2);
 				valueChart.removeObjective(objectiveTwo);
 				expect(valueChart.getObjectives()).to.have.length(1);
-				expect(valueChart.getObjectives()[0].getName()).to.equal('ObjectiveOne');				
+				expect(valueChart.getObjectives()[0]).to.deep.equal(objectiveOne);				
 			});
 		});
 	});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 10:00:05
+* @Last Modified time: 2016-05-27 13:52:43
 */
 
 // Import DiscreteDomain, the class to be tested.
@@ -29,7 +29,7 @@ describe('DiscreteDomain', () => {
 			// An actual test case that runs. Code not in an "it" (or "before", or "beforeEach", etc) block will NOT run. 
 			// Don't try to put initialization code between "it" blocks in a context function.
 			it('should return an empty array', () => {
-				expect(discreteDomain.getElements()).to.have.length(0);
+				expect(discreteDomain.getElements()).to.be.empty;;
 			});
 		});
 
@@ -105,7 +105,7 @@ describe('DiscreteDomain', () => {
 
 			it('should remove the element even if that leaves the domain empty', () => {
 				discreteDomain.removeElement('rainy');
-				expect(discreteDomain.getElements()).to.have.length(0);
+				expect(discreteDomain.getElements()).to.be.empty;;
 			});
 		});
 	});
@@ -116,15 +116,15 @@ describe('DiscreteDomain', () => {
 		})
 
 		it('should be able to set the domain to be ordered', () => {
-			expect(discreteDomain.getOrdered()).to.equal(false);
+			expect(discreteDomain.getOrdered()).to.be.false;;
 			discreteDomain.setOrdered(true);
-			expect(discreteDomain.getOrdered()).to.equal(true);
+			expect(discreteDomain.getOrdered()).to.be.true;
 		});
 
 		it('should be able to set the domain to be un-ordered', () => {
-			expect(discreteDomain.getOrdered()).to.equal(true);
+			expect(discreteDomain.getOrdered()).to.be.true;
 			discreteDomain.setOrdered(false);
-			expect(discreteDomain.getOrdered()).to.equal(false);
+			expect(discreteDomain.getOrdered()).to.be.false;;
 		});
 
 	});

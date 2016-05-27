@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 09:05:58
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 10:41:43
+* @Last Modified time: 2016-05-27 14:15:56
 */
 
 import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective';
@@ -13,22 +13,29 @@ declare var expect: any;
 
 describe('AbstractObjective', () => {
 	var rootObjectve: AbstractObjective;
-	var levelTwoPrimitiveOne: PrimitiveObjective;
-	var levelTwoPrimitiveTwo: PrimitiveObjective;
-	var levelTwoAbstractOne: AbstractObjective;
+	var distance: PrimitiveObjective;
+	var elevation: PrimitiveObjective;
+	var weather: AbstractObjective;
+	var precipitation: AbstractObjective;
+	var forecast: AbstractObjective;
+	var type: PrimitiveObjective;
+	var temperature: PrimitiveObjective;
+	var amount: PrimitiveObjective;
+	var accuracy: PrimitiveObjective;
+	var prediction: PrimitiveObjective;
 
 	before(function() {
-		levelTwoPrimitiveOne = new PrimitiveObjective('PrimitiveChild', 'A description goes here')
-		levelTwoAbstractOne = new AbstractObjective('AbstractChild', 'A description goes here');
-		levelTwoPrimitiveTwo = new PrimitiveObjective('ThirdChild', 'A description goes here');
+		distance = new PrimitiveObjective('distance', 'A description goes here')
+		weather = new AbstractObjective('weather', 'A description goes here');
+		elevation = new PrimitiveObjective('elevation', 'A description goes here');
 	});
 
 	describe('#constructor(name: string, description: string)', () => {
 
 		context('when constructor is used', () => {
 			it('should have a name, and description', () => {
-				rootObjectve = new AbstractObjective('TestObjective', 'A description goes here');
-				expect(rootObjectve.getName()).to.equal('TestObjective');
+				rootObjectve = new AbstractObjective('rootObjective', 'A description goes here');
+				expect(rootObjectve.getName()).to.equal('rootObjective');
 				expect(rootObjectve.getDescription()).to.equal('A description goes here');
 			});
 		});
@@ -39,30 +46,30 @@ describe('AbstractObjective', () => {
 
 		context('when there are no subObjectives', () => {
 			it('should not remove a subObjective', () => {
-				expect(rootObjectve.getDirectSubObjectives()).to.have.length(0);
-				rootObjectve.removeSubObjective(levelTwoPrimitiveOne);
-				expect(rootObjectve.getDirectSubObjectives()).to.have.length(0);
+				expect(rootObjectve.getDirectSubObjectives()).to.be.empty;;
+				rootObjectve.removeSubObjective(distance);
+				expect(rootObjectve.getDirectSubObjectives()).to.be.empty;;
 			});
 		});
 
 		context('when there is at least one subObjective', () => {
 
 			before(function() {
-				rootObjectve.addSubObjective(levelTwoPrimitiveOne);
-				rootObjectve.addSubObjective(levelTwoAbstractOne);
+				rootObjectve.addSubObjective(distance);
+				rootObjectve.addSubObjective(weather);
 			})
 
 			it('should not remove an objective that is not in the list of subObjectives', () => {
 				expect(rootObjectve.getDirectSubObjectives()).to.have.length(2);
-				rootObjectve.removeSubObjective(levelTwoPrimitiveTwo);
+				rootObjectve.removeSubObjective(elevation);
 				expect(rootObjectve.getDirectSubObjectives()).to.have.length(2);
 			});
 
 			it('should remove an objective that is in the list of subObjectives', () => {
 				expect(rootObjectve.getDirectSubObjectives()).to.have.length(2);
-				rootObjectve.removeSubObjective(levelTwoPrimitiveOne);
+				rootObjectve.removeSubObjective(distance);
 				expect(rootObjectve.getDirectSubObjectives()).to.have.length(1);
-				expect(rootObjectve.getDirectSubObjectives()[0].getName()).to.equal('AbstractChild');
+				expect(rootObjectve.getDirectSubObjectives()[0]).to.deep.equal(weather);
 			});
 		});
 	});
@@ -70,8 +77,10 @@ describe('AbstractObjective', () => {
 	describe('#getAllSubObjectives()', () => {
 
 		before(function() {
-			rootObjectve.addSubObjective(levelTwoPrimitiveOne);
-			levelTwoAbstractOne.addSubObjective(levelTwoPrimitiveTwo);
+			rootObjectve = new AbstractObjective('RootObjective', 'A description goes here');
+			rootObjectve.addSubObjective(weather);
+			rootObjectve.addSubObjective(distance);
+			weather.addSubObjective(elevation);
 		});
 
 		context('when at least one subObjective has subObjectives of its own', () => {
@@ -83,32 +92,37 @@ describe('AbstractObjective', () => {
 		context('when the hierarchy of objectives is complex', () => {
 
 			before(function() {
-				var levelThreeAbstractOne: AbstractObjective = new AbstractObjective('LevelThreeAbstractOne', 'A description goes here');
-				var levelThreeAbstractTwo: AbstractObjective = new AbstractObjective('LevelThreeAbstractTwo', 'A description goes here');
-				var levelFourAbstract: AbstractObjective = new AbstractObjective('LevelFour', 'A description goes here');
-				var levelThreePrimitive: PrimitiveObjective = new PrimitiveObjective('LevelThreePrimitive', 'A description goes here');		
-				var levelFourPrimitiveOne: PrimitiveObjective = new PrimitiveObjective('LevelFourPrimitiveOne', 'A description goes here');		
-				var levelFourPrimitiveTwo: PrimitiveObjective = new PrimitiveObjective('LevelFourPrimitiveTwo', 'A description goes here');		
-				var levelFourPrimitiveThree: PrimitiveObjective = new PrimitiveObjective('LevelFourPrimitiveThree', 'A description goes here');		
-				var levelFivePrimitiveOne: PrimitiveObjective = new PrimitiveObjective('LevelFivePrimitiveOne', 'A description goes here');		
+				rootObjectve = new AbstractObjective('RootObjective', 'A description goes here');
+				distance = new PrimitiveObjective('distance', 'A description goes here')
+				weather = new AbstractObjective('weather', 'A description goes here');
+				elevation = new PrimitiveObjective('elevation', 'A description goes here');
+				precipitation = new AbstractObjective('Precipitation', 'A description goes here');
+				forecast = new AbstractObjective('Forecast', 'A description goes here');
+				type = new PrimitiveObjective('Type', 'A description goes here');
+				temperature = new PrimitiveObjective('Temperature', 'A description goes here');		
+				amount = new PrimitiveObjective('Amount', 'A description goes here');		
+				accuracy = new PrimitiveObjective('Accuracy', 'A description goes here');		
+				prediction = new PrimitiveObjective('Prediction', 'A description goes here');		
+
+				// Level two
+				rootObjectve.addSubObjective(distance);
+				rootObjectve.addSubObjective(weather);
+				weather.addSubObjective(elevation);
 
 				// Level Three
-				levelTwoAbstractOne.addSubObjective(levelThreePrimitive);
-				levelTwoAbstractOne.addSubObjective(levelThreeAbstractOne);
-				levelTwoAbstractOne.addSubObjective(levelThreeAbstractTwo);
+				weather.addSubObjective(temperature);
+				weather.addSubObjective(precipitation);
+				weather.addSubObjective(forecast);
 
 				// Level Four
-				levelThreeAbstractOne.addSubObjective(levelFourAbstract);
-				levelThreeAbstractOne.addSubObjective(levelFourPrimitiveOne);
-				levelThreeAbstractTwo.addSubObjective(levelFourPrimitiveTwo);
-				levelThreeAbstractTwo.addSubObjective(levelFourPrimitiveThree);
-
-				// Level Five
-				levelFourAbstract.addSubObjective(levelFivePrimitiveOne);
+				precipitation.addSubObjective(type);
+				precipitation.addSubObjective(amount);
+				forecast.addSubObjective(accuracy);
+				forecast.addSubObjective(prediction);
 			});
 
 			it('should still retrieve all of the subObjectives in the hierarchy', () => {
-				expect(rootObjectve.getAllSubObjectives()).to.have.length(11);
+				expect(rootObjectve.getAllSubObjectives()).to.have.length(10);
 			});
 		});
 	});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 09:21:33
+* @Last Modified time: 2016-05-27 13:53:48
 */
 
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
@@ -34,7 +34,7 @@ describe('PrimitiveObjective', () => {
 
 		it('should have a domain when the domain is set', () => {
 			primitiveObjective.setDomain(discreteDomain);
-			expect(primitiveObjective.getDomain()).to.equal(discreteDomain);
+			expect(primitiveObjective.getDomain()).to.deep.equal(discreteDomain);
 		});
 	});
 

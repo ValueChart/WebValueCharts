@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:37:49
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 10:11:44
+* @Last Modified time: 2016-05-27 13:41:14
 */
 
 
@@ -26,7 +26,7 @@ describe('ContinuousDomain', () => {
 				
 				expect(continuousDomain.getMinValue()).to.equal(0);
 				expect(continuousDomain.getMaxValue()).to.equal(10);
-				expect(continuousDomain.type).to.equal('continuous');
+				expect(continuousDomain).to.have.property('type','continuous');
 			});
 		});
 	});
