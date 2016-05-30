@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 09:19:19
+* @Last Modified time: 2016-05-30 10:25:01
 */
 
 import { Objective } 	from './Objective';
@@ -20,6 +20,7 @@ export class PrimitiveObjective implements Objective {
 	constructor(name: string, description: string) {
 		this.name = name;
 		this.description = description; 
+		this.objectiveType = 'primitive';
 	}
 
 
