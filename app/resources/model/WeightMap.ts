@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:44
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 12:35:30
+* @Last Modified time: 2016-05-30 15:33:47
 */
 
 import { PrimitiveObjective } 			from './PrimitiveObjective';
@@ -48,7 +48,7 @@ export class WeightMap {
 		for (var i: number = 0; i < normalizedWeights.length; i++) {
 			normalizedWeights[i] = normalizedWeights[i] / weightTotal;
 		}
-
+		
 		return normalizedWeights;
 	}
 

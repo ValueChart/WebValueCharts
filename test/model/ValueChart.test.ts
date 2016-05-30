@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 10:53:52
+* @Last Modified time: 2016-05-30 11:53:15
 */
 
 
@@ -15,6 +15,13 @@ import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective'
 
 
 declare var expect: any;
+
+class MockValueChart extends ValueChart {
+	
+	constructor(name: string, description: string, creator: string) {
+		super(name, description, creator);
+	}
+}
 
 
 describe('ValueChart', () => {
@@ -45,7 +52,7 @@ describe('ValueChart', () => {
 
 		context('when constructor is used', () => {
 			it('should have a name, description and creator', () => {
-				valueChart = new ValueChart('TestChart', 'This is a test chart', 'Aaron');
+				valueChart = new MockValueChart('TestChart', 'This is a test chart', 'Aaron');
 				expect(valueChart.getName()).to.equal('TestChart');
 				expect(valueChart.getDescription()).to.equal('This is a test chart');
 				expect(valueChart.getCreator()).to.equal('Aaron');
@@ -95,7 +102,7 @@ describe('ValueChart', () => {
 	describe('#removeRootObjective(objective: Objective)', () => {
 
 		before(function() {
-			valueChart = new ValueChart('TestChart', 'This is a test chart', 'Aaron');
+			valueChart = new MockValueChart('TestChart', 'This is a test chart', 'Aaron');
 			distance = new PrimitiveObjective("Distance", "A description goes here");
 			weather = new AbstractObjective("Weather", "A description goes here");
 			cost = new AbstractObjective("Cost", "A description goes here");
@@ -134,7 +141,7 @@ describe('ValueChart', () => {
 	describe('Methods for getting Objectives', () => {
 		
 		before(function() {
-			valueChart = new ValueChart('TestChart', 'This is a test chart', 'Aaron');
+			valueChart = new MockValueChart('TestChart', 'This is a test chart', 'Aaron');
 
 			forcastedWeather = new AbstractObjective('ForcastedWeather', 'A description goes here');
 			forcastedTemperature = new PrimitiveObjective('Temperature', 'A description goes here');

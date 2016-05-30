@@ -2,23 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 11:14:07
+* @Last Modified time: 2016-05-30 11:35:20
 */
 
 import { Objective } 				from './Objective';
 import { PrimitiveObjective } 		from './PrimitiveObjective';
 import { AbstractObjective } 		from './AbstractObjective';
 import { Alternative }				from './Alternative';
-import { User } 					from './User';
 
 
 
-export class ValueChart {
+export abstract class ValueChart {
 
 	private name: string;
 	private description: string;
 	private creator: string;
-	private user: User;
 	private rootObjectives: Objective[];
 	private alternatives: Alternative[];
 
@@ -52,14 +50,6 @@ export class ValueChart {
 
 	setCreator(creator: string): void {
 		this.creator = creator;
-	}
-
-	getUser(): User {
-		return this.user;
-	}
-
-	setUser(user: User): void {
-		this.user = user;
 	}
 
 	getRootObjectives(): Objective[] {
