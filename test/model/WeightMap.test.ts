@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 15:52:48
+* @Last Modified time: 2016-05-31 10:15:03
 */
 
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
@@ -35,7 +35,7 @@ describe('WeightMap', () => {
 		humidity = new PrimitiveObjective('Humidity', 'A description goes here');
 	});
 
-	describe('#getObjectiveWeight', () => {
+	describe('#getObjectiveWeight()', () => {
 
 		context('when there are no Objective-weights pairs in the WeightMap', () => {
 			it('should return undefined for any Objective', () => {
@@ -117,7 +117,7 @@ describe('WeightMap', () => {
 			weightMap.setObjectiveWeight(distance, 10);
 		});
 
-		context('when the Objective-weight pair to remove is in the WeightMap', () => {
+		context('when the Objective-weight pair to remove is NOT in the WeightMap', () => {
 			it('should not do anything', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);

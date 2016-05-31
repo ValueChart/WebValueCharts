@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 23:02:36
+* @Last Modified time: 2016-05-31 09:59:19
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -22,12 +22,13 @@ export class ContinuousScoreFunction implements ScoreFunction {
 	private interpolationStrategy: InterpolationStrategy;
 
 	constructor(minDomainValue: number, maxDomainValue: number) {
+		this.type = 'continuous';
+		
 		this.minDomainValue = minDomainValue;
 		this.maxDomainValue = maxDomainValue;
 		this.elementScoreMap = new Map<number, number>();
-		this.type = 'continuous';
 		
-		this.interpolationStrategy = this.linearInterpolation;
+		this.interpolationStrategy = ContinuousScoreFunction.linearInterpolation;
 	}
 
 	
@@ -75,13 +76,23 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		return this.interpolationStrategy(start, end, domainElement);
 	};
 
-	linearInterpolation(start: { element: number, score: number }, end: { element: number, score: number }, elementToInterpolate: number): number {
+
+	setInterpolationStrategy(strategy: InterpolationStrategy): void {
+		this.interpolationStrategy = strategy;
+	}
+
+
+	// Interpolation functions:
+
+	static linearInterpolation(start: { element: number, score: number }, end: { element: number, score: number }, elementToInterpolate: number): number {
 
 		var slope = (end.score - start.score) / (end.element - start.element);
 		var offset = start.score - (slope * start.element);
 
 		return (slope * elementToInterpolate) + offset;
 	}
+
+
 }
 
 
