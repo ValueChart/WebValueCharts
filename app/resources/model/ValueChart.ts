@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 11:35:20
+* @Last Modified time: 2016-05-31 15:34:18
 */
 
 import { Objective } 				from './Objective';
@@ -56,6 +56,10 @@ export abstract class ValueChart {
 		return this.rootObjectives;
 	}
 
+	setRootObjectives(objectives: Objective[]): void {
+		this.rootObjectives = objectives;
+	}
+
 	addRootObjective(objective: Objective): void {
 		if (this.rootObjectives.indexOf(objective) === -1) {
 			this.rootObjectives.push(objective);
@@ -103,6 +107,10 @@ export abstract class ValueChart {
 
 	getAlternatives(): Alternative[] {
 		return this.alternatives;
+	}
+
+	setAlternatives(alternatives: Alternative[]): void {
+		this.alternatives = alternatives;
 	}
 
 	addAlternative(alernative: Alternative): void {

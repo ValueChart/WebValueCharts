@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 16:33:48
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 10:15:22
+* @Last Modified time: 2016-05-31 15:50:29
 */
 
 import { DiscreteScoreFunction } 		from '../../app/resources/model/DiscreteScoreFunction';
@@ -27,13 +27,13 @@ describe('DiscreteScoreFunction', () => {
 		snowing = 'snowing';
 	});
 
-	describe('#getElementScore()', () => {
+	describe('#getScore()', () => {
 
 		context('when there are no element-score pairs in the DiscreteScoreFunction', () => {
 			it('should return undefined for any domain element', () => {
-				expect(discreteScoreFunction.getElementScore(sunny)).to.be.undefined;
-				expect(discreteScoreFunction.getElementScore(raining)).to.be.undefined;
-				expect(discreteScoreFunction.getElementScore(snowing)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(sunny)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(raining)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(snowing)).to.be.undefined;
 			});
 		});
 
@@ -45,13 +45,13 @@ describe('DiscreteScoreFunction', () => {
 			});
 
 			it('should return undefined for a domain element that is not in the DiscreteScoreFunction', () => {
-				expect(discreteScoreFunction.getElementScore(cloudy)).to.be.undefined;
-				expect(discreteScoreFunction.getElementScore(raining)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(cloudy)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(raining)).to.be.undefined;
 			});
 
 			it('should return a score for a domain element that is in the DiscreteScoreFunction', () => {
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(2);
-				expect(discreteScoreFunction.getElementScore(snowing)).to.equal(1);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(2);
+				expect(discreteScoreFunction.getScore(snowing)).to.equal(1);
 			});
 		});
 	});
@@ -66,9 +66,9 @@ describe('DiscreteScoreFunction', () => {
 			});
 
 			it('should insert the domain element into the map, and assign it a score at the same time', () => {
-				expect(discreteScoreFunction.getElementScore(sunny)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(sunny)).to.be.undefined;
 				discreteScoreFunction.setElementScore(sunny, 0.5);
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(0.5);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(0.5);
 			});
 		});
 
@@ -81,8 +81,8 @@ describe('DiscreteScoreFunction', () => {
 
 			it('should insert the element-score pair into the map without affecting the other element-score pairs', () => {
 				discreteScoreFunction.setElementScore(raining, 10);
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(0.5);
-				expect(discreteScoreFunction.getElementScore(raining)).to.equal(10);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(0.5);
+				expect(discreteScoreFunction.getScore(raining)).to.equal(10);
 			});
 		});
 
@@ -96,7 +96,7 @@ describe('DiscreteScoreFunction', () => {
 
 			it('should overwrite the old score with the new one', () => {
 				discreteScoreFunction.setElementScore(sunny, 3);
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(3);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(3);
 			});
 		});
 	});
@@ -111,21 +111,21 @@ describe('DiscreteScoreFunction', () => {
 
 		context('when the element-score pair to remove is NOT in the DiscreteScoreFunction', () => {
 			it('should not do anything', () => {
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(3);
-				expect(discreteScoreFunction.getElementScore(raining)).to.equal(10);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(3);
+				expect(discreteScoreFunction.getScore(raining)).to.equal(10);
 				discreteScoreFunction.removeElement(cloudy);
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(3);
-				expect(discreteScoreFunction.getElementScore(raining)).to.equal(10);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(3);
+				expect(discreteScoreFunction.getScore(raining)).to.equal(10);
 			});
 		});
 
 		context('when the element-score pair to remove is in the DiscreteScoreFunction', () => {
 			it('should remove the element-score pair', () => {
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(3);
-				expect(discreteScoreFunction.getElementScore(raining)).to.equal(10);
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(3);
+				expect(discreteScoreFunction.getScore(raining)).to.equal(10);
 				discreteScoreFunction.removeElement(raining);
-				expect(discreteScoreFunction.getElementScore(sunny)).to.equal(3);
-				expect(discreteScoreFunction.getElementScore(raining)).to.be.undefined;
+				expect(discreteScoreFunction.getScore(sunny)).to.equal(3);
+				expect(discreteScoreFunction.getScore(raining)).to.be.undefined;
 			});
 		});
 	});

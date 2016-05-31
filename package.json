@@ -30,20 +30,20 @@
     "bootstrap": "^3.3.6"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "concurrently": "^2.0.0",
     "connect-history-api-fallback": "^1.2.0",
-    "lite-server": "^2.2.0",
-    "typescript": "^1.8.10",
-    "typings": "^1.0.4",
-    "chai": "^3.5.0",
-    "mocha": "^2.5.2",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
-    "karma-mocha": "^1.0.1",
     "karma-chrome-launcher": "^1.0.1",
+    "karma-mocha": "^1.0.1",
     "karma-typescript-preprocessor2": "^1.1.1",
     "karma-webpack": "^1.7.0",
+    "lite-server": "^2.2.0",
+    "mocha": "^2.5.2",
     "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4",
     "webpack": "^1.13.1"
   }
 }

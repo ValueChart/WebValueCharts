@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 09:59:19
+* @Last Modified time: 2016-05-31 15:31:36
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -21,7 +21,7 @@ export class ContinuousScoreFunction implements ScoreFunction {
 	private elementScoreMap: Map<number, number>;
 	private interpolationStrategy: InterpolationStrategy;
 
-	constructor(minDomainValue: number, maxDomainValue: number) {
+	constructor(minDomainValue?: number, maxDomainValue?: number) {
 		this.type = 'continuous';
 		
 		this.minDomainValue = minDomainValue;
@@ -40,7 +40,7 @@ export class ContinuousScoreFunction implements ScoreFunction {
 			this.minDomainValue = domainElement;
 	}
 
-	removeElementScore(domainElement: number): void {
+	removeElement(domainElement: number): void {
 		this.elementScoreMap.delete(domainElement);
 	}
 
@@ -58,7 +58,7 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		while (iteratorElement.done === false) {
 
 		// Locate the nearest elements on either side of the current element that are defined. Because these have been inserted 
-		// into the valuefunction it is assumed that there is a specific function defined between them. Is this assumption wrong?
+		// into the value function it is assumed that there is a specific function defined between them. Is this assumption wrong?
 		// I believe that this works well for Linear Functions, but maybe not for more complex functions?
 			if (iteratorElement.value > belowElement && iteratorElement.value < domainElement) {
 				belowElement = iteratorElement.value;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 17:00:34
+* @Last Modified time: 2016-05-31 15:11:42
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -19,7 +19,7 @@ export class DiscreteScoreFunction implements ScoreFunction {
 		this.type = 'discrete';
 	}
 
-	getElementScore(domainElement: string): number {
+	getScore(domainElement: string): number {
 		return this.elementScoreMap.get(domainElement);
 	}
 

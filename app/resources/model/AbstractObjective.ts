@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-25 09:50:52
+* @Last Modified time: 2016-05-31 14:38:34
 */
 
 import { Objective } 	from './Objective';
@@ -37,6 +37,10 @@ export class AbstractObjective implements Objective {
 
 	setDescription(description: string): void {
 		this.description = description;
+	}
+
+	setDirectSubObjectives(objectives: Objective[]): void {
+		this.subObjectives = objectives;
 	}
 
 	addSubObjective(objective: Objective): void {
