@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:14:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 16:10:38
+* @Last Modified time: 2016-05-30 17:12:41
 */
 
 import { ScoreFunctionMap } 			from '../../app/resources/model/ScoreFunctionMap';
@@ -33,7 +33,7 @@ describe('ScoreFunctionMap', () => {
 		distance = new PrimitiveObjective('Distance', 'A description goes here');
 		elevation = new PrimitiveObjective('Elevation', 'A description goes here');
 
-		continuousScoreFunction = new ContinuousScoreFunction();
+		continuousScoreFunction = new ContinuousScoreFunction(0, 10);
 		discreteScoreFunction = new DiscreteScoreFunction();
 	});
 
