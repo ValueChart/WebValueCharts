@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 15:31:36
+* @Last Modified time: 2016-05-31 16:15:15
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -34,9 +34,9 @@ export class ContinuousScoreFunction implements ScoreFunction {
 	
 	setElementScore(domainElement: number, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
-		if (domainElement > this.maxDomainValue)
+		if (domainElement > this.maxDomainValue || this.maxDomainValue === undefined)
 			this.maxDomainValue = domainElement;
-		else if (domainElement < this.minDomainValue)
+		if (domainElement < this.minDomainValue || this.minDomainValue === undefined)
 			this.minDomainValue = domainElement;
 	}
 

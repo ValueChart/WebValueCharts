@@ -5,7 +5,12 @@
 				<div class="form-group">
 					<button class="btn btn-default btn-lg" ng-click="" id="">Create ValueChart</button>
 					<button class="btn btn-default btn-lg" ng-click="" id="">Create GroupValueChart</button>
-
+					 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
+                        <button class="btn btn-default">
+                            UploadValueChart
+                        </button>
+                        <input type="file" class="upload" (change)="uploadValueChart($event)"/>
+                    </a>
 				</div>
 			</form>
 		</div>

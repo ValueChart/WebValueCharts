@@ -13,8 +13,6 @@ import { CreateComponent }									from '../create-component/create.component';
 @Routes([
   {path: '/register', component: RegisterComponent}, // useAsDefault: true - coming soon...
   {path: '/create', component: CreateComponent},
-  {path: '*', component: RegisterComponent}
-
 ])
 export class RootComponent implements OnInit {
 

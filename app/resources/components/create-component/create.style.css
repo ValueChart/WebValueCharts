@@ -1,0 +1,27 @@
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-05-31 10:41:17
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-05-31 11:46:35
+*/
+
+a.upload {
+	display: block;
+}
+
+.file-upload {
+	position: relative;
+	overflow: hidden;
+	margin: 10px;
+}
+.file-upload input.upload {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 7px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}

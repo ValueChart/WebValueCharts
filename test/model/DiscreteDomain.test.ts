@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 13:52:43
+* @Last Modified time: 2016-05-31 16:56:48
 */
 
 // Import DiscreteDomain, the class to be tested.
@@ -116,15 +116,15 @@ describe('DiscreteDomain', () => {
 		})
 
 		it('should be able to set the domain to be ordered', () => {
-			expect(discreteDomain.getOrdered()).to.be.false;;
-			discreteDomain.setOrdered(true);
-			expect(discreteDomain.getOrdered()).to.be.true;
+			expect(discreteDomain.ordered).to.be.false;;
+			discreteDomain.ordered = true;
+			expect(discreteDomain.ordered).to.be.true;
 		});
 
 		it('should be able to set the domain to be un-ordered', () => {
-			expect(discreteDomain.getOrdered()).to.be.true;
-			discreteDomain.setOrdered(false);
-			expect(discreteDomain.getOrdered()).to.be.false;;
+			expect(discreteDomain.ordered).to.be.true;
+			discreteDomain.ordered = false;
+			expect(discreteDomain.ordered).to.be.false;;
 		});
 
 	});
