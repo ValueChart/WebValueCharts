@@ -2,17 +2,22 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 18:02:31
+* @Last Modified time: 2016-06-01 11:07:05
 */
 
 import { XMLValueChartParser } 		from '../../app/resources/services/XMLValueChartParser.service.ts';
 import { IndividualValueChart }		from '../../app/resources/model/IndividualValueChart';
 import { Alternative }				from '../../app/resources/model/Alternative';
+import { User } 					from '../../app/resources/model/User';
 import { Objective } 				from '../../app/resources/model/Objective';
 import { PrimitiveObjective } 		from '../../app/resources/model/PrimitiveObjective';
 import { AbstractObjective } 		from '../../app/resources/model/AbstractObjective';
 import { DiscreteDomain }			from '../../app/resources/model/DiscreteDomain';
 import { ContinuousDomain }			from '../../app/resources/model/ContinuousDomain';
+import { WeightMap } 				from '../../app/resources/model/WeightMap';
+import { ScoreFunctionMap } 		from '../../app/resources/model/ScoreFunctionMap';
+import { ContinuousScoreFunction } 	from '../../app/resources/model/ContinuousScoreFunction';
+import { DiscreteScoreFunction } 	from '../../app/resources/model/DiscreteScoreFunction';
 
 
 declare var expect: any;
@@ -31,8 +36,8 @@ describe('XMLValueChartParser', () => {
 	});
 
 
-	describe('parseDiscreteDomain(domainNodes: any)', () => {
-		var discreteDomainNode: any;
+	describe('parseDiscreteDomain(domainNodes: Element)', () => {
+		var discreteDomainNode: Element;
 
 		before(function() {
 			discreteDomainNode = xmlDocument.querySelector('Criterion [name=area]').querySelector('Domain'); 
@@ -49,8 +54,8 @@ describe('XMLValueChartParser', () => {
 
 	});
 
-	describe('parseContinuousDomain(domainNodes: any)', () => {
-		var continuousDomainNode: any;
+	describe('parseContinuousDomain(domainNodes: Element)', () => {
+		var continuousDomainNode: Element;
 
 		before(function() {
 			continuousDomainNode = xmlDocument.querySelector('Criterion [name=skytrain-distance]').querySelector('Domain');
@@ -64,8 +69,8 @@ describe('XMLValueChartParser', () => {
 		});
 	});
 
-	describe('parsePrimitiveObjective(primitiveObjectiveNodes: any)', () => {
-		var primitiveObjectiveNode: any;
+	describe('parsePrimitiveObjective(primitiveObjectiveNodes: Element)', () => {
+		var primitiveObjectiveNode: Element;
 
 		before(function() {
 			primitiveObjectiveNode = xmlDocument.querySelector('Criterion [name=size]');
@@ -85,8 +90,8 @@ describe('XMLValueChartParser', () => {
 		});
 	});	
 
-	describe('parseAbstractObjective(abstractObjectiveNodes: any)', () => {
-		var abstractObjectiveNode: any;
+	describe('parseAbstractObjective(abstractObjectiveNodes: Element)', () => {
+		var abstractObjectiveNode: Element;
 
 
 		context('when the AbstractObjective has no children which are also AbstractObjectives', () => {
@@ -124,9 +129,9 @@ describe('XMLValueChartParser', () => {
 		});
 	});
 
-	describe('parseAlternatives(alternativeNodes: any, objectives: PrimitiveObjective[])', () => {
+	describe('parseAlternatives(alternativeNodes: Element, objectives: PrimitiveObjective[])', () => {
 		var objectives: PrimitiveObjective[];
-		var alternativeNodes: any;
+		var alternativeNodes: Element;
 
 		before(function() {
 			var valueChart: IndividualValueChart = new IndividualValueChart('', '', '');
@@ -180,20 +185,143 @@ describe('XMLValueChartParser', () => {
 
 	});
 
+	describe('parseUser(xmlDocument: Document, objectives: PrimitiveObjective[])', () => {
+		var objectives: PrimitiveObjective[];
+		var size: PrimitiveObjective;
+		var area: PrimitiveObjective; 
+		var rate: PrimitiveObjective;
+		var skytrainDistance: PrimitiveObjective;
+		var internetAccess: PrimitiveObjective;
+
+		before(function() {
+			var valueChart: IndividualValueChart = new IndividualValueChart('', '', '');
+			valueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
+			objectives = valueChart.getAllPrimitiveObjectives();
+
+			size = objectives.filter((objective: PrimitiveObjective) => {
+				return objective.getName() === 'size';
+			})[0];
+
+			area = objectives.filter((objective: PrimitiveObjective) => {
+				return objective.getName() === 'area';
+			})[0];
+
+			rate = objectives.filter((objective: PrimitiveObjective) => {
+				return objective.getName() === 'rate';
+			})[0];
+
+			skytrainDistance = objectives.filter((objective: PrimitiveObjective) => {
+				return objective.getName() === 'skytrain-distance';
+			})[0];
+
+			internetAccess = objectives.filter((objective: PrimitiveObjective) => {
+				return objective.getName() === 'internet-access';
+			})[0];
+		});
+
+		it('should parse the User WeightMap field correctly from the document base node', () => {
+			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
+			var weightMap: WeightMap = user.getWeightMap();
+
+			expect(weightMap.getObjectiveWeight(size)).to.equal(0.04);
+			expect(weightMap.getObjectiveWeight(area)).to.equal(0.46);
+			expect(weightMap.getObjectiveWeight(rate)).to.equal(0.2);
+			expect(weightMap.getObjectiveWeight(skytrainDistance)).to.equal(0.09);
+			expect(weightMap.getObjectiveWeight(internetAccess)).to.equal(0.21);
+		});
+
+		it('should parse the User ScoreFunctionmap field correctly from the document base node', () => {
+			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
+			var scoreFunctionMap: ScoreFunctionMap = user.getScoreFunctionMap();
+
+			var sizeScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(size);
+			var areaScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(area);
+			var rateScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(rate);
+			var skytrainDistanceScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(skytrainDistance);
+			var internetScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(internetAccess);
+
+			// Size
+			expect(sizeScoreFunction.getScore(200.0)).to.equal(0.0);
+			expect(sizeScoreFunction.getScore(237.5)).to.equal(0.25);
+			expect(sizeScoreFunction.getScore(275.0)).to.equal(0.5);
+			expect(sizeScoreFunction.getScore(312.5)).to.equal(0.75);
+			expect(sizeScoreFunction.getScore(350.0)).to.equal(1.0);
+
+			// area
+			expect(areaScoreFunction.getScore('nightlife')).to.equal(0.5);
+			expect(areaScoreFunction.getScore('beach')).to.equal(1.0);
+			expect(areaScoreFunction.getScore('airport')).to.equal(0.0);
+
+			// rate
+			expect(rateScoreFunction.getScore(100.0)).to.equal(1.0);
+			expect(rateScoreFunction.getScore(125.0)).to.equal(0.75);
+			expect(rateScoreFunction.getScore(150.0)).to.equal(0.5);
+			expect(rateScoreFunction.getScore(175.0)).to.equal(0.25);
+			expect(rateScoreFunction.getScore(200.0)).to.equal(0.0);
+
+			// skytrain distance
+			expect(skytrainDistanceScoreFunction.getScore(1.0)).to.equal(1.0);
+			expect(skytrainDistanceScoreFunction.getScore(3.0)).to.equal(0.75);
+			expect(skytrainDistanceScoreFunction.getScore(5.0)).to.equal(0.5);
+			expect(skytrainDistanceScoreFunction.getScore(7.0)).to.equal(0.25);
+			expect(skytrainDistanceScoreFunction.getScore(9.0)).to.equal(0.0);
+
+			// internet connection
+			expect(internetScoreFunction.getScore('none')).to.equal(0.0);
+			expect(internetScoreFunction.getScore('highspeed')).to.equal(1.0);
+			expect(internetScoreFunction.getScore('lowspeed')).to.equal(0.24500000476837158);
+
+
+		});
+	});
+
 
 	describe('parseValueChart(xmlString: string)', () => {
+		var objectives: PrimitiveObjective[];
+		var alternativeNodes: Element;
+		var objectiveNodes: Element;
+		var objectiveColors: any;
+
+		before(function() {
+			var tempValueChart: IndividualValueChart = new IndividualValueChart('', '', '');
+			tempValueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
+			objectives = tempValueChart.getAllPrimitiveObjectives();
+			objectiveNodes = (<any>xmlDocument.querySelector('Criteria')).children[0];
+
+			alternativeNodes = xmlDocument.querySelector('Alternatives');
+
+			objectiveColors = {
+				'area': 'rgb(1, 102, 94)',
+				'skytrain-distance': 'rgb(103, 169, 207)',
+				'size': 'rgb(103, 0, 13)',
+				'internet-access': 'rgb(227, 26, 28)',
+				'rate': 'rgb(254, 196, 79)'
+			};
+		})
 		
-		it('should parse the xml (in string form) to produce a complete value chart', () => {
+		it('should parse the xml (in string form) to produce a complete ValueChart', () => {
+			var valueChart: IndividualValueChart = valueChartParser.parseValueChart(XMLTestString);
+			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
+			var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativeNodes, objectives);
+			var rootObjectives: Objective[] = valueChartParser.parseObjectives([objectiveNodes]);
+
+			expect(valueChart.getName()).to.equal('Hotel');
+			expect(valueChart.getAlternatives()).to.deep.equal(alternatives);
+			expect(valueChart.getUser()).to.deep.equal(user);
+			expect(valueChart.getRootObjectives()).to.have.length(1);
+			expect(valueChart.getRootObjectives()[0].getName()).to.equal('Hotel');
+
+			var primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
+
+			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
+				expect(objective.getColor()).to.equal(objectiveColors[objective.getName()]);
+			});
 
 		});
 
 	});
 
 });
-
-
-
-
 
 
 

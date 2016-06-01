@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 18:05:30
+* @Last Modified time: 2016-06-01 11:09:21
 */
 // Library Classes
 import { Injectable } 				from '@angular/core';
@@ -24,7 +24,7 @@ import { ContinuousDomain } 		from '../model/ContinuousDomain';
 import { DiscreteDomain } 			from '../model/DiscreteDomain';
 
 
-// @Injectable()
+@Injectable()
 export class XMLValueChartParser {
 
 	xmlDocParser: DOMParser;
@@ -36,23 +36,24 @@ export class XMLValueChartParser {
 	parseValueChart(xmlString: string): IndividualValueChart {
 
 		var xmlDocument: Document = this.xmlDocParser.parseFromString(xmlString, 'application/xml');
-		var objectiveNodes: any = xmlDocument.querySelector('Criteria');	// Should probably rename the criteria tag to be objectives; 
-		var alternativeNodes: any = xmlDocument.querySelector('Alternatives');
-		var colorNodess: any = xmlDocument.querySelector('Colors');
+		var objectiveNodes: Element = xmlDocument.querySelector('Criteria');	// Should probably rename the "criteria" tag to be "objectives"; 
+		var alternativeNodes: Element = xmlDocument.querySelector('Alternatives');
+		var colorNodess: Element = xmlDocument.querySelector('Colors');
 
 		var valueChartName: string = xmlDocument.querySelector('ValueCharts').getAttribute('problem');
 
 		// Description and Creator are not in the XML data files at the moment.
 		var valueChart: IndividualValueChart = new IndividualValueChart(valueChartName, '', '');	
-		valueChart.setRootObjectives(this.parseObjectives(objectiveNodes.children));
+		valueChart.setRootObjectives(this.parseObjectives(<Element[]> (<any> objectiveNodes).children));
 		var primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
 		valueChart.setAlternatives(this.parseAlternatives(alternativeNodes, primitiveObjectives));
 		valueChart.setUser(this.parseUser(xmlDocument, primitiveObjectives));
+		this.setObjectiveColors(xmlDocument, primitiveObjectives);
 
 		return valueChart;
 	}
 	// It seems that the type must be declared as any because TypeScript does not recognize the attribute "children" on a DOM element.
-	parseObjectives(objectiveNodes: any): Objective[] {
+	parseObjectives(objectiveNodes: Element[]): Objective[] {
 		var parsedObjectives: Objective[] = [];
 
 		for (var i: number = 0; i < objectiveNodes.length; i++) {
@@ -66,16 +67,16 @@ export class XMLValueChartParser {
 		return parsedObjectives;
 	}
 
-	parseAbstractObjective(abstractObjectiveNodes: any): AbstractObjective {
+	parseAbstractObjective(abstractObjectiveNodes: Element): AbstractObjective {
 		var name: string = abstractObjectiveNodes.getAttribute('name');
 		// The data files have no description for abstract objectives at the moment.
 		var abstractObjective: AbstractObjective = new AbstractObjective(name, '');
-		abstractObjective.setDirectSubObjectives(this.parseObjectives(abstractObjectiveNodes.children));
+		abstractObjective.setDirectSubObjectives(this.parseObjectives((<any> abstractObjectiveNodes).children));
 		
 		return abstractObjective;
 	}
 
-	parsePrimitiveObjective(primitiveObjectiveNodes: any): PrimitiveObjective {
+	parsePrimitiveObjective(primitiveObjectiveNodes: Element): PrimitiveObjective {
 		var name: string = primitiveObjectiveNodes.getAttribute('name');
 		var description: string = primitiveObjectiveNodes.querySelector('Description').innerHTML;
 
@@ -92,18 +93,18 @@ export class XMLValueChartParser {
 		return primitiveObjective;
 	}
 
-	parseContinuousDomain(domainNodes: any): ContinuousDomain {
-		var minValue = +domainNodes.children[0].getAttribute('x');
-		var maxValue = +domainNodes.children[domainNodes.children.length - 1].getAttribute('x');
+	parseContinuousDomain(domainNodes: Element): ContinuousDomain {
+		var minValue = +(<any> domainNodes).children[0].getAttribute('x');
+		var maxValue = +(<any>domainNodes).children[(<any> domainNodes).children.length - 1].getAttribute('x');
 
 		return new ContinuousDomain(minValue, maxValue);
 	}
 
-	parseDiscreteDomain(domainNodes: any): DiscreteDomain {
+	parseDiscreteDomain(domainNodes: Element): DiscreteDomain {
 		var discreteDomain: DiscreteDomain = new DiscreteDomain(false);
 
-		for (var i: number = 0; i < domainNodes.children.length; i++) {
-			discreteDomain.addElement(domainNodes.children[i].getAttribute('x'));
+		for (var i: number = 0; i < (<any> domainNodes).children.length; i++) {
+			discreteDomain.addElement((<any> domainNodes).children[i].getAttribute('x'));
 		}
 
 		return discreteDomain;
@@ -130,7 +131,7 @@ export class XMLValueChartParser {
 
 			for (var i: number = 0; i < domainNode.children.length; i++) {
 				let x: number | string = domainNode.children[i].getAttribute('x');
-				let y: number = domainNode.children[i].getAttribute('y')
+				let y: number = +domainNode.children[i].getAttribute('y')
 				scoreFunction.setElementScore(x, y);
 			}
 
@@ -140,19 +141,19 @@ export class XMLValueChartParser {
 		return user;
 	}
 
-	parseAlternatives(alternativeNodes: any, objectives: PrimitiveObjective[]): Alternative[] {
+	parseAlternatives(alternativeNodes: Element, objectives: PrimitiveObjective[]): Alternative[] {
 
 		var alternatives: Alternative[] = [];
 
-		for (var i: number = 0; i < alternativeNodes.children.length; i++) {
-			var node: any = alternativeNodes.children[i];
+		for (var i: number = 0; i < (<any> alternativeNodes).children.length; i++) {
+			var node: any = (<any>alternativeNodes).children[i];
 			let alternative: Alternative = new Alternative(node.getAttribute('name'), node.querySelector('Description').innerHTML);
 
 			var valueNodes: any = node.querySelectorAll('AlternativeValue');
 
 			for (var j: number = 0; j < valueNodes.length; j++) {
 				let objectiveName: string = valueNodes[j].getAttribute('criterion');
-				let mappedValue = valueNodes[j].getAttribute('value');
+				let mappedValue: string | number = valueNodes[j].getAttribute('value');
 				let objectiveToMap: PrimitiveObjective = objectives.filter((currentObjective: PrimitiveObjective) => {
 					return objectiveName === currentObjective.getName();
 				})[0];
@@ -168,4 +169,13 @@ export class XMLValueChartParser {
 
 		return alternatives;
 	}
+
+	setObjectiveColors(xmlDocument: Document, objectives: PrimitiveObjective[]): void {
+		objectives.forEach((objective: PrimitiveObjective) => {
+			let color: Element = xmlDocument.querySelector('Color[name=' + objective.getName() + ']');
+			objective.setColor('rgb(' + color.getAttribute('r') + ', ' + color.getAttribute('g') + ', ' + color.getAttribute('b') + ')');
+		});
+	}
+
+
 }

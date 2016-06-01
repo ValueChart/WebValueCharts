@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-24 12:40:36
+* @Last Modified time: 2016-06-01 11:16:24
 */
 
 // Karma configuration
@@ -24,7 +24,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test/**/*.ts',
+      'node_modules/reflect-metadata/Reflect.js', // Need to load this so that type annotations work in the test browser
+      'test/**/*.ts'
     ],
 
 
