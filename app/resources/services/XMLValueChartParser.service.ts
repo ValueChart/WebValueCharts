@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 11:09:21
+* @Last Modified time: 2016-06-01 12:27:10
 */
 // Library Classes
 import { Injectable } 				from '@angular/core';
@@ -21,7 +21,7 @@ import { ContinuousScoreFunction } 	from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction } 	from '../model/DiscreteScoreFunction';
 import { Domain } 					from '../model/Domain';
 import { ContinuousDomain } 		from '../model/ContinuousDomain';
-import { DiscreteDomain } 			from '../model/DiscreteDomain';
+import { CategoricalDomain } 			from '../model/CategoricalDomain';
 
 
 @Injectable()
@@ -87,7 +87,7 @@ export class XMLValueChartParser {
 		if (domainNodes.getAttribute('type') === 'continuous') {
 			primitiveObjective.setDomain(this.parseContinuousDomain(domainNodes));			
 		} else {
-			primitiveObjective.setDomain(this.parseDiscreteDomain(domainNodes));	
+			primitiveObjective.setDomain(this.parseCategoricalDomain(domainNodes));	
 		}
 
 		return primitiveObjective;
@@ -100,14 +100,14 @@ export class XMLValueChartParser {
 		return new ContinuousDomain(minValue, maxValue);
 	}
 
-	parseDiscreteDomain(domainNodes: Element): DiscreteDomain {
-		var discreteDomain: DiscreteDomain = new DiscreteDomain(false);
+	parseCategoricalDomain(domainNodes: Element): CategoricalDomain {
+		var categoricalDomain: CategoricalDomain = new CategoricalDomain(false);
 
 		for (var i: number = 0; i < (<any> domainNodes).children.length; i++) {
-			discreteDomain.addElement((<any> domainNodes).children[i].getAttribute('x'));
+			categoricalDomain.addElement((<any> domainNodes).children[i].getAttribute('x'));
 		}
 
-		return discreteDomain;
+		return categoricalDomain;
 	}
 
 	parseUser(xmlDocument: Document, objectives: PrimitiveObjective[]): User {

@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 16:56:10
+* @Last Modified time: 2016-06-01 12:00:42
 */
 
 
 import { Domain } from './Domain'
 
-export class DiscreteDomain implements Domain {
+export class CategoricalDomain implements Domain {
 
 	public type: string;
 	public ordered: boolean;

@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 15:00:34
+* @Last Modified time: 2016-06-01 12:27:08
 */
 
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
-import { DiscreteDomain } 		from '../../app/resources/model/DiscreteDomain';
+import { CategoricalDomain } 		from '../../app/resources/model/CategoricalDomain';
 import { ContinuousDomain } 		from '../../app/resources/model/ContinuousDomain';
 
 
@@ -14,11 +14,11 @@ declare var expect: any;
 
 describe('PrimitiveObjective', () => {
 	var primitiveObjective: PrimitiveObjective;
-	var discreteDomain: DiscreteDomain;
+	var categoricalDomain: CategoricalDomain;
 	var continuousDomain: ContinuousDomain;
 
 	before(function() {
-		discreteDomain = new DiscreteDomain(false);
+		categoricalDomain = new CategoricalDomain(false);
 		continuousDomain = new ContinuousDomain(10, 20);
 	});
 
@@ -41,8 +41,8 @@ describe('PrimitiveObjective', () => {
 		})
 
 		it('should have a domain when the domain is set', () => {
-			primitiveObjective.setDomain(discreteDomain);
-			expect(primitiveObjective.getDomain()).to.deep.equal(discreteDomain);
+			primitiveObjective.setDomain(categoricalDomain);
+			expect(primitiveObjective.getDomain()).to.deep.equal(categoricalDomain);
 		});
 	});
 
@@ -54,7 +54,7 @@ describe('PrimitiveObjective', () => {
 
 		context('when domain is discrete', () => {
 			it('should have a domain type: "discrete"', () => {
-				primitiveObjective.setDomain(discreteDomain);
+				primitiveObjective.setDomain(categoricalDomain);
 				expect(primitiveObjective.getDomainType()).to.equal('discrete');
 			});
 		});

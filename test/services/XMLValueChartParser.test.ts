@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 11:07:05
+* @Last Modified time: 2016-06-01 12:27:08
 */
 
 import { XMLValueChartParser } 		from '../../app/resources/services/XMLValueChartParser.service.ts';
@@ -12,7 +12,7 @@ import { User } 					from '../../app/resources/model/User';
 import { Objective } 				from '../../app/resources/model/Objective';
 import { PrimitiveObjective } 		from '../../app/resources/model/PrimitiveObjective';
 import { AbstractObjective } 		from '../../app/resources/model/AbstractObjective';
-import { DiscreteDomain }			from '../../app/resources/model/DiscreteDomain';
+import { CategoricalDomain }			from '../../app/resources/model/CategoricalDomain';
 import { ContinuousDomain }			from '../../app/resources/model/ContinuousDomain';
 import { WeightMap } 				from '../../app/resources/model/WeightMap';
 import { ScoreFunctionMap } 		from '../../app/resources/model/ScoreFunctionMap';
@@ -36,20 +36,20 @@ describe('XMLValueChartParser', () => {
 	});
 
 
-	describe('parseDiscreteDomain(domainNodes: Element)', () => {
-		var discreteDomainNode: Element;
+	describe('parseCategoricalDomain(domainNodes: Element)', () => {
+		var categoricalDomainNode: Element;
 
 		before(function() {
-			discreteDomainNode = xmlDocument.querySelector('Criterion [name=area]').querySelector('Domain'); 
+			categoricalDomainNode = xmlDocument.querySelector('Criterion [name=area]').querySelector('Domain'); 
 		});
 
-		it('should parse all elements of the domain from the document node and return a DiscreteDomain object', () => {
-			var discreteDomain: DiscreteDomain = valueChartParser.parseDiscreteDomain(discreteDomainNode);
+		it('should parse all elements of the domain from the document node and return a CategoricalDomain object', () => {
+			var categoricalDomain: CategoricalDomain = valueChartParser.parseCategoricalDomain(categoricalDomainNode);
 
-			expect(discreteDomain.getElements()).to.have.length(3);
-			expect(discreteDomain.getElements()).to.include('nightlife');
-			expect(discreteDomain.getElements()).to.include('beach');
-			expect(discreteDomain.getElements()).to.include('airport');
+			expect(categoricalDomain.getElements()).to.have.length(3);
+			expect(categoricalDomain.getElements()).to.include('nightlife');
+			expect(categoricalDomain.getElements()).to.include('beach');
+			expect(categoricalDomain.getElements()).to.include('airport');
 		});
 
 	});
