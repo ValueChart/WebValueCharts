@@ -55,5 +55,6 @@ typings
 
 app/resources/components/**/*.js
 app/resources/model/*.js
+app/resources/services/*.js
 app/main.js
 test/**/*.js
