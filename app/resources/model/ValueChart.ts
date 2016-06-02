@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 15:34:18
+* @Last Modified time: 2016-06-01 15:36:41
 */
 
 import { Objective } 				from './Objective';
@@ -125,4 +125,20 @@ export abstract class ValueChart {
 			this.alternatives.splice(alternativeIndex, 1);
 		}
 	}
+
+	getAlternativeValuesforObjective(objective: PrimitiveObjective): { value: (string | number), alternative: Alternative }[] {
+		var alternativeValues: { value: (string | number), alternative: Alternative }[] = [];
+
+		this.alternatives.forEach((alternative: Alternative) => {
+			alternativeValues.push({ value: alternative.getObjectiveValue(objective), alternative: alternative });
+		});
+
+		return alternativeValues;
+	}
 }
+
+
+
+
+
+

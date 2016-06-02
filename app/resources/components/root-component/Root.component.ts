@@ -2,12 +2,12 @@ import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 import { Routes, Router, ROUTER_DIRECTIVES }				from '@angular/router';
 
-import { RegisterComponent }								from '../register-component/register.component';
-import { CreateComponent }									from '../create-component/create.component';
+import { RegisterComponent }								from '../register-component/Register.component';
+import { CreateComponent }									from '../create-component/Create.component';
 
 @Component({
 	selector: 'root',
-	templateUrl: 'app/resources/components/root-component/root.template.html',
+	templateUrl: 'app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES]
 })
 @Routes([

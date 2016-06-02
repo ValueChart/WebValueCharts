@@ -8,8 +8,8 @@ import { ValueChart } 				from '../../model/ValueChart';
 
 @Component({
 	selector: 'create',
-	templateUrl: 'app/resources/components/create-component/create.template.html',
-	styleUrls: ['app/resources/components/create-component/create.style.css'],
+	templateUrl: 'app/resources/components/create-component/Create.template.html',
+	styleUrls: ['app/resources/components/create-component/Create.style.css'],
 	providers: [XMLValueChartParser]
 })
 export class CreateComponent {
