@@ -2,11 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 11:16:21
+* @Last Modified time: 2016-06-03 16:17:05
 */
 
-import { Objective } 	from './Objective';
-import { Domain } 		from './Domain';
+import { Objective } 			from './Objective';
+import { PrimitiveObjective }	from './PrimitiveObjective';
+import { Domain } 				from './Domain';
 
 
 export class AbstractObjective implements Objective {
@@ -69,7 +70,7 @@ export class AbstractObjective implements Objective {
 		return subObjectives;
 	}
 
-	getAllPrimitiveSubObjectives(): Objective[] {
+	getAllPrimitiveSubObjectives(): PrimitiveObjective[] {
 		var subObjectives: Objective[] = [];
 		this.subObjectives.forEach((objective: Objective) => {
 			subObjectives.push(objective);
@@ -82,6 +83,6 @@ export class AbstractObjective implements Objective {
 			return objective.objectiveType === 'primitive';
 		});
 
-		return subObjectives;
+		return <PrimitiveObjective[]> subObjectives;
 	}
 }

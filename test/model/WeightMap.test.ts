@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 10:15:03
+* @Last Modified time: 2016-06-03 10:49:35
 */
 
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
@@ -75,8 +75,10 @@ describe('WeightMap', () => {
 
 			it('should insert the Objective into the map, and assign it a weight at the same time', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.be.undefined;
+				expect(weightMap.getWeightTotal()).to.equal(0);
 				weightMap.setObjectiveWeight(weather, 0.5);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
+				expect(weightMap.getWeightTotal()).to.equal(0.5);
 			});
 		});
 
@@ -88,9 +90,11 @@ describe('WeightMap', () => {
 			});
 
 			it('should insert the Objective-weight pair into the map without affecting the other Objective-weight pairs', () => {
+				expect(weightMap.getWeightTotal()).to.equal(0.5);
 				weightMap.setObjectiveWeight(distance, 10);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(0.5);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
+				expect(weightMap.getWeightTotal()).to.equal(10.5);
 			});
 		});
 
@@ -103,8 +107,10 @@ describe('WeightMap', () => {
 			});
 
 			it('should overwrite the old weight with the new one', () => {
+				expect(weightMap.getWeightTotal()).to.equal(10.5);
 				weightMap.setObjectiveWeight(weather, 3);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
+				expect(weightMap.getWeightTotal()).to.equal(13);
 			});
 		});
 	});
@@ -121,9 +127,11 @@ describe('WeightMap', () => {
 			it('should not do anything', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
+				expect(weightMap.getWeightTotal()).to.equal(13);
 				weightMap.removeObjectiveWeight(elevation);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
+				expect(weightMap.getWeightTotal()).to.equal(13);
 			});
 		});
 
@@ -131,10 +139,35 @@ describe('WeightMap', () => {
 			it('should remove the Objective weight', () => {
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.equal(10);
+				expect(weightMap.getWeightTotal()).to.equal(13);
 				weightMap.removeObjectiveWeight(distance);
 				expect(weightMap.getObjectiveWeight(weather)).to.equal(3);
 				expect(weightMap.getObjectiveWeight(distance)).to.be.undefined;
+				expect(weightMap.getWeightTotal()).to.equal(3);
 			});
+		});
+	});
+
+	describe('#getNormalizedObjectiveWeight(objective: PrimitiveObjective)', () => {
+		var weightTotal: number;
+
+		before(function() {
+			weightMap = new WeightMap();
+			weightMap.setObjectiveWeight(weather, 3);
+			weightMap.setObjectiveWeight(distance, 5);
+			weightMap.setObjectiveWeight(elevation, 2);
+			weightMap.setObjectiveWeight(temperature, 1);
+			weightMap.setObjectiveWeight(humidity, 2);
+
+			weightTotal = 3 + 5 + 2 + 1 + 2;
+		});
+
+		it('should retrieve properly normalied weights', () => {
+			expect(weightMap.getNormalizedObjectiveWeight(weather)).to.be.closeTo(3 / weightTotal, roundingError); // This should be the weight for weather.
+			expect(weightMap.getNormalizedObjectiveWeight(distance)).to.be.closeTo(5 / weightTotal, roundingError); // This should be the weight for distance.
+			expect(weightMap.getNormalizedObjectiveWeight(elevation)).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for elevation.
+			expect(weightMap.getNormalizedObjectiveWeight(temperature)).to.be.closeTo(1 / weightTotal, roundingError); // This should be the weight for temperature.
+			expect(weightMap.getNormalizedObjectiveWeight(humidity)).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for humidity.		
 		});
 	});
 
@@ -237,11 +270,11 @@ describe('WeightMap', () => {
 				normalizedWeights = weightMap.getNormalizedWeights(objectiveOrder);
 
 				expect(normalizedWeights).to.have.length(5);
-				expect(normalizedWeights[0]).to.equal(.2); // This should be the weight for temperature.
-				expect(normalizedWeights[1]).to.equal(.4); // This should be the weight for distance.
-				expect(normalizedWeights[2]).to.equal(.1); // This should be the weight for humidity.
-				expect(normalizedWeights[3]).to.equal(.1); // This should be the weight for weather.
-				expect(normalizedWeights[4]).to.equal(.2); // This should be the weight for elevation.
+				expect(normalizedWeights[0]).to.be.closeTo(.2, roundingError); // This should be the weight for temperature.
+				expect(normalizedWeights[1]).to.be.closeTo(.4, roundingError); // This should be the weight for distance.
+				expect(normalizedWeights[2]).to.be.closeTo(.1, roundingError); // This should be the weight for humidity.
+				expect(normalizedWeights[3]).to.be.closeTo(.1, roundingError); // This should be the weight for weather.
+				expect(normalizedWeights[4]).to.be.closeTo(.2, roundingError); // This should be the weight for elevation.
 			});
 		});
 

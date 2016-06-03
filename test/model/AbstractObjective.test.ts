@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 09:05:58
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 14:15:56
+* @Last Modified time: 2016-06-03 16:16:30
 */
 
 import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective';
@@ -125,6 +125,56 @@ describe('AbstractObjective', () => {
 				expect(rootObjectve.getAllSubObjectives()).to.have.length(10);
 			});
 		});
+	});
+
+	describe('getAllPrimitiveSubObjectives()', () => {
+
+		context('when the hierarchy of objectives is complex', () => {
+
+			before(function() {
+				rootObjectve = new AbstractObjective('RootObjective', 'A description goes here');
+				distance = new PrimitiveObjective('distance', 'A description goes here')
+				weather = new AbstractObjective('weather', 'A description goes here');
+				elevation = new PrimitiveObjective('elevation', 'A description goes here');
+				precipitation = new AbstractObjective('Precipitation', 'A description goes here');
+				forecast = new AbstractObjective('Forecast', 'A description goes here');
+				type = new PrimitiveObjective('Type', 'A description goes here');
+				temperature = new PrimitiveObjective('Temperature', 'A description goes here');
+				amount = new PrimitiveObjective('Amount', 'A description goes here');
+				accuracy = new PrimitiveObjective('Accuracy', 'A description goes here');
+				prediction = new PrimitiveObjective('Prediction', 'A description goes here');
+
+				// Level two
+				rootObjectve.addSubObjective(distance);
+				rootObjectve.addSubObjective(weather);
+				weather.addSubObjective(elevation);
+
+				// Level Three
+				weather.addSubObjective(temperature);
+				weather.addSubObjective(precipitation);
+				weather.addSubObjective(forecast);
+
+				// Level Four
+				precipitation.addSubObjective(type);
+				precipitation.addSubObjective(amount);
+				forecast.addSubObjective(accuracy);
+				forecast.addSubObjective(prediction);
+			});
+
+			it('should still retrieve all of the subObjectives in the hierarchy', () => {
+				var primitiveObjectives: PrimitiveObjective[] = rootObjectve.getAllPrimitiveSubObjectives();
+
+				expect(primitiveObjectives).to.have.length(7);
+				expect(primitiveObjectives).to.include(amount);
+				expect(primitiveObjectives).to.include(accuracy);
+				expect(primitiveObjectives).to.include(prediction);
+				expect(primitiveObjectives).to.include(temperature);
+				expect(primitiveObjectives).to.include(type);
+				expect(primitiveObjectives).to.include(elevation);
+				expect(primitiveObjectives).to.include(distance);
+			});
+		});
+
 	});
 });
 
