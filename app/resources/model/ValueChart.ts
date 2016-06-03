@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 15:36:41
+* @Last Modified time: 2016-06-03 11:32:54
 */
 
 import { Objective } 				from './Objective';
@@ -14,6 +14,7 @@ import { Alternative }				from './Alternative';
 
 export abstract class ValueChart {
 
+	public type: string;
 	private name: string;
 	private description: string;
 	private creator: string;

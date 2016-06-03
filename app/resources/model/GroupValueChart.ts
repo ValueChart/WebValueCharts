@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 09:32:09
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 16:31:59
+* @Last Modified time: 2016-06-03 11:33:21
 */
 
 import { ValueChart }			from './ValueChart';
@@ -22,6 +22,7 @@ export class GroupValueChart extends ValueChart {
 	constructor(name: string, description: string, creator: string) {
 		super(name, description, creator);
 		this.users = [];
+		this.type = 'group';
 	}
 
 	getUsers(): User[] {

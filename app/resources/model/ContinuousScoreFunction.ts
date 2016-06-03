@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 16:15:15
+* @Last Modified time: 2016-06-03 10:29:19
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -52,7 +52,7 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		var aboveElement: number = this.maxDomainValue;
 		var belowElement: number = this.minDomainValue;
 
-		var elementIterator = this.elementScoreMap.keys();
+		var elementIterator: Iterator<number> = this.elementScoreMap.keys();
 		var iteratorElement: IteratorResult<number> = elementIterator.next();
 
 		while (iteratorElement.done === false) {

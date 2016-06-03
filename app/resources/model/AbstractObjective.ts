@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 14:38:34
+* @Last Modified time: 2016-06-03 11:16:21
 */
 
 import { Objective } 	from './Objective';
@@ -66,6 +66,22 @@ export class AbstractObjective implements Objective {
 				Array.prototype.push.apply(subObjectives, (<AbstractObjective> objective).getAllSubObjectives());
 			}
 		});
+		return subObjectives;
+	}
+
+	getAllPrimitiveSubObjectives(): Objective[] {
+		var subObjectives: Objective[] = [];
+		this.subObjectives.forEach((objective: Objective) => {
+			subObjectives.push(objective);
+			if (objective.objectiveType === 'abstract') {
+				Array.prototype.push.apply(subObjectives, (<AbstractObjective>objective).getAllSubObjectives());
+			}
+		});
+
+		subObjectives = subObjectives.filter((objective: Objective) => {
+			return objective.objectiveType === 'primitive';
+		});
+
 		return subObjectives;
 	}
 }
