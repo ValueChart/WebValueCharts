@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-19 16:32:05
+* @Last Modified time: 2016-06-02 16:37:01
 */
 
 // =========================================================================================================================================
@@ -19,13 +19,15 @@
 	var map = {
 		'app':                        'app', // 'dist',
 		'rxjs':                       'node_modules/rxjs',
-		'@angular':                   'node_modules/@angular'
+		'@angular':                   'node_modules/@angular',
+		'd3': 						  'app/vendors/d3'
 	};
 
 	// Defines default extensions and files.
 	var packages = {
 		'app':                        { main: 'main.js',  defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
+		'd3':						  { main:'d3.js', defaultExtension: 'js' }
 	};
 
 
