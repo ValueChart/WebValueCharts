@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 17:27:19
+* @Last Modified time: 2016-06-03 22:16:41
 */
 
 
@@ -79,8 +79,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
 		// Configure the size of the user viewport. This will be scaled to fit the bdataRowser window
-		this.viewportWidth = 600;
-		this.viewportHeight = 400;
+		this.viewportWidth = 900;
+		this.viewportHeight = 450;
 
 		// Configure the orientation options depending on the 
 		this.configureViewOrientation(this.viewOrientation)
@@ -88,7 +88,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		// Create the SVG base element, and set it to dynamically fit to the viewport.
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
-			.attr('viewBox', '0 0' + ' ' + this.viewportWidth + ' ' + this.viewportWidth)
+			.attr('viewBox', '0 0' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
 		// Get objective data in a format that suits d3.
@@ -122,22 +122,35 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	}
 
 	// Render the rows of the ValueChart
-	renderDataRows(objectives: any[]): void {
+	renderDataRows(rows: any[]): void {
 		this.chartRows = this.el.append('g')
 			.selectAll('g')
-				.data(objectives)
+				.data(rows)
 				.enter()
 				.append('g')
 					.attr('transform', (d: any, i: number) => {
-						return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / objectives.length));
+						return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / rows.length));
 					});
 
 		this.chartRows.append('rect')
 			.attr(this.dimensionOne, this.dimensionOneSize)
-			.attr(this.dimensionTwo, this.dimensionTwoSize / objectives.length)
+			.attr(this.dimensionTwo, this.dimensionTwoSize / rows.length)
 			.style('stroke-width', 1)
 			.style('stroke', 'black')
 			.style('fill', 'white');
+
+		this.chartRows.append('g')
+			.selectAll('g')
+				.data((d: VCRowData) => { return d.cells; })
+				.enter().append('g')
+					.classed('cell', true)
+						.append('rect')
+							.attr(this.dimensionOne, (d: VCCellData, i: number) => { return (this.dimensionOneSize / rows[0].cells.length); })
+							.attr(this.dimensionTwo, this.dimensionTwoSize / rows.length)
+							.attr(this.coordinateOne, (d: VCCellData, i: number) => { return (i * (this.dimensionTwoSize / rows.length)); })
+							.style('stroke-width', 1)
+							.style('stroke', 'black')
+							.style('fill', 'white');
 	}
 
 	// Render the ValueChart according to the current orientation.
@@ -149,6 +162,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			.selectAll('rect')
 				.attr(this.dimensionOne, this.dimensionOneSize)
 				.attr(this.dimensionTwo, this.dimensionTwoSize / this.dataRows.length);
+
 	}
 
 	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,
@@ -175,8 +189,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
 			this.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-			this.dimensionOneSize = 500;	// This is the width of the graph
-			this.dimensionTwoSize = 300;	// This is the height of the graph
+			this.dimensionOneSize = 800;	// This is the width of the graph
+			this.dimensionTwoSize = 400;	// This is the height of the graph
 
 		} else if (this.viewOrientation === 'vertical') {
 			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
@@ -184,8 +198,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
 			this.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-			this.dimensionOneSize = 300;	// This is the height of the graph
-			this.dimensionTwoSize = 500;	// This is the width of the graph
+			this.dimensionOneSize = 400;	// This is the height of the graph
+			this.dimensionTwoSize = 800;	// This is the width of the graph
 		}
 	}
 

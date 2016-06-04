@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 17:03:27
+* @Last Modified time: 2016-06-03 17:44:39
 */
 
 import { Injectable } 					from '@angular/core';
@@ -96,7 +96,7 @@ export class ChartDataService {
 		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
 			objectivesData.push({
 				objective: objective,
-				objectiveValues: this.getCellData(objective)
+				cells: this.getCellData(objective)
 			});
 		});
 

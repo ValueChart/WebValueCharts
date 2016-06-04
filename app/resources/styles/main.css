@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 14:23:56
+* @Last Modified time: 2016-06-03 22:16:20
 */
 
 /* Global Styles */
@@ -51,21 +51,12 @@
 }
 /* SVG */
 
-.svg-container {
-    display: inline-block;
-    position: relative;
-    top: 10rem;
-    left: 10rem;
-    width: 100%;
-    padding-bottom: 100%; /* aspect ratio */
-    vertical-align: top;
-    overflow: hidden;
-}
 .svg-content-responsive {
-    display: inline-block;
     position: absolute;
-    top: 10px;
-    left: 0;
+    width: 90%;
+    height: 90%;
+    top: 10%;
+    left: 10%;
 }
 
 
