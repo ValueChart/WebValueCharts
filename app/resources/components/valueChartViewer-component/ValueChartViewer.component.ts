@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 15:47:33
+* @Last Modified time: 2016-06-03 17:28:13
 */
 
 import { Component }				from '@angular/core';
@@ -33,7 +33,6 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	switchOrientation() {
-		console.log('changing orientation');
 		if (this.orientation === 'horizontal') {
 			this.orientation = 'vertical';
 		} else {

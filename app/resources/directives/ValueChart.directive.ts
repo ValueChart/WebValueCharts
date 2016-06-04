@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 16:06:08
+* @Last Modified time: 2016-06-03 17:27:19
 */
 
 
@@ -14,7 +14,7 @@ import { TemplateRef, ViewContainerRef, ElementRef }	from '@angular/core';
 import * as d3 											from 'd3';
 
 // Application classes
-import { ChartDataService }								from '../services/ChartData.service';
+import { ChartDataService, VCCellData, VCRowData }		from '../services/ChartData.service';
 
 // Model Classes
 import { ValueChart } 									from '../model/ValueChart';
@@ -30,101 +30,109 @@ import { WeightMap }									from '../model/WeightMap';
 })
 export class ValueChartDirective implements OnInit, OnChanges {
 
-	private valueChart: ValueChart;
-	private weightMap: WeightMap;
-	private viewOrientation: string;
-	private el: any;
+	private isInitialized: boolean;
+	// Inputs to the directive.
+	private valueChart: ValueChart;		// A ValueChart. Can be an IndividualValueChart or a GroupValueChart
+	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
-	private viewportWidth: number;	
+	// Height and width of the viewport for use with viewBox attribute of the root SVG element
+	private viewportWidth: number;
 	private viewportHeight: number;
 
+	// Fields for configuring whether to render horizontally or vertically. May combine these into a config object later.
 	private dimensionOneSize: number;
 	private dimensionTwoSize: number;
-
 	private dimensionOne: string;
 	private dimensionTwo: string;
 	private coordinateOne: string;
 	private coordinateTwo: string;
 
-	private objectiveCharts: any;
-	private objectives: any[];
-												// Using any for now...
+	// ValueChart data that has been organized to work with d3.
+	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data.
+
+
+	// Fields for d3 collections that should be saved for later manipulation
+	private el: any; // The SVG base element for the ValueChart rendering.
+	private chartRows: any; // The collection of g elements that hold each row (or column if in vertical orientation) of the chart. 
+
+
 	constructor(
-		private template: TemplateRef<any>, 
-		private viewContainer: ViewContainerRef, 
-		private elementRef: ElementRef, 
+		private template: TemplateRef<any>,
+		private viewContainer: ViewContainerRef,
+		private elementRef: ElementRef,
 		private chartDataService: ChartDataService) { }
 
+	// Binds to the directive attribute 'data', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives data attribute.
 	@Input() set data(value: any) {
-		this.valueChart = <ValueChart> value;
+		this.valueChart = <ValueChart>value;
 	}
 
+	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives orientation attribute.
 	@Input() set orientation(value: any) {
-		this.viewOrientation = <string> value;
+		this.viewOrientation = <string>value;
 	}
 
+	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngOnChange
+	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
+	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
+		// Configure the size of the user viewport. This will be scaled to fit the bdataRowser window
 		this.viewportWidth = 600;
 		this.viewportHeight = 400;
 
-		this.configureViewOrientation()
+		// Configure the orientation options depending on the 
+		this.configureViewOrientation(this.viewOrientation)
 
-		console.log(this.valueChart);
-
-		console.log(this.elementRef);
-
-		console.log(this.viewOrientation);
-
-		// Make the SVG scale dynamically to fit the viewport.
+		// Create the SVG base element, and set it to dynamically fit to the viewport.
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
 			.attr('viewBox', '0 0' + ' ' + this.viewportWidth + ' ' + this.viewportWidth)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
-		this.objectives = [];
+		// Get objective data in a format that suits d3.
+		this.dataRows = this.chartDataService.getRowData(this.valueChart);
 
-		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
-			this.objectives.push({
-				objective: objective,
-				objectiveValues: this.chartDataService.getValuesForPrimitiveObjective(objective)
-			});
-		});
+		// Render the ValueChart;
+		this.renderDataRows(this.dataRows);
 
-		this.renderPrimitiveObjectives(this.objectives);
+		this.isInitialized = true;
 	}
 
-	configureViewOrientation(): void {
-		if (this.viewOrientation === 'horizontal') {
-			console.log('horizontal')
-			this.dimensionOne = 'width';
-			this.dimensionTwo = 'height';
-			this.coordinateOne = 'x';
-			this.coordinateTwo = 'y';
+	// The type of changeRecord should be SimpleChanges, but no such type exists in this release. TODO: Update this once Angular has been updated.
+	// noOnChanges is called by Angular whenever the inputs to the directive change. It is called BEFORE ngOnIt when the directive is first
+	// initialized. 
+	ngOnChanges(changeRecord: any): void {
+		// Check to see if the directive has been initialized yet (ie. if ngOnInit has run).
+		if (this.isInitialized === undefined)
+			return;
 
-			this.dimensionOneSize = 500;	// This is the width of the graph
-			this.dimensionTwoSize = 300;	// This is the height of the graph
-		} else if (this.viewOrientation === 'vertical') {
-			console.log('vertical')
-			this.dimensionOne = 'height';
-			this.dimensionTwo = 'width';
-			this.coordinateOne = 'y';
-			this.coordinateTwo = 'x';
+		// The valueChart data has changed.
+		if (changeRecord.data){
+			this.valueChart = changeRecord.data.currentValue;
+		}
 
-			this.dimensionOneSize = 300;	// This is the height of the graph
-			this.dimensionTwoSize = 500;	// This is the width of the graph
+		// The orientation of the ValueChart has been changed.
+		if (changeRecord.orientation) {
+			this.viewOrientation = changeRecord.orientation.currentValue;
+			this.configureViewOrientation(this.viewOrientation);
+			this.reorientValueChart();
 		}
 	}
 
-	renderPrimitiveObjectives(objectives: any[]) {
-		this.objectiveCharts = this.el.append('g')
+	// Render the rows of the ValueChart
+	renderDataRows(objectives: any[]): void {
+		this.chartRows = this.el.append('g')
 			.selectAll('g')
 				.data(objectives)
-				.enter().append('g')
+				.enter()
+				.append('g')
 					.attr('transform', (d: any, i: number) => {
-						return this.generateTranslation(0, (i * this.dimensionTwoSize / objectives.length));
+						return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / objectives.length));
 					});
 
-		this.objectiveCharts.append('rect')
+		this.chartRows.append('rect')
 			.attr(this.dimensionOne, this.dimensionOneSize)
 			.attr(this.dimensionTwo, this.dimensionTwoSize / objectives.length)
 			.style('stroke-width', 1)
@@ -132,7 +140,20 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			.style('fill', 'white');
 	}
 
-	generateTranslation(coordinateOneAmount: number, coordinateTwoAmount: number): string {
+	// Render the ValueChart according to the current orientation.
+	reorientValueChart(): void {
+		this.chartRows
+			.attr('transform', (d: any, i: number) => {
+				return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / this.dataRows.length));
+			})
+			.selectAll('rect')
+				.attr(this.dimensionOne, this.dimensionOneSize)
+				.attr(this.dimensionTwo, this.dimensionTwoSize / this.dataRows.length);
+	}
+
+	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,
+	// so this function is required to return the correct string.
+	generateTransformTranslation(coordinateOneAmount: number, coordinateTwoAmount: number): string {
 		if (this.viewOrientation === 'horizontal') {
 			return 'translate(' + coordinateOneAmount + ',' + coordinateTwoAmount + ')';
 		} else {
@@ -140,29 +161,32 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		}
 	}
 
-	// The type of changeRecord should be SimpleChanges, but no such type exists in this release. TODO: Update this once Angular has been updated.
-	ngOnChanges(changeRecord: any) {
-		console.log(changeRecord, 'change in progress');
 
+	// This function configures the variables used for height, width, x, and y attributes of SVG elements.
+	// Whenever defining height and width attributes, the attributes should be set using dimensionOne, and dimensionTwo
+	// The same goes for x and y positions. This insures that when the orientation of the graph changes, the x and y,
+	// and height, and width attributes are switched. Note that the size of the graph -  width: 500, height: 300 - does not change,
+	// although the which variable represents that dimension does.
+	configureViewOrientation(viewOrientation: string): void {
+		if (this.viewOrientation === 'horizontal') {
+			// We want to render the ValueChart horizontally
+			this.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
+			this.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
+			this.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
+			this.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-		if (this.el === undefined)
-			return;
-		
-		if (changeRecord.data)
-			this.valueChart = changeRecord.data.currentValue;
-		if (changeRecord.orientation)
-			this.viewOrientation = changeRecord.orientation.currentValue;
+			this.dimensionOneSize = 500;	// This is the width of the graph
+			this.dimensionTwoSize = 300;	// This is the height of the graph
 
-		this.configureViewOrientation();
+		} else if (this.viewOrientation === 'vertical') {
+			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
+			this.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
+			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
+			this.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-		// This stuff is temporary
-		this.objectiveCharts
-			.attr('transform', (d: any, i: number) => {
-				return this.generateTranslation(0, (i * this.dimensionTwoSize / this.objectives.length));
-			})
-			.selectAll('rect')
-				.attr(this.dimensionOne, this.dimensionOneSize)
-				.attr(this.dimensionTwo, this.dimensionTwoSize / this.objectives.length)
-
+			this.dimensionOneSize = 300;	// This is the height of the graph
+			this.dimensionTwoSize = 500;	// This is the width of the graph
+		}
 	}
+
 }

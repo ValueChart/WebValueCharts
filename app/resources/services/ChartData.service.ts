@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 13:33:41
+* @Last Modified time: 2016-06-03 17:03:27
 */
 
 import { Injectable } 					from '@angular/core';
@@ -14,8 +14,24 @@ import { GroupValueChart }				from '../model/GroupValueChart';
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { AbstractObjective }			from '../model/AbstractObjective';
-import { User }							from '../model/User';
+import { User }							from '../model/User';	
+import { Alternative }					from '../model/Alternative';
 import { WeightMap }					from '../model/WeightMap';
+
+
+export interface VCRowData {
+	objective: PrimitiveObjective;
+	cells: VCCellData[];
+}
+
+export interface VCCellData {
+	alternative: Alternative;
+	value: (string | number);
+	userScores: {
+		user: User,
+		y: number
+	}[];
+}
 
 
 @Injectable()
@@ -51,7 +67,7 @@ export class ChartDataService {
 		return weight;
 	}
 
-	getValuesForPrimitiveObjective(objective: PrimitiveObjective): any {
+	getCellData(objective: PrimitiveObjective): VCCellData[] {
 		var users: User[];
 
 		if (this.valueChart.type === 'group') {
@@ -73,6 +89,20 @@ export class ChartDataService {
 
 		return objectiveValues;
 	}
+
+	getRowData(valueChart: ValueChart): VCRowData[] {
+		var objectivesData: any[] = [];
+
+		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
+			objectivesData.push({
+				objective: objective,
+				objectiveValues: this.getCellData(objective)
+			});
+		});
+
+		return objectivesData;
+	}
+
 
 }
 
