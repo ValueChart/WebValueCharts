@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 22:16:41
+* @Last Modified time: 2016-06-04 19:22:46
 */
 
 
@@ -30,9 +30,13 @@ import { WeightMap }									from '../model/WeightMap';
 })
 export class ValueChartDirective implements OnInit, OnChanges {
 
+	private VALUECHART_WIDTH: number = 800;
+	private VALUECHART_HEIGHT: number = 400;
+
 	private isInitialized: boolean;
 	// Inputs to the directive.
 	private valueChart: ValueChart;		// A ValueChart. Can be an IndividualValueChart or a GroupValueChart
+	private weightMap: WeightMap;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
 	// Height and width of the viewport for use with viewBox attribute of the root SVG element
@@ -46,6 +50,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	private dimensionTwo: string;
 	private coordinateOne: string;
 	private coordinateTwo: string;
+	private dimensionOneScale: any;
+	private dimensionTwoScale: any;
 
 	// ValueChart data that has been organized to work with d3.
 	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data.
@@ -78,9 +84,15 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
-		// Configure the size of the user viewport. This will be scaled to fit the bdataRowser window
+		// Configure the size of the user viewport. This will be scaled to fit the browser window
 		this.viewportWidth = 900;
 		this.viewportHeight = 450;
+
+		if (this.valueChart.type === 'individual')
+			this.weightMap = (<IndividualValueChart> this.valueChart).getUser().getWeightMap();
+		else {
+			this.weightMap = (<GroupValueChart> this.valueChart).calculateAverageWeightMap();
+		}
 
 		// Configure the orientation options depending on the 
 		this.configureViewOrientation(this.viewOrientation)
@@ -93,9 +105,9 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 		// Get objective data in a format that suits d3.
 		this.dataRows = this.chartDataService.getRowData(this.valueChart);
-
+		this.calculateWeightOffsets(this.dataRows);
 		// Render the ValueChart;
-		this.renderDataRows(this.dataRows);
+		this.renderRows(this.dataRows);
 
 		this.isInitialized = true;
 	}
@@ -122,35 +134,71 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	}
 
 	// Render the rows of the ValueChart
-	renderDataRows(rows: any[]): void {
-		this.chartRows = this.el.append('g')
+	renderRows(rows: VCRowData[]): void {
+
+		this.chartRows = this.el.append('g').append('g')
 			.selectAll('g')
 				.data(rows)
 				.enter()
 				.append('g')
-					.attr('transform', (d: any, i: number) => {
-						return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / rows.length));
+					.attr('transform', (d: VCRowData, i: number) => {
+						return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
 					});
 
 		this.chartRows.append('rect')
+			.classed('row-outline', true)
 			.attr(this.dimensionOne, this.dimensionOneSize)
-			.attr(this.dimensionTwo, this.dimensionTwoSize / rows.length)
+			.attr(this.dimensionTwo, (d: VCRowData) => { return this.dimensionTwoScale(d.weight) })
 			.style('stroke-width', 1)
-			.style('stroke', 'black')
+			.style('stroke', 'grey')
 			.style('fill', 'white');
 
+		this.el.select('g').append('g')
+			.selectAll('line')
+				.data(this.valueChart.getAlternatives())
+				.enter()
+				.append('line')
+					.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+					.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
+					.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+					.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize })
+					.style('stroke-width', 1)
+					.style('stroke', 'grey');
+
+
+		this.renderCells();
+
+	}
+
+	// Don't worry about this for now.
+	renderCells(): void {
 		this.chartRows.append('g')
 			.selectAll('g')
-				.data((d: VCRowData) => { return d.cells; })
-				.enter().append('g')
-					.classed('cell', true)
+			.data((d: VCRowData) => { return d.cells; })
+			.enter().append('g')
+				.classed('cell', true)
+					.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
+					.selectAll('rect')
+						.data((d: VCCellData, i: number) => { console.log(d); return d.userScores; })
+						.enter()
 						.append('rect')
-							.attr(this.dimensionOne, (d: VCCellData, i: number) => { return (this.dimensionOneSize / rows[0].cells.length); })
-							.attr(this.dimensionTwo, this.dimensionTwoSize / rows.length)
-							.attr(this.coordinateOne, (d: VCCellData, i: number) => { return (i * (this.dimensionTwoSize / rows.length)); })
-							.style('stroke-width', 1)
-							.style('stroke', 'black')
-							.style('fill', 'white');
+							.style('fill', 'red')
+							.attr('height', 20)
+							.attr('width', 20)
+	}		
+
+	// TODO: Move this to ChartDataSerivce
+
+	// Calculate the weight offset for each row. The weight offset for one row is the combined weights of all rows
+	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
+	// seeing as the weight of the previous rows depends on the their weights.
+	calculateWeightOffsets(rows: VCRowData[]): void {
+		var weightOffset: number = 0;
+
+		for (var i = 0; i < rows.length; i++) {
+			rows[i].weightOffset = weightOffset;
+			weightOffset += rows[i].weight;
+		}
 	}
 
 	// Render the ValueChart according to the current orientation.
@@ -189,8 +237,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
 			this.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-			this.dimensionOneSize = 800;	// This is the width of the graph
-			this.dimensionTwoSize = 400;	// This is the height of the graph
+			this.dimensionOneSize = this.VALUECHART_WIDTH;	// This is the width of the graph
+			this.dimensionTwoSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
+
+			this.dimensionTwoScale = d3.scale.linear()
+				.domain([0, 1])
+				.range([0, this.VALUECHART_HEIGHT]);
 
 		} else if (this.viewOrientation === 'vertical') {
 			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
@@ -198,8 +250,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
 			this.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-			this.dimensionOneSize = 400;	// This is the height of the graph
-			this.dimensionTwoSize = 800;	// This is the width of the graph
+			this.dimensionOneSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
+			this.dimensionTwoSize = this.VALUECHART_WIDTH;	// This is the width of the graph
+
+			this.dimensionTwoScale = d3.scale.linear()
+				.domain([0, 1])
+				.range([0, this.VALUECHART_HEIGHT]);
 		}
 	}
 

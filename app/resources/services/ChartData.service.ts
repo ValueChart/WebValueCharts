@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 17:44:39
+* @Last Modified time: 2016-06-04 19:21:13
 */
 
 import { Injectable } 					from '@angular/core';
@@ -21,6 +21,8 @@ import { WeightMap }					from '../model/WeightMap';
 
 export interface VCRowData {
 	objective: PrimitiveObjective;
+	weight: number;
+	weightOffset: number;
 	cells: VCCellData[];
 }
 
@@ -29,7 +31,7 @@ export interface VCCellData {
 	value: (string | number);
 	userScores: {
 		user: User,
-		y: number
+		score: number
 	}[];
 }
 
@@ -80,10 +82,13 @@ export class ChartDataService {
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
-			for (var i: number; i < users.length; i++) {
-				objectiveValue.userScores[i] = {};
-				objectiveValue.userScores[i].user = users[i];
-				objectiveValue.userScores[i].y = users[i].getScoreFunctionMap().getObjectiveScoreFunction(objectiveValue.objective).getScore(objectiveValue.value);
+			for (var i: number = 0; i < users.length; i++) {
+				var userScore: { user: User; score: number; } = {
+					user: users[i],
+					score: users[i].getScoreFunctionMap().getObjectiveScoreFunction(objective).getScore(objectiveValue.value)
+				}
+
+				objectiveValue.userScores.push(userScore);
 			}
 		});	
 
@@ -91,16 +96,25 @@ export class ChartDataService {
 	}
 
 	getRowData(valueChart: ValueChart): VCRowData[] {
-		var objectivesData: any[] = [];
+		var rowData: VCRowData[] = [];
+		var weightMap: WeightMap;
+
+		if (this.valueChart.type === 'group') {
+			weightMap = (<GroupValueChart>this.valueChart).calculateAverageWeightMap();
+		} else {
+			weightMap = ((<IndividualValueChart>this.valueChart).getUser().getWeightMap());
+		}
 
 		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
-			objectivesData.push({
+			rowData.push({
 				objective: objective,
-				cells: this.getCellData(objective)
+				weight: weightMap.getObjectiveWeight(objective),
+				cells: this.getCellData(objective),
+				weightOffset: 0
 			});
 		});
 
-		return objectivesData;
+		return rowData;
 	}
 
 
