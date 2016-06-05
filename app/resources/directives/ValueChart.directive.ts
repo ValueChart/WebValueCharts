@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-04 19:22:46
+* @Last Modified time: 2016-06-05 16:18:15
 */
 
 
@@ -22,7 +22,7 @@ import { GroupValueChart } 								from '../model/GroupValueChart';
 import { IndividualValueChart } 						from '../model/IndividualValueChart';
 import { PrimitiveObjective }							from '../model/PrimitiveObjective';
 import { WeightMap }									from '../model/WeightMap';
-
+import { User }											from '../model/User';
 
 @Directive({
 	selector: 'ValueChart',
@@ -37,6 +37,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// Inputs to the directive.
 	private valueChart: ValueChart;		// A ValueChart. Can be an IndividualValueChart or a GroupValueChart
 	private weightMap: WeightMap;
+	private numPrimitiveObjectives: number;
+	private numUsers: number;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
 	// Height and width of the viewport for use with viewBox attribute of the root SVG element
@@ -52,6 +54,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	private coordinateTwo: string;
 	private dimensionOneScale: any;
 	private dimensionTwoScale: any;
+
+	private rowScales: any[];
 
 	// ValueChart data that has been organized to work with d3.
 	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data.
@@ -88,10 +92,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		this.viewportWidth = 900;
 		this.viewportHeight = 450;
 
-		if (this.valueChart.type === 'individual')
-			this.weightMap = (<IndividualValueChart> this.valueChart).getUser().getWeightMap();
-		else {
+		if (this.valueChart.type === 'individual') {
+			this.weightMap = (<IndividualValueChart>this.valueChart).getUser().getWeightMap();
+			this.numUsers = 1;
+		} else {
 			this.weightMap = (<GroupValueChart> this.valueChart).calculateAverageWeightMap();
+			this.numUsers = (<GroupValueChart> this.valueChart).getUsers().length;
 		}
 
 		// Configure the orientation options depending on the 
@@ -106,6 +112,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		// Get objective data in a format that suits d3.
 		this.dataRows = this.chartDataService.getRowData(this.valueChart);
 		this.calculateWeightOffsets(this.dataRows);
+
+		this.numPrimitiveObjectives = this.dataRows.length;
+
+		this.rowScales = [];
+		this.calculateRowScales(this.dataRows);
+
 		// Render the ValueChart;
 		this.renderRows(this.dataRows);
 
@@ -131,6 +143,16 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.configureViewOrientation(this.viewOrientation);
 			this.reorientValueChart();
 		}
+	}
+
+	calculateRowScales(rows: VCRowData[]): void {
+		rows.forEach((row: VCRowData, index: number) => {
+			var scale = d3.scale.linear()
+				.domain([0, 1])
+				.range([0, this.dimensionTwoScale(row.weight)]);
+
+			this.rowScales.push(scale);
+		});
 	}
 
 	// Render the rows of the ValueChart
@@ -179,12 +201,15 @@ export class ValueChartDirective implements OnInit, OnChanges {
 				.classed('cell', true)
 					.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
 					.selectAll('rect')
-						.data((d: VCCellData, i: number) => { console.log(d); return d.userScores; })
+						.data((d: VCCellData, i: number) => { return d.userScores; })
 						.enter()
 						.append('rect')
 							.style('fill', 'red')
-							.attr('height', 20)
-							.attr('width', 20)
+							.attr(this.dimensionOne, (d: any, i: number) => { return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
+							.attr(this.dimensionTwo, ( d: any, i: number ) => { return this.rowScales[d.rowIndex](d.score); } )
+							.attr(this.coordinateOne, (d: any, i: number) => { return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
+							.attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); })
+
 	}		
 
 	// TODO: Move this to ChartDataSerivce

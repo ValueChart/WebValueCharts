@@ -2,30 +2,29 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 16:10:40
+* @Last Modified time: 2016-06-05 15:28:39
 */
 
 import { ScoreFunction } 			from './ScoreFunction';
-import { PrimitiveObjective } 		from './PrimitiveObjective';
 
 
 export class ScoreFunctionMap {
 	
-	private scoreFunctions: Map<PrimitiveObjective, ScoreFunction>;
+	private scoreFunctions: Map<string, ScoreFunction>;
 
 	constructor() {
-		this.scoreFunctions = new Map<PrimitiveObjective, ScoreFunction>();
+		this.scoreFunctions = new Map<string, ScoreFunction>();
 	}
 
-	getObjectiveScoreFunction(objective: PrimitiveObjective): ScoreFunction {
-		return this.scoreFunctions.get(objective);
+	getObjectiveScoreFunction(objectiveName: string): ScoreFunction {
+		return this.scoreFunctions.get(objectiveName);
 	}
 
-	setObjectiveScoreFunction(objective: PrimitiveObjective, ScoreFunction: ScoreFunction): void {
-		this.scoreFunctions.set(objective, ScoreFunction);
+	setObjectiveScoreFunction(objectiveName: string, ScoreFunction: ScoreFunction): void {
+		this.scoreFunctions.set(objectiveName, ScoreFunction);
 	}
 
-	removeObjectiveScoreFunction(objective: PrimitiveObjective): void {
-		this.scoreFunctions.delete(objective);
+	removeObjectiveScoreFunction(objectiveName: string): void {
+		this.scoreFunctions.delete(objectiveName);
 	}
 }

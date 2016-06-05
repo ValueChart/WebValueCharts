@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 11:32:54
+* @Last Modified time: 2016-06-05 15:21:58
 */
 
 import { Objective } 				from './Objective';
@@ -131,7 +131,7 @@ export abstract class ValueChart {
 		var alternativeValues: { value: (string | number), alternative: Alternative }[] = [];
 
 		this.alternatives.forEach((alternative: Alternative) => {
-			alternativeValues.push({ value: alternative.getObjectiveValue(objective), alternative: alternative });
+			alternativeValues.push({ value: alternative.getObjectiveValue(objective.getName()), alternative: alternative });
 		});
 
 		return alternativeValues;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-04 19:21:13
+* @Last Modified time: 2016-06-05 16:07:09
 */
 
 import { Injectable } 					from '@angular/core';
@@ -32,6 +32,7 @@ export interface VCCellData {
 	userScores: {
 		user: User,
 		score: number
+		rowIndex: number,
 	}[];
 }
 
@@ -63,13 +64,13 @@ export class ChartDataService {
 		}
 
 		(<AbstractObjective>objective).getAllPrimitiveSubObjectives().forEach((objective: PrimitiveObjective) => {
-			weight += weightMap.getObjectiveWeight(objective);
+			weight += weightMap.getObjectiveWeight(objective.getName());
 		});
 
 		return weight;
 	}
 
-	getCellData(objective: PrimitiveObjective): VCCellData[] {
+	getCellData(objective: PrimitiveObjective, rowIndex: number): VCCellData[] {
 		var users: User[];
 
 		if (this.valueChart.type === 'group') {
@@ -83,9 +84,10 @@ export class ChartDataService {
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
 			for (var i: number = 0; i < users.length; i++) {
-				var userScore: { user: User; score: number; } = {
+				var userScore: { user: User; score: number; rowIndex: number } = {
+					rowIndex: rowIndex,
 					user: users[i],
-					score: users[i].getScoreFunctionMap().getObjectiveScoreFunction(objective).getScore(objectiveValue.value)
+					score: users[i].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getScore(objectiveValue.value)
 				}
 
 				objectiveValue.userScores.push(userScore);
@@ -105,11 +107,11 @@ export class ChartDataService {
 			weightMap = ((<IndividualValueChart>this.valueChart).getUser().getWeightMap());
 		}
 
-		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
+		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			rowData.push({
 				objective: objective,
-				weight: weightMap.getObjectiveWeight(objective),
-				cells: this.getCellData(objective),
+				weight: weightMap.getObjectiveWeight(objective.getName()),
+				cells: this.getCellData(objective, index),
 				weightOffset: 0
 			});
 		});

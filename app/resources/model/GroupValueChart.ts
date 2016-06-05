@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 09:32:09
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 11:33:21
+* @Last Modified time: 2016-06-05 15:35:42
 */
 
 import { ValueChart }			from './ValueChart';
@@ -73,7 +73,7 @@ export class GroupValueChart extends ValueChart {
 
 		for (var i = 0; i < primitiveObjectives.length; i++) {
 			var averageWeight = combinedWeights[i] / this.users.length;
-			averageWeightMap.setObjectiveWeight(primitiveObjectives[i], averageWeight);
+			averageWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), averageWeight);
 		}
 		return averageWeightMap;
 	}

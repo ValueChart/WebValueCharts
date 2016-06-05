@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:27:10
+* @Last Modified time: 2016-06-05 15:31:59
 */
 // Library Classes
 import { Injectable } 				from '@angular/core';
@@ -118,7 +118,7 @@ export class XMLValueChartParser {
 		objectives.forEach((objective: PrimitiveObjective) => {
 			var objectiveNode = xmlDocument.querySelector('Criterion[name=' + objective.getName() + ']');
 			// The + here allows quick conversion from string to number
-			user.getWeightMap().setObjectiveWeight(objective, +objectiveNode.getAttribute('weight'));
+			user.getWeightMap().setObjectiveWeight(objective.getName(), +objectiveNode.getAttribute('weight'));
 			var domainNode: any = objectiveNode.querySelector('Domain');
 
 			var scoreFunction: ScoreFunction;
@@ -135,7 +135,7 @@ export class XMLValueChartParser {
 				scoreFunction.setElementScore(x, y);
 			}
 
-			user.getScoreFunctionMap().setObjectiveScoreFunction(objective, scoreFunction);
+			user.getScoreFunctionMap().setObjectiveScoreFunction(objective.getName(), scoreFunction);
 		});
 
 		return user;
@@ -162,7 +162,7 @@ export class XMLValueChartParser {
 					mappedValue = +mappedValue;
 				}
 
-				alternative.setObjectiveValue(objectiveToMap, mappedValue);
+				alternative.setObjectiveValue(objectiveToMap.getName(), mappedValue);
 			}
 			alternatives.push(alternative);
 		}

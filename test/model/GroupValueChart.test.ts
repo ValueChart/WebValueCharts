@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 09:31:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 16:23:10
+* @Last Modified time: 2016-06-05 15:33:52
 */
 
 import { GroupValueChart } 		from '../../app/resources/model/GroupValueChart';
@@ -110,26 +110,26 @@ describe('GroupValueChart', () => {
 	describe('calculateAverageWeightMap()', () => {
 
 		before(function() {
-			aaronWeightMap.setObjectiveWeight(distance, aaronDistanceWeight);
-			aaronWeightMap.setObjectiveWeight(temperature, aaronTemperatureWeight);
-			aaronWeightMap.setObjectiveWeight(precipitation, aaronPrecipitationWeight);
-			aaronWeightMap.setObjectiveWeight(humidity, aaronHumidityWeight);
-			aaronWeightMap.setObjectiveWeight(costInMoney, aaronCostInMoneyWeight);
-			aaronWeightMap.setObjectiveWeight(costInTime, aaronCostInTimeWeight);
+			aaronWeightMap.setObjectiveWeight(distance.getName(), aaronDistanceWeight);
+			aaronWeightMap.setObjectiveWeight(temperature.getName(), aaronTemperatureWeight);
+			aaronWeightMap.setObjectiveWeight(precipitation.getName(), aaronPrecipitationWeight);
+			aaronWeightMap.setObjectiveWeight(humidity.getName(), aaronHumidityWeight);
+			aaronWeightMap.setObjectiveWeight(costInMoney.getName(), aaronCostInMoneyWeight);
+			aaronWeightMap.setObjectiveWeight(costInTime.getName(), aaronCostInTimeWeight);
 
-			samuelWeightMap.setObjectiveWeight(distance, samuelDistanceWeight);
-			samuelWeightMap.setObjectiveWeight(temperature, samuelTemperatureWeight);
-			samuelWeightMap.setObjectiveWeight(precipitation, samuelPrecipitationWeight);
-			samuelWeightMap.setObjectiveWeight(humidity, samuelHumidityWeight);
-			samuelWeightMap.setObjectiveWeight(costInMoney, samuelCostInMoneyWeight);
-			samuelWeightMap.setObjectiveWeight(costInTime, samuelCostInTimeWeight);
+			samuelWeightMap.setObjectiveWeight(distance.getName(), samuelDistanceWeight);
+			samuelWeightMap.setObjectiveWeight(temperature.getName(), samuelTemperatureWeight);
+			samuelWeightMap.setObjectiveWeight(precipitation.getName(), samuelPrecipitationWeight);
+			samuelWeightMap.setObjectiveWeight(humidity.getName(), samuelHumidityWeight);
+			samuelWeightMap.setObjectiveWeight(costInMoney.getName(), samuelCostInMoneyWeight);
+			samuelWeightMap.setObjectiveWeight(costInTime.getName(), samuelCostInTimeWeight);
 
-			emilyWeightMap.setObjectiveWeight(distance, emilyDistanceWeight);
-			emilyWeightMap.setObjectiveWeight(temperature, emilyTemperatureWeight);
-			emilyWeightMap.setObjectiveWeight(precipitation, emilyPrecipitationWeight);
-			emilyWeightMap.setObjectiveWeight(humidity, emilyHumidityWeight);
-			emilyWeightMap.setObjectiveWeight(costInMoney, emilyCostInMoneyWeight);
-			emilyWeightMap.setObjectiveWeight(costInTime, emilyCostInTimeWeight);
+			emilyWeightMap.setObjectiveWeight(distance.getName(), emilyDistanceWeight);
+			emilyWeightMap.setObjectiveWeight(temperature.getName(), emilyTemperatureWeight);
+			emilyWeightMap.setObjectiveWeight(precipitation.getName(), emilyPrecipitationWeight);
+			emilyWeightMap.setObjectiveWeight(humidity.getName(), emilyHumidityWeight);
+			emilyWeightMap.setObjectiveWeight(costInMoney.getName(), emilyCostInMoneyWeight);
+			emilyWeightMap.setObjectiveWeight(costInTime.getName(), emilyCostInTimeWeight);
 
 			aaron.setWeightMap(aaronWeightMap);
 			samuel.setWeightMap(samuelWeightMap);
@@ -145,12 +145,12 @@ describe('GroupValueChart', () => {
 			it('should produce a weight map that is the same as that users', () => {
 				var averageWeightMap: WeightMap = groupValueChart.calculateAverageWeightMap();
 
-				expect(averageWeightMap.getObjectiveWeight(distance)).to.be.closeTo( 		aaronDistanceWeight 	/ aaronTotalWeight, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(temperature)).to.be.closeTo( 	aaronTemperatureWeight 	/ aaronTotalWeight, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(precipitation)).to.be.closeTo( 	aaronPrecipitationWeight/ aaronTotalWeight, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(humidity)).to.be.closeTo( 		aaronHumidityWeight 	/ aaronTotalWeight, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInMoney)).to.be.closeTo( 	aaronCostInMoneyWeight 	/ aaronTotalWeight, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInTime)).to.be.closeTo( 		aaronCostInTimeWeight 	/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(distance.getName())).to.be.closeTo( 		aaronDistanceWeight 	/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(temperature.getName())).to.be.closeTo( 	aaronTemperatureWeight 	/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(precipitation.getName())).to.be.closeTo( 	aaronPrecipitationWeight/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(humidity.getName())).to.be.closeTo( 		aaronHumidityWeight 	/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInMoney.getName())).to.be.closeTo( 	aaronCostInMoneyWeight 	/ aaronTotalWeight, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInTime.getName())).to.be.closeTo( 		aaronCostInTimeWeight 	/ aaronTotalWeight, roundingError);
 			});
 
 		});
@@ -164,12 +164,12 @@ describe('GroupValueChart', () => {
 			it('should produce a weight map that is an average of the two users', () => {
 				var averageWeightMap: WeightMap = groupValueChart.calculateAverageWeightMap();
 
-				expect(averageWeightMap.getObjectiveWeight(distance)).to.be.closeTo((( 		aaronDistanceWeight 	/ aaronTotalWeight ) + ( samuelDistanceWeight 	/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(temperature)).to.be.closeTo((( 	aaronTemperatureWeight 	/ aaronTotalWeight ) + ( samuelTemperatureWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(precipitation)).to.be.closeTo((( aaronPrecipitationWeight/ aaronTotalWeight ) + ( samuelPrecipitationWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(humidity)).to.be.closeTo((( 		aaronHumidityWeight 	/ aaronTotalWeight ) + ( samuelHumidityWeight 	/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInMoney)).to.be.closeTo((( 	aaronCostInMoneyWeight 	/ aaronTotalWeight ) + ( samuelCostInMoneyWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInTime)).to.be.closeTo((( 	aaronCostInTimeWeight 	/ aaronTotalWeight ) + ( samuelCostInTimeWeight / samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(distance.getName())).to.be.closeTo((( 		aaronDistanceWeight 	/ aaronTotalWeight ) + ( samuelDistanceWeight 	/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(temperature.getName())).to.be.closeTo((( 	aaronTemperatureWeight 	/ aaronTotalWeight ) + ( samuelTemperatureWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(precipitation.getName())).to.be.closeTo((( aaronPrecipitationWeight/ aaronTotalWeight ) + ( samuelPrecipitationWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(humidity.getName())).to.be.closeTo((( 		aaronHumidityWeight 	/ aaronTotalWeight ) + ( samuelHumidityWeight 	/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInMoney.getName())).to.be.closeTo((( 	aaronCostInMoneyWeight 	/ aaronTotalWeight ) + ( samuelCostInMoneyWeight/ samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInTime.getName())).to.be.closeTo((( 	aaronCostInTimeWeight 	/ aaronTotalWeight ) + ( samuelCostInTimeWeight / samueTotallWeight )) / groupValueChart.getUsers().length, roundingError);
 
 			});
 
@@ -184,12 +184,12 @@ describe('GroupValueChart', () => {
 			it('should produce a weight map that is an average of the two users', () => {
 				var averageWeightMap: WeightMap = groupValueChart.calculateAverageWeightMap();
 
-				expect(averageWeightMap.getObjectiveWeight(distance)).to.be.closeTo((( 		aaronDistanceWeight 	/ aaronTotalWeight ) + ( samuelDistanceWeight 	/ samueTotallWeight ) + ( emilyDistanceWeight 		/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(temperature)).to.be.closeTo((( 	aaronTemperatureWeight 	/ aaronTotalWeight ) + ( samuelTemperatureWeight/ samueTotallWeight ) + ( emilyTemperatureWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(precipitation)).to.be.closeTo((( aaronPrecipitationWeight/ aaronTotalWeight ) + ( samuelPrecipitationWeight/ samueTotallWeight ) + ( emilyPrecipitationWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(humidity)).to.be.closeTo((( 		aaronHumidityWeight 	/ aaronTotalWeight ) + ( samuelHumidityWeight 	/ samueTotallWeight ) + ( emilyHumidityWeight 		/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInMoney)).to.be.closeTo((( 	aaronCostInMoneyWeight 	/ aaronTotalWeight ) + ( samuelCostInMoneyWeight/ samueTotallWeight ) + ( emilyCostInMoneyWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
-				expect(averageWeightMap.getObjectiveWeight(costInTime)).to.be.closeTo((( 	aaronCostInTimeWeight 	/ aaronTotalWeight ) + ( samuelCostInTimeWeight / samueTotallWeight ) + ( emilyCostInTimeWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(distance.getName())).to.be.closeTo((( 		aaronDistanceWeight 	/ aaronTotalWeight ) + ( samuelDistanceWeight 	/ samueTotallWeight ) + ( emilyDistanceWeight 		/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(temperature.getName())).to.be.closeTo((( 	aaronTemperatureWeight 	/ aaronTotalWeight ) + ( samuelTemperatureWeight/ samueTotallWeight ) + ( emilyTemperatureWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(precipitation.getName())).to.be.closeTo((( aaronPrecipitationWeight/ aaronTotalWeight ) + ( samuelPrecipitationWeight/ samueTotallWeight ) + ( emilyPrecipitationWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(humidity.getName())).to.be.closeTo((( 		aaronHumidityWeight 	/ aaronTotalWeight ) + ( samuelHumidityWeight 	/ samueTotallWeight ) + ( emilyHumidityWeight 		/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInMoney.getName())).to.be.closeTo((( 	aaronCostInMoneyWeight 	/ aaronTotalWeight ) + ( samuelCostInMoneyWeight/ samueTotallWeight ) + ( emilyCostInMoneyWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
+				expect(averageWeightMap.getObjectiveWeight(costInTime.getName())).to.be.closeTo((( 	aaronCostInTimeWeight 	/ aaronTotalWeight ) + ( samuelCostInTimeWeight / samueTotallWeight ) + ( emilyCostInTimeWeight 	/ emilyTotalWeight )) / groupValueChart.getUsers().length, roundingError);
 
 			});
 		});

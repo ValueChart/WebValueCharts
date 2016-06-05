@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:27:08
+* @Last Modified time: 2016-06-05 15:36:09
 */
 
 import { XMLValueChartParser } 		from '../../app/resources/services/XMLValueChartParser.service.ts';
@@ -156,28 +156,28 @@ describe('XMLValueChartParser', () => {
 
 			alternatives.forEach((alternative: Alternative) => {
 				if (alternative.getName() === 'Sheraton') {
-					expect(alternative.getObjectiveValue(area)).to.equal('nightlife');
-					expect(alternative.getObjectiveValue(size)).to.equal(350.0);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('nightlife');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(350.0);
 					expect(alternative.getDescription()).to.equal("Get a good night's sleep with premium bedding, a down duvet, and blackout drapes/curtains. The 32-inch TV offers pay movies. Request an in-room massage. A coffee/tea maker is provided. You will have a shower/tub combination, as well as complimentary toiletries and a hair dryer. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.");
 				} else if (alternative.getName() === 'BestWestern') {
-					expect(alternative.getObjectiveValue(area)).to.equal('nightlife');
-					expect(alternative.getObjectiveValue(size)).to.equal(200);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('nightlife');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(200);
 					expect(alternative.getDescription()).to.equal("Balcony with city views. Complimentary wireless Internet access. 42-inch LCD TV. Pay movies. Coffee/tea maker. Fridge and microwave. Private bathroom. Shower/tub combination. Complimentary toiletries. Hair dryer. Safe. Desk. Complimentary newspapers. This room is Non-Smoking.");
 				} else if (alternative.getName() === 'Hyatt') {
-					expect(alternative.getObjectiveValue(area)).to.equal('beach');
-					expect(alternative.getObjectiveValue(size)).to.equal(275.0);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('beach');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(275.0);
 					expect(alternative.getDescription()).to.equal("Wide, floor-to-ceiling windows. Desk. 42-inch flat-screen TV with cable, pay movies, and video games (surcharge). Voice mail. Upholstered armchair with ottoman. Bathrobes. Hairdryer. Designer toiletries. Shower/tub combination. Refrigerator. Video account review and check-out. Rollaway beds available.");
 				} else if (alternative.getName() === 'Marriott') {
-					expect(alternative.getObjectiveValue(area)).to.equal('airport');
-					expect(alternative.getObjectiveValue(size)).to.equal(200);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('airport');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(200);
 					expect(alternative.getDescription()).to.equal("The video-game console and TV with satellite channels are offered for your entertainment. A coffee/tea maker is provided. The private bathroom has designer toiletries. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.");
 				} else if (alternative.getName() === 'HolidayInn') {
-					expect(alternative.getObjectiveValue(area)).to.equal('airport');
-					expect(alternative.getObjectiveValue(size)).to.equal(237.5);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('airport');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(237.5);
 					expect(alternative.getDescription()).to.equal("The 42-inch flat-screen TV offers cable channels. A coffee/tea maker is provided. The private bathroom has a hair dryer. Air conditioning, a desk, and a wake-up call service are among the conveniences offered. This room is Non-Smoking.");
 				} else if (alternative.getName() === 'Ramada') {
-					expect(alternative.getObjectiveValue(area)).to.equal('beach');
-					expect(alternative.getObjectiveValue(size)).to.equal(312.5);
+					expect(alternative.getObjectiveValue(area.getName())).to.equal('beach');
+					expect(alternative.getObjectiveValue(size.getName())).to.equal(312.5);
 					expect(alternative.getDescription()).to.equal("1 double bed. Desk. 37-inch LCD high-definition TV. Pay movies. Phone. Voice mail. Clock radio. Coffee/tea maker. Hair dryer. Iron/ironing board. Complimentary weekday newspaper. Bathroom with granite-topped vanity. Blackout drapes/curtains. Air conditioning. Climate control");
 				}
 			});
@@ -223,22 +223,22 @@ describe('XMLValueChartParser', () => {
 			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
 			var weightMap: WeightMap = user.getWeightMap();
 
-			expect(weightMap.getObjectiveWeight(size)).to.equal(0.04);
-			expect(weightMap.getObjectiveWeight(area)).to.equal(0.46);
-			expect(weightMap.getObjectiveWeight(rate)).to.equal(0.2);
-			expect(weightMap.getObjectiveWeight(skytrainDistance)).to.equal(0.09);
-			expect(weightMap.getObjectiveWeight(internetAccess)).to.equal(0.21);
+			expect(weightMap.getObjectiveWeight(size.getName())).to.equal(0.04);
+			expect(weightMap.getObjectiveWeight(area.getName())).to.equal(0.46);
+			expect(weightMap.getObjectiveWeight(rate.getName())).to.equal(0.2);
+			expect(weightMap.getObjectiveWeight(skytrainDistance.getName())).to.equal(0.09);
+			expect(weightMap.getObjectiveWeight(internetAccess.getName())).to.equal(0.21);
 		});
 
 		it('should parse the User ScoreFunctionmap field correctly from the document base node', () => {
 			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
 			var scoreFunctionMap: ScoreFunctionMap = user.getScoreFunctionMap();
 
-			var sizeScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(size);
-			var areaScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(area);
-			var rateScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(rate);
-			var skytrainDistanceScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(skytrainDistance);
-			var internetScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(internetAccess);
+			var sizeScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(size.getName());
+			var areaScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(area.getName());
+			var rateScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(rate.getName());
+			var skytrainDistanceScoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(skytrainDistance.getName());
+			var internetScoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> scoreFunctionMap.getObjectiveScoreFunction(internetAccess.getName());
 
 			// Size
 			expect(sizeScoreFunction.getScore(200.0)).to.equal(0.0);

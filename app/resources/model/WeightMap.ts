@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:44
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 10:45:15
+* @Last Modified time: 2016-06-05 15:24:13
 */
 
 import { PrimitiveObjective } 			from './PrimitiveObjective';
@@ -10,39 +10,39 @@ import { PrimitiveObjective } 			from './PrimitiveObjective';
 
 export class WeightMap {
 
-	private weights: Map<PrimitiveObjective, number>;
+	private weights: Map<string, number>;
 	private weightTotal: number;
 
 	constructor() {
-		this.weights = new Map<PrimitiveObjective, number>();
+		this.weights = new Map<string, number>();
 		this.weightTotal = 0;
 	}
 
-	getObjectiveWeight(objective: PrimitiveObjective): number {
-		return this.weights.get(objective);
+	getObjectiveWeight(objectiveName: string): number {
+		return this.weights.get(objectiveName);
 	}
 
-	getNormalizedObjectiveWeight(objective: PrimitiveObjective): number {
-		return this.weights.get(objective) / this.weightTotal;
+	getNormalizedObjectiveWeight(objectiveName: string): number {
+		return this.weights.get(objectiveName) / this.weightTotal;
 	}
 
-	setObjectiveWeight(objective: PrimitiveObjective, weight: number): void {
-		var priorWeight: number = this.weights.get(objective);
+	setObjectiveWeight(objectiveName: string, weight: number): void {
+		var priorWeight: number = this.weights.get(objectiveName);
 		if (priorWeight !== undefined) {
 			this.weightTotal -= priorWeight;
 		}
 
-		this.weights.set(objective, weight);
+		this.weights.set(objectiveName, weight);
 		this.weightTotal += weight;
 	}
 
-	removeObjectiveWeight(objective: PrimitiveObjective): void {
-		var priorWeight: number = this.weights.get(objective);
+	removeObjectiveWeight(objectiveName: string): void {
+		var priorWeight: number = this.weights.get(objectiveName);
 		if (priorWeight !== undefined) {
 			this.weightTotal -= priorWeight;
 		}
 
-		this.weights.delete(objective);
+		this.weights.delete(objectiveName);
 	}
 
 	recalculateWeightTotal(): number {
@@ -66,7 +66,7 @@ export class WeightMap {
 	getObjectiveWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var orderedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i]);
+			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i].getName());
 		}
 
 		return orderedWeights
@@ -75,7 +75,7 @@ export class WeightMap {
 	getNormalizedWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var normalizedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			normalizedWeights[i] = this.weights.get(orderedObjectives[i]) / this.weightTotal;
+			normalizedWeights[i] = this.weights.get(orderedObjectives[i].getName()) / this.weightTotal;
 		}
 
 		return normalizedWeights;
