@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 16:18:15
+* @Last Modified time: 2016-06-05 21:55:25
 */
 
 
@@ -64,7 +64,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: any; // The SVG base element for the ValueChart rendering.
 	private chartRows: any; // The collection of g elements that hold each row (or column if in vertical orientation) of the chart. 
-
+	private chartCells: any;
+	private chartLines: any;
 
 	constructor(
 		private template: TemplateRef<any>,
@@ -140,19 +141,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		// The orientation of the ValueChart has been changed.
 		if (changeRecord.orientation) {
 			this.viewOrientation = changeRecord.orientation.currentValue;
+
+			// Change orientation
 			this.configureViewOrientation(this.viewOrientation);
+			this.calculateRowScales(this.dataRows);
 			this.reorientValueChart();
 		}
-	}
-
-	calculateRowScales(rows: VCRowData[]): void {
-		rows.forEach((row: VCRowData, index: number) => {
-			var scale = d3.scale.linear()
-				.domain([0, 1])
-				.range([0, this.dimensionTwoScale(row.weight)]);
-
-			this.rowScales.push(scale);
-		});
 	}
 
 	// Render the rows of the ValueChart
@@ -175,8 +169,9 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			.style('stroke', 'grey')
 			.style('fill', 'white');
 
-		this.el.select('g').append('g')
-			.selectAll('line')
+		this.chartLines = this.el.select('g').append('g');
+
+		this.chartLines.selectAll('line')
 				.data(this.valueChart.getAlternatives())
 				.enter()
 				.append('line')
@@ -187,28 +182,27 @@ export class ValueChartDirective implements OnInit, OnChanges {
 					.style('stroke-width', 1)
 					.style('stroke', 'grey');
 
-
 		this.renderCells();
-
 	}
 
 	// Don't worry about this for now.
 	renderCells(): void {
-		this.chartRows.append('g')
+		this.chartCells = this.chartRows.append('g')
 			.selectAll('g')
 			.data((d: VCRowData) => { return d.cells; })
 			.enter().append('g')
 				.classed('cell', true)
-					.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
-					.selectAll('rect')
-						.data((d: VCCellData, i: number) => { return d.userScores; })
-						.enter()
-						.append('rect')
-							.style('fill', 'red')
-							.attr(this.dimensionOne, (d: any, i: number) => { return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
-							.attr(this.dimensionTwo, ( d: any, i: number ) => { return this.rowScales[d.rowIndex](d.score); } )
-							.attr(this.coordinateOne, (d: any, i: number) => { return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
-							.attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); })
+					.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); });
+					
+		this.chartCells.selectAll('rect')
+			.data((d: VCCellData, i: number) => { return d.userScores; })
+			.enter()
+			.append('rect')
+				.style('fill', 'red')
+				.attr(this.dimensionOne, (d: any, i: number) => { return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
+				.attr(this.dimensionTwo, ( d: any, i: number ) => { return this.rowScales[d.rowIndex](d.score); } )
+				.attr(this.coordinateOne, (d: any, i: number) => { return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
+				.attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); });
 
 	}		
 
@@ -226,15 +220,45 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		}
 	}
 
+	calculateRowScales(rows: VCRowData[]): void {
+		rows.forEach((row: VCRowData, index: number) => {
+			var scale = d3.scale.linear()
+				.domain([0, 1])
+				.range([0, this.dimensionTwoScale(row.weight)]);
+
+			this.rowScales.push(scale);
+		});
+	}
+
 	// Render the ValueChart according to the current orientation.
 	reorientValueChart(): void {
+
 		this.chartRows
 			.attr('transform', (d: any, i: number) => {
-				return this.generateTransformTranslation(0, (i * this.dimensionTwoSize / this.dataRows.length));
+				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
 			})
-			.selectAll('rect')
+			.selectAll('.row-outline')
 				.attr(this.dimensionOne, this.dimensionOneSize)
-				.attr(this.dimensionTwo, this.dimensionTwoSize / this.dataRows.length);
+				.attr(this.dimensionTwo, (d: VCRowData) => { return this.dimensionTwoScale(d.weight) })
+
+		this.chartLines.selectAll('line')
+			.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+			.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
+			.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+			.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
+
+		this.chartCells
+			.attr('transform', (d: VCCellData, i: number) => { 
+				return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); 
+			});
+
+		this.chartCells.selectAll('rect')
+			.attr(this.dimensionOne, (d: any, i: number) => { return(this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
+			.attr(this.dimensionTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](d.score); })
+			.attr(this.coordinateOne, (d: any, i: number) => { return((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
+
+		if (this.viewOrientation === 'horizontal')
+			this.chartCells.selectAll('rect').attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); });
 
 	}
 
@@ -280,7 +304,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 			this.dimensionTwoScale = d3.scale.linear()
 				.domain([0, 1])
-				.range([0, this.VALUECHART_HEIGHT]);
+				.range([0, this.VALUECHART_WIDTH]);
 		}
 	}
 
