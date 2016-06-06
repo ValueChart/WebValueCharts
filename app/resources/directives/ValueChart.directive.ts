@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 12:10:34
+* @Last Modified time: 2016-06-06 14:40:08
 */
 
 
@@ -114,6 +114,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		// Get objective data in a format that suits d3.
 		this.dataRows = this.chartDataService.getRowData(this.valueChart);
 		this.calculateWeightOffsets(this.dataRows);
+		this.calculateStackedBarOffsets(this.dataRows);
+		console.log(this.dataRows);
 
 		this.numPrimitiveObjectives = this.dataRows.length;
 
@@ -121,7 +123,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		this.createObjectiveChart(this.dataRows);
 		this.renderObjectiveChart(this.dataRows);
 
-		this.createStackedBarChart();
+		this.createStackedBarChart(this.dataRows);
 		this.renderStackedBarChart();
 
 		this.isInitialized = true;
@@ -146,7 +148,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 			// Change orientation
 			this.configureViewOrientation(this.viewOrientation);
-
+			this.calculateStackedBarOffsets(this.dataRows);
 			this.renderObjectiveChart(this.dataRows);
 			this.renderStackedBarChart();
 
@@ -204,12 +206,6 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	}
 
 	renderObjectiveChart(rows: VCRowData[]): void {
-		this.renderRows(rows);
-	}
-
-	// Render the rows of the ValueChart
-	renderRows(rows: VCRowData[]): void {
-
 		this.objectiveChartSelections.chart
 			.attr('transform', () => {
 				if (this.viewOrientation == 'horizontal')
@@ -218,33 +214,37 @@ export class ValueChartDirective implements OnInit, OnChanges {
 					return this.generateTransformTranslation(100, 0);
 			});
 
-		this.objectiveChartSelections.rows
-			.attr('transform', (d: VCRowData, i: number) => {
-				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
-			});
+		this.objectiveChartSelections.dividingLines
+			.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+			.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
+			.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+			.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
 
+		this.renderObjectiveChartRows();
+	}
+
+	// Render the rows of the ValueChart
+	renderObjectiveChartRows(): void {
 		this.objectiveChartSelections.rowOutlines
 			.attr('transform', (d: VCRowData, i: number) => {
 				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
 			})
 			.attr(this.dimensionOne, this.dimensionOneSize)
-			.attr(this.dimensionTwo, (d: VCRowData) => { 
+			.attr(this.dimensionTwo, (d: VCRowData) => {
 				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
-				return this.dimensionTwoScale(objectiveWeight); 
+				return this.dimensionTwoScale(objectiveWeight);
 			});
 
-		this.objectiveChartSelections.dividingLines
-				.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-				.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
-				.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-				.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
-				
+		this.objectiveChartSelections.rows
+			.attr('transform', (d: VCRowData, i: number) => {
+				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
+			});				
 
-		this.renderCells();
+		this.renderObjectiveChartCells();
 	}
 
 	// Don't worry about this for now.
-	renderCells(): void {
+	renderObjectiveChartCells(): void {
 		this.objectiveChartSelections.cells
 				.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
 					
@@ -253,13 +253,13 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			.attr(this.dimensionOne, (d: any, i: number) => { 
 				return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers;
 			})
-			.attr(this.dimensionTwo, ( d: any, i: number ) => { 
+			.attr(this.dimensionTwo, (d: any, i: number ) => { 
 				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
 				return this.dimensionTwoScale(d.score * objectiveWeight); 
 			} )
 			.attr(this.coordinateOne, (d: any, i: number) => { 
 				return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; 
-			})
+			});
 						
 		if (this.viewOrientation === 'horizontal') {
 			this.objectiveChartSelections.userScores
@@ -270,27 +270,51 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		}
 	}
 
-	createStackedBarChart(): void {
+	createStackedBarChart(rows: VCRowData[]): void {
 		this.stackedBarChartSelections.chart = this.el.append('g')
 			.classed('stackedbar-chart', true);
 
-		this.stackedBarChartSelections.outline = this.stackedBarChartSelections.chart
-			.append('rect')
-				.classed('stackedbar-outline', true)
-				.attr('fill', 'white')
-				.attr('stroke', 'grey')
-				.attr('stroke-width', 1);
+		this.createStackedBarRows(this.stackedBarChartSelections.chart, rows);
+	}
 
-		this.stackedBarChartSelections.dividingLines = this.stackedBarChartSelections.chart
-			.append('g')
-				.classed('stackedbar-dividers-container', true)
-				.selectAll('line')
+	createStackedBarRows(stackedBarChart: any, rows: VCRowData[]): void {
+		this.stackedBarChartSelections.outline = stackedBarChart.append('g')
+				.classed('stackedbar-outline-container', true)
+				.append('rect')
+					.classed('stackedbar-outline', true)
+					.attr('fill', 'white')
+					.attr('stroke', 'grey')
+					.attr('stroke-width', 1);
+
+		this.stackedBarChartSelections.rows = stackedBarChart.append('g')
+				.classed('stackedbar-rows-container', true)
+				.selectAll('g')
+					.data(rows)
+					.enter().append('g')
+						.classed('objective-col', true);
+
+		this.stackedBarChartSelections.dividingLines = stackedBarChart.append('g')
+			.classed('stackedbar-dividers-container', true)
+			.selectAll('line')
 				.data(this.valueChart.getAlternatives())
 				.enter().append('line')
 					.classed('stackedbar-dividing-line', true)
 					.style('stroke-width', 1)
 					.style('stroke', 'grey');
 
+		this.createStackedBarCells(this.stackedBarChartSelections.rows);
+	}
+
+	createStackedBarCells(stackedBarRows: any): void {
+		this.stackedBarChartSelections.cells = stackedBarRows.selectAll('g')
+			.data((d: VCRowData) => { return d.cells; })
+			.enter().append('g')
+				.classed('stackedbar-cell', true);
+
+		this.stackedBarChartSelections.userScores = this.stackedBarChartSelections.cells.selectAll('rect')
+			.data((d: VCCellData, i: number) => { return d.userScores; })
+			.enter().append('rect')
+				.classed('stackedbar-user-scores', true);
 	}
 
 	renderStackedBarChart(): void {
@@ -304,7 +328,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 		this.stackedBarChartSelections.outline
 			.attr(this.dimensionOne, this.dimensionOneSize)
-			.attr(this.dimensionTwo, this.dimensionTwoSize)
+			.attr(this.dimensionTwo, this.dimensionTwoSize);
 
 		this.stackedBarChartSelections.dividingLines
 			.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { 
@@ -316,7 +340,40 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			})
 			.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
 
-	}		
+		this.renderStackedBarRows();
+	}	
+
+	renderStackedBarRows(): void {			
+
+		this.renderStackedBarCells()
+	}
+
+	renderStackedBarCells(): void {
+		this.stackedBarChartSelections.cells
+			.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
+
+
+		this.stackedBarChartSelections.userScores
+			.style('fill', (d: any, i: number) => { return d.objective.getColor(); })
+			.attr(this.dimensionOne, (d: any, i: number) => {
+				return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers;
+			})
+			.attr(this.dimensionTwo, (d: any, i: number) => {
+				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				return this.dimensionTwoScale(d.score * objectiveWeight);
+			})
+			.attr(this.coordinateOne, (d: any, i: number) => {
+				return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i;
+			})
+			.attr(this.coordinateTwo, (d: any, i: number) => {
+				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				if (this.viewOrientation == 'horizontal')
+					return (this.dimensionTwoSize - this.dimensionTwoScale(d.offset)) - this.dimensionTwoScale(d.score * objectiveWeight);
+				else
+					return this.dimensionTwoScale(d.offset);
+			});
+
+	}
 
 	// TODO: Move this to ChartDataSerivce
 
@@ -329,6 +386,24 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		for (var i = 0; i < rows.length; i++) {
 			rows[i].weightOffset = weightOffset;
 			weightOffset += this.weightMap.getNormalizedObjectiveWeight(rows[i].objective.getName());
+		}
+	}
+
+	calculateStackedBarOffsets(rows: VCRowData[]): void {
+		var stack = d3.layout.stack()
+			.x((d: any, i: number) => { return i; })
+			.y((d: any) => { return (d.score * this.weightMap.getNormalizedObjectiveWeight(d.objective.getName())); })
+			.out((d: any, y0: number) => {
+				d.offset = y0;
+			});
+
+		if (this.viewOrientation === 'horizontal') {
+			stack.order('reverse');
+		}
+
+		for (var i: number = 0; i < rows[0].cells.length; i++) {
+			stack.values((d: any) => { return d.cells[i].userScores; })
+			stack(<any> rows);
 		}
 	}
 

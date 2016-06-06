@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 09:37:30
+* @Last Modified time: 2016-06-06 14:20:28
 */
 
 import { Injectable } 					from '@angular/core';
@@ -32,6 +32,7 @@ export interface VCCellData {
 		user: User,
 		score: number
 		objective: Objective,
+		offset?: number
 	}[];
 }
 
