@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 21:55:25
+* @Last Modified time: 2016-06-06 12:10:34
 */
 
 
@@ -30,8 +30,8 @@ import { User }											from '../model/User';
 })
 export class ValueChartDirective implements OnInit, OnChanges {
 
-	private VALUECHART_WIDTH: number = 800;
-	private VALUECHART_HEIGHT: number = 400;
+	private VALUECHART_WIDTH: number = 400;
+	private VALUECHART_HEIGHT: number = 200;
 
 	private isInitialized: boolean;
 	// Inputs to the directive.
@@ -55,17 +55,15 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	private dimensionOneScale: any;
 	private dimensionTwoScale: any;
 
-	private rowScales: any[];
-
 	// ValueChart data that has been organized to work with d3.
 	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data.
 
 
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: any; // The SVG base element for the ValueChart rendering.
-	private chartRows: any; // The collection of g elements that hold each row (or column if in vertical orientation) of the chart. 
-	private chartCells: any;
-	private chartLines: any;
+
+	private objectiveChartSelections: any; 
+	private stackedBarChartSelections: any;
 
 	constructor(
 		private template: TemplateRef<any>,
@@ -101,8 +99,11 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			this.numUsers = (<GroupValueChart> this.valueChart).getUsers().length;
 		}
 
+		this.objectiveChartSelections = {};
+		this.stackedBarChartSelections = {};
+
 		// Configure the orientation options depending on the 
-		this.configureViewOrientation(this.viewOrientation)
+		this.configureViewOrientation(this.viewOrientation);
 
 		// Create the SVG base element, and set it to dynamically fit to the viewport.
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
@@ -116,11 +117,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 		this.numPrimitiveObjectives = this.dataRows.length;
 
-		this.rowScales = [];
-		this.calculateRowScales(this.dataRows);
-
 		// Render the ValueChart;
-		this.renderRows(this.dataRows);
+		this.createObjectiveChart(this.dataRows);
+		this.renderObjectiveChart(this.dataRows);
+
+		this.createStackedBarChart();
+		this.renderStackedBarChart();
 
 		this.isInitialized = true;
 	}
@@ -144,65 +146,175 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 			// Change orientation
 			this.configureViewOrientation(this.viewOrientation);
-			this.calculateRowScales(this.dataRows);
-			this.reorientValueChart();
+
+			this.renderObjectiveChart(this.dataRows);
+			this.renderStackedBarChart();
+
 		}
+	}
+
+	createObjectiveChart(rows: VCRowData[]): void {
+		this.objectiveChartSelections.chart = this.el.append('g')
+			.classed('objective-chart', true)
+			
+		this.createObjectiveRows(this.objectiveChartSelections.chart, rows);
+	}
+
+	createObjectiveRows(objectiveChart: any, rows: VCRowData[]): void {
+		this.objectiveChartSelections.rowOutlines = objectiveChart.append('g')
+			.classed('objective-row-outlines-container', true)
+			.selectAll('rect')
+				.data(rows)
+				.enter().append('rect')
+					.classed('objective-row-outline', true)
+					.style('stroke-width', 1)
+					.style('stroke', 'grey')
+					.style('fill', 'white');
+
+		this.objectiveChartSelections.rows = objectiveChart.append('g')
+			.classed('objective-rows-container', true)
+			.selectAll('g')
+				.data(rows)
+				.enter().append('g')
+					.classed('objective-row', true);
+
+		this.objectiveChartSelections.dividingLines = objectiveChart.append('g')
+			.classed('objective-dividers-container', true)
+			.selectAll('line')
+				.data(this.valueChart.getAlternatives())
+				.enter().append('line')
+					.classed('objective-dividing-line', true)
+					.style('stroke-width', 1)
+					.style('stroke', 'grey');
+
+		this.createObjectiveCells(this.objectiveChartSelections.rows)
+
+	}
+
+	createObjectiveCells(objectiveRows: any): void {
+		this.objectiveChartSelections.cells = objectiveRows.selectAll('g')
+			.data((d: VCRowData) => { return d.cells; })
+			.enter().append('g')
+				.classed('objective-cell', true);
+
+		this.objectiveChartSelections.userScores = this.objectiveChartSelections.cells.selectAll('rect')
+			.data((d: VCCellData, i: number) => { return d.userScores; })
+			.enter().append('rect')
+				.classed('objective-user-scores', true);
+	}
+
+	renderObjectiveChart(rows: VCRowData[]): void {
+		this.renderRows(rows);
 	}
 
 	// Render the rows of the ValueChart
 	renderRows(rows: VCRowData[]): void {
 
-		this.chartRows = this.el.append('g').append('g')
-			.selectAll('g')
-				.data(rows)
-				.enter()
-				.append('g')
-					.attr('transform', (d: VCRowData, i: number) => {
-						return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
-					});
+		this.objectiveChartSelections.chart
+			.attr('transform', () => {
+				if (this.viewOrientation == 'horizontal')
+					return this.generateTransformTranslation(400, 210);
+				else
+					return this.generateTransformTranslation(100, 0);
+			});
 
-		this.chartRows.append('rect')
-			.classed('row-outline', true)
+		this.objectiveChartSelections.rows
+			.attr('transform', (d: VCRowData, i: number) => {
+				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
+			});
+
+		this.objectiveChartSelections.rowOutlines
+			.attr('transform', (d: VCRowData, i: number) => {
+				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
+			})
 			.attr(this.dimensionOne, this.dimensionOneSize)
-			.attr(this.dimensionTwo, (d: VCRowData) => { return this.dimensionTwoScale(d.weight) })
-			.style('stroke-width', 1)
-			.style('stroke', 'grey')
-			.style('fill', 'white');
+			.attr(this.dimensionTwo, (d: VCRowData) => { 
+				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				return this.dimensionTwoScale(objectiveWeight); 
+			});
 
-		this.chartLines = this.el.select('g').append('g');
-
-		this.chartLines.selectAll('line')
-				.data(this.valueChart.getAlternatives())
-				.enter()
-				.append('line')
-					.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-					.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
-					.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-					.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize })
-					.style('stroke-width', 1)
-					.style('stroke', 'grey');
+		this.objectiveChartSelections.dividingLines
+				.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+				.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
+				.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
+				.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
+				
 
 		this.renderCells();
 	}
 
 	// Don't worry about this for now.
 	renderCells(): void {
-		this.chartCells = this.chartRows.append('g')
-			.selectAll('g')
-			.data((d: VCRowData) => { return d.cells; })
-			.enter().append('g')
-				.classed('cell', true)
-					.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); });
+		this.objectiveChartSelections.cells
+				.attr('transform', (d: VCCellData, i: number) => { return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); })
 					
-		this.chartCells.selectAll('rect')
-			.data((d: VCCellData, i: number) => { return d.userScores; })
-			.enter()
+		this.objectiveChartSelections.userScores	
+			.style('fill', (d: any, i: number) => { return d.objective.getColor(); })
+			.attr(this.dimensionOne, (d: any, i: number) => { 
+				return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers;
+			})
+			.attr(this.dimensionTwo, ( d: any, i: number ) => { 
+				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				return this.dimensionTwoScale(d.score * objectiveWeight); 
+			} )
+			.attr(this.coordinateOne, (d: any, i: number) => { 
+				return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; 
+			})
+						
+		if (this.viewOrientation === 'horizontal') {
+			this.objectiveChartSelections.userScores
+				.attr(this.coordinateTwo, (d: any, i: number) => {
+					var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+					return this.dimensionTwoScale(objectiveWeight) - this.dimensionTwoScale(d.score * objectiveWeight);
+				});
+		}
+	}
+
+	createStackedBarChart(): void {
+		this.stackedBarChartSelections.chart = this.el.append('g')
+			.classed('stackedbar-chart', true);
+
+		this.stackedBarChartSelections.outline = this.stackedBarChartSelections.chart
 			.append('rect')
-				.style('fill', 'red')
-				.attr(this.dimensionOne, (d: any, i: number) => { return (this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
-				.attr(this.dimensionTwo, ( d: any, i: number ) => { return this.rowScales[d.rowIndex](d.score); } )
-				.attr(this.coordinateOne, (d: any, i: number) => { return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
-				.attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); });
+				.classed('stackedbar-outline', true)
+				.attr('fill', 'white')
+				.attr('stroke', 'grey')
+				.attr('stroke-width', 1);
+
+		this.stackedBarChartSelections.dividingLines = this.stackedBarChartSelections.chart
+			.append('g')
+				.classed('stackedbar-dividers-container', true)
+				.selectAll('line')
+				.data(this.valueChart.getAlternatives())
+				.enter().append('line')
+					.classed('stackedbar-dividing-line', true)
+					.style('stroke-width', 1)
+					.style('stroke', 'grey');
+
+	}
+
+	renderStackedBarChart(): void {
+		this.stackedBarChartSelections.chart
+			.attr('transform', () => {
+				if (this.viewOrientation == 'horizontal')
+					return this.generateTransformTranslation(400, 0);
+				else
+					return this.generateTransformTranslation(100, 410);
+			});
+
+		this.stackedBarChartSelections.outline
+			.attr(this.dimensionOne, this.dimensionOneSize)
+			.attr(this.dimensionTwo, this.dimensionTwoSize)
+
+		this.stackedBarChartSelections.dividingLines
+			.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { 
+				return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); 
+			})
+			.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
+			.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { 
+				return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); 
+			})
+			.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
 
 	}		
 
@@ -216,50 +328,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 		for (var i = 0; i < rows.length; i++) {
 			rows[i].weightOffset = weightOffset;
-			weightOffset += rows[i].weight;
+			weightOffset += this.weightMap.getNormalizedObjectiveWeight(rows[i].objective.getName());
 		}
-	}
-
-	calculateRowScales(rows: VCRowData[]): void {
-		rows.forEach((row: VCRowData, index: number) => {
-			var scale = d3.scale.linear()
-				.domain([0, 1])
-				.range([0, this.dimensionTwoScale(row.weight)]);
-
-			this.rowScales.push(scale);
-		});
-	}
-
-	// Render the ValueChart according to the current orientation.
-	reorientValueChart(): void {
-
-		this.chartRows
-			.attr('transform', (d: any, i: number) => {
-				return this.generateTransformTranslation(0, (this.dimensionTwoScale(d.weightOffset)));
-			})
-			.selectAll('.row-outline')
-				.attr(this.dimensionOne, this.dimensionOneSize)
-				.attr(this.dimensionTwo, (d: VCRowData) => { return this.dimensionTwoScale(d.weight) })
-
-		this.chartLines.selectAll('line')
-			.attr(this.coordinateOne + '1', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-			.attr(this.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
-			.attr(this.coordinateOne + '2', (d: VCCellData, i: number) => { return i * (this.dimensionOneSize / this.valueChart.getAlternatives().length); })
-			.attr(this.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.dimensionTwoSize });
-
-		this.chartCells
-			.attr('transform', (d: VCCellData, i: number) => { 
-				return this.generateTransformTranslation(i * (this.dimensionOneSize / this.valueChart.getAlternatives().length), 0); 
-			});
-
-		this.chartCells.selectAll('rect')
-			.attr(this.dimensionOne, (d: any, i: number) => { return(this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers; })
-			.attr(this.dimensionTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](d.score); })
-			.attr(this.coordinateOne, (d: any, i: number) => { return((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; })
-
-		if (this.viewOrientation === 'horizontal')
-			this.chartCells.selectAll('rect').attr(this.coordinateTwo, (d: any, i: number) => { return this.rowScales[d.rowIndex](1) - this.rowScales[d.rowIndex](d.score); });
-
 	}
 
 	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,

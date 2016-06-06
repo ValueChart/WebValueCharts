@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 16:07:09
+* @Last Modified time: 2016-06-06 09:37:30
 */
 
 import { Injectable } 					from '@angular/core';
@@ -21,7 +21,6 @@ import { WeightMap }					from '../model/WeightMap';
 
 export interface VCRowData {
 	objective: PrimitiveObjective;
-	weight: number;
 	weightOffset: number;
 	cells: VCCellData[];
 }
@@ -32,7 +31,7 @@ export interface VCCellData {
 	userScores: {
 		user: User,
 		score: number
-		rowIndex: number,
+		objective: Objective,
 	}[];
 }
 
@@ -70,7 +69,7 @@ export class ChartDataService {
 		return weight;
 	}
 
-	getCellData(objective: PrimitiveObjective, rowIndex: number): VCCellData[] {
+	getCellData(objective: PrimitiveObjective): VCCellData[] {
 		var users: User[];
 
 		if (this.valueChart.type === 'group') {
@@ -84,8 +83,8 @@ export class ChartDataService {
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
 			for (var i: number = 0; i < users.length; i++) {
-				var userScore: { user: User; score: number; rowIndex: number } = {
-					rowIndex: rowIndex,
+				var userScore: { user: User; score: number; objective: Objective } = {
+					objective: objective,
 					user: users[i],
 					score: users[i].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getScore(objectiveValue.value)
 				}
@@ -110,9 +109,8 @@ export class ChartDataService {
 		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			rowData.push({
 				objective: objective,
-				weight: weightMap.getObjectiveWeight(objective.getName()),
-				cells: this.getCellData(objective, index),
-				weightOffset: 0
+				weightOffset: 0,
+				cells: this.getCellData(objective)
 			});
 		});
 
