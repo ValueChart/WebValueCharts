@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 14:20:28
+* @Last Modified time: 2016-06-06 16:34:28
 */
 
 import { Injectable } 					from '@angular/core';
@@ -36,6 +36,12 @@ export interface VCCellData {
 	}[];
 }
 
+export interface VCLabelData {
+	objective: Objective;
+	weight: number;
+	subLabelData?: VCLabelData[]
+}
+
 
 @Injectable()
 export class ChartDataService {
@@ -52,22 +58,35 @@ export class ChartDataService {
 		return this.valueChart;
 	}
 
-	// Uses average weight for GroupValueCharts
-	getAbstractObjectiveWeight(objective: AbstractObjective): number {
-		var weight: number = 0;
-		var weightMap: WeightMap;
+	getLabelData(valueChart: ValueChart, weightMap: WeightMap): VCLabelData[] {
+		var labelData: VCLabelData[] = [];
 
-		if (this.valueChart.type === 'group') {
-			weightMap = (<GroupValueChart> this.valueChart).calculateAverageWeightMap();
-		} else {
-			weightMap = (<IndividualValueChart> this.valueChart).getUser().getWeightMap();
+		valueChart.getRootObjectives().forEach((objective: Objective) => {
+			labelData.push(this.calculateAbstractObjectiveWeight(objective, weightMap));
+		})
+
+		return labelData; 
+	} 
+
+	calculateAbstractObjectiveWeight(objective: Objective, weightMap: WeightMap): VCLabelData {
+		var lableData: VCLabelData;
+
+		if (objective.objectiveType === 'abstract') {
+			var weight = 0;
+			var children: VCLabelData[] = [];
+
+			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
+				let lableDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, weightMap);
+				weight += lableDatum.weight;
+				children.push(lableDatum);
+			});
+
+			lableData = { 'objective': objective, 'weight': weight, subLabelData: children };
+		} else if (objective.objectiveType === 'primitive') {
+			lableData =  { 'objective': objective, 'weight': weightMap.getNormalizedObjectiveWeight(objective.getName()) };
 		}
 
-		(<AbstractObjective>objective).getAllPrimitiveSubObjectives().forEach((objective: PrimitiveObjective) => {
-			weight += weightMap.getObjectiveWeight(objective.getName());
-		});
-
-		return weight;
+		return lableData;
 	}
 
 	getCellData(objective: PrimitiveObjective): VCCellData[] {
@@ -99,13 +118,6 @@ export class ChartDataService {
 
 	getRowData(valueChart: ValueChart): VCRowData[] {
 		var rowData: VCRowData[] = [];
-		var weightMap: WeightMap;
-
-		if (this.valueChart.type === 'group') {
-			weightMap = (<GroupValueChart>this.valueChart).calculateAverageWeightMap();
-		} else {
-			weightMap = ((<IndividualValueChart>this.valueChart).getUser().getWeightMap());
-		}
 
 		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			rowData.push({

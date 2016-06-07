@@ -2,27 +2,27 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 14:40:08
+* @Last Modified time: 2016-06-06 17:20:40
 */
 
 
-import { Directive, Input } 							from '@angular/core';
-import { OnInit, OnChanges, SimpleChange }				from '@angular/core';
-import { TemplateRef, ViewContainerRef, ElementRef }	from '@angular/core';
+import { Directive, Input } 										from '@angular/core';
+import { OnInit, OnChanges, SimpleChange }							from '@angular/core';
+import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
 
 // d3
-import * as d3 											from 'd3';
+import * as d3 														from 'd3';
 
 // Application classes
-import { ChartDataService, VCCellData, VCRowData }		from '../services/ChartData.service';
+import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 
 // Model Classes
-import { ValueChart } 									from '../model/ValueChart';
-import { GroupValueChart } 								from '../model/GroupValueChart';
-import { IndividualValueChart } 						from '../model/IndividualValueChart';
-import { PrimitiveObjective }							from '../model/PrimitiveObjective';
-import { WeightMap }									from '../model/WeightMap';
-import { User }											from '../model/User';
+import { ValueChart } 												from '../model/ValueChart';
+import { GroupValueChart } 											from '../model/GroupValueChart';
+import { IndividualValueChart } 									from '../model/IndividualValueChart';
+import { PrimitiveObjective }										from '../model/PrimitiveObjective';
+import { WeightMap }												from '../model/WeightMap';
+import { User }														from '../model/User';
 
 @Directive({
 	selector: 'ValueChart',
@@ -56,12 +56,13 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	private dimensionTwoScale: any;
 
 	// ValueChart data that has been organized to work with d3.
-	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data.
-
+	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data. Each array element is the data for one objective.
+	private labelData: VCLabelData[];
 
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: any; // The SVG base element for the ValueChart rendering.
 
+	private labelSelections: any;
 	private objectiveChartSelections: any; 
 	private stackedBarChartSelections: any;
 
@@ -101,6 +102,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 		this.objectiveChartSelections = {};
 		this.stackedBarChartSelections = {};
+		this.labelSelections = {};
 
 		// Configure the orientation options depending on the 
 		this.configureViewOrientation(this.viewOrientation);
@@ -111,13 +113,16 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			.attr('viewBox', '0 0' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
+
 		// Get objective data in a format that suits d3.
 		this.dataRows = this.chartDataService.getRowData(this.valueChart);
 		this.calculateWeightOffsets(this.dataRows);
 		this.calculateStackedBarOffsets(this.dataRows);
-		console.log(this.dataRows);
-
 		this.numPrimitiveObjectives = this.dataRows.length;
+
+		this.labelData = this.chartDataService.getLabelData(this.valueChart, this.weightMap);
+		this.createLabelSpace(this.labelData);
+		this.renderLabelSpace(this.labelData);
 
 		// Render the ValueChart;
 		this.createObjectiveChart(this.dataRows);
@@ -149,11 +154,99 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			// Change orientation
 			this.configureViewOrientation(this.viewOrientation);
 			this.calculateStackedBarOffsets(this.dataRows);
+			this.renderLabelSpace(this.labelData);
 			this.renderObjectiveChart(this.dataRows);
 			this.renderStackedBarChart();
 
 		}
 	}
+
+
+	createLabelSpace(labelData: VCLabelData[]): void {
+		this.labelSelections.labelRootSpace = this.el.append('g')
+			.classed('labelspace-rootspace', true)
+			
+		this.labelSelections.spaceOutline = this.labelSelections.labelRootSpace.append('g')
+			.classed('labelspace-outline-container', true)
+			.append('rect')
+				.classed('lablespace-outline', true)
+					.style('fill', 'white')
+					.style('stroke-width', 1)
+					.style('stroke', 'grey');
+
+		this.createLabels(this.labelSelections.labelRootSpace.append('g'), labelData, 'rootspace');
+	}
+
+	createLabels(labelSpace: any, labelData: VCLabelData[], parentName: string): void {
+		
+		var subLabelSpaces = labelSpace.selectAll('g')
+			.data(labelData)
+			.enter().append('g')
+				.classed('labelspace-subspace', true)
+				.attr('id', (d: VCLabelData) => { return 'labelspace-' + d.objective.getName() + '-container' })
+				.attr('parent', parentName);
+
+		subLabelSpaces.append('rect')
+			.classed('labelspace-subspace-outline', true)
+			.attr('id', (d: VCLabelData) => { return 'labelspace-' + d.objective.getName() + '-outline' });
+
+		subLabelSpaces.append('text')
+			.classed('labelspace-subspace-text', true)
+			.attr('id', (d: VCLabelData) => { return 'labelspace-' + d.objective.getName() + '-text' });
+
+
+		labelData.forEach((labelDatum: VCLabelData) => {
+			if (labelDatum.subLabelData === undefined)
+				return;
+
+			this.createLabels(this.el.select('#labelspace-' + labelDatum.objective.getName() + '-container'), labelDatum.subLabelData, labelDatum.objective.getName());
+		});
+	}
+
+	renderLabelSpace(labelData: VCLabelData[]): void {
+		this.labelSelections.labelRootSpace
+			.attr('transform', () => {
+				if (this.viewOrientation === 'vertical')
+					return this.generateTransformTranslation(0, this.dimensionTwoSize + 10);
+				else
+					return this.generateTransformTranslation(0, 0);
+			});
+				
+		this.labelSelections.spaceOutline
+			.attr(this.dimensionOne, this.dimensionOneSize)
+			.attr(this.dimensionTwo, this.dimensionTwoSize);
+
+		var labelSpaces = this.labelSelections.labelRootSpace.selectAll('g[parent=rootspace]');
+		this.renderLabels(labelSpaces, labelData);
+	}
+
+	renderLabels(labelSpaces: any, labelData: VCLabelData[]): void {
+		
+		var numLabelsAtLevel = labelData.length;
+		var dimensionOne: number = 20;
+
+		labelSpaces.select('rect')
+			.style('fill', 'white')
+			.style('stroke-width', 1)
+			.style('stroke', 'grey')
+			.attr(this.dimensionOne, dimensionOne)
+			.attr(this.dimensionTwo, (d: VCLabelData, i: number) => {
+				return (this.dimensionTwoSize / numLabelsAtLevel);
+			})
+			.attr(this.coordinateOne, 0)
+
+
+
+		labelData.forEach((labelDatum: VCLabelData) => {
+			if (labelDatum.subLabelData === undefined)
+				return;
+			let subLabelSpaces = this.labelSelections.labelRootSpace.selectAll('g[parent=' + labelDatum.objective.getName() + ']');
+			subLabelSpaces.attr('transform', this.generateTransformTranslation(dimensionOne, 0));
+
+			this.renderLabels(subLabelSpaces, labelDatum.subLabelData);
+		});
+	}
+
 
 	createObjectiveChart(rows: VCRowData[]): void {
 		this.objectiveChartSelections.chart = this.el.append('g')
@@ -208,10 +301,10 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	renderObjectiveChart(rows: VCRowData[]): void {
 		this.objectiveChartSelections.chart
 			.attr('transform', () => {
-				if (this.viewOrientation == 'horizontal')
-					return this.generateTransformTranslation(400, 210);
+				if (this.viewOrientation == 'vertical')
+					return this.generateTransformTranslation(this.dimensionOneSize, this.dimensionTwoSize + 10);
 				else
-					return this.generateTransformTranslation(100, 0);
+					return this.generateTransformTranslation(this.dimensionOneSize, 0);	// TODO: Fix this.
 			});
 
 		this.objectiveChartSelections.dividingLines
@@ -261,7 +354,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 				return ((this.dimensionOneSize / this.valueChart.getAlternatives().length) / this.numUsers) * i; 
 			});
 						
-		if (this.viewOrientation === 'horizontal') {
+		if (this.viewOrientation === 'vertical') {
 			this.objectiveChartSelections.userScores
 				.attr(this.coordinateTwo, (d: any, i: number) => {
 					var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
@@ -320,10 +413,10 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	renderStackedBarChart(): void {
 		this.stackedBarChartSelections.chart
 			.attr('transform', () => {
-				if (this.viewOrientation == 'horizontal')
-					return this.generateTransformTranslation(400, 0);
+				if (this.viewOrientation == 'vertical')
+					return this.generateTransformTranslation(this.dimensionOneSize, 0);
 				else
-					return this.generateTransformTranslation(100, 410);
+					return this.generateTransformTranslation(this.dimensionOneSize, this.dimensionTwoSize + 10);
 			});
 
 		this.stackedBarChartSelections.outline
@@ -367,7 +460,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			})
 			.attr(this.coordinateTwo, (d: any, i: number) => {
 				var objectiveWeight: number = this.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
-				if (this.viewOrientation == 'horizontal')
+				if (this.viewOrientation == 'vertical')
 					return (this.dimensionTwoSize - this.dimensionTwoScale(d.offset)) - this.dimensionTwoScale(d.score * objectiveWeight);
 				else
 					return this.dimensionTwoScale(d.offset);
@@ -397,7 +490,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 				d.offset = y0;
 			});
 
-		if (this.viewOrientation === 'horizontal') {
+		if (this.viewOrientation === 'vertical') {
 			stack.order('reverse');
 		}
 
@@ -410,7 +503,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,
 	// so this function is required to return the correct string.
 	generateTransformTranslation(coordinateOneAmount: number, coordinateTwoAmount: number): string {
-		if (this.viewOrientation === 'horizontal') {
+		if (this.viewOrientation === 'vertical') {
 			return 'translate(' + coordinateOneAmount + ',' + coordinateTwoAmount + ')';
 		} else {
 			return 'translate(' + coordinateTwoAmount + ',' + coordinateOneAmount + ')';
@@ -424,7 +517,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// and height, and width attributes are switched. Note that the size of the graph -  width: 500, height: 300 - does not change,
 	// although the which variable represents that dimension does.
 	configureViewOrientation(viewOrientation: string): void {
-		if (this.viewOrientation === 'horizontal') {
+		if (this.viewOrientation === 'vertical') {
 			// We want to render the ValueChart horizontally
 			this.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
 			this.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
@@ -438,7 +531,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 				.domain([0, 1])
 				.range([0, this.VALUECHART_HEIGHT]);
 
-		} else if (this.viewOrientation === 'vertical') {
+		} else if (this.viewOrientation === 'horizontal') {
 			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
 			this.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
 			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
