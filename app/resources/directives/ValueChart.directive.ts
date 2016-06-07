@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 17:20:40
+* @Last Modified time: 2016-06-07 12:37:52
 */
 
 
@@ -30,8 +30,8 @@ import { User }														from '../model/User';
 })
 export class ValueChartDirective implements OnInit, OnChanges {
 
-	private VALUECHART_WIDTH: number = 400;
-	private VALUECHART_HEIGHT: number = 200;
+	private VALUECHART_WIDTH: number = 600;
+	private VALUECHART_HEIGHT: number = 300;
 
 	private isInitialized: boolean;
 	// Inputs to the directive.
@@ -54,6 +54,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	private coordinateTwo: string;
 	private dimensionOneScale: any;
 	private dimensionTwoScale: any;
+
+	private labelWidth: number;
 
 	// ValueChart data that has been organized to work with d3.
 	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data. Each array element is the data for one objective.
@@ -89,8 +91,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
 		// Configure the size of the user viewport. This will be scaled to fit the browser window
-		this.viewportWidth = 900;
-		this.viewportHeight = 450;
+		this.viewportWidth = 1300;
+		this.viewportHeight = 650;
 
 		if (this.valueChart.type === 'individual') {
 			this.weightMap = (<IndividualValueChart>this.valueChart).getUser().getWeightMap();
@@ -121,10 +123,12 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		this.numPrimitiveObjectives = this.dataRows.length;
 
 		this.labelData = this.chartDataService.getLabelData(this.valueChart, this.weightMap);
+		this.calculateMinLabelWidth(this.labelData);
+		
+		// Render the ValueChart;
 		this.createLabelSpace(this.labelData);
 		this.renderLabelSpace(this.labelData);
 
-		// Render the ValueChart;
 		this.createObjectiveChart(this.dataRows);
 		this.renderObjectiveChart(this.dataRows);
 
@@ -154,6 +158,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			// Change orientation
 			this.configureViewOrientation(this.viewOrientation);
 			this.calculateStackedBarOffsets(this.dataRows);
+			this.calculateMinLabelWidth(this.labelData);
 			this.renderLabelSpace(this.labelData);
 			this.renderObjectiveChart(this.dataRows);
 			this.renderStackedBarChart();
@@ -221,27 +226,57 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	}
 
 	renderLabels(labelSpaces: any, labelData: VCLabelData[]): void {
-		
-		var numLabelsAtLevel = labelData.length;
-		var dimensionOne: number = 20;
+
+		var weightOffsets: number[] = [];
+		var weightSum: number = 0;
+		for (var i: number = 0; i < labelData.length; i++) {
+			weightOffsets[i] = weightSum;
+			weightSum += labelData[i].weight;
+		}
 
 		labelSpaces.select('rect')
 			.style('fill', 'white')
-			.style('stroke-width', 1)
-			.style('stroke', 'grey')
-			.attr(this.dimensionOne, dimensionOne)
-			.attr(this.dimensionTwo, (d: VCLabelData, i: number) => {
-				return (this.dimensionTwoSize / numLabelsAtLevel);
+			.style('stroke-width', (d: VCLabelData) => {
+				if (d.depthOfChildren === 0)
+					return 2;
+				else
+					return 1;
 			})
+			.style('stroke', (d: VCLabelData) => {
+				if (d.depthOfChildren === 0)
+					return (<PrimitiveObjective>d.objective).getColor();
+				else
+					return 'gray';
+			})
+			.attr(this.dimensionOne, (d: VCLabelData) => {
+				if (d.depthOfChildren === 0)
+					return this.dimensionOneSize - (d.depth * this.labelWidth); // Expand the last label to fill the rest of the space.
+				else
+					return this.labelWidth;
+			})
+			.attr(this.dimensionTwo, (d: VCLabelData, i: number) => { return this.dimensionTwoScale(d.weight); })
 			.attr(this.coordinateOne, 0)
+			.attr(this.coordinateTwo, ((d: VCLabelData, i: number) => { return this.dimensionTwoScale(weightOffsets[i]); }));
 
 
 
-		labelData.forEach((labelDatum: VCLabelData) => {
+		labelSpaces.select('text')
+			.attr(this.coordinateOne, (this.labelWidth / 5))
+			.attr(this.coordinateTwo, (d: VCLabelData, i: number) => { 
+				if (this.viewOrientation === "vertical")
+					return this.dimensionTwoScale(weightOffsets[i]) + (this.dimensionTwoScale(d.weight) / 2) + 5; 
+				else
+					return this.dimensionTwoScale(weightOffsets[i]) + (this.dimensionTwoScale(d.weight) / 5) + 5;
+			})
+			.style('fill', 'black')
+			.text((d: VCLabelData) => { return d.objective.getName() + ' (' +  Math.round(d.weight * 100) + '%)' });
+
+
+		labelData.forEach((labelDatum: VCLabelData, index: number) => {
 			if (labelDatum.subLabelData === undefined)
 				return;
 			let subLabelSpaces = this.labelSelections.labelRootSpace.selectAll('g[parent=' + labelDatum.objective.getName() + ']');
-			subLabelSpaces.attr('transform', this.generateTransformTranslation(dimensionOne, 0));
+			subLabelSpaces.attr('transform', this.generateTransformTranslation(this.labelWidth, this.dimensionTwoScale(weightOffsets[index])));
 
 			this.renderLabels(subLabelSpaces, labelDatum.subLabelData);
 		});
@@ -498,6 +533,15 @@ export class ValueChartDirective implements OnInit, OnChanges {
 			stack.values((d: any) => { return d.cells[i].userScores; })
 			stack(<any> rows);
 		}
+	}
+
+	calculateMinLabelWidth(labelData: VCLabelData[]): void {
+		var maxDepthOfChildren = 0;
+		labelData.forEach((labelDatum: VCLabelData) => {
+			if (labelDatum.depthOfChildren > maxDepthOfChildren)
+				maxDepthOfChildren = labelDatum.depthOfChildren;
+		});
+		this.labelWidth = this.dimensionOneSize / (maxDepthOfChildren + 1);
 	}
 
 	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,

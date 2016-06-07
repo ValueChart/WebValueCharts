@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-06 16:34:28
+* @Last Modified time: 2016-06-07 10:36:16
 */
 
 import { Injectable } 					from '@angular/core';
@@ -39,6 +39,8 @@ export interface VCCellData {
 export interface VCLabelData {
 	objective: Objective;
 	weight: number;
+	depth: number;
+	depthOfChildren: number;
 	subLabelData?: VCLabelData[]
 }
 
@@ -62,31 +64,34 @@ export class ChartDataService {
 		var labelData: VCLabelData[] = [];
 
 		valueChart.getRootObjectives().forEach((objective: Objective) => {
-			labelData.push(this.calculateAbstractObjectiveWeight(objective, weightMap));
+			labelData.push(this.calculateAbstractObjectiveWeight(objective, weightMap, 0));
 		})
 
 		return labelData; 
 	} 
 
-	calculateAbstractObjectiveWeight(objective: Objective, weightMap: WeightMap): VCLabelData {
-		var lableData: VCLabelData;
+	calculateAbstractObjectiveWeight(objective: Objective, weightMap: WeightMap, depth: number): VCLabelData {
+		var labelData: VCLabelData;
 
 		if (objective.objectiveType === 'abstract') {
 			var weight = 0;
 			var children: VCLabelData[] = [];
+			var maxDepthOfChildren: number = 0;
 
 			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let lableDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, weightMap);
+				let lableDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, weightMap, depth + 1);
 				weight += lableDatum.weight;
+				if (lableDatum.depthOfChildren > maxDepthOfChildren)
+					maxDepthOfChildren = lableDatum.depthOfChildren;
 				children.push(lableDatum);
 			});
 
-			lableData = { 'objective': objective, 'weight': weight, subLabelData: children };
+			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
 		} else if (objective.objectiveType === 'primitive') {
-			lableData =  { 'objective': objective, 'weight': weightMap.getNormalizedObjectiveWeight(objective.getName()) };
+			labelData =  { 'objective': objective, 'weight': weightMap.getNormalizedObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0};
 		}
 
-		return lableData;
+		return labelData;
 	}
 
 	getCellData(objective: PrimitiveObjective): VCCellData[] {
