@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 15:22:36
+* @Last Modified time: 2016-06-08 16:51:13
 */
 
 import { Injectable } 					from '@angular/core';
@@ -128,6 +128,7 @@ export class ChartDataService {
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
 			for (var i: number = 0; i < users.length; i++) {
+
 				var userScore: { user: User; score: number; objective: Objective } = {
 					objective: objective,
 					user: users[i],
@@ -151,7 +152,6 @@ export class ChartDataService {
 				cells: this.getCellData(objective)
 			});
 		});
-
 		return rowData;
 	}
 

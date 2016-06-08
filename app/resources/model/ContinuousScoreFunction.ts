@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 10:29:19
+* @Last Modified time: 2016-06-08 16:52:41
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -46,6 +46,7 @@ export class ContinuousScoreFunction implements ScoreFunction {
 
 	getScore(domainElement: number): number {
 		var score = this.elementScoreMap.get(domainElement); 
+
 		if (score !== undefined) {
 			return score;	// The value was in the mapping of domain elements to scores.
 		} 

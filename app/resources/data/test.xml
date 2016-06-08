@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ValueCharts problem="OCRunoffMng">
+<Colors>
+<Color b="0" g="115" name="Potential_Domino_Effects" r="0"/>
+<Color b="0" g="102" name="Disruption_to_stakeholders" r="0"/>
+<Color b="0" g="51" name="Risk" r="0"/>
+<Color b="128" g="0" name="Innovation_Support" r="0"/>
+<Color b="115" g="0" name="Cliff_Erosion" r="0"/>
+<Color b="89" g="0" name="Reuse_Capacity" r="0"/>
+</Colors>
+<Criteria>
+<Criterion name="OCRunoffMng" type="abstract">
+<Criterion name="Operation" type="abstract">
+<Criterion name="Potential_Domino_Effects" type="primitive" weight="0.15">
+<Domain type="continuous" unit="Unit3">
+<ContinuousValue x="4.0" y="1.0"/>
+<ContinuousValue x="10.0" y="0.66"/>
+<ContinuousValue x="15.0" y="0.33"/>
+<ContinuousValue x="20.0" y="0.0"/>
+</Domain>
+</Criterion>
+<Criterion name="Disruption_to_stakeholders" type="primitive" weight="0.15">
+<Domain type="discrete">
+<DiscreteValue x="None" y="1.0"/>
+<DiscreteValue x="Somewhat" y="0.5"/>
+<DiscreteValue x="Very" y="0.0"/>
+</Domain>
+</Criterion>
+<Criterion name="Risk" type="primitive" weight="0.2">
+<Domain type="continuous" unit="Unit2">
+<ContinuousValue x="2.0" y="1.0"/>
+<ContinuousValue x="4.0" y="0.6"/>
+<ContinuousValue x="6.0" y="0.4"/>
+<ContinuousValue x="8.0" y="0.3"/>
+<ContinuousValue x="10.0" y="0.2"/>
+<ContinuousValue x="12.0" y="0.15"/>
+</Domain>
+</Criterion>
+</Criterion>
+<Criterion name="Sustainability" type="abstract">
+<Criterion name="Innovation_Support" type="primitive" weight="0.15">
+<Domain type="discrete">
+<DiscreteValue x="No" y="0.0"/>
+<DiscreteValue x="Medium" y="0.5"/>
+<DiscreteValue x="High" y="1.0"/>
+</Domain>
+</Criterion>
+<Criterion name="Cliff_Erosion" type="primitive" weight="0.15">
+<Domain type="discrete">
+<DiscreteValue x="None" y="1.0"/>
+<DiscreteValue x="Medium" y="0.2"/>
+<DiscreteValue x="Large" y="0.0"/>
+</Domain>
+</Criterion>
+<Criterion name="Reuse_Capacity" type="primitive" weight="0.2">
+<Domain type="continuous" unit="m3/month">
+<ContinuousValue x="0.0" y="0.1"/>
+<ContinuousValue x="20.0" y="0.0"/>
+<ContinuousValue x="80.0" y="1.0"/>
+<ContinuousValue x="100.0" y="1.0"/>
+</Domain>
+</Criterion>
+</Criterion>
+</Criterion>
+</Criteria>
+<Alternatives>
+<Alternative name="Site Unchanged">
+<AlternativeValue criterion="Risk" value="3.0"/>
+<AlternativeValue criterion="Disruption_to_stakeholders" value="None"/>
+<AlternativeValue criterion="Cliff_Erosion" value="None"/>
+<AlternativeValue criterion="Innovation_Support" value="No"/>
+<AlternativeValue criterion="Potential_Domino_Effects" value="4.0"/>
+<AlternativeValue criterion="Reuse_Capacity" value="0.0"/>
+</Alternative>
+<Alternative name="Vantage College. Conventional Runoff Management">
+<AlternativeValue criterion="Risk" value="2.0"/>
+<AlternativeValue criterion="Disruption_to_stakeholders" value="Somewhat"/>
+<AlternativeValue criterion="Cliff_Erosion" value="Medium"/>
+<AlternativeValue criterion="Innovation_Support" value="No"/>
+<AlternativeValue criterion="Potential_Domino_Effects" value="7.0"/>
+<AlternativeValue criterion="Reuse_Capacity" value="0.0"/>
+</Alternative>
+<Alternative name="Vantage College. Best practice Onsite Runoff">
+<AlternativeValue criterion="Risk" value="6.0"/>
+<AlternativeValue criterion="Disruption_to_stakeholders" value="Somewhat"/>
+<AlternativeValue criterion="Cliff_Erosion" value="Large"/>
+<AlternativeValue criterion="Innovation_Support" value="Medium"/>
+<AlternativeValue criterion="Potential_Domino_Effects" value="12.0"/>
+<AlternativeValue criterion="Reuse_Capacity" value="50.0"/>
+</Alternative>
+<Alternative name="Direct Runoff to Sustainability Street">
+<AlternativeValue criterion="Risk" value="12.0"/>
+<AlternativeValue criterion="Disruption_to_stakeholders" value="Very"/>
+<AlternativeValue criterion="Cliff_Erosion" value="Medium"/>
+<AlternativeValue criterion="Innovation_Support" value="High"/>
+<AlternativeValue criterion="Potential_Domino_Effects" value="20.0"/>
+<AlternativeValue criterion="Reuse_Capacity" value="100.0"/>
+</Alternative>
+</Alternatives>
+</ValueCharts>

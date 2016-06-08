@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 13:06:38
+* @Last Modified time: 2016-06-08 16:49:59
 */
 // Library Classes
 import { Injectable } 				from '@angular/core';
@@ -78,7 +78,8 @@ export class XMLValueChartParser {
 
 	parsePrimitiveObjective(primitiveObjectiveNodes: Element): PrimitiveObjective {
 		var name: string = primitiveObjectiveNodes.getAttribute('name');
-		var description: string = primitiveObjectiveNodes.querySelector('Description').innerHTML;
+		if (primitiveObjectiveNodes.querySelector('Description'))
+			var description: string = primitiveObjectiveNodes.querySelector('Description').innerHTML;
 
 		var primitiveObjective: PrimitiveObjective = new PrimitiveObjective(name, description);
 
@@ -130,7 +131,12 @@ export class XMLValueChartParser {
 			}
 
 			for (var i: number = 0; i < domainNode.children.length; i++) {
-				let x: number | string = domainNode.children[i].getAttribute('x');
+				let x: number | string;
+				if (domainNode.getAttribute('type') === 'continuous') {
+					x = +domainNode.children[i].getAttribute('x');
+				} else if (domainNode.getAttribute('type') === 'discrete') {
+					x = domainNode.children[i].getAttribute('x');
+				}
 				let y: number = +domainNode.children[i].getAttribute('y')
 				scoreFunction.setElementScore(x, y);
 			}
@@ -147,7 +153,13 @@ export class XMLValueChartParser {
 
 		for (var i: number = 0; i < (<any> alternativeNodes).children.length; i++) {
 			var node: any = (<any>alternativeNodes).children[i];
-			let alternative: Alternative = new Alternative(node.getAttribute('name'), node.querySelector('Description').innerHTML);
+			var description: string;
+
+			if (node.querySelector('Description'))
+				description = node.querySelector('Description').innerHTML;
+			else
+				description = '';
+			let alternative: Alternative = new Alternative(node.getAttribute('name'), description);
 
 			var valueNodes: any = node.querySelectorAll('AlternativeValue');
 
