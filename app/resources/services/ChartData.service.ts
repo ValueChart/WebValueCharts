@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 14:01:23
+* @Last Modified time: 2016-06-08 15:22:36
 */
 
 import { Injectable } 					from '@angular/core';
@@ -17,7 +17,10 @@ import { AbstractObjective }			from '../model/AbstractObjective';
 import { User }							from '../model/User';	
 import { Alternative }					from '../model/Alternative';
 import { WeightMap }					from '../model/WeightMap';
-
+import { CategoricalDomain }			from '../model/CategoricalDomain';
+import { IntervalDomain }				from '../model/IntervalDomain';
+import { ContinuousDomain }				from '../model/ContinuousDomain';
+import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
 
 export interface VCRowData {
 	objective: PrimitiveObjective;
@@ -50,6 +53,7 @@ export class ChartDataService {
 
 	private valueChart: ValueChart;
 	public weightMap: WeightMap;
+	public scoreFunctionMap: ScoreFunctionMap;
 	public numUsers: number;
 	public numAlternatives: number;
 
@@ -63,6 +67,7 @@ export class ChartDataService {
 
 		if (this.valueChart.type === 'individual') {
 			this.weightMap = (<IndividualValueChart>this.valueChart).getUser().getWeightMap();
+			this.scoreFunctionMap = (<IndividualValueChart>this.valueChart).getUser().getScoreFunctionMap();
 			this.numUsers = 1;
 		} else {
 			this.weightMap = (<GroupValueChart>this.valueChart).calculateAverageWeightMap();
@@ -193,7 +198,38 @@ export class ChartDataService {
 			if (labelDatum.depthOfChildren > maxDepthOfChildren)
 				maxDepthOfChildren = labelDatum.depthOfChildren;
 		});
-		return dimensionOneSize / (maxDepthOfChildren + 1);
+		return dimensionOneSize / (maxDepthOfChildren + 2);
+	}
+
+	getDomainElements(objective: PrimitiveObjective): (string | number)[] {
+		var domainElements: (string | number)[];
+
+		if (objective.getDomainType() === 'categorical') {
+			domainElements = (<CategoricalDomain> objective.getDomain()).getElements();
+		} else if (objective.getDomainType() === 'interval') {
+			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
+		} else {
+			domainElements = this.getElementsFromContinuousDomain((<ContinuousDomain> objective.getDomain()))
+		}
+
+		return domainElements;
+	}
+
+
+	getElementsFromContinuousDomain(continouousDomain: ContinuousDomain): number[] {
+		var range: number[] = continouousDomain.getRange()
+		var increment = (range[1] - range[0]) / 4;
+		var element = range[0];
+
+		var elements: number[] = [];
+
+		while (element <= range[1]) {
+
+			elements.push(Math.round(element * 100) / 100);
+			element += increment;
+		}
+
+		return elements;
 	}
 
 }

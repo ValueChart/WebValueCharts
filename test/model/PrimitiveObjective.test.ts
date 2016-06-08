@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:27:08
+* @Last Modified time: 2016-06-08 13:03:11
 */
 
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
@@ -53,9 +53,9 @@ describe('PrimitiveObjective', () => {
 		})
 
 		context('when domain is discrete', () => {
-			it('should have a domain type: "discrete"', () => {
+			it('should have a domain type: "categorical"', () => {
 				primitiveObjective.setDomain(categoricalDomain);
-				expect(primitiveObjective.getDomainType()).to.equal('discrete');
+				expect(primitiveObjective.getDomainType()).to.equal('categorical');
 			});
 		});
 

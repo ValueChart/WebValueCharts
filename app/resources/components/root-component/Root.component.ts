@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 14:13:02
+* @Last Modified time: 2016-06-07 15:35:36
 */
 
 import { Component } 										from '@angular/core';
@@ -21,6 +21,8 @@ import { RenderConfigService }								from '../../services/RenderConfig.service'
 import { ObjectiveChartRenderer }							from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }								from '../../renderers/SummaryChart.renderer';
 import { LabelRenderer }									from '../../renderers/Label.renderer';
+import { ScoreFunctionRenderer }							from '../../renderers/ScoreFunction.renderer';
+
 
 
 @Component({
@@ -34,7 +36,8 @@ import { LabelRenderer }									from '../../renderers/Label.renderer';
 				RenderConfigService,
 				ObjectiveChartRenderer, 
 				SummaryChartRenderer, 
-				LabelRenderer]
+				LabelRenderer,
+				ScoreFunctionRenderer]
 })
 @Routes([
   {path: '/register', component: RegisterComponent}, // useAsDefault: true - coming soon...

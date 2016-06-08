@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 14:04:03
+* @Last Modified time: 2016-06-08 11:42:52
 */
 
 
@@ -78,8 +78,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
 		// Configure the size of the user viewport. This will be scaled to fit the browser window
-		this.viewportWidth = 1300;
-		this.viewportHeight = 650;
+		this.viewportWidth = 1700;
+		this.viewportHeight = 850;
 
 		// Configure the orientation options depending on the 
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);

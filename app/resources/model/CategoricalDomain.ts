@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:00:42
+* @Last Modified time: 2016-06-08 12:57:06
 */
 
 
@@ -15,7 +15,7 @@ export class CategoricalDomain implements Domain {
 	private elements: string[];
 
 	constructor(ordered: boolean) {	
-		this.type = "discrete"; 
+		this.type = "categorical"; 
 		this.ordered = ordered;
 		this.elements = [];
 	}

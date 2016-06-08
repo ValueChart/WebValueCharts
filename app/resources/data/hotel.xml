@@ -157,7 +157,7 @@
           <Alternative name="Marriott">
                <AlternativeValue criterion="area" value="airport"/>
                <AlternativeValue criterion="internet-access" value="lowspeed"/>
-               <AlternativeValue criterion="rate" value="160.0"/>
+               <AlternativeValue criterion="rate" value="175.0"/>
                <AlternativeValue criterion="skytrain-distance" value="9.0"/>
                <AlternativeValue criterion="size" value="200.0"/>
                <Description name="Marriott">The video-game console and TV with satellite channels are offered for your entertainment. A coffee/tea maker is provided. The private bathroom has designer toiletries. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>
@@ -173,7 +173,7 @@
           <Alternative name="Ramada">
                <AlternativeValue criterion="area" value="beach"/>
                <AlternativeValue criterion="internet-access" value="none"/>
-               <AlternativeValue criterion="rate" value="120.0"/>
+               <AlternativeValue criterion="rate" value="125.0"/>
                <AlternativeValue criterion="skytrain-distance" value="1.0"/>
                <AlternativeValue criterion="size" value="312.5"/>
                <Description name="Ramada">1 double bed. Desk. 37-inch LCD high-definition TV. Pay movies. Phone. Voice mail. Clock radio. Coffee/tea maker. Hair dryer. Iron/ironing board. Complimentary weekday newspaper. Bathroom with granite-topped vanity. Blackout drapes/curtains. Air conditioning. Climate control</Description>

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 13:36:00
+* @Last Modified time: 2016-06-08 11:42:50
 */
 
 import { Injectable } 												from '@angular/core';
@@ -11,8 +11,8 @@ import { Injectable } 												from '@angular/core';
 @Injectable()
 export class RenderConfigService {
 
-	public VALUECHART_WIDTH: number = 600;
-	public VALUECHART_HEIGHT: number = 300;
+	public VALUECHART_WIDTH: number = 800;
+	public VALUECHART_HEIGHT: number = 400;
 
 	private viewOrientation: string;
 
