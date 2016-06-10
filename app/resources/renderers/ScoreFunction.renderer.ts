@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 11:56:52
+* @Last Modified time: 2016-06-10 14:31:17
 */
 
 import { Injectable } 					from '@angular/core';
@@ -38,12 +38,20 @@ export abstract class ScoreFunctionRenderer {
 	public axisContainer: any;						// The 'g' element that conntains the y and x axis.
 	public utilityLabelContainer: any;				// The 'g' element that contains the labels for utility axis.
 
-	protected yAxisXCoordinate: number;				// The x coordinate of the y-axis in the plot.
-	protected xAxisYCoordinate: number;				// The y coordinate of the x-axis in the plot
-	protected yAxisTopCoordinate: number;			// The y coordinate of the top of the y-axis
-	protected xAxisRightCoordinate: number;			// The x coordinate of the rightmost end of the x-axis.
+	protected utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
+	protected domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
+	protected utilityAxisMaxCoordinateTwo: number;			// The y coordinate of the top of the y-axis
+	protected domainAxisMaxCoordinateOne: number;			// The x coordinate of the rightmost end of the x-axis.
 
 	protected labelOffset: number = 10;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
+
+	protected dimensionOne: string;
+	protected dimensionTwo: string;
+	protected coordinateOne: string;
+	protected coordinateTwo: string;
+	protected dimensionOneSize: number;
+	protected dimensionTwoSize: number;
+
 
 	constructor(protected chartDataService: ChartDataService) { }
 
@@ -126,63 +134,107 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	// This function renders the elements created by createScoreFunction
-	renderScoreFunction(el: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number): void {
+	renderScoreFunction(el: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number, viewOrientation: string): void {
 		var objectiveName: string = objective.getName();
 
 		var domainElements: (number | string)[] = this.chartDataService.getDomainElements(objective);
 		var domainSize: number = domainElements.length;
 
-		this.yAxisXCoordinate = Math.max(width / 20, this.labelOffset);
-		this.xAxisYCoordinate = Math.min((19 / 20) * height, height - this.labelOffset);
-		this.yAxisTopCoordinate = Math.max(height / 20, 5);
-		this.xAxisRightCoordinate = Math.min((19 / 20) * width, width - this.labelOffset);
+		if (viewOrientation === 'vertical') {
+			this.dimensionOne = 'width';
+			this.dimensionTwo = 'height';
+			this.coordinateOne = 'x';
+			this.coordinateTwo = 'y';
+
+			this.dimensionOneSize = width;
+			this.dimensionTwoSize = height;
+
+			this.domainAxisCoordinateTwo = Math.min((19 / 20) * this.dimensionTwoSize, this.dimensionTwoSize - this.labelOffset);
+
+			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize / 20, 5);
+
+		} else {
+			this.dimensionOne = 'height';
+			this.dimensionTwo = 'width';
+			this.coordinateOne = 'y';
+			this.coordinateTwo = 'x';
+
+			this.dimensionOneSize = height;
+			this.dimensionTwoSize = width;
+
+			this.domainAxisCoordinateTwo = Math.max((1 / 20) * this.dimensionTwoSize, this.labelOffset) + 10;
+
+			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize * (19 / 20), 5);
+
+		}
+
+		this.domainAxisMaxCoordinateOne = Math.min((19 / 20) * this.dimensionOneSize, this.dimensionOneSize - this.labelOffset);
+		this.utilityAxisCoordinateOne = Math.max(this.dimensionOneSize / 20, this.labelOffset);
+
+
 
 		this.plotOutline
-			.select('rect')
-				.attr('width', width - 1)
-				.attr('height', height);
+			.attr(this.dimensionOne, this.dimensionOneSize - 1)
+			.attr(this.dimensionTwo, this.dimensionTwoSize);
 
 
-		this.renderScoreFunctionAxis(this.axisContainer, this.utilityLabelContainer, objectiveName);
+		this.renderScoreFunctionAxis(this.axisContainer, this.utilityLabelContainer, objectiveName, viewOrientation);
 
-		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, scoreFunction, domainElements, width, height);			
+		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);			
 	}
 
 	// This function renders the elements created by createScoreFunctionAxis
-	renderScoreFunctionAxis(axisContainer: any, utilityLabelContainer: any, objectiveName: string): void {
+	renderScoreFunctionAxis(axisContainer: any, utilityLabelContainer: any, objectiveName: string, viewOrientation: string): void {
 
 		axisContainer.select('.scorefunction-' + objectiveName + '-x-axis')
-			.attr('x1', this.yAxisXCoordinate)
-			.attr('y1', this.xAxisYCoordinate)
-			.attr('x2', this.xAxisRightCoordinate)
-			.attr('y2', this.xAxisYCoordinate);
+			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
+			.attr(this.coordinateTwo + '1', this.domainAxisCoordinateTwo)
+			.attr(this.coordinateOne + '2', this.domainAxisMaxCoordinateOne)
+			.attr(this.coordinateTwo + '2', this.domainAxisCoordinateTwo);
 
 		axisContainer.select('.scorefunction-' + objectiveName + '-y-axis')
-			.attr('x1', this.yAxisXCoordinate)
-			.attr('y1', this.xAxisYCoordinate)
-			.attr('x2', this.yAxisXCoordinate)
-			.attr('y2', this.yAxisTopCoordinate);
+			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
+			.attr(this.coordinateTwo + '1', this.domainAxisCoordinateTwo)
+			.attr(this.coordinateOne + '2', this.utilityAxisCoordinateOne)
+			.attr(this.coordinateTwo + '2', this.utilityAxisMaxCoordinateTwo);
+
+		var utilityLabelCoordinateOne: number;
+		if (viewOrientation === 'vertical')
+			utilityLabelCoordinateOne = this.utilityAxisCoordinateOne - this.labelOffset;
+		else 
+			utilityLabelCoordinateOne = this.utilityAxisCoordinateOne;
 
 		utilityLabelContainer.select('.scorefunction-' + objectiveName + '-0-label')
 			.text('0')
-			.attr('x', this.yAxisXCoordinate - this.labelOffset)
-			.attr('y', this.xAxisYCoordinate + (this.labelOffset / 2));
+			.attr(this.coordinateOne, utilityLabelCoordinateOne)
+			.attr(this.coordinateTwo, (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo + (this.labelOffset / 2) : this.domainAxisCoordinateTwo);
 
 		utilityLabelContainer.select('.scorefunction-' + objectiveName + '-1-label')
 			.text('1')
-			.attr('x', this.yAxisXCoordinate - this.labelOffset)
-			.attr('y', this.yAxisTopCoordinate + this.labelOffset);
+			.attr(this.coordinateOne, utilityLabelCoordinateOne)
+			.attr(this.coordinateTwo, (viewOrientation === 'vertical') ? this.utilityAxisMaxCoordinateTwo + this.labelOffset : this.utilityAxisMaxCoordinateTwo - (this.labelOffset));
 	}
 
 	// This function renders the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
 	// to render their specific elements.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[],  width: number, height: number): void {
+	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
 
 		this.domainSize = domainElements.length;
 
+		var labelCoordinateOneOffset: number;
+		var labelCoordinateTwo: number;
+
+		if (viewOrientation === 'vertical') {
+			labelCoordinateOneOffset = this.labelOffset;
+			labelCoordinateTwo = this.domainAxisCoordinateTwo + this.labelOffset - 2;
+		} else {
+			labelCoordinateOneOffset = (2 * this.labelOffset);
+			labelCoordinateTwo = this.domainAxisCoordinateTwo - (this.labelOffset * 2);
+		}
+
 		domainLabels
-			.attr('x', (d: (string | number), i: number) => { return (((this.xAxisRightCoordinate - this.yAxisXCoordinate) / this.domainSize) * i) + this.labelOffset; }) // Position the domain labels at even intervals along the axis.
-			.attr('y', this.xAxisYCoordinate + this.labelOffset - 2)
+			.attr(this.coordinateOne, (d: (string | number), i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+			.attr(this.coordinateTwo, labelCoordinateTwo)
 			.text((d: (string | number)) => { return d; })
 			.style('font-size', '9px');
 	}
@@ -191,7 +243,7 @@ export abstract class ScoreFunctionRenderer {
 
 	// Anonymous functions that are used often enough to be made class fields:
 
-	calculatePlotElementCoordinateOne = (d: (string | number), i: number) => { return (((this.xAxisRightCoordinate - this.yAxisXCoordinate) / this.domainSize) * i) + this.labelOffset * 1.5; }
+	calculatePlotElementCoordinateOne = (d: (string | number), i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
 
 
 

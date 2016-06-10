@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 12:10:28
+* @Last Modified time: 2016-06-10 14:26:03
 */
 
 import { Injectable } 					from '@angular/core';
@@ -82,35 +82,48 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the rednerPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 
 	// like points and connecting lines for the scatter plot that is used to represent element scores.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], width: number, height: number): void {
-		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, width, height);
+	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);
 
-		this.renderContinuousPlot(plotElementsContainer, objective, (<ContinuousScoreFunction>scoreFunction), <number[]>domainElements, width, height);
+		this.renderContinuousPlot(plotElementsContainer, objective, (<ContinuousScoreFunction>scoreFunction), <number[]>domainElements, viewOrientation);
 
 	}
 
-	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], width: number, height: number): void {
+	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation): void {
 		var pointRadius = this.labelOffset / 3;
 
 		var heightScale = d3.scale.linear()
 			.domain([0, 1])
-			.range([0, this.xAxisYCoordinate - pointRadius]);
+			.range([0, this.domainAxisCoordinateTwo - pointRadius]);
+
+		if (viewOrientation === 'vertical') {
+			heightScale.range([0, this.domainAxisCoordinateTwo - pointRadius]);
+		} else {
+			heightScale.range([this.domainAxisCoordinateTwo, this.utilityAxisMaxCoordinateTwo - pointRadius]);
+		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
-		var calculatePointCoordinateTwo = (d: (string | number)) => { return (this.xAxisYCoordinate) - heightScale(scoreFunction.getScore(+d)); };
+		var calculatePointCoordinateTwo = (d: (string | number)) => { 
+			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - heightScale(scoreFunction.getScore(+d)) : heightScale(scoreFunction.getScore(+d)); 
+		};
 
 		plotElementsContainer.selectAll('circle')
-			.attr('cx', this.calculatePlotElementCoordinateOne)
-			.attr('cy', calculatePointCoordinateTwo)
+			.attr('c' + this.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
 			.style('fill', objective.getColor());
 
 		plotElementsContainer.selectAll('line')
-			.attr('x1', this.calculatePlotElementCoordinateOne)
-			.attr('y1', calculatePointCoordinateTwo)
-			.attr('x2', (d: (string | number), i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1); })
-			.attr('y2', (d: (string | number), i: number) => { return calculatePointCoordinateTwo(domainElements[i + 1]); })
+			.attr(this.coordinateOne  + '1', this.calculatePlotElementCoordinateOne)
+			.attr(this.coordinateTwo + '1', calculatePointCoordinateTwo)
+			.attr(this.coordinateOne  + '2', (d: (string | number), i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1); })
+			.attr(this.coordinateTwo + '2', (d: (string | number), i: number) => { return calculatePointCoordinateTwo(domainElements[i + 1]); })
 			.style('stroke', 'black')
 			.style('stroke-width', 1);
 	}
 }
+
+
+
+
+

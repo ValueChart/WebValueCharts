@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 11:01:17
+* @Last Modified time: 2016-06-10 13:19:49
 */
 
 import { Injectable } 												from '@angular/core';
@@ -273,7 +273,7 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderers[datum.getName()].renderScoreFunction(el, datum, scoreFunction, width, height);
+			this.scoreFunctionRenderers[datum.getName()].renderScoreFunction(el, datum, scoreFunction, width, height, viewOrientation);
 
 			weightOffset += objectiveWeight;
 		});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 12:10:33
+* @Last Modified time: 2016-06-10 14:30:29
 */
 
 import { Injectable } 					from '@angular/core';
@@ -76,18 +76,22 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction specific elements, 
 	// like bars for the bar chart that is used to represent element scores.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], width: number, height: number): void {
-		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, width, height);
+	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);
 
-		this.renderDiscretePlot(plotElementsContainer, objective, (<DiscreteScoreFunction>scoreFunction), width, height);
+		this.renderDiscretePlot(plotElementsContainer, objective, (<DiscreteScoreFunction> scoreFunction), viewOrientation);
 	}
 
-	renderDiscretePlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, width: number, height: number): void {
-		var barWidth: number = (width / this.domainSize) / 3;
-
+	renderDiscretePlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, viewOrientation: string): void {
+		var barWidth: number = (this.dimensionOneSize / this.domainSize) / 3;
 		var heightScale = d3.scale.linear()
-			.domain([0, 1])
-			.range([0, this.xAxisYCoordinate]);
+			.domain([0, 1]);
+		if (viewOrientation === 'vertical') {
+			heightScale.range([0, this.domainAxisCoordinateTwo]);
+		} else {
+			heightScale.range([0, this.utilityAxisMaxCoordinateTwo]);
+
+		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: (string | number)) => { return Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); };
@@ -95,10 +99,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		plotElementsContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
 			.selectAll('.scorefunction-' + objective.getName() + '-bar')
-			.attr('height', calculateBarDimensionTwo)
-			.attr('width', barWidth)
-			.attr('x', this.calculatePlotElementCoordinateOne)
-			.attr('y', (d: (string | number)) => { return this.xAxisYCoordinate - calculateBarDimensionTwo(d); })
+			.attr(this.dimensionOne, barWidth)
+			.attr(this.dimensionTwo, calculateBarDimensionTwo)
+			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(this.coordinateTwo, (d: (string | number)) => { 
+				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo; 
+			})
 			.style('fill', 'white')
 			.style('stroke', objective.getColor())
 			.style('stroke-width', 1);
@@ -106,10 +112,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		plotElementsContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
 			.selectAll('.scorefunction-' + objective.getName() + '-bartop')
-			.attr('height', this.labelOffset)
-			.attr('width', barWidth)
-			.attr('x', this.calculatePlotElementCoordinateOne)
-			.attr('y', (d: (string | number)) => { return this.xAxisYCoordinate - calculateBarDimensionTwo(d); })
+			.attr(this.dimensionTwo, this.labelOffset)
+			.attr(this.dimensionOne, barWidth)
+			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(this.coordinateTwo, (d: (string | number)) => {
+				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d);
+			})
 			.style('fill', objective.getColor());
 
 	}
