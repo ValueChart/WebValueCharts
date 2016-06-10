@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 22:59:21
+* @Last Modified time: 2016-06-10 11:00:34
 */
 
 import { Injectable } 					from '@angular/core';
@@ -10,6 +10,7 @@ import { Injectable } 					from '@angular/core';
 // d3
 import * as d3 							from 'd3';
 
+// Application Classes
 import { ChartDataService }				from '../services/ChartData.service';
 
 
@@ -22,17 +23,35 @@ import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 
 
 @Injectable()
-export class ScoreFunctionRenderer {
+export abstract class ScoreFunctionRenderer {
 
-	labelOffset: number = 10;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
+	protected domainSize: number;
 
-	constructor(private chartDataService: ChartDataService) { }
+	public rootContainer: any;
+	public plotOutline: any;
+	public plotContainer: any;
+	public domainLabelContainer: any;
+	public domainLabels: any;
+	public plotElementsContainer: any;
+	public axisContainer: any;
+	public utilityLabelContainer: any;
+
+	protected yAxisXCoordinate: number;
+	protected xAxisYCoordinate: number;
+	protected yAxisTopCoordinate: number;
+	protected xAxisRightCoordinate: number;
+
+	protected labelOffset: number = 10;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
+
+	constructor(protected chartDataService: ChartDataService) { }
 
 
 	createScoreFunction(el: any, objective: PrimitiveObjective): void {
 		var objectiveName: string = objective.getName();
 
-		el.append('g')
+		this.rootContainer = el;
+
+		this.plotOutline = el.append('g')
 			.classed('scorefunction-' + objectiveName + '-outline-container', true)
 			.append('rect')
 				.classed('scorefunction-' + objectiveName + '-outline', true)
@@ -40,234 +59,126 @@ export class ScoreFunctionRenderer {
 				.style('stroke-width', 1)
 				.style('stroke', 'grey');
 
-		var chartContainer = el.append('g')
+		this.plotContainer = el.append('g')
 			.classed('scorefunction-' + objectiveName + '-chart-container', true);
 
-		this.createScoreFunctionAxis(chartContainer, objectiveName);
+		this.createScoreFunctionAxis(this.plotContainer, objectiveName);
 
 		// TODO: should make this method a member of PrimitiveObjective?
 		var domainElements: (string | number)[] = this.chartDataService.getDomainElements(objective);
 
-		var domainLabelContainer = chartContainer.append('g')
+		this.domainLabelContainer = this.plotContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-domainlabels-container', true);
 
-		var plotContainer = chartContainer.append('g')
+		this.plotElementsContainer = this.plotContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-plot-container', true);
 
-		this.createPlot(plotContainer, domainLabelContainer, objective, domainElements);
+		this.createPlot(this.plotElementsContainer, this.domainLabelContainer, objective, domainElements);
 	}
 
-	createScoreFunctionAxis(chartContainer: any, objectiveName: string) {
+	createScoreFunctionAxis(plotContainer: any, objectiveName: string): void {
 		
-		var axisContainer = chartContainer.append('g')
+		this.axisContainer = plotContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-axis-container', true);
 
-		axisContainer.append('line')
+		this.axisContainer.append('line')
 			.classed('scorefunction-' + objectiveName + '-x-axis', true)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
 
-		axisContainer.append('line')
+		this.axisContainer.append('line')
 			.classed('scorefunction-' + objectiveName + '-y-axis', true)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
 
-		var utilityLabelContainer = chartContainer.append('g')
+		this.utilityLabelContainer = plotContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-utilitylabel-container', true);
 
-		utilityLabelContainer.append('text')
+		this.utilityLabelContainer.append('text')
 			.classed('scorefunction-' + objectiveName + '-0-label', true);
 
-		utilityLabelContainer.append('text')
+		this.utilityLabelContainer.append('text')
 			.classed('scorefunction-' + objectiveName + '-1-label', true);
 	}
 
-	createPlot(plotContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
+	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		var objectiveName = objective.getName();
 
 		domainLabelContainer.selectAll('.scorefunction-' + objectiveName + '-domain-labels')
 			.data(domainElements)
 			.enter().append('text')
-			.classed('scorefunction-' + objectiveName + '-domain-labels', true)
-			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objectiveName + '-' + d + '-label';
-			});
-
-		if (objective.getDomainType() === 'continuous') {
-			this.createContinuousPlot(plotContainer, objective, domainElements);
-		} else if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval') {
-			this.createDiscretePlot(plotContainer, objective, domainElements);
-		}
-	}
-
-	createDiscretePlot(plotContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[] ) {
-		var barContainer = plotContainer.append('g')
-			.classed('scorefunction-' + objective.getName() + '-bars-container', true);
-
-		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bar')
-				.data(domainElements)
-				.enter().append('rect')
-					.classed('scorefunction-' + objective.getName() + '-bar', true)
-					.attr('id', (d: (string | number)) => {
-						return 'scorefunction-' + objective.getName() + '-' + d + '-bar';
-					});
-
-		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bartop')
-			.data(domainElements)
-			.enter().append('rect')
-				.classed('scorefunction-' + objective.getName() + '-bartop', true)
+				.classed('scorefunction-' + objectiveName + '-domain-labels', true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getName() + '-' + d + '-bartop';
+					return 'scorefunction-' + objectiveName + '-' + d + '-label';
 				});
-					
+
+		this.domainLabels = domainLabelContainer.selectAll('.scorefunction-' + objectiveName + '-domain-labels');
 	}
 
-	createContinuousPlot(plotContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
-
-		plotContainer.append('g')
-			.classed('scorefunction-' + objective.getName() + '-points-container', true)
-			.selectAll('circle')
-				.data(domainElements)
-				.enter().append('circle')
-					.classed('scorefunction-' + objective.getName() + '-point', true)
-					.attr('id', (d: (string | number)) => {
-						return 'scorefunction-' + objective.getName() + '-' + d + '-point';
-					});
-
-		domainElements.pop();
-
-		plotContainer.append('g')
-			.classed('scorefunction-' + objective.getName() + '-fitline-container', true)
-			.selectAll('line')
-				.data(domainElements)
-				.enter().append('line')
-					.classed('scorefunction-' + objective.getName() + '-fitline', true)
-					.attr('id', (d: (string | number)) => {
-						return 'scorefunction-' + objective.getName() + '-' + d + '-fitline';
-					});
-	}
-
-	renderScoreFunction(el: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number) {
+	renderScoreFunction(el: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number): void {
 		var objectiveName: string = objective.getName();
 
 		var domainElements: (number | string)[] = this.chartDataService.getDomainElements(objective);
 		var domainSize: number = domainElements.length;
 
-		el.select('.scorefunction-' + objectiveName + '-outline-container')
+		this.yAxisXCoordinate = Math.max(width / 20, this.labelOffset);
+		this.xAxisYCoordinate = Math.min((19 / 20) * height, height - this.labelOffset);
+		this.yAxisTopCoordinate = Math.max(height / 20, 5);
+		this.xAxisRightCoordinate = Math.min((19 / 20) * width, width - this.labelOffset);
+
+		this.plotOutline
 			.select('rect')
 				.attr('width', width - 1)
 				.attr('height', height);
 
 
-		var yAxisXPosition: number = Math.max(width / 20, this.labelOffset);
-		var xAxisYPosition: number = Math.min((19 / 20) * height, height - this.labelOffset);
-		var yAxisTopPosition: number = Math.max(height / 20, 5);
-		var xAxisRightPosition: number = Math.min((19 / 20) * width, width - this.labelOffset);
+		this.renderScoreFunctionAxis(this.axisContainer, this.utilityLabelContainer, objectiveName);
 
-		el.select('.scorefunction-' + objectiveName + '-x-axis')
-			.attr('x1', yAxisXPosition)
-			.attr('y1', xAxisYPosition)
-			.attr('x2', xAxisRightPosition)
-			.attr('y2', xAxisYPosition);
+		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, scoreFunction, domainElements, width, height);			
+	}
 
-		el.select('.scorefunction-' + objectiveName + '-y-axis')
-			.attr('x1', yAxisXPosition)
-			.attr('y1', xAxisYPosition)
-			.attr('x2', yAxisXPosition)
-			.attr('y2', yAxisTopPosition);
+	renderScoreFunctionAxis(axisContainer: any, utilityLabelContainer: any, objectiveName: string): void {
 
-		var labelContainer: any = el.select('.scorefunction-' + objectiveName + '-label-container');
+		axisContainer.select('.scorefunction-' + objectiveName + '-x-axis')
+			.attr('x1', this.yAxisXCoordinate)
+			.attr('y1', this.xAxisYCoordinate)
+			.attr('x2', this.xAxisRightCoordinate)
+			.attr('y2', this.xAxisYCoordinate);
 
-		labelContainer.select('.scorefunction-' + objectiveName + '-0-label')
+		axisContainer.select('.scorefunction-' + objectiveName + '-y-axis')
+			.attr('x1', this.yAxisXCoordinate)
+			.attr('y1', this.xAxisYCoordinate)
+			.attr('x2', this.yAxisXCoordinate)
+			.attr('y2', this.yAxisTopCoordinate);
+
+		utilityLabelContainer.select('.scorefunction-' + objectiveName + '-0-label')
 			.text('0')
-			.attr('x', yAxisXPosition - this.labelOffset)
-			.attr('y', xAxisYPosition + (this.labelOffset / 2));
+			.attr('x', this.yAxisXCoordinate - this.labelOffset)
+			.attr('y', this.xAxisYCoordinate + (this.labelOffset / 2));
 
-		labelContainer.select('.scorefunction-' + objectiveName + '-1-label')
+		utilityLabelContainer.select('.scorefunction-' + objectiveName + '-1-label')
 			.text('1')
-			.attr('x', yAxisXPosition - this.labelOffset)
-			.attr('y', yAxisTopPosition + this.labelOffset);
+			.attr('x', this.yAxisXCoordinate - this.labelOffset)
+			.attr('y', this.yAxisTopCoordinate + this.labelOffset);
+	}
 
+	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[],  width: number, height: number): void {
 
-		labelContainer.selectAll('.scorefunction-' + objectiveName + '-domain-labels')
-			.attr('x', (d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainSize) * i) + this.labelOffset; })
-			.attr('y', xAxisYPosition + this.labelOffset - 2)
+		this.domainSize = domainElements.length;
+
+		domainLabels
+			.attr('x', (d: (string | number), i: number) => { return (((this.xAxisRightCoordinate - this.yAxisXCoordinate) / this.domainSize) * i) + this.labelOffset; })
+			.attr('y', this.xAxisYCoordinate + this.labelOffset - 2)
 			.text((d: (string | number)) => { return d; })
 			.style('font-size', '9px');
-
-		var plotContainer = el.select('.scorefunction-' + objectiveName + '-plot-container');
-
-
-		if (objective.getDomainType() === 'continuous') {
-			this.renderContinuousPlot(plotContainer, objective, (<ContinuousScoreFunction>scoreFunction), <number[]> domainElements, width, height);
-		} else if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval') {
-			this.renderDiscretePlot(plotContainer, objective, (<DiscreteScoreFunction>scoreFunction), domainSize, width, height);
-		}			
 	}
 
-	renderDiscretePlot(plotContainer: any, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, domainSize: number, width: number, height: number) {
-		
-		// Should not redo these calculations. TODO: Fix
-		var yAxisXPosition: number = Math.max(width / 20, this.labelOffset);
-		var xAxisYPosition: number = Math.min((19 / 20) * height, height - this.labelOffset);
-		var yAxisTopPosition: number = Math.max(height / 20, 5);
-		var xAxisRightPosition: number = Math.min((19 / 20) * width, width - this.labelOffset);
 
 
-		var barWidth: number = (width / domainSize) / 3;
-		var heightScale = d3.scale.linear()
-			.domain([0, 1])
-			.range([0, xAxisYPosition]);
+	// Anonymous functions that are used often enough to be made class fields:
 
-		plotContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
-			.selectAll('.scorefunction-' + objective.getName() + '-bar')
-				.attr('height', (d: (string | number)) => { return Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); })
-				.attr('width', barWidth)
-				.attr('x', ((d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainSize) * i) + this.labelOffset * 1.5; }))
-				.attr('y', (d: (string | number)) => { return xAxisYPosition - Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); })
-				.style('fill', 'white')
-				.style('stroke', objective.getColor())
-				.style('stroke-width', 1);
+	calculatePlotElementCoordinateOne = (d: (string | number), i: number) => { return (((this.xAxisRightCoordinate - this.yAxisXCoordinate) / this.domainSize) * i) + this.labelOffset * 1.5; }
 
-
-		plotContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
-			.selectAll('.scorefunction-' + objective.getName() + '-bartop')
-				.attr('height', this.labelOffset)
-				.attr('width', barWidth)
-				.attr('x', ((d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainSize) * i) + this.labelOffset * 1.5; }))
-				.attr('y', (d: (string | number)) => { return xAxisYPosition - Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); })
-				.style('fill', objective.getColor());
-
-	}
-
-	renderContinuousPlot(plotContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], width: number, height: number) {
-		
-		var yAxisXPosition: number = Math.max(width / 20, this.labelOffset);
-		var xAxisYPosition: number = Math.min((19 / 20) * height, height - this.labelOffset);
-		var yAxisTopPosition: number = Math.max(height / 20, 5);
-		var xAxisRightPosition: number = Math.min((19 / 20) * width, width - this.labelOffset);
-
-		var pointRadius = this.labelOffset / 3;
-
-		var heightScale = d3.scale.linear()
-			.domain([0, 1])
-			.range([0, xAxisYPosition - pointRadius]);
-
-
-		plotContainer.selectAll('circle')
-			.attr('cx', (d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainElements.length) * i) + this.labelOffset * 1.5; })
-			.attr('cy', (d: (string | number)) => { return (xAxisYPosition) - heightScale(scoreFunction.getScore(+d)); })
-			.attr('r', pointRadius)
-			.style('fill', objective.getColor());
-
-		plotContainer.selectAll('line')
-			.attr('x1', (d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainElements.length) * i) + this.labelOffset * 1.5; })
-			.attr('y1', (d: (string | number)) => { return (xAxisYPosition) - heightScale(scoreFunction.getScore(+d)); })
-			.attr('x2', (d: (string | number), i: number) => { return (((xAxisRightPosition - yAxisXPosition) / domainElements.length) * (i + 1)) + this.labelOffset * 1.5; })
-			.attr('y2', (d: (string | number), i: number) => { return (xAxisYPosition) - heightScale(scoreFunction.getScore(domainElements[i+1])); })
-			.style('stroke', 'black')
-			.style('stroke-width', 1);
-	}
 
 
 }

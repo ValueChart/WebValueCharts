@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 17:39:08
+* @Last Modified time: 2016-06-10 11:01:17
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,6 +14,10 @@ import * as d3 														from 'd3';
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
+import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
+import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
+
+
 
 // Model Classes
 import { Objective }					from '../model/Objective';
@@ -38,10 +42,11 @@ export class LabelRenderer {
 	private labelWidth: number;				// The min of the labels, calculated based on maximum depth of the objective hierarchy and the amount of 
 											// space that the label area occupies.
 
+	public scoreFunctionRenderers: any;
+
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
-		private scoreFunctionRenderer: ScoreFunctionRenderer) { }
+		private chartDataService: ChartDataService) { }
 
 	// Create the base containers and elements for the labels.
 	createLabelSpace(el: any, labelData: VCLabelData[], objectiveData: PrimitiveObjective[]): void {
@@ -208,6 +213,9 @@ export class LabelRenderer {
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
 	createScoreFunctions(scoreFunctionContainer: any, data: PrimitiveObjective[]): void {
 		// Create a 'g' element to contain each score function plot.
+		
+		this.scoreFunctionRenderers = {}
+
 		var newScoreFunctionPlots: any = scoreFunctionContainer.selectAll('.label-scorefunction')
 			.data(data)
 			.enter().append('g')
@@ -217,7 +225,14 @@ export class LabelRenderer {
 		// Use the ScoreFunctionRenderer to create each score function.
 		newScoreFunctionPlots[0].forEach((scoreFunctionPlot: any) => {
 			var el: any = d3.select(scoreFunctionPlot);
-			this.scoreFunctionRenderer.createScoreFunction(el, el.data()[0]);	
+			var datum: PrimitiveObjective = el.data()[0];
+
+			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
+				this.scoreFunctionRenderers[datum.getName()] = new DiscreteScoreFunctionRenderer(this.chartDataService);
+			else 
+				this.scoreFunctionRenderers[datum.getName()] = new ContinuousScoreFunctionRenderer(this.chartDataService);
+
+			this.scoreFunctionRenderers[datum.getName()].createScoreFunction(el, datum);	
 		});
 
 	}
@@ -258,7 +273,7 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderer.renderScoreFunction(el, datum, scoreFunction, width, height);
+			this.scoreFunctionRenderers[datum.getName()].renderScoreFunction(el, datum, scoreFunction, width, height);
 
 			weightOffset += objectiveWeight;
 		});
