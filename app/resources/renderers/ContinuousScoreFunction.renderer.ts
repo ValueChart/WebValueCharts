@@ -2,7 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 14:26:03
+<<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
+* @Last Modified time: 2016-06-10 15:04:14
+=======
+* @Last Modified time: 2016-06-10 14:58:37
+>>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
 */
 
 import { Injectable } 					from '@angular/core';
@@ -89,7 +93,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation): void {
+	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation: string): void {
 		var pointRadius = this.labelOffset / 3;
 
 		var heightScale = d3.scale.linear()
