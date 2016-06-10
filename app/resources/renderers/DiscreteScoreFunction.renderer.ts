@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 14:30:29
+* @Last Modified time: 2016-06-10 15:13:46
 */
 
 import { Injectable } 					from '@angular/core';
@@ -89,7 +89,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		if (viewOrientation === 'vertical') {
 			heightScale.range([0, this.domainAxisCoordinateTwo]);
 		} else {
-			heightScale.range([0, this.utilityAxisMaxCoordinateTwo]);
+			heightScale.range([0, this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo]);
 
 		}
 
@@ -116,7 +116,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.dimensionOne, barWidth)
 			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(this.coordinateTwo, (d: (string | number)) => {
-				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d);
+				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
 			.style('fill', objective.getColor());
 

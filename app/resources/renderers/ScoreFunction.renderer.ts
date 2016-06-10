@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 14:31:17
+* @Last Modified time: 2016-06-10 15:16:10
 */
 
 import { Injectable } 					from '@angular/core';
@@ -152,7 +152,8 @@ export abstract class ScoreFunctionRenderer {
 			this.domainAxisCoordinateTwo = Math.min((19 / 20) * this.dimensionTwoSize, this.dimensionTwoSize - this.labelOffset);
 
 			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize / 20, 5);
-
+			this.utilityAxisCoordinateOne = Math.max(this.dimensionOneSize / 20, this.labelOffset);
+			
 		} else {
 			this.dimensionOne = 'height';
 			this.dimensionTwo = 'width';
@@ -165,11 +166,10 @@ export abstract class ScoreFunctionRenderer {
 			this.domainAxisCoordinateTwo = Math.max((1 / 20) * this.dimensionTwoSize, this.labelOffset) + 10;
 
 			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize * (19 / 20), 5);
-
+			this.utilityAxisCoordinateOne = Math.max(this.dimensionOneSize / 20, this.labelOffset);
 		}
 
 		this.domainAxisMaxCoordinateOne = Math.min((19 / 20) * this.dimensionOneSize, this.dimensionOneSize - this.labelOffset);
-		this.utilityAxisCoordinateOne = Math.max(this.dimensionOneSize / 20, this.labelOffset);
 
 
 
