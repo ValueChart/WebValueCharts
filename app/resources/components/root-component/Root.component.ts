@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 15:35:36
+* @Last Modified time: 2016-06-10 15:52:05
 */
 
 import { Component } 										from '@angular/core';
@@ -32,12 +32,7 @@ import { ScoreFunctionRenderer }							from '../../renderers/ScoreFunction.rende
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
 				ViewContainerRef,
-				ChartDataService, 
-				RenderConfigService,
-				ObjectiveChartRenderer, 
-				SummaryChartRenderer, 
-				LabelRenderer,
-				ScoreFunctionRenderer]
+				ChartDataService]
 })
 @Routes([
   {path: '/register', component: RegisterComponent}, // useAsDefault: true - coming soon...
