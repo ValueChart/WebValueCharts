@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 11:03:01
+* @Last Modified time: 2016-06-10 12:10:33
 */
 
 import { Injectable } 					from '@angular/core';
@@ -22,6 +22,7 @@ import { ScoreFunction }				from '../model/ScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 
+// This class contains the logic for creating and rendering the a DiscreteScoreFunction for an Objective as a bar chart. 
 
 @Injectable()
 export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
@@ -34,10 +35,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		super(chartDataService);
 	}
 
-
+	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
+	// like bars for the bar chart that is used to represent element scores.
 	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
 
+		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
 		this.barContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-' + objective.getName() + '-bars-container', true);
 
@@ -45,7 +49,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	createDiscretePlotElements(barContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
-
+		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bar')
 			.data(domainElements)
 			.enter().append('rect')
@@ -54,8 +58,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return 'scorefunction-' + objective.getName() + '-' + d + '-bar';
 			});
 
+
 		this.utilityBars = barContainer.selectAll('.scorefunction-' + objective.getName() + '-bar');
 
+		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bartop')
 			.data(domainElements)
 			.enter().append('rect')
@@ -68,7 +74,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-
+	// This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction specific elements, 
+	// like bars for the bar chart that is used to represent element scores.
 	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], width: number, height: number): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, width, height);
 
@@ -82,6 +89,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.domain([0, 1])
 			.range([0, this.xAxisYCoordinate]);
 
+		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: (string | number)) => { return Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); };
 
 

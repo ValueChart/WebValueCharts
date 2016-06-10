@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 11:03:08
+* @Last Modified time: 2016-06-10 12:10:28
 */
 
 import { Injectable } 					from '@angular/core';
@@ -22,6 +22,7 @@ import { ScoreFunction }				from '../model/ScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 
+// This class contains the logic for creating and rendering the a ContinuousScoreFunction for an Objective as a scatter plot chart. 
 
 @Injectable()
 export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
@@ -35,9 +36,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		super(chartDataService);
 	}
 
+	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
+	// like points and connecting lines for the scatter plot that is used to represent element scores.
 	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
 
+		// Create the continuous score function specific element containers
 		this.pointsContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-' + objective.getName() + '-points-container', true);
 
@@ -48,7 +53,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	createContinuousPlotElements(pointsContainer: any, linesContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
-
+		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		pointsContainer.selectAll('.scorefunction-' + objective.getName() + '-point')
 			.data(domainElements)
 			.enter().append('circle')
@@ -59,8 +64,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.plottedPoints = pointsContainer.selectAll('.scorefunction-' + objective.getName() + '-point');
 
+		// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
+		// To do this, we simply remove the last domain element from the list before we create the lines.
 		domainElements.pop();
 
+		// Create a slope line for each new adjacent pair of elements in the Objective's domain. Note that this is all elements when the plot is first created.
 		linesContainer.selectAll('.scorefunction-' + objective.getName() + '-fitline')
 			.data(domainElements)
 			.enter().append('line')
@@ -72,6 +80,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.fitLines = linesContainer.selectAll('.scorefunction-' + objective.getName() + '-fitline');
 	}
 
+	// This method overrides the rednerPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 
+	// like points and connecting lines for the scatter plot that is used to represent element scores.
 	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], width: number, height: number): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, width, height);
 
@@ -86,6 +96,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.domain([0, 1])
 			.range([0, this.xAxisYCoordinate - pointRadius]);
 
+		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: (string | number)) => { return (this.xAxisYCoordinate) - heightScale(scoreFunction.getScore(+d)); };
 
 		plotElementsContainer.selectAll('circle')
