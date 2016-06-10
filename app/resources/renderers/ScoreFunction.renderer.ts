@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 17:21:35
+* @Last Modified time: 2016-06-09 22:59:21
 */
 
 import { Injectable } 					from '@angular/core';
@@ -24,9 +24,10 @@ import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 @Injectable()
 export class ScoreFunctionRenderer {
 
-	labelOffset: number = 10;
+	labelOffset: number = 10;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
 
 	constructor(private chartDataService: ChartDataService) { }
+
 
 	createScoreFunction(el: any, objective: PrimitiveObjective): void {
 		var objectiveName: string = objective.getName();
@@ -42,6 +43,22 @@ export class ScoreFunctionRenderer {
 		var chartContainer = el.append('g')
 			.classed('scorefunction-' + objectiveName + '-chart-container', true);
 
+		this.createScoreFunctionAxis(chartContainer, objectiveName);
+
+		// TODO: should make this method a member of PrimitiveObjective?
+		var domainElements: (string | number)[] = this.chartDataService.getDomainElements(objective);
+
+		var domainLabelContainer = chartContainer.append('g')
+			.classed('scorefunction-' + objectiveName + '-domainlabels-container', true);
+
+		var plotContainer = chartContainer.append('g')
+			.classed('scorefunction-' + objectiveName + '-plot-container', true);
+
+		this.createPlot(plotContainer, domainLabelContainer, objective, domainElements);
+	}
+
+	createScoreFunctionAxis(chartContainer: any, objectiveName: string) {
+		
 		var axisContainer = chartContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-axis-container', true);
 
@@ -55,34 +72,32 @@ export class ScoreFunctionRenderer {
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
 
-		var labelContainer = chartContainer.append('g')
-			.classed('scorefunction-' + objectiveName + '-label-container', true);
+		var utilityLabelContainer = chartContainer.append('g')
+			.classed('scorefunction-' + objectiveName + '-utilitylabel-container', true);
 
-		labelContainer.append('text')
+		utilityLabelContainer.append('text')
 			.classed('scorefunction-' + objectiveName + '-0-label', true);
 
-		labelContainer.append('text')
+		utilityLabelContainer.append('text')
 			.classed('scorefunction-' + objectiveName + '-1-label', true);
+	}
 
-		var domainElements: (string | number)[] = this.chartDataService.getDomainElements(objective);
+	createPlot(plotContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
+		var objectiveName = objective.getName();
 
-		labelContainer.selectAll('.scorefunction-' + objectiveName + '-domain-labels')
+		domainLabelContainer.selectAll('.scorefunction-' + objectiveName + '-domain-labels')
 			.data(domainElements)
 			.enter().append('text')
-				.classed('scorefunction-' + objectiveName + '-domain-labels', true)
-				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objectiveName + '-' + d + '-label';
-				});
-
-		var plotContainer = chartContainer.append('g')
-			.classed('scorefunction-' + objectiveName + '-plot-container', true);
+			.classed('scorefunction-' + objectiveName + '-domain-labels', true)
+			.attr('id', (d: (string | number)) => {
+				return 'scorefunction-' + objectiveName + '-' + d + '-label';
+			});
 
 		if (objective.getDomainType() === 'continuous') {
 			this.createContinuousPlot(plotContainer, objective, domainElements);
 		} else if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval') {
 			this.createDiscretePlot(plotContainer, objective, domainElements);
 		}
-
 	}
 
 	createDiscretePlot(plotContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[] ) {

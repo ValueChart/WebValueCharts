@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 16:51:13
+* @Last Modified time: 2016-06-09 22:42:07
 */
 
 import { Injectable } 					from '@angular/core';
@@ -156,7 +156,7 @@ export class ChartDataService {
 	}
 
 
-	// Methods for manipulating and updating ValueChart data that has been formatted for d3
+	// Methods for manipulating and updating ValueChart data that has been formatted for d3: 
 
 	// Calculate the weight offset for each row. The weight offset for one row is the combined weights of all rows
 	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,

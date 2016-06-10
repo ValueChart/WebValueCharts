@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 17:23:39
+* @Last Modified time: 2016-06-09 22:41:42
 */
 
 import { Injectable } 												from '@angular/core';
@@ -11,10 +11,10 @@ import { Injectable } 												from '@angular/core';
 @Injectable()
 export class RenderConfigService {
 
-	public VALUECHART_WIDTH: number = 800;
-	public VALUECHART_HEIGHT: number = 400;
+	public VALUECHART_WIDTH: number = 800;	// Width of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
+	public VALUECHART_HEIGHT: number = 400;	// Height of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
 
-	private viewOrientation: string;
+	private viewOrientation: string;	// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
 
 	public dimensionOne: string; // Width when in 'vertical' Orientation, Height when in 'horizontal' Orientation
 	public dimensionTwo: string; // Height when in 'vertical' Orientation, Width when in 'horizontal' Orientation
