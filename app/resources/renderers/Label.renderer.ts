@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 15:30:14
+* @Last Modified time: 2016-06-09 17:39:08
 */
 
 import { Injectable } 												from '@angular/core';
@@ -19,29 +19,38 @@ import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.render
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
+import { ScoreFunction }				from '../model/ScoreFunction';
 
+
+// This class is renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
+// rectangle whose width (or height depending on the orientation) is proportional to its weight. The rectangles are positioned in such a
+// way that they act as labels for the objectives in the objective chart.
 
 @Injectable()
 export class LabelRenderer {
 
-	public labelRootSpace: any;
-	public labelSpaceOutline: any;
-	public labelContainer: any;
-	public scoreFunctionContainer: any;
+	// d3 selections that are saved to avoid searching the DOM every time they are needed.
+	public rootContainer: any;				// the 'g' element that is the root container of the Label area.
+	public labelSpaceOutline: any;			// the 'rect' element that is the outline of the label area.
+	public labelContainer: any;				// the 'g' element that contains the hierarchical label structure.
+	public scoreFunctionContainer: any;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
-	private labelWidth: number;
+	private labelWidth: number;				// The min of the labels, calculated based on maximum depth of the objective hierarchy and the amount of 
+											// space that the label area occupies.
 
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private scoreFunctionRenderer: ScoreFunctionRenderer) { }
 
+	// Create the base containers and elements for the labels.
+	createLabelSpace(el: any, labelData: VCLabelData[], objectiveData: PrimitiveObjective[]): void {
+		// Create the root container which will hold all label related SVG elements.
+		this.rootContainer = el.append('g')
+			.classed('label-root-container', true)
 
-	createLabelSpace(el: any, labelData: VCLabelData[]): void {
-		this.labelRootSpace = el.append('g')
-			.classed('label-rootspace', true)
-
-		this.labelSpaceOutline = this.labelRootSpace.append('g')
+		// Create the outline box for the label area. Append the styles here because they will not change.
+		this.labelSpaceOutline = this.rootContainer.append('g')
 			.classed('label-outline-container', true)
 			.append('rect')
 				.classed('label-outline', true)
@@ -49,52 +58,43 @@ export class LabelRenderer {
 				.style('stroke-width', 1)
 				.style('stroke', 'grey');
 
-		this.labelContainer = this.labelRootSpace.append('g')
+		// Create the container which will hold all labels.
+		this.labelContainer = this.rootContainer.append('g')
 			.classed('label-labels-container', true);
 
-		this.scoreFunctionContainer = this.labelRootSpace.append('g')
+		// Create the container which will the hold Score Functions plots for each PrimitiveObjective.
+		this.scoreFunctionContainer = this.rootContainer.append('g')
 			.classed('label-scorefunction-container', true);
 
-		this.createScoreFunctions(this.scoreFunctionContainer);
+		// Recursively create the labels based on the Objective structure.
+		this.createLabels(el, this.labelContainer, labelData, 'rootcontainer');
 
-		this.createLabels(el, this.labelContainer, labelData, 'rootspace');
+		// Create the score Functions.
+		this.createScoreFunctions(this.scoreFunctionContainer, objectiveData);
 	}
 
-	createScoreFunctions(scoreFunctionContainer: any): void {
-		var data: PrimitiveObjective[] = this.chartDataService.getValueChart().getAllPrimitiveObjectives();
-
-		scoreFunctionContainer.selectAll('g')
-			.data(data)
-			.enter().append('g')
-				.classed('label-scorefunction', true)
-				.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getName() + '-scorefunction'; })
-
-		data.forEach((datum: PrimitiveObjective) => {
-			var el: any = scoreFunctionContainer.select('#label-' + datum.getName() + '-scorefunction');
-			this.scoreFunctionRenderer.createScoreFunction(el, datum);
-		});
-
-	}
-
-	createLabels(el: any, labelSpace: any, labelData: VCLabelData[], parentName: string): void {
-
-		var subLabelSpaces = labelSpace.selectAll('g')
+	// This function recursively creates labels for an array of Objectives that have been put into labelData format.
+	createLabels(el: any, labelContainer: any, labelData: VCLabelData[], parentName: string): void {
+		// Create a new container for each element in labelData.
+		var newLabelContainers: any = labelContainer.selectAll('g[parent=parentName]')
 			.data(labelData)
 			.enter().append('g')
-				.classed('label-subspace', true)
+				.classed('label-subcontainer', true)
 				.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-container' })
-				.attr('parent', parentName);
+				.attr('parent', parentName);	// Set the name parent objective on the 'g', or 'rootcontainer' if it has not parent objective. 
 
-		subLabelSpaces.append('rect')
-			.classed('label-subspace-outline', true)
+		// Append an outline rectangle for label container that was just created.
+		newLabelContainers.append('rect')
+			.classed('label-subcontainer-outline', true)
 			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-outline' });
 
-		subLabelSpaces.append('text')
-			.classed('label-subspace-text', true)
+		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
+		newLabelContainers.append('text')
+			.classed('label-subcontainer-text', true)
 			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-text' })
 			.style('font-size', '18px');
 
-
+		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: VCLabelData) => {
 			if (labelDatum.subLabelData === undefined)
 				return;
@@ -103,41 +103,151 @@ export class LabelRenderer {
 		});
 	}
 
-	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string): void {
+	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
+	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objectiveData: PrimitiveObjective[]): void {
+		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize);
 
-		this.labelRootSpace
+		// Position the root container for the label area. This positions all of its child elements as well.
+		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
+		this.rootContainer
 			.attr('transform', () => {
 				if (viewOrientation === 'vertical')
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, this.renderConfigService.dimensionTwoSize + 10);
+					return 'translate(0,' + (this.renderConfigService.dimensionTwoSize + 10) + ')';	
 				else
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, 0);
+					return 'translate(0,0)';
 			});
-
+			
+		// Set the width and height of labelSpaceOutline 'rect' to the width and hight of the label area.
 		this.labelSpaceOutline
 			.attr(this.renderConfigService.dimensionOne, this.renderConfigService.dimensionOneSize)
 			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize);
 
-
-		this.renderScoreFunctions(viewOrientation, this.labelRootSpace.select('.label-scorefunction-container'));
-
-		var labelSpaces = this.labelRootSpace.selectAll('g[parent=rootspace]');
+		// Render the labels, starting with the labels for the highest level AbstractObjectives, which are in the 'g' directly under the root container.
+		var labelSpaces = this.rootContainer.selectAll('g[parent=rootcontainer]');
 		this.renderLabels(labelSpaces, labelData, viewOrientation);
+
+		// Render the score function plots.
+		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objectiveData);
+
 	}
 
-	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: any): void {
-		var data: PrimitiveObjective[] = this.chartDataService.getValueChart().getAllPrimitiveObjectives();
+	// This function recursively renders labels for an array of Objectives that have been put into labelData format. It works very similarly to createLabels.
+	renderLabels(labelSpaces: any, labelData: VCLabelData[], viewOrientation: string): void {
+		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
+		var weightOffsets: number[] = [];
+		var weightSum: number = 0;	// The weight offset for the first objective at this level is 0.
+		for (var i: number = 0; i < labelData.length; i++) {
+			weightOffsets[i] = weightSum;
+			weightSum += labelData[i].weight;
+		}
+
+		this.renderLabelOutline(labelSpaces.select('.label-subcontainer-outline'), weightOffsets);	// Render the outlining rectangle.
+
+		this.renderLabelText(labelSpaces.select('.label-subcontainer-text'), weightOffsets, viewOrientation)	// Render the text within the label
+
+		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
+		labelData.forEach((labelDatum: VCLabelData, index: number) => {
+			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
+				return;
+			let subLabelSpaces = this.rootContainer.selectAll('g[parent=' + labelDatum.objective.getName() + ']');	// Get all sub label containers whose parent is the current label
+			
+			let scaledWeightOffset: number = this.renderConfigService.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
+			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
+			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
+
+			this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation);	// Render the sub labels.
+		});
+	}
+
+	// Render the outline of a label.
+	renderLabelOutline(rectEl: any, weightOffsets: number[]): any {
+		// Render the styles of the outline rectangle.
+		rectEl.style('fill', 'white')
+			.style('stroke-width', (d: VCLabelData) => {
+				return (d.depthOfChildren === 0) ? 2 : 1;	// PrimitiveObjectives should have thicker lines
+			})
+			.style('stroke', (d: VCLabelData) => {
+				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
+			});
+
+		rectEl.attr(this.renderConfigService.dimensionOne, (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
+				return (d.depthOfChildren === 0) ?
+					(this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth) 
+				: 
+					this.labelWidth;
+			})
+			.attr(this.renderConfigService.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
+			.attr(this.renderConfigService.dimensionTwo, (d: VCLabelData, i: number) => {
+				return this.renderConfigService.dimensionTwoScale(d.weight);					// Determine the height (or width) as a function of the weight
+			})
+			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => {
+				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
+			}));																				// The first objective should have no offset from the top of the containing 'g'. This is NOT the weight offset computed for all objectives at this level.
+	}
+
+	// Render the text of a label.
+	renderLabelText(textEl: any, weightOffsets: number[], viewOrientation: string): any {
+
+		var textOffset: number = 5;
+		// Determine the position of the text within the box depending on the orientation
+		textEl.attr(this.renderConfigService.coordinateOne, () => {
+				return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2); 
+			})
+			.attr(this.renderConfigService.coordinateTwo, (d: VCLabelData, i: number) => {
+				return (viewOrientation === "vertical") ?
+					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 2) + textOffset
+					:
+					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
+			})
+			.style('fill', 'black')
+			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
+
+	}
+
+	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
+	createScoreFunctions(scoreFunctionContainer: any, data: PrimitiveObjective[]): void {
+		// Create a 'g' element to contain each score function plot.
+		var newScoreFunctionPlots: any = scoreFunctionContainer.selectAll('.label-scorefunction')
+			.data(data)
+			.enter().append('g')
+			.classed('label-scorefunction', true)
+			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getName() + '-scorefunction'; })
+
+		// Use the ScoreFunctionRenderer to create each score function.
+		newScoreFunctionPlots[0].forEach((scoreFunctionPlot: any) => {
+			var el: any = d3.select(scoreFunctionPlot);
+			this.scoreFunctionRenderer.createScoreFunction(el, el.data()[0]);	
+		});
+
+	}
+	// This function calls uses the ScoreFunctionRenderer to position and give widths + heights to the score functions created by the createScoreFunctions method.
+	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: any, data: PrimitiveObjective[]): void {
 		var scoreFunctionMap: ScoreFunctionMap = this.chartDataService.scoreFunctionMap;
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
+		var el: any;
+		var datum: PrimitiveObjective;
+		var objectiveWeight: number;
+		var scoreFunction: ScoreFunction;
+		var dimensionOneTransform: number;
+		var dimensionTwoTransform: number;
 
-		data.forEach((datum: PrimitiveObjective) => {
-			let objectiveWeight = this.chartDataService.weightMap.getNormalizedObjectiveWeight(datum.getName());
-			let el: any = scoreFunctionContainer.select('#label-' + datum.getName() + '-scorefunction');
-			let dimensionOneTransform: number = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;
-			let dimensionTwoTransform: number = this.renderConfigService.dimensionTwoScale(weightOffset);
 
+
+		// Select all the score function plot containers:
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction');
+
+		scoreFunctionsPlots[0].forEach((scoreFunctionPlot: any) => {
+			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
+			datum = el.data()[0];																			// Get the data for this score function from the selection
+			objectiveWeight = this.chartDataService.weightMap.getNormalizedObjectiveWeight(datum.getName());
+			scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(datum.getName());
+			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
+			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
+
+			// Place the score function plot in the correct location.
 			el.attr('transform', this.renderConfigService.generateTransformTranslation(viewOrientation, dimensionOneTransform, dimensionTwoTransform));
 
 			if (viewOrientation === 'vertical') {
@@ -148,72 +258,9 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderer.renderScoreFunction(el, datum, scoreFunctionMap.getObjectiveScoreFunction(datum.getName()), width, height);
+			this.scoreFunctionRenderer.renderScoreFunction(el, datum, scoreFunction, width, height);
 
 			weightOffset += objectiveWeight;
-		});
-
-	}
-
-	renderLabels(labelSpaces: any, labelData: VCLabelData[], viewOrientation: string): void {
-
-		var weightOffsets: number[] = [];
-		var weightSum: number = 0;
-		for (var i: number = 0; i < labelData.length; i++) {
-			weightOffsets[i] = weightSum;
-			weightSum += labelData[i].weight;
-		}
-
-		labelSpaces.select('rect')
-			.style('fill', 'white')
-			.style('stroke-width', (d: VCLabelData) => {
-				if (d.depthOfChildren === 0)
-					return 2;
-				else
-					return 1;
-			})
-			.style('stroke', (d: VCLabelData) => {
-				if (d.depthOfChildren === 0)
-					return (<PrimitiveObjective>d.objective).getColor();
-				else
-					return 'gray';
-			})
-			.attr(this.renderConfigService.dimensionOne, (d: VCLabelData) => {
-				if (d.depthOfChildren === 0)
-					return (this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth); // Expand the last label to fill the rest of the space.
-				else
-					return this.labelWidth;
-			})
-			.attr(this.renderConfigService.dimensionTwo, (d: VCLabelData, i: number) => { return this.renderConfigService.dimensionTwoScale(d.weight); })
-			.attr(this.renderConfigService.coordinateOne, 0)
-			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => { return this.renderConfigService.dimensionTwoScale(weightOffsets[i]); }));
-
-
-
-		labelSpaces.select('text')
-			.attr(this.renderConfigService.coordinateOne, () => {
-				if (viewOrientation === 'vertical')
-					return 10;
-				else
-					return (this.labelWidth / 2);
-			})
-			.attr(this.renderConfigService.coordinateTwo, (d: VCLabelData, i: number) => {
-				if (viewOrientation === "vertical")
-					return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 2) + 5;
-				else
-					return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + 5;
-			})
-			.style('fill', 'black')
-			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });
-
-
-		labelData.forEach((labelDatum: VCLabelData, index: number) => {
-			if (labelDatum.subLabelData === undefined)
-				return;
-			let subLabelSpaces = this.labelRootSpace.selectAll('g[parent=' + labelDatum.objective.getName() + ']');
-			subLabelSpaces.attr('transform', this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, this.renderConfigService.dimensionTwoScale(weightOffsets[index])));
-
-			this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation);
 		});
 	}
 }

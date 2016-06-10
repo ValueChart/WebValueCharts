@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 11:42:52
+* @Last Modified time: 2016-06-09 16:25:32
 */
 
 
@@ -47,6 +47,7 @@ export class ValueChartDirective implements OnInit, OnChanges {
 	// ValueChart data that has been organized to work with d3.
 	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data. Each array element is the data for one objective.
 	private labelData: VCLabelData[];
+	private primitiveObjectives: PrimitiveObjective[];
 
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: any; // The SVG base element for the ValueChart rendering.
@@ -98,10 +99,10 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
 		this.labelData = this.chartDataService.getLabelData(this.valueChart);
-		
+		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 		// Render the ValueChart;
-		this.labelRenderer.createLabelSpace(this.el, this.labelData);
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation);
+		this.labelRenderer.createLabelSpace(this.el, this.labelData, this.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.dataRows);
 		this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
@@ -124,6 +125,8 @@ export class ValueChartDirective implements OnInit, OnChanges {
 		if (changeRecord.data){
 			this.valueChart = changeRecord.data.currentValue;
 			this.chartDataService.setValueChart(this.valueChart);
+
+			// TODO: Need to update data fields in this class.
 		}
 
 		// The orientation of the ValueChart has been changed.
@@ -135,11 +138,9 @@ export class ValueChartDirective implements OnInit, OnChanges {
 
 			this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
-			this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation);
+			this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 			this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
 			this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
-
-
 		}
 	}
 

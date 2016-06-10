@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 15:21:46
+* @Last Modified time: 2016-06-08 17:21:35
 */
 
 import { Injectable } 					from '@angular/core';
@@ -252,34 +252,7 @@ export class ScoreFunctionRenderer {
 			.attr('y2', (d: (string | number), i: number) => { return (xAxisYPosition) - heightScale(scoreFunction.getScore(domainElements[i+1])); })
 			.style('stroke', 'black')
 			.style('stroke-width', 1);
-
-
 	}
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

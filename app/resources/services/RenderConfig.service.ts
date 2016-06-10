@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 11:42:50
+* @Last Modified time: 2016-06-08 17:23:39
 */
 
 import { Injectable } 												from '@angular/core';
@@ -78,8 +78,4 @@ export class RenderConfigService {
 			return 'translate(' + coordinateTwoAmount + ',' + coordinateOneAmount + ')';
 		}
 	}
-
-
-
-
 }
