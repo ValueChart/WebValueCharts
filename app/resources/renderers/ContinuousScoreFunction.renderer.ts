@@ -3,13 +3,15 @@
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
 <<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
-* @Last Modified time: 2016-06-10 15:04:14
+* @Last Modified time: 2016-06-11 23:01:00
 =======
 * @Last Modified time: 2016-06-10 14:58:37
 >>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
 */
 
 import { Injectable } 					from '@angular/core';
+import { NgZone }						from '@angular/core';
+
 
 // d3
 import * as d3 							from 'd3';
@@ -36,7 +38,9 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public linesContainer: any;
 	public fitLines: any;
 
-	constructor(chartDataService: ChartDataService) {
+	private heightScale: any;
+
+	constructor(chartDataService: ChartDataService, private ngZone: NgZone) {
 		super(chartDataService);
 	}
 
@@ -45,13 +49,14 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
-
+		
 		// Create the continuous score function specific element containers
+		this.linesContainer = plotElementsContainer.append('g')
+			.classed('scorefunction-' + objective.getName() + '-fitline-container', true);
+
 		this.pointsContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-' + objective.getName() + '-points-container', true);
 
-		this.linesContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-' + objective.getName() + '-fitline-container', true);
 
 		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, objective, domainElements);
 	}
@@ -96,34 +101,49 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation: string): void {
 		var pointRadius = this.labelOffset / 3;
 
-		var heightScale = d3.scale.linear()
+		this.heightScale = d3.scale.linear()
 			.domain([0, 1])
 			.range([0, this.domainAxisCoordinateTwo - pointRadius]);
 
 		if (viewOrientation === 'vertical') {
-			heightScale.range([0, this.domainAxisCoordinateTwo - pointRadius]);
+			this.heightScale.range([0, this.domainAxisCoordinateTwo - pointRadius]);
 		} else {
-			heightScale.range([this.domainAxisCoordinateTwo, this.utilityAxisMaxCoordinateTwo - pointRadius]);
+			this.heightScale.range([this.domainAxisCoordinateTwo, this.utilityAxisMaxCoordinateTwo - pointRadius]);
 		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: (string | number)) => { 
-			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - heightScale(scoreFunction.getScore(+d)) : heightScale(scoreFunction.getScore(+d)); 
+			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d)) : this.heightScale(scoreFunction.getScore(+d)); 
 		};
 
-		plotElementsContainer.selectAll('circle')
+		this.plottedPoints
 			.attr('c' + this.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
 			.style('fill', objective.getColor());
 
-		plotElementsContainer.selectAll('line')
+		this.fitLines
 			.attr(this.coordinateOne  + '1', this.calculatePlotElementCoordinateOne)
 			.attr(this.coordinateTwo + '1', calculatePointCoordinateTwo)
 			.attr(this.coordinateOne  + '2', (d: (string | number), i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1); })
 			.attr(this.coordinateTwo + '2', (d: (string | number), i: number) => { return calculatePointCoordinateTwo(domainElements[i + 1]); })
 			.style('stroke', 'black')
 			.style('stroke-width', 1);
+
+		this.plottedPoints.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
+
+			var score: number;
+			if (viewOrientation === 'vertical') {
+				score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+			} else {
+				score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+			}
+			score = Math.max(0, Math.min(score, 1));
+
+			// Run inside the angular zone?
+			this.ngZone.run(() => { scoreFunction.setElementScore(d, score) });
+
+		}));
 	}
 }
 

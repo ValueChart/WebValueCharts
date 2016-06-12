@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 22:31:50
+* @Last Modified time: 2016-06-11 22:01:03
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,7 +13,11 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+
 // Model Classes
+import { User }														from '../model/User';
+import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
+import { ScoreFunction }											from '../model/ScoreFunction';
 
 // This class is renders a ValueChart's Alternatives into a series of bar charts that displays the utility for each Alternative's consequences.
 // This utility is based on the weights given to objectives, and the user determined scores assigned to points in the consequence space. 
@@ -168,7 +172,8 @@ export class ObjectiveChartRenderer {
 			this.userScores
 				.attr(this.renderConfigService.coordinateTwo, (d: any, i: number) => {
 					var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
-					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(d.score * objectiveWeight);
+					var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
 		}
 	}
@@ -182,7 +187,8 @@ export class ObjectiveChartRenderer {
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: any, i: number) => {
 		var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
-		return this.renderConfigService.dimensionTwoScale(d.score * objectiveWeight);
+		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};
 }
 

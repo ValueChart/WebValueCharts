@@ -2,10 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 13:19:49
+* @Last Modified time: 2016-06-11 22:53:26
 */
 
 import { Injectable } 												from '@angular/core';
+import { NgZone }											from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
@@ -46,7 +47,8 @@ export class LabelRenderer {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService) { }
+		private chartDataService: ChartDataService,
+		private ngZone: NgZone) { }
 
 	// Create the base containers and elements for the labels.
 	createLabelSpace(el: any, labelData: VCLabelData[], objectiveData: PrimitiveObjective[]): void {
@@ -228,9 +230,9 @@ export class LabelRenderer {
 			var datum: PrimitiveObjective = el.data()[0];
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getName()] = new DiscreteScoreFunctionRenderer(this.chartDataService);
+				this.scoreFunctionRenderers[datum.getName()] = new DiscreteScoreFunctionRenderer(this.chartDataService, this.ngZone);
 			else 
-				this.scoreFunctionRenderers[datum.getName()] = new ContinuousScoreFunctionRenderer(this.chartDataService);
+				this.scoreFunctionRenderers[datum.getName()] = new ContinuousScoreFunctionRenderer(this.chartDataService, this.ngZone);
 
 			this.scoreFunctionRenderers[datum.getName()].createScoreFunction(el, datum);	
 		});

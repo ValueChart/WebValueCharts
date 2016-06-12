@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 22:42:07
+* @Last Modified time: 2016-06-11 22:05:11
 */
 
 import { Injectable } 					from '@angular/core';
@@ -33,8 +33,8 @@ export interface VCCellData {
 	value: (string | number);
 	userScores: {
 		user: User,
-		score: number
 		objective: Objective,
+		value: (string | number);
 		offset?: number
 	}[];
 }
@@ -114,25 +114,25 @@ export class ChartDataService {
 		return labelData;
 	}
 
-	getCellData(objective: PrimitiveObjective): VCCellData[] {
+	getCellData(valueChart: ValueChart, objective: PrimitiveObjective): VCCellData[] {
 		var users: User[];
 
-		if (this.valueChart.type === 'group') {
-			users = (<GroupValueChart>this.valueChart).getUsers();
+		if (valueChart.type === 'group') {
+			users = (<GroupValueChart>valueChart).getUsers();
 		} else {
-			users = [(<IndividualValueChart>this.valueChart).getUser()];
+			users = [(<IndividualValueChart>valueChart).getUser()];
 		}
 
-		var objectiveValues: any[] = this.valueChart.getAlternativeValuesforObjective(objective);
+		var objectiveValues: any[] = valueChart.getAlternativeValuesforObjective(objective);
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
 			for (var i: number = 0; i < users.length; i++) {
 
-				var userScore: { user: User; score: number; objective: Objective } = {
+				var userScore: { user: User; value: string | number; objective: Objective; } = {
 					objective: objective,
 					user: users[i],
-					score: users[i].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getScore(objectiveValue.value)
+					value: objectiveValue.value
 				}
 
 				objectiveValue.userScores.push(userScore);
@@ -149,7 +149,7 @@ export class ChartDataService {
 			rowData.push({
 				objective: objective,
 				weightOffset: 0,
-				cells: this.getCellData(objective)
+				cells: this.getCellData(valueChart, objective)
 			});
 		});
 		return rowData;
@@ -175,7 +175,9 @@ export class ChartDataService {
 	calculateStackedBarOffsets(rows: VCRowData[], viewOrientation: string): VCRowData[] {
 		var stack = d3.layout.stack()
 			.x((d: any, i: number) => { return i; })
-			.y((d: any) => { return (d.score * this.weightMap.getNormalizedObjectiveWeight(d.objective.getName())); })
+			.y((d: any) => { 
+				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+				return (score * this.weightMap.getNormalizedObjectiveWeight(d.objective.getName())); })
 			.out((d: any, y0: number) => {
 				d.offset = y0;
 			});

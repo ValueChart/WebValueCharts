@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 15:13:46
+* @Last Modified time: 2016-06-11 22:50:19
 */
 
 import { Injectable } 					from '@angular/core';
-
+import { NgZone }						from '@angular/core';
 // d3
 import * as d3 							from 'd3';
 
@@ -14,13 +14,15 @@ import * as d3 							from 'd3';
 import { ChartDataService }				from '../services/ChartData.service';
 import { ScoreFunctionRenderer }		from './ScoreFunction.renderer';
 
-
 // Model Classes
+import { ValueChart }					from '../model/ValueChart';
+import { IndividualValueChart }			from '../model/IndividualValueChart';
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { ScoreFunction }				from '../model/ScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
+
 
 // This class contains the logic for creating and rendering the a DiscreteScoreFunction for an Objective as a bar chart. 
 
@@ -31,7 +33,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public utilityBars: any;
 	public barTops: any;
 
-	constructor(chartDataService: ChartDataService) {
+	private heightScale: any;
+	private domainElements: any;
+
+	constructor(chartDataService: ChartDataService, private ngZone: NgZone) {
 		super(chartDataService);
 	}
 
@@ -40,6 +45,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
+
+		this.domainElements = domainElements;
 
 		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
 		this.barContainer = plotElementsContainer.append('g')
@@ -84,21 +91,20 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	renderDiscretePlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, viewOrientation: string): void {
 		var barWidth: number = (this.dimensionOneSize / this.domainSize) / 3;
-		var heightScale = d3.scale.linear()
+		this.heightScale = d3.scale.linear()
 			.domain([0, 1]);
 		if (viewOrientation === 'vertical') {
-			heightScale.range([0, this.domainAxisCoordinateTwo]);
+			this.heightScale.range([0, this.domainAxisCoordinateTwo - this.utilityAxisMaxCoordinateTwo]);
 		} else {
-			heightScale.range([0, this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo]);
+			this.heightScale.range([0, this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo]);
 
 		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
-		var calculateBarDimensionTwo = (d: (string | number)) => { return Math.max(heightScale(scoreFunction.getScore('' + d)), this.labelOffset); };
+		var calculateBarDimensionTwo = (d: (string | number)) => { return Math.max(this.heightScale(scoreFunction.getScore('' + d)), this.labelOffset); };
 
 
-		plotElementsContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
-			.selectAll('.scorefunction-' + objective.getName() + '-bar')
+		this.utilityBars
 			.attr(this.dimensionOne, barWidth)
 			.attr(this.dimensionTwo, calculateBarDimensionTwo)
 			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
@@ -109,9 +115,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.style('stroke', objective.getColor())
 			.style('stroke-width', 1);
 
-
-		plotElementsContainer.select('.scorefunction-' + objective.getName() + '-bars-container')
-			.selectAll('.scorefunction-' + objective.getName() + '-bartop')
+		this.barTops
 			.attr(this.dimensionTwo, this.labelOffset)
 			.attr(this.dimensionOne, barWidth)
 			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
@@ -119,7 +123,21 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
 			.style('fill', objective.getColor());
+		
+		this.barTops.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
 
+			var score: number;
+			if (viewOrientation === 'vertical') {
+				score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+			} else {
+				score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+			}
+			score = Math.max(0, Math.min(score, 1));
+
+			// Run inside the angular zone?
+			this.ngZone.run(() => { scoreFunction.setElementScore(d, score) });
+
+		}));
 	}
 
 }

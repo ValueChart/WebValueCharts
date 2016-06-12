@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-10 15:16:10
+* @Last Modified time: 2016-06-11 13:30:18
 */
 
 import { Injectable } 					from '@angular/core';
@@ -52,12 +52,15 @@ export abstract class ScoreFunctionRenderer {
 	protected dimensionOneSize: number;
 	protected dimensionTwoSize: number;
 
+	protected objective: PrimitiveObjective;
+
 
 	constructor(protected chartDataService: ChartDataService) { }
 
 	// This function creates the base containers and elements for a score function plot.s
 	createScoreFunction(el: any, objective: PrimitiveObjective): void {
 		var objectiveName: string = objective.getName();
+		this.objective = objective;
 
 		// The root container is passed in.
 		this.rootContainer = el;

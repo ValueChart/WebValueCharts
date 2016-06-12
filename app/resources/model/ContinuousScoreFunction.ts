@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 16:52:41
+* @Last Modified time: 2016-06-11 14:38:22
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -31,6 +31,9 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		this.interpolationStrategy = ContinuousScoreFunction.linearInterpolation;
 	}
 
+	getElementScoreMap(): Map<number, number> {
+		return this.elementScoreMap;
+	}
 	
 	setElementScore(domainElement: number, score: number): void {
 		this.elementScoreMap.set(domainElement, score);

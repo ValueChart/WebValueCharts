@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 22:33:28
+* @Last Modified time: 2016-06-11 22:40:36
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,7 +13,11 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+
 // Model Classes
+import { User }														from '../model/User';
+import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
+import { ScoreFunction }											from '../model/ScoreFunction';
 
 // This class is renders a ValueChart's Alternatives into a stacked bar chart that summarizes the utility of each Alternative based on
 // objective weights, and the user determined scores assigned to points in the consequence space. Each Alternative's value for each PrimitiveObjective 
@@ -109,6 +113,17 @@ export class SummaryChartRenderer {
 		this.userScores = this.cells.selectAll('.summary-user-scores');
 	}
 
+	updateSummaryChart(rows: VCRowData[], viewOrientation: string): void {
+
+		var cellsToUpdate = this.rows.data(rows).selectAll('.summary-cell')
+			.data((d: VCRowData) => { return d.cells; })
+			
+		var userScoresToUpdate = cellsToUpdate.selectAll('.summary-user-scores')
+				.data((d: VCCellData, i: number) => { return d.userScores; });
+
+		this.renderSummaryChartCells(cellsToUpdate, userScoresToUpdate, viewOrientation);
+	}
+
 	// This function positions and gives widths + heights to the elements created by the createSummaryChart method.
 	renderSummaryChart(viewOrientation: string): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
@@ -125,41 +140,45 @@ export class SummaryChartRenderer {
 			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize);
 
 
-		this.renderSummaryChartRows(viewOrientation);
+		this.renderSummaryChartRows(this.dividingLines, this.cells, this.userScores, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartRows. Note that we don't position the row
 	// containers here because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
-	renderSummaryChartRows(viewOrientation: string): void {
+	renderSummaryChartRows(dividingLines: any, cells: any, userScores: any, viewOrientation: string): void {
 		// Position the dividing lines so that they evenly divide the available space into columns, one for each Alternative.
-		this.dividingLines
+		dividingLines
 			.attr(this.renderConfigService.coordinateOne + '1', this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
 			.attr(this.renderConfigService.coordinateOne + '2', this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.renderConfigService.dimensionTwoSize });
 
-		this.renderSummaryChartCells(viewOrientation)
+		this.renderSummaryChartCells(cells, userScores, viewOrientation)
 	}
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartCells.
-	renderSummaryChartCells(viewOrientation: string): void {
+	renderSummaryChartCells(cells: any, userScores: any, viewOrientation: string): void {
 		// Position each row's cells next to each other in the row.  
-		this.cells
+		cells
 			.attr('transform', (d: VCCellData, i: number) => { 
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, this.calculateCellCoordinateOne(d,i), 0); 
 			})
 
 		// Position and give heights and widths to the user scores.
-		this.userScores
+		userScores
 			.style('fill', (d: any, i: number) => { return d.objective.getColor(); })
 			.attr(this.renderConfigService.dimensionOne, this.calculateUserScoreDimensionOne)
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return (this.calculateUserScoreDimensionOne(d, i)) * i; })
-			.attr(this.renderConfigService.coordinateTwo, (d: any, i: number) => {
+			
+
+		userScores.attr(this.renderConfigService.coordinateTwo, (d: any, i: number) => {
 				var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+
 				if (viewOrientation == 'vertical')
 					// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
-					return (this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(d.offset)) - this.renderConfigService.dimensionTwoScale(d.score * objectiveWeight);
+					return (this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(d.offset)) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				else
 					return this.renderConfigService.dimensionTwoScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 			});
@@ -174,7 +193,8 @@ export class SummaryChartRenderer {
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: any, i: number) => {
 		var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
-		return this.renderConfigService.dimensionTwoScale(d.score * objectiveWeight);
+		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};
 
 }
