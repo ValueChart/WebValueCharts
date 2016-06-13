@@ -3,7 +3,7 @@
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
 <<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
-* @Last Modified time: 2016-06-13 15:16:32
+* @Last Modified time: 2016-06-13 15:49:47
 =======
 * @Last Modified time: 2016-06-10 14:58:37
 >>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
@@ -122,7 +122,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr('c' + this.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
-			.style('fill', objective.getColor());
+			.style('fill', objective.getColor())
+			.style('cursor', () => {
+				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+			});
+
 
 		this.fitLines
 			.attr(this.coordinateOne + '1', this.calculatePlotElementCoordinateOne)

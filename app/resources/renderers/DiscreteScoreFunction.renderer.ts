@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:18:36
+* @Last Modified time: 2016-06-13 15:49:23
 */
 
 import { Injectable } 					from '@angular/core';
@@ -73,10 +73,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		barContainer.selectAll('.scorefunction-bartop')
 			.data(domainElements)
 			.enter().append('rect')
-			.classed('scorefunction-bartop', true)
-			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objective.getName() + '-' + d + '-bartop';
-			});
+				.classed('scorefunction-bartop', true)
+				.attr('id', (d: (string | number)) => {
+					return 'scorefunction-' + objective.getName() + '-' + d + '-bartop';
+				});
 
 		this.barTops = barContainer.selectAll('.scorefunction-bartop');
 
@@ -109,10 +109,11 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.dimensionOne, barWidth)
 			.attr(this.dimensionTwo, calculateBarDimensionTwo)
 			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
-			.attr(this.coordinateTwo, (d: (string | number)) => { 
-				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo; 
+			.attr(this.coordinateTwo, (d: (string | number)) => {
+				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo;
 			})
-			.style('stroke', objective.getColor())
+			.style('stroke', objective.getColor());
+
 
 		this.barTops
 			.attr(this.dimensionTwo, this.labelOffset)
@@ -121,7 +122,11 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo, (d: (string | number)) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
-			.style('fill', objective.getColor());
+			.style('fill', objective.getColor())
+			.style('cursor', () => {
+				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+			});
+
 		
 		// Assign the callback function for when the bar tops are dragged. Note that this must be done inside a anonymous function because we require
 		// access to the scope defined by the renderDiscretePlot method.

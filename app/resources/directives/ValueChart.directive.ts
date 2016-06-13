@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:00:23
+* @Last Modified time: 2016-06-13 15:51:20
 */
 
 
@@ -199,8 +199,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 
-	// TODO: This is not being called anymore because of ngDoCheck.
-
 	// The type of changeRecord should be SimpleChanges, but no such type exists in this release. TODO: Update this once Angular has been updated.
 	// noOnChanges is called by Angular whenever the inputs to the directive change. It is called BEFORE ngOnIt when the directive is first
 	// initialized. 
@@ -211,7 +209,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
-		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
+		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 		this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
 		
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:17:15
+* @Last Modified time: 2016-06-13 15:47:07
 */
 
 /* Global Styles */
@@ -68,19 +68,6 @@
 
 
 /* ValueChart SVG Styles */
-
-
-.scorefunction-point {
-    cursor: ns-resize;
-}
-
-.scorefunction-bartop {
-    cursor: ns-resize;
-}
-
-.label-subcontainer-divider {
-    cursor:  ns-resize;
-}
 
 .valuechart-outline {
     fill: white;

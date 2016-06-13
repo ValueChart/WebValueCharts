@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:11:33
+* @Last Modified time: 2016-06-13 15:55:17
 */
 
 import { Injectable } 												from '@angular/core';
@@ -236,7 +236,10 @@ export class LabelRenderer {
 				return (i === 0) ? 0 : this.calculateLabelWidth(d);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
-			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset);
+			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
+			.style('cursor', () => {
+				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+			});
 
 		labelDividers.call(d3.behavior.drag().on('drag', this.resizeWeights));
 	}
@@ -325,8 +328,7 @@ export class LabelRenderer {
 	resizeWeights = (d: any, i: number) => {
 		var weightMap: WeightMap = this.chartDataService.weightMap;
 
-		var weight: number = this.renderConfigService.dimensionTwoScale.invert((<any>d3.event).y);
-		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event).dy);
+		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: any = d3.select('#label-' + d.objective.getName() + '-container');
 		var parentName = container.node().getAttribute('parent');

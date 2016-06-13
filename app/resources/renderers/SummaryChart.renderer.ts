@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:05:49
+* @Last Modified time: 2016-06-13 15:36:09
 */
 
 import { Injectable } 												from '@angular/core';
@@ -31,7 +31,7 @@ export class SummaryChartRenderer {
 	public chart: any;					// The 'g' element that contains all the elements making up the summary chart.
 	public outline: any;				// The 'rect' element that outlines the summary chart.
 	public rowsContainer: any;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public dividingLineContainer: any;		// The 'g' element that contains the lines that divide different alternatives bars from each other. 
+	public dividingLineContainer: any;	// The 'g' element that contains the lines that divide different alternatives bars from each other. 
 	public rows: any;					// The collection of all 'g' elements s.t. each element is a row container.
 	public dividingLines: any;			// The collection of all 'line' elements that are used to divide different alternative bars from each other.
 	public cells: any;					// The collection of all 'g' elements s.t. each element is a cell container.
