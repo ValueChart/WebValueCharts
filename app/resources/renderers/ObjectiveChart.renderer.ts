@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:30:13
+* @Last Modified time: 2016-06-13 16:21:12
 */
 
 import { Injectable } 												from '@angular/core';
@@ -16,6 +16,7 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 
 // Model Classes
 import { User }														from '../model/User';
+import { Alternative }												from '../model/Alternative';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 
@@ -29,15 +30,17 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 export class ObjectiveChartRenderer {
 
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
-	public chart: any;					// The 'g' element that contains all the elements making up the objective chart.
+	public chart: any;						// The 'g' element that contains all the elements making up the objective chart.
 	public rowOutlinesContainer: any;
-	public rowOutlines: any;			// The collection of all 'rect' elements that are used outline each row.
-	public rowsContainer: any;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: any;					// The collection of 'g' elements s.t. each element is a row container.
-	public dividingLinesContainer: any;
-	public dividingLines: any;			// The collection of all the 'line' elements that are used to divide different alternative bars from each other.
-	public cells: any;					// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: any;				// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public rowOutlines: any;				// The collection of all 'rect' elements that are used outline each row.
+	public rowsContainer: any;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public rows: any;						// The collection of 'g' elements s.t. each element is a row container.
+	public dividingLinesContainer: any; 	// the 'g' element that contains the lines which divide alternatives bars from each other.
+	public dividingLines: any;				// The collection of all the 'line' elements that are used to divide different alternative bars from each other.
+	public alternativeLabelsContainer: any; // The 'g' element that contains the alternative labels.
+	public alternativeLabels: any;			// The collection of all 'text' elements s.t. each element is an alternative label.
+	public cells: any;						// The collection of all 'g' elements s.t. each element is a cell container.
+	public userScores: any;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	
 
 	constructor(
@@ -58,13 +61,16 @@ export class ObjectiveChartRenderer {
 		// Create the container to hold the dividing lines (dividing between different alternatives).
 		this.dividingLinesContainer = this.chart.append('g')
 			.classed('objective-dividers-container', true);
+		// Create the container to hold the labels for the alternatives
+		this.alternativeLabelsContainer = this.chart.append('g')
+			.classed('objective-alt-labels-container', true);
 
 
-		this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.dividingLinesContainer, rows);
+		this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.dividingLinesContainer, this.alternativeLabelsContainer, rows);
 	}
 
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
-	createObjectiveRows( rowsContainer: any, rowOutlinesContainer: any, dividingLinesContainer: any, rows: VCRowData[]): void {
+	createObjectiveRows( rowsContainer: any, rowOutlinesContainer: any, dividingLinesContainer: any, alternativeLabelsContainer: any, rows: VCRowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
 		rowOutlinesContainer.selectAll('.objective-row-outline')
 			.data(rows)
@@ -84,10 +90,17 @@ export class ObjectiveChartRenderer {
 			.enter().append('line')
 				.classed('objective-dividing-line', true)
 				.classed('valuechart-dividing-line', true);
+
+		alternativeLabelsContainer.selectAll('.objective-alternative-label')
+			.data(this.chartDataService.getValueChart().getAlternatives())
+			.enter().append('text')
+				.classed('objective-alternative-label', true);
+
 		// Select all the row outlines (not just the new ones as is done above), and save them as a class field. The same goes for the next two lines, respectively
 		this.rowOutlines = this.rowOutlinesContainer.selectAll('.objective-row-outline');
 		this.rows = rowsContainer.selectAll('.objective-row');
 		this.dividingLines = this.dividingLinesContainer.selectAll('.objective-dividing-line');
+		this.alternativeLabels = this.alternativeLabelsContainer.selectAll('.objective-alternative-label');
 
 		this.createObjectiveCells(this.rows)
 	}
@@ -161,6 +174,12 @@ export class ObjectiveChartRenderer {
 			.attr(this.renderConfigService.coordinateTwo + '1', (d: VCCellData, i: number) => { return 0; })
 			.attr(this.renderConfigService.coordinateOne + '2', this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.renderConfigService.dimensionTwoSize });
+
+		this.alternativeLabels
+			.text((d: Alternative) => { return d.getName(); })
+			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i) + 20; })
+			.attr(this.renderConfigService.coordinateTwo, this.renderConfigService.dimensionTwoSize + 20)
+			.style('font-size', '20px');
 
 		this.renderObjectiveChartCells(cells, userScores, viewOrientation);
 	}
