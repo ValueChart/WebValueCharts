@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 23:02:00
+* @Last Modified time: 2016-06-13 11:03:17
 */
 
 
@@ -170,8 +170,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var userChanges = this.userDiffer.diff(user);
 
-		var weightMap = user.getWeightMap();
+		var weightMap = user.getWeightMap().getInternalWeightMap();
 		var weightMapChanges = this.weightMapDiffer.diff(weightMap);
+
+		if (weightMapChanges) {
+			this.onValueChartChange();
+		}
 
 		var scoreFunctionMap = user.getScoreFunctionMap();
 		var scoreFunctionMapChanges = this.scoreFunctionMapDiffer.diff(scoreFunctionMap);
@@ -192,7 +196,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.previousOrientation = this.viewOrientation;
 			this.onOrientationChange();
 		}
-
 	}
 
 
@@ -214,14 +217,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	onValueChartChange(): void {
-		this.dataRows = this.chartDataService.getRowData(this.valueChart);
 
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
 		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
 
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
+		this.labelRenderer.updateLabelSpace(this.labelData, 'rootcontainer', this.viewOrientation, this.primitiveObjectives);
 		this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
 	}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 22:53:26
+* @Last Modified time: 2016-06-13 11:06:04
 */
 
 import { Injectable } 												from '@angular/core';
@@ -25,6 +25,7 @@ import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
 import { ScoreFunction }				from '../model/ScoreFunction';
+import { WeightMap }					from '../model/WeightMap';
 
 
 // This class is renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
@@ -101,6 +102,11 @@ export class LabelRenderer {
 			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-text' })
 			.style('font-size', '18px');
 
+		newLabelContainers.append('line')
+			.classed('label-subcontainer-divider', true)
+			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-divider' });
+
+
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: VCLabelData) => {
 			if (labelDatum.subLabelData === undefined)
@@ -110,8 +116,17 @@ export class LabelRenderer {
 		});
 	}
 
+	updateLabelSpace(labelData: VCLabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
+		
+		var labelSpaces = this.rootContainer.selectAll('g[parent=' + parentName + ']').data(labelData);
+		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
+
+		// Render the score function plots.
+		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objective);
+	}
+
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
-	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objectiveData: PrimitiveObjective[]): void {
+	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize);
 
@@ -132,15 +147,15 @@ export class LabelRenderer {
 
 		// Render the labels, starting with the labels for the highest level AbstractObjectives, which are in the 'g' directly under the root container.
 		var labelSpaces = this.rootContainer.selectAll('g[parent=rootcontainer]');
-		this.renderLabels(labelSpaces, labelData, viewOrientation);
+		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
 
 		// Render the score function plots.
-		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objectiveData);
+		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objective);
 
 	}
 
 	// This function recursively renders labels for an array of Objectives that have been put into labelData format. It works very similarly to createLabels.
-	renderLabels(labelSpaces: any, labelData: VCLabelData[], viewOrientation: string): void {
+	renderLabels(labelSpaces: any, labelData: VCLabelData[], viewOrientation: string, isDataUpdate: boolean): void {
 		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
 		var weightOffsets: number[] = [];
 		var weightSum: number = 0;	// The weight offset for the first objective at this level is 0.
@@ -149,9 +164,12 @@ export class LabelRenderer {
 			weightSum += labelData[i].weight;
 		}
 
-		this.renderLabelOutline(labelSpaces.select('.label-subcontainer-outline'), weightOffsets);	// Render the outlining rectangle.
+		this.renderLabelOutline(labelSpaces.select('.label-subcontainer-outline'), weightOffsets, viewOrientation);	// Render the outlining rectangle.
 
 		this.renderLabelText(labelSpaces.select('.label-subcontainer-text'), weightOffsets, viewOrientation)	// Render the text within the label
+
+		this.renderLabelDividers(labelSpaces.select('.label-subcontainer-divider'), weightOffsets, viewOrientation);
+
 
 		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
 		labelData.forEach((labelDatum: VCLabelData, index: number) => {
@@ -162,43 +180,41 @@ export class LabelRenderer {
 			let scaledWeightOffset: number = this.renderConfigService.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
-
-			this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation);	// Render the sub labels.
+			if (isDataUpdate)
+				this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation, false);	// Render the sub labels.
+			else
+				this.renderLabels(subLabelSpaces.data(labelDatum.subLabelData), labelDatum.subLabelData, viewOrientation, true);	// Render the sub labels using the data update selection.
 		});
 	}
 
 	// Render the outline of a label.
-	renderLabelOutline(rectEl: any, weightOffsets: number[]): any {
+	renderLabelOutline(outlineElement: any, weightOffsets: number[], viewOrientation: string): any {
 		// Render the styles of the outline rectangle.
-		rectEl.style('fill', 'white')
+
+		outlineElement.style('fill', 'white')
 			.style('stroke-width', (d: VCLabelData) => {
-				return (d.depthOfChildren === 0) ? 2 : 1;	// PrimitiveObjectives should have thicker lines
+				return (d.depthOfChildren === 0) ? 3 : 2;	// PrimitiveObjectives should have thicker lines
 			})
 			.style('stroke', (d: VCLabelData) => {
 				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
 			});
 
-		rectEl.attr(this.renderConfigService.dimensionOne, (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
-				return (d.depthOfChildren === 0) ?
-					(this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth) 
-				: 
-					this.labelWidth;
-			})
+		outlineElement.attr(this.renderConfigService.dimensionOne, this.calculateLabelWidth)
 			.attr(this.renderConfigService.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
 			.attr(this.renderConfigService.dimensionTwo, (d: VCLabelData, i: number) => {
-				return this.renderConfigService.dimensionTwoScale(d.weight);					// Determine the height (or width) as a function of the weight
+				return Math.max(this.renderConfigService.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
 			})
 			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => {
-				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
-			}));																				// The first objective should have no offset from the top of the containing 'g'. This is NOT the weight offset computed for all objectives at this level.
+				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + 1;			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
+			}));	
 	}
 
 	// Render the text of a label.
-	renderLabelText(textEl: any, weightOffsets: number[], viewOrientation: string): any {
+	renderLabelText(textElement: any, weightOffsets: number[], viewOrientation: string): any {
 
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
-		textEl.attr(this.renderConfigService.coordinateOne, () => {
+		textElement.attr(this.renderConfigService.coordinateOne, () => {
 				return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2); 
 			})
 			.attr(this.renderConfigService.coordinateTwo, (d: VCLabelData, i: number) => {
@@ -210,6 +226,60 @@ export class LabelRenderer {
 			.style('fill', 'black')
 			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
 
+	}
+
+	renderLabelDividers(labelDividers: any, weightOffsets: number[], viewOrientation: string) {
+
+		var calculateDimensionTwoOffset = (d: VCLabelData, i: number) => {
+			return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);					// Determine the height (or width) as a function of the weight
+		};
+
+		labelDividers
+			.attr(this.renderConfigService.coordinateOne + '1', 0)
+			.attr(this.renderConfigService.coordinateOne + '2', (d: VCLabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
+				return (i === 0) ? 0 : this.calculateLabelWidth(d);
+			})
+			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
+			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
+			.style('opacity', 0)
+			.style('stroke', 'black')
+			.style('stroke-width', 8);
+
+		labelDividers.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
+			var weightMap: WeightMap = this.chartDataService.weightMap;
+
+			var weight: number = this.renderConfigService.dimensionTwoScale.invert((<any>d3.event).y);
+			var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event).dy);
+
+			var outline: any = d3.select('#label-' + d.objective.getName() + '-divider');
+			var container: any = d3.select('#label-' + d.objective.getName() + '-container');
+			var parentName = container.node().getAttribute('parent');
+			var parentContainer = d3.select('#label-' + parentName + '-container');
+			var siblings = (<any> parentContainer.data()[0]).subLabelData;
+
+			var combinedWeight: number = d.weight + siblings[i - 1].weight;
+
+			var currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
+			var siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
+			// Run inside the angular zone?
+			this.ngZone.run(() => {
+
+				if (d.objective.objectiveType === 'abstract') {
+					this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
+				} else {
+					d.weight = currentElementWeight;
+					weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
+				}
+
+
+				if (siblings[i - 1].objective.objectiveType === 'abstract') {
+					this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
+				} else {
+					siblings[i - 1].weight = siblingElementWeight;
+					weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
+				}
+			});
+		}));
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -236,7 +306,6 @@ export class LabelRenderer {
 
 			this.scoreFunctionRenderers[datum.getName()].createScoreFunction(el, datum);	
 		});
-
 	}
 	// This function calls uses the ScoreFunctionRenderer to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: any, data: PrimitiveObjective[]): void {
@@ -280,4 +349,12 @@ export class LabelRenderer {
 			weightOffset += objectiveWeight;
 		});
 	}
+
+	calculateLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
+		return (d.depthOfChildren === 0) ?
+			(this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth)
+			:
+			this.labelWidth;
+	};
+
 }
