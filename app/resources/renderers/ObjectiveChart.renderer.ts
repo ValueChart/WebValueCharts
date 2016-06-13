@@ -2,7 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 16:21:12
+<<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
+* @Last Modified time: 2016-06-13 16:43:05
+=======
+* @Last Modified time: 2016-06-13 16:38:20
+>>>>>>> Add labels for alternatives to Objective Chart.
 */
 
 import { Injectable } 												from '@angular/core';
@@ -178,7 +182,9 @@ export class ObjectiveChartRenderer {
 		this.alternativeLabels
 			.text((d: Alternative) => { return d.getName(); })
 			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i) + 20; })
-			.attr(this.renderConfigService.coordinateTwo, this.renderConfigService.dimensionTwoSize + 20)
+			.attr(this.renderConfigService.coordinateTwo, () => {
+				return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoSize - 5 : 5;
+			})
 			.style('font-size', '20px');
 
 		this.renderObjectiveChartCells(cells, userScores, viewOrientation);
