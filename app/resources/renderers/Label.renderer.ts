@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 11:06:04
+* @Last Modified time: 2016-06-13 13:38:45
 */
 
 import { Injectable } 												from '@angular/core';
@@ -193,7 +193,7 @@ export class LabelRenderer {
 
 		outlineElement.style('fill', 'white')
 			.style('stroke-width', (d: VCLabelData) => {
-				return (d.depthOfChildren === 0) ? 3 : 2;	// PrimitiveObjectives should have thicker lines
+				return 3;	// PrimitiveObjectives should have thicker lines
 			})
 			.style('stroke', (d: VCLabelData) => {
 				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
@@ -205,7 +205,7 @@ export class LabelRenderer {
 				return Math.max(this.renderConfigService.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
 			})
 			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => {
-				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + 1;			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
+				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
 			}));	
 	}
 
@@ -231,7 +231,7 @@ export class LabelRenderer {
 	renderLabelDividers(labelDividers: any, weightOffsets: number[], viewOrientation: string) {
 
 		var calculateDimensionTwoOffset = (d: VCLabelData, i: number) => {
-			return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);					// Determine the height (or width) as a function of the weight
+			return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
 		};
 
 		labelDividers
@@ -243,43 +243,9 @@ export class LabelRenderer {
 			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
 			.style('opacity', 0)
 			.style('stroke', 'black')
-			.style('stroke-width', 8);
+			.style('stroke-width', 12);
 
-		labelDividers.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
-			var weightMap: WeightMap = this.chartDataService.weightMap;
-
-			var weight: number = this.renderConfigService.dimensionTwoScale.invert((<any>d3.event).y);
-			var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event).dy);
-
-			var outline: any = d3.select('#label-' + d.objective.getName() + '-divider');
-			var container: any = d3.select('#label-' + d.objective.getName() + '-container');
-			var parentName = container.node().getAttribute('parent');
-			var parentContainer = d3.select('#label-' + parentName + '-container');
-			var siblings = (<any> parentContainer.data()[0]).subLabelData;
-
-			var combinedWeight: number = d.weight + siblings[i - 1].weight;
-
-			var currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
-			var siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
-			// Run inside the angular zone?
-			this.ngZone.run(() => {
-
-				if (d.objective.objectiveType === 'abstract') {
-					this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
-				} else {
-					d.weight = currentElementWeight;
-					weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
-				}
-
-
-				if (siblings[i - 1].objective.objectiveType === 'abstract') {
-					this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
-				} else {
-					siblings[i - 1].weight = siblingElementWeight;
-					weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
-				}
-			});
-		}));
+		labelDividers.call(d3.behavior.drag().on('drag', this.resizeWeights));
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -350,11 +316,53 @@ export class LabelRenderer {
 		});
 	}
 
+
+	// Anonymous functions for setting selection attributes that are used enough to be made class fields
+
 	calculateLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
 		return (d.depthOfChildren === 0) ?
 			(this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth)
 			:
 			this.labelWidth;
 	};
+
+
+
+	// Event handler for resizing weights by dragging label edges.
+	resizeWeights = (d: any, i: number) => {
+		var weightMap: WeightMap = this.chartDataService.weightMap;
+
+		var weight: number = this.renderConfigService.dimensionTwoScale.invert((<any>d3.event).y);
+		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event).dy);
+
+		var container: any = d3.select('#label-' + d.objective.getName() + '-container');
+		var parentName = container.node().getAttribute('parent');
+		var parentContainer = d3.select('#label-' + parentName + '-container');
+		var siblings = (<any>parentContainer.data()[0]).subLabelData;
+
+		var combinedWeight: number = d.weight + siblings[i - 1].weight;
+
+		var currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
+		var siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
+		// Run inside the angular zone!
+		this.ngZone.run(() => {
+
+			if (d.objective.objectiveType === 'abstract') {
+				this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
+			} else {
+				d.weight = currentElementWeight;
+				weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
+			}
+
+
+			if (siblings[i - 1].objective.objectiveType === 'abstract') {
+				this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
+			} else {
+				siblings[i - 1].weight = siblingElementWeight;
+				weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
+			}
+		});
+	};
+
 
 }

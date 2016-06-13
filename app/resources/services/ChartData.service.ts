@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 10:54:15
+* @Last Modified time: 2016-06-13 13:38:01
 */
 
 import { Injectable } 					from '@angular/core';
@@ -236,21 +236,29 @@ export class ChartDataService {
 		return elements;
 	}
 
-	incrementAbstractObjectiveWeight(labelDatum: VCLabelData, weightMap: WeightMap, weightIncrement: number, parentWeight: number): void {
+	incrementAbstractObjectiveWeight(labelDatum: VCLabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
 
 		var children: VCLabelData[] = labelDatum.subLabelData;
 		var numChildren: number = children.length;
+		var priorWeight = labelDatum.weight;
+		
+		labelDatum.weight = Math.max(Math.min(labelDatum.weight + weightIncrement, maxWeight), 0);
+		
 
-		labelDatum.weight = Math.max(Math.min(labelDatum.weight + weightIncrement, parentWeight), 0);
 		weightIncrement = weightIncrement / numChildren;
 
 		children.forEach((child: VCLabelData) => {
+			var childMax: number = maxWeight;
+
+			if (labelDatum.weight === maxWeight)
+				childMax = ((child.weight) / priorWeight) * maxWeight;
+
 			if (child.subLabelData === undefined) {
-				var newWeight = Math.max(Math.min(child.weight + weightIncrement, 1), 0);
+				var newWeight = Math.max(Math.min(child.weight + weightIncrement, childMax), 0);
 				child.weight = newWeight;
 				weightMap.setObjectiveWeight(child.objective.getName(), newWeight);
 			} else {
-				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, labelDatum.weight);
+				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, childMax);
 			}
 		});
 	}
