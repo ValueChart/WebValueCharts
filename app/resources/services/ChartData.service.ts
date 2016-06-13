@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 13:38:01
+* @Last Modified time: 2016-06-13 14:59:14
 */
 
 import { Injectable } 					from '@angular/core';
@@ -239,13 +239,17 @@ export class ChartDataService {
 	incrementAbstractObjectiveWeight(labelDatum: VCLabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
 
 		var children: VCLabelData[] = labelDatum.subLabelData;
-		var numChildren: number = children.length;
+		var nonZeroChildren: number = 0;
 		var priorWeight = labelDatum.weight;
 		
 		labelDatum.weight = Math.max(Math.min(labelDatum.weight + weightIncrement, maxWeight), 0);
 		
-
-		weightIncrement = weightIncrement / numChildren;
+		children.forEach((child:VCLabelData) => {
+			if (child.weight !== 0)
+				nonZeroChildren++;
+		});
+		if (nonZeroChildren)
+			weightIncrement = weightIncrement / nonZeroChildren;
 
 		children.forEach((child: VCLabelData) => {
 			var childMax: number = maxWeight;

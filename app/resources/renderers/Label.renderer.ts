@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 14:59:06
+* @Last Modified time: 2016-06-13 15:11:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -62,9 +62,7 @@ export class LabelRenderer {
 			.classed('label-outline-container', true)
 			.append('rect')
 				.classed('label-outline', true)
-				.style('fill', 'white')
-				.style('stroke-width', 1)
-				.style('stroke', 'grey');
+				.classed('valuechart-outline', true);
 
 		// Create the container which will hold all labels.
 		this.labelContainer = this.rootContainer.append('g')
@@ -94,16 +92,18 @@ export class LabelRenderer {
 		// Append an outline rectangle for label container that was just created.
 		newLabelContainers.append('rect')
 			.classed('label-subcontainer-outline', true)
+			.classed('valuechart-label-outline', true)
 			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-outline' });
 
 		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
 		newLabelContainers.append('text')
 			.classed('label-subcontainer-text', true)
-			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-text' })
-			.style('font-size', '18px');
+			.classed('valuechart-label-text', true)
+			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-text' });
 
 		newLabelContainers.append('line')
 			.classed('label-subcontainer-divider', true)
+			.classed('valuechart-label-divider', true)
 			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-divider' });
 
 
@@ -192,9 +192,6 @@ export class LabelRenderer {
 		// Render the styles of the outline rectangle.
 
 		outlineElement.style('fill', 'white')
-			.style('stroke-width', (d: VCLabelData) => {
-				return 3;	// PrimitiveObjectives should have thicker lines
-			})
 			.style('stroke', (d: VCLabelData) => {
 				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
 			});
@@ -223,7 +220,6 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.style('fill', 'black')
 			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
@@ -240,10 +236,7 @@ export class LabelRenderer {
 				return (i === 0) ? 0 : this.calculateLabelWidth(d);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
-			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
-			.style('opacity', 0)
-			.style('stroke', 'black')
-			.style('stroke-width', 12);
+			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset);
 
 		labelDividers.call(d3.behavior.drag().on('drag', this.resizeWeights));
 	}

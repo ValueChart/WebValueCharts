@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 22:40:36
+* @Last Modified time: 2016-06-13 15:05:49
 */
 
 import { Injectable } 												from '@angular/core';
@@ -51,10 +51,8 @@ export class SummaryChartRenderer {
 		this.outline = this.chart.append('g')
 			.classed('summary-outline-container', true)
 			.append('rect')
-				.classed('summary-outline', true)
-				.attr('fill', 'white')
-				.attr('stroke', 'grey')
-				.attr('stroke-width', 1);
+			.classed('summary-outline', true)
+			.classed('valuechart-outline', true)
 
 		// Create the container that holds all the row containers.
 		this.rowsContainer = this.chart.append('g')
@@ -81,8 +79,7 @@ export class SummaryChartRenderer {
 			.data(this.chartDataService.getValueChart().getAlternatives())
 			.enter().append('line')
 				.classed('summary-dividing-line', true)
-				.style('stroke-width', 1)
-				.style('stroke', 'grey');
+				.classed('valuechart-dividing-line', true)
 
 		// Save all the rows as a field of the class. This is done separately from creating the rows as newRows is the selection of newly created rows containers,
 		// NOT all row containers. A similar argument explains why the dividing lines are saved here as well.

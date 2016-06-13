@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 22:01:03
+* @Last Modified time: 2016-06-13 15:30:13
 */
 
 import { Injectable } 												from '@angular/core';
@@ -70,9 +70,7 @@ export class ObjectiveChartRenderer {
 			.data(rows)
 			.enter().append('rect')
 				.classed('objective-row-outline', true)
-				.style('stroke-width', 1)
-				.style('stroke', 'grey')
-				.style('fill', 'white');
+				.classed('valuechart-outline', true);
 
 		// Create the containers to hold the new rows.
 		rowsContainer.selectAll('.objective-row')
@@ -85,13 +83,11 @@ export class ObjectiveChartRenderer {
 			.data(this.chartDataService.getValueChart().getAlternatives())
 			.enter().append('line')
 				.classed('objective-dividing-line', true)
-				.style('stroke-width', 1)
-				.style('stroke', 'grey');
-
+				.classed('valuechart-dividing-line', true);
 		// Select all the row outlines (not just the new ones as is done above), and save them as a class field. The same goes for the next two lines, respectively
 		this.rowOutlines = this.rowOutlinesContainer.selectAll('.objective-row-outline');
 		this.rows = rowsContainer.selectAll('.objective-row');
-		this.dividingLines = this.rowOutlinesContainer.selectAll('.objective-dividing-line');
+		this.dividingLines = this.dividingLinesContainer.selectAll('.objective-dividing-line');
 
 		this.createObjectiveCells(this.rows)
 	}
@@ -107,15 +103,30 @@ export class ObjectiveChartRenderer {
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
 		this.cells.selectAll('.objective-user-scores')
-			.data((d: VCCellData, i: number) => { return d.userScores; })
+			.data((d: VCCellData) => { return d.userScores; })
 			.enter().append('rect')
 				.classed('objective-user-scores', true);
 
 		this.userScores = this.cells.selectAll('.objective-user-scores');
 	}
 
+	updateObjectiveChart(rows: VCRowData[], viewOrientation: string): void {
+		var rowOutlinesToUpdate = this.rowOutlines
+			.data(rows);
+
+		var rowsToUpdate = this.rows.data(rows);
+
+		var cellsToUpdate = rowsToUpdate.selectAll('.objective-cell')
+			.data((d: VCRowData) => { return d.cells; })
+
+		var userScoresToUpdate = cellsToUpdate.selectAll('.objective-user-scores')
+			.data((d: VCCellData, i: number) => { return d.userScores; });
+
+		this.renderObjectiveChartRows(rowOutlinesToUpdate, rowsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
+	}
+
 	// This function positions and gives widths + heights to the elements created by the createObjectiveChart method.
-	renderObjectiveChart(rows: VCRowData[], viewOrientation: string): void {
+	renderObjectiveChart(viewOrientation: string): void {
 		this.chart
 			.attr('transform', () => {
 				if (viewOrientation == 'vertical')
@@ -124,13 +135,13 @@ export class ObjectiveChartRenderer {
 					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.renderConfigService.dimensionOneSize, 0);	// TODO: Fix this.
 			});
 
-		this.renderObjectiveChartRows(viewOrientation);
+		this.renderObjectiveChartRows(this.rowOutlines, this.rows, this.cells, this.userScores, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveRows. Unlike in the summary chart we directly position the row
 	// containers here because the positions of the scores (and therefore row containers) is are absolute since the bar charts are not stacked. 
-	renderObjectiveChartRows(viewOrientation: string): void {
-		this.rowOutlines
+	renderObjectiveChartRows(rowOutlines: any, rows: any, cells: any, userScores: any, viewOrientation: string): void {
+		rowOutlines
 			.attr('transform', (d: VCRowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.renderConfigService.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
 			})																																					// this is because the heights of the previous rows are proportional to their weights.
@@ -140,7 +151,7 @@ export class ObjectiveChartRenderer {
 				return this.renderConfigService.dimensionTwoScale(objectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
-		this.rows
+		rows
 			.attr('transform', (d: VCRowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.renderConfigService.dimensionTwoScale(d.weightOffset)));	// Transform each row container to have the correct y (or x) position based on the combined weights of the previous rows.
 			});
@@ -151,11 +162,11 @@ export class ObjectiveChartRenderer {
 			.attr(this.renderConfigService.coordinateOne + '2', this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.renderConfigService.dimensionTwoSize });
 
-		this.renderObjectiveChartCells(viewOrientation);
+		this.renderObjectiveChartCells(cells, userScores, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveCells.
-	renderObjectiveChartCells(viewOrientation: string): void {
+	renderObjectiveChartCells(cells: any, userScores: any, viewOrientation: string): void {
 		this.cells
 			.attr('transform', (d: VCCellData, i: number) => { 
 				var coordinateOne: number = this.calculateCellCoordinateOne(d, i);

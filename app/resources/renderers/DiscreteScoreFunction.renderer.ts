@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 22:50:19
+* @Last Modified time: 2016-06-13 15:18:36
 */
 
 import { Injectable } 					from '@angular/core';
@@ -50,34 +50,35 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
 		this.barContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-' + objective.getName() + '-bars-container', true);
+			.classed('scorefunction-bars-container', true)
+			.attr('id', 'scorefunction-' + objective.getName() + '-bars-container');
 
 		this.createDiscretePlotElements(this.barContainer, objective, domainElements);
 	}
 
 	createDiscretePlotElements(barContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bar')
+		barContainer.selectAll('.scorefunction-bar')
 			.data(domainElements)
 			.enter().append('rect')
-			.classed('scorefunction-' + objective.getName() + '-bar', true)
+			.classed('scorefunction-bar', true)
 			.attr('id', (d: (string | number)) => {
 				return 'scorefunction-' + objective.getName() + '-' + d + '-bar';
 			});
 
 
-		this.utilityBars = barContainer.selectAll('.scorefunction-' + objective.getName() + '-bar');
+		this.utilityBars = barContainer.selectAll('.scorefunction-bar');
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barContainer.selectAll('.scorefunction-' + objective.getName() + '-bartop')
+		barContainer.selectAll('.scorefunction-bartop')
 			.data(domainElements)
 			.enter().append('rect')
-			.classed('scorefunction-' + objective.getName() + '-bartop', true)
+			.classed('scorefunction-bartop', true)
 			.attr('id', (d: (string | number)) => {
 				return 'scorefunction-' + objective.getName() + '-' + d + '-bartop';
 			});
 
-		this.barTops = barContainer.selectAll('.scorefunction-' + objective.getName() + '-bartop');
+		this.barTops = barContainer.selectAll('.scorefunction-bartop');
 
 	}
 
@@ -111,9 +112,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo, (d: (string | number)) => { 
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo; 
 			})
-			.style('fill', 'white')
 			.style('stroke', objective.getColor())
-			.style('stroke-width', 1);
 
 		this.barTops
 			.attr(this.dimensionTwo, this.labelOffset)
@@ -124,17 +123,23 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('fill', objective.getColor());
 		
+		// Assign the callback function for when the bar tops are dragged. Note that this must be done inside a anonymous function because we require
+		// access to the scope defined by the renderDiscretePlot method.
 		this.barTops.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
 
 			var score: number;
+			// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 			if (viewOrientation === 'vertical') {
+				// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
 				score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
 			} else {
+				// No need to do anything with offsets here because x is already left to right.
 				score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
 			}
-			score = Math.max(0, Math.min(score, 1));
+			score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
 
-			// Run inside the angular zone?
+			// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
+			// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
 			this.ngZone.run(() => { scoreFunction.setElementScore(d, score) });
 
 		}));

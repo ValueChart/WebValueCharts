@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-07 14:56:59
+* @Last Modified time: 2016-06-13 15:17:15
 */
 
 /* Global Styles */
@@ -64,6 +64,61 @@
 .orientation-btn {
     top: 5rem;
 }
+
+
+
+/* ValueChart SVG Styles */
+
+
+.scorefunction-point {
+    cursor: ns-resize;
+}
+
+.scorefunction-bartop {
+    cursor: ns-resize;
+}
+
+.label-subcontainer-divider {
+    cursor:  ns-resize;
+}
+
+.valuechart-outline {
+    fill: white;
+    stroke: grey;
+    stroke-width: 1;   
+}
+
+.valuechart-dividing-line {
+    stroke: grey;
+    stroke-width: 1;   
+}
+
+.valuechart-label-text {
+    font-size: 18px;
+    fill: black;
+}
+
+.valuechart-label-outline {
+    stroke-width: 3;
+}
+
+.valuechart-label-divider {
+    opacity: 0;
+    stroke: black;
+    stroke-width: 12;
+} 
+
+.scorefunction-fitline {
+    stroke: black;
+    stroke-width: 1;
+}
+
+.scorefunction-bar {
+    fill: white;
+    stroke-width: 1;
+}
+
+
 
 
 /* Override bootstrap default styles*/

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 13:40:52
+* @Last Modified time: 2016-06-13 15:00:23
 */
 
 
@@ -123,7 +123,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.dataRows);
-		this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
+		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 
 		this.summaryChartRenderer.createSummaryChart(this.el, this.dataRows);
 		this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
@@ -211,7 +211,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
-		this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
+		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
 		this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
 		
 	}
@@ -222,7 +222,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
 		this.labelRenderer.updateLabelSpace(this.labelData, 'rootcontainer', this.viewOrientation, this.primitiveObjectives);
-		this.objectiveChartRenderer.renderObjectiveChart(this.dataRows, this.viewOrientation);
+		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
 	}
 
