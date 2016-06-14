@@ -1,10 +1,74 @@
-<div >
-	<ValueChart [data]="valueChart" [orientation]="orientation"></ValueChart>
-</div>
-<div class="flex-row orientation-btn">
-	<form class="form-horizontal">
-		<div class="form-group">
-			<button class="btn btn-default btn-lg" (click)="switchOrientation()" id="orientationBtn">Switch Orientation</button>
-		</div>
-	</form>
+<div id="ValueChartView">
+	<div class="col-sm-offset-1 valuechart-toolbar">
+		<form class="form-inline">
+			<div class="form-group">
+				<div class="dropdown">	
+					<button class="btn btn-default dropdown-toggle" type="button" id="orientation-dropdown" data-toggle="dropdown" 
+					aria-haspopup="true" aria-expanded="true">
+						Chart Orientation
+						<span class="caret"></span>
+					</button>
+					 <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="orientation-dropwon">
+					    <li [class.disabled]="orientation === 'vertical'">
+					 	   <a href="javascript:void(0)" (click)="setOrientation('vertical')">
+					 	   		Vertical
+					 	  		<span *ngIf="orientation === 'vertical'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
+					    <li [class.disabled]="orientation === 'horizontal'">
+					    	<a href="javascript:void(0)" (click)="setOrientation('horizontal')">
+					    		Horizontal
+					    		<span *ngIf="orientation === 'horizontal'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+					    </li>
+					 </ul>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="dropdown">	
+					<button class="btn btn-default dropdown-toggle" type="button" id="displayOptions-dropdown" data-toggle="dropdown" 
+					aria-haspopup="true" aria-expanded="true">
+						Chart Display Options
+						<span class="caret"></span>
+					</button>
+					  <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="displayOptions-dropdown">
+					    <li>
+					 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
+					 	   		Utility Graphs
+					 	  		<span *ngIf="displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
+					    <li>
+					 	   <a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
+					 	   		Domain Values
+					 	  		<span *ngIf="displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
+					    <li>
+					 	   <a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
+					 	   		Scales
+					 	  		<span *ngIf="displayScales" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
+					    <li>
+					 	   <a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
+					 	   		TotalScores
+					 	  		<span *ngIf="displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
+					 </ul>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div >
+		<ValueChart 
+			[data]="valueChart" 
+			[orientation]="orientation" 
+			[displayScoreFunctions]="displayScoreFunctions" 
+			[displayDomainValues]="displayDomainValues" 
+			[displayScales]="displayScales" 
+			[displayTotalScores]="displayTotalScores">
+		</ValueChart>
+	</div>
 </div>

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 14:59:14
+* @Last Modified time: 2016-06-14 13:12:30
 */
 
 import { Injectable } 					from '@angular/core';
@@ -196,13 +196,16 @@ export class ChartDataService {
 		return rows;
 	}
 
-	calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number): number {
+	calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
 		var maxDepthOfChildren = 0;
 		labelData.forEach((labelDatum: VCLabelData) => {
 			if (labelDatum.depthOfChildren > maxDepthOfChildren)
 				maxDepthOfChildren = labelDatum.depthOfChildren;
 		});
-		return dimensionOneSize / (maxDepthOfChildren + 2);
+
+		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
+
+		return dimensionOneSize / maxDepthOfChildren;
 	}
 
 	getDomainElements(objective: PrimitiveObjective): (string | number)[] {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:47:07
+* @Last Modified time: 2016-06-14 15:52:00
 */
 
 /* Global Styles */
@@ -55,14 +55,20 @@
     position: absolute;
     height: 85%;
     width: 90%;
-    top: 10%;
+    top: 12%;
     left: 10%;
 }
 
 /* ValueChart Viewer Styles */
 
-.orientation-btn {
-    top: 5rem;
+.valuechart-toolbar {
+    position: relative;
+    top: 10rem;
+}
+
+.best-score-label {
+    font-weight: bold;
+    fill: red;
 }
 
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-09 22:41:42
+* @Last Modified time: 2016-06-14 13:51:14
 */
 
 import { Injectable } 												from '@angular/core';
@@ -26,6 +26,9 @@ export class RenderConfigService {
 	public dimensionTwoSize: number; // Height (or Width) of a major element of a ValueChart (objective chart, labels, and summary chart)
 
 	public dimensionTwoScale: any; // Linear scale between domain [0,1] and range [0, dimensionTwoSize]
+
+	public viewConfiguration: any = {};
+	public previousViewConfiguration: any = {};
 
 
 	constructor() { 

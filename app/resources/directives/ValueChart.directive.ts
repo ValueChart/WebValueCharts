@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 09:09:41
+* @Last Modified time: 2016-06-14 16:00:55
 */
 
 
@@ -45,10 +45,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private isInitialized: boolean;
 	// Inputs to the directive.
 	private valueChart: ValueChart;		// A ValueChart. Can be an IndividualValueChart or a GroupValueChart
+
 	private previousOrientation: string;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
 	// Height and width of the viewport for use with viewBox attribute of the root SVG element
+
 	private viewportWidth: number;
 	private viewportHeight: number;
 
@@ -79,6 +81,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private renderConfigService: RenderConfigService) { 
 	}
 
+
+	// Variable binding functions. These functions are called when the directive is initialized.
+
+
 	// Binds to the directive attribute 'data', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives data attribute.
 	@Input() set data(value: any) {
@@ -91,7 +97,31 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewOrientation = <string> value;
 	}
 
-	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngOnChange
+	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.
+	@Input() set displayScoreFunctions(value: any) {
+		this.renderConfigService.viewConfiguration.displayScoreFunctions = <boolean> value;
+	}
+
+	// Binds to the directive attribute 'displayDomainValues', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives displayDomainValues attribute.
+	@Input() set displayDomainValues(value: any) {
+	this.renderConfigService.viewConfiguration.displayDomainValues = <boolean>value;
+	}
+
+	// Binds to the directive attribute 'displayScales', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives displayScales attribute.
+	@Input() set displayScales(value: any) {
+	this.renderConfigService.viewConfiguration.displayScales = <boolean>value;
+	}
+
+	// Binds to the directive attribute 'displayTotalScores', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives displayTotalScores attribute.
+	@Input() set displayTotalScores(value: any) {
+		this.renderConfigService.viewConfiguration.displayTotalScores = <boolean>value;
+	}
+
+	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
@@ -126,7 +156,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 
 		this.summaryChartRenderer.createSummaryChart(this.el, this.dataRows);
-		this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
+		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
 
 		this.initChangeDetection();
 
@@ -153,11 +183,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.scoreFunctionDiffers.push(scoreFunctionDiffer);
 		});
 
+		this.renderConfigService.previousViewConfiguration.displayScoreFunctions	= this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.renderConfigService.previousViewConfiguration.displayDomainValues 		= this.renderConfigService.viewConfiguration.displayDomainValues;
+		this.renderConfigService.previousViewConfiguration.displayScales 			= this.renderConfigService.viewConfiguration.displayScales;
+		this.renderConfigService.previousViewConfiguration.displayTotalScores 		= this.renderConfigService.viewConfiguration.displayTotalScores;
+
 
 	}
 
 
-	// Set up change detection here:
+	// This function is called by Angular whenever it detects that a change to this directive's inputs MAY have occurred. The method body is our implementation of change
+	// detection. We are implementing our own change detection Since Angular's change detection (ngOnChanges) is by reference. Note that when a a class implements 
+	// DoCheck, ngOnChanges is never called, even if the class also implements OnChanges. This means that changes must both be detected, and handled in ngDoCheck.
 	ngDoCheck() {
 		// DO NOT proceed with change detection if the directive has not yet been initialized.
 		if (this.isInitialized === undefined)
@@ -191,27 +228,37 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	
 		});
 
-
+		// Check View Configuration options:
 		if (this.previousOrientation !== this.viewOrientation) {
 			this.previousOrientation = this.viewOrientation;
 			this.onOrientationChange();
 		}
-	}
 
+		if (this.renderConfigService.viewConfiguration.displayScoreFunctions !== this.renderConfigService.previousViewConfiguration.displayScoreFunctions) {
+			this.renderConfigService.previousViewConfiguration.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
+			// Toggle Score Functions.
+			this.onDisplayScoreFunctionsChange();
+		}
 
-	// The type of changeRecord should be SimpleChanges, but no such type exists in this release. TODO: Update this once Angular has been updated.
-	// noOnChanges is called by Angular whenever the inputs to the directive change. It is called BEFORE ngOnIt when the directive is first
-	// initialized. 
-	onOrientationChange(): void {
+		if (this.renderConfigService.viewConfiguration.displayDomainValues !== this.renderConfigService.previousViewConfiguration.displayDomainValues) {
+			this.renderConfigService.previousViewConfiguration.displayDomainValues = this.renderConfigService.viewConfiguration.displayDomainValues;
+			// Toggle Score Functions/.
+			console.log('domain values display changed');
 
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+		}
 
-		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
+		if (this.renderConfigService.viewConfiguration.displayScales !== this.renderConfigService.previousViewConfiguration.displayScales) {
+			this.renderConfigService.previousViewConfiguration.displayScales = this.renderConfigService.viewConfiguration.displayScales;
+			// Toggle Score Functions/.
+			console.log('scales display changed');
 
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
-		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
-		this.summaryChartRenderer.renderSummaryChart(this.viewOrientation);
-		
+		}
+
+		if (this.renderConfigService.viewConfiguration.displayTotalScores !== this.renderConfigService.previousViewConfiguration.displayTotalScores) {
+			this.renderConfigService.previousViewConfiguration.displayTotalScores = this.renderConfigService.viewConfiguration.displayTotalScores;
+			// Toggle Total Scores
+			this.onDisplayTotalScoresChange();
+		}
 	}
 
 	onValueChartChange(): void {
@@ -223,5 +270,25 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
 	}
+
+	onOrientationChange(): void {
+
+		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+
+		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
+
+		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
+		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
+		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
+	}
+
+	onDisplayScoreFunctionsChange(): void {
+		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
+	}
+
+	onDisplayTotalScoresChange(): void {
+		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
+	}
+
 
 }

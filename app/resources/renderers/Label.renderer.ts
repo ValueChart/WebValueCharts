@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 09:37:39
+* @Last Modified time: 2016-06-14 13:53:50
 */
 
 import { Injectable } 												from '@angular/core';
@@ -43,6 +43,7 @@ export class LabelRenderer {
 
 	private labelWidth: number;				// The min of the labels, calculated based on maximum depth of the objective hierarchy and the amount of 
 											// space that the label area occupies.
+	private displayScoreFunctions: boolean;
 
 	public scoreFunctionRenderers: any;
 
@@ -117,19 +118,29 @@ export class LabelRenderer {
 	}
 
 	updateLabelSpace(labelData: VCLabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
+		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
+		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
 		
 		var labelSpaces = this.rootContainer.selectAll('g[parent=' + parentName + ']').data(labelData);
 		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
-		// Render the score function plots.
-		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objective);
+		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.label-scorefunction-container');
+
+		if (this.displayScoreFunctions) {
+			// Render the score function plots.
+			scoreFunctionContainer.style('display', 'block');
+			this.renderScoreFunctions(viewOrientation, scoreFunctionContainer, objective);
+		} else {
+			scoreFunctionContainer.style('display', 'none');
+		}
 	}
 
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
 	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize);
-
+		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
@@ -149,9 +160,16 @@ export class LabelRenderer {
 		var labelSpaces = this.rootContainer.selectAll('g[parent=rootcontainer]');
 		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
 
-		// Render the score function plots.
-		this.renderScoreFunctions(viewOrientation, this.rootContainer.select('.label-scorefunction-container'), objective);
+		var scoreFunctionContainer: d3.Selection<any>  = this.rootContainer.select('.label-scorefunction-container');
 
+		if (this.displayScoreFunctions) {
+			// Render the score function plots.
+			scoreFunctionContainer.style('display', 'block');
+			this.renderScoreFunctions(viewOrientation, scoreFunctionContainer, objective);
+		} else {
+			scoreFunctionContainer.style('display', 'none');
+		}
+		
 	}
 
 	// This function recursively renders labels for an array of Objectives that have been put into labelData format. It works very similarly to createLabels.
@@ -316,8 +334,9 @@ export class LabelRenderer {
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields
 
 	calculateLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
+		var scoreFunctionOffset: number = ((this.displayScoreFunctions) ? this.labelWidth : 0);
 		return (d.depthOfChildren === 0) ?
-			(this.renderConfigService.dimensionOneSize - this.labelWidth) - (d.depth * this.labelWidth)
+			(this.renderConfigService.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
 			:
 			this.labelWidth;
 	};
