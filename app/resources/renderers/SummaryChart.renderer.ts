@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 15:58:31
+* @Last Modified time: 2016-06-14 16:48:48
 */
 
 import { Injectable } 												from '@angular/core';
@@ -40,6 +40,7 @@ export class SummaryChartRenderer {
 	public scoreTotalsContainer: d3.Selection<any>;
 	public scoreTotalsSubContainers: d3.Selection<any>;
 	public scoreTotals: d3.Selection<any>;
+	public utilityAxisContainer: d3.Selection<any>;
 
 	constructor(
 		private renderConfigService: RenderConfigService,
@@ -68,6 +69,11 @@ export class SummaryChartRenderer {
 
 		this.scoreTotalsContainer = this.chart.append('g')
 			.classed('summary-totalscores-container', true);
+
+		this.utilityAxisContainer = this.chart.append('g')
+			.classed('summary-utilityaxis-container', true)
+			.classed('utility-axis', true);
+
 
 		this.createSummaryChartRows(this.rowsContainer, this.dividingLineContainer, this.scoreTotalsContainer, rows);
 	}
@@ -175,8 +181,30 @@ export class SummaryChartRenderer {
 		this.scoreTotals = this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
 			.selectAll('.summary-score-total');
 
+		if (this.renderConfigService.viewConfiguration.displayScales) {
+			this.utilityAxisContainer.style('display', 'block');
+			this.renderUtilityAxis(viewOrientation);
+		} else {
+			this.utilityAxisContainer.style('display', 'none');
+		}
 
 		this.renderSummaryChartRows(this.dividingLines, this.scoreTotals, this.cells, this.userScores, viewOrientation);
+	}
+
+
+	renderUtilityAxis(viewOrientation: string): void {
+		var uilityScale = d3.scale.linear()
+			.domain([0, 100])
+			.range([this.renderConfigService.dimensionTwoSize, 0]);
+
+		var utilityAxis: any = d3.svg.axis()
+			.scale(uilityScale)
+			.ticks(10)
+			.orient("left");
+
+		this.utilityAxisContainer
+			.attr('transform', this.renderConfigService.generateTransformTranslation(viewOrientation, -20, 0))
+			.call(utilityAxis);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartRows. Note that we don't position the row

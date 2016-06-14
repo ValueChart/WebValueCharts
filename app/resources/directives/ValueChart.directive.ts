@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 16:00:55
+* @Last Modified time: 2016-06-14 16:48:01
 */
 
 
@@ -137,7 +137,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Create the SVG base element, and set it to dynamically fit to the viewport.
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
-			.attr('viewBox', '0 0' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
+			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
 		// Get objective data in a format that suits d3.
@@ -160,7 +160,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.initChangeDetection();
 
-		this.isInitialized = true;
+
+		this.isInitialized = true;	
 	}
 
 	initChangeDetection(): void {
@@ -243,21 +244,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.renderConfigService.viewConfiguration.displayDomainValues !== this.renderConfigService.previousViewConfiguration.displayDomainValues) {
 			this.renderConfigService.previousViewConfiguration.displayDomainValues = this.renderConfigService.viewConfiguration.displayDomainValues;
 			// Toggle Score Functions/.
-			console.log('domain values display changed');
-
 		}
 
 		if (this.renderConfigService.viewConfiguration.displayScales !== this.renderConfigService.previousViewConfiguration.displayScales) {
 			this.renderConfigService.previousViewConfiguration.displayScales = this.renderConfigService.viewConfiguration.displayScales;
-			// Toggle Score Functions/.
-			console.log('scales display changed');
-
+			// Toggle Utility Scale
+			this.onSummaryChartChanged();
 		}
 
 		if (this.renderConfigService.viewConfiguration.displayTotalScores !== this.renderConfigService.previousViewConfiguration.displayTotalScores) {
 			this.renderConfigService.previousViewConfiguration.displayTotalScores = this.renderConfigService.viewConfiguration.displayTotalScores;
 			// Toggle Total Scores
-			this.onDisplayTotalScoresChange();
+			this.onSummaryChartChanged();
 		}
 	}
 
@@ -286,7 +284,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 	}
 
-	onDisplayTotalScoresChange(): void {
+	onSummaryChartChanged(): void {
 		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
 	}
 
