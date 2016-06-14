@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 13:30:18
+* @Last Modified time: 2016-06-14 09:40:58
 */
 
 import { Injectable } 					from '@angular/core';
@@ -29,14 +29,14 @@ export abstract class ScoreFunctionRenderer {
 
 	protected domainSize: number;					// The number of domain elements the score function needs to plot.
 
-	public rootContainer: any;						// The 'g' element that is the root container of the score function plot.
-	public plotOutline: any;						// The 'rect' element that is used to outline the score function plot
-	public plotContainer: any;						// The 'g' element that contains the plot itself.
-	public domainLabelContainer: any;				// The 'g' element that contains the labels for each domain element. 
-	public domainLabels: any;						// The collection of 'text' elements s.t. each element is a label for one domain element.
-	public plotElementsContainer: any;				// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
-	public axisContainer: any;						// The 'g' element that conntains the y and x axis.
-	public utilityLabelContainer: any;				// The 'g' element that contains the labels for utility axis.
+	public rootContainer: d3.Selection<any>;						// The 'g' element that is the root container of the score function plot.
+	public plotOutline: d3.Selection<any>;						// The 'rect' element that is used to outline the score function plot
+	public plotContainer: d3.Selection<any>;						// The 'g' element that contains the plot itself.
+	public domainLabelContainer: d3.Selection<any>;				// The 'g' element that contains the labels for each domain element. 
+	public domainLabels: d3.Selection<any>;						// The collection of 'text' elements s.t. each element is a label for one domain element.
+	public plotElementsContainer: d3.Selection<any>;				// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
+	public axisContainer: d3.Selection<any>;						// The 'g' element that conntains the y and x axis.
+	public utilityLabelContainer: d3.Selection<any>;				// The 'g' element that contains the labels for utility axis.
 
 	protected utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
 	protected domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
@@ -58,7 +58,7 @@ export abstract class ScoreFunctionRenderer {
 	constructor(protected chartDataService: ChartDataService) { }
 
 	// This function creates the base containers and elements for a score function plot.s
-	createScoreFunction(el: any, objective: PrimitiveObjective): void {
+	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective): void {
 		var objectiveName: string = objective.getName();
 		this.objective = objective;
 
@@ -94,7 +94,7 @@ export abstract class ScoreFunctionRenderer {
 
 	// This function creates the axis of a score function plot, both x and y, and creates the utility axis labels.
 	// Note that the domain labels are created in createPlot, because they are data dependent.
-	createScoreFunctionAxis(plotContainer: any, objectiveName: string): void {
+	createScoreFunctionAxis(plotContainer: d3.Selection<any>, objectiveName: string): void {
 		
 		this.axisContainer = plotContainer.append('g')
 			.classed('scorefunction-' + objectiveName + '-axis-container', true);
@@ -121,7 +121,7 @@ export abstract class ScoreFunctionRenderer {
 
 	// This function creates the domain labels for the domain element axis. DiscreteScoreFunction and ContinuousScoreFunction extend this method in order
 	// to create the specific elements they need.
-	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		var objectiveName = objective.getName();
 
 		// Create one label for each element of the PrimitiveObjective's domain.
@@ -137,7 +137,7 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	// This function renders the elements created by createScoreFunction
-	renderScoreFunction(el: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number, viewOrientation: string): void {
+	renderScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number, viewOrientation: string): void {
 		var objectiveName: string = objective.getName();
 
 		var domainElements: (number | string)[] = this.chartDataService.getDomainElements(objective);
@@ -187,7 +187,7 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	// This function renders the elements created by createScoreFunctionAxis
-	renderScoreFunctionAxis(axisContainer: any, utilityLabelContainer: any, objectiveName: string, viewOrientation: string): void {
+	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, utilityLabelContainer: d3.Selection<any>, objectiveName: string, viewOrientation: string): void {
 
 		axisContainer.select('.scorefunction-' + objectiveName + '-x-axis')
 			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
@@ -220,7 +220,7 @@ export abstract class ScoreFunctionRenderer {
 
 	// This function renders the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
 	// to render their specific elements.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
 
 		this.domainSize = domainElements.length;
 

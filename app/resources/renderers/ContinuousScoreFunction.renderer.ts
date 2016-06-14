@@ -3,7 +3,7 @@
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
 <<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
-* @Last Modified time: 2016-06-13 15:49:47
+* @Last Modified time: 2016-06-14 09:43:05
 =======
 * @Last Modified time: 2016-06-10 14:58:37
 >>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
@@ -33,10 +33,10 @@ import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 @Injectable()
 export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
-	public pointsContainer: any;
-	public plottedPoints: any;
-	public linesContainer: any;
-	public fitLines: any;
+	public pointsContainer: d3.Selection<any>;
+	public plottedPoints: d3.Selection<any>;
+	public linesContainer: d3.Selection<any>;
+	public fitLines: d3.Selection<any>;
 
 	private heightScale: any;
 
@@ -46,7 +46,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
 	// like points and connecting lines for the scatter plot that is used to represent element scores.
-	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
 		
@@ -63,7 +63,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, objective, domainElements);
 	}
 
-	createContinuousPlotElements(pointsContainer: any, linesContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createContinuousPlotElements(pointsContainer: d3.Selection<any>, linesContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		pointsContainer.selectAll('.scorefunction-point')
 			.data(domainElements)
@@ -93,14 +93,14 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the rednerPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 
 	// like points and connecting lines for the scatter plot that is used to represent element scores.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);
 
 		this.renderContinuousPlot(plotElementsContainer, objective, (<ContinuousScoreFunction>scoreFunction), <number[]>domainElements, viewOrientation);
 
 	}
 
-	renderContinuousPlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation: string): void {
+	renderContinuousPlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation: string): void {
 		var pointRadius = this.labelOffset / 2;
 
 		this.heightScale = d3.scale.linear()

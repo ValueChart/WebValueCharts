@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:49:23
+* @Last Modified time: 2016-06-14 09:42:29
 */
 
 import { Injectable } 					from '@angular/core';
@@ -29,9 +29,9 @@ import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 @Injectable()
 export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
-	public barContainer: any;
-	public utilityBars: any;
-	public barTops: any;
+	public barContainer: d3.Selection<any>;
+	public utilityBars: d3.Selection<any>;
+	public barTops: d3.Selection<any>;
 
 	private heightScale: any;
 	private domainElements: any;
@@ -42,7 +42,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
 	// like bars for the bar chart that is used to represent element scores.
-	createPlot(plotElementsContainer: any, domainLabelContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, domainElements);
 
@@ -56,7 +56,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.createDiscretePlotElements(this.barContainer, objective, domainElements);
 	}
 
-	createDiscretePlotElements(barContainer: any, objective: PrimitiveObjective, domainElements: (string | number)[]) {
+	createDiscretePlotElements(barContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.scorefunction-bar')
 			.data(domainElements)
@@ -84,13 +84,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction specific elements, 
 	// like bars for the bar chart that is used to represent element scores.
-	renderPlot(domainLabels: any, plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);
 
 		this.renderDiscretePlot(plotElementsContainer, objective, (<DiscreteScoreFunction> scoreFunction), viewOrientation);
 	}
 
-	renderDiscretePlot(plotElementsContainer: any, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, viewOrientation: string): void {
+	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, viewOrientation: string): void {
 		var barWidth: number = (this.dimensionOneSize / this.domainSize) / 3;
 		this.heightScale = d3.scale.linear()
 			.domain([0, 1]);

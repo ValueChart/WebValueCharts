@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-13 16:43:05
+* @Last Modified time: 2016-06-14 09:27:15
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -34,17 +34,17 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 export class ObjectiveChartRenderer {
 
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
-	public chart: any;						// The 'g' element that contains all the elements making up the objective chart.
-	public rowOutlinesContainer: any;
-	public rowOutlines: any;				// The collection of all 'rect' elements that are used outline each row.
-	public rowsContainer: any;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: any;						// The collection of 'g' elements s.t. each element is a row container.
-	public dividingLinesContainer: any; 	// the 'g' element that contains the lines which divide alternatives bars from each other.
-	public dividingLines: any;				// The collection of all the 'line' elements that are used to divide different alternative bars from each other.
-	public alternativeLabelsContainer: any; // The 'g' element that contains the alternative labels.
-	public alternativeLabels: any;			// The collection of all 'text' elements s.t. each element is an alternative label.
-	public cells: any;						// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: any;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public chart: d3.Selection<any>;							// The 'g' element that contains all the elements making up the objective chart.
+	public rowOutlinesContainer: d3.Selection<any>;				// The 'g' element that contains all the row outline elements
+	public rowOutlines: d3.Selection<any>;					// The collection of all 'rect' elements that are used outline each row.
+	public rowsContainer: d3.Selection<any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public rows: d3.Selection<any>;								// The collection of 'g' elements s.t. each element is a row container.
+	public dividingLinesContainer: d3.Selection<any>; 			// the 'g' element that contains the lines which divide alternatives bars from each other.
+	public dividingLines: d3.Selection<any>;					// The collection of all the 'line' elements that are used to divide different alternative bars from each other.
+	public alternativeLabelsContainer: d3.Selection<any>;		// The 'g' element that contains the alternative labels.
+	public alternativeLabels: d3.Selection<any>;				// The collection of all 'text' elements s.t. each element is an alternative label.
+	public cells: d3.Selection<any>;							// The collection of all 'g' elements s.t. each element is a cell container.
+	public userScores: d3.Selection<any>;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	
 
 	constructor(
@@ -52,12 +52,12 @@ export class ObjectiveChartRenderer {
 		private chartDataService: ChartDataService) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
-	createObjectiveChart(el: any, rows: VCRowData[]): void {
+	createObjectiveChart(el: d3.Selection<any>, rows: VCRowData[]): void {
 		// Create the root container for the objective chart.
 		this.chart = el.append('g')
 			.classed('objective-chart', true);
 		// Create the container for the row outlines.
-		this.rowOutlinesContainer = this.rowOutlines = this.chart.append('g')
+		this.rowOutlinesContainer = this.chart.append('g')
 			.classed('objective-row-outlines-container', true);
 		// Create the container to hold the rows.
 		this.rowsContainer = this.chart.append('g')
@@ -74,7 +74,7 @@ export class ObjectiveChartRenderer {
 	}
 
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
-	createObjectiveRows( rowsContainer: any, rowOutlinesContainer: any, dividingLinesContainer: any, alternativeLabelsContainer: any, rows: VCRowData[]): void {
+	createObjectiveRows(rowsContainer: d3.Selection<any>, rowOutlinesContainer: d3.Selection<any>, dividingLinesContainer: d3.Selection<any>, alternativeLabelsContainer: d3.Selection<any>, rows: VCRowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
 		rowOutlinesContainer.selectAll('.objective-row-outline')
 			.data(rows)
@@ -109,7 +109,7 @@ export class ObjectiveChartRenderer {
 		this.createObjectiveCells(this.rows)
 	}
 	// This function creates the cells that compose each row of the objective chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
-	createObjectiveCells(objectiveRows: any): void {
+	createObjectiveCells(objectiveRows: d3.Selection<SVGGElement>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
 		objectiveRows.selectAll('.objective-cell')
 			.data((d: VCRowData) => { return d.cells; })
@@ -157,7 +157,7 @@ export class ObjectiveChartRenderer {
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveRows. Unlike in the summary chart we directly position the row
 	// containers here because the positions of the scores (and therefore row containers) is are absolute since the bar charts are not stacked. 
-	renderObjectiveChartRows(rowOutlines: any, rows: any, cells: any, userScores: any, viewOrientation: string): void {
+	renderObjectiveChartRows(rowOutlines: d3.Selection<any>, rows: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		rowOutlines
 			.attr('transform', (d: VCRowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.renderConfigService.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
@@ -191,7 +191,7 @@ export class ObjectiveChartRenderer {
 	}
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveCells.
-	renderObjectiveChartCells(cells: any, userScores: any, viewOrientation: string): void {
+	renderObjectiveChartCells(cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		this.cells
 			.attr('transform', (d: VCCellData, i: number) => { 
 				var coordinateOne: number = this.calculateCellCoordinateOne(d, i);

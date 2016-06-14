@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 16:36:26
+* @Last Modified time: 2016-06-14 09:09:41
 */
 
 
 import { Directive, Input } 										from '@angular/core';
 import { OnInit, DoCheck, SimpleChange }					from '@angular/core';
 import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
-import { KeyValueDiffers, IterableDiffers }							from '@angular/core';
+import { KeyValueDiffers, IterableDiffers, KeyValueDiffer }							from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
@@ -57,15 +57,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private labelData: VCLabelData[];
 	private primitiveObjectives: PrimitiveObjective[];
 
-	private valueChartDiffer: any;
-	private userDiffer: any;
-	private weightMapDiffer: any;
-	private scoreFunctionMapDiffer: any;
-	private scoreFunctionDiffer: any;
-	private scoreFunctionDiffers: any;
+	private valueChartDiffer: KeyValueDiffer;
+	private userDiffer: KeyValueDiffer;
+	private weightMapDiffer: KeyValueDiffer;
+	private scoreFunctionMapDiffer: KeyValueDiffer;
+	private scoreFunctionDiffer: KeyValueDiffer;
+	private scoreFunctionDiffers: KeyValueDiffer[];
 
 	// Fields for d3 collections that should be saved for later manipulation
-	private el: any; // The SVG base element for the ValueChart rendering.
+	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
 
 	constructor(
 		private template: TemplateRef<any>,
@@ -165,7 +165,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.chartDataService.setValueChart(this.valueChart);
 
-		var valueChartChanges = this.valueChartDiffer.diff(this,ValueChart);
+		var valueChartChanges = this.valueChartDiffer.diff(this.valueChart);
 
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var userChanges = this.userDiffer.diff(user);

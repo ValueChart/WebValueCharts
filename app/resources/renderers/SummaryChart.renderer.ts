@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-13 15:36:09
+* @Last Modified time: 2016-06-14 09:29:07
 */
 
 import { Injectable } 												from '@angular/core';
@@ -28,21 +28,21 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 export class SummaryChartRenderer {
 
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
-	public chart: any;					// The 'g' element that contains all the elements making up the summary chart.
-	public outline: any;				// The 'rect' element that outlines the summary chart.
-	public rowsContainer: any;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public dividingLineContainer: any;	// The 'g' element that contains the lines that divide different alternatives bars from each other. 
-	public rows: any;					// The collection of all 'g' elements s.t. each element is a row container.
-	public dividingLines: any;			// The collection of all 'line' elements that are used to divide different alternative bars from each other.
-	public cells: any;					// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: any;				// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public chart: d3.Selection<any>;					// The 'g' element that contains all the elements making up the summary chart.
+	public outline: d3.Selection<any>;					// The 'rect' element that outlines the summary chart.
+	public rowsContainer: d3.Selection<any>;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public dividingLineContainer: d3.Selection<any>;	// The 'g' element that contains the lines that divide different alternatives bars from each other. 
+	public rows: d3.Selection<any>;						// The collection of all 'g' elements s.t. each element is a row container.
+	public dividingLines: d3.Selection<any>;			// The collection of all 'line' elements that are used to divide different alternative bars from each other.
+	public cells: d3.Selection<any>;					// The collection of all 'g' elements s.t. each element is a cell container.
+	public userScores: d3.Selection<any>;				// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
-	createSummaryChart(el: any, rows: VCRowData[]): void {
+	createSummaryChart(el: d3.Selection<any>, rows: VCRowData[]): void {
 		// Create the base container for the chart.
 		this.chart = el.append('g')
 			.classed('summary-chart', true);
@@ -67,9 +67,9 @@ export class SummaryChartRenderer {
 
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
 	// and the rows are stacked on each other in order to create a stacked bar chart. 
-	createSummaryChartRows(rowsContainer: any, dividingLineContainer: any, rows: VCRowData[]): void {
+	createSummaryChartRows(rowsContainer: d3.Selection<any>, dividingLineContainer: d3.Selection<any>, rows: VCRowData[]): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
-		var newRows: any = rowsContainer.selectAll('.summary-row')
+		var newRows: d3.Selection<any> = rowsContainer.selectAll('.summary-row')
 			.data(rows)
 			.enter().append('g')
 				.classed('summary-row', true);
@@ -90,7 +90,7 @@ export class SummaryChartRenderer {
 	}
 
 	// This function creates the cells that compose each row of the summary chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
-	createSummaryChartCells(stackedBarRows: any): void {
+	createSummaryChartCells(stackedBarRows: d3.Selection<any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
 		stackedBarRows.selectAll('.summary-cell')
 			.data((d: VCRowData) => { return d.cells; })
@@ -112,10 +112,10 @@ export class SummaryChartRenderer {
 
 	updateSummaryChart(rows: VCRowData[], viewOrientation: string): void {
 
-		var cellsToUpdate = this.rows.data(rows).selectAll('.summary-cell')
+		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.summary-cell')
 			.data((d: VCRowData) => { return d.cells; })
 			
-		var userScoresToUpdate = cellsToUpdate.selectAll('.summary-user-scores')
+		var userScoresToUpdate: d3.Selection<any> = cellsToUpdate.selectAll('.summary-user-scores')
 				.data((d: VCCellData, i: number) => { return d.userScores; });
 
 		this.renderSummaryChartCells(cellsToUpdate, userScoresToUpdate, viewOrientation);
@@ -142,7 +142,7 @@ export class SummaryChartRenderer {
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartRows. Note that we don't position the row
 	// containers here because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
-	renderSummaryChartRows(dividingLines: any, cells: any, userScores: any, viewOrientation: string): void {
+	renderSummaryChartRows(dividingLines: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		// Position the dividing lines so that they evenly divide the available space into columns, one for each Alternative.
 		dividingLines
 			.attr(this.renderConfigService.coordinateOne + '1', this.calculateCellCoordinateOne)
@@ -154,7 +154,7 @@ export class SummaryChartRenderer {
 	}
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartCells.
-	renderSummaryChartCells(cells: any, userScores: any, viewOrientation: string): void {
+	renderSummaryChartCells(cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		// Position each row's cells next to each other in the row.  
 		cells
 			.attr('transform', (d: VCCellData, i: number) => { 
