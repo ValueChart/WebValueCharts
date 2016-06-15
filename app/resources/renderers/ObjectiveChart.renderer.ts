@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-14 09:27:15
+* @Last Modified time: 2016-06-15 10:38:51
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -20,6 +20,7 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 
 // Model Classes
 import { User }														from '../model/User';
+import { WeightMap }												from '../model/WeightMap';
 import { Alternative }												from '../model/Alternative';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
@@ -36,7 +37,7 @@ export class ObjectiveChartRenderer {
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
 	public chart: d3.Selection<any>;							// The 'g' element that contains all the elements making up the objective chart.
 	public rowOutlinesContainer: d3.Selection<any>;				// The 'g' element that contains all the row outline elements
-	public rowOutlines: d3.Selection<any>;					// The collection of all 'rect' elements that are used outline each row.
+	public rowOutlines: d3.Selection<any>;						// The collection of all 'rect' elements that are used outline each row.
 	public rowsContainer: d3.Selection<any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
 	public rows: d3.Selection<any>;								// The collection of 'g' elements s.t. each element is a row container.
 	public dividingLinesContainer: d3.Selection<any>; 			// the 'g' element that contains the lines which divide alternatives bars from each other.
@@ -44,8 +45,8 @@ export class ObjectiveChartRenderer {
 	public alternativeLabelsContainer: d3.Selection<any>;		// The 'g' element that contains the alternative labels.
 	public alternativeLabels: d3.Selection<any>;				// The collection of all 'text' elements s.t. each element is an alternative label.
 	public cells: d3.Selection<any>;							// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: d3.Selection<any>;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	
+	public userScores: d3.Selection<any>;						// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public objectiveDomainLabels: d3.Selection<any>;
 
 	constructor(
 		private renderConfigService: RenderConfigService,
@@ -124,6 +125,9 @@ export class ObjectiveChartRenderer {
 			.enter().append('rect')
 				.classed('objective-user-scores', true);
 
+		this.objectiveDomainLabels = this.cells.append('text')
+			.classed('objective-domain-label', true);
+
 		this.userScores = this.cells.selectAll('.objective-user-scores');
 	}
 
@@ -179,38 +183,63 @@ export class ObjectiveChartRenderer {
 			.attr(this.renderConfigService.coordinateOne + '2', this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.renderConfigService.dimensionTwoSize });
 
+		var alternativeLabelCoordOneOffset: number = ((viewOrientation === 'vertical') ? 20 : 40);
+		var alternativeLabelCoordTwoOffset: number = 20;
+
 		this.alternativeLabels
 			.text((d: Alternative) => { return d.getName(); })
-			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i) + 20; })
+			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i) + alternativeLabelCoordOneOffset; })
 			.attr(this.renderConfigService.coordinateTwo, () => {
-				return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoSize - 5 : 5;
+				return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoSize + alternativeLabelCoordTwoOffset : alternativeLabelCoordTwoOffset;
 			})
 			.style('font-size', '20px');
+
 
 		this.renderObjectiveChartCells(cells, userScores, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveCells.
 	renderObjectiveChartCells(cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
-		this.cells
-			.attr('transform', (d: VCCellData, i: number) => { 
+		cells
+			.attr('transform', (d: VCCellData, i: number) => {
 				var coordinateOne: number = this.calculateCellCoordinateOne(d, i);
-				return this.renderConfigService.generateTransformTranslation(viewOrientation, coordinateOne, 0); 
-			})
+				return this.renderConfigService.generateTransformTranslation(viewOrientation, coordinateOne, 0);
+			});
 
-		this.userScores
+		var domainLabelCoord: number = 5;
+
+		this.objectiveDomainLabels
+			.text((d: VCCellData, i: number) => { return d.value })
+			.attr(this.renderConfigService.coordinateOne, (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / 3)
+			.attr(this.renderConfigService.coordinateTwo, (d: VCCellData, i: number) => {
+				var weight: number = this.chartDataService.weightMap.getObjectiveWeight(d.userScores[0].objective.getName());
+				return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoScale(weight) - domainLabelCoord : domainLabelCoord;
+			});
+
+		this.toggleDomainLabels();
+
+		userScores
 			.style('fill', (d: any, i: number) => { return d.objective.getColor(); })
 			.attr(this.renderConfigService.dimensionOne, this.calculateUserScoreDimensionsOne)
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateUserScoreDimensionsOne(d, i) * i; });
 
+
 		if (viewOrientation === 'vertical') {
-			this.userScores
+			userScores
 				.attr(this.renderConfigService.coordinateTwo, (d: any, i: number) => {
 					var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
 					var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
+		}
+	}
+
+	toggleDomainLabels(): void {
+		if (this.renderConfigService.viewConfiguration.displayDomainValues) {
+			this.objectiveDomainLabels.style('display', 'block');
+		} else {
+			this.objectiveDomainLabels.style('display', 'none');
 		}
 	}
 

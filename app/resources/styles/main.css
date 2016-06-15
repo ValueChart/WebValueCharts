@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 16:32:51
+* @Last Modified time: 2016-06-14 17:27:59
 */
 
 /* Global Styles */
@@ -49,21 +49,23 @@
 .creation-page {
 	top: 20rem;
 }
+
 /* SVG */
 
 .svg-content-responsive {
     position: absolute;
-    height: 85%;
+    height: 83%;
     width: 90%;
-    top: 12%;
+    top: 17%;
     left: 10%;
 }
 
 /* ValueChart Viewer Styles */
 
 .valuechart-toolbar {
+    z-index: 100;
     position: relative;
-    top: 10rem;
+    top: 6.5rem;
 }
 
 .best-score-label {
@@ -116,7 +118,6 @@
     fill: white;
     stroke-width: 1;
 }
-
 
 
 

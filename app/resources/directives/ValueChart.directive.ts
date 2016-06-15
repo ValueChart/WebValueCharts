@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 16:48:01
+* @Last Modified time: 2016-06-15 10:39:05
 */
 
 
@@ -244,18 +244,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.renderConfigService.viewConfiguration.displayDomainValues !== this.renderConfigService.previousViewConfiguration.displayDomainValues) {
 			this.renderConfigService.previousViewConfiguration.displayDomainValues = this.renderConfigService.viewConfiguration.displayDomainValues;
 			// Toggle Score Functions/.
+			this.objectiveChartRenderer.toggleDomainLabels();
 		}
 
 		if (this.renderConfigService.viewConfiguration.displayScales !== this.renderConfigService.previousViewConfiguration.displayScales) {
 			this.renderConfigService.previousViewConfiguration.displayScales = this.renderConfigService.viewConfiguration.displayScales;
 			// Toggle Utility Scale
-			this.onSummaryChartChanged();
+			this.summaryChartRenderer.toggleUtilityAxis();
 		}
 
 		if (this.renderConfigService.viewConfiguration.displayTotalScores !== this.renderConfigService.previousViewConfiguration.displayTotalScores) {
 			this.renderConfigService.previousViewConfiguration.displayTotalScores = this.renderConfigService.viewConfiguration.displayTotalScores;
 			// Toggle Total Scores
-			this.onSummaryChartChanged();
+			this.summaryChartRenderer.toggleScoreTotals();
 		}
 	}
 
@@ -283,10 +284,5 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	onDisplayScoreFunctionsChange(): void {
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 	}
-
-	onSummaryChartChanged(): void {
-		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
-	}
-
 
 }

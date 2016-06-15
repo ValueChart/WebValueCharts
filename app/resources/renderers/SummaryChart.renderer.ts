@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 16:48:48
+* @Last Modified time: 2016-06-15 10:03:42
 */
 
 import { Injectable } 												from '@angular/core';
@@ -180,13 +180,10 @@ export class SummaryChartRenderer {
 
 		this.scoreTotals = this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
 			.selectAll('.summary-score-total');
+		
+		this.renderUtilityAxis(viewOrientation);
 
-		if (this.renderConfigService.viewConfiguration.displayScales) {
-			this.utilityAxisContainer.style('display', 'block');
-			this.renderUtilityAxis(viewOrientation);
-		} else {
-			this.utilityAxisContainer.style('display', 'none');
-		}
+		this.toggleUtilityAxis();
 
 		this.renderSummaryChartRows(this.dividingLines, this.scoreTotals, this.cells, this.userScores, viewOrientation);
 	}
@@ -223,12 +220,9 @@ export class SummaryChartRenderer {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
 			});
 
-		if (this.renderConfigService.viewConfiguration.displayTotalScores)	{
-			this.scoreTotalsContainer.style('display', 'block');
-			this.renderScoreTotals(scoreTotals, viewOrientation);
-		} else {
-			this.scoreTotalsContainer.style('display', 'none');
-		}
+		this.renderScoreTotals(scoreTotals, viewOrientation);
+
+		this.toggleScoreTotals();
 
 		this.renderSummaryChartCells(cells, userScores, viewOrientation)
 	}
@@ -305,6 +299,22 @@ export class SummaryChartRenderer {
 				else
 					return this.renderConfigService.dimensionTwoScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 			});
+	}
+
+	toggleUtilityAxis(): void {
+		if (this.renderConfigService.viewConfiguration.displayScales) {
+			this.utilityAxisContainer.style('display', 'block');
+		} else {
+			this.utilityAxisContainer.style('display', 'none');
+		}
+	}
+
+	toggleScoreTotals(): void {
+		if (this.renderConfigService.viewConfiguration.displayTotalScores) {
+			this.scoreTotalsContainer.style('display', 'block');
+		} else {
+			this.scoreTotalsContainer.style('display', 'none');
+		}
 	}
 
 	// Anonymous functions that are used often enough to be made class fields:
