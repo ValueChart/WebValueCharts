@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 09:40:58
+* @Last Modified time: 2016-06-15 11:56:32
 */
 
 import { Injectable } 					from '@angular/core';
@@ -242,12 +242,12 @@ export abstract class ScoreFunctionRenderer {
 			.style('font-size', '9px');
 	}
 
+	abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
+
 
 
 	// Anonymous functions that are used often enough to be made class fields:
 
 	calculatePlotElementCoordinateOne = (d: (string | number), i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
-
-
 
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 09:42:29
+* @Last Modified time: 2016-06-15 12:10:22
 */
 
 import { Injectable } 					from '@angular/core';
@@ -32,6 +32,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public barContainer: d3.Selection<any>;
 	public utilityBars: d3.Selection<any>;
 	public barTops: d3.Selection<any>;
+	public barLabelContainer: d3.Selection<any>;
+	public barLabels: d3.Selection<any>;
 
 	private heightScale: any;
 	private domainElements: any;
@@ -53,10 +55,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.classed('scorefunction-bars-container', true)
 			.attr('id', 'scorefunction-' + objective.getName() + '-bars-container');
 
-		this.createDiscretePlotElements(this.barContainer, objective, domainElements);
+		this.barLabelContainer = plotElementsContainer.append('g')
+			.classed('scorefunction-pointlabels-container', true)
+			.attr('id', 'scorefunction-' + objective.getName() + '-pointlabels-container');
+
+		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective, domainElements);
 	}
 
-	createDiscretePlotElements(barContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]) {
+	createDiscretePlotElements(barContainer: d3.Selection<any>, labelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.scorefunction-bar')
 			.data(domainElements)
@@ -66,8 +72,17 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return 'scorefunction-' + objective.getName() + '-' + d + '-bar';
 			});
 
-
 		this.utilityBars = barContainer.selectAll('.scorefunction-bar');
+
+		labelContainer.selectAll('.scorefunction-point-labels')
+			.data(domainElements)
+			.enter().append('text')
+			.classed('scorefunction-point-labels', true)
+			.attr('id', (d: (string | number)) => {
+				return 'scorefunction-' + objective.getName() + '-' + d + '-label';
+			});
+
+		this.barLabels = labelContainer.selectAll('.scorefunction-point-labels');
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.scorefunction-bartop')
@@ -114,6 +129,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('stroke', objective.getColor());
 
+		this.barLabels
+			.text((d: any, i: number) => { return Math.round(100 * scoreFunction.getScore(d)) / 100; })
+			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + barWidth + 2; })
+			.attr(this.coordinateTwo, (d: (string | number)) => {
+				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : calculateBarDimensionTwo(d) + 30;
+			})
+			.style('font-size', 8);
+
 
 		this.barTops
 			.attr(this.dimensionTwo, this.labelOffset)
@@ -148,6 +171,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			this.ngZone.run(() => { scoreFunction.setElementScore(d, score) });
 
 		}));
+	}
+
+	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+		if (displayScoreFunctionValueLabels) {
+			this.barLabelContainer.style('display', 'block');
+		} else {
+			this.barLabelContainer.style('display', 'none');
+		}
 	}
 
 }

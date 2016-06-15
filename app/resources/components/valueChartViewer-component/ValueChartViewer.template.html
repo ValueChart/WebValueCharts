@@ -56,6 +56,12 @@
 					 	  		<span *ngIf="displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 					 	   </a>
 					    </li>
+					    <li>
+					 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
+					 	   		Score Labels
+					 	  		<span *ngIf="displayScoreFunctionValueLabels" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					 	   </a>
+					    </li>
 					 </ul>
 				</div>
 			</div>
@@ -68,7 +74,8 @@
 			[displayScoreFunctions]="displayScoreFunctions" 
 			[displayDomainValues]="displayDomainValues" 
 			[displayScales]="displayScales" 
-			[displayTotalScores]="displayTotalScores">
+			[displayTotalScores]="displayTotalScores"
+			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels">
 		</ValueChart>
 	</div>
 </div>

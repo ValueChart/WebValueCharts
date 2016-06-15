@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 13:53:50
+* @Last Modified time: 2016-06-15 11:56:12
 */
 
 import { Injectable } 												from '@angular/core';
@@ -325,9 +325,16 @@ export class LabelRenderer {
 			}
 
 			this.scoreFunctionRenderers[datum.getName()].renderScoreFunction(el, datum, scoreFunction, width, height, viewOrientation);
+			this.scoreFunctionRenderers[datum.getName()].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
 
 			weightOffset += objectiveWeight;
 		});
+	}
+
+	toggleScoreFunctionValueLabels(): void {
+		for(var field in this.scoreFunctionRenderers) {
+			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
+		}
 	}
 
 

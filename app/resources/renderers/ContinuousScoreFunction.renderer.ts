@@ -3,7 +3,7 @@
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
 <<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
-* @Last Modified time: 2016-06-14 09:43:05
+* @Last Modified time: 2016-06-15 12:00:52
 =======
 * @Last Modified time: 2016-06-10 14:58:37
 >>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
@@ -37,6 +37,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public plottedPoints: d3.Selection<any>;
 	public linesContainer: d3.Selection<any>;
 	public fitLines: d3.Selection<any>;
+	public pointLabelContainer: d3.Selection<any>;
+	public pointLabels: d3.Selection<any>;
 
 	private heightScale: any;
 
@@ -59,11 +61,15 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.classed('scorefunction-points-container', true)
 			.attr('id','scorefunction-' + objective.getName() + '-points-container');
 
+		this.pointLabelContainer = plotElementsContainer.append('g')
+			.classed('scorefunction-pointlabels-container', true)
+			.attr('id', 'scorefunction-' + objective.getName() + '-pointlabels-container');
 
-		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, objective, domainElements);
+
+		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, this.pointLabelContainer, objective, domainElements);
 	}
 
-	createContinuousPlotElements(pointsContainer: d3.Selection<any>, linesContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createContinuousPlotElements(pointsContainer: d3.Selection<any>, linesContainer: d3.Selection<any>, labelsContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		pointsContainer.selectAll('.scorefunction-point')
 			.data(domainElements)
@@ -74,6 +80,16 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				});
 
 		this.plottedPoints = pointsContainer.selectAll('.scorefunction-point');
+
+		labelsContainer.selectAll('.scorefunction-point-labels')
+			.data(domainElements)
+			.enter().append('text')
+				.classed('scorefunction-point-labels', true)
+				.attr('id', (d: (string | number)) => {
+					return 'scorefunction-' + objective.getName() + '-' + d + '-label';
+				});
+
+		this.pointLabels = labelsContainer.selectAll('.scorefunction-point-labels');
 
 		// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
 		// To do this, we simply remove the last domain element from the list before we create the lines.
@@ -127,6 +143,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			});
 
+		this.pointLabels
+			.text((d: any, i: number) => { return Math.round(100 * scoreFunction.getScore(+d)) / 100; })
+			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 2; })
+			.attr(this.coordinateTwo, calculatePointCoordinateTwo)
+			.style('font-size', 8);
 
 		this.fitLines
 			.attr(this.coordinateOne + '1', this.calculatePlotElementCoordinateOne)
@@ -154,6 +175,14 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			this.ngZone.run(() => { scoreFunction.setElementScore(d, score) });
 
 		}));
+	}
+
+	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+		if (displayScoreFunctionValueLabels) {
+			this.pointLabelContainer.style('display', 'block');
+		} else {
+			this.pointLabelContainer.style('display', 'none');
+		}
 	}
 }
 

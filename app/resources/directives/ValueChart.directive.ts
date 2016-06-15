@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 10:39:05
+* @Last Modified time: 2016-06-15 11:56:04
 */
 
 
@@ -121,6 +121,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.renderConfigService.viewConfiguration.displayTotalScores = <boolean>value;
 	}
 
+	@Input() set displayScoreFunctionValueLabels(value: any) {
+		this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels = <boolean>value;
+	}
+
 	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
@@ -184,11 +188,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.scoreFunctionDiffers.push(scoreFunctionDiffer);
 		});
 
-		this.renderConfigService.previousViewConfiguration.displayScoreFunctions	= this.renderConfigService.viewConfiguration.displayScoreFunctions;
-		this.renderConfigService.previousViewConfiguration.displayDomainValues 		= this.renderConfigService.viewConfiguration.displayDomainValues;
-		this.renderConfigService.previousViewConfiguration.displayScales 			= this.renderConfigService.viewConfiguration.displayScales;
-		this.renderConfigService.previousViewConfiguration.displayTotalScores 		= this.renderConfigService.viewConfiguration.displayTotalScores;
-
+		this.renderConfigService.previousViewConfiguration.displayScoreFunctions			= this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.renderConfigService.previousViewConfiguration.displayDomainValues 				= this.renderConfigService.viewConfiguration.displayDomainValues;
+		this.renderConfigService.previousViewConfiguration.displayScales 					= this.renderConfigService.viewConfiguration.displayScales;
+		this.renderConfigService.previousViewConfiguration.displayTotalScores 				= this.renderConfigService.viewConfiguration.displayTotalScores;
+		this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels 	= this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels
 
 	}
 
@@ -243,7 +247,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		if (this.renderConfigService.viewConfiguration.displayDomainValues !== this.renderConfigService.previousViewConfiguration.displayDomainValues) {
 			this.renderConfigService.previousViewConfiguration.displayDomainValues = this.renderConfigService.viewConfiguration.displayDomainValues;
-			// Toggle Score Functions/.
+			// Toggle Domain Labels.
 			this.objectiveChartRenderer.toggleDomainLabels();
 		}
 
@@ -257,6 +261,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.renderConfigService.previousViewConfiguration.displayTotalScores = this.renderConfigService.viewConfiguration.displayTotalScores;
 			// Toggle Total Scores
 			this.summaryChartRenderer.toggleScoreTotals();
+		}
+
+		if (this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels !== this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels) {
+			this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels = this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels;
+			// Toggle Score Function Value Labels.
+			console.log('change detected');
+			this.labelRenderer.toggleScoreFunctionValueLabels();
 		}
 	}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 13:07:18
+* @Last Modified time: 2016-06-15 11:52:21
 */
 
 import { Component }				from '@angular/core';
@@ -30,6 +30,7 @@ export class ValueChartViewerComponent implements OnInit {
 	displayDomainValues: boolean;
 	displayScales: boolean;
 	displayTotalScores: boolean;
+	displayScoreFunctionValueLabels: boolean;
 	
 	constructor(private chartDataService: ChartDataService) { }
 
@@ -40,6 +41,7 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayTotalScores = true;
 		this.displayScales = false;
 		this.displayDomainValues = false;
+		this.displayScoreFunctionValueLabels = false;
 	}
 
 	setOrientation(viewOrientation: string): void{
@@ -61,5 +63,9 @@ export class ValueChartViewerComponent implements OnInit {
 	setDisplayTotalScores(newVal: boolean): void {
 		this.displayTotalScores = newVal;
 	}	
+	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
+		this.displayScoreFunctionValueLabels = newVal;
+	}
+
 
 }
