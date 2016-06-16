@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 10:03:42
+* @Last Modified time: 2016-06-15 18:09:52
 */
 
 import { Injectable } 												from '@angular/core';
@@ -192,12 +192,20 @@ export class SummaryChartRenderer {
 	renderUtilityAxis(viewOrientation: string): void {
 		var uilityScale = d3.scale.linear()
 			.domain([0, 100])
-			.range([this.renderConfigService.dimensionTwoSize, 0]);
+			
 
 		var utilityAxis: any = d3.svg.axis()
 			.scale(uilityScale)
 			.ticks(10)
-			.orient("left");
+
+		if (viewOrientation === 'vertical') {
+			uilityScale.range([this.renderConfigService.dimensionTwoSize, 0]);
+			utilityAxis.orient("left"); // Render it as a y axis with the ticks to the left of the axis.
+		}
+		else {
+			uilityScale.range([0, this.renderConfigService.dimensionTwoSize]);
+			utilityAxis.orient("top"); // Render it as an x-axis with the ticks above the axis.
+		}
 
 		this.utilityAxisContainer
 			.attr('transform', this.renderConfigService.generateTransformTranslation(viewOrientation, -20, 0))
