@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 11:56:04
+* @Last Modified time: 2016-06-16 11:29:59
 */
 
 
@@ -234,6 +234,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		});
 
 		// Check View Configuration options:
+
 		if (this.previousOrientation !== this.viewOrientation) {
 			this.previousOrientation = this.viewOrientation;
 			this.onOrientationChange();
@@ -272,7 +273,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	onValueChartChange(): void {
-
+		console.log('valuechart change')
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
@@ -282,7 +283,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	onOrientationChange(): void {
-
+		console.log('orientation change')
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);
 
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
