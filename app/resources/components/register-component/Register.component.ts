@@ -2,11 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-02 10:59:10
+* @Last Modified time: 2016-06-15 18:47:43
 */
 
 import { Component }										from '@angular/core';
 import { Routes, Router, ROUTER_DIRECTIVES }				from '@angular/router';
+
+// Application Classes
+import { CurrentUserService }								from '../../services/CurrentUser.service';
 
 
 @Component({
@@ -16,8 +19,13 @@ import { Routes, Router, ROUTER_DIRECTIVES }				from '@angular/router';
 })
 export class RegisterComponent {
 
-	constructor() {}
-
 	username: string;
+
+	constructor(private currentUserService: CurrentUserService) {}
+
+	setUsername(username: string): void {
+		this.currentUserService.setUsername(username);
+	}
+
 
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 12:54:44
+* @Last Modified time: 2016-06-15 20:11:31
 */
 
 import { Component }				from '@angular/core';
@@ -40,6 +40,10 @@ export class CreateComponent {
 		};
 
 		reader.readAsText(xmlFile);
+	}
+
+	uploadGroupValueChart(event: Event): void {
+		// TODO: Implement uploading Group ValueCharts
 	}
 
 }

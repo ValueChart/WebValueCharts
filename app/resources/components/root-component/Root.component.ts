@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 14:19:05
+* @Last Modified time: 2016-06-15 18:37:49
 */
 
 import { Component } 										from '@angular/core';
@@ -17,12 +17,7 @@ import { ValueChartViewerComponent }						from '../valueChartViewer-component/Va
 import { XMLValueChartParser } 								from '../../services/XMLValueChartParser.service';
 import { ChartDataService }									from '../../services/ChartData.service';
 import { RenderConfigService }								from '../../services/RenderConfig.service';
-
-import { ObjectiveChartRenderer }							from '../../renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer }								from '../../renderers/SummaryChart.renderer';
-import { LabelRenderer }									from '../../renderers/Label.renderer';
-import { ScoreFunctionRenderer }							from '../../renderers/ScoreFunction.renderer';
-
+import { CurrentUserService }								from '../../services/CurrentUser.service';
 
 
 @Component({
@@ -32,7 +27,8 @@ import { ScoreFunctionRenderer }							from '../../renderers/ScoreFunction.rende
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
 				ViewContainerRef,
-				ChartDataService]
+				ChartDataService,
+				CurrentUserService]
 })
 @Routes([
   {path: '/register', component: RegisterComponent}, // useAsDefault: true - coming soon...

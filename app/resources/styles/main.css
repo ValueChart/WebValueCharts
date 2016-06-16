@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 17:27:59
+* @Last Modified time: 2016-06-15 20:10:28
 */
 
 /* Global Styles */
@@ -46,8 +46,24 @@
 
 /* Creation Page Styles */
 
+.column-container {
+    justify-content: space-around !important;
+}
+
+.column {
+
+}
+
 .creation-page {
-	top: 20rem;
+	top: 8rem;
+}
+
+.vertical-divider {
+    border-left:1px solid #909090; 
+    border-right:1px solid #a2a2a2; 
+    height: 200%;
+    position: relative;
+    top: 5rem;
 }
 
 /* SVG */

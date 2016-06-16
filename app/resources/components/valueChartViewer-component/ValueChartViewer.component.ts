@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 11:52:21
+* @Last Modified time: 2016-06-15 18:23:31
 */
 
 import { Component }				from '@angular/core';
@@ -65,6 +65,15 @@ export class ValueChartViewerComponent implements OnInit {
 	}	
 	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
 		this.displayScoreFunctionValueLabels = newVal;
+	}
+
+
+	editObjectiveModel(): void {
+		// TODO: Implement Editing of Objective Model
+	}
+
+	editPreferenceModel(): void {
+		// TODO: Implement Editing of Preference Model.
 	}
 
 

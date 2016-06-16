@@ -12,7 +12,7 @@
 				</div>
 			</div>
 			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" [routerLink]="['/create']" id="register-button">Continue</a>
+				<a class="btn btn-success btn-lg" [routerLink]="['/create']" (click)="setUsername(username)" id="register-button">Continue</a>
 			</div>
 		</form>
 	</div>

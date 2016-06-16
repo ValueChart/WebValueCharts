@@ -1,18 +1,41 @@
 <div class="">
 	<div class="flex-column creation-page">
-		<div class="flex-row">
-			<form class="form-horizontal">
-				<div class="form-group">
-					<button class="btn btn-default btn-lg" id="createValueChart">Create ValueChart</button>
-					<button class="btn btn-default btn-lg" id="createGroupValueChart">Create GroupValueChart</button>
-					 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
-                        <button class="btn btn-default">
-                            UploadValueChart
-                        </button>
-                        <input type="file" class="upload" (change)="uploadValueChart($event)"/>
-                    </a>
+		<div class="flex-row column-container col-xs-12">
+			<div class="col-xs-6">
+				<div class="page-header flex-row">
+				  	<h2>Individual ValueChart</h2>
 				</div>
-			</form>
+				<form class="form-inline flex-row column-container">
+					<div class="form-group">
+						<button class="btn btn-default btn-lg" id="createValueChart">Create ValueChart</button>
+						 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
+	                        <button class="btn btn-default btn-lg">
+	                            Upload a ValueChart
+	                        </button>
+	                        <input type="file" class="upload" (change)="uploadValueChart($event)"/>
+	                    </a>
+					</div>
+				</form>
+			</div>
+			<div>
+				<div class="vertical-divider"></div>
+			</div>
+			<div class="col-xs-6">
+				<div class="page-header flex-row">
+				  	<h2>Group ValueChart</h2>
+				</div>
+				<form class="form-inline flex-row column-container">
+					<div class="form-group">
+						<button class="btn btn-default btn-lg" id="createGroupValueChart">Create GroupValueChart</button>
+						 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
+	                        <button class="btn btn-default btn-lg">
+	                            Upload a Group ValueChart
+	                        </button>
+	                        <input type="file" class="upload" (change)="uploadGroupValueChart($event)"/>
+	                    </a>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
