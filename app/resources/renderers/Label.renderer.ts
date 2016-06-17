@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 11:41:34
+* @Last Modified time: 2016-06-17 15:58:09
 */
 
 import { Injectable } 												from '@angular/core';
@@ -228,12 +228,6 @@ export class LabelRenderer {
 				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
 			}));	
 
-		// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
-		labelOutlines.call(d3.behavior.drag()
-			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
-			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
-			.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
-
 	}
 
 	// Render the text of a label.
@@ -251,12 +245,6 @@ export class LabelRenderer {
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
 			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
-
-		// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
-		labelTexts.call(d3.behavior.drag()
-			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
-			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
-			.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
 
 	}
 
@@ -354,6 +342,29 @@ export class LabelRenderer {
 			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
 		}
 	}
+
+	toggleObjectiveSorting(enableDragging: boolean): void {
+		var labelOutlines: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-outline')
+		var labelTexts: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-text')		
+
+		if (enableDragging){
+			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
+			labelOutlines.call(d3.behavior.drag()
+				.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
+				.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
+				.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
+	
+			// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
+			labelTexts.call(d3.behavior.drag()
+				.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
+				.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
+				.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
+		} else {
+			// TODO: double check that this is proper way to reset the drag behavior.
+			labelOutlines.call(d3.behavior.drag());
+			labelTexts.call(d3.behavior.drag());
+		}	
+	}	
 
 
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields

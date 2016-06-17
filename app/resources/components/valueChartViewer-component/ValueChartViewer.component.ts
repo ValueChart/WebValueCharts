@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 18:23:31
+* @Last Modified time: 2016-06-17 15:14:00
 */
 
 import { Component }				from '@angular/core';
@@ -22,6 +22,8 @@ import { ValueChart } 				from '../../model/ValueChart';
 })
 export class ValueChartViewerComponent implements OnInit {
 
+	private PUMPOFF: string = 'none';
+
 	valueChart: ValueChart;
 
 	// ValueChart Display Configuration Options:
@@ -31,6 +33,10 @@ export class ValueChartViewerComponent implements OnInit {
 	displayScales: boolean;
 	displayTotalScores: boolean;
 	displayScoreFunctionValueLabels: boolean;
+
+	sortObjectives: boolean;
+	pumpWeights: string;
+	pumpType: string;
 	
 	constructor(private chartDataService: ChartDataService) { }
 
@@ -42,6 +48,9 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayScales = false;
 		this.displayDomainValues = false;
 		this.displayScoreFunctionValueLabels = false;
+
+		this.pumpWeights = this.PUMPOFF;
+		this.sortObjectives = false;
 	}
 
 	setOrientation(viewOrientation: string): void{
@@ -67,7 +76,6 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayScoreFunctionValueLabels = newVal;
 	}
 
-
 	editObjectiveModel(): void {
 		// TODO: Implement Editing of Objective Model
 	}
@@ -75,6 +83,23 @@ export class ValueChartViewerComponent implements OnInit {
 	editPreferenceModel(): void {
 		// TODO: Implement Editing of Preference Model.
 	}
+
+	toggleSort(newVal: boolean): void {
+		this.sortObjectives = newVal;
+		if (this.sortObjectives) {
+			this.pumpWeights = this.PUMPOFF;
+		}
+	}
+
+	togglePump(pumpType: string): void {
+		if (this.pumpWeights ===this.PUMPOFF) {
+			this.pumpWeights = pumpType;
+			this.sortObjectives = false;
+		} else {
+			this.pumpWeights = this.PUMPOFF;
+		}
+	}
+
 
 
 }

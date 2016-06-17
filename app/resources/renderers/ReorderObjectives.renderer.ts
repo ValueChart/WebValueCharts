@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 11:41:26
+* @Last Modified time: 2016-06-17 16:04:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -79,6 +79,9 @@ export class ReorderObejctivesRenderer {
 		// Set all the siblings that are NOT being moved to be partially transparent.
 		this.siblingContainers.style('opacity', 0.5);
 		this.containerToReorder.style('opacity', 1);
+
+		// Just until the location of score functions is fixed.
+		this.labelRenderer.scoreFunctionContainer.selectAll('.label-scorefunction').style('opacity', 0.5);
 
 		var parentOutline: d3.Selection<any> = this.parentContainer.select('rect'); 		// Select the rect that outlines the parent label of the label we are reordering.
 		var currentOutline: d3.Selection<any> = this.containerToReorder.select('rect');		// Select the rect that outlines the label we are reordering.
@@ -196,6 +199,8 @@ export class ReorderObejctivesRenderer {
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.chartDataService.reorderRows(primitiveObjectives);
+		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
+		this.labelRenderer.toggleObjectiveSorting(true);
 	}
 
 	generateNewLabelTransform(previousXTransform: number, previousYTransform: number, deltaCoordinateTwo: number): string {

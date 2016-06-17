@@ -76,6 +76,22 @@
 				</div>
 			</div>
 		</form>
+		<form class="form-inline col-xs-12">
+			<div class='col-xs-6'> 
+				<div class="form-group">
+					<button class="btn btn-default" [class.active]="sortObjectives" (click)="toggleSort(!sortObjectives)">Sort Objectives</button>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-default" (click)="togglePump(pumpType)">Pump Weights</button>
+					<label class="radio-inline" [class.disabled]="pumpWeights === 'none'">
+					 	<input type="radio" name="pump-options" id="increase" value="'increase'" [(ngModel)]="pumpType" checked>Increase
+					</label>
+					<label class="radio-inline" [class.disabled]="pumpWeights === 'none'">
+						<input type="radio" name="pump-options" id="decrease" value="'decrease'" [(ngModel)]="pumpType">Decrease
+					</label>
+				</div>
+			</div>
+		</form>
 	</div>
 	<div >
 		<ValueChart 
@@ -85,7 +101,9 @@
 			[displayDomainValues]="displayDomainValues" 
 			[displayScales]="displayScales" 
 			[displayTotalScores]="displayTotalScores"
-			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels">
+			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
+			[sortObjectives]="sortObjectives"
+			[pumpWeights]="pumpWeights">
 		</ValueChart>
 	</div>
 </div>

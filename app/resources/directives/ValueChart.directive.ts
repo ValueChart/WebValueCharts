@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 10:10:12
+* @Last Modified time: 2016-06-17 15:58:17
 */
 
 
@@ -66,6 +66,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private scoreFunctionDiffers: KeyValueDiffer[];
 	private rowsDiffer: IterableDiffer;
 
+	private interactions: any = {};
+	private previousInteractions: any = {};
+
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
 
@@ -91,6 +94,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() set data(value: any) {
 		this.valueChart = <ValueChart> value;
 	}
+
+	// View Configuration
 
 	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives orientation attribute.
@@ -124,6 +129,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	@Input() set displayScoreFunctionValueLabels(value: any) {
 		this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels = <boolean>value;
+	}
+
+	// Interactions:
+
+	@Input() set sortObjectives(value: any) {
+		this.interactions.sortObjectives = <boolean> value;
+	}
+
+	@Input() set pumpWeights(value: any) {
+		this.interactions.pumpWeights = <string> value;
 	}
 
 	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
@@ -191,11 +206,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.scoreFunctionDiffers.push(scoreFunctionDiffer);
 		});
 
+		// View Configuration
+
 		this.renderConfigService.previousViewConfiguration.displayScoreFunctions			= this.renderConfigService.viewConfiguration.displayScoreFunctions;
 		this.renderConfigService.previousViewConfiguration.displayDomainValues 				= this.renderConfigService.viewConfiguration.displayDomainValues;
 		this.renderConfigService.previousViewConfiguration.displayScales 					= this.renderConfigService.viewConfiguration.displayScales;
 		this.renderConfigService.previousViewConfiguration.displayTotalScores 				= this.renderConfigService.viewConfiguration.displayTotalScores;
 		this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels 	= this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels
+
+
+		// Interactions:
+
+		this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+		this.previousInteractions.pumpWeights = this.interactions.pumpWeights; 
 
 	}
 
@@ -276,6 +299,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels = this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels;
 			// Toggle Score Function Value Labels.
 			this.labelRenderer.toggleScoreFunctionValueLabels();
+		}
+
+		// Interactions
+
+		if (this.interactions.sortObjectives !== this.previousInteractions.sortObjectives) {
+			this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+			this.labelRenderer.toggleObjectiveSorting(this.interactions.sortObjectives);
+		}
+
+		if (this.interactions.pumpWeights !== this.previousInteractions.pumpWeights) {
+			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
+
 		}
 	}
 
