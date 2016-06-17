@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 10:31:47
+* @Last Modified time: 2016-06-17 10:49:55
 */
 
 import { Injectable } 												from '@angular/core';
@@ -30,7 +30,7 @@ export class ReorderObejctivesRenderer {
 	private primitiveObjectives: PrimitiveObjective[]
 
 	private reorderObjectiveMouseOffset: number;
-	private yChange: number = 0;
+	private dimensionTwoChange: number = 0;
 
 	private containerToReorder: d3.Selection<any>;
 	private parentObjectiveName: string;
@@ -53,7 +53,7 @@ export class ReorderObejctivesRenderer {
 	startReorderObjectives = (d: VCLabelData, i: number) => {
 		this.ignoreReorder = false;
 		this.reorderObjectiveMouseOffset = undefined;
-		this.yChange = 0;
+		this.dimensionTwoChange = 0;
 
 		this.containerToReorder = d3.select('#label-' + d.objective.getName() + '-container');
 		this.parentObjectiveName = (<Element>this.containerToReorder.node()).getAttribute('parent');
@@ -105,26 +105,25 @@ export class ReorderObejctivesRenderer {
 		deltaCoordinateTwo = deltaCoordinateTwo - this.reorderObjectiveMouseOffset;
 
 		// Make sure that the label does not exit the bounds of the label area.
-		if (deltaCoordinateTwo + this.yChange + this.objectiveCoordTwoOffset < 0) {
-			deltaCoordinateTwo = 0 - this.yChange - this.objectiveCoordTwoOffset;
-		} else if (deltaCoordinateTwo + this.yChange + this.objectiveCoordTwoOffset > this.maxCoordinateTwo) {
-			deltaCoordinateTwo = this.maxCoordinateTwo - this.yChange - this.objectiveCoordTwoOffset;
+		if (deltaCoordinateTwo + this.dimensionTwoChange + this.objectiveCoordTwoOffset < 0) {
+			deltaCoordinateTwo = 0 - this.dimensionTwoChange - this.objectiveCoordTwoOffset;
+		} else if (deltaCoordinateTwo + this.dimensionTwoChange + this.objectiveCoordTwoOffset > this.maxCoordinateTwo) {
+			deltaCoordinateTwo = this.maxCoordinateTwo - this.dimensionTwoChange - this.objectiveCoordTwoOffset;
 		}
 
-		this.yChange += deltaCoordinateTwo;
+		this.dimensionTwoChange += deltaCoordinateTwo;
 
-		var labelDimensionTwoOffset: number = (this.yChange > 0) ? this.objectiveDimensionTwo : 0;
+		var labelDimensionTwoOffset: number = (this.dimensionTwoChange > 0) ? this.objectiveDimensionTwo : 0;
 
 		for (var i = 0; i < this.jumpPoints.length; i++) {
-			if (this.yChange + deltaCoordinateTwo + labelDimensionTwoOffset > (this.jumpPoints[i] - this.objectiveCoordTwoOffset)
-				&& this.yChange + deltaCoordinateTwo + labelDimensionTwoOffset < (this.jumpPoints[i + 1] - this.objectiveCoordTwoOffset)) {
-				console.log('setting index')
+			if (this.dimensionTwoChange + deltaCoordinateTwo + labelDimensionTwoOffset > (this.jumpPoints[i] - this.objectiveCoordTwoOffset)
+				&& this.dimensionTwoChange + deltaCoordinateTwo + labelDimensionTwoOffset < (this.jumpPoints[i + 1] - this.objectiveCoordTwoOffset)) {
 				this.newObjectiveIndex = i;
 				break;
 			}
 		}
 
-		if (this.yChange > 0)
+		if (this.dimensionTwoChange > 0)
 			this.newObjectiveIndex--;
 
 		var currentTransform: string = this.containerToReorder.attr('transform');
@@ -133,7 +132,8 @@ export class ReorderObejctivesRenderer {
 		var xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
 		var yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
 
-		var labelTransform: string = this.renderConfigService.generateTransformTranslation(this.renderConfigService.viewOrientation, xTransform, yTransform + deltaCoordinateTwo);
+		var labelTransform: string = this.generateNewTransform(xTransform, yTransform, deltaCoordinateTwo);
+
 
 		this.containerToReorder.attr('transform', labelTransform);
 
@@ -145,7 +145,7 @@ export class ReorderObejctivesRenderer {
 		if (this.ignoreReorder) {
 			return;
 		}
-		
+
 		var parentData: VCLabelData = this.parentContainer.datum();
 
 		if (this.newObjectiveIndex !== this.currentObjectiveIndex) {
@@ -164,6 +164,14 @@ export class ReorderObejctivesRenderer {
 
 		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), labelData, primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(labelData, this.renderConfigService.viewOrientation, primitiveObjectives);
+	}
+
+	generateNewTransform(previousXTransform: number, previousYTransform: number, deltaCoordinateTwo: number): string {
+		if (this.renderConfigService.viewOrientation === 'vertical') {
+			return 'translate(' + previousXTransform + ',' + (previousYTransform + deltaCoordinateTwo) + ')';
+		} else {
+			return 'translate(' + (previousXTransform + deltaCoordinateTwo) + ',' + previousYTransform + ')';
+		}
 	}
 
 	getOrderedObjectives(labelData: VCLabelData[]): PrimitiveObjective[] {
@@ -190,8 +198,8 @@ export class ReorderObejctivesRenderer {
 			let commaIndex: number = currentTransform.indexOf(',');
 			let xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
 			let yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
-			let labelTransform: string = this.renderConfigService.generateTransformTranslation(this.renderConfigService.viewOrientation, xTransform, yTransform + deltaCoordinateTwo);
-			scoreFunction.attr('transform', labelTransform);
+			let scoreFunctionTransform: string = this.generateNewTransform(xTransform, yTransform, deltaCoordinateTwo);
+			scoreFunction.attr('transform', scoreFunctionTransform);
 		}
 	}
 
