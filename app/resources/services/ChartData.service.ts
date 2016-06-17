@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-14 13:12:30
+* @Last Modified time: 2016-06-17 09:57:56
 */
 
 import { Injectable } 					from '@angular/core';
@@ -57,6 +57,7 @@ export class ChartDataService {
 	public primitiveObjectives: PrimitiveObjective[];
 	public numUsers: number;
 	public numAlternatives: number;
+	public rows: VCRowData[];
 
 
 	constructor() { }
@@ -267,6 +268,23 @@ export class ChartDataService {
 			} else {
 				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, childMax);
 			}
+		});
+	}
+
+	reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
+		var desiredIndices: any = {};
+
+		this.rows.sort((a: VCRowData, b: VCRowData) => {
+			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
+			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
+
+			desiredIndices[a.objective.getName()] = aIndex;
+			desiredIndices[b.objective.getName()] = bIndex;
+
+			if (aIndex < bIndex)
+				return -1;
+			else
+				return 1;
 		});
 	}
 

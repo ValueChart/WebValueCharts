@@ -2,34 +2,33 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-16 11:29:59
+* @Last Modified time: 2016-06-17 10:10:12
 */
 
 
-import { Directive, Input } 										from '@angular/core';
-import { OnInit, DoCheck, SimpleChange }					from '@angular/core';
-import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
-import { KeyValueDiffers, IterableDiffers, KeyValueDiffer }							from '@angular/core';
+import { Directive, Input } 													from '@angular/core';
+import { OnInit, DoCheck, SimpleChange }										from '@angular/core';
+import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
+import { KeyValueDiffers, IterableDiffers, KeyValueDiffer, IterableDiffer }		from '@angular/core';
 
 // d3
-import * as d3 														from 'd3';
+import * as d3 																	from 'd3';
 
 // Application classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
-import { RenderConfigService }										from '../services/RenderConfig.service';
-import { ObjectiveChartRenderer }									from '../renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer }										from '../renderers/SummaryChart.renderer';
-import { LabelRenderer }											from '../renderers/Label.renderer';
-
+import { ChartDataService, VCCellData, VCRowData, VCLabelData }					from '../services/ChartData.service';
+import { RenderConfigService }													from '../services/RenderConfig.service';
+import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
+import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
+import { LabelRenderer }														from '../renderers/Label.renderer';
 
 // Model Classes
-import { ValueChart } 												from '../model/ValueChart';
-import { GroupValueChart } 											from '../model/GroupValueChart';
-import { IndividualValueChart } 									from '../model/IndividualValueChart';
-import { PrimitiveObjective }										from '../model/PrimitiveObjective';
-import { WeightMap }												from '../model/WeightMap';
-import { User }														from '../model/User';
-import { ScoreFunction }											from '../model/ScoreFunction';
+import { ValueChart } 															from '../model/ValueChart';
+import { GroupValueChart } 														from '../model/GroupValueChart';
+import { IndividualValueChart } 												from '../model/IndividualValueChart';
+import { PrimitiveObjective }													from '../model/PrimitiveObjective';
+import { WeightMap }															from '../model/WeightMap';
+import { User }																	from '../model/User';
+import { ScoreFunction }														from '../model/ScoreFunction';
 
 @Directive({
 	selector: 'ValueChart',
@@ -65,6 +64,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private scoreFunctionMapDiffer: KeyValueDiffer;
 	private scoreFunctionDiffer: KeyValueDiffer;
 	private scoreFunctionDiffers: KeyValueDiffer[];
+	private rowsDiffer: IterableDiffer;
 
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
@@ -74,6 +74,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private viewContainer: ViewContainerRef,
 		private elementRef: ElementRef,
 		private differs: KeyValueDiffers,
+		private arrayDiffers: IterableDiffers,
 		private objectiveChartRenderer: ObjectiveChartRenderer,
 		private summaryChartRenderer: SummaryChartRenderer,
 		private labelRenderer: LabelRenderer,
@@ -149,6 +150,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
+		this.chartDataService.rows = this.dataRows;
 
 		this.labelData = this.chartDataService.getLabelData(this.valueChart);
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
@@ -175,6 +177,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.userDiffer = this.differs.find({}).create(null);
 		this.weightMapDiffer = this.differs.find({}).create(null);
 		this.scoreFunctionMapDiffer = this.differs.find({}).create(null);
+		this.rowsDiffer = this.arrayDiffers.find([]).create(null);
 
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var scoreFunctionMap = user.getScoreFunctionMap();
@@ -233,6 +236,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	
 		});
 
+		var rowsChanges = this.rowsDiffer.diff(this.dataRows);
+		if (rowsChanges) {
+			this.onRowChange();
+		}
+
 		// Check View Configuration options:
 
 		if (this.previousOrientation !== this.viewOrientation) {
@@ -267,13 +275,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels !== this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels) {
 			this.renderConfigService.previousViewConfiguration.displayScoreFunctionValueLabels = this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels;
 			// Toggle Score Function Value Labels.
-			console.log('change detected');
 			this.labelRenderer.toggleScoreFunctionValueLabels();
 		}
 	}
 
 	onValueChartChange(): void {
-		console.log('valuechart change')
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 
@@ -282,8 +288,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
 	}
 
+	onRowChange(): void {
+		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
+		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
+		
+		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
+
+	}
+
 	onOrientationChange(): void {
-		console.log('orientation change')
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);
 
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);

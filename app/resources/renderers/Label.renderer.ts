@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-16 16:52:35
+* @Last Modified time: 2016-06-17 10:22:22
 */
 
 import { Injectable } 												from '@angular/core';
-import { NgZone }											from '@angular/core';
+import { NgZone }													from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
@@ -17,16 +17,17 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
+import { ReorderObejctivesRenderer }								from '../renderers/ReorderObjectives.renderer';
 
 
 
 // Model Classes
-import { Objective }					from '../model/Objective';
-import { PrimitiveObjective }			from '../model/PrimitiveObjective';
-import { AbstractObjective }			from '../model/AbstractObjective';
-import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
-import { ScoreFunction }				from '../model/ScoreFunction';
-import { WeightMap }					from '../model/WeightMap';
+import { Objective }												from '../model/Objective';
+import { PrimitiveObjective }										from '../model/PrimitiveObjective';
+import { AbstractObjective }										from '../model/AbstractObjective';
+import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
+import { ScoreFunction }											from '../model/ScoreFunction';
+import { WeightMap }												from '../model/WeightMap';
 
 
 // This class is renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
@@ -47,17 +48,15 @@ export class LabelRenderer {
 	private displayScoreFunctions: boolean;
 
 	public scoreFunctionRenderers: any;
-
-
-	private reorderObjectiveMouseOffset: number;
-	private yChange: number = 0;
-
-	private objectiveToReorder: any = {};
+	private reorderObejctivesRenderer: ReorderObejctivesRenderer;
 
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
-		private ngZone: NgZone) { }
+		private ngZone: NgZone) { 
+
+		this.reorderObejctivesRenderer = new ReorderObejctivesRenderer(this.renderConfigService, this.chartDataService, this);
+	}
 
 	// Create the base containers and elements for the labels.
 	createLabelSpace(el: d3.Selection<any>, labelData: VCLabelData[], objectiveData: PrimitiveObjective[]): void {
@@ -230,9 +229,9 @@ export class LabelRenderer {
 			}));	
 
 		labelOutlines.call(d3.behavior.drag()
-								.on('dragstart', this.startReorderObjectives)
-								.on('drag', this.reorderObjectives)
-								.on('dragend', this.endReorderObjectives));
+			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
+			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
+			.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
 
 	}
 
@@ -251,6 +250,11 @@ export class LabelRenderer {
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
 			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
+
+		labelTexts.call(d3.behavior.drag()
+			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
+			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
+			.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
 
 	}
 
@@ -349,22 +353,6 @@ export class LabelRenderer {
 		}
 	}
 
-	adjustScoreFunctionPosition(container: d3.Selection<any>, deltaCoordinateTwo: number, objective: Objective): void {
-		if (objective.objectiveType === 'abstract') {
-			(<AbstractObjective> objective).getAllSubObjectives().forEach((subObjective: Objective) => {
-				this.adjustScoreFunctionPosition(container, deltaCoordinateTwo, subObjective);
-			});
-		} else {
-			var scoreFunction: d3.Selection<any> = this.rootContainer.select('#label-' + objective.getName() + '-scorefunction');
-			let currentTransform: string = scoreFunction.attr('transform');
-			let commaIndex: number = currentTransform.indexOf(',');
-			let xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
-			let yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
-			let labelTransform: string = this.renderConfigService.generateTransformTranslation(this.renderConfigService.viewOrientation, xTransform, yTransform + deltaCoordinateTwo);
-			scoreFunction.attr('transform', labelTransform);
-		}
-	}
-
 
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields
 
@@ -377,112 +365,6 @@ export class LabelRenderer {
 
 		return retValue;
 	};
-
-	startReorderObjectives = (d: VCLabelData, i: number) => {
-		console.log('start was called');
-
-		this.objectiveToReorder.container = d3.select('#label-' + d.objective.getName() + '-container');
-		this.objectiveToReorder.parentName = (<Element>this.objectiveToReorder.container.node()).getAttribute('parent');
-		this.objectiveToReorder.parentContainer = d3.select('#label-' + this.objectiveToReorder.parentName + '-container');
-		this.objectiveToReorder.siblings = this.objectiveToReorder.parentContainer.selectAll('g[parent=' + this.objectiveToReorder.parentName + ']');
-
-		var parentOutline: d3.Selection<any> = this.objectiveToReorder.parentContainer.select('rect');
-		var currentOutline: d3.Selection<any> = this.objectiveToReorder.container.select('rect');
-
-		this.objectiveToReorder.labelDimensionTwo = +currentOutline.attr(this.renderConfigService.dimensionTwo);
-
-		this.objectiveToReorder.maxCoordTwo = +parentOutline.attr(this.renderConfigService.dimensionTwo) - this.objectiveToReorder.labelDimensionTwo;
-
-		this.objectiveToReorder.coordTwoOffset = +currentOutline.attr(this.renderConfigService.coordinateTwo);
-		this.objectiveToReorder.index = this.objectiveToReorder.siblings[0].indexOf(this.objectiveToReorder.container.node());
-
-		this.objectiveToReorder.newIndex = this.objectiveToReorder.index;
-
-
-		this.objectiveToReorder.jumpPoints = [];
-
-		this.objectiveToReorder.siblings.select('rect')[0].forEach((el: Element) => {
-			if (el !== undefined) {
-				let selection: d3.Selection<any> = d3.select(el);
-				let jumpPoint: number = (+selection.attr(this.renderConfigService.dimensionTwo) / 2) + +selection.attr(this.renderConfigService.coordinateTwo);
-				this.objectiveToReorder.jumpPoints.push(jumpPoint);
-			} 
-		});
-	}
-
-	reorderObjectives = (d: VCLabelData, i: number) => {
-
-		var deltaCoordinateTwo: number = (<any>d3.event)[this.renderConfigService.coordinateTwo];
-
-		if (this.reorderObjectiveMouseOffset === undefined) {
-			this.reorderObjectiveMouseOffset = deltaCoordinateTwo;
-		}
-
-		deltaCoordinateTwo = deltaCoordinateTwo - this.reorderObjectiveMouseOffset;
-
-		// Make sure that the label does not exit the bounds of the label area.
-		if (deltaCoordinateTwo + this.yChange + this.objectiveToReorder.coordTwoOffset < 0) {
-			deltaCoordinateTwo = 0 - this.yChange - this.objectiveToReorder.coordTwoOffset;
-		} else if (deltaCoordinateTwo + this.yChange + this.objectiveToReorder.coordTwoOffset > this.objectiveToReorder.maxCoordTwo) {
-			deltaCoordinateTwo = this.objectiveToReorder.maxCoordTwo - this.yChange - this.objectiveToReorder.coordTwoOffset;
-		}
-
-		this.yChange += deltaCoordinateTwo;
-
-		var labelDimensionTwoOffset: number = 0;
-		if (this.yChange > 0)
-			labelDimensionTwoOffset = this.objectiveToReorder.labelDimensionTwo;
-
-		for (var i = 0; i < this.objectiveToReorder.jumpPoints.length; i++) {
-			if (i === this.objectiveToReorder.jumpPoints.length - 1) {
-				this.objectiveToReorder.newIndex = i;
-			} else if (this.yChange + labelDimensionTwoOffset > this.objectiveToReorder.jumpPoints[i]
-				&& this.yChange + labelDimensionTwoOffset < this.objectiveToReorder.jumpPoints[i + 1]) {
-				this.objectiveToReorder.newIndex = i;
-				break;
-			}
-		}
-
-		var currentTransform: string = this.objectiveToReorder.container.attr('transform');
-		var commaIndex: number = currentTransform.indexOf(',');
-		// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.
-		var xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
-		var yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
-
-		var labelTransform: string = this.renderConfigService.generateTransformTranslation(this.renderConfigService.viewOrientation, xTransform, yTransform + deltaCoordinateTwo);
-
-		this.objectiveToReorder.container.attr('transform', labelTransform);
-		
-		this.adjustScoreFunctionPosition(this.scoreFunctionContainer, deltaCoordinateTwo, d.objective);
-
-	}
-
-	endReorderObjectives = (d: VCLabelData, i: number) => {
-		console.log('ending drag');
-		var parentData: VCLabelData = this.objectiveToReorder.parentContainer.datum();
-
-		if (this.objectiveToReorder.newIndex !== this.objectiveToReorder.index) {
-			console.log(this.objectiveToReorder.newIndex, 'There is a new index!');
-
-			let temp: VCLabelData = parentData.subLabelData[this.objectiveToReorder.index];
-			parentData.subLabelData.splice(this.objectiveToReorder.index, 1);
-			parentData.subLabelData.splice(this.objectiveToReorder.newIndex, 0, temp);
-		}
-
-		var labelData: VCLabelData[] = d3.select('g[parent=rootcontainer]').data();
-
-		var primitiveObjectives: PrimitiveObjective[] = this.chartDataService.primitiveObjectives;
-
-		(<Element> d3.select('.label-root-container').node()).remove();
-
-		this.createLabelSpace(d3.select('.ValueChart'), labelData, primitiveObjectives);
-		this.renderLabelSpace(labelData, this.renderConfigService.viewOrientation, primitiveObjectives);
-		this.reorderObjectiveMouseOffset = undefined;
-		this.yChange = 0;
-
-	}
-
-
 
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: VCLabelData, i: number) => {
