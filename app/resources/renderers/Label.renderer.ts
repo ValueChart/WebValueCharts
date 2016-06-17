@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 10:22:22
+* @Last Modified time: 2016-06-17 11:41:34
 */
 
 import { Injectable } 												from '@angular/core';
@@ -30,7 +30,7 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
 
-// This class is renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
+// This class renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
 // rectangle whose width (or height depending on the orientation) is proportional to its weight. The rectangles are positioned in such a
 // way that they act as labels for the objectives in the objective chart.
 
@@ -54,7 +54,7 @@ export class LabelRenderer {
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private ngZone: NgZone) { 
-
+		// Initialize the renderer that reorders objectives when a label is dragged.
 		this.reorderObejctivesRenderer = new ReorderObejctivesRenderer(this.renderConfigService, this.chartDataService, this);
 	}
 
@@ -228,6 +228,7 @@ export class LabelRenderer {
 				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
 			}));	
 
+		// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
 		labelOutlines.call(d3.behavior.drag()
 			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
 			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
@@ -251,6 +252,7 @@ export class LabelRenderer {
 			})
 			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
 
+		// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
 		labelTexts.call(d3.behavior.drag()
 			.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
 			.on('drag', this.reorderObejctivesRenderer.reorderObjectives)

@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-16 13:09:41
+* @Last Modified time: 2016-06-17 11:41:43
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -25,7 +25,7 @@ import { Alternative }												from '../model/Alternative';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 
-// This class is renders a ValueChart's Alternatives into a series of bar charts that displays the utility for each Alternative's consequences.
+// This class renders a ValueChart's Alternatives into a series of bar charts that displays the utility for each Alternative's consequences.
 // This utility is based on the weights given to objectives, and the user determined scores assigned to points in the consequence space. 
 // Each Alternative's value for each PrimitiveObjective is rendered into a rectangle whose height (or width depending on the orientation) is 
 // proportional to its (weight * userScore). The rectangles for each Alternative are aligned vertically (or horizontally) so that they form a of 
