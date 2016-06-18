@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 11:41:52
+* @Last Modified time: 2016-06-18 13:32:32
 */
 
 import { Injectable } 												from '@angular/core';
@@ -239,7 +239,7 @@ export class SummaryChartRenderer {
 
 		var calculateTotalScore = (d: any) => {
 			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName()));
+			var score = scoreFunction.getScore(d.value) * (this.chartDataService.weightMap.getObjectiveWeight(d.objective.getName()));
 			return score + d.offset;
 		};
 
@@ -298,7 +298,7 @@ export class SummaryChartRenderer {
 			
 
 		userScores.attr(this.renderConfigService.coordinateTwo, (d: any, i: number) => {
-				var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+				var objectiveWeight: number = this.chartDataService.weightMap.getObjectiveWeight(d.objective.getName());
 				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 
 				if (viewOrientation == 'vertical')
@@ -333,7 +333,7 @@ export class SummaryChartRenderer {
 	calculateUserScoreDimensionOne = (d: any, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: any, i: number) => {
-		var objectiveWeight: number = this.chartDataService.weightMap.getNormalizedObjectiveWeight(d.objective.getName());
+		var objectiveWeight: number = this.chartDataService.weightMap.getObjectiveWeight(d.objective.getName());
 		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};

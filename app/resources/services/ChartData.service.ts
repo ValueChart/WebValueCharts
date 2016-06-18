@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 21:03:04
+* @Last Modified time: 2016-06-18 13:21:49
 */
 
 import { Injectable } 					from '@angular/core';
@@ -112,7 +112,7 @@ export class ChartDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
 		} else if (objective.objectiveType === 'primitive') {
-			labelData =  { 'objective': objective, 'weight': this.weightMap.getNormalizedObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0};
+			labelData =  { 'objective': objective, 'weight': this.weightMap.getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0};
 		}
 
 		return labelData;
@@ -126,7 +126,7 @@ export class ChartDataService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.weightMap.getNormalizedObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = this.weightMap.getObjectiveWeight(labelDatum.objective.getName());
 		}
 	}
 
@@ -182,7 +182,7 @@ export class ChartDataService {
 
 		for (var i = 0; i < rows.length; i++) {
 			rows[i].weightOffset = weightOffset;
-			weightOffset += this.weightMap.getNormalizedObjectiveWeight(rows[i].objective.getName());
+			weightOffset += this.weightMap.getObjectiveWeight(rows[i].objective.getName());
 		}
 
 		return rows;
@@ -193,7 +193,7 @@ export class ChartDataService {
 			.x((d: any, i: number) => { return i; })
 			.y((d: any) => { 
 				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-				return (score * this.weightMap.getNormalizedObjectiveWeight(d.objective.getName())); })
+				return (score * this.weightMap.getObjectiveWeight(d.objective.getName())); })
 			.out((d: any, y0: number) => {
 				d.offset = y0;
 			});

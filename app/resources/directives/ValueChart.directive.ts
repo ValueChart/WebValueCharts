@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 21:13:45
+* @Last Modified time: 2016-06-18 13:38:36
 */
 
 
@@ -150,6 +150,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewportHeight = 850;
 
 		// Configure the orientation options depending on the 
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);
 
 		this.previousOrientation = this.viewOrientation;
@@ -242,7 +243,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		var weightMapChanges = this.weightMapDiffer.diff(weightMap);
 
 		if (weightMapChanges) {
-			console.log('value chart change')
 			this.onValueChartChange();
 		}
 
@@ -310,13 +310,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 
 		if (this.interactions.pumpWeights !== this.previousInteractions.pumpWeights) {
-			console.log(this.interactions.pumpWeights);
 			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
 			this.labelRenderer.togglePump(this.interactions.pumpWeights);
 		}
 	}
 
 	onValueChartChange(): void {
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 		
@@ -330,6 +331,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	onRowChange(): void {
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 		
@@ -340,6 +343,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	onOrientationChange(): void {
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 

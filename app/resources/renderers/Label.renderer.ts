@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 21:25:55
+* @Last Modified time: 2016-06-18 13:38:50
 */
 
 import { Injectable } 												from '@angular/core';
@@ -323,7 +323,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots[0].forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.chartDataService.weightMap.getNormalizedObjectiveWeight(datum.getName());
+			objectiveWeight = this.chartDataService.weightMap.getObjectiveWeight(datum.getName());
 			scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(datum.getName());
 			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
@@ -382,7 +382,6 @@ export class LabelRenderer {
 			var pumpAmount: number = ((pumpType === 'increase') ? 0.02 : -0.02);
 
 			labelOutlineElements.click((eventObject: Event) => {
-				console.log(this.chartDataService.weightMap);
 				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
 				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
 				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
@@ -405,7 +404,6 @@ export class LabelRenderer {
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: VCLabelData, i: number) => {
 		var weightMap: WeightMap = this.chartDataService.weightMap;
-		console.log(weightMap);
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');

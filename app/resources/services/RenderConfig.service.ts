@@ -2,11 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-16 11:20:47
+* @Last Modified time: 2016-06-18 13:25:54
 */
 
 import { Injectable } 												from '@angular/core';
 
+
+import { ChartDataService }											from './ChartData.service';
 
 @Injectable()
 export class RenderConfigService {
@@ -31,7 +33,7 @@ export class RenderConfigService {
 	public previousViewConfiguration: any = {};
 
 
-	constructor() { 
+	constructor(private chartDataService: ChartDataService) { 
 		this.configureViewOrientation('vertical');
 	}
 
@@ -43,7 +45,7 @@ export class RenderConfigService {
 	configureViewOrientation(viewOrientation: string): void {
 		this.viewOrientation = viewOrientation;
 
-		if (this.viewOrientation === 'vertical') {
+		if (viewOrientation === 'vertical') {
 			// We want to render the ValueChart horizontally
 			this.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
 			this.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
@@ -53,11 +55,7 @@ export class RenderConfigService {
 			this.dimensionOneSize = this.VALUECHART_WIDTH;	// This is the width of the graph
 			this.dimensionTwoSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
 
-			this.dimensionTwoScale = d3.scale.linear()
-				.domain([0, 1])
-				.range([0, this.VALUECHART_HEIGHT]);
-
-		} else if (this.viewOrientation === 'horizontal') {
+		} else if (viewOrientation === 'horizontal') {
 			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
 			this.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
 			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
@@ -66,8 +64,20 @@ export class RenderConfigService {
 			this.dimensionOneSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
 			this.dimensionTwoSize = this.VALUECHART_WIDTH;	// This is the width of the graph
 
+			
+		}
+	}
+
+	recalculateDimensionTwoScale(viewOrientation: string): void {
+		if (viewOrientation === 'vertical') {
+
 			this.dimensionTwoScale = d3.scale.linear()
-				.domain([0, 1])
+				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
+				.range([0, this.VALUECHART_HEIGHT]);
+		} else if (viewOrientation === 'horizontal') {
+			
+			this.dimensionTwoScale = d3.scale.linear()
+				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_WIDTH]);
 		}
 	}
