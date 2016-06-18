@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 16:04:33
+* @Last Modified time: 2016-06-17 21:16:11
 */
 
 import { Injectable } 												from '@angular/core';
@@ -188,6 +188,8 @@ export class ReorderObejctivesRenderer {
 
 		// Select all the label data, not just the siblings of the label we moved.
 		var labelData: VCLabelData[] = d3.select('g[parent=rootcontainer]').data();
+
+
 		// Retrieve the objective ordering from the ordering of the label data.
 		var primitiveObjectives: PrimitiveObjective[] = this.getOrderedObjectives(labelData);
 

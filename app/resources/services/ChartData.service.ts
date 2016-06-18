@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 09:57:56
+* @Last Modified time: 2016-06-17 21:03:04
 */
 
 import { Injectable } 					from '@angular/core';
@@ -58,6 +58,7 @@ export class ChartDataService {
 	public numUsers: number;
 	public numAlternatives: number;
 	public rows: VCRowData[];
+	public labelData: VCLabelData[];
 
 
 	constructor() { }
@@ -102,11 +103,11 @@ export class ChartDataService {
 			var maxDepthOfChildren: number = 0;
 
 			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let lableDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, depth + 1);
-				weight += lableDatum.weight;
-				if (lableDatum.depthOfChildren > maxDepthOfChildren)
-					maxDepthOfChildren = lableDatum.depthOfChildren;
-				children.push(lableDatum);
+				let labelDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, depth + 1);
+				weight += labelDatum.weight;
+				if (labelDatum.depthOfChildren > maxDepthOfChildren)
+					maxDepthOfChildren = labelDatum.depthOfChildren;
+				children.push(labelDatum);
 			});
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
@@ -115,6 +116,18 @@ export class ChartDataService {
 		}
 
 		return labelData;
+	}
+
+	updateLabelData(labelDatum: VCLabelData): void {
+		if (labelDatum.depthOfChildren !== 0) {
+			labelDatum.weight = 0;
+			labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
+				this.updateLabelData(subLabelDatum);
+				labelDatum.weight += subLabelDatum.weight;
+			});
+		} else {
+			labelDatum.weight = this.weightMap.getNormalizedObjectiveWeight(labelDatum.objective.getName());
+		}
 	}
 
 	getCellData(valueChart: ValueChart, objective: PrimitiveObjective): VCCellData[] {
@@ -245,13 +258,18 @@ export class ChartDataService {
 		var children: VCLabelData[] = labelDatum.subLabelData;
 		var nonZeroChildren: number = 0;
 		var priorWeight = labelDatum.weight;
-		
-		labelDatum.weight = Math.max(Math.min(labelDatum.weight + weightIncrement, maxWeight), 0);
-		
+				
+		if ((labelDatum.weight + weightIncrement) < 0) {
+			weightIncrement = 0 - labelDatum.weight;
+		}
+
+		labelDatum.weight = Math.min(labelDatum.weight + weightIncrement, maxWeight);
+
 		children.forEach((child:VCLabelData) => {
 			if (child.weight !== 0)
 				nonZeroChildren++;
 		});
+
 		if (nonZeroChildren)
 			weightIncrement = weightIncrement / nonZeroChildren;
 

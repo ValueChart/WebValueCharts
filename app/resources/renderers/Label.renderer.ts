@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 15:58:09
+* @Last Modified time: 2016-06-17 21:25:55
 */
 
 import { Injectable } 												from '@angular/core';
@@ -10,7 +10,7 @@ import { NgZone }													from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-
+import * as $														from 'jquery';
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
@@ -116,8 +116,14 @@ export class LabelRenderer {
 
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: VCLabelData) => {
-			if (labelDatum.subLabelData === undefined)
-				return;
+			if (labelDatum.subLabelData === undefined) {
+				el.select('#label-' + labelDatum.objective.getName() + '-outline')
+					.classed('label-primitive-objective-pump', true);
+
+				el.select('#label-' + labelDatum.objective.getName() + '-text')
+					.classed('label-primitive-objective-pump', true);
+				return;	
+			}
 
 			this.createLabels(el, el.select('#label-' + labelDatum.objective.getName() + '-container'), labelDatum.subLabelData, labelDatum.objective.getName());
 		});
@@ -142,6 +148,9 @@ export class LabelRenderer {
 
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
 	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
+
+		// TODO: This is temporary. Remove soon.
+
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
 		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
@@ -203,9 +212,10 @@ export class LabelRenderer {
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 			if (isDataUpdate)
-				this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation, false);	// Render the sub labels.
-			else
 				this.renderLabels(subLabelSpaces.data(labelDatum.subLabelData), labelDatum.subLabelData, viewOrientation, true);	// Render the sub labels using the data update selection.
+			else
+				this.renderLabels(subLabelSpaces, labelDatum.subLabelData, viewOrientation, false);	// Render the sub labels.
+
 		});
 	}
 
@@ -226,8 +236,7 @@ export class LabelRenderer {
 			})
 			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => {
 				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
-			}));	
-
+			}));
 	}
 
 	// Render the text of a label.
@@ -366,6 +375,20 @@ export class LabelRenderer {
 		}	
 	}	
 
+	togglePump(pumpType: string): void {
+		var labelOutlineElements: JQuery = $('.label-primitive-objective-pump');
+		labelOutlineElements.off("click");
+		if (pumpType !== 'none') {
+			var pumpAmount: number = ((pumpType === 'increase') ? 0.02 : -0.02);
+
+			labelOutlineElements.click((eventObject: Event) => {
+				console.log(this.chartDataService.weightMap);
+				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
+				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
+				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
+			});
+		}
+	}
 
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields
 
@@ -382,7 +405,7 @@ export class LabelRenderer {
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: VCLabelData, i: number) => {
 		var weightMap: WeightMap = this.chartDataService.weightMap;
-
+		console.log(weightMap);
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 15:58:17
+* @Last Modified time: 2016-06-17 21:13:45
 */
 
 
@@ -168,6 +168,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.chartDataService.rows = this.dataRows;
 
 		this.labelData = this.chartDataService.getLabelData(this.valueChart);
+		this.chartDataService.labelData = this.labelData;
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 		// Render the ValueChart;
 		this.labelRenderer.createLabelSpace(this.el, this.labelData, this.primitiveObjectives);
@@ -180,7 +181,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
 
 		this.initChangeDetection();
-
 
 		this.isInitialized = true;	
 	}
@@ -242,6 +242,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		var weightMapChanges = this.weightMapDiffer.diff(weightMap);
 
 		if (weightMapChanges) {
+			console.log('value chart change')
 			this.onValueChartChange();
 		}
 
@@ -309,14 +310,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 
 		if (this.interactions.pumpWeights !== this.previousInteractions.pumpWeights) {
+			console.log(this.interactions.pumpWeights);
 			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
-
+			this.labelRenderer.togglePump(this.interactions.pumpWeights);
 		}
 	}
 
 	onValueChartChange(): void {
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
+		
+		this.labelData.forEach((labelDatum: VCLabelData) => {
+			this.chartDataService.updateLabelData(labelDatum);
+		});
 
 		this.labelRenderer.updateLabelSpace(this.labelData, 'rootcontainer', this.viewOrientation, this.primitiveObjectives);
 		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);

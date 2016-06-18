@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 15:14:00
+* @Last Modified time: 2016-06-17 20:36:48
 */
 
 import { Component }				from '@angular/core';
@@ -36,7 +36,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	sortObjectives: boolean;
 	pumpWeights: string;
-	pumpType: string;
 	
 	constructor(private chartDataService: ChartDataService) { }
 
@@ -86,18 +85,12 @@ export class ValueChartViewerComponent implements OnInit {
 
 	toggleSort(newVal: boolean): void {
 		this.sortObjectives = newVal;
-		if (this.sortObjectives) {
-			this.pumpWeights = this.PUMPOFF;
-		}
+		this.pumpWeights = 'none';
 	}
 
-	togglePump(pumpType: string): void {
-		if (this.pumpWeights ===this.PUMPOFF) {
-			this.pumpWeights = pumpType;
-			this.sortObjectives = false;
-		} else {
-			this.pumpWeights = this.PUMPOFF;
-		}
+	setPumpType(pumpType: string): void {
+		this.pumpWeights = (this.pumpWeights === pumpType) ? 'none' : pumpType; 
+		this.sortObjectives = false;
 	}
 
 
