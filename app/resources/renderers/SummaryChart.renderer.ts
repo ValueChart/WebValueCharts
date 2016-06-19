@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-18 13:32:32
+* @Last Modified time: 2016-06-19 16:27:48
 */
 
 import { Injectable } 												from '@angular/core';
@@ -247,7 +247,7 @@ export class SummaryChartRenderer {
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: any, i: number) => { return Math.round(100 * calculateTotalScore(d)); })
+			.text((d: any, i: number) => { return Math.round(100 * (calculateTotalScore(d)) / this.chartDataService.weightMap.getWeightTotal()); })
 			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;

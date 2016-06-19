@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-18 13:38:50
+* @Last Modified time: 2016-06-19 15:28:54
 */
 
 import { Injectable } 												from '@angular/core';
@@ -253,7 +253,7 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round(d.weight * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
@@ -422,7 +422,6 @@ export class LabelRenderer {
 			if (d.objective.objectiveType === 'abstract') {
 				this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
 			} else {
-				d.weight = currentElementWeight;
 				weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
 			}
 
@@ -430,7 +429,6 @@ export class LabelRenderer {
 			if (siblings[i - 1].objective.objectiveType === 'abstract') {
 				this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
 			} else {
-				siblings[i - 1].weight = siblingElementWeight;
 				weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
 			}
 		});
