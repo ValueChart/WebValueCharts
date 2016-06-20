@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 10:07:53
+* @Last Modified time: 2016-06-20 13:59:43
 */
 
 import { Injectable } 					from '@angular/core';
@@ -21,6 +21,8 @@ import { CategoricalDomain }			from '../model/CategoricalDomain';
 import { IntervalDomain }				from '../model/IntervalDomain';
 import { ContinuousDomain }				from '../model/ContinuousDomain';
 import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
+
+
 
 export interface VCRowData {
 	objective: PrimitiveObjective;
@@ -56,6 +58,7 @@ export class ChartDataService {
 	public scoreFunctionMap: ScoreFunctionMap;
 	public primitiveObjectives: PrimitiveObjective[];
 	public numUsers: number;
+	public alternatives: Alternative[];
 	public numAlternatives: number;
 	public rows: VCRowData[];
 	public labelData: VCLabelData[];
@@ -77,6 +80,7 @@ export class ChartDataService {
 			this.numUsers = (<GroupValueChart>this.valueChart).getUsers().length;
 		}
 		this.numAlternatives = this.valueChart.getAlternatives().length;
+		this.alternatives = this.valueChart.getAlternatives();
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 	}
 
@@ -302,6 +306,58 @@ export class ChartDataService {
 			else
 				return 1;
 		});
+	}
+
+	reorderCellsByScore(objectiveToReorderBy: PrimitiveObjective): void {
+		var reorderedRow: VCRowData;
+		var reorderedRowIndex: number;
+		var cellIndices: any = {};
+
+		for (var i = 0; i < this.rows.length; i++) {
+			if (this.rows[i].objective.getName() === objectiveToReorderBy.getName()) {
+				this.rows[i].cells.sort((a: VCCellData, b: VCCellData) => {
+					var scoreFunction = this.scoreFunctionMap.getObjectiveScoreFunction(objectiveToReorderBy.getName());
+
+					if (scoreFunction.getScore(a.value) === scoreFunction.getScore(b.value)) {
+						return (a.alternative.getName() > b.alternative.getName()) ? -1 : 1;
+					} else if (scoreFunction.getScore(a.value) > scoreFunction.getScore(b.value)) {
+						return -1;
+					} else {
+						return 1;
+					}
+				});
+				reorderedRowIndex = i;
+				reorderedRow = this.rows[i];
+				break;	
+			}
+		}
+
+		reorderedRow.cells.forEach((cell: VCCellData, index: number) => {
+			cellIndices[cell.alternative.getName()] = index;
+		});
+
+		var sortCells = (a: VCCellData, b: VCCellData) => {
+			if (cellIndices[a.alternative.getName()] < cellIndices[b.alternative.getName()]) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+
+		this.rows.forEach((row: VCRowData, index: number) => {
+			if (index === reorderedRowIndex)
+				return;
+			row.cells.sort(sortCells);
+		});
+
+		this.alternatives.sort((a: Alternative, b: Alternative) => {
+			if (cellIndices[a.getName()] < cellIndices[b.getName()]) {
+				return -1;
+			} else {
+				return 1;
+			}
+		})
+
 	}
 
 }

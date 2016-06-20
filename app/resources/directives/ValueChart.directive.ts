@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-18 13:38:36
+* @Last Modified time: 2016-06-20 14:23:39
 */
 
 
@@ -65,7 +65,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private scoreFunctionDiffer: KeyValueDiffer;
 	private scoreFunctionDiffers: KeyValueDiffer[];
 	private rowsDiffer: IterableDiffer;
-
+	private cellsDiffer: IterableDiffer;
 	private interactions: any = {};
 	private previousInteractions: any = {};
 
@@ -137,6 +137,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.interactions.sortObjectives = <boolean> value;
 	}
 
+	@Input() set sortAlternatives(value: any) {	
+		this.interactions.sortAlternatives = <boolean> value;
+	}
+
 	@Input() set pumpWeights(value: any) {
 		this.interactions.pumpWeights = <string> value;
 	}
@@ -194,6 +198,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.weightMapDiffer = this.differs.find({}).create(null);
 		this.scoreFunctionMapDiffer = this.differs.find({}).create(null);
 		this.rowsDiffer = this.arrayDiffers.find([]).create(null);
+		this.cellsDiffer = this.arrayDiffers.find([]).create(null);
 
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var scoreFunctionMap = user.getScoreFunctionMap();
@@ -219,6 +224,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Interactions:
 
 		this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+		this.previousInteractions.sortAlternatives = this.interactions.sortAlternatives;
 		this.previousInteractions.pumpWeights = this.interactions.pumpWeights; 
 
 	}
@@ -232,9 +238,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
+		// Check the data for changes:
+
 		this.chartDataService.setValueChart(this.valueChart);
 
 		var valueChartChanges = this.valueChartDiffer.diff(this.valueChart);
+
+		if (valueChartChanges) {
+			this.onValueChartChange();
+		}
 
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var userChanges = this.userDiffer.diff(user);
@@ -264,7 +276,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (rowsChanges) {
 			this.onRowChange();
 		}
-
+		// Check to see if the order of the cells has changed.
+		var cellsChanges = this.cellsDiffer.diff(this.dataRows[0].cells);
+		if (cellsChanges) {
+			this.onRowChange();
+		}
 		// Check View Configuration options:
 
 		if (this.previousOrientation !== this.viewOrientation) {
@@ -302,15 +318,23 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.labelRenderer.toggleScoreFunctionValueLabels();
 		}
 
-		// Interactions
+		// Check the Interactions options:
 
 		if (this.interactions.sortObjectives !== this.previousInteractions.sortObjectives) {
 			this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+			// Toggle Dragging to sort objectives:
 			this.labelRenderer.toggleObjectiveSorting(this.interactions.sortObjectives);
+		}
+
+		if (this.interactions.sortAlternatives !== this.previousInteractions.sortAlternatives) {
+			this.previousInteractions.sortAlternatives = this.interactions.sortAlternatives;
+			// Toggle Dragging to sort objectives:
+			this.labelRenderer.toggleAlternativeSorting(this.interactions.sortAlternatives);
 		}
 
 		if (this.interactions.pumpWeights !== this.previousInteractions.pumpWeights) {
 			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
+			// Toggle the pump interaction:
 			this.labelRenderer.togglePump(this.interactions.pumpWeights);
 		}
 	}

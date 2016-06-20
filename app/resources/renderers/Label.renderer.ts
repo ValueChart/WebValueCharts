@@ -2,15 +2,16 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-19 15:28:54
+* @Last Modified time: 2016-06-20 14:23:41
 */
 
 import { Injectable } 												from '@angular/core';
 import { NgZone }													from '@angular/core';
 
-// d3
+// d3 and JQuery
 import * as d3 														from 'd3';
 import * as $														from 'jquery';
+
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
@@ -118,10 +119,10 @@ export class LabelRenderer {
 		labelData.forEach((labelDatum: VCLabelData) => {
 			if (labelDatum.subLabelData === undefined) {
 				el.select('#label-' + labelDatum.objective.getName() + '-outline')
-					.classed('label-primitive-objective-pump', true);
+					.classed('label-primitive-objective', true);
 
 				el.select('#label-' + labelDatum.objective.getName() + '-text')
-					.classed('label-primitive-objective-pump', true);
+					.classed('label-primitive-objective', true);
 				return;	
 			}
 
@@ -148,8 +149,6 @@ export class LabelRenderer {
 
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
 	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
-
-		// TODO: This is temporary. Remove soon.
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
@@ -353,8 +352,8 @@ export class LabelRenderer {
 	}
 
 	toggleObjectiveSorting(enableDragging: boolean): void {
-		var labelOutlines: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-outline')
-		var labelTexts: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-text')		
+		var labelOutlines: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-outline');
+		var labelTexts: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-text');		
 
 		if (enableDragging){
 			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
@@ -373,15 +372,29 @@ export class LabelRenderer {
 			labelOutlines.call(d3.behavior.drag());
 			labelTexts.call(d3.behavior.drag());
 		}	
-	}	
+	}
+
+	toggleAlternativeSorting(enableSorting: boolean): void {
+		var primitiveObjeciveLabels: JQuery = $('.label-primitive-objective');
+		primitiveObjeciveLabels.off('dblclick');
+
+		if (enableSorting) {
+			primitiveObjeciveLabels.dblclick((eventObject: Event) => {
+				eventObject.preventDefault();
+				var objectiveToReorderBy: PrimitiveObjective = (<any> eventObject.target).__data__.objective;
+
+				this.chartDataService.reorderCellsByScore(objectiveToReorderBy);
+			});
+		}
+	}
 
 	togglePump(pumpType: string): void {
-		var labelOutlineElements: JQuery = $('.label-primitive-objective-pump');
-		labelOutlineElements.off("click");
+		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
+		primitiveObjectiveLabels.off('click');
 		if (pumpType !== 'none') {
 			var pumpAmount: number = ((pumpType === 'increase') ? 0.02 : -0.02);
 
-			labelOutlineElements.click((eventObject: Event) => {
+			primitiveObjectiveLabels.click((eventObject: Event) => {
 				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
 				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
 				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);

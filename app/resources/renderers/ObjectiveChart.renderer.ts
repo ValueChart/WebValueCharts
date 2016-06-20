@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-18 13:32:15
+* @Last Modified time: 2016-06-20 13:25:43
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -91,13 +91,13 @@ export class ObjectiveChartRenderer {
 
 		// Create the dividing lines for the new alternatives.
 		dividingLinesContainer.selectAll('.objective-dividing-line')
-			.data(this.chartDataService.getValueChart().getAlternatives())
+			.data(this.chartDataService.alternatives)
 			.enter().append('line')
 				.classed('objective-dividing-line', true)
 				.classed('valuechart-dividing-line', true);
 
 		alternativeLabelsContainer.selectAll('.objective-alternative-label')
-			.data(this.chartDataService.getValueChart().getAlternatives())
+			.data(this.chartDataService.alternatives)
 			.enter().append('text')
 				.classed('objective-alternative-label', true);
 
@@ -125,8 +125,10 @@ export class ObjectiveChartRenderer {
 			.enter().append('rect')
 				.classed('objective-user-scores', true);
 
-		this.objectiveDomainLabels = this.cells.append('text')
-			.classed('objective-domain-label', true);
+		this.objectiveDomainLabels = this.cells.selectAll('.objective-domain-label')
+			.data((d: VCCellData) => { return [d]; })
+			.enter().append('text')
+				.classed('objective-domain-label', true);
 
 		this.userScores = this.cells.selectAll('.objective-user-scores');
 	}
@@ -137,13 +139,16 @@ export class ObjectiveChartRenderer {
 
 		var rowsToUpdate = this.rows.data(rows);
 
+		var alternativeLabelsToUpdate = this.alternativeLabels.data(this.chartDataService.alternatives);
+
 		var cellsToUpdate = rowsToUpdate.selectAll('.objective-cell')
 			.data((d: VCRowData) => { return d.cells; })
 
 		var userScoresToUpdate = cellsToUpdate.selectAll('.objective-user-scores')
 			.data((d: VCCellData, i: number) => { return d.userScores; });
 
-		this.renderObjectiveChartRows(rowOutlinesToUpdate, rowsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
+
+		this.renderObjectiveChartRows(rowOutlinesToUpdate, rowsToUpdate, alternativeLabelsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by the createObjectiveChart method.
@@ -156,12 +161,12 @@ export class ObjectiveChartRenderer {
 					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.renderConfigService.dimensionOneSize, 0);	// TODO: Fix this.
 			});
 
-		this.renderObjectiveChartRows(this.rowOutlines, this.rows, this.cells, this.userScores, viewOrientation);
+		this.renderObjectiveChartRows(this.rowOutlines, this.rows, this.alternativeLabels, this.cells, this.userScores, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by createObjectiveRows. Unlike in the summary chart we directly position the row
 	// containers here because the positions of the scores (and therefore row containers) is are absolute since the bar charts are not stacked. 
-	renderObjectiveChartRows(rowOutlines: d3.Selection<any>, rows: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
+	renderObjectiveChartRows(rowOutlines: d3.Selection<any>, rows: d3.Selection<any>, alternativeLabels: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		rowOutlines
 			.attr('transform', (d: VCRowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.renderConfigService.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
@@ -186,7 +191,7 @@ export class ObjectiveChartRenderer {
 		var alternativeLabelCoordOneOffset: number = ((viewOrientation === 'vertical') ? 20 : 40);
 		var alternativeLabelCoordTwoOffset: number = 20;
 
-		this.alternativeLabels
+		alternativeLabels
 			.text((d: Alternative) => { return d.getName(); })
 			.attr(this.renderConfigService.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i) + alternativeLabelCoordOneOffset; })
 			.attr(this.renderConfigService.coordinateTwo, () => {
@@ -208,13 +213,14 @@ export class ObjectiveChartRenderer {
 
 		var domainLabelCoord: number = 5;
 
-		this.objectiveDomainLabels
-			.text((d: VCCellData, i: number) => { return d.value })
-			.attr(this.renderConfigService.coordinateOne, (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / 3)
-			.attr(this.renderConfigService.coordinateTwo, (d: VCCellData, i: number) => {
-				var weight: number = this.chartDataService.weightMap.getObjectiveWeight(d.userScores[0].objective.getName());
-				return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoScale(weight) - domainLabelCoord : domainLabelCoord;
-			});
+		cells.selectAll('.objective-domain-label')
+			.data((d: VCCellData) => { return [d]; })
+				.text((d: VCCellData, i: number) => { return d.value })
+				.attr(this.renderConfigService.coordinateOne, (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / 3)
+				.attr(this.renderConfigService.coordinateTwo, (d: VCCellData, i: number) => {
+					var weight: number = this.chartDataService.weightMap.getObjectiveWeight(d.userScores[0].objective.getName());
+					return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoScale(weight) - domainLabelCoord : domainLabelCoord;
+				});
 
 		this.toggleDomainLabels();
 

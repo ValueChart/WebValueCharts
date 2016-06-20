@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 20:36:48
+* @Last Modified time: 2016-06-20 14:16:03
 */
 
 import { Component }				from '@angular/core';
@@ -35,6 +35,7 @@ export class ValueChartViewerComponent implements OnInit {
 	displayScoreFunctionValueLabels: boolean;
 
 	sortObjectives: boolean;
+	sortAlternatives: boolean;
 	pumpWeights: string;
 	
 	constructor(private chartDataService: ChartDataService) { }
@@ -48,8 +49,9 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayDomainValues = false;
 		this.displayScoreFunctionValueLabels = false;
 
-		this.pumpWeights = this.PUMPOFF;
 		this.sortObjectives = false;
+		this.sortAlternatives = false;
+		this.pumpWeights = this.PUMPOFF;
 	}
 
 	setOrientation(viewOrientation: string): void{
@@ -83,13 +85,21 @@ export class ValueChartViewerComponent implements OnInit {
 		// TODO: Implement Editing of Preference Model.
 	}
 
-	toggleSort(newVal: boolean): void {
+	toggleSortObjectives(newVal: boolean): void {
 		this.sortObjectives = newVal;
+		this.sortAlternatives = false;
+		this.pumpWeights = 'none';
+	}
+
+	toggleSortAlternatives(newVal: boolean): void {
+		this.sortAlternatives = newVal;
+		this.sortObjectives = false;
 		this.pumpWeights = 'none';
 	}
 
 	setPumpType(pumpType: string): void {
 		this.pumpWeights = (this.pumpWeights === pumpType) ? 'none' : pumpType; 
+		this.sortAlternatives = false;
 		this.sortObjectives = false;
 	}
 

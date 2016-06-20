@@ -11,14 +11,17 @@
 			</div>
 			<div class='col-xs-4'> 
 				<div class="form-group">
-					<button class="btn btn-default" (click)="toggleSort(!sortObjectives)">Sort Objectives
-						<span *ngIf="sortObjectives" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+					<button class="btn btn-default" [class.active]="sortObjectives" (click)="toggleSortObjectives(!sortObjectives)">Sort Objectives
+					</button>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-default" [class.active]="sortAlternatives" (click)="toggleSortAlternatives(!sortAlternatives)">Sort Alternatives
 					</button>
 				</div>
 				<div class="form-group">
 					<div class="dropdown">	
 						<button class="btn btn-default dropdown-toggle" type="button" id="pump-dropdown" data-toggle="dropdown" 
-						aria-haspopup="true" aria-expanded="true">
+						aria-haspopup="true" aria-expanded="true" [class.active]="pumpWeights !== 'none'">
 							Pump
 							<span class="caret"></span>
 						</button>
@@ -117,6 +120,7 @@
 			[displayTotalScores]="displayTotalScores"
 			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
 			[sortObjectives]="sortObjectives"
+			[sortAlternatives]="sortAlternatives"
 			[pumpWeights]="pumpWeights">
 		</ValueChart>
 	</div>

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-19 16:27:48
+* @Last Modified time: 2016-06-20 13:25:41
 */
 
 import { Injectable } 												from '@angular/core';
@@ -87,7 +87,7 @@ export class SummaryChartRenderer {
 			.enter().append('g')
 				.classed('summary-row', true);
 
-		var alternatives: Alternative[] = this.chartDataService.getValueChart().getAlternatives();
+		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
 		// Create the lines that divide different Alternatives form each other.
 		dividingLineContainer.selectAll('.summary-dividing-line')
@@ -139,7 +139,7 @@ export class SummaryChartRenderer {
 
 	updateSummaryChart(rows: VCRowData[], viewOrientation: string): void {
 
-		var alternatives: Alternative[] = this.chartDataService.getValueChart().getAlternatives();
+		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
 		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.summary-cell')
 			.data((d: VCRowData) => { return d.cells; })
