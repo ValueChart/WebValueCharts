@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-19 16:39:41
+* @Last Modified time: 2016-06-20 10:07:53
 */
 
 import { Injectable } 					from '@angular/core';
@@ -258,7 +258,7 @@ export class ChartDataService {
 		var children: VCLabelData[] = labelDatum.subLabelData;
 		var childrenWeightTotal: number = 0;
 		var nonZeroChildren: number = 0;
-		
+
 		children.forEach((child:VCLabelData) => {
 			if (child.weight !== 0) {
 				childrenWeightTotal += child.weight;
@@ -266,12 +266,15 @@ export class ChartDataService {
 			}
 		});
 
-		if (nonZeroChildren)
+		if (nonZeroChildren && weightIncrement < 0) {
 			weightIncrement = weightIncrement / nonZeroChildren;
+		} else {
+			weightIncrement = weightIncrement / children.length;
+		}
 
 		children.forEach((child: VCLabelData) => {
 			let childMax: number = maxWeight;
-			if (childrenWeightTotal !== 0) {
+			if (childrenWeightTotal !== 0 && child.weight !== 0) {
 				childMax = maxWeight * (child.weight / childrenWeightTotal);
 			}
 
