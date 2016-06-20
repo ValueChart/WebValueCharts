@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:16:03
+* @Last Modified time: 2016-06-20 14:37:28
 */
 
 import { Component }				from '@angular/core';
@@ -10,7 +10,7 @@ import { OnInit }					from '@angular/core';
 
 // Application classes
 import { ValueChartDirective }		from '../../directives/ValueChart.directive';
-import { ChartDataService }			from '../../services/ChartData.service';
+import { CurrentUserService }		from '../../services/CurrentUser.service';
 
 // Model Classes
 import { ValueChart } 				from '../../model/ValueChart';
@@ -38,10 +38,10 @@ export class ValueChartViewerComponent implements OnInit {
 	sortAlternatives: boolean;
 	pumpWeights: string;
 	
-	constructor(private chartDataService: ChartDataService) { }
+	constructor(private currentUserService: CurrentUserService) { }
 
 	ngOnInit() {
-		this.valueChart = this.chartDataService.getValueChart();
+		this.valueChart = this.currentUserService.getValueChart();
 		this.orientation = 'vertical';
 		this.displayScoreFunctions = true;
 		this.displayTotalScores = true;

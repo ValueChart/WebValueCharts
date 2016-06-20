@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:23:39
+* @Last Modified time: 2016-06-20 14:43:07
 */
 
 
@@ -34,6 +34,7 @@ import { ScoreFunction }														from '../model/ScoreFunction';
 	selector: 'ValueChart',
 	inputs: ['data', 'orientation'],
 	providers: [
+		ChartDataService,
 		RenderConfigService,
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
@@ -153,29 +154,33 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewportWidth = 1700;
 		this.viewportHeight = 850;
 
-		// Configure the orientation options depending on the 
-		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+		// Configure the Chart Data Service: 
+		this.chartDataService.setValueChart(this.valueChart);
 
-		this.previousOrientation = this.viewOrientation;
-
-		// Create the SVG base element, and set it to dynamically fit to the viewport.
-		this.el = d3.select(this.elementRef.nativeElement).append('svg')
-			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
-			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
-			.attr('preserveAspectRatio', 'xMinYMin meet');
-
-		// Get objective data in a format that suits d3.
 		this.dataRows = this.chartDataService.getRowData(this.valueChart);
-
 		this.dataRows = this.chartDataService.calculateWeightOffsets(this.dataRows);
 		this.dataRows = this.chartDataService.calculateStackedBarOffsets(this.dataRows, this.viewOrientation);
 		this.chartDataService.rows = this.dataRows;
 
 		this.labelData = this.chartDataService.getLabelData(this.valueChart);
 		this.chartDataService.labelData = this.labelData;
+
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
-		// Render the ValueChart;
+
+
+		// Configure the Render Service:
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+
+
+		// Create the SVG base element, and set it to dynamically fit to the viewport:
+		this.el = d3.select(this.elementRef.nativeElement).append('svg')
+			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
+			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
+			.attr('preserveAspectRatio', 'xMinYMin meet');
+
+
+		// Render the ValueChart:
 		this.labelRenderer.createLabelSpace(this.el, this.labelData, this.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.primitiveObjectives);
 
@@ -185,14 +190,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.createSummaryChart(this.el, this.dataRows);
 		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
 
+		// Initialize Change Detection:
 		this.initChangeDetection();
 
+		// ValueChart Setup is complete:
 		this.isInitialized = true;	
 	}
 
 	initChangeDetection(): void {
 		// Create Differs for the pieces of the ValueChart:
-
 		this.valueChartDiffer = this.differs.find({}).create(null);
 		this.userDiffer = this.differs.find({}).create(null);
 		this.weightMapDiffer = this.differs.find({}).create(null);
@@ -213,6 +219,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		});
 
 		// View Configuration
+
+		this.previousOrientation = this.viewOrientation;
 
 		this.renderConfigService.previousViewConfiguration.displayScoreFunctions			= this.renderConfigService.viewConfiguration.displayScoreFunctions;
 		this.renderConfigService.previousViewConfiguration.displayDomainValues 				= this.renderConfigService.viewConfiguration.displayDomainValues;

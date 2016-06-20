@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 20:11:31
+* @Last Modified time: 2016-06-20 14:38:20
 */
 
 import { Component }				from '@angular/core';
@@ -11,7 +11,8 @@ import { Router }				from '@angular/router';
 // Application classes:
 import { XMLValueChartParser } 		from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }		from '../../directives/ValueChart.directive';
-import { ChartDataService }			from '../../services/ChartData.service';
+import { CurrentUserService }			from '../../services/CurrentUser.service';
+
 // Model Classes
 import { IndividualValueChart } 	from '../../model/IndividualValueChart';
 
@@ -25,7 +26,7 @@ export class CreateComponent {
 	constructor(
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
-		private chartDataService: ChartDataService) {	}
+		private currentUserService: CurrentUserService) {	}
 
 	uploadValueChart(event: Event) {
 		var xmlFile: File = (<HTMLInputElement> event.target).files[0];
@@ -34,7 +35,7 @@ export class CreateComponent {
 		reader.onload = (fileReaderEvent: ProgressEvent) => {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
-				this.chartDataService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
+				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
 				this.router.navigate(['/view/ValueChart']); 
 			}
 		};

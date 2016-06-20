@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 18:37:49
+* @Last Modified time: 2016-06-20 14:38:32
 */
 
 import { Component } 										from '@angular/core';
@@ -27,7 +27,6 @@ import { CurrentUserService }								from '../../services/CurrentUser.service';
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
 				ViewContainerRef,
-				ChartDataService,
 				CurrentUserService]
 })
 @Routes([

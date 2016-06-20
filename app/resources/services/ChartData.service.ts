@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 13:59:43
+* @Last Modified time: 2016-06-20 14:49:44
 */
 
 import { Injectable } 					from '@angular/core';
@@ -49,6 +49,10 @@ export interface VCLabelData {
 	subLabelData?: VCLabelData[]
 }
 
+// This class serves two purposes:
+// 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
+//			this state as a way of initiating change detection in ValueChartDirective, thus trigging re-rendering. 
+//		2. It contains methods for converting a ValueChartDirective's ValueChart into a format suitable for d3, and for updating this data in response to user actions.
 
 @Injectable()
 export class ChartDataService {
@@ -66,8 +70,7 @@ export class ChartDataService {
 
 	constructor() { }
 
-	// Methods for formatting data for rendering using d3
-
+	// Initialize Service fields based on the passed in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
 		this.valueChart = valueChart;
 
