@@ -2,11 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:37:28
+* @Last Modified time: 2016-06-20 16:56:17
 */
 
 import { Component }				from '@angular/core';
 import { OnInit }					from '@angular/core';
+
+// JQuery
+import * as $														from 'jquery';
 
 // Application classes
 import { ValueChartDirective }		from '../../directives/ValueChart.directive';
@@ -37,6 +40,8 @@ export class ValueChartViewerComponent implements OnInit {
 	sortObjectives: boolean;
 	sortAlternatives: boolean;
 	pumpWeights: string;
+
+	$: JQueryStatic;
 	
 	constructor(private currentUserService: CurrentUserService) { }
 
@@ -52,7 +57,24 @@ export class ValueChartViewerComponent implements OnInit {
 		this.sortObjectives = false;
 		this.sortAlternatives = false;
 		this.pumpWeights = this.PUMPOFF;
+
+		this.$ = $;
+
+		$(window).resize((eventObjective: Event) => {
+			// When the window is resized, set the height of the detail box to be 90% of the height of summary chart.
+			$('#alternative-detail-box')[0].style.height = ($('.summary-outline')[0].getBoundingClientRect().height * 0.9) + 'px';
+		});
 	}
+
+	// Detail Box:
+
+	expandAlternative(): void {
+		console.log('expanding an alternative');
+	}
+
+
+
+	// Configuration Options:
 
 	setOrientation(viewOrientation: string): void{
 		this.orientation = viewOrientation;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 20:10:28
+* @Last Modified time: 2016-06-20 16:02:12
 */
 
 /* Global Styles */
@@ -79,7 +79,7 @@
 /* ValueChart Viewer Styles */
 
 .valuechart-toolbar {
-    z-index: 100;
+    z-index: 10;
     position: relative;
     top: 6.5rem;
 }
@@ -93,6 +93,20 @@
     fill: none;
     stroke-width: 1.5px;
     stroke: #000;
+}
+
+.detail-box {
+    position: absolute !important;
+    top: 10%;
+    z-index: 11;
+}
+
+.detail-box-vertical {
+    left: 10%
+}
+
+.detail-box-horizontal {
+    left: 55%;
 }
 
 

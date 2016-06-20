@@ -110,6 +110,20 @@
 			</div>
 		</form>
 	</div>
+	<div id="detail-box" class="detail-box col-xs-5"
+		[class.detail-box-horizontal]="orientation === 'horizontal'" 
+		[class.detail-box-vertical]="orientation === 'vertical'">
+		<div class="page-header">
+		  <h4>Alternatives</h4>
+		</div>
+		<div class="well well-lg" id="alternative-detail-box" [style.height.px]="$('.summary-outline')[0].getBoundingClientRect().height * 0.9"> 
+			<div *ngFor="let alternative of valueChart.getAlternatives()">
+				<a href="javascript:void(0)" (click)="expandAlternative()">
+					{{alternative.getName()}}
+				</a>
+			</div>
+		</div>
+	</div>
 	<div >
 		<ValueChart 
 			[data]="valueChart" 
