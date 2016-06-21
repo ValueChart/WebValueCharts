@@ -2,11 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-<<<<<<< e3ce95e43af878580ac692fe03af75398cead44a
-* @Last Modified time: 2016-06-18 13:44:57
-=======
-* @Last Modified time: 2016-06-10 14:58:37
->>>>>>> Set up ValueFunctionRenderer and its child classed to render both horizontally and vertically.
+* @Last Modified time: 2016-06-21 16:15:31
 */
 
 import { Injectable } 					from '@angular/core';
@@ -19,6 +15,7 @@ import * as d3 							from 'd3';
 // Application Classes
 import { ChartDataService }				from '../services/ChartData.service';
 import { ScoreFunctionRenderer }		from './ScoreFunction.renderer';
+import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
 
 
 // Model Classes
@@ -42,8 +39,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	private heightScale: any;
 
-	constructor(chartDataService: ChartDataService, private ngZone: NgZone) {
-		super(chartDataService);
+	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
+		super(chartDataService, chartUndoRedoService);
 	}
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
@@ -156,9 +153,16 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo + '2', (d: (string | number), i: number) => { return calculatePointCoordinateTwo(domainElements[i + 1]); });
 
 
+		var dragToResizeScores = d3.behavior.drag();
+
+		this.plottedPoints.call(dragToResizeScores.on('dragstart', (d: any, i: number) => {
+			// Save the current state of the ScoreFunction.
+			this.chartUndoRedoService.saveScoreFunctionState(scoreFunction, objective);
+		}));
+
 		// Assign the callback function for when the points are dragged. Note that this must be done inside a anonymous function because we require
 		// access to the scope defined by the renderContinuousPlot method.
-		this.plottedPoints.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
+		this.plottedPoints.call(dragToResizeScores.on('drag', (d: any, i: number) => {
 			var score: number;
 			// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 			if (viewOrientation === 'vertical') {

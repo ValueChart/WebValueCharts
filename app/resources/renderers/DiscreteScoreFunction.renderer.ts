@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-18 13:44:50
+* @Last Modified time: 2016-06-21 15:10:50
 */
 
 import { Injectable } 					from '@angular/core';
@@ -12,6 +12,7 @@ import * as d3 							from 'd3';
 
 // Application Classes
 import { ChartDataService }				from '../services/ChartData.service';
+import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }		from './ScoreFunction.renderer';
 
 // Model Classes
@@ -38,8 +39,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	private heightScale: any;
 	private domainElements: any;
 
-	constructor(chartDataService: ChartDataService, private ngZone: NgZone) {
-		super(chartDataService);
+	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
+		super(chartDataService, chartUndoRedoService);
 	}
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
@@ -150,10 +151,18 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			});
 
+		var dragToChangeScore = d3.behavior.drag();
+
+		// Save the old ScoreFunction 
+		this.barTops.call(dragToChangeScore.on('dragstart', (d: any, i: number) => {
+			// Save the current state of the ScoreFunction.
+			this.chartUndoRedoService.saveScoreFunctionState(scoreFunction, objective);
+		}));
+
 		
 		// Assign the callback function for when the bar tops are dragged. Note that this must be done inside a anonymous function because we require
 		// access to the scope defined by the renderDiscretePlot method.
-		this.barTops.call(d3.behavior.drag().on('drag', (d: any, i: number) => {
+		this.barTops.call(dragToChangeScore.on('drag', (d: any, i: number) => {
 
 			var score: number;
 			// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:

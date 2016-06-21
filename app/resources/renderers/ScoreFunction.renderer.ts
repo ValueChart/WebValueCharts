@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-15 11:56:32
+* @Last Modified time: 2016-06-21 14:18:16
 */
 
 import { Injectable } 					from '@angular/core';
@@ -12,6 +12,7 @@ import * as d3 							from 'd3';
 
 // Application Classes
 import { ChartDataService }				from '../services/ChartData.service';
+import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
 
 
 // Model Classes
@@ -55,7 +56,7 @@ export abstract class ScoreFunctionRenderer {
 	protected objective: PrimitiveObjective;
 
 
-	constructor(protected chartDataService: ChartDataService) { }
+	constructor(protected chartDataService: ChartDataService, protected chartUndoRedoService: ChartUndoRedoService) { }
 
 	// This function creates the base containers and elements for a score function plot.s
 	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective): void {

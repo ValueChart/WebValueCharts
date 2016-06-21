@@ -2,29 +2,43 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 11:59:00
+* @Last Modified time: 2016-06-21 15:47:31
 */
 
-import { Component }				from '@angular/core';
-import { OnInit }					from '@angular/core';
+import { Component }															from '@angular/core';
+import { OnInit }																from '@angular/core';
 
 // JQuery
-import * as $						from 'jquery';
+import * as $																	from 'jquery';
 
 // Application classes
-import { ValueChartDirective }		from '../../directives/ValueChart.directive';
-import { CurrentUserService }		from '../../services/CurrentUser.service';
+import { ValueChartDirective }													from '../../directives/ValueChart.directive';
+import { CurrentUserService }													from '../../services/CurrentUser.service';
+import { ChartDataService }														from '../../services/ChartData.service';
+import { RenderConfigService }													from '../../services/RenderConfig.service';
+import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
+
+import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
+import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
+import { LabelRenderer }														from '../../renderers/Label.renderer';
 
 // Model Classes
-import { ValueChart } 				from '../../model/ValueChart';
-import { Alternative } 				from '../../model/Alternative';
-import { PrimitiveObjective } 		from '../../model/PrimitiveObjective';
+import { ValueChart } 															from '../../model/ValueChart';
+import { Alternative } 															from '../../model/Alternative';
+import { PrimitiveObjective } 													from '../../model/PrimitiveObjective';
 
 
 @Component({
 	selector: 'create',
 	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
-	directives: [ValueChartDirective]
+	directives: [ValueChartDirective],
+	providers: [
+		ChartDataService,
+		RenderConfigService,
+		ChartUndoRedoService,
+		ObjectiveChartRenderer,
+		SummaryChartRenderer,
+		LabelRenderer]
 })
 export class ValueChartViewerComponent implements OnInit {
 
@@ -50,7 +64,9 @@ export class ValueChartViewerComponent implements OnInit {
 
 	$: JQueryStatic;
 	
-	constructor(private currentUserService: CurrentUserService) { }
+	constructor(
+		private currentUserService: CurrentUserService,
+		private chartUndoRedoService: ChartUndoRedoService) { }
 
 	ngOnInit() {
 		this.valueChart = this.currentUserService.getValueChart();
@@ -103,6 +119,15 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 
+	// Undo and Redo:
+
+	undoChartChange(): void {
+		this.chartUndoRedoService.undo();
+	}
+
+	redoChartChange(): void {
+		this.chartUndoRedoService.redo();
+	}
 
 	// Configuration Options:
 

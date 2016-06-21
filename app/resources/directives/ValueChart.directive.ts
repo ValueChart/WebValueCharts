@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:43:07
+* @Last Modified time: 2016-06-21 15:44:05
 */
 
 
@@ -17,6 +17,8 @@ import * as d3 																	from 'd3';
 // Application classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }					from '../services/ChartData.service';
 import { RenderConfigService }													from '../services/RenderConfig.service';
+import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
+
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
@@ -32,13 +34,7 @@ import { ScoreFunction }														from '../model/ScoreFunction';
 
 @Directive({
 	selector: 'ValueChart',
-	inputs: ['data', 'orientation'],
-	providers: [
-		ChartDataService,
-		RenderConfigService,
-		ObjectiveChartRenderer,
-		SummaryChartRenderer,
-		LabelRenderer]
+	inputs: ['data', 'orientation']
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -249,7 +245,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Check the data for changes:
 
 		this.chartDataService.setValueChart(this.valueChart);
-
 		var valueChartChanges = this.valueChartDiffer.diff(this.valueChart);
 
 		if (valueChartChanges) {
@@ -259,8 +254,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var userChanges = this.userDiffer.diff(user);
 
-		var weightMap = user.getWeightMap().getInternalWeightMap();
-		var weightMapChanges = this.weightMapDiffer.diff(weightMap);
+		var internalWeightMap = user.getWeightMap().getInternalWeightMap();
+
+		var weightMapChanges = this.weightMapDiffer.diff(internalWeightMap);
 
 		if (weightMapChanges) {
 			this.onValueChartChange();

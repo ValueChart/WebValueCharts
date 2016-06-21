@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 13:34:14
+* @Last Modified time: 2016-06-21 15:09:44
 */
 
 import { Injectable } 												from '@angular/core';
@@ -15,6 +15,8 @@ import * as $														from 'jquery';
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
@@ -54,6 +56,7 @@ export class LabelRenderer {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
+		private chartUndoRedoService: ChartUndoRedoService,
 		private ngZone: NgZone) { 
 		// Initialize the renderer that reorders objectives when a label is dragged.
 		this.reorderObejctivesRenderer = new ReorderObejctivesRenderer(this.renderConfigService, this.chartDataService, this);
@@ -273,7 +276,16 @@ export class LabelRenderer {
 				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			});
 
-		labelDividers.call(d3.behavior.drag().on('drag', this.resizeWeights));
+		var dragToResizeWeights = d3.behavior.drag();
+
+		labelDividers.call(dragToResizeWeights.on('dragstart', (d: any, i: number) => {
+			// Save the current state of the Weight Map.
+			this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
+		}));
+
+		labelDividers.call(dragToResizeWeights.on('drag', this.resizeWeights));
+
+
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -294,9 +306,9 @@ export class LabelRenderer {
 			var datum: PrimitiveObjective = el.data()[0];
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getName()] = new DiscreteScoreFunctionRenderer(this.chartDataService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getName()] = new DiscreteScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
 			else 
-				this.scoreFunctionRenderers[datum.getName()] = new ContinuousScoreFunctionRenderer(this.chartDataService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getName()] = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
 
 			this.scoreFunctionRenderers[datum.getName()].createScoreFunction(el, datum);	
 		});
@@ -393,6 +405,10 @@ export class LabelRenderer {
 		primitiveObjectiveLabels.off('click');
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
+				// Save the current state of the Weight Map.
+				this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
+
+				// Calculate the correct weight increment.
 				var totalWeight: number = this.chartDataService.weightMap.getWeightTotal();
 				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
 				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());

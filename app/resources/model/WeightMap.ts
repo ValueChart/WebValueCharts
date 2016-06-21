@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:44
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 14:47:37
+* @Last Modified time: 2016-06-21 15:02:26
 */
 
 import { PrimitiveObjective } 			from './PrimitiveObjective';
@@ -20,6 +20,10 @@ export class WeightMap {
 
 	getInternalWeightMap(): Map<string, number> {
 		return this.weights;
+	}
+
+	setInternalWeightMap(newMap: Map<string, number>): void {
+		this.weights = newMap;
 	}
 
 	getObjectiveWeight(objectiveName: string): number {

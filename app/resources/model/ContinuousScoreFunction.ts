@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 14:38:22
+* @Last Modified time: 2016-06-21 14:33:18
 */
 
 import { ScoreFunction } 		from './ScoreFunction';
@@ -34,6 +34,10 @@ export class ContinuousScoreFunction implements ScoreFunction {
 	getElementScoreMap(): Map<number, number> {
 		return this.elementScoreMap;
 	}
+
+	setElementScoreMap(newMap: Map<number, number>): void {
+		this.elementScoreMap = newMap;
+	} 
 	
 	setElementScore(domainElement: number, score: number): void {
 		this.elementScoreMap.set(domainElement, score);

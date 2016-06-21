@@ -3,19 +3,25 @@
 		<form class="form-inline col-xs-12">
 			<div class="col-xs-4">
 				<div class="form-group">
-					<button class="btn btn-default" (click)="editObjectiveModel()">Edit Objective Model</button>
+					<button class="btn btn-default" (click)="editObjectiveModel()">
+						Edit Objective Model
+					</button>
 				</div>
 				<div class="form-group">
-					<button class="btn btn-default" (click)="editPreferenceModel()">Edit Preference Model</button>
+					<button class="btn btn-default" (click)="editPreferenceModel()">
+						Edit Preference Model
+					</button>
 				</div>
 			</div>
 			<div class='col-xs-4'> 
 				<div class="form-group">
-					<button class="btn btn-default" [class.active]="sortObjectives" (click)="toggleSortObjectives(!sortObjectives)">Sort Objectives
+					<button class="btn btn-default" [class.active]="sortObjectives" (click)="toggleSortObjectives(!sortObjectives)">
+						Sort Objectives
 					</button>
 				</div>
 				<div class="form-group">
-					<button class="btn btn-default" [class.active]="sortAlternatives" (click)="toggleSortAlternatives(!sortAlternatives)">Sort Alternatives
+					<button class="btn btn-default" [class.active]="sortAlternatives" (click)="toggleSortAlternatives(!sortAlternatives)">
+						Sort Alternatives
 					</button>
 				</div>
 				<div class="form-group">
@@ -106,6 +112,20 @@
 						    </li>
 						 </ul>
 					</div>
+				</div>
+			</div>
+		</form>
+		<form class="form-inline col-xs-12">
+			<div class='col-xs-offset-4 col-xs-4'> 
+				<div class="form-group">
+					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canUndo()" (click)="undoChartChange()">
+						Undo
+					</button>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canRedo()" (click)="redoChartChange()">
+						Redo
+					</button>
 				</div>
 			</div>
 		</form>
