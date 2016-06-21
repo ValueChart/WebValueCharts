@@ -110,21 +110,39 @@
 			</div>
 		</form>
 	</div>
-	<div id="detail-box" class="detail-box col-xs-5"
+	<div id="detail-box" class="detail-box"
 		[class.detail-box-horizontal]="orientation === 'horizontal'" 
 		[class.detail-box-vertical]="orientation === 'vertical'">
 		<div class="page-header">
-		  <h4>Alternatives</h4>
+		  <h4>{{detailBoxHeader}}</h4>
 		</div>
-		<div class="well well-lg" id="alternative-detail-box" [style.height.px]="$('.summary-outline')[0].getBoundingClientRect().height * 0.9"> 
+		<div class="well well-lg" id="alternative-detail-box" [style.height.px]="$('.summary-outline')[0].getBoundingClientRect().height - 50"
+			[style.width.px]="$('.summary-outline')[0].getBoundingClientRect().width - 25"> 
 			<div *ngFor="let alternative of valueChart.getAlternatives()">
-				<a href="javascript:void(0)" (click)="expandAlternative()">
-					{{alternative.getName()}}
-				</a>
+				<div class="col-sm-12"> 
+					<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxHeader === 'Alternatives'">
+						{{alternative.getName()}}
+					</a>
+				</div>
+				<div *ngIf="detailBoxHeader === alternative.getName()">
+					<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
+						<div>
+							<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
+							<span class="col-xl-8 col-md-7">{{value}}</span>
+						</div>
+					</div>
+					<div> 
+						<span class="col-xl-4 col-md-5"><b>Description</b></span>
+						<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
+					</div>
+				</div>
+			</div>
+			<div>
+				<button class="btn btn-default" (click)="collapseAlternative()" *ngIf="detailBoxHeader !== 'Alternatives'">Back</button>
 			</div>
 		</div>
 	</div>
-	<div >
+	<div>
 		<ValueChart 
 			[data]="valueChart" 
 			[orientation]="orientation" 
