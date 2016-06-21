@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:23:41
+* @Last Modified time: 2016-06-21 13:34:14
 */
 
 import { Injectable } 												from '@angular/core';
@@ -252,7 +252,7 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 100) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
@@ -392,11 +392,14 @@ export class LabelRenderer {
 		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
 		primitiveObjectiveLabels.off('click');
 		if (pumpType !== 'none') {
-			var pumpAmount: number = ((pumpType === 'increase') ? 0.02 : -0.02);
-
 			primitiveObjectiveLabels.click((eventObject: Event) => {
+				var totalWeight: number = this.chartDataService.weightMap.getWeightTotal();
 				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
 				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
+				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
+				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
+
+
 				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
 		}
