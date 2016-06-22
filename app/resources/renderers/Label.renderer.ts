@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 15:09:44
+* @Last Modified time: 2016-06-22 09:51:34
 */
 
 import { Injectable } 												from '@angular/core';
@@ -415,6 +415,9 @@ export class LabelRenderer {
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
+				if (previousWeight + pumpAmount < 0) {
+					pumpAmount = 0 - previousWeight;
+				}
 
 				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
