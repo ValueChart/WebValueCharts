@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:44
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 15:02:26
+* @Last Modified time: 2016-06-22 10:17:02
 */
 
+import { Memento }						from './Memento'; 
 import { PrimitiveObjective } 			from './PrimitiveObjective';
 
 
-export class WeightMap {
+export class WeightMap implements Memento {
 
 	private weights: Map<string, number>;
 	private weightTotal: number;
@@ -87,6 +88,26 @@ export class WeightMap {
 		}
 
 		return normalizedWeights;
+	}
+
+	getMemento(): WeightMap {
+		// Create a new WeightMap object.
+		var weightMapCopy: WeightMap = new WeightMap();
+		// COpy over all the properties from the WeightMap that is being saved.
+		Object.assign(weightMapCopy, this);
+		// Create a new internal map object.
+		var internalMapCopy = new Map<string, number>();
+
+		// Copy the internal map values we want to save to the new internal map.
+		this.getInternalWeightMap().forEach((value: number, key: string) => {
+			internalMapCopy.set(key, value);
+		});
+
+		// Set the internal map of the WeightMap to the copy we just made. This is important, as otherwise the internal map in the new WeightMap will be
+		// a reference to the internal map in the in-use WeightMap. This means that any further changes could overwrite our saved copy.
+		weightMapCopy.setInternalWeightMap(internalMapCopy);
+
+		return weightMapCopy;
 	}
 
 }

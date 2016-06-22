@@ -2,9 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 14:33:18
+* @Last Modified time: 2016-06-22 10:11:49
 */
 
+import { Memento }				from './Memento';
 import { ScoreFunction } 		from './ScoreFunction';
 
 
@@ -13,31 +14,23 @@ interface InterpolationStrategy {
 }
 
 
-export class ContinuousScoreFunction implements ScoreFunction {
+export class ContinuousScoreFunction extends ScoreFunction {
 
 	public type: string;
 	private maxDomainValue: number;
 	private minDomainValue: number;
-	private elementScoreMap: Map<number, number>;
 	private interpolationStrategy: InterpolationStrategy;
 
 	constructor(minDomainValue?: number, maxDomainValue?: number) {
+		super();
+
 		this.type = 'continuous';
 		
 		this.minDomainValue = minDomainValue;
 		this.maxDomainValue = maxDomainValue;
-		this.elementScoreMap = new Map<number, number>();
-		
+
 		this.interpolationStrategy = ContinuousScoreFunction.linearInterpolation;
 	}
-
-	getElementScoreMap(): Map<number, number> {
-		return this.elementScoreMap;
-	}
-
-	setElementScoreMap(newMap: Map<number, number>): void {
-		this.elementScoreMap = newMap;
-	} 
 	
 	setElementScore(domainElement: number, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
@@ -45,10 +38,6 @@ export class ContinuousScoreFunction implements ScoreFunction {
 			this.maxDomainValue = domainElement;
 		if (domainElement < this.minDomainValue || this.minDomainValue === undefined)
 			this.minDomainValue = domainElement;
-	}
-
-	removeElement(domainElement: number): void {
-		this.elementScoreMap.delete(domainElement);
 	}
 
 	getScore(domainElement: number): number {
@@ -60,8 +49,8 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		var aboveElement: number = this.maxDomainValue;
 		var belowElement: number = this.minDomainValue;
 
-		var elementIterator: Iterator<number> = this.elementScoreMap.keys();
-		var iteratorElement: IteratorResult<number> = elementIterator.next();
+		var elementIterator: Iterator<number | string> = this.elementScoreMap.keys();
+		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
 
 		while (iteratorElement.done === false) {
 
@@ -69,10 +58,10 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		// into the value function it is assumed that there is a specific function defined between them. Is this assumption wrong?
 		// I believe that this works well for Linear Functions, but maybe not for more complex functions?
 			if (iteratorElement.value > belowElement && iteratorElement.value < domainElement) {
-				belowElement = iteratorElement.value;
+				belowElement = <number> +iteratorElement.value;
 			}
 			if (iteratorElement.value < aboveElement && iteratorElement.value > domainElement) {
-				aboveElement = iteratorElement.value;
+				aboveElement = <number> +iteratorElement.value;
 			}
 			iteratorElement = elementIterator.next();
 		}
@@ -98,6 +87,29 @@ export class ContinuousScoreFunction implements ScoreFunction {
 		var offset = start.score - (slope * start.element);
 
 		return (slope * elementToInterpolate) + offset;
+	}
+
+	getMemento(): ContinuousScoreFunction {
+		var scoreFunctionCopy: ContinuousScoreFunction;
+
+		// Create a new ScoreFunction object
+		scoreFunctionCopy = new ContinuousScoreFunction();
+		// Copy over the properties from the ScoreFunction that is being saved.
+		Object.assign(scoreFunctionCopy, this);
+
+		// Create a new internal map object.
+		var internalMapCopy = new Map<number, number>();
+
+		// Copy the internal map values we want to save to the new internal map.
+		this.getElementScoreMap().forEach((value: number, key: number) => {
+			internalMapCopy.set(key, value);
+		});
+
+		// Set the internal map to be the copy we just made. This is important, as otherwise the internal map in the new ScoreFunction will be
+		// a reference to the internal map in the in-use ScoreFunction. This means that any further changes could overwrite our saved copy.
+		scoreFunctionCopy.setElementScoreMap(internalMapCopy);
+
+		return scoreFunctionCopy;
 	}
 
 

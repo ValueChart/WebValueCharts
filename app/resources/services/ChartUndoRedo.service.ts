@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 16:16:43
+* @Last Modified time: 2016-06-22 10:13:18
 */
 
 
@@ -59,7 +59,7 @@ export class ChartUndoRedoService {
 		// Record the type of change has been made.
 		this.undoChanges.push(this.SCORE_FUNCTION_CHANGE);
 
-		var scoreFunctionCopy: ScoreFunction = this.copyScoreFunction(scoreFunction);
+		var scoreFunctionCopy: ScoreFunction = scoreFunction.getMemento();
 
 		// Save the copy that was just created, along with the name of the objective that it maps to.
 		this.undoScoreFunctionStates.push({ 'scoreFunction': scoreFunctionCopy, 'objectiveName': objective.getName() });
@@ -71,7 +71,7 @@ export class ChartUndoRedoService {
 		// Record the type of change that has been made.
 		this.undoChanges.push(this.WEIGHT_MAP_CHANGE);
 
-		var weightMapCopy: WeightMap = this.copyWeightMap(weightMap);
+		var weightMapCopy: WeightMap = weightMap.getMemento();
 
 		// Save the copy that was just created.
 		this.undoWeightMapStates.push(weightMapCopy);
@@ -133,54 +133,6 @@ export class ChartUndoRedoService {
 		}
 	}
 
-	// TODO: Decide if these methods should be pushed to the Model Classes.
-
-	copyScoreFunction(scoreFunction: ScoreFunction): ScoreFunction {
-		var scoreFunctionCopy: ScoreFunction;
-
-		// Create a new ScoreFunction object
-		if (scoreFunction.type === 'discrete') {
-			scoreFunctionCopy = new DiscreteScoreFunction();
-		} else if (scoreFunction.type === 'continuous') {
-			scoreFunctionCopy = new ContinuousScoreFunction();
-		}
-		// Copy over the properties from the ScoreFunction that is being saved.
-		Object.assign(scoreFunctionCopy, scoreFunction);
-
-		// Create a new internal map object.
-		var internalMapCopy = new Map<string | number, number>();
-
-		// Copy the internal map values we want to save to the new internal map.
-		scoreFunction.getElementScoreMap().forEach((value: number, key: string | number) => {
-			internalMapCopy.set(key, value);
-		});
-
-		// Set the internal map to be the copy we just made. This is important, as otherwise the internal map in the new ScoreFunction will be
-		// a reference to the internal map in the in-use ScoreFunction. This means that any further changes could overwrite our saved copy.
-		scoreFunctionCopy.setElementScoreMap(internalMapCopy);
-
-		return scoreFunctionCopy;
-	}
-
-	copyWeightMap(weightMap: WeightMap): WeightMap {
-		// Create a new WeightMap object.
-		var weightMapCopy: WeightMap = new WeightMap();
-		// COpy over all the properties from the WeightMap that is being saved.
-		Object.assign(weightMapCopy, weightMap);
-		// Create a new internal map object.
-		var internalMapCopy = new Map<string, number>();
-
-		// Copy the internal map values we want to save to the new internal map.
-		weightMap.getInternalWeightMap().forEach((value: number, key: string) => {
-			internalMapCopy.set(key, value);
-		});
-
-		// Set the internal map of the WeightMap to the copy we just made. This is important, as otherwise the internal map in the new WeightMap will be
-		// a reference to the internal map in the in-use WeightMap. This means that any further changes could overwrite our saved copy.
-		weightMapCopy.setInternalWeightMap(internalMapCopy);
-
-		return weightMapCopy;
-	}
 
 
 }
