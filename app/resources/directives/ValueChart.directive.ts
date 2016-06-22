@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 15:44:05
+* @Last Modified time: 2016-06-22 13:51:51
 */
 
 
@@ -63,6 +63,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private scoreFunctionDiffers: KeyValueDiffer[];
 	private rowsDiffer: IterableDiffer;
 	private cellsDiffer: IterableDiffer;
+
+	// Interaction Toggles
 	private interactions: any = {};
 	private previousInteractions: any = {};
 
@@ -141,6 +143,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() set pumpWeights(value: any) {
 		this.interactions.pumpWeights = <string> value;
 	}
+
+	@Input() set setObjectiveColors(value: any) {
+		this.interactions.setObjectiveColors = <string>value;
+	}
+
 
 	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
@@ -230,7 +237,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
 		this.previousInteractions.sortAlternatives = this.interactions.sortAlternatives;
 		this.previousInteractions.pumpWeights = this.interactions.pumpWeights; 
-
+		this.previousInteractions.setObjectiveColors = this.interactions.setObjectiveColors;
 	}
 
 
@@ -340,6 +347,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
 			// Toggle the pump interaction:
 			this.labelRenderer.togglePump(this.interactions.pumpWeights);
+		}
+
+		if (this.interactions.setObjectiveColors !== this.previousInteractions.setObjectiveColors) {
+			this.previousInteractions.setObjectiveColors = this.interactions.setObjectiveColors;
+			// Toggle setting objective colors:
+			this.labelRenderer.toggleSettingObjectiveColors(this.interactions.setObjectiveColors);
+		}
+
+		if (this.chartDataService.colorsHaveChanged) {
+			// Objective colors have been changed
+			this.chartDataService.colorsHaveChanged = false;
+			this.onValueChartChange();
 		}
 	}
 

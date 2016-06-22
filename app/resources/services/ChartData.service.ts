@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:49:44
+* @Last Modified time: 2016-06-22 13:51:22
 */
 
 import { Injectable } 					from '@angular/core';
@@ -67,6 +67,7 @@ export class ChartDataService {
 	public rows: VCRowData[];
 	public labelData: VCLabelData[];
 
+	public colorsHaveChanged = false;
 
 	constructor() { }
 

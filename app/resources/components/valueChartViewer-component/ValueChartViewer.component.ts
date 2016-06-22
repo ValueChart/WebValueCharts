@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 15:47:31
+* @Last Modified time: 2016-06-22 10:29:33
 */
 
 import { Component }															from '@angular/core';
@@ -42,7 +42,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 })
 export class ValueChartViewerComponent implements OnInit {
 
-	private PUMPOFF: string = 'none';
+	private PUMP_OFF: string = 'none';
 
 	valueChart: ValueChart;
 
@@ -54,14 +54,18 @@ export class ValueChartViewerComponent implements OnInit {
 	displayTotalScores: boolean;
 	displayScoreFunctionValueLabels: boolean;
 
+	// ValueChart Interactions Configuration:
 	sortObjectives: boolean;
 	sortAlternatives: boolean;
 	pumpWeights: string;
+	setObjectiveColors: boolean;
 
+	// Detail Box 
 	detailBoxHeader: string;
 	alternativeObjectives: string[];
 	alternativeObjectiveValues: (string | number)[];
 
+	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
 	
 	constructor(
@@ -79,7 +83,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.sortObjectives = false;
 		this.sortAlternatives = false;
-		this.pumpWeights = this.PUMPOFF;
+		this.pumpWeights = this.PUMP_OFF;
+		this.setObjectiveColors = false;
 
 		this.detailBoxHeader = 'Alternatives';
 		this.alternativeObjectives = [];
@@ -173,18 +178,28 @@ export class ValueChartViewerComponent implements OnInit {
 		this.sortObjectives = newVal;
 		this.sortAlternatives = false;
 		this.pumpWeights = 'none';
+		this.setObjectiveColors = false;
 	}
 
 	toggleSortAlternatives(newVal: boolean): void {
 		this.sortAlternatives = newVal;
 		this.sortObjectives = false;
 		this.pumpWeights = 'none';
+		this.setObjectiveColors = false;
 	}
 
 	setPumpType(pumpType: string): void {
 		this.pumpWeights = (this.pumpWeights === pumpType) ? 'none' : pumpType; 
 		this.sortAlternatives = false;
 		this.sortObjectives = false;
+		this.setObjectiveColors = false;
+	}
+
+	toggleSetObjectiveColors(newVal: boolean): void {
+		this.setObjectiveColors = newVal;
+		this.sortAlternatives = false;
+		this.sortObjectives = false;
+		this.pumpWeights = this.PUMP_OFF;
 	}
 
 
