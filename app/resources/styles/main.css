@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 12:01:11
+* @Last Modified time: 2016-06-23 10:42:43
 */
 
 /* Global Styles */
@@ -72,7 +72,7 @@
     position: absolute;
     height: 83%;
     width: 90%;
-    top: 17%;
+    top: 15rem;
     left: 10%;
 }
 
@@ -81,7 +81,7 @@
 .valuechart-toolbar {
     z-index: 11;
     position: relative;
-    top: 6.5rem;
+    top: 3.5rem;
 }
 
 .best-score-label {
@@ -97,7 +97,7 @@
 
 .detail-box {
     position: absolute !important;
-    top: 10%;
+    top: 8rem;
     z-index: 10;
 }
 
@@ -112,6 +112,9 @@
     overflow-y: scroll;
 }
 
+.toolbar-row {
+    bottom: 3rem;
+}
 
 
 /* ValueChart SVG Styles */
