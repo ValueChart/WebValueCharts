@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 15:36:09
+* @Last Modified time: 2016-06-23 17:11:48
 */
 
-import { XMLValueChartParser } 		from '../../app/resources/services/XMLValueChartParser.service.ts';
+// Application Classes:
+import { XMLValueChartParser } 		from '../../app/resources/services/XMLValueChartParser.service';
+
+// Model Classes:
 import { IndividualValueChart }		from '../../app/resources/model/IndividualValueChart';
 import { Alternative }				from '../../app/resources/model/Alternative';
 import { User } 					from '../../app/resources/model/User';
@@ -19,12 +22,14 @@ import { ScoreFunctionMap } 		from '../../app/resources/model/ScoreFunctionMap';
 import { ContinuousScoreFunction } 	from '../../app/resources/model/ContinuousScoreFunction';
 import { DiscreteScoreFunction } 	from '../../app/resources/model/DiscreteScoreFunction';
 
+// Test Resources:
+var XMLTestString: string = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<ValueCharts problem=\"Hotel\">\n     <Colors>\n          <Color b=\"94\" g=\"102\" name=\"area\" r=\"1\"/>\n          <Color b=\"207\" g=\"169\" name=\"skytrain-distance\" r=\"103\"/>\n          <Color b=\"13\" g=\"0\" name=\"size\" r=\"103\"/>\n          <Color b=\"28\" g=\"26\" name=\"internet-access\" r=\"227\"/>\n          <Color b=\"79\" g=\"196\" name=\"rate\" r=\"254\"/>\n     </Colors>\n     <Criteria>\n          <Criterion name=\"Hotel\" type=\"abstract\">\n               <Criterion name=\"location\" type=\"abstract\">\n                    <Criterion name=\"area\" type=\"primitive\" weight=\"0.46\">\n                         <Domain type=\"discrete\">\n                              <DiscreteValue x=\"nightlife\" y=\"0.5\"/>\n                              <DiscreteValue x=\"beach\" y=\"1.0\"/>\n                              <DiscreteValue x=\"airport\" y=\"0.0\"/>\n                         </Domain>\n                         <Description name=\"area\">&lt;![CDATA[&lt;html&gt;\n                                   &lt;body&gt;\n                                   &lt;h1&gt;Area&lt;/h1&gt;\n                                   &lt;ul&gt;\n                                   &lt;li&gt;Sheraton: near nightlife&lt;/li&gt;\n                                   &lt;li&gt;Best Western: near nightlife&lt;/li&gt;\n                                   &lt;li&gt;Hyatt: on the beach&lt;/li&gt;\n                                   &lt;li&gt;Marriott: near airport&lt;/li&gt;\n                                   &lt;li&gt;Holiday Inn: near airport&lt;/li&gt;\n                                   &lt;li&gt;Ramada: on the beach&lt;/li&gt;\n                                   &lt;/ul&gt;\n                                   &lt;/body&gt;\n                                   &lt;/html&gt;]]&gt;\n                         </Description>\n                    </Criterion>\n                    <Criterion name=\"skytrain-distance\" type=\"primitive\" weight=\"0.09\">\n                         <Domain type=\"continuous\" unit=\"blocks\">\n                              <ContinuousValue x=\"1.0\" y=\"1.0\"/>\n                              <ContinuousValue x=\"3.0\" y=\"0.75\"/>\n                              <ContinuousValue x=\"5.0\" y=\"0.5\"/>\n                              <ContinuousValue x=\"7.0\" y=\"0.25\"/>\n                              <ContinuousValue x=\"9.0\" y=\"0.0\"/>\n                         </Domain>\n                         <Description name=\"skytrain-distance\">&lt;![CDATA[&lt;html&gt;\n                                   &lt;body&gt;\n                                   &lt;h1&gt;Distance to Skytrain station&lt;/h1&gt;\n                                   &lt;h3&gt;unit: blocks&lt;/h3&gt;\n                                   &lt;ul&gt;\n                                   &lt;li&gt;Sheraton: 7&lt;/li&gt;\n                                   &lt;li&gt;Best Western: 2&lt;/li&gt;\n                                   &lt;li&gt;Hyatt: 2&lt;/li&gt;\n                                   &lt;li&gt;Marriott: 9&lt;/li&gt;\n                                   &lt;li&gt;Holiday Inn: 1&lt;/li&gt;\n                                   &lt;li&gt;Ramada: 1&lt;/li&gt;\n                                   &lt;/ul&gt;\n                                   &lt;/body&gt;\n                                   &lt;/html&gt;]]&gt;\n                         </Description>\n                    </Criterion>\n               </Criterion>\n               <Criterion name=\"room\" type=\"abstract\">\n                    <Criterion name=\"size\" type=\"primitive\" weight=\"0.04\">\n                         <Domain type=\"continuous\" unit=\"sq-ft\">\n                              <ContinuousValue x=\"200.0\" y=\"0.0\"/>\n                              <ContinuousValue x=\"237.5\" y=\"0.25\"/>\n                              <ContinuousValue x=\"275.0\" y=\"0.5\"/>\n                              <ContinuousValue x=\"312.5\" y=\"0.75\"/>\n                              <ContinuousValue x=\"350.0\" y=\"1.0\"/>\n                         </Domain>\n                         <Description name=\"size\">&lt;![CDATA[&lt;html&gt;\n                                   &lt;body&gt;\n                                   &lt;h1&gt;Room size&lt;/h1&gt;\n                                   &lt;h3&gt;unit: square feet&lt;/h3&gt;\n                                   &lt;ul&gt;\n                                   &lt;li&gt;Sheraton: 350&lt;/li&gt;\n                                   &lt;li&gt;Best Western: 200&lt;/li&gt;\n                                   &lt;li&gt;Hyatt: 275&lt;/li&gt;\n                                   &lt;li&gt;Marriott: 200&lt;/li&gt;\n                                   &lt;li&gt;Holiday Inn: 237.5&lt;/li&gt;\n                                   &lt;li&gt;Ramada: 312.5&lt;/li&gt;\n                                   &lt;/ul&gt;\n                                   &lt;/body&gt;\n                                   &lt;/html&gt;]]&gt;\n                         </Description>\n                    </Criterion>\n                    <Criterion name=\"internet-access\" type=\"primitive\" weight=\"0.21\">\n                         <Domain type=\"discrete\">\n                              <DiscreteValue x=\"none\" y=\"0.0\"/>\n                              <DiscreteValue x=\"highspeed\" y=\"1.0\"/>\n                              <DiscreteValue x=\"lowspeed\" y=\"0.24500000476837158\"/>\n                         </Domain>\n                         <Description name=\"internet-access\">&lt;![CDATA[&lt;html&gt;\n                                   &lt;body&gt;\n                                   &lt;h1&gt;Internet access&lt;/h1&gt;\n                                   &lt;ul&gt;\n                                   &lt;li&gt;Sheraton: high speed (wired)&lt;/li&gt;\n                                   &lt;li&gt;Best Western: high speed (wireless)&lt;/li&gt;\n                                   &lt;li&gt;Hyatt: low speed (wireless)&lt;/li&gt;\n                                   &lt;li&gt;Marriott: low speed (wireless)&lt;/li&gt;\n                                   &lt;li&gt;Holiday Inn: none&lt;/li&gt;\n                                   &lt;li&gt;Ramada: none&lt;/li&gt;\n                                   &lt;/ul&gt;\n                                   &lt;/body&gt;\n                                   &lt;/html&gt;]]&gt;\n                         </Description>\n                    </Criterion>\n               </Criterion>\n               <Criterion name=\"rate\" type=\"primitive\" weight=\"0.2\">\n                    <Domain type=\"continuous\" unit=\"CAD\">\n                         <ContinuousValue x=\"100.0\" y=\"1.0\"/>\n                         <ContinuousValue x=\"125.0\" y=\"0.75\"/>\n                         <ContinuousValue x=\"150.0\" y=\"0.5\"/>\n                         <ContinuousValue x=\"175.0\" y=\"0.25\"/>\n                         <ContinuousValue x=\"200.0\" y=\"0.0\"/>\n                    </Domain>\n                    <Description name=\"rate\">&lt;![CDATA[&lt;html&gt;\n                              &lt;body&gt;\n                              &lt;h1&gt;Rate per night&lt;/h1&gt;\n                              &lt;h3&gt;unit: CAD&lt;/h3&gt;\n                              &lt;ul&gt;\n                              &lt;li&gt;Sheraton: 150&lt;/li&gt;\n                              &lt;li&gt;Best Western: 100&lt;/li&gt;\n                              &lt;li&gt;Hyatt: 200&lt;/li&gt;\n                              &lt;li&gt;Marriott: 160&lt;/li&gt;\n                              &lt;li&gt;Holiday Inn: 100&lt;/li&gt;\n                              &lt;li&gt;Ramada: 120&lt;/li&gt;\n                              &lt;/ul&gt;\n                              &lt;/body&gt;\n                              &lt;/html&gt;]]&gt;\n                    </Description>\n               </Criterion>\n          </Criterion>\n     </Criteria>\n     <Alternatives>\n          <Alternative name=\"Sheraton\">\n               <AlternativeValue criterion=\"area\" value=\"nightlife\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"highspeed\"/>\n               <AlternativeValue criterion=\"rate\" value=\"150.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"7.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"350.0\"/>\n               <Description name=\"Sheraton\">Get a good night's sleep with premium bedding, a down duvet, and blackout drapes/curtains. The 32-inch TV offers pay movies. Request an in-room massage. A coffee/tea maker is provided. You will have a shower/tub combination, as well as complimentary toiletries and a hair dryer. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>\n          </Alternative>\n          <Alternative name=\"BestWestern\">\n               <AlternativeValue criterion=\"area\" value=\"nightlife\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"highspeed\"/>\n               <AlternativeValue criterion=\"rate\" value=\"100.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"2.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"200.0\"/>\n               <Description name=\"BestWestern\">Balcony with city views. Complimentary wireless Internet access. 42-inch LCD TV. Pay movies. Coffee/tea maker. Fridge and microwave. Private bathroom. Shower/tub combination. Complimentary toiletries. Hair dryer. Safe. Desk. Complimentary newspapers. This room is Non-Smoking.</Description>\n          </Alternative>\n          <Alternative name=\"Hyatt\">\n               <AlternativeValue criterion=\"area\" value=\"beach\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"lowspeed\"/>\n               <AlternativeValue criterion=\"rate\" value=\"200.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"2.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"275.0\"/>\n               <Description name=\"Hyatt\">Wide, floor-to-ceiling windows. Desk. 42-inch flat-screen TV with cable, pay movies, and video games (surcharge). Voice mail. Upholstered armchair with ottoman. Bathrobes. Hairdryer. Designer toiletries. Shower/tub combination. Refrigerator. Video account review and check-out. Rollaway beds available.</Description>\n          </Alternative>\n          <Alternative name=\"Marriott\">\n               <AlternativeValue criterion=\"area\" value=\"airport\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"lowspeed\"/>\n               <AlternativeValue criterion=\"rate\" value=\"160.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"9.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"200.0\"/>\n               <Description name=\"Marriott\">The video-game console and TV with satellite channels are offered for your entertainment. A coffee/tea maker is provided. The private bathroom has designer toiletries. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>\n          </Alternative>\n          <Alternative name=\"HolidayInn\">\n               <AlternativeValue criterion=\"area\" value=\"airport\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"none\"/>\n               <AlternativeValue criterion=\"rate\" value=\"100.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"1.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"237.5\"/>\n               <Description name=\"HolidayInn\">The 42-inch flat-screen TV offers cable channels. A coffee/tea maker is provided. The private bathroom has a hair dryer. Air conditioning, a desk, and a wake-up call service are among the conveniences offered. This room is Non-Smoking.</Description>\n          </Alternative>\n          <Alternative name=\"Ramada\">\n               <AlternativeValue criterion=\"area\" value=\"beach\"/>\n               <AlternativeValue criterion=\"internet-access\" value=\"none\"/>\n               <AlternativeValue criterion=\"rate\" value=\"120.0\"/>\n               <AlternativeValue criterion=\"skytrain-distance\" value=\"1.0\"/>\n               <AlternativeValue criterion=\"size\" value=\"312.5\"/>\n               <Description name=\"Ramada\">1 double bed. Desk. 37-inch LCD high-definition TV. Pay movies. Phone. Voice mail. Clock radio. Coffee/tea maker. Hair dryer. Iron/ironing board. Complimentary weekday newspaper. Bathroom with granite-topped vanity. Blackout drapes/curtains. Air conditioning. Climate control</Description>\n          </Alternative>\n     </Alternatives>\n</ValueCharts>";
+
 
 declare var expect: any;
 
 
 describe('XMLValueChartParser', () => {
-
 	var valueChartParser: XMLValueChartParser;
 	var xmlDocParser: DOMParser;
 	var xmlDocument: Document;
@@ -322,190 +327,3 @@ describe('XMLValueChartParser', () => {
 	});
 
 });
-
-
-
-var XMLTestString: string = 
-
-`<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts problem="Hotel">
-     <Colors>
-          <Color b="94" g="102" name="area" r="1"/>
-          <Color b="207" g="169" name="skytrain-distance" r="103"/>
-          <Color b="13" g="0" name="size" r="103"/>
-          <Color b="28" g="26" name="internet-access" r="227"/>
-          <Color b="79" g="196" name="rate" r="254"/>
-     </Colors>
-     <Criteria>
-          <Criterion name="Hotel" type="abstract">
-               <Criterion name="location" type="abstract">
-                    <Criterion name="area" type="primitive" weight="0.46">
-                         <Domain type="discrete">
-                              <DiscreteValue x="nightlife" y="0.5"/>
-                              <DiscreteValue x="beach" y="1.0"/>
-                              <DiscreteValue x="airport" y="0.0"/>
-                         </Domain>
-                         <Description name="area">&lt;![CDATA[&lt;html&gt;
-                                   &lt;body&gt;
-                                   &lt;h1&gt;Area&lt;/h1&gt;
-                                   &lt;ul&gt;
-                                   &lt;li&gt;Sheraton: near nightlife&lt;/li&gt;
-                                   &lt;li&gt;Best Western: near nightlife&lt;/li&gt;
-                                   &lt;li&gt;Hyatt: on the beach&lt;/li&gt;
-                                   &lt;li&gt;Marriott: near airport&lt;/li&gt;
-                                   &lt;li&gt;Holiday Inn: near airport&lt;/li&gt;
-                                   &lt;li&gt;Ramada: on the beach&lt;/li&gt;
-                                   &lt;/ul&gt;
-                                   &lt;/body&gt;
-                                   &lt;/html&gt;]]&gt;
-                         </Description>
-                    </Criterion>
-                    <Criterion name="skytrain-distance" type="primitive" weight="0.09">
-                         <Domain type="continuous" unit="blocks">
-                              <ContinuousValue x="1.0" y="1.0"/>
-                              <ContinuousValue x="3.0" y="0.75"/>
-                              <ContinuousValue x="5.0" y="0.5"/>
-                              <ContinuousValue x="7.0" y="0.25"/>
-                              <ContinuousValue x="9.0" y="0.0"/>
-                         </Domain>
-                         <Description name="skytrain-distance">&lt;![CDATA[&lt;html&gt;
-                                   &lt;body&gt;
-                                   &lt;h1&gt;Distance to Skytrain station&lt;/h1&gt;
-                                   &lt;h3&gt;unit: blocks&lt;/h3&gt;
-                                   &lt;ul&gt;
-                                   &lt;li&gt;Sheraton: 7&lt;/li&gt;
-                                   &lt;li&gt;Best Western: 2&lt;/li&gt;
-                                   &lt;li&gt;Hyatt: 2&lt;/li&gt;
-                                   &lt;li&gt;Marriott: 9&lt;/li&gt;
-                                   &lt;li&gt;Holiday Inn: 1&lt;/li&gt;
-                                   &lt;li&gt;Ramada: 1&lt;/li&gt;
-                                   &lt;/ul&gt;
-                                   &lt;/body&gt;
-                                   &lt;/html&gt;]]&gt;
-                         </Description>
-                    </Criterion>
-               </Criterion>
-               <Criterion name="room" type="abstract">
-                    <Criterion name="size" type="primitive" weight="0.04">
-                         <Domain type="continuous" unit="sq-ft">
-                              <ContinuousValue x="200.0" y="0.0"/>
-                              <ContinuousValue x="237.5" y="0.25"/>
-                              <ContinuousValue x="275.0" y="0.5"/>
-                              <ContinuousValue x="312.5" y="0.75"/>
-                              <ContinuousValue x="350.0" y="1.0"/>
-                         </Domain>
-                         <Description name="size">&lt;![CDATA[&lt;html&gt;
-                                   &lt;body&gt;
-                                   &lt;h1&gt;Room size&lt;/h1&gt;
-                                   &lt;h3&gt;unit: square feet&lt;/h3&gt;
-                                   &lt;ul&gt;
-                                   &lt;li&gt;Sheraton: 350&lt;/li&gt;
-                                   &lt;li&gt;Best Western: 200&lt;/li&gt;
-                                   &lt;li&gt;Hyatt: 275&lt;/li&gt;
-                                   &lt;li&gt;Marriott: 200&lt;/li&gt;
-                                   &lt;li&gt;Holiday Inn: 237.5&lt;/li&gt;
-                                   &lt;li&gt;Ramada: 312.5&lt;/li&gt;
-                                   &lt;/ul&gt;
-                                   &lt;/body&gt;
-                                   &lt;/html&gt;]]&gt;
-                         </Description>
-                    </Criterion>
-                    <Criterion name="internet-access" type="primitive" weight="0.21">
-                         <Domain type="discrete">
-                              <DiscreteValue x="none" y="0.0"/>
-                              <DiscreteValue x="highspeed" y="1.0"/>
-                              <DiscreteValue x="lowspeed" y="0.24500000476837158"/>
-                         </Domain>
-                         <Description name="internet-access">&lt;![CDATA[&lt;html&gt;
-                                   &lt;body&gt;
-                                   &lt;h1&gt;Internet access&lt;/h1&gt;
-                                   &lt;ul&gt;
-                                   &lt;li&gt;Sheraton: high speed (wired)&lt;/li&gt;
-                                   &lt;li&gt;Best Western: high speed (wireless)&lt;/li&gt;
-                                   &lt;li&gt;Hyatt: low speed (wireless)&lt;/li&gt;
-                                   &lt;li&gt;Marriott: low speed (wireless)&lt;/li&gt;
-                                   &lt;li&gt;Holiday Inn: none&lt;/li&gt;
-                                   &lt;li&gt;Ramada: none&lt;/li&gt;
-                                   &lt;/ul&gt;
-                                   &lt;/body&gt;
-                                   &lt;/html&gt;]]&gt;
-                         </Description>
-                    </Criterion>
-               </Criterion>
-               <Criterion name="rate" type="primitive" weight="0.2">
-                    <Domain type="continuous" unit="CAD">
-                         <ContinuousValue x="100.0" y="1.0"/>
-                         <ContinuousValue x="125.0" y="0.75"/>
-                         <ContinuousValue x="150.0" y="0.5"/>
-                         <ContinuousValue x="175.0" y="0.25"/>
-                         <ContinuousValue x="200.0" y="0.0"/>
-                    </Domain>
-                    <Description name="rate">&lt;![CDATA[&lt;html&gt;
-                              &lt;body&gt;
-                              &lt;h1&gt;Rate per night&lt;/h1&gt;
-                              &lt;h3&gt;unit: CAD&lt;/h3&gt;
-                              &lt;ul&gt;
-                              &lt;li&gt;Sheraton: 150&lt;/li&gt;
-                              &lt;li&gt;Best Western: 100&lt;/li&gt;
-                              &lt;li&gt;Hyatt: 200&lt;/li&gt;
-                              &lt;li&gt;Marriott: 160&lt;/li&gt;
-                              &lt;li&gt;Holiday Inn: 100&lt;/li&gt;
-                              &lt;li&gt;Ramada: 120&lt;/li&gt;
-                              &lt;/ul&gt;
-                              &lt;/body&gt;
-                              &lt;/html&gt;]]&gt;
-                    </Description>
-               </Criterion>
-          </Criterion>
-     </Criteria>
-     <Alternatives>
-          <Alternative name="Sheraton">
-               <AlternativeValue criterion="area" value="nightlife"/>
-               <AlternativeValue criterion="internet-access" value="highspeed"/>
-               <AlternativeValue criterion="rate" value="150.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="7.0"/>
-               <AlternativeValue criterion="size" value="350.0"/>
-               <Description name="Sheraton">Get a good night's sleep with premium bedding, a down duvet, and blackout drapes/curtains. The 32-inch TV offers pay movies. Request an in-room massage. A coffee/tea maker is provided. You will have a shower/tub combination, as well as complimentary toiletries and a hair dryer. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>
-          </Alternative>
-          <Alternative name="BestWestern">
-               <AlternativeValue criterion="area" value="nightlife"/>
-               <AlternativeValue criterion="internet-access" value="highspeed"/>
-               <AlternativeValue criterion="rate" value="100.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="2.0"/>
-               <AlternativeValue criterion="size" value="200.0"/>
-               <Description name="BestWestern">Balcony with city views. Complimentary wireless Internet access. 42-inch LCD TV. Pay movies. Coffee/tea maker. Fridge and microwave. Private bathroom. Shower/tub combination. Complimentary toiletries. Hair dryer. Safe. Desk. Complimentary newspapers. This room is Non-Smoking.</Description>
-          </Alternative>
-          <Alternative name="Hyatt">
-               <AlternativeValue criterion="area" value="beach"/>
-               <AlternativeValue criterion="internet-access" value="lowspeed"/>
-               <AlternativeValue criterion="rate" value="200.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="2.0"/>
-               <AlternativeValue criterion="size" value="275.0"/>
-               <Description name="Hyatt">Wide, floor-to-ceiling windows. Desk. 42-inch flat-screen TV with cable, pay movies, and video games (surcharge). Voice mail. Upholstered armchair with ottoman. Bathrobes. Hairdryer. Designer toiletries. Shower/tub combination. Refrigerator. Video account review and check-out. Rollaway beds available.</Description>
-          </Alternative>
-          <Alternative name="Marriott">
-               <AlternativeValue criterion="area" value="airport"/>
-               <AlternativeValue criterion="internet-access" value="lowspeed"/>
-               <AlternativeValue criterion="rate" value="160.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="9.0"/>
-               <AlternativeValue criterion="size" value="200.0"/>
-               <Description name="Marriott">The video-game console and TV with satellite channels are offered for your entertainment. A coffee/tea maker is provided. The private bathroom has designer toiletries. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>
-          </Alternative>
-          <Alternative name="HolidayInn">
-               <AlternativeValue criterion="area" value="airport"/>
-               <AlternativeValue criterion="internet-access" value="none"/>
-               <AlternativeValue criterion="rate" value="100.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="1.0"/>
-               <AlternativeValue criterion="size" value="237.5"/>
-               <Description name="HolidayInn">The 42-inch flat-screen TV offers cable channels. A coffee/tea maker is provided. The private bathroom has a hair dryer. Air conditioning, a desk, and a wake-up call service are among the conveniences offered. This room is Non-Smoking.</Description>
-          </Alternative>
-          <Alternative name="Ramada">
-               <AlternativeValue criterion="area" value="beach"/>
-               <AlternativeValue criterion="internet-access" value="none"/>
-               <AlternativeValue criterion="rate" value="120.0"/>
-               <AlternativeValue criterion="skytrain-distance" value="1.0"/>
-               <AlternativeValue criterion="size" value="312.5"/>
-               <Description name="Ramada">1 double bed. Desk. 37-inch LCD high-definition TV. Pay movies. Phone. Voice mail. Clock radio. Coffee/tea maker. Hair dryer. Iron/ironing board. Complimentary weekday newspaper. Bathroom with granite-topped vanity. Blackout drapes/curtains. Air conditioning. Climate control</Description>
-          </Alternative>
-     </Alternatives>
-</ValueCharts>`

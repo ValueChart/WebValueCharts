@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 13:51:22
+* @Last Modified time: 2016-06-23 10:59:09
 */
 
 import { Injectable } 					from '@angular/core';
@@ -71,7 +71,7 @@ export class ChartDataService {
 
 	constructor() { }
 
-	// Initialize Service fields based on the passed in ValueChart.
+	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
 		this.valueChart = valueChart;
 
