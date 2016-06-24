@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 13:52:49
+* @Last Modified time: 2016-06-24 16:13:41
 */
 
 import { Component }															from '@angular/core';
@@ -228,7 +228,13 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	toggleSortAlternatives(sortType: string): void {
-		this.sortAlternatives = (this.sortAlternatives === sortType) ? this.ALTERNATIVE_SORT_OFF : sortType;
+		this.sortAlternatives = (this.sortAlternatives === sortType && (sortType === 'objective' || sortType === 'manual')) ? this.ALTERNATIVE_SORT_OFF : sortType;
+
+		if (sortType === 'alphabet' || sortType === 'reset') {
+			window.setTimeout(() => {
+				this.sortAlternatives = 'none';
+			}, 10);
+		}
 
 		// Turn off all other interactions.
 		this.reorderObjectives = false;

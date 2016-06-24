@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 14:06:08
+* @Last Modified time: 2016-06-24 16:21:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -41,11 +41,12 @@ export class SortAlternativesInteraction {
 		if (sortingType === this.SORT_BY_OBJECTIVE) {
 			this.sortAlternativesByObjective(true);
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
-
+			console.log('sorting alphabetically');
+			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderAlphabetically);
 		} else if (sortingType === this.SORT_MANUALLY) {
 
 		} else if (sortingType === this.RESET_SORT) {
-
+			this.chartDataService.resetCellOrder();
 		} else if (sortingType === this.SORT_OFF) {
 			this.sortAlternativesByObjective(false);
 		}
@@ -60,8 +61,7 @@ export class SortAlternativesInteraction {
 			primitiveObjeciveLabels.dblclick((eventObject: Event) => {
 				eventObject.preventDefault();
 				var objectiveToReorderBy: PrimitiveObjective = (<any>eventObject.target).__data__.objective;
-
-				this.chartDataService.reorderCellsByScore(objectiveToReorderBy);
+				this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderByObjectiveScore, objectiveToReorderBy);
 			});
 		}
 	}

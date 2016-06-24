@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 10:26:22
+* @Last Modified time: 2016-06-24 16:21:06
 */
 
 import { Injectable } 					from '@angular/core';
@@ -67,8 +67,7 @@ export class ChartDataService {
 	public rows: VCRowData[];
 	public labelData: VCLabelData[];
 
-	public colorsHaveChanged = false;
-
+	public colorsHaveChanged: boolean = false;
 	constructor() { }
 
 	// Initialize Service fields based on the passed-in ValueChart.
@@ -312,56 +311,70 @@ export class ChartDataService {
 		});
 	}
 
-	reorderCellsByScore(objectiveToReorderBy: PrimitiveObjective): void {
-		var reorderedRow: VCRowData;
-		var reorderedRowIndex: number;
-		var cellIndices: any = {};
+	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectiveToReorderBy: PrimitiveObjective): number[] {
+		// Generate an array of indexes according to the number of cells in each row.
+		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
 
-		for (var i = 0; i < this.rows.length; i++) {
-			if (this.rows[i].objective.getName() === objectiveToReorderBy.getName()) {
-				this.rows[i].cells.sort((a: VCCellData, b: VCCellData) => {
-					var scoreFunction = this.scoreFunctionMap.getObjectiveScoreFunction(objectiveToReorderBy.getName());
+		for (var i = 0; i < rowsToReorder.length; i++) {
+			if (rowsToReorder[i].objective.getName() === objectiveToReorderBy.getName()) {
 
-					if (scoreFunction.getScore(a.value) === scoreFunction.getScore(b.value)) {
-						return (a.alternative.getName() > b.alternative.getName()) ? -1 : 1;
-					} else if (scoreFunction.getScore(a.value) > scoreFunction.getScore(b.value)) {
-						return -1;
+				cellIndices.sort((a: number, b: number) => {
+					var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(objectiveToReorderBy.getName());
+					var aScore: number = scoreFunction.getScore(rowsToReorder[i].cells[a].value);
+					var bScore: number = scoreFunction.getScore(rowsToReorder[i].cells[b].value);
+
+					if (aScore === bScore) {
+						return 0;						// Do not change the ordering of a and b.
+					} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
+						return -1;						// a should come before b in the ordering
 					} else {
-						return 1;
+						return 1;						// b should come before a in the ordering.
 					}
 				});
-				reorderedRowIndex = i;
-				reorderedRow = this.rows[i];
-				break;	
+				return cellIndices;
 			}
 		}
+	}
 
-		reorderedRow.cells.forEach((cell: VCCellData, index: number) => {
-			cellIndices[cell.alternative.getName()] = index;
+	generateCellOrderAlphabetically(chartDataService: ChartDataService): number[] {
+		// Generate an array of indexes according to the number of cells in each row.
+		var cellIndices: number[] = d3.range(chartDataService.numAlternatives);
+
+		cellIndices.sort((a: number, b: number) => {
+
+			var aName: string = chartDataService.alternatives[a].getName().toLowerCase();
+			var bName: string = chartDataService.alternatives[b].getName().toLowerCase();
+
+			if (aName === bName) {
+				return 0;						// Do not change the ordering of a and b.
+			} else if (aName < bName) {			// The earlier the letter in the alphabet, the smaller its character code.
+				return -1;						// a should come before b in the ordering
+			} else {
+				return 1;						// b should come before a in the ordering.
+			}
 		});
 
-		var sortCells = (a: VCCellData, b: VCCellData) => {
-			if (cellIndices[a.alternative.getName()] < cellIndices[b.alternative.getName()]) {
-				return -1;
-			} else {
-				return 1;
-			}
-		}
+		return cellIndices; 
+	}
+
+	reorderAllCells(generateOrder: Function, objective?: PrimitiveObjective): void {
+		var reorderedRow: VCRowData;
+		var cellIndices: number[] = generateOrder(this, this.rows, objective);
+
 
 		this.rows.forEach((row: VCRowData, index: number) => {
-			if (index === reorderedRowIndex)
-				return;
-			row.cells.sort(sortCells);
+			row.cells = d3.permute(row.cells, cellIndices);
 		});
+		this.alternatives = d3.permute(this.alternatives, cellIndices);
+	}
 
-		this.alternatives.sort((a: Alternative, b: Alternative) => {
-			if (cellIndices[a.getName()] < cellIndices[b.getName()]) {
-				return -1;
-			} else {
-				return 1;
-			}
+	resetCellOrder(): void {
+		// Reset the alternative order to be the ordering from the ValueChart.
+		this.alternatives = this.valueChart.getAlternatives();
+		// Keep the ordering of the rows, but reset the cell order to be the ordering from the ValueChart.
+		this.rows.forEach((row: VCRowData) => {
+			row.cells = this.getCellData(this.valueChart, row.objective);
 		})
-
 	}
 
 }
