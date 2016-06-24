@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 16:21:33
+* @Last Modified time: 2016-06-24 16:29:56
 */
 
 import { Injectable } 												from '@angular/core';
@@ -18,7 +18,7 @@ import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 // Model Classes
-import { PrimitiveObjective }										from '../model/PrimitiveObjective';
+import { Objective }												from '../model/Objective';
 
 
 
@@ -54,15 +54,21 @@ export class SortAlternativesInteraction {
 	}
 
 	sortAlternativesByObjective(enableSorting: boolean): void {
-		var primitiveObjeciveLabels: JQuery = $('.label-primitive-objective');
-		primitiveObjeciveLabels.off('dblclick');
+		var objectiveLabels: JQuery = $('.label-subcontainer-outline');
+		var objectiveText: JQuery = $('.label-subcontainer-text');
+
+		objectiveLabels.off('dblclick');
+		objectiveText.off('dblclick');
+
+		var sortByObjective = (eventObject: Event) => {
+			eventObject.preventDefault();
+			var objectiveToReorderBy: Objective = (<any>eventObject.target).__data__.objective;
+			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderByObjectiveScore, objectiveToReorderBy);
+		}
 
 		if (enableSorting) {
-			primitiveObjeciveLabels.dblclick((eventObject: Event) => {
-				eventObject.preventDefault();
-				var objectiveToReorderBy: PrimitiveObjective = (<any>eventObject.target).__data__.objective;
-				this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderByObjectiveScore, objectiveToReorderBy);
-			});
+			objectiveLabels.dblclick(sortByObjective);
+			objectiveText.dblclick(sortByObjective);
 		}
 	}
 

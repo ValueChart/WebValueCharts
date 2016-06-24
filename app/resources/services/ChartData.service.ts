@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 16:21:06
+* @Last Modified time: 2016-06-24 16:59:12
 */
 
 import { Injectable } 					from '@angular/core';
@@ -311,29 +311,37 @@ export class ChartDataService {
 		});
 	}
 
-	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectiveToReorderBy: PrimitiveObjective): number[] {
+	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
+		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
-			if (rowsToReorder[i].objective.getName() === objectiveToReorderBy.getName()) {
-
-				cellIndices.sort((a: number, b: number) => {
-					var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(objectiveToReorderBy.getName());
-					var aScore: number = scoreFunction.getScore(rowsToReorder[i].cells[a].value);
-					var bScore: number = scoreFunction.getScore(rowsToReorder[i].cells[b].value);
-
-					if (aScore === bScore) {
-						return 0;						// Do not change the ordering of a and b.
-					} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
-						return -1;						// a should come before b in the ordering
-					} else {
-						return 1;						// b should come before a in the ordering.
-					}
+			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
+				var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
+				var weight: number = chartDataService.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
+				rowsToReorder[i].cells.forEach((cell: VCCellData, index: number) => {
+					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
-				return cellIndices;
 			}
 		}
+
+		console.log(alternativeScores);
+
+		cellIndices.sort((a: number, b: number) => {
+			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
+			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
+
+			if (aScore === bScore) {
+				return 0;						// Do not change the ordering of a and b.
+			} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
+				return -1;						// a should come before b in the ordering
+			} else {
+				return 1;						// b should come before a in the ordering.
+			}
+		});
+		
+		return cellIndices;
 	}
 
 	generateCellOrderAlphabetically(chartDataService: ChartDataService): number[] {
@@ -357,9 +365,17 @@ export class ChartDataService {
 		return cellIndices; 
 	}
 
-	reorderAllCells(generateOrder: Function, objective?: PrimitiveObjective): void {
+	reorderAllCells(generateOrder: Function, objective?: Objective): void {
 		var reorderedRow: VCRowData;
-		var cellIndices: number[] = generateOrder(this, this.rows, objective);
+		var objectivesToOrderBy: PrimitiveObjective[];
+
+		if (objective.objectiveType === 'abstract')
+			objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
+		else {
+			objectivesToOrderBy = [<PrimitiveObjective> objective];
+		}
+
+		var cellIndices: number[] = generateOrder(this, this.rows, objectivesToOrderBy);
 
 
 		this.rows.forEach((row: VCRowData, index: number) => {
