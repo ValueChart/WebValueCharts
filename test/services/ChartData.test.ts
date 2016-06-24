@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-23 18:04:06
+* @Last Modified time: 2016-06-24 11:48:27
 */
 
 // Application Classes:
@@ -39,6 +39,9 @@ describe('ChartDataService', () => {
 		valueChart = <IndividualValueChart> valueChartParser.parseValueChart(XMLTestString);
 		chartDataService.setValueChart(valueChart);
 	});
+
+
+	// ============================== Data Formatting Methods ===================================
 
 	describe('getLabelData(valueChart: ValueChart): VCLabelData[]', () => {
 
@@ -203,12 +206,17 @@ describe('ChartDataService', () => {
 	describe('getCellData(valueChart: ValueChart, objective: PrimitiveObjective): VCCellData[]', () => {
 
 		var rate: PrimitiveObjective;
+		var alternativeNames: string[];
+		var values: number[];
 
 		before(function() {
 			// Get the rate objective.
 			rate = valueChart.getAllPrimitiveObjectives().filter((objective: PrimitiveObjective) => {
 				return objective.getName() === 'rate';
 			})[0];
+
+			alternativeNames = ['Sheraton', 'BestWestern', 'Hyatt', 'Marriott', 'HolidayInn', 'Ramada'];
+			values = [150.0, 100.0, 200.0, 175.0, 100.0, 125.0];
 		});
 
 		it('should format the alternative values for the given objective into cells, where each cell has one user score for each user.', () => {
@@ -217,8 +225,6 @@ describe('ChartDataService', () => {
 
 			expect(cellData).to.have.length(6);
 
-			var alternativeNames = ['Sheraton', 'BestWestern', 'Hyatt', 'Marriott', 'HolidayInn', 'Ramada'];
-			var values = [150.0, 100.0, 200.0, 175.0, 100.0, 125.0];
 			cellData.forEach((cell: VCCellData, index: number) => {
 				expect(cell.alternative.getName()).to.equal(alternativeNames[index]);
 				expect(cell.value).to.equal(values[index]);
@@ -230,8 +236,103 @@ describe('ChartDataService', () => {
 
 	});
 
+	describe('getRowData(valueChart: ValueChart): VCRowData[]', () => {
+
+		var objectiveNames: string[];
+
+		before(function() {
+			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
+		});
+
+		it(`should format the obejctives from the given ValueChart into rows, where each row is divided one cell for Alernative in the ValueChart
+			and each cell has one user score for each user`, () => {
+
+			var rows: VCRowData[] = chartDataService.getRowData(valueChart);
+
+			expect(rows).to.have.length(5);				// There are five objectives in the hotel ValueChart, so the data should have five rows.
+
+			rows.forEach((row: VCRowData, index: number) => {
+				expect(row.cells).to.have.length(6);	// There are six alternatives in the hotel ValueChart, so each row should have 6 cells.
+
+				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Each row should have the correct objective. Note: The row ordering here comes form the ordering inside the ValueChart, which comes from the XML data.
+			
+				row.cells.forEach((cell: VCCellData) => {
+					expect(cell.userScores).to.have.length(1);	// The ValueChart only has one user, so each cell should have on user score.
+				});	
+			});
+		});
+	});
 
 
+	// ============================== Data Manipulation Methods ===================================
+
+	describe('calculateWeightOffsets(rows: VCRowData[]): VCRowData[]', () => {
+
+		var objectiveNames: string[];
+		var weightOffsets: number[];
+		var rows: VCRowData[];
+
+		before(function() {
+			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
+			chartDataService.setValueChart(valueChart);
+			rows = chartDataService.getRowData(valueChart);
+			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
+			weightOffsets = [0, 0.46, 0.55, 0.59, 0.80];	// These weight offsets were found by summing the weights of all previous rows in the ordering for each row.
+															// The weights are ordered the same as the objective names.
+		});
+
+		it('should calculate the weight offset of each row as the sum of the weights of the rows coming before it in the array of rows.', () => {
+
+			rows = chartDataService.calculateWeightOffsets(rows);
+
+			rows.forEach((row: VCRowData, index: number) => {
+				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Verify the ordering of objectives in the row data.
+				expect(row.weightOffset).to.be.closeTo(weightOffsets[index], roundingError);			// Verify that the weights offsets were computed correctly.
+			});
+		});
+	});
+
+	describe('calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number', () => {
+
+		var labelData: VCLabelData[];
+		var dimensionOneSize: number;
+
+		before(function() {
+			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
+			chartDataService.setValueChart(valueChart);
+			labelData = chartDataService.getLabelData(valueChart);
+		});
+
+		context('when score functions are being rendered', () => {
+
+			it('should calculate the proper width of the labels with an offset left for the score functions', () => {
+				dimensionOneSize = 100;
+				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
+				var expectedLabelWidth = (dimensionOneSize / 4);	// The max depth of the labels is 3, + 1 for the score function = 3.
+				expect(labelWidth).to.equal(expectedLabelWidth);
+
+				dimensionOneSize = 567;
+				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
+				var expectedLabelWidth = (dimensionOneSize / 4);	// The max depth of the labels is 3, + 1 for the score function = 3.
+				expect(labelWidth).to.equal(expectedLabelWidth);
+			});
+		});
+
+		context('when score functions are not being rendered', () => {
+
+			it('should calculate the proper width of the labels with no offset left', () => {
+				dimensionOneSize = 100;
+				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
+				var expectedLabelWidth = (dimensionOneSize / 3);	// The max depth of the labels is 3, and with no score function the labels should fill all available space.
+				expect(labelWidth).to.equal(expectedLabelWidth);
+
+				dimensionOneSize = 567;
+				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
+				var expectedLabelWidth = (dimensionOneSize / 3);	// The max depth of the labels is 3, and with no score function the labels should fill all available space.
+				expect(labelWidth).to.equal(expectedLabelWidth);
+			});
+		});
+	});
 });
 
 
