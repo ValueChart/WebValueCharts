@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 11:55:01
+* @Last Modified time: 2016-06-24 13:52:49
 */
 
 import { Component }															from '@angular/core';
@@ -25,6 +25,10 @@ import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChar
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../../renderers/Label.renderer';
 
+import { ReorderObjectivesInteraction }											from '../../interactions/ReorderObjectives.interaction';
+import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
+import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
+
 // Model Classes
 import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
@@ -36,16 +40,23 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
 	directives: [ValueChartDirective],
 	providers: [
+	// Services:
 		ChartDataService,
 		RenderConfigService,
 		ChartUndoRedoService,
+	// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
-		LabelRenderer]
+		LabelRenderer,
+	// Interactions:
+		ReorderObjectivesInteraction,
+		ResizeWeightsInteraction,
+		SortAlternativesInteraction]
 })
 export class ValueChartViewerComponent implements OnInit {
 
 	private PUMP_OFF: string = 'none';
+	private ALTERNATIVE_SORT_OFF: string = 'none';
 
 	valueChart: ValueChart;
 	alternatives: Alternative[];
@@ -60,7 +71,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// ValueChart Interactions Configuration:
 	reorderObjectives: boolean;
-	sortAlternatives: boolean;
+	sortAlternatives: string;
 	pumpWeights: string;
 	setObjectiveColors: boolean;
 
@@ -102,7 +113,7 @@ export class ValueChartViewerComponent implements OnInit {
 		// Interactions
 
 		this.reorderObjectives = false;
-		this.sortAlternatives = false;
+		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
 
@@ -145,10 +156,13 @@ export class ValueChartViewerComponent implements OnInit {
 			this.alternativeObjectives[index] = objective.getName();
 			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
 		});
+
+		this.resizeDetailBox();
 	}
 
 	collapseAlternative(): void {
 		this.detailBoxHeader = 'Alternatives';
+		this.resizeDetailBox();
 	}
 
 
@@ -206,28 +220,36 @@ export class ValueChartViewerComponent implements OnInit {
 
 	toggleReorderObjectives(newVal: boolean): void {
 		this.reorderObjectives = newVal;
-		this.sortAlternatives = false;
+
+		// Turn off all other interactions.
+		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.pumpWeights = 'none';
 		this.setObjectiveColors = false;
 	}
 
-	toggleSortAlternatives(newVal: boolean): void {
-		this.sortAlternatives = newVal;
+	toggleSortAlternatives(sortType: string): void {
+		this.sortAlternatives = (this.sortAlternatives === sortType) ? this.ALTERNATIVE_SORT_OFF : sortType;
+
+		// Turn off all other interactions.
 		this.reorderObjectives = false;
 		this.pumpWeights = 'none';
 		this.setObjectiveColors = false;
 	}
 
 	setPumpType(pumpType: string): void {
-		this.pumpWeights = (this.pumpWeights === pumpType) ? 'none' : pumpType; 
-		this.sortAlternatives = false;
+		this.pumpWeights = (this.pumpWeights === pumpType) ? this.PUMP_OFF : pumpType; 
+
+		// Turn off all other interactions.
+		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.reorderObjectives = false;
 		this.setObjectiveColors = false;
 	}
 
 	toggleSetObjectiveColors(newVal: boolean): void {
 		this.setObjectiveColors = newVal;
-		this.sortAlternatives = false;
+
+		// Turn off all other interactions.
+		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.reorderObjectives = false;
 		this.pumpWeights = this.PUMP_OFF;
 	}

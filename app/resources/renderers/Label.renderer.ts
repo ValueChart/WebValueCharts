@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 11:54:55
+* @Last Modified time: 2016-06-24 13:50:51
 */
 
 import { Injectable } 												from '@angular/core';
@@ -20,9 +20,9 @@ import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
-import { ReorderObejctivesRenderer }								from '../renderers/ReorderObjectives.renderer';
+import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
 
-
+import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -51,15 +51,13 @@ export class LabelRenderer {
 	private displayScoreFunctions: boolean;
 
 	public scoreFunctionRenderers: any;
-	private reorderObejctivesRenderer: ReorderObejctivesRenderer;
 
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
+		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private ngZone: NgZone) { 
-		// Initialize the renderer that reorders objectives when a label is dragged.
-		this.reorderObejctivesRenderer = new ReorderObejctivesRenderer(this.renderConfigService, this.chartDataService, this);
 	}
 
 	// Create the base containers and elements for the labels.
@@ -231,7 +229,7 @@ export class LabelRenderer {
 			});
 
 		labelOutlines
-			.attr(this.renderConfigService.dimensionOne, this.calculateLabelWidth)
+			.attr(this.renderConfigService.dimensionOne, this.determineLabelWidth)
 			.attr(this.renderConfigService.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
 			.attr(this.renderConfigService.dimensionTwo, (d: VCLabelData, i: number) => {
 				return Math.max(this.renderConfigService.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
@@ -268,7 +266,7 @@ export class LabelRenderer {
 		labelDividers
 			.attr(this.renderConfigService.coordinateOne + '1', 0)
 			.attr(this.renderConfigService.coordinateOne + '2', (d: VCLabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
-				return (i === 0) ? 0 : this.calculateLabelWidth(d);
+				return (i === 0) ? 0 : this.determineLabelWidth(d);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
 			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
@@ -278,14 +276,13 @@ export class LabelRenderer {
 
 		var dragToResizeWeights = d3.behavior.drag();
 
-		labelDividers.call(dragToResizeWeights.on('dragstart', (d: any, i: number) => {
+		dragToResizeWeights.on('dragstart', (d: any, i: number) => {
 			// Save the current state of the Weight Map.
 			this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
-		}));
+		})
+		.on('drag', this.resizeWeightsInteraction.resizeWeights);
 
-		labelDividers.call(dragToResizeWeights.on('drag', this.resizeWeights));
-
-
+		labelDividers.call(dragToResizeWeights);
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -363,67 +360,6 @@ export class LabelRenderer {
 		}
 	}
 
-	toggleObjectiveReordering(enableReordering: boolean): void {
-		var labelOutlines: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-outline');
-		var labelTexts: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-text');		
-
-		if (enableReordering){
-			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
-			labelOutlines.call(d3.behavior.drag()
-				.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
-				.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
-				.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
-	
-			// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
-			labelTexts.call(d3.behavior.drag()
-				.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)
-				.on('drag', this.reorderObejctivesRenderer.reorderObjectives)
-				.on('dragend', this.reorderObejctivesRenderer.endReorderObjectives));
-		} else {
-			// TODO: double check that this is proper way to reset the drag behavior.
-			labelOutlines.call(d3.behavior.drag());
-			labelTexts.call(d3.behavior.drag());
-		}	
-	}
-
-	toggleAlternativeSorting(enableSorting: boolean): void {
-		var primitiveObjeciveLabels: JQuery = $('.label-primitive-objective');
-		primitiveObjeciveLabels.off('dblclick');
-
-		if (enableSorting) {
-			primitiveObjeciveLabels.dblclick((eventObject: Event) => {
-				eventObject.preventDefault();
-				var objectiveToReorderBy: PrimitiveObjective = (<any> eventObject.target).__data__.objective;
-
-				this.chartDataService.reorderCellsByScore(objectiveToReorderBy);
-			});
-		}
-	}
-
-	togglePump(pumpType: string): void {
-		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
-		primitiveObjectiveLabels.off('click');
-		if (pumpType !== 'none') {
-			primitiveObjectiveLabels.click((eventObject: Event) => {
-				// Save the current state of the Weight Map.
-				this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
-
-				// Calculate the correct weight increment.
-				var totalWeight: number = this.chartDataService.weightMap.getWeightTotal();
-				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
-				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
-				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
-
-				if (previousWeight + pumpAmount < 0) {
-					pumpAmount = 0 - previousWeight;
-				}
-
-				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
-			});
-		}
-	}
-
 	toggleSettingObjectiveColors(setObjectiveColors: boolean): void {
 		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
 		primitiveObjectiveLabels.off('click');
@@ -446,7 +382,7 @@ export class LabelRenderer {
 
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields
 
-	calculateLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
+	determineLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
 		var scoreFunctionOffset: number = ((this.displayScoreFunctions) ? this.labelWidth : 0);
 		var retValue = (d.depthOfChildren === 0) ?
 			(this.renderConfigService.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
@@ -455,39 +391,5 @@ export class LabelRenderer {
 
 		return retValue;
 	};
-
-	// Event handler for resizing weights by dragging label edges.
-	resizeWeights = (d: VCLabelData, i: number) => {
-		var weightMap: WeightMap = this.chartDataService.weightMap;
-		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
-
-		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');
-		var parentName = (<Element> container.node()).getAttribute('parent');
-		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
-		var siblings: VCLabelData[] = (<VCLabelData>parentContainer.data()[0]).subLabelData;
-
-		var combinedWeight: number = d.weight + siblings[i - 1].weight;
-
-		var currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
-		var siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
-		
-		// Run inside the angular zone so that change detection is triggered.
-		this.ngZone.run(() => {
-
-			if (d.objective.objectiveType === 'abstract') {
-				this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
-			} else {
-				weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
-			}
-
-
-			if (siblings[i - 1].objective.objectiveType === 'abstract') {
-				this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
-			} else {
-				weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
-			}
-		});
-	};
-
 
 }

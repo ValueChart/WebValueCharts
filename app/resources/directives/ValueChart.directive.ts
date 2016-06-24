@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 11:54:58
+* @Last Modified time: 2016-06-24 13:55:28
 */
 
 
@@ -22,6 +22,10 @@ import { ChartUndoRedoService }													from '../services/ChartUndoRedo.serv
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
+
+import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
+import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
+import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 
 // Model Classes
 import { ValueChart } 															from '../model/ValueChart';
@@ -72,16 +76,23 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
 
 	constructor(
+		// Angular Resources:
 		private template: TemplateRef<any>,
 		private viewContainer: ViewContainerRef,
 		private elementRef: ElementRef,
 		private differs: KeyValueDiffers,
 		private arrayDiffers: IterableDiffers,
+		// Services:
+		private chartDataService: ChartDataService,
+		private renderConfigService: RenderConfigService,
+		// Renderers:
 		private objectiveChartRenderer: ObjectiveChartRenderer,
 		private summaryChartRenderer: SummaryChartRenderer,
 		private labelRenderer: LabelRenderer,
-		private chartDataService: ChartDataService,
-		private renderConfigService: RenderConfigService) { 
+		// Interactions:
+		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
+		private resizeWeightsInteraction: ResizeWeightsInteraction,
+		private sortAlternativesInteraction: SortAlternativesInteraction) { 
 	}
 
 
@@ -137,7 +148,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	@Input() set sortAlternatives(value: any) {	
-		this.interactions.sortAlternatives = <boolean> value;
+		this.interactions.sortAlternatives = <string> value;
 	}
 
 	@Input() set pumpWeights(value: any) {
@@ -334,19 +345,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.interactions.reorderObjectives !== this.previousInteractions.reorderObjectives) {
 			this.previousInteractions.reorderObjectives = this.interactions.reorderObjectives;
 			// Toggle Dragging to sort objectives:
-			this.labelRenderer.toggleObjectiveReordering(this.interactions.reorderObjectives);
+			this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactions.reorderObjectives);
 		}
 
 		if (this.interactions.sortAlternatives !== this.previousInteractions.sortAlternatives) {
 			this.previousInteractions.sortAlternatives = this.interactions.sortAlternatives;
-			// Toggle Dragging to sort objectives:
-			this.labelRenderer.toggleAlternativeSorting(this.interactions.sortAlternatives);
+			this.sortAlternativesInteraction.toggleAlternativeSorting(this.previousInteractions.sortAlternatives);
 		}
 
 		if (this.interactions.pumpWeights !== this.previousInteractions.pumpWeights) {
 			this.previousInteractions.pumpWeights = this.interactions.pumpWeights;
 			// Toggle the pump interaction:
-			this.labelRenderer.togglePump(this.interactions.pumpWeights);
+			this.resizeWeightsInteraction.togglePump(this.interactions.pumpWeights);
 		}
 
 		if (this.interactions.setObjectiveColors !== this.previousInteractions.setObjectiveColors) {

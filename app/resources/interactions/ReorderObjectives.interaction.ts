@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 12:00:29
+* @Last Modified time: 2016-06-24 13:31:18
 */
 
 import { Injectable } 												from '@angular/core';
@@ -16,8 +16,6 @@ import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../servic
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 
-
-
 // Model Classes
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
@@ -30,7 +28,7 @@ import { AbstractObjective }										from '../model/AbstractObjective';
 // in the label ordering when a label is released.
 
 @Injectable()
-export class ReorderObejctivesRenderer {
+export class ReorderObjectivesInteraction {
 	private ignoreReorder: boolean;
 
 	private primitiveObjectives: PrimitiveObjective[]
@@ -55,6 +53,30 @@ export class ReorderObejctivesRenderer {
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private labelRenderer: LabelRenderer) { }
+
+
+	toggleObjectiveReordering(enableReordering: boolean): void {
+		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-outline');
+		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-text');
+
+		if (enableReordering) {
+			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
+			labelOutlines.call(d3.behavior.drag()
+				.on('dragstart', this.startReorderObjectives)
+				.on('drag', this.reorderObjectives)
+				.on('dragend', this.endReorderObjectives));
+
+			// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
+			labelTexts.call(d3.behavior.drag()
+				.on('dragstart', this.startReorderObjectives)
+				.on('drag', this.reorderObjectives)
+				.on('dragend', this.endReorderObjectives));
+		} else {
+			// Reset the drag behavior to default.
+			labelOutlines.call(d3.behavior.drag());
+			labelTexts.call(d3.behavior.drag());
+		}
+	}
 
 	// This function is called when a user first beings to drag a label to rearrange the ordering of objectives. It contains all the logic required to initialize the drag,
 	// including determining the bounds that the label can be dragged in, the points where the label is considered to have switched positions, etc.
@@ -202,7 +224,7 @@ export class ReorderObejctivesRenderer {
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.chartDataService.reorderRows(primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
-		this.labelRenderer.toggleObjectiveReordering(true);
+		this.toggleObjectiveReordering(true);
 	}
 
 	generateNewLabelTransform(previousXTransform: number, previousYTransform: number, deltaCoordinateTwo: number): string {

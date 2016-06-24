@@ -49,9 +49,39 @@
 					</div>
 				</div>
 				<div class="form-group pull-right">
-					<button class="btn btn-default" [class.active]="sortAlternatives" (click)="toggleSortAlternatives(!sortAlternatives)">
-						Sort Alternatives
-					</button>
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" [class.active]="sortAlternatives === 'objective' || sortAlternatives === 'manual'"
+							type="button" id="alternative-sort-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+							Sort Alternatives
+							<span class="caret"></span>
+
+							<!-- (click)="toggleSortAlternatives(!sortAlternatives)" -->
+						</button>
+						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="alternative-sort-dropdown">
+						    <li>
+						 	   <a href="javascript:void(0)" (click)="toggleSortAlternatives('objective')">
+						 	   		Objective Score
+						 	  		<span *ngIf="sortAlternatives === 'objective'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+						 	   </a>
+						    </li>
+						    <li>
+						    	<a href="javascript:void(0)" (click)="toggleSortAlternatives('alphabet')">
+						    		Alphabetically
+								</a>
+						    </li>
+						    <li>
+						    	<a href="javascript:void(0)" (click)="toggleSortAlternatives('manual')">
+						    		Manually
+						    		<span *ngIf="sortAlternatives === 'manual'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+								</a>
+						    </li>
+						    <li>
+						    	<a href="javascript:void(0)" (click)="toggleSortAlternatives('reset')">
+						    		Reset
+								</a>
+						    </li>
+						</ul>
+					</div>			
 				</div>
 				<div class="form-group pull-right">
 					<button class="btn btn-default" [class.active]="reorderObjectives" (click)="toggleReorderObjectives(!reorderObjectives)">
@@ -74,7 +104,7 @@
 							Chart Orientation
 							<span class="caret"></span>
 						</button>
-						 <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="orientation-dropwon">
+						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="orientation-dropdown">
 						    <li [class.disabled]="orientation === 'vertical'">
 						 	   <a href="javascript:void(0)" (click)="setOrientation('vertical')">
 						 	   		Vertical
@@ -87,7 +117,7 @@
 						    		<span *ngIf="orientation === 'horizontal'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 								</a>
 						    </li>
-						 </ul>
+						</ul>
 					</div>
 				</div>
 				<div class="form-group pull-right">
