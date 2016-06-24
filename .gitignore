@@ -60,4 +60,5 @@ app/resources/directives/*.js
 app/resources/renderers/*.js
 
 app/main.js
+app/app.routes.js
 test/**/*.js

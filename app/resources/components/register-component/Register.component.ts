@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-23 09:44:14
+* @Last Modified time: 2016-06-24 09:57:51
 */
 
 import { Component }										from '@angular/core';
-import { Routes, Router, ROUTER_DIRECTIVES }				from '@angular/router';
+import { ROUTER_DIRECTIVES }								from '@angular/router';
 
 // Application Classes
 import { CurrentUserService }								from '../../services/CurrentUser.service';

@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-20 14:38:20
+* @Last Modified time: 2016-06-24 09:58:09
 */
 
 import { Component }				from '@angular/core';
-import { Router }				from '@angular/router';
+import { Router }					from '@angular/router';
 
 // Application classes:
 import { XMLValueChartParser } 		from '../../services/XMLValueChartParser.service';
