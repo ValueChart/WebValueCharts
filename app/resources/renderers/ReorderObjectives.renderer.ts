@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-17 21:16:11
+* @Last Modified time: 2016-06-24 12:00:29
 */
 
 import { Injectable } 												from '@angular/core';
@@ -202,7 +202,7 @@ export class ReorderObejctivesRenderer {
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.chartDataService.reorderRows(primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
-		this.labelRenderer.toggleObjectiveSorting(true);
+		this.labelRenderer.toggleObjectiveReordering(true);
 	}
 
 	generateNewLabelTransform(previousXTransform: number, previousYTransform: number, deltaCoordinateTwo: number): string {

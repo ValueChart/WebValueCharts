@@ -54,8 +54,8 @@
 					</button>
 				</div>
 				<div class="form-group pull-right">
-					<button class="btn btn-default" [class.active]="sortObjectives" (click)="toggleSortObjectives(!sortObjectives)">
-						Sort Objectives
+					<button class="btn btn-default" [class.active]="reorderObjectives" (click)="toggleReorderObjectives(!reorderObjectives)">
+						Reorder Objectives
 					</button>
 				</div>
 				<div class="form-group pull-right">
@@ -174,7 +174,7 @@
 			[displayScales]="displayScales" 
 			[displayTotalScores]="displayTotalScores"
 			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
-			[sortObjectives]="sortObjectives"
+			[reorderObjectives]="reorderObjectives"
 			[sortAlternatives]="sortAlternatives"
 			[pumpWeights]="pumpWeights"
 			[setObjectiveColors]="setObjectiveColors">

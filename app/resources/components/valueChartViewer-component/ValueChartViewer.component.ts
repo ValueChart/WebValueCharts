@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 10:33:47
+* @Last Modified time: 2016-06-24 11:55:01
 */
 
 import { Component }															from '@angular/core';
@@ -59,7 +59,7 @@ export class ValueChartViewerComponent implements OnInit {
 	displayScoreFunctionValueLabels: boolean;
 
 	// ValueChart Interactions Configuration:
-	sortObjectives: boolean;
+	reorderObjectives: boolean;
 	sortAlternatives: boolean;
 	pumpWeights: string;
 	setObjectiveColors: boolean;
@@ -101,7 +101,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		// Interactions
 
-		this.sortObjectives = false;
+		this.reorderObjectives = false;
 		this.sortAlternatives = false;
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
@@ -204,8 +204,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// Interaction Toggles
 
-	toggleSortObjectives(newVal: boolean): void {
-		this.sortObjectives = newVal;
+	toggleReorderObjectives(newVal: boolean): void {
+		this.reorderObjectives = newVal;
 		this.sortAlternatives = false;
 		this.pumpWeights = 'none';
 		this.setObjectiveColors = false;
@@ -213,7 +213,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	toggleSortAlternatives(newVal: boolean): void {
 		this.sortAlternatives = newVal;
-		this.sortObjectives = false;
+		this.reorderObjectives = false;
 		this.pumpWeights = 'none';
 		this.setObjectiveColors = false;
 	}
@@ -221,14 +221,14 @@ export class ValueChartViewerComponent implements OnInit {
 	setPumpType(pumpType: string): void {
 		this.pumpWeights = (this.pumpWeights === pumpType) ? 'none' : pumpType; 
 		this.sortAlternatives = false;
-		this.sortObjectives = false;
+		this.reorderObjectives = false;
 		this.setObjectiveColors = false;
 	}
 
 	toggleSetObjectiveColors(newVal: boolean): void {
 		this.setObjectiveColors = newVal;
 		this.sortAlternatives = false;
-		this.sortObjectives = false;
+		this.reorderObjectives = false;
 		this.pumpWeights = this.PUMP_OFF;
 	}
 

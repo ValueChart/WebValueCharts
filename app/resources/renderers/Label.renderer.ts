@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 14:06:20
+* @Last Modified time: 2016-06-24 11:54:55
 */
 
 import { Injectable } 												from '@angular/core';
@@ -363,11 +363,11 @@ export class LabelRenderer {
 		}
 	}
 
-	toggleObjectiveSorting(enableDragging: boolean): void {
+	toggleObjectiveReordering(enableReordering: boolean): void {
 		var labelOutlines: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-outline');
 		var labelTexts: d3.Selection<any> = this.rootContainer.selectAll('.label-subcontainer-text');		
 
-		if (enableDragging){
+		if (enableReordering){
 			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
 			labelOutlines.call(d3.behavior.drag()
 				.on('dragstart', this.reorderObejctivesRenderer.startReorderObjectives)

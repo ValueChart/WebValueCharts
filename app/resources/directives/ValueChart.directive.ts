@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 13:51:51
+* @Last Modified time: 2016-06-24 11:54:58
 */
 
 
@@ -132,8 +132,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Interactions:
 
-	@Input() set sortObjectives(value: any) {
-		this.interactions.sortObjectives = <boolean> value;
+	@Input() set reorderObjectives(value: any) {
+		this.interactions.reorderObjectives = <boolean> value;
 	}
 
 	@Input() set sortAlternatives(value: any) {	
@@ -234,7 +234,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Interactions:
 
-		this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+		this.previousInteractions.reorderObjectives = this.interactions.reorderObjectives;
 		this.previousInteractions.sortAlternatives = this.interactions.sortAlternatives;
 		this.previousInteractions.pumpWeights = this.interactions.pumpWeights; 
 		this.previousInteractions.setObjectiveColors = this.interactions.setObjectiveColors;
@@ -331,10 +331,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Check the Interactions options:
 
-		if (this.interactions.sortObjectives !== this.previousInteractions.sortObjectives) {
-			this.previousInteractions.sortObjectives = this.interactions.sortObjectives;
+		if (this.interactions.reorderObjectives !== this.previousInteractions.reorderObjectives) {
+			this.previousInteractions.reorderObjectives = this.interactions.reorderObjectives;
 			// Toggle Dragging to sort objectives:
-			this.labelRenderer.toggleObjectiveSorting(this.interactions.sortObjectives);
+			this.labelRenderer.toggleObjectiveReordering(this.interactions.reorderObjectives);
 		}
 
 		if (this.interactions.sortAlternatives !== this.previousInteractions.sortAlternatives) {
