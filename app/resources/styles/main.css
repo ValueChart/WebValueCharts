@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-23 10:42:43
+* @Last Modified time: 2016-06-27 15:09:32
 */
 
 /* Global Styles */
@@ -128,6 +128,10 @@
 .valuechart-dividing-line {
     stroke: grey;
     stroke-width: 1;   
+}
+
+.alternative-box {
+    fill: rgba(255, 255, 255, 0);
 }
 
 .valuechart-label-text {

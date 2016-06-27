@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 13:51:41
+* @Last Modified time: 2016-06-27 15:32:58
 */
 
 import { Injectable } 												from '@angular/core';
@@ -32,15 +32,15 @@ export class SummaryChartRenderer {
 	public chart: d3.Selection<any>;					// The 'g' element that contains all the elements making up the summary chart.
 	public outline: d3.Selection<any>;					// The 'rect' element that outlines the summary chart.
 	public rowsContainer: d3.Selection<any>;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public dividingLineContainer: d3.Selection<any>;	// The 'g' element that contains the lines that divide different alternatives bars from each other. 
 	public rows: d3.Selection<any>;						// The collection of all 'g' elements s.t. each element is a row container.
-	public dividingLines: d3.Selection<any>;			// The collection of all 'line' elements that are used to divide different alternative bars from each other.
 	public cells: d3.Selection<any>;					// The collection of all 'g' elements s.t. each element is a cell container.
 	public userScores: d3.Selection<any>;				// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	public scoreTotalsContainer: d3.Selection<any>;
 	public scoreTotalsSubContainers: d3.Selection<any>;
 	public scoreTotals: d3.Selection<any>;
 	public utilityAxisContainer: d3.Selection<any>;
+	public alternativeBoxesContainer: d3.Selection<any>;
+	public alternativeBoxes: d3.Selection<any>;
 
 	constructor(
 		private renderConfigService: RenderConfigService,
@@ -63,24 +63,22 @@ export class SummaryChartRenderer {
 		this.rowsContainer = this.chart.append('g')
 			.classed('summary-rows-container', true);
 
-		// Create the container that holds the dividing lines.
-		this.dividingLineContainer = this.chart.append('g')
-			.classed('summary-dividers-container', true);
-
 		this.scoreTotalsContainer = this.chart.append('g')
-			.classed('summary-totalscores-container', true);
+			.classed('summary-scoretotals-container', true);
 
 		this.utilityAxisContainer = this.chart.append('g')
 			.classed('summary-utilityaxis-container', true)
 			.classed('utility-axis', true);
 
+		this.alternativeBoxesContainer = this.chart.append('g')
+			.classed('summary-alternative-boxes-container', true);
 
-		this.createSummaryChartRows(this.rowsContainer, this.dividingLineContainer, this.scoreTotalsContainer, rows);
+		this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, rows);
 	}
 
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
 	// and the rows are stacked on each other in order to create a stacked bar chart. 
-	createSummaryChartRows(rowsContainer: d3.Selection<any>, dividingLineContainer: d3.Selection<any>, scoreTotalsContainer: d3.Selection<any>, rows: VCRowData[]): void {
+	createSummaryChartRows(rowsContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, scoreTotalsContainer: d3.Selection<any>, rows: VCRowData[]): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
 		var newRows: d3.Selection<any> = rowsContainer.selectAll('.summary-row')
 			.data(rows)
@@ -89,12 +87,6 @@ export class SummaryChartRenderer {
 
 		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
-		// Create the lines that divide different Alternatives form each other.
-		dividingLineContainer.selectAll('.summary-dividing-line')
-			.data(alternatives)
-			.enter().append('line')
-				.classed('summary-dividing-line', true)
-				.classed('valuechart-dividing-line', true);
 
 		var subContainers = scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
 			.data((rows[0].cells))
@@ -106,10 +98,18 @@ export class SummaryChartRenderer {
 			.enter().append('text')
 				.classed('summary-score-total', true);
 
+		boxesContainer.selectAll('.summary-alternative-box')
+			.data(this.chartDataService.alternatives)
+			.enter().append('rect')
+				.classed('valuechart-dividing-line', true)
+				.classed('summary-alternative-box', true)
+				.classed('alternative-box', true);
+
+
 		// Save all the rows as a field of the class. This is done separately from creating the rows as newRows is the selection of newly created rows containers,
 		// NOT all row containers. A similar argument explains why the dividing lines are saved here as well.
 		this.rows = rowsContainer.selectAll('.summary-row');
-		this.dividingLines = dividingLineContainer.selectAll('.summary-dividing-line');
+		this.alternativeBoxes = boxesContainer.selectAll('.summary-alternative-box');
 		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer');
 		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.summary-score-total');
 
@@ -122,7 +122,8 @@ export class SummaryChartRenderer {
 		stackedBarRows.selectAll('.summary-cell')
 			.data((d: VCRowData) => { return d.cells; })
 			.enter().append('g')
-				.classed('summary-cell', true);
+				.classed('summary-cell', true)
+				.classed('cell', true);
 
 		// Save all the cells as a field of the class.
 		this.cells = stackedBarRows.selectAll('.summary-cell');
@@ -147,7 +148,7 @@ export class SummaryChartRenderer {
 		var userScoresToUpdate: d3.Selection<any> = cellsToUpdate.selectAll('.summary-user-scores')
 			.data((d: VCCellData, i: number) => { return d.userScores; });
 
-		var dividingLinesToUpdate: d3.Selection<any> = this.dividingLineContainer.selectAll('.summary-dividing-line')
+		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.summary-alternative-box')
 			.data(alternatives);
 
 		var scoreTotalsToUpdate: d3.Selection<any> = this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
@@ -155,7 +156,7 @@ export class SummaryChartRenderer {
 			.selectAll('.summary-score-total')
 				.data((d: VCCellData) => { return d.userScores; });
 
-		this.renderSummaryChartRows(dividingLinesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
+		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
 	}
 
 	// This function positions and gives widths + heights to the elements created by the createSummaryChart method.
@@ -185,7 +186,7 @@ export class SummaryChartRenderer {
 
 		this.toggleUtilityAxis();
 
-		this.renderSummaryChartRows(this.dividingLines, this.scoreTotals, this.cells, this.userScores, viewOrientation);
+		this.renderSummaryChartRows(this.alternativeBoxes, this.scoreTotals, this.cells, this.userScores, viewOrientation);
 	}
 
 
@@ -214,28 +215,30 @@ export class SummaryChartRenderer {
 
 	// This function positions and gives widths + heights to the elements created by createSummaryChartRows. Note that we don't position the row
 	// containers here because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
-	renderSummaryChartRows(dividingLines: d3.Selection<any>, scoreTotals: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
-		// Position the dividing lines so that they evenly divide the available space into columns, one for each Alternative.
-		dividingLines
-			.attr(this.renderConfigService.coordinateOne + '1', this.calculateCellCoordinateOne)
-			.attr(this.renderConfigService.coordinateTwo + '1', 0)
-			.attr(this.renderConfigService.coordinateOne + '2', this.calculateCellCoordinateOne)
-			.attr(this.renderConfigService.coordinateTwo + '2', (d: VCCellData, i: number) => { return this.renderConfigService.dimensionTwoSize });
+	renderSummaryChartRows(alternativeBoxes: d3.Selection<any>, scoreTotals: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
+		alternativeBoxes
+			.attr(this.renderConfigService.dimensionOne, this.calculateUserScoreDimensionOne)
+			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize)
+			.attr(this.renderConfigService.coordinateOne, this.calculateCellCoordinateOne)
+			.attr(this.renderConfigService.coordinateTwo, 0)
+			.attr('alternative', (d: Alternative) => { return d.getName(); })
+			.attr('id', (d: Alternative) => { return 'summary-' + d.getName() + '-box'});
 
 
-		this.scoreTotalsSubContainers
+		this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
 			.attr('transform', (d: VCCellData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
-			});
+			})
+			.attr('alternative', (d: VCCellData) => { return d.alternative.getName(); });
 
-		this.renderScoreTotals(scoreTotals, viewOrientation);
+		this.renderScoreTotalLabels(scoreTotals, viewOrientation);
 
 		this.toggleScoreTotals();
 
 		this.renderSummaryChartCells(cells, userScores, viewOrientation)
 	}
 
-	renderScoreTotals(scoreTotals: d3.Selection<any>, viewOrientation: string): void {
+	renderScoreTotalLabels(scoreTotals: d3.Selection<any>, viewOrientation: string): void {
 
 		var calculateTotalScore = (d: any) => {
 			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
@@ -262,7 +265,6 @@ export class SummaryChartRenderer {
 			.style('font-size', 22)
 			.classed('best-score-label', false);
 
-
 		var maxScore: number = 0;
 		var bestTotalScore: d3.Selection<any>;
 
@@ -288,6 +290,7 @@ export class SummaryChartRenderer {
 			.attr('transform', (d: VCCellData, i: number) => { 
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, this.calculateCellCoordinateOne(d,i), 0); 
 			})
+			.attr('alternative', (d: VCCellData) => { return d.alternative.getName();});
 
 		// Position and give heights and widths to the user scores.
 		userScores

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-18 13:25:54
+* @Last Modified time: 2016-06-27 11:34:40
 */
 
 import { Injectable } 												from '@angular/core';
@@ -89,6 +89,19 @@ export class RenderConfigService {
 			return 'translate(' + coordinateOneAmount + ',' + coordinateTwoAmount + ')';
 		} else {
 			return 'translate(' + coordinateTwoAmount + ',' + coordinateOneAmount + ')';
+		}
+	}
+
+	incrementTransform(previousTransform: string, deltaCoordinateOne: number, deltaCoordinateTwo: number): string {
+		var commaIndex: number = previousTransform.indexOf(',');
+		// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.
+		var xTransform: number = +previousTransform.substring(previousTransform.indexOf('(') + 1, commaIndex);
+		var yTransform: number = +previousTransform.substring(commaIndex + 1, previousTransform.indexOf(')'));
+
+		if (this.viewOrientation === 'vertical') {
+			return 'translate(' + (xTransform + deltaCoordinateOne) + ',' + (yTransform + deltaCoordinateTwo) + ')';
+		} else {
+			return 'translate(' + (xTransform + deltaCoordinateTwo) + ',' + (yTransform + deltaCoordinateOne) + ')';
 		}
 	}
 }

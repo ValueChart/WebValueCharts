@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 16:16:05
+* @Last Modified time: 2016-06-27 14:08:22
 */
 
 
@@ -65,8 +65,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private scoreFunctionMapDiffer: KeyValueDiffer;
 	private scoreFunctionDiffer: KeyValueDiffer;
 	private scoreFunctionDiffers: KeyValueDiffer[];
+
 	private rowsDiffer: IterableDiffer;
 	private cellsDiffer: IterableDiffer;
+	private alternativesDiffer: IterableDiffer;
 
 	// Interaction Toggles
 	private interactions: any = {};
@@ -219,6 +221,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.scoreFunctionMapDiffer = this.differs.find({}).create(null);
 		this.rowsDiffer = this.arrayDiffers.find([]).create(null);
 		this.cellsDiffer = this.arrayDiffers.find([]).create(null);
+		this.alternativesDiffer = this.arrayDiffers.find([]).create(null);
 
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var scoreFunctionMap = user.getScoreFunctionMap();
@@ -299,6 +302,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Check to see if the order of the cells has changed.
 		var cellsChanges = this.cellsDiffer.diff(this.dataRows[0].cells);
 		if (cellsChanges) {
+			this.onRowChange();
+		}
+
+		var alternativeChanges = this.alternativesDiffer.diff(this.chartDataService.alternatives);
+		if (alternativeChanges) {
 			this.onRowChange();
 		}
 		// Check View Configuration options:

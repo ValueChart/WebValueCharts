@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 13:31:18
+* @Last Modified time: 2016-06-27 14:05:10
 */
 
 import { Injectable } 												from '@angular/core';
@@ -59,23 +59,17 @@ export class ReorderObjectivesInteraction {
 		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-outline');
 		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-text');
 
-		if (enableReordering) {
-			// Add the drag controllers to the label text so that the label text can be dragged to reorder objectives.
-			labelOutlines.call(d3.behavior.drag()
-				.on('dragstart', this.startReorderObjectives)
-				.on('drag', this.reorderObjectives)
-				.on('dragend', this.endReorderObjectives));
+		var dragToReorder = d3.behavior.drag();
 
-			// Add the drag controllers to the text outlines so that the label area can be dragged to reorder objectives.
-			labelTexts.call(d3.behavior.drag()
+		if (enableReordering) {
+			dragToReorder
 				.on('dragstart', this.startReorderObjectives)
 				.on('drag', this.reorderObjectives)
-				.on('dragend', this.endReorderObjectives));
-		} else {
-			// Reset the drag behavior to default.
-			labelOutlines.call(d3.behavior.drag());
-			labelTexts.call(d3.behavior.drag());
-		}
+				.on('dragend', this.endReorderObjectives);
+		} 
+
+		labelOutlines.call(dragToReorder);
+		labelTexts.call(dragToReorder);
 	}
 
 	// This function is called when a user first beings to drag a label to rearrange the ordering of objectives. It contains all the logic required to initialize the drag,
@@ -135,7 +129,9 @@ export class ReorderObjectivesInteraction {
 		if (this.ignoreReorder) {
 			return;
 		}
-		// Get the change in Coordinate Two from the d3 event.
+		// Get the change in Coordinate Two from the d3 event. Note that although we are getting coordinateTwo, not dCoordinateTwo, this is the still the change.
+		// The reason for this is because when a label is dragged, the transform of label container is changed, which can changes cooordinateTwo of the outline rectangle inside the container.
+		// THis change is equal to deltaCoordinateTwo, meaning d3.event.cooordinateTwo is reset to 0 at the end of cooordinateTwo drag event, making cooordinateTwo really dCoordinateTwo
 		var deltaCoordinateTwo: number = (<any>d3.event)[this.renderConfigService.coordinateTwo];
 
 		// If we have not yet determined the mouse offset, then this is the first drag event that has been fired, and the mouse offset from 0 should the current mouse position.
@@ -164,8 +160,8 @@ export class ReorderObjectivesInteraction {
 		var labelDimensionTwoOffset: number = (this.totalCoordTwoChange > 0) ? this.objectiveDimensionTwo : 0;
 		// Determine which of the two jump points the label is current between, and assigned its new position accordingly.
 		for (var i = 0; i < this.jumpPoints.length; i++) {
-			if (this.totalCoordTwoChange + deltaCoordinateTwo + labelDimensionTwoOffset > (this.jumpPoints[i] - this.objectiveCoordTwoOffset)
-				&& this.totalCoordTwoChange + deltaCoordinateTwo + labelDimensionTwoOffset < (this.jumpPoints[i + 1] - this.objectiveCoordTwoOffset)) {
+			if (this.totalCoordTwoChange + labelDimensionTwoOffset > (this.jumpPoints[i] - this.objectiveCoordTwoOffset)
+				&& this.totalCoordTwoChange + labelDimensionTwoOffset < (this.jumpPoints[i + 1] - this.objectiveCoordTwoOffset)) {
 				this.newObjectiveIndex = i;
 				break;
 			}
@@ -175,14 +171,10 @@ export class ReorderObjectivesInteraction {
 			this.newObjectiveIndex--;
 
 		// Retrieved the previous transform of the label we are dragging so that it can be incremented properly.
-		var currentTransform: string = this.containerToReorder.attr('transform');
-		var commaIndex: number = currentTransform.indexOf(',');
-		// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.
-		var xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
-		var yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
+		var previousTransform: string = this.containerToReorder.attr('transform');
 
 		// Generate the new transform.
-		var labelTransform: string = this.generateNewLabelTransform(xTransform, yTransform, deltaCoordinateTwo);
+		var labelTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
 
 		// Apply the new transformation to the label.
 		this.containerToReorder.attr('transform', labelTransform);
@@ -203,8 +195,7 @@ export class ReorderObjectivesInteraction {
 
 		// Move the label data for the label we rearranged to its new position in the array of labels.
 		if (this.newObjectiveIndex !== this.currentObjectiveIndex) {
-			let temp: VCLabelData = parentData.subLabelData[this.currentObjectiveIndex];
-			parentData.subLabelData.splice(this.currentObjectiveIndex, 1);
+			let temp: VCLabelData = parentData.subLabelData.splice(this.currentObjectiveIndex, 1)[0];
 			parentData.subLabelData.splice(this.newObjectiveIndex, 0, temp);
 		}
 
@@ -225,14 +216,6 @@ export class ReorderObjectivesInteraction {
 		this.chartDataService.reorderRows(primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.toggleObjectiveReordering(true);
-	}
-
-	generateNewLabelTransform(previousXTransform: number, previousYTransform: number, deltaCoordinateTwo: number): string {
-		if (this.renderConfigService.viewOrientation === 'vertical') {
-			return 'translate(' + previousXTransform + ',' + (previousYTransform + deltaCoordinateTwo) + ')';
-		} else {
-			return 'translate(' + (previousXTransform + deltaCoordinateTwo) + ',' + previousYTransform + ')';
-		}
 	}
 
 	// This function extracts the ordering of objectives from the ordering of labels.
@@ -257,11 +240,8 @@ export class ReorderObjectivesInteraction {
 			});
 		} else {
 			var scoreFunction: d3.Selection<any> = this.labelRenderer.rootContainer.select('#label-' + objective.getName() + '-scorefunction');
-			let currentTransform: string = scoreFunction.attr('transform');
-			let commaIndex: number = currentTransform.indexOf(',');
-			let xTransform: number = +currentTransform.substring(currentTransform.indexOf('(') + 1, commaIndex);
-			let yTransform: number = +currentTransform.substring(commaIndex + 1, currentTransform.indexOf(')'));
-			let scoreFunctionTransform: string = this.generateNewLabelTransform(xTransform, yTransform, deltaCoordinateTwo);
+			let previousTransform: string = scoreFunction.attr('transform');
+			let scoreFunctionTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
 			scoreFunction.attr('transform', scoreFunctionTransform);
 		}
 	}
