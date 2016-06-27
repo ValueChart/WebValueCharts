@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 16:59:12
+* @Last Modified time: 2016-06-27 10:15:53
 */
 
 import { Injectable } 					from '@angular/core';
@@ -325,9 +325,7 @@ export class ChartDataService {
 				});
 			}
 		}
-
-		console.log(alternativeScores);
-
+		
 		cellIndices.sort((a: number, b: number) => {
 			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
 			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
@@ -369,10 +367,12 @@ export class ChartDataService {
 		var reorderedRow: VCRowData;
 		var objectivesToOrderBy: PrimitiveObjective[];
 
-		if (objective.objectiveType === 'abstract')
-			objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
-		else {
-			objectivesToOrderBy = [<PrimitiveObjective> objective];
+		if (objective) {
+			if (objective.objectiveType === 'abstract')
+				objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
+			else {
+				objectivesToOrderBy = [<PrimitiveObjective> objective];
+			}
 		}
 
 		var cellIndices: number[] = generateOrder(this, this.rows, objectivesToOrderBy);
