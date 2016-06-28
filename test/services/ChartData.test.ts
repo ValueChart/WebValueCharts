@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 11:48:27
+* @Last Modified time: 2016-06-27 22:57:20
 */
 
 // Application Classes:
@@ -46,7 +46,7 @@ describe('ChartDataService', () => {
 	describe('getLabelData(valueChart: ValueChart): VCLabelData[]', () => {
 
 		it('it should convert the objective hierarchy into a hierarchy of VCLabelData', () => {
-			labelData = chartDataService.getLabelData(valueChart);
+			labelData = chartDataService.getLabelData();
 
 			expect(labelData).to.have.length(1); 							// The objective hierarchy from the XMLTestString has one root objective.
 			expect(labelData[0].objective.getName()).to.equal('Hotel');		// The root objective from the XMLTestString should be 'Hotel'
@@ -98,6 +98,7 @@ describe('ChartDataService', () => {
 		context('when some of the PrimitiveObjective weights are changed', () => {
 			before(function() {
 				var weightMap: WeightMap = valueChart.getUser().getWeightMap();
+				chartDataService.setValueChart(valueChart);
 				weightMap.setObjectiveWeight('size', 0.1);
 				weightMap.setObjectiveWeight('rate', 0.14);
 			});
@@ -149,6 +150,7 @@ describe('ChartDataService', () => {
 
 		context('when all of the PrimitiveObjective weights are changed', () => {
 			before(function() {
+				chartDataService.setValueChart(valueChart);
 				var weightMap: WeightMap = valueChart.getUser().getWeightMap();
 				weightMap.setObjectiveWeight('size', 0.2);
 				weightMap.setObjectiveWeight('rate', 0.75);
@@ -211,6 +213,7 @@ describe('ChartDataService', () => {
 
 		before(function() {
 			// Get the rate objective.
+			chartDataService.setValueChart(valueChart);
 			rate = valueChart.getAllPrimitiveObjectives().filter((objective: PrimitiveObjective) => {
 				return objective.getName() === 'rate';
 			})[0];
@@ -221,7 +224,7 @@ describe('ChartDataService', () => {
 
 		it('should format the alternative values for the given objective into cells, where each cell has one user score for each user.', () => {
 
-			var cellData: VCCellData[] = chartDataService.getCellData(valueChart, rate);
+			var cellData: VCCellData[] = chartDataService.getCellData(rate);
 
 			expect(cellData).to.have.length(6);
 
@@ -241,13 +244,14 @@ describe('ChartDataService', () => {
 		var objectiveNames: string[];
 
 		before(function() {
+			chartDataService.setValueChart(valueChart);
 			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
 		});
 
 		it(`should format the obejctives from the given ValueChart into rows, where each row is divided one cell for Alernative in the ValueChart
 			and each cell has one user score for each user`, () => {
 
-			var rows: VCRowData[] = chartDataService.getRowData(valueChart);
+			var rows: VCRowData[] = chartDataService.getRowData();
 
 			expect(rows).to.have.length(5);				// There are five objectives in the hotel ValueChart, so the data should have five rows.
 
@@ -275,7 +279,7 @@ describe('ChartDataService', () => {
 		before(function() {
 			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
 			chartDataService.setValueChart(valueChart);
-			rows = chartDataService.getRowData(valueChart);
+			rows = chartDataService.getRowData();
 			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
 			weightOffsets = [0, 0.46, 0.55, 0.59, 0.80];	// These weight offsets were found by summing the weights of all previous rows in the ordering for each row.
 															// The weights are ordered the same as the objective names.
@@ -283,7 +287,7 @@ describe('ChartDataService', () => {
 
 		it('should calculate the weight offset of each row as the sum of the weights of the rows coming before it in the array of rows.', () => {
 
-			rows = chartDataService.calculateWeightOffsets(rows);
+			chartDataService.updateWeightOffsets();
 
 			rows.forEach((row: VCRowData, index: number) => {
 				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Verify the ordering of objectives in the row data.
@@ -300,7 +304,7 @@ describe('ChartDataService', () => {
 		before(function() {
 			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
 			chartDataService.setValueChart(valueChart);
-			labelData = chartDataService.getLabelData(valueChart);
+			labelData = chartDataService.getLabelData();
 		});
 
 		context('when score functions are being rendered', () => {

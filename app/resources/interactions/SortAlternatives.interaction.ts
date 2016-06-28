@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 15:35:46
+* @Last Modified time: 2016-06-27 22:46:01
 */
 
 import { Injectable } 												from '@angular/core';
@@ -15,6 +15,8 @@ import * as $														from 'jquery';
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { ChangeDetectionService}									from '../services/ChangeDetection.service';
+
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -49,18 +51,25 @@ export class SortAlternativesInteraction {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
-		private chartUndoRedoService: ChartUndoRedoService) { }
+		private chartUndoRedoService: ChartUndoRedoService,
+		private changeDetectionService: ChangeDetectionService) { }
 
 	toggleAlternativeSorting(sortingType: string): void {
 		// Toggle Dragging to sort objectives:
 		if (sortingType === this.SORT_BY_OBJECTIVE) {
 			this.sortAlternativesByObjective(true);
+
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
 			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderAlphabetically);
+			this.changeDetectionService.alternativeOrderChanged = true;
+
 		} else if (sortingType === this.SORT_MANUALLY) {
 			this.sortAlternativesManually(true);
+
 		} else if (sortingType === this.RESET_SORT) {
 			this.chartDataService.resetCellOrder();
+			this.changeDetectionService.alternativeOrderChanged = true;
+
 		} else if (sortingType === this.SORT_OFF) {
 			this.sortAlternativesByObjective(false);
 			this.sortAlternativesManually(false);
@@ -79,6 +88,7 @@ export class SortAlternativesInteraction {
 			eventObject.preventDefault();
 			var objectiveToReorderBy: Objective = (<any>eventObject.target).__data__.objective;
 			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderByObjectiveScore, objectiveToReorderBy);
+			this.changeDetectionService.alternativeOrderChanged = true;
 		}
 
 		if (enableSorting) {
@@ -189,13 +199,14 @@ export class SortAlternativesInteraction {
 			alternatives.splice(this.newAlternativeIndex, 0, temp);
 
 
-			this.chartDataService.rows.forEach((row: VCRowData) => {
+			this.chartDataService.getRowData().forEach((row: VCRowData) => {
 				var temp: VCCellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
 				row.cells.splice(this.newAlternativeIndex, 0, temp);
 			});
 		}
 
 		d3.selectAll('.cell').style('opacity', 1);
+		this.changeDetectionService.alternativeOrderChanged = true;
 	}
 
 }

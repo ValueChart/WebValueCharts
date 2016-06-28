@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 11:34:40
+* @Last Modified time: 2016-06-27 22:27:32
 */
 
 import { Injectable } 												from '@angular/core';
@@ -30,7 +30,6 @@ export class RenderConfigService {
 	public dimensionTwoScale: any; // Linear scale between domain [0,1] and range [0, dimensionTwoSize]
 
 	public viewConfiguration: any = {};
-	public previousViewConfiguration: any = {};
 
 
 	constructor(private chartDataService: ChartDataService) { 

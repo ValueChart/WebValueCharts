@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 13:50:51
+* @Last Modified time: 2016-06-27 21:56:19
 */
 
 import { Injectable } 												from '@angular/core';
@@ -357,26 +357,6 @@ export class LabelRenderer {
 	toggleScoreFunctionValueLabels(): void {
 		for(var field in this.scoreFunctionRenderers) {
 			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
-		}
-	}
-
-	toggleSettingObjectiveColors(setObjectiveColors: boolean): void {
-		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
-		primitiveObjectiveLabels.off('click');
-		if (setObjectiveColors) {
-			primitiveObjectiveLabels.click((eventObject: Event) => {
-				var targetObjective: PrimitiveObjective = d3.select(eventObject.target).datum().objective;
-				var colorPicker = $('#primitiveObjective-color-picker');
-				colorPicker.off('change');
-				
-				colorPicker.change((e: Event) => {
-					var color: string = (<any> e.target).value;
-					targetObjective.setColor(color);
-					this.chartDataService.colorsHaveChanged = true;
-				});
-
-				colorPicker.click();
-			});
 		}
 	}
 

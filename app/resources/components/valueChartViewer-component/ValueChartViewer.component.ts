@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 16:13:41
+* @Last Modified time: 2016-06-27 22:03:20
 */
 
 import { Component }															from '@angular/core';
@@ -15,11 +15,14 @@ import * as $																	from 'jquery';
 // Application classes
 import { CreateComponent }														from '../create-component/Create.component';
 
-import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 import { CurrentUserService }													from '../../services/CurrentUser.service';
+
+import { ValueChartDirective }													from '../../directives/ValueChart.directive';
+
 import { ChartDataService }														from '../../services/ChartData.service';
 import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
+import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -28,6 +31,7 @@ import { LabelRenderer }														from '../../renderers/Label.renderer';
 import { ReorderObjectivesInteraction }											from '../../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
+import { SetColorsInteraction }													from '../../interactions/SetColors.interaction';
 
 // Model Classes
 import { ValueChart } 															from '../../model/ValueChart';
@@ -44,6 +48,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ChartDataService,
 		RenderConfigService,
 		ChartUndoRedoService,
+		ChangeDetectionService,
 	// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
@@ -51,7 +56,8 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	// Interactions:
 		ReorderObjectivesInteraction,
 		ResizeWeightsInteraction,
-		SortAlternativesInteraction]
+		SortAlternativesInteraction,
+		SetColorsInteraction]
 })
 export class ValueChartViewerComponent implements OnInit {
 

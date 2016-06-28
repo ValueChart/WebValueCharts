@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 14:05:10
+* @Last Modified time: 2016-06-27 22:12:47
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,6 +14,8 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { ChangeDetectionService}									from '../services/ChangeDetection.service';
+
 import { LabelRenderer }											from '../renderers/Label.renderer';
 
 // Model Classes
@@ -52,6 +54,7 @@ export class ReorderObjectivesInteraction {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
+		private changeDetectionService: ChangeDetectionService,
 		private labelRenderer: LabelRenderer) { }
 
 
@@ -216,6 +219,8 @@ export class ReorderObjectivesInteraction {
 		this.chartDataService.reorderRows(primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.toggleObjectiveReordering(true);
+
+		this.changeDetectionService.rowOrderChanged = true;
 	}
 
 	// This function extracts the ordering of objectives from the ordering of labels.

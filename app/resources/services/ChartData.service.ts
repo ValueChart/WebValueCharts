@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 10:15:53
+* @Last Modified time: 2016-06-27 22:53:16
 */
 
 import { Injectable } 					from '@angular/core';
@@ -62,12 +62,13 @@ export class ChartDataService {
 	public scoreFunctionMap: ScoreFunctionMap;
 	public primitiveObjectives: PrimitiveObjective[];
 	public numUsers: number;
+
 	public alternatives: Alternative[];
 	public numAlternatives: number;
-	public rows: VCRowData[];
-	public labelData: VCLabelData[];
 
-	public colorsHaveChanged: boolean = false;
+	private rowData: VCRowData[];
+	private labelData: VCLabelData[];
+
 	constructor() { }
 
 	// Initialize Service fields based on the passed-in ValueChart.
@@ -91,13 +92,18 @@ export class ChartDataService {
 		return this.valueChart;
 	}
 
-	getLabelData(valueChart: ValueChart): VCLabelData[] {
+	getLabelData(): VCLabelData[] {
+		if (this.labelData) {
+			return this.labelData;
+		}
+
 		var labelData: VCLabelData[] = [];
 
-		valueChart.getRootObjectives().forEach((objective: Objective) => {
+		this.valueChart.getRootObjectives().forEach((objective: Objective) => {
 			labelData.push(this.calculateAbstractObjectiveWeight(objective, 0));
-		})
+		});
 
+		this.labelData = labelData;
 		return labelData; 
 	} 
 
@@ -137,16 +143,16 @@ export class ChartDataService {
 		}
 	}
 
-	getCellData(valueChart: ValueChart, objective: PrimitiveObjective): VCCellData[] {
+	getCellData(objective: PrimitiveObjective): VCCellData[] {
 		var users: User[];
 
-		if (valueChart.type === 'group') {
-			users = (<GroupValueChart>valueChart).getUsers();
+		if (this.valueChart.type === 'group') {
+			users = (<GroupValueChart>this.valueChart).getUsers();
 		} else {
-			users = [(<IndividualValueChart>valueChart).getUser()];
+			users = [(<IndividualValueChart>this.valueChart).getUser()];
 		}
 
-		var objectiveValues: any[] = valueChart.getAlternativeValuesforObjective(objective);
+		var objectiveValues: any[] = this.valueChart.getAlternativeValuesforObjective(objective);
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
@@ -165,37 +171,16 @@ export class ChartDataService {
 		return objectiveValues;
 	}
 
-	getRowData(valueChart: ValueChart): VCRowData[] {
-		var rowData: VCRowData[] = [];
-
-		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			rowData.push({
-				objective: objective,
-				weightOffset: 0,
-				cells: this.getCellData(valueChart, objective)
-			});
-		});
-		return rowData;
-	}
-
-
-	// Methods for manipulating and updating ValueChart data that has been formatted for d3: 
-
-	// Calculate the weight offset for each row. The weight offset for one row is the combined weights of all rows
-	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
-	// seeing as the weight of the previous rows depends on the their weights.
-	calculateWeightOffsets(rows: VCRowData[]): VCRowData[] {
+	updateWeightOffsets(): void {
 		var weightOffset: number = 0;
 
-		for (var i = 0; i < rows.length; i++) {
-			rows[i].weightOffset = weightOffset;
-			weightOffset += this.weightMap.getObjectiveWeight(rows[i].objective.getName());
+		for (var i = 0; i < this.rowData.length; i++) {
+			this.rowData[i].weightOffset = weightOffset;
+			weightOffset += this.weightMap.getObjectiveWeight(this.rowData[i].objective.getName());
 		}
-
-		return rows;
 	}
 
-	calculateStackedBarOffsets(rows: VCRowData[], viewOrientation: string): VCRowData[] {
+	updateStackedBarOffsets(viewOrientation: string) {
 		var stack = d3.layout.stack()
 			.x((d: any, i: number) => { return i; })
 			.y((d: any) => { 
@@ -209,12 +194,135 @@ export class ChartDataService {
 			stack.order('reverse');
 		}
 
-		for (var i: number = 0; i < rows[0].cells.length; i++) {
+		for (var i: number = 0; i < this.rowData[0].cells.length; i++) {
 			stack.values((d: any) => { return d.cells[i].userScores; })
-			stack(<any>rows);
+			stack(<any>this.rowData);
+		}
+	}
+
+	getRowData(): VCRowData[] {
+		if (this.rowData) {
+			return this.rowData;
 		}
 
-		return rows;
+		var rowData: VCRowData[] = [];
+
+		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+			rowData.push({
+				objective: objective,
+				weightOffset: 0,
+				cells: this.getCellData(objective)
+			});
+		});
+
+		this.rowData = rowData;
+		return rowData;
+	}
+
+	reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
+		var desiredIndices: any = {};
+
+		this.rowData.sort((a: VCRowData, b: VCRowData) => {
+			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
+			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
+
+			desiredIndices[a.objective.getName()] = aIndex;
+			desiredIndices[b.objective.getName()] = bIndex;
+
+			if (aIndex < bIndex)
+				return -1;
+			else
+				return 1;
+		});
+	}
+
+	reorderAllCells(generateOrder: Function, objective?: Objective): void {
+		var reorderedRow: VCRowData;
+		var objectivesToOrderBy: PrimitiveObjective[];
+
+		if (objective) {
+			if (objective.objectiveType === 'abstract')
+				objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
+			else {
+				objectivesToOrderBy = [<PrimitiveObjective> objective];
+			}
+		}
+
+		var cellIndices: number[] = generateOrder(this, this.rowData, objectivesToOrderBy);
+
+
+		this.rowData.forEach((row: VCRowData, index: number) => {
+			row.cells = d3.permute(row.cells, cellIndices);
+		});
+		this.alternatives = d3.permute(this.alternatives, cellIndices);
+	}
+
+	resetCellOrder(): void {
+		// Reset the alternative order to be the ordering from the ValueChart.
+		this.alternatives = this.valueChart.getAlternatives();
+		// Keep the ordering of the rows, but reset the cell order to be the ordering from the ValueChart.
+		this.rowData.forEach((row: VCRowData) => {
+			row.cells = this.getCellData(row.objective);
+		})
+	}
+
+
+	// Methods for manipulating and updating ValueChart data that has been formatted for d3: 
+
+	// Calculate the weight offset for each row. The weight offset for one row is the combined weights of all rows
+	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
+	// seeing as the weight of the previous rows depends on the their weights.
+
+	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
+		// Generate an array of indexes according to the number of cells in each row.
+		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
+		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
+
+		for (var i = 0; i < rowsToReorder.length; i++) {
+			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
+				var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
+				var weight: number = chartDataService.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
+				rowsToReorder[i].cells.forEach((cell: VCCellData, index: number) => {
+					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
+				});
+			}
+		}
+		
+		cellIndices.sort((a: number, b: number) => {
+			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
+			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
+
+			if (aScore === bScore) {
+				return 0;						// Do not change the ordering of a and b.
+			} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
+				return -1;						// a should come before b in the ordering
+			} else {
+				return 1;						// b should come before a in the ordering.
+			}
+		});
+		
+		return cellIndices;
+	}
+
+	generateCellOrderAlphabetically(chartDataService: ChartDataService): number[] {
+		// Generate an array of indexes according to the number of cells in each row.
+		var cellIndices: number[] = d3.range(chartDataService.numAlternatives);
+
+		cellIndices.sort((a: number, b: number) => {
+
+			var aName: string = chartDataService.alternatives[a].getName().toLowerCase();
+			var bName: string = chartDataService.alternatives[b].getName().toLowerCase();
+
+			if (aName === bName) {
+				return 0;						// Do not change the ordering of a and b.
+			} else if (aName < bName) {			// The earlier the letter in the alphabet, the smaller its character code.
+				return -1;						// a should come before b in the ordering
+			} else {
+				return 1;						// b should come before a in the ordering.
+			}
+		});
+
+		return cellIndices; 
 	}
 
 	calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
@@ -292,105 +400,6 @@ export class ChartDataService {
 				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, childMax);
 			}
 		});
-	}
-
-	reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
-		var desiredIndices: any = {};
-
-		this.rows.sort((a: VCRowData, b: VCRowData) => {
-			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
-			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
-
-			desiredIndices[a.objective.getName()] = aIndex;
-			desiredIndices[b.objective.getName()] = bIndex;
-
-			if (aIndex < bIndex)
-				return -1;
-			else
-				return 1;
-		});
-	}
-
-	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
-		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
-		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
-
-		for (var i = 0; i < rowsToReorder.length; i++) {
-			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = chartDataService.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
-				rowsToReorder[i].cells.forEach((cell: VCCellData, index: number) => {
-					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
-				});
-			}
-		}
-		
-		cellIndices.sort((a: number, b: number) => {
-			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
-			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
-
-			if (aScore === bScore) {
-				return 0;						// Do not change the ordering of a and b.
-			} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
-				return -1;						// a should come before b in the ordering
-			} else {
-				return 1;						// b should come before a in the ordering.
-			}
-		});
-		
-		return cellIndices;
-	}
-
-	generateCellOrderAlphabetically(chartDataService: ChartDataService): number[] {
-		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(chartDataService.numAlternatives);
-
-		cellIndices.sort((a: number, b: number) => {
-
-			var aName: string = chartDataService.alternatives[a].getName().toLowerCase();
-			var bName: string = chartDataService.alternatives[b].getName().toLowerCase();
-
-			if (aName === bName) {
-				return 0;						// Do not change the ordering of a and b.
-			} else if (aName < bName) {			// The earlier the letter in the alphabet, the smaller its character code.
-				return -1;						// a should come before b in the ordering
-			} else {
-				return 1;						// b should come before a in the ordering.
-			}
-		});
-
-		return cellIndices; 
-	}
-
-	reorderAllCells(generateOrder: Function, objective?: Objective): void {
-		var reorderedRow: VCRowData;
-		var objectivesToOrderBy: PrimitiveObjective[];
-
-		if (objective) {
-			if (objective.objectiveType === 'abstract')
-				objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
-			else {
-				objectivesToOrderBy = [<PrimitiveObjective> objective];
-			}
-		}
-
-		var cellIndices: number[] = generateOrder(this, this.rows, objectivesToOrderBy);
-
-
-		this.rows.forEach((row: VCRowData, index: number) => {
-			row.cells = d3.permute(row.cells, cellIndices);
-		});
-		this.alternatives = d3.permute(this.alternatives, cellIndices);
-	}
-
-	resetCellOrder(): void {
-		// Reset the alternative order to be the ordering from the ValueChart.
-		this.alternatives = this.valueChart.getAlternatives();
-		// Keep the ordering of the rows, but reset the cell order to be the ordering from the ValueChart.
-		this.rows.forEach((row: VCRowData) => {
-			row.cells = this.getCellData(this.valueChart, row.objective);
-		})
 	}
 
 }
