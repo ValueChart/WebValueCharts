@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 13:14:15
+* @Last Modified time: 2016-06-28 15:51:40
 */
 
 import { Injectable } 												from '@angular/core';
@@ -12,7 +12,7 @@ import * as d3 														from 'd3';
 import * as $														from 'jquery';
 
 // Application Classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
+import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
@@ -23,6 +23,9 @@ import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 import { Alternative }												from '../model/Alternative';
+
+import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+
 
 
 @Injectable()

@@ -2,18 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:34:47
+* @Last Modified time: 2016-06-28 15:51:08
 */
 
 // Application Classes:
-import { ChartDataService, VCRowData, VCCellData, VCLabelData}		from '../../app/resources/services/ChartData.service';
+import { ChartDataService }											from '../../app/resources/services/ChartData.service';
 import { XMLValueChartParser } 										from '../../app/resources/services/XMLValueChartParser.service';
 
 // Model Classes:
 import { ValueChart }												from '../../app/resources/model/ValueChart';
 import { IndividualValueChart }										from '../../app/resources/model/IndividualValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
-import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective';
+import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
+
+import {VCRowData, VCCellData, VCLabelData}							from '../../app/resources/model/ChartDataTypes';
+
 
 
 // Test Resources:

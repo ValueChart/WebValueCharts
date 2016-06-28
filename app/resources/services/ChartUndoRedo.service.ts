@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:54:35
+* @Last Modified time: 2016-06-28 15:35:38
 */
 
 
@@ -167,8 +167,7 @@ export class ChartUndoRedoService {
 
 	objectivesChange(objectivesRecord: ObjectivesRecord, stateRecords: Memento[]): void {
 		var currentObjectives: Objective[] = this.chartDataService.getValueChart().getRootObjectives();
-		console.log(objectivesRecord);
-		console.log(currentObjectives);
+
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 
 		this.chartDataService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);

@@ -2,56 +2,31 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:46:42
+* @Last Modified time: 2016-06-28 15:54:45
 */
 
-import { Injectable } 					from '@angular/core';
+import { Injectable } 							from '@angular/core';
 
 // Application Classes:
-import { AlternativeOrderRecord }		from '../model/Records';
+import { AlternativeOrderRecord }				from '../model/Records';
 
 // Model Classes
-import { ValueChart }					from '../model/ValueChart';
-import { IndividualValueChart }			from '../model/IndividualValueChart';
-import { GroupValueChart }				from '../model/GroupValueChart';
-import { Objective }					from '../model/Objective';
-import { PrimitiveObjective }			from '../model/PrimitiveObjective';
-import { AbstractObjective }			from '../model/AbstractObjective';
-import { User }							from '../model/User';	
-import { Alternative }					from '../model/Alternative';
-import { WeightMap }					from '../model/WeightMap';
-import { CategoricalDomain }			from '../model/CategoricalDomain';
-import { IntervalDomain }				from '../model/IntervalDomain';
-import { ContinuousDomain }				from '../model/ContinuousDomain';
-import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
+import { ValueChart }							from '../model/ValueChart';
+import { IndividualValueChart }					from '../model/IndividualValueChart';
+import { GroupValueChart }						from '../model/GroupValueChart';
+import { Objective }							from '../model/Objective';
+import { PrimitiveObjective }					from '../model/PrimitiveObjective';
+import { AbstractObjective }					from '../model/AbstractObjective';
+import { User }									from '../model/User';	
+import { Alternative }							from '../model/Alternative';
+import { WeightMap }							from '../model/WeightMap';
+import { CategoricalDomain }					from '../model/CategoricalDomain';
+import { IntervalDomain }						from '../model/IntervalDomain';
+import { ContinuousDomain }						from '../model/ContinuousDomain';
+import { ScoreFunctionMap }						from '../model/ScoreFunctionMap';
 
-
-
-export interface VCRowData {
-	objective: PrimitiveObjective;
-	weightOffset: number;
-	cells: VCCellData[];
-}
-
-export interface VCCellData {
-	alternative: Alternative;
-	value: (string | number);
-	userScores: {
-		user: User,
-		objective: Objective,
-		value: (string | number);
-		offset?: number
-	}[];
-}
-
-export interface VCLabelData {
-	objective: Objective;
-	weight: number;
-	depth: number;
-	depthOfChildren: number;
-	subLabelData?: VCLabelData[]
-}
-
+import {VCRowData, VCCellData, VCLabelData}		from '../model/ChartDataTypes';
+	
 // This class serves two purposes:
 // 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
 //			this state as a way of initiating change detection in ValueChartDirective, thus trigging re-rendering. 
@@ -88,11 +63,15 @@ export class ChartDataService {
 			this.weightMap = (<GroupValueChart>this.valueChart).calculateAverageWeightMap();
 			this.numUsers = (<GroupValueChart>this.valueChart).getUsers().length;
 		}
+
 		this.numAlternatives = this.valueChart.getAlternatives().length;
 		this.alternatives = this.valueChart.getAlternatives();
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 
 		this.originalAlternativeOrder = new AlternativeOrderRecord(this.alternatives);
+
+		this.generateLabelData();
+		this.generateRowData();
 	}
 
 	getValueChart(): ValueChart {
@@ -127,15 +106,16 @@ export class ChartDataService {
 		if (this.labelData) {
 			return this.labelData;
 		}
+		this.generateLabelData();
+		return this.labelData; 
+	}
 
+	generateLabelData(): void {
 		this.labelData = [];
 
 		this.valueChart.getRootObjectives().forEach((objective: Objective) => {
 			this.labelData.push(this.getLabelDatum(objective, 0));
 		});
-
-
-		return this.labelData; 
 	}
 
 	updateLabelDataWeights(labelDatum: VCLabelData): void {
@@ -190,6 +170,11 @@ export class ChartDataService {
 			return this.rowData;
 		}
 
+		this.generateRowData();
+		return this.rowData;
+	}
+
+	generateRowData(): void {
 		this.rowData = [];
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
@@ -199,8 +184,6 @@ export class ChartDataService {
 				cells: this.getCellData(objective)
 			});
 		});
-
-		return this.rowData;
 	}
 
 	updateWeightOffsets(): void {

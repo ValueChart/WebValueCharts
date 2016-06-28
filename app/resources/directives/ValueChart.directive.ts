@@ -2,20 +2,19 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:34:49
+* @Last Modified time: 2016-06-28 15:54:46
 */
 
 
 import { Directive, Input } 													from '@angular/core';
 import { OnInit, DoCheck, SimpleChange }										from '@angular/core';
 import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
-import { KeyValueDiffers, IterableDiffers, KeyValueDiffer, IterableDiffer }		from '@angular/core';
 
 // d3
 import * as d3 																	from 'd3';
 
 // Application classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }					from '../services/ChartData.service';
+import { ChartDataService}														from '../services/ChartData.service';
 import { RenderConfigService }													from '../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
@@ -29,7 +28,6 @@ import { ResizeWeightsInteraction }												from '../interactions/ResizeWeigh
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../interactions/SetColors.interaction';
 
-
 // Model Classes
 import { ValueChart } 															from '../model/ValueChart';
 import { GroupValueChart } 														from '../model/GroupValueChart';
@@ -38,6 +36,9 @@ import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 import { WeightMap }															from '../model/WeightMap';
 import { User }																	from '../model/User';
 import { ScoreFunction }														from '../model/ScoreFunction';
+
+import {VCRowData, VCCellData, VCLabelData}										from '../model/ChartDataTypes';
+
 
 @Directive({
 	selector: 'ValueChart',
@@ -53,14 +54,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
 	// Height and width of the viewport for use with viewBox attribute of the root SVG element
-
 	private viewportWidth: number;
 	private viewportHeight: number;
-
-	// ValueChart data that has been organized to work with d3.
-	private dataRows: VCRowData[];	// ValueCharts row (or column if in vertical orientation) data. Each array element is the data for one objective.
-	private labelData: VCLabelData[];
-	private primitiveObjectives: PrimitiveObjective[];
 
 	// Interaction Toggles
 	private interactionConfig: any = {};
@@ -95,14 +90,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewportWidth = 1700;
 		this.viewportHeight = 850;
 
-		// Configure the Chart Data Service.
+		// Configure the ChartDataService.
 		this.chartDataService.setValueChart(this.valueChart);
-		// 
-		this.dataRows = this.chartDataService.getRowData();
+		// Retrieve the formatted data from ChartDataService.
 		this.chartDataService.updateWeightOffsets();
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
-
-		this.labelData = this.chartDataService.getLabelData();
 
 		// Configure the Render Service:
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
@@ -127,14 +119,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 		// Render the ValueChart:
-		this.labelRenderer.createLabelSpace(this.el, this.labelData, this.chartDataService.primitiveObjectives);
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.labelRenderer.createLabelSpace(this.el, this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
 
-		this.objectiveChartRenderer.createObjectiveChart(this.el, this.dataRows);
+		this.objectiveChartRenderer.createObjectiveChart(this.el, this.chartDataService.getRowData());
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 
-		this.summaryChartRenderer.createSummaryChart(this.el, this.dataRows);
-		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
+		this.summaryChartRenderer.createSummaryChart(this.el, this.chartDataService.getRowData());
+		this.summaryChartRenderer.renderSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
 	initChangeDetection(): void {
@@ -157,7 +149,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			return;
 
 		this.detectValueChartChanges();
-		this.detectDataRowChanges();
+		this.detectDataOrderChanges();
 		this.detectViewConfigChanges();
 		this.detectInteractionConfigChanges();
 	}
@@ -167,51 +159,52 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Check for changes to the ValueChart fields. This is NOT deep.
 		var valueChartChanges = this.changeDetectionService.valueChartDiffer.diff(this.valueChart);
 		if (valueChartChanges) {
-			this.updateValueChart();
+			this.chartDataService.setValueChart(this.valueChart);
+			this.updateValueChartDisplay();
 		}
 		// Check for changes to the User fields. This is NOT deep.
 		var user = (<IndividualValueChart>this.valueChart).getUser();
 		var userChanges = this.changeDetectionService.userDiffer.diff(user);
 		if (userChanges) {
-			this.updateValueChart();
+			this.updateValueChartDisplay();
 		}
 		// Check for changes to the WeightMap. This is NOT deep, and only checks the internal mappings of the WeightMap.
 		var internalWeightMap = user.getWeightMap().getInternalWeightMap();
 		var weightMapChanges = this.changeDetectionService.weightMapDiffer.diff(internalWeightMap);
 		if (weightMapChanges) {
-			this.updateValueChart();
+			this.updateValueChartDisplay();
 		}
 
 		// Check for changes to the ScoreFunctions. This is NOT deep, and only checks the internal mappings of the ScoreFunctions.
 		var scoreFunctionMap = user.getScoreFunctionMap();
 		var scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffer.diff(scoreFunctionMap);
 		if (scoreFunctionMapChanges) {
-			this.updateValueChart();
+			this.updateValueChartDisplay();
 		}
 
 		var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
 		scoreFunctions.forEach((scoreFunction: ScoreFunction, index: number) => {
 			var scoreFunctionChanges = this.changeDetectionService.scoreFunctionDiffers[index].diff(scoreFunction.getElementScoreMap());
 			if (scoreFunctionChanges) {
-				this.updateValueChart();
+				this.updateValueChartDisplay();
 			}
 		});
 
 		if (this.changeDetectionService.colorsHaveChanged) {
 			// Objective colors have been changed
 			this.changeDetectionService.colorsHaveChanged = false;
-			this.updateValueChart();
+			this.updateValueChartDisplay();
 		}
 	}
 
-	detectDataRowChanges(): void {
+	detectDataOrderChanges(): void {
 		if (this.changeDetectionService.rowOrderChanged		||
 			this.changeDetectionService.alternativeOrderChanged
 			) {
 				this.changeDetectionService.rowOrderChanged = false;
 				this.changeDetectionService.alternativeOrderChanged = false;
 
-				this.updateDataRows();
+				this.updateDataRowsDisplay();
 		}
 	}
 
@@ -277,29 +270,29 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 	}
 
-	updateValueChart(): void {
+	updateValueChartDisplay(): void {
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.chartDataService.updateWeightOffsets();
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 		
-		this.labelData.forEach((labelDatum: VCLabelData) => {
+		this.chartDataService.getLabelData().forEach((labelDatum: VCLabelData) => {
 			this.chartDataService.updateLabelDataWeights(labelDatum);
 		});
 
-		this.labelRenderer.updateLabelSpace(this.labelData, 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);
-		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
+		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
-	updateDataRows(): void {
+	updateDataRowsDisplay(): void {
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.chartDataService.updateWeightOffsets();
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 		
-		this.objectiveChartRenderer.updateObjectiveChart(this.dataRows, this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.dataRows, this.viewOrientation);
+		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 
 	}
 
@@ -309,13 +302,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
-		this.summaryChartRenderer.renderSummaryChart(this.dataRows, this.viewOrientation);
+		this.summaryChartRenderer.renderSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
 	updateScoreFunctionDisplay(): void {
-		this.labelRenderer.renderLabelSpace(this.labelData, this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
 	}
 
 

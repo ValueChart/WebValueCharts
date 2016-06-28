@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:08:33
+* @Last Modified time: 2016-06-28 15:51:39
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,7 +13,7 @@ import * as d3 														from 'd3';
 import * as $														from 'jquery';
 
 // Application Classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
+import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
@@ -22,7 +22,7 @@ import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreF
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
 import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
 
-import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
+import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.interaction';
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -31,6 +31,9 @@ import { AbstractObjective }										from '../model/AbstractObjective';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
+
+import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+
 
 
 // This class renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 

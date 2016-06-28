@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:55:17
+* @Last Modified time: 2016-06-28 15:51:42
 */
 
 import { Injectable } 												from '@angular/core';
@@ -12,7 +12,7 @@ import { NgZone }													from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
+import { ChartDataService}											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -23,6 +23,9 @@ import { LabelRenderer }											from '../renderers/Label.renderer';
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
+
+import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+
 
 
 // This class contains all the logic for dragging objective labels change the order of objectives in the objective and summary charts.
