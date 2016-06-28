@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 13:45:29
+* @Last Modified time: 2016-06-28 11:08:34
 */
 
 import { Injectable } 												from '@angular/core';
@@ -41,7 +41,7 @@ export class ResizeWeightsInteraction {
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
 				// Save the current state of the Weight Map.
-				this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
+				this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
 
 				// Calculate the correct weight increment.
 				var totalWeight: number = this.chartDataService.weightMap.getWeightTotal();

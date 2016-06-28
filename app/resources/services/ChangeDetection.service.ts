@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:37:05
+* @Last Modified time: 2016-06-28 11:41:54
 */
 
 import { Injectable } 															from '@angular/core';
@@ -19,7 +19,6 @@ export class ChangeDetectionService {
 
 	// Public flags that can be set to notify the ValueChart directive about changes.
 	public rowOrderChanged: boolean;
-	public cellOrderChanged: boolean;
 	public alternativeOrderChanged: boolean;
 	public colorsHaveChanged: boolean;
 

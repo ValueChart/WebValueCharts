@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:54:37
+* @Last Modified time: 2016-06-28 11:42:42
 */
 
 
@@ -196,15 +196,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				this.updateValueChart();
 			}
 		});
+
+		if (this.changeDetectionService.colorsHaveChanged) {
+			// Objective colors have been changed
+			this.changeDetectionService.colorsHaveChanged = false;
+			this.updateValueChart();
+		}
 	}
 
 	detectDataRowChanges(): void {
 		if (this.changeDetectionService.rowOrderChanged		||
-			this.changeDetectionService.cellOrderChanged 	||
 			this.changeDetectionService.alternativeOrderChanged
 			) {
 			this.changeDetectionService.rowOrderChanged = false;
-			this.changeDetectionService.cellOrderChanged = false;
 			this.changeDetectionService.alternativeOrderChanged = false;
 
 			this.updateDataRows();
@@ -270,12 +274,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.changeDetectionService.previousInteractionConfig.setObjectiveColors = this.interactionConfig.setObjectiveColors;
 			// Toggle setting objective colors:
 			this.setColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
-		}
-
-		if (this.changeDetectionService.colorsHaveChanged) {
-			// Objective colors have been changed
-			this.changeDetectionService.colorsHaveChanged = false;
-			this.updateValueChart();
 		}
 	}
 

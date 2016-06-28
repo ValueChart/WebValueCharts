@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:46:01
+* @Last Modified time: 2016-06-28 11:45:14
 */
 
 import { Injectable } 												from '@angular/core';
@@ -20,6 +20,8 @@ import { ChangeDetectionService}									from '../services/ChangeDetection.servi
 
 // Model Classes
 import { Objective }												from '../model/Objective';
+import { PrimitiveObjective }										from '../model/PrimitiveObjective';
+import { AbstractObjective }										from '../model/AbstractObjective';
 import { Alternative }												from '../model/Alternative';
 
 
@@ -60,13 +62,17 @@ export class SortAlternativesInteraction {
 			this.sortAlternativesByObjective(true);
 
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
-			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderAlphabetically);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+
+			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderAlphabetically());
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_MANUALLY) {
 			this.sortAlternativesManually(true);
 
 		} else if (sortingType === this.RESET_SORT) {
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+
 			this.chartDataService.resetCellOrder();
 			this.changeDetectionService.alternativeOrderChanged = true;
 
@@ -85,9 +91,17 @@ export class SortAlternativesInteraction {
 		objectiveText.off('dblclick');
 
 		var sortByObjective = (eventObject: Event) => {
-			eventObject.preventDefault();
-			var objectiveToReorderBy: Objective = (<any>eventObject.target).__data__.objective;
-			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderByObjectiveScore, objectiveToReorderBy);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+
+			var objective: Objective = (<any>eventObject.target).__data__.objective;
+			var objectivesToReorderBy: PrimitiveObjective[];
+			if (objective.objectiveType === 'abstract') {
+				objectivesToReorderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
+			} else {
+				objectivesToReorderBy = [<PrimitiveObjective> objective];
+			}
+			var cellIndices: number[] = this.chartDataService.generateCellOrderByObjectiveScore(this.chartDataService.getRowData(), objectivesToReorderBy)
+			this.chartDataService.reorderAllCells(cellIndices);
 			this.changeDetectionService.alternativeOrderChanged = true;
 		}
 
@@ -113,6 +127,8 @@ export class SortAlternativesInteraction {
 	}
 
 	startSortAlternatives = (d: Alternative, i: number) => {
+		this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+
 		this.minCoordOne = 0;
 		this.maxCoordOne = this.renderConfigService.dimensionOneSize;
 		this.totalCoordOneChange = 0;

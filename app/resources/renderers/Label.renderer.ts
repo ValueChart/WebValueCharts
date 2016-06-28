@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 21:56:19
+* @Last Modified time: 2016-06-28 11:08:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -278,7 +278,7 @@ export class LabelRenderer {
 
 		dragToResizeWeights.on('dragstart', (d: any, i: number) => {
 			// Save the current state of the Weight Map.
-			this.chartUndoRedoService.saveWeightMapState(this.chartDataService.weightMap);
+			this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
 		})
 		.on('drag', this.resizeWeightsInteraction.resizeWeights);
 

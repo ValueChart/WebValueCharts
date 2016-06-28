@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:53:16
+* @Last Modified time: 2016-06-28 11:21:18
 */
 
 import { Injectable } 					from '@angular/core';
@@ -236,24 +236,11 @@ export class ChartDataService {
 		});
 	}
 
-	reorderAllCells(generateOrder: Function, objective?: Objective): void {
-		var reorderedRow: VCRowData;
-		var objectivesToOrderBy: PrimitiveObjective[];
-
-		if (objective) {
-			if (objective.objectiveType === 'abstract')
-				objectivesToOrderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
-			else {
-				objectivesToOrderBy = [<PrimitiveObjective> objective];
-			}
-		}
-
-		var cellIndices: number[] = generateOrder(this, this.rowData, objectivesToOrderBy);
-
-
+	reorderAllCells(cellIndices: number[]): void {
 		this.rowData.forEach((row: VCRowData, index: number) => {
 			row.cells = d3.permute(row.cells, cellIndices);
 		});
+
 		this.alternatives = d3.permute(this.alternatives, cellIndices);
 	}
 
@@ -273,15 +260,15 @@ export class ChartDataService {
 	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
 	// seeing as the weight of the previous rows depends on the their weights.
 
-	generateCellOrderByObjectiveScore(chartDataService: ChartDataService, rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
+	generateCellOrderByObjectiveScore(rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
 		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = chartDataService.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = chartDataService.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
+				var scoreFunction = this.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
+				var weight: number = this.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
 				rowsToReorder[i].cells.forEach((cell: VCCellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
@@ -304,14 +291,14 @@ export class ChartDataService {
 		return cellIndices;
 	}
 
-	generateCellOrderAlphabetically(chartDataService: ChartDataService): number[] {
+	generateCellOrderAlphabetically(): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(chartDataService.numAlternatives);
+		var cellIndices: number[] = d3.range(this.numAlternatives);
 
 		cellIndices.sort((a: number, b: number) => {
 
-			var aName: string = chartDataService.alternatives[a].getName().toLowerCase();
-			var bName: string = chartDataService.alternatives[b].getName().toLowerCase();
+			var aName: string = this.alternatives[a].getName().toLowerCase();
+			var bName: string = this.alternatives[b].getName().toLowerCase();
 
 			if (aName === bName) {
 				return 0;						// Do not change the ordering of a and b.

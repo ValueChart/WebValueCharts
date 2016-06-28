@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 16:15:31
+* @Last Modified time: 2016-06-28 11:08:18
 */
 
 import { Injectable } 					from '@angular/core';
@@ -157,7 +157,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.plottedPoints.call(dragToResizeScores.on('dragstart', (d: any, i: number) => {
 			// Save the current state of the ScoreFunction.
-			this.chartUndoRedoService.saveScoreFunctionState(scoreFunction, objective);
+			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 		}));
 
 		// Assign the callback function for when the points are dragged. Note that this must be done inside a anonymous function because we require

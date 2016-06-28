@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-21 15:10:50
+* @Last Modified time: 2016-06-28 11:08:17
 */
 
 import { Injectable } 					from '@angular/core';
@@ -156,7 +156,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Save the old ScoreFunction 
 		this.barTops.call(dragToChangeScore.on('dragstart', (d: any, i: number) => {
 			// Save the current state of the ScoreFunction.
-			this.chartUndoRedoService.saveScoreFunctionState(scoreFunction, objective);
+			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 		}));
 
 		

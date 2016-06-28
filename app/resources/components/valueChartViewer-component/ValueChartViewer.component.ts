@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:03:20
+* @Last Modified time: 2016-06-28 10:29:25
 */
 
 import { Component }															from '@angular/core';
@@ -127,8 +127,6 @@ export class ValueChartViewerComponent implements OnInit {
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
 
-		this.resizeDetailBox();
-
 		// Resize the alternative detail box whenever the window is resized.
 		$(window).resize((eventObjective: Event) => {
 			this.resizeDetailBox();
@@ -148,6 +146,7 @@ export class ValueChartViewerComponent implements OnInit {
 			let detailBoxContainer: any = $('.detail-box')[0];
 			let labelOutline: any = $('.label-outline')[0];
 			if (labelOutline) {
+				// Offset the detail box to the left if the ValueChart is in horizontal orientation.
 				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
 			}
 		}

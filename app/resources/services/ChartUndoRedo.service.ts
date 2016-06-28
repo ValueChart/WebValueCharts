@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 10:13:18
+* @Last Modified time: 2016-06-28 12:12:06
 */
 
 
@@ -10,9 +10,11 @@ import { Injectable } 					from '@angular/core';
 
 // Application Classes
 import { ChartDataService }				from './ChartData.service';
+import { ChangeDetectionService }		from './ChangeDetection.service';
 
 // Model Classes
 import { ValueChart }					from '../model/ValueChart';
+import { Alternative }					from '../model/Alternative';
 import { IndividualValueChart }			from '../model/IndividualValueChart';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { WeightMap }					from '../model/WeightMap';
@@ -21,119 +23,160 @@ import { ScoreFunction }				from '../model/ScoreFunction';
 import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 
+import { Memento }						from '../model/Memento';
+
+class AlternativeOrderRecord implements Memento {
+
+	public alternativeIndexMap: any;
+
+	constructor(alternatives: Alternative[]) {
+		this.alternativeIndexMap = {};
+
+		alternatives.forEach((alternative: Alternative, index: number) => {
+			this.alternativeIndexMap[alternative.getName()] = index;
+		});
+	}
+
+	getMemento(): Memento {
+		return this;
+	}
+} 
+
+class ScoreFunctionRecord implements Memento {
+	public objectiveName: string;
+	public scoreFunction: ScoreFunction;
+
+	constructor(objectiveName: string, scoreFunction: ScoreFunction) {
+		this.objectiveName = objectiveName;
+		this.scoreFunction = scoreFunction;
+	}
+
+	getMemento(): ScoreFunctionRecord {
+		return new ScoreFunctionRecord(this.objectiveName, this.scoreFunction.getMemento());
+	}
+}
+
 
 @Injectable()
 export class ChartUndoRedoService {
 
-	private SCORE_FUNCTION_CHANGE = 'scorefunction';
-	private WEIGHT_MAP_CHANGE = 'weightmap';
+	private SCORE_FUNCTION_CHANGE = 'scoreFunctionChange';
+	private WEIGHT_MAP_CHANGE = 'weightMapChange';
+	private ALTERNATIVE_ORDER_CHANGE = 'alternativeOrderChange';
 
-	private undoChanges: string[];
-	private redoChanges: string[];
+	private undoChangeTypes: string[];
+	private redoChangeTypes: string[];
 
-	private undoWeightMapStates: WeightMap[];
-	private redoWeightMapStates: WeightMap[];
-
-	private undoScoreFunctionStates: { 'scoreFunction': ScoreFunction, 'objectiveName': string }[];
-	private redoScoreFunctionStates: { 'scoreFunction': ScoreFunction, 'objectiveName': string }[];
+	private undoStateRecords: Memento[];
+	private redoStateRecords: Memento[];
 
 
-	constructor(private chartDataService: ChartDataService) {
-		this.undoChanges = [];
-		this.redoChanges = [];
-		this.undoWeightMapStates = [];
-		this.redoWeightMapStates = [];
-		this.undoScoreFunctionStates = [];
-		this.redoScoreFunctionStates = [];
+	constructor(
+		private chartDataService: ChartDataService,
+		private changeDetectionService: ChangeDetectionService) {
+		this.undoChangeTypes = [];
+		this.redoChangeTypes = [];
+		this.undoStateRecords = [];
+		this.redoStateRecords = [];
 	}
 
 	clearRedo(): void {
-		this.redoChanges = [];
-		this.redoWeightMapStates = [];
-		this.redoScoreFunctionStates = [];
+		this.redoChangeTypes = [];
+		this.redoStateRecords = [];
 	}
 
-	saveScoreFunctionState(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
+	saveScoreFunctionRecord(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 		// Record the type of change has been made.
-		this.undoChanges.push(this.SCORE_FUNCTION_CHANGE);
+		this.undoChangeTypes.push(this.SCORE_FUNCTION_CHANGE);
 
-		var scoreFunctionCopy: ScoreFunction = scoreFunction.getMemento();
+		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getName(), scoreFunction).getMemento();
 
 		// Save the copy that was just created, along with the name of the objective that it maps to.
-		this.undoScoreFunctionStates.push({ 'scoreFunction': scoreFunctionCopy, 'objectiveName': objective.getName() });
+		this.undoStateRecords.push(scoreFunctionRecord);
 	}
 
-	saveWeightMapState(weightMap: WeightMap): void {
+	saveWeightMapRecord(weightMap: WeightMap): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 		// Record the type of change that has been made.
-		this.undoChanges.push(this.WEIGHT_MAP_CHANGE);
+		this.undoChangeTypes.push(this.WEIGHT_MAP_CHANGE);
 
-		var weightMapCopy: WeightMap = weightMap.getMemento();
+		var weightMapRecord: WeightMap = weightMap.getMemento();
 
 		// Save the copy that was just created.
-		this.undoWeightMapStates.push(weightMapCopy);
+		this.undoStateRecords.push(weightMapRecord);
+	}
+
+	saveAlternativeOrderRecord(alternatives: Alternative[]): void {
+		// A new change as been made, so we should clear the redo stack.
+		this.clearRedo();
+
+		this.undoChangeTypes.push(this.ALTERNATIVE_ORDER_CHANGE);
+
+		var alternativeOrderRecord: AlternativeOrderRecord = new AlternativeOrderRecord(alternatives);
+
+		this.undoStateRecords.push(alternativeOrderRecord);
 	}
 
 	canUndo(): boolean {
-		return this.undoChanges.length !== 0;
+		return this.undoChangeTypes.length !== 0;
 	}
 
 	canRedo(): boolean {
-		return this.redoChanges.length !== 0;
+		return this.redoChangeTypes.length !== 0;
 	}
 
 	undo(): void {
 		if (!this.canUndo())
 			return;
 
-		var changeType = this.undoChanges.pop();
-		this.redoChanges.push(changeType);
+		var changeType: string = this.undoChangeTypes.pop();
+		this.redoChangeTypes.push(changeType);
+		var stateRecord: Memento = this.undoStateRecords.pop();
+		(<any> this)[changeType](stateRecord, this.redoStateRecords);
 
-		if (changeType === this.SCORE_FUNCTION_CHANGE) {
-			var scoreFunctionRecord = this.undoScoreFunctionStates.pop();
-			var currentScoreFunction: ScoreFunction = this.chartDataService.scoreFunctionMap.getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
-			this.redoScoreFunctionStates.push({ 'scoreFunction': currentScoreFunction, 'objectiveName': scoreFunctionRecord.objectiveName });
-
-			this.chartDataService.scoreFunctionMap.setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
-		} else if (changeType === this.WEIGHT_MAP_CHANGE) {
-			var savedWeightMap = this.undoWeightMapStates.pop();
-			var currentWeightMap: WeightMap = this.chartDataService.weightMap;
-			this.redoWeightMapStates.push(currentWeightMap);
-
-			this.chartDataService.weightMap = savedWeightMap;
-			// TODO: This will need to be changed because it assumes an IndividualValueChart...
-			(<IndividualValueChart> this.chartDataService.getValueChart()).getUser().setWeightMap(savedWeightMap);
-		}
 	}
 
 	redo(): void {
 		if (!this.canRedo()) 
 			return;
 
-		var changeType = this.redoChanges.pop();
-		this.undoChanges.push(changeType);
-
-		if (changeType === this.SCORE_FUNCTION_CHANGE) {
-			var scoreFunctionRecord = this.redoScoreFunctionStates.pop();
-			var currentScoreFunction: ScoreFunction = this.chartDataService.scoreFunctionMap.getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
-			this.undoScoreFunctionStates.push({ 'scoreFunction': currentScoreFunction, 'objectiveName': scoreFunctionRecord.objectiveName });
-
-			this.chartDataService.scoreFunctionMap.setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
-		} else if (changeType === this.WEIGHT_MAP_CHANGE) {
-			var savedWeightMap = this.redoWeightMapStates.pop();
-			var currentWeightMap: WeightMap = this.chartDataService.weightMap;
-			this.undoWeightMapStates.push(currentWeightMap);
-
-			this.chartDataService.weightMap = savedWeightMap;
-			// TODO: This will need to be changed because it assumes an IndividualValueChart...
-			(<IndividualValueChart>this.chartDataService.getValueChart()).getUser().setWeightMap(savedWeightMap);
-		}
+		var changeType = this.redoChangeTypes.pop();
+		this.undoChangeTypes.push(changeType);
+		var stateRecord: Memento = this.redoStateRecords.pop();
+		(<any> this)[changeType](stateRecord, this.undoStateRecords);
 	}
 
+	weightMapChange(weightMapRecord: WeightMap, stateRecords: Memento[]): void {
+		var currentWeightMap: WeightMap = this.chartDataService.weightMap;
+		stateRecords.push(currentWeightMap);
+		// TODO: Why isn't this.chartDataService.weightMap the same reference as chartDataService.valueChart.user.weightMap?
+		this.chartDataService.weightMap = weightMapRecord;
+		(<IndividualValueChart> this.chartDataService.getValueChart()).getUser().setWeightMap(weightMapRecord);
+	}
 
+	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, stateRecords: Memento[]): void {
+		var currentScoreFunction: ScoreFunction = this.chartDataService.scoreFunctionMap.getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
+		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
+
+		this.chartDataService.scoreFunctionMap.setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+	}
+
+	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, stateRecords: Memento[]): void {
+		var alternatives: Alternative[] = this.chartDataService.alternatives;
+		stateRecords.push(new AlternativeOrderRecord(alternatives));
+
+		var cellIndices: number[] = [];
+
+		alternatives.forEach((alternative: Alternative, index: number) => {
+			cellIndices[alternativeOrderRecord.alternativeIndexMap[alternative.getName()]] = index;
+		});
+
+		this.chartDataService.reorderAllCells(cellIndices);
+		this.changeDetectionService.alternativeOrderChanged = true;
+	}
 
 }
 
