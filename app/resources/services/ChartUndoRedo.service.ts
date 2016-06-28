@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 12:12:06
+* @Last Modified time: 2016-06-28 13:25:57
 */
 
 
@@ -24,37 +24,8 @@ import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 
 import { Memento }						from '../model/Memento';
-
-class AlternativeOrderRecord implements Memento {
-
-	public alternativeIndexMap: any;
-
-	constructor(alternatives: Alternative[]) {
-		this.alternativeIndexMap = {};
-
-		alternatives.forEach((alternative: Alternative, index: number) => {
-			this.alternativeIndexMap[alternative.getName()] = index;
-		});
-	}
-
-	getMemento(): Memento {
-		return this;
-	}
-} 
-
-class ScoreFunctionRecord implements Memento {
-	public objectiveName: string;
-	public scoreFunction: ScoreFunction;
-
-	constructor(objectiveName: string, scoreFunction: ScoreFunction) {
-		this.objectiveName = objectiveName;
-		this.scoreFunction = scoreFunction;
-	}
-
-	getMemento(): ScoreFunctionRecord {
-		return new ScoreFunctionRecord(this.objectiveName, this.scoreFunction.getMemento());
-	}
-}
+import { AlternativeOrderRecord }		from '../model/Records';
+import { ScoreFunctionRecord }			from '../model/Records';
 
 
 @Injectable()

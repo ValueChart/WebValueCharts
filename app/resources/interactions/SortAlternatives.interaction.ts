@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:45:14
+* @Last Modified time: 2016-06-28 13:14:15
 */
 
 import { Injectable } 												from '@angular/core';
@@ -39,7 +39,7 @@ export class SortAlternativesInteraction {
 	private alternativeBox: d3.Selection<any>;
 	private alternativeLabelToMove: d3.Selection<any>;
 	private totalScoreLabelToMove: d3.Selection<any>;
-
+	
 	private alternativeDimensionOneSize: number;
 	private minCoordOne: number;
 	private maxCoordOne: number;

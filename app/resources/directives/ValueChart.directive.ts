@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:42:42
+* @Last Modified time: 2016-06-28 13:37:35
 */
 
 
@@ -208,10 +208,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.changeDetectionService.rowOrderChanged		||
 			this.changeDetectionService.alternativeOrderChanged
 			) {
-			this.changeDetectionService.rowOrderChanged = false;
-			this.changeDetectionService.alternativeOrderChanged = false;
+				this.changeDetectionService.rowOrderChanged = false;
+				this.changeDetectionService.alternativeOrderChanged = false;
 
-			this.updateDataRows();
+				this.updateDataRows();
 		}
 	}
 

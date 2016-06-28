@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:21:18
+* @Last Modified time: 2016-06-28 13:26:20
 */
 
 import { Injectable } 					from '@angular/core';
+
+// Application Classes:
+import { AlternativeOrderRecord }		from '../model/Records';
 
 // Model Classes
 import { ValueChart }					from '../model/ValueChart';
@@ -69,6 +72,8 @@ export class ChartDataService {
 	private rowData: VCRowData[];
 	private labelData: VCLabelData[];
 
+	private originalAlternativeOrder: AlternativeOrderRecord;
+
 	constructor() { }
 
 	// Initialize Service fields based on the passed-in ValueChart.
@@ -86,6 +91,8 @@ export class ChartDataService {
 		this.numAlternatives = this.valueChart.getAlternatives().length;
 		this.alternatives = this.valueChart.getAlternatives();
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
+
+		this.originalAlternativeOrder = new AlternativeOrderRecord(this.alternatives);
 	}
 
 	getValueChart(): ValueChart {
@@ -171,6 +178,25 @@ export class ChartDataService {
 		return objectiveValues;
 	}
 
+	getRowData(): VCRowData[] {
+		if (this.rowData) {
+			return this.rowData;
+		}
+
+		var rowData: VCRowData[] = [];
+
+		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+			rowData.push({
+				objective: objective,
+				weightOffset: 0,
+				cells: this.getCellData(objective)
+			});
+		});
+
+		this.rowData = rowData;
+		return rowData;
+	}
+
 	updateWeightOffsets(): void {
 		var weightOffset: number = 0;
 
@@ -200,25 +226,6 @@ export class ChartDataService {
 		}
 	}
 
-	getRowData(): VCRowData[] {
-		if (this.rowData) {
-			return this.rowData;
-		}
-
-		var rowData: VCRowData[] = [];
-
-		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			rowData.push({
-				objective: objective,
-				weightOffset: 0,
-				cells: this.getCellData(objective)
-			});
-		});
-
-		this.rowData = rowData;
-		return rowData;
-	}
-
 	reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
 		var desiredIndices: any = {};
 
@@ -245,12 +252,13 @@ export class ChartDataService {
 	}
 
 	resetCellOrder(): void {
-		// Reset the alternative order to be the ordering from the ValueChart.
-		this.alternatives = this.valueChart.getAlternatives();
-		// Keep the ordering of the rows, but reset the cell order to be the ordering from the ValueChart.
-		this.rowData.forEach((row: VCRowData) => {
-			row.cells = this.getCellData(row.objective);
-		})
+		var cellIndices: number[] = [];
+
+		this.alternatives.forEach((alternative: Alternative, index: number) => {
+			cellIndices[this.originalAlternativeOrder.alternativeIndexMap[alternative.getName()]] = index;
+		});
+
+		this.reorderAllCells(cellIndices);
 	}
 
 
