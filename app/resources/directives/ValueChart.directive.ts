@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 13:37:35
+* @Last Modified time: 2016-06-28 14:34:49
 */
 
 
@@ -284,7 +284,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 		
 		this.labelData.forEach((labelDatum: VCLabelData) => {
-			this.chartDataService.updateLabelData(labelDatum);
+			this.chartDataService.updateLabelDataWeights(labelDatum);
 		});
 
 		this.labelRenderer.updateLabelSpace(this.labelData, 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);

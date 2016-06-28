@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 13:26:20
+* @Last Modified time: 2016-06-28 14:46:42
 */
 
 import { Injectable } 					from '@angular/core';
@@ -99,22 +99,7 @@ export class ChartDataService {
 		return this.valueChart;
 	}
 
-	getLabelData(): VCLabelData[] {
-		if (this.labelData) {
-			return this.labelData;
-		}
-
-		var labelData: VCLabelData[] = [];
-
-		this.valueChart.getRootObjectives().forEach((objective: Objective) => {
-			labelData.push(this.calculateAbstractObjectiveWeight(objective, 0));
-		});
-
-		this.labelData = labelData;
-		return labelData; 
-	} 
-
-	calculateAbstractObjectiveWeight(objective: Objective, depth: number): VCLabelData {
+	getLabelDatum(objective: Objective, depth: number): VCLabelData {
 		var labelData: VCLabelData;
 
 		if (objective.objectiveType === 'abstract') {
@@ -123,7 +108,7 @@ export class ChartDataService {
 			var maxDepthOfChildren: number = 0;
 
 			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let labelDatum: VCLabelData = this.calculateAbstractObjectiveWeight(subObjective, depth + 1);
+				let labelDatum: VCLabelData = this.getLabelDatum(subObjective, depth + 1);
 				weight += labelDatum.weight;
 				if (labelDatum.depthOfChildren > maxDepthOfChildren)
 					maxDepthOfChildren = labelDatum.depthOfChildren;
@@ -138,16 +123,38 @@ export class ChartDataService {
 		return labelData;
 	}
 
-	updateLabelData(labelDatum: VCLabelData): void {
+	getLabelData(): VCLabelData[] {
+		if (this.labelData) {
+			return this.labelData;
+		}
+
+		this.labelData = [];
+
+		this.valueChart.getRootObjectives().forEach((objective: Objective) => {
+			this.labelData.push(this.getLabelDatum(objective, 0));
+		});
+
+
+		return this.labelData; 
+	}
+
+	updateLabelDataWeights(labelDatum: VCLabelData): void {
 		if (labelDatum.depthOfChildren !== 0) {
 			labelDatum.weight = 0;
 			labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
-				this.updateLabelData(subLabelDatum);
+				this.updateLabelDataWeights(subLabelDatum);
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
 			labelDatum.weight = this.weightMap.getObjectiveWeight(labelDatum.objective.getName());
 		}
+	}
+
+	updateLabelData(): void {
+		// Use splice so as to avoid changing the array reference.
+		this.valueChart.getRootObjectives().forEach((objective: Objective, index: number) => {
+			this.labelData[index] = this.getLabelDatum(objective, 0);
+		});
 	}
 
 	getCellData(objective: PrimitiveObjective): VCCellData[] {
@@ -183,18 +190,17 @@ export class ChartDataService {
 			return this.rowData;
 		}
 
-		var rowData: VCRowData[] = [];
+		this.rowData = [];
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			rowData.push({
+			this.rowData.push({
 				objective: objective,
 				weightOffset: 0,
 				cells: this.getCellData(objective)
 			});
 		});
 
-		this.rowData = rowData;
-		return rowData;
+		return this.rowData;
 	}
 
 	updateWeightOffsets(): void {

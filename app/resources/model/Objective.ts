@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-24 17:44:27
+* @Last Modified time: 2016-06-28 14:15:51
 */
 
-export interface Objective {
+import { Memento }				from './Memento';
+
+
+export interface Objective extends Memento {
 
 	objectiveType: string;
 
