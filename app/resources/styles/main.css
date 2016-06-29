@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 15:09:32
+* @Last Modified time: 2016-06-28 17:45:37
 */
 
 /* Global Styles */
@@ -114,6 +114,11 @@
 
 .toolbar-row {
     bottom: 3rem;
+}
+
+.alternative-link:hover {
+    fill: #23527c !important;
+    text-decoration: underline;
 }
 
 

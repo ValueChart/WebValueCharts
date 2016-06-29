@@ -2,18 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:57:20
+* @Last Modified time: 2016-06-28 15:51:08
 */
 
 // Application Classes:
-import { ChartDataService, VCRowData, VCCellData, VCLabelData}		from '../../app/resources/services/ChartData.service';
+import { ChartDataService }											from '../../app/resources/services/ChartData.service';
 import { XMLValueChartParser } 										from '../../app/resources/services/XMLValueChartParser.service';
 
 // Model Classes:
 import { ValueChart }												from '../../app/resources/model/ValueChart';
 import { IndividualValueChart }										from '../../app/resources/model/IndividualValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
-import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective';
+import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
+
+import {VCRowData, VCCellData, VCLabelData}							from '../../app/resources/model/ChartDataTypes';
+
 
 
 // Test Resources:
@@ -105,7 +108,7 @@ describe('ChartDataService', () => {
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
 				labelData.forEach((labelDatum: VCLabelData) => {
-					chartDataService.updateLabelData(labelDatum);
+					chartDataService.updateLabelDataWeights(labelDatum);
 				});
 
 				var children: VCLabelData[] = labelData[0].subLabelData;
@@ -161,7 +164,7 @@ describe('ChartDataService', () => {
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
 				labelData.forEach((labelDatum: VCLabelData) => {
-					chartDataService.updateLabelData(labelDatum);
+					chartDataService.updateLabelDataWeights(labelDatum);
 				});
 
 				var children: VCLabelData[] = labelData[0].subLabelData;

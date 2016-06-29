@@ -2,11 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-30 10:25:01
+* @Last Modified time: 2016-06-28 14:15:50
 */
 
 import { Objective } 	from './Objective';
 import { Domain } 		from './Domain';
+
+import { Memento }				from './Memento';
 
 
 export class PrimitiveObjective implements Objective {
@@ -58,5 +60,14 @@ export class PrimitiveObjective implements Objective {
 
 	setDomain(domain: Domain):void {
 		this.domain = domain;
+	}
+
+	getMemento(): Memento {
+		// Create a new PrimitiveObjective object.
+		var primitiveObjectiveCopy: PrimitiveObjective = new PrimitiveObjective(this.name, this.description);
+		// Copy over all the properties from the PrimitiveObjective that is being copied. Note that this does NOT create a new domain Objective, it merely preservers the reference.
+		Object.assign(primitiveObjectiveCopy, this);
+
+		return primitiveObjectiveCopy;
 	}
 }

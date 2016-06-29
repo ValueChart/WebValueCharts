@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 12:12:06
+* @Last Modified time: 2016-06-28 15:35:38
 */
 
 
@@ -16,45 +16,15 @@ import { ChangeDetectionService }		from './ChangeDetection.service';
 import { ValueChart }					from '../model/ValueChart';
 import { Alternative }					from '../model/Alternative';
 import { IndividualValueChart }			from '../model/IndividualValueChart';
+import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { WeightMap }					from '../model/WeightMap';
-import { ScoreFunctionMap }				from '../model/ScoreFunctionMap';
 import { ScoreFunction }				from '../model/ScoreFunction';
-import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
-import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 
 import { Memento }						from '../model/Memento';
-
-class AlternativeOrderRecord implements Memento {
-
-	public alternativeIndexMap: any;
-
-	constructor(alternatives: Alternative[]) {
-		this.alternativeIndexMap = {};
-
-		alternatives.forEach((alternative: Alternative, index: number) => {
-			this.alternativeIndexMap[alternative.getName()] = index;
-		});
-	}
-
-	getMemento(): Memento {
-		return this;
-	}
-} 
-
-class ScoreFunctionRecord implements Memento {
-	public objectiveName: string;
-	public scoreFunction: ScoreFunction;
-
-	constructor(objectiveName: string, scoreFunction: ScoreFunction) {
-		this.objectiveName = objectiveName;
-		this.scoreFunction = scoreFunction;
-	}
-
-	getMemento(): ScoreFunctionRecord {
-		return new ScoreFunctionRecord(this.objectiveName, this.scoreFunction.getMemento());
-	}
-}
+import { AlternativeOrderRecord }		from '../model/Records';
+import { ScoreFunctionRecord }			from '../model/Records';
+import { ObjectivesRecord }				from '../model/Records';
 
 
 @Injectable()
@@ -63,6 +33,7 @@ export class ChartUndoRedoService {
 	private SCORE_FUNCTION_CHANGE = 'scoreFunctionChange';
 	private WEIGHT_MAP_CHANGE = 'weightMapChange';
 	private ALTERNATIVE_ORDER_CHANGE = 'alternativeOrderChange';
+	private OBJECTIVES_CHANGE = 'objectivesChange';
 
 	private undoChangeTypes: string[];
 	private redoChangeTypes: string[];
@@ -85,13 +56,18 @@ export class ChartUndoRedoService {
 		this.redoStateRecords = [];
 	}
 
+	deleteNewestRecord(): void {
+		this.undoChangeTypes.pop();
+		this.undoStateRecords.pop();
+	}
+
 	saveScoreFunctionRecord(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 		// Record the type of change has been made.
 		this.undoChangeTypes.push(this.SCORE_FUNCTION_CHANGE);
 
-		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getName(), scoreFunction).getMemento();
+		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getName(), scoreFunction);
 
 		// Save the copy that was just created, along with the name of the objective that it maps to.
 		this.undoStateRecords.push(scoreFunctionRecord);
@@ -118,6 +94,17 @@ export class ChartUndoRedoService {
 		var alternativeOrderRecord: AlternativeOrderRecord = new AlternativeOrderRecord(alternatives);
 
 		this.undoStateRecords.push(alternativeOrderRecord);
+	}
+
+	saveObjectivesRecord(objectives: Objective[]): void {
+		// A new change as been made, so we should clear the redo stack.
+		this.clearRedo();
+
+		this.undoChangeTypes.push(this.OBJECTIVES_CHANGE);
+
+		var objectivesRecord: ObjectivesRecord = new ObjectivesRecord(objectives);
+
+		this.undoStateRecords.push(objectivesRecord);
 	}
 
 	canUndo(): boolean {
@@ -176,6 +163,17 @@ export class ChartUndoRedoService {
 
 		this.chartDataService.reorderAllCells(cellIndices);
 		this.changeDetectionService.alternativeOrderChanged = true;
+	}
+
+	objectivesChange(objectivesRecord: ObjectivesRecord, stateRecords: Memento[]): void {
+		var currentObjectives: Objective[] = this.chartDataService.getValueChart().getRootObjectives();
+
+		stateRecords.push(new ObjectivesRecord(currentObjectives));
+
+		this.chartDataService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
+		this.chartDataService.updateLabelData();
+
+		this.changeDetectionService.rowOrderChanged = true;
 	}
 
 }

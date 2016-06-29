@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 10:29:25
+* @Last Modified time: 2016-06-28 17:44:36
 */
 
 import { Component }															from '@angular/core';
@@ -11,6 +11,8 @@ import { Router }																from '@angular/router';
 
 // JQuery
 import * as $																	from 'jquery';
+// d3
+import * as d3 																	from 'd3';
 
 // Application classes
 import { CreateComponent }														from '../create-component/Create.component';
@@ -23,6 +25,7 @@ import { ChartDataService }														from '../../services/ChartData.service'
 import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
+import { RenderEventsService }													from '../../services/RenderEvents.service';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -49,6 +52,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		RenderConfigService,
 		ChartUndoRedoService,
 		ChangeDetectionService,
+		RenderEventsService,
 	// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
@@ -86,13 +90,18 @@ export class ValueChartViewerComponent implements OnInit {
 	alternativeObjectives: string[];
 	alternativeObjectiveValues: (string | number)[];
 
+	DETAIL_BOX_WIDTH_OFFSET: number = -50;
+	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
+	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.3;
+
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
 	
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
-		private chartUndoRedoService: ChartUndoRedoService) { }
+		private chartUndoRedoService: ChartUndoRedoService,
+		private renderEventsService: RenderEventsService) { }
 
 	ngOnInit() {
 		this.valueChart = this.currentUserService.getValueChart();
@@ -131,6 +140,8 @@ export class ValueChartViewerComponent implements OnInit {
 		$(window).resize((eventObjective: Event) => {
 			this.resizeDetailBox();
 		});
+
+		this.renderEventsService.summaryChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
 
 	resizeDetailBox(): void {
@@ -138,8 +149,8 @@ export class ValueChartViewerComponent implements OnInit {
 		var alternativeDetailBox: any = $('#alternative-detail-box')[0];
 		var summaryOutline: any = $('.summary-outline')[0];
 		if (summaryOutline) {
-			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height - 50) + 'px';
-			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width - 25) + 'px';
+			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
+			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
 		}
 
 		if (this.orientation === 'horizontal') {
@@ -147,10 +158,20 @@ export class ValueChartViewerComponent implements OnInit {
 			let labelOutline: any = $('.label-outline')[0];
 			if (labelOutline) {
 				// Offset the detail box to the left if the ValueChart is in horizontal orientation.
-				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
+				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
 			}
 		}
 	}
+
+	linkAlternativeLabelsToDetailBox = () => {
+		d3.selectAll('.objective-alternative-label')
+			.classed('alternative-link', true);
+
+		$('.objective-alternative-label').click((eventObject: Event) => {
+			var selection: d3.Selection<any> = d3.select(eventObject.target);
+			this.expandAlternative(selection.datum());
+		});
+	};
 
 	// Detail Box:
 
@@ -264,7 +285,4 @@ export class ValueChartViewerComponent implements OnInit {
 		this.reorderObjectives = false;
 		this.pumpWeights = this.PUMP_OFF;
 	}
-
-
-
 }

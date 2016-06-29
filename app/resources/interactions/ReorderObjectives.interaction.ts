@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:12:47
+* @Last Modified time: 2016-06-28 15:51:42
 */
 
 import { Injectable } 												from '@angular/core';
@@ -12,9 +12,10 @@ import { NgZone }													from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
+import { ChartDataService}											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
+import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelRenderer }											from '../renderers/Label.renderer';
 
@@ -22,6 +23,9 @@ import { LabelRenderer }											from '../renderers/Label.renderer';
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
+
+import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+
 
 
 // This class contains all the logic for dragging objective labels change the order of objectives in the objective and summary charts.
@@ -55,6 +59,7 @@ export class ReorderObjectivesInteraction {
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private changeDetectionService: ChangeDetectionService,
+		private chartUndoRedoService: ChartUndoRedoService,
 		private labelRenderer: LabelRenderer) { }
 
 
@@ -91,6 +96,8 @@ export class ReorderObjectivesInteraction {
 			this.ignoreReorder = true;
 			return;
 		}
+
+		this.chartUndoRedoService.saveObjectivesRecord(this.chartDataService.getValueChart().getRootObjectives());
 
 		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');						// The container that holds the container for the label we are reordering.
 		this.siblingContainers = this.parentContainer.selectAll('g[parent=' + this.parentObjectiveName + ']');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
@@ -196,10 +203,20 @@ export class ReorderObjectivesInteraction {
 		// Get the label data for the siblings of the label we arranged. Note that this contains the label data for the label we rearranged.
 		var parentData: VCLabelData = this.parentContainer.datum();
 
+
 		// Move the label data for the label we rearranged to its new position in the array of labels.
 		if (this.newObjectiveIndex !== this.currentObjectiveIndex) {
+			// Reorder the label data.
 			let temp: VCLabelData = parentData.subLabelData.splice(this.currentObjectiveIndex, 1)[0];
 			parentData.subLabelData.splice(this.newObjectiveIndex, 0, temp);
+
+			// Reorder the Objectives
+			let siblingObjectives: Objective[] = (<AbstractObjective> parentData.objective).getDirectSubObjectives()
+			let tempObjective: Objective = siblingObjectives.splice(this.currentObjectiveIndex, 1)[0];
+			siblingObjectives.splice(this.newObjectiveIndex, 0, tempObjective);
+		} else {
+			// No changes were made, so delete the change record that was created in startReorderObjectives.
+			this.chartUndoRedoService.deleteNewestRecord();
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.

@@ -2,12 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-03 16:17:05
+* @Last Modified time: 2016-06-28 14:52:01
 */
 
 import { Objective } 			from './Objective';
 import { PrimitiveObjective }	from './PrimitiveObjective';
 import { Domain } 				from './Domain';
+
+import { Memento }				from './Memento';
 
 
 export class AbstractObjective implements Objective {
@@ -84,5 +86,22 @@ export class AbstractObjective implements Objective {
 		});
 
 		return <PrimitiveObjective[]> subObjectives;
+	}
+
+	getMemento(): Memento {
+		// Create a new AbstractObjective object.
+		var abstractObjectiveCopy: AbstractObjective = new AbstractObjective(this.name, this.description);
+		// Copy over all the properties from the AbstractObjective that is being copied. Note that this does NOT create a new domain Objective, it merely preservers the reference.
+		Object.assign(abstractObjectiveCopy, this);
+		var subObjectives: Objective[] = []
+
+		// Create copies of each of the child objectives.
+		for (var i = 0; i < this.subObjectives.length; i++) {
+			subObjectives[i] = <Objective> this.subObjectives[i].getMemento();
+		}
+
+		abstractObjectiveCopy.setDirectSubObjectives(subObjectives);
+
+		return abstractObjectiveCopy
 	}
 }

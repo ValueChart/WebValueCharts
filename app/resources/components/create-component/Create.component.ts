@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 09:58:09
+* @Last Modified time: 2016-06-28 16:11:58
 */
 
 import { Component }				from '@angular/core';
@@ -11,7 +11,7 @@ import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 // Application classes:
 import { XMLValueChartParser } 		from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }		from '../../directives/ValueChart.directive';
-import { CurrentUserService }			from '../../services/CurrentUser.service';
+import { CurrentUserService }		from '../../services/CurrentUser.service';
 
 // Model Classes
 import { IndividualValueChart } 	from '../../model/IndividualValueChart';

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:08:34
+* @Last Modified time: 2016-06-28 15:51:41
 */
 
 import { Injectable } 												from '@angular/core';
@@ -12,7 +12,7 @@ import { NgZone }													from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService, VCCellData, VCRowData, VCLabelData }		from '../services/ChartData.service';
+import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -24,6 +24,9 @@ import { AbstractObjective }										from '../model/AbstractObjective';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
+
+import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+
 
 
 @Injectable()
