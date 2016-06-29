@@ -8,10 +8,10 @@ import { CurrentUserService }			from '../../services/CurrentUser.service';
 import { IndividualValueChart } 	from '../../model/IndividualValueChart';
 
 @Component({
-	selector: 'createValueChart',
-	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html'
+	selector: 'buildAlternatives',
+	templateUrl: 'app/resources/components/buildAlternatives-component/BuildAlternatives.template.html'
 })
-export class CreateValueChartComponent {
+export class BuildAlternativesComponent {
 
 	constructor(
 		private router: Router,

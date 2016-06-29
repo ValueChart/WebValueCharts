@@ -48,4 +48,19 @@ export class CreateComponent {
 		// TODO: Implement uploading Group ValueCharts
 	}
 
+	addUserToExistingChart(event: Event) {
+		var xmlFile: File = (<HTMLInputElement> event.target).files[0];
+
+		var reader: FileReader = new FileReader();
+		reader.onload = (fileReaderEvent: ProgressEvent) => {
+			if (event.isTrusted) {
+				var xmlString = (<FileReader>fileReaderEvent.target).result;
+				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
+				this.router.navigate(['/buildCVF']); 
+			}
+		};
+
+		reader.readAsText(xmlFile);
+	}
+
 }

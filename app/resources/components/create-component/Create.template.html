@@ -7,7 +7,7 @@
 				</div>
 				<form class="form-inline flex-row column-container">
 					<div class="form-group">
-						<a class="btn btn-default btn-lg" [routerLink]="['/createValueChart']" id="createValueChart">Create ValueChart</a>
+						<a class="btn btn-default btn-lg" [routerLink]="['/buildObjectives']" id="createValueChart">Create ValueChart</a>
 						 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
 	                        <button class="btn btn-default btn-lg">
 	                            Upload a ValueChart
@@ -26,15 +26,22 @@
 				</div>
 				<form class="form-inline flex-row column-container">
 					<div class="form-group">
-						<a class="btn btn-default btn-lg" [routerLink]="['/createGroupValueChart']" id="createGroupValueChart">Create GroupValueChart</a>
+						<a class="btn btn-default btn-lg" [routerLink]="['/buildObjectives']" id="createGroupValueChart">Create GroupValueChart</a>
 						 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
 	                        <button class="btn btn-default btn-lg">
 	                            Upload a GroupValueChart
 	                        </button>
 	                        <input type="file" class="upload" (change)="uploadGroupValueChart($event)"/>
-	                    </a>
-	                    <a class="btn btn-default btn-lg" [routerLink]="['/create']" id="addUser">Add User Preferences</a>
+	                    </a>     
 					</div>
+				</form>
+				<form class="form-inline flex-row column-container">
+					 <a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
+	                        <button class="btn btn-default btn-lg">
+	                            Add User To Existing Chart
+	                        </button>
+	                        <input type="file" class="upload" (change)="addUserToExistingChart($event)"/>
+	                 </a>
 				</form>
 			</div>
 		</div>
