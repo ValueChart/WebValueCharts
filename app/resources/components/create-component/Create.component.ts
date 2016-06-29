@@ -6,7 +6,7 @@
 */
 
 import { Component }				from '@angular/core';
-import { Router }					from '@angular/router';
+import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // Application classes:
 import { XMLValueChartParser } 		from '../../services/XMLValueChartParser.service';
@@ -20,6 +20,7 @@ import { IndividualValueChart } 	from '../../model/IndividualValueChart';
 	selector: 'create',
 	templateUrl: 'app/resources/components/create-component/Create.template.html',
 	styleUrls: ['app/resources/components/create-component/Create.style.css'],
+	directives: [ROUTER_DIRECTIVES]
 })
 export class CreateComponent {
 

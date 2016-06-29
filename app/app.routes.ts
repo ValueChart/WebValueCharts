@@ -10,13 +10,18 @@ import { provideRouter, RouterConfig } 		from '@angular/router';
 // Application Classes
 import { RegisterComponent }				from './resources/components/register-component/Register.component';
 import { CreateComponent }					from './resources/components/create-component/Create.component';
-import { ValueChartViewerComponent }			from './resources/components/valueChartViewer-component/ValueChartViewer.component';
+import { CreateValueChartComponent }		from './resources/components/createValueChart-component/CreateValueChart.component';
+import { CreateGroupValueChartComponent }	from './resources/components/createGroupValueChart-component/CreateGroupValueChart.component';
+import { ValueChartViewerComponent }		from './resources/components/valueChartViewer-component/ValueChartViewer.component';
 
 
 export const routes: RouterConfig = [
 	{ path: '', redirectTo: '/register', terminal: true },	// Redirect from the base URL to /register.
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'create', component: CreateComponent },
+	{ path: 'createValueChart', component: CreateValueChartComponent },
+	{ path: 'createGroupValueChart', component: CreateGroupValueChartComponent },
+	{ path: 'addUser', component: CreateComponent },
 	{ path: 'view/ValueChart', component: ValueChartViewerComponent }
 ];
 
