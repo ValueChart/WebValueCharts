@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-28 15:51:39
+* @Last Modified time: 2016-06-28 17:26:04
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -17,6 +17,7 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RenderEventsService }										from '../services/RenderEvents.service';
 
 // Model Classes
 import { User }														from '../model/User';
@@ -54,7 +55,8 @@ export class ObjectiveChartRenderer {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService) { }
+		private chartDataService: ChartDataService,
+		private renderEventsService: RenderEventsService) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
 	createObjectiveChart(el: d3.Selection<any>, rows: VCRowData[]): void {
@@ -252,6 +254,8 @@ export class ObjectiveChartRenderer {
 					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
 		}
+
+		this.renderEventsService.summaryChartDispatcher['Rendering-Over']();
 	}
 
 	toggleDomainLabels(): void {
