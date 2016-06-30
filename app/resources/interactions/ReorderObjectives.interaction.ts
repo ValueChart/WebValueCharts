@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:51:42
+* @Last Modified time: 2016-06-30 11:28:54
 */
 
 import { Injectable } 												from '@angular/core';
@@ -222,20 +222,13 @@ export class ReorderObjectivesInteraction {
 		// Select all the label data, not just the siblings of the label we moved.
 		var labelData: VCLabelData[] = d3.select('g[parent=rootcontainer]').data();
 
-
 		// Retrieve the objective ordering from the ordering of the label data.
 		var primitiveObjectives: PrimitiveObjective[] = this.getOrderedObjectives(labelData);
 
-		// Delete the previous label area.
-		(<Element>d3.select('.label-root-container').node()).remove();
-		// Rebuild and re-render the label area.
-		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), labelData, primitiveObjectives);
-		this.labelRenderer.renderLabelSpace(labelData, this.renderConfigService.viewOrientation, primitiveObjectives);
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.chartDataService.reorderRows(primitiveObjectives);
-		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
-		this.toggleObjectiveReordering(true);
+		this.chartDataService.primitiveObjectives = primitiveObjectives;
 
 		this.changeDetectionService.rowOrderChanged = true;
 	}

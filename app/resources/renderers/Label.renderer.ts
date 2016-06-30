@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:51:39
+* @Last Modified time: 2016-06-30 11:27:05
 */
 
 import { Injectable } 												from '@angular/core';
@@ -329,7 +329,8 @@ export class LabelRenderer {
 
 
 		// Select all the score function plot containers:
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction');
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction')
+			.data(data);
 
 		scoreFunctionsPlots[0].forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
