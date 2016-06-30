@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts problem="Hotel">
+<ValueCharts problem="Hotel" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
 	          	<Objective name="location" type="abstract">
-	                <Objective name="area" type="primitive">
-	                    <Domain type="categorical"/>
+	                <Objective name="area" type="primitive" color="#">
+	                    <Domain type="categorical" ordered="false"/>
 	                    <Description>
 	                    	Description Information Goes Here
 	                    </Description>
 	                </Objective>
-	                <Objective name="skytrain-distance" type="primitive">
-	                    <Domain type="continuous" unit="blocks"/>
+	                <Objective name="skytrain-distance" type="primitive" color="#">
+	                    <Domain type="continuous" unit="blocks" min="" max=""/>
 	                    <Description>
 	                    	Description Information Goes Here
 	                    </Description>
 	                </Objective>
 	           </Objective>
 	           <Objective name="room" type="abstract">
-	                <Objective name="size" type="primitive">
-	                    <Domain type="continuous" unit="sq-ft"/>
+	                <Objective name="size" type="primitive" color="#">
+	                    <Domain type="continuous" unit="sq-ft" min="" max=""/>
 	                    <Description>
 	                    	Description Information Goes Here
 	                    </Description>
 	                </Objective>
-	                <Objective name="internet-access" type="primitive">
-	                    <Domain type="categorical"/>
+	                <Objective name="internet-access" type="primitive" color="#"> 
+	                    <Domain type="categorical" ordered="false"/>
 	                    <Description>
 	                    	Description Information Goes Here
 	                    </Description>
 	                </Objective>
 	           </Objective>
-	           <Objective name="rate" type="primitive">
-	                <Domain type="continuous" unit="CAD"/>
+	           <Objective name="rate" type="primitive" color="#">
+	                <Domain type="continuous" unit="CAD" min="" max=""/>
 	                <Description>
 	                	Description Information Goes Here
 	                </Description>
@@ -41,19 +41,19 @@
 	    </Objectives>
 	     <Alternatives>
 	          <Alternative name="Sheraton">
-	               <AlternativeValue objective="area" domain-value="nightlife"/>
-	               <AlternativeValue objective="internet-access" domain-value="highspeed"/>
-	               <AlternativeValue objective="rate" domain-value="150.0"/>
-	               <AlternativeValue objective="skytrain-distance" domain-value="7.0"/>
-	               <AlternativeValue objective="size" domain-value="350.0"/>
+	               <AlternativeValue objective="area" value="nightlife"/>
+	               <AlternativeValue objective="internet-access" value="highspeed"/>
+	               <AlternativeValue objective="rate" value="150.0"/>
+	               <AlternativeValue objective="skytrain-distance" value="7.0"/>
+	               <AlternativeValue objective="size" value="350.0"/>
 	               <Description name="Sheraton">Get a good night's sleep with premium bedding, a down duvet, and blackout drapes/curtains. The 32-inch TV offers pay movies. Request an in-room massage. A coffee/tea maker is provided. You will have a shower/tub combination, as well as complimentary toiletries and a hair dryer. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</Description>
 	          </Alternative>
 	          <Alternative name="BestWestern">
-	               <AlternativeValue objective="area" domain-value="nightlife"/>
-	               <AlternativeValue objective="internet-access" domain-value="highspeed"/>
-	               <AlternativeValue objective="rate" domain-value="100.0"/>
-	               <AlternativeValue objective="skytrain-distance" domain-value="2.0"/>
-	               <AlternativeValue objective="size" domain-value="200.0"/>
+	               <AlternativeValue objective="area" value="nightlife"/>
+	               <AlternativeValue objective="internet-access" value="highspeed"/>
+	               <AlternativeValue objective="rate" value="100.0"/>
+	               <AlternativeValue objective="skytrain-distance" value="2.0"/>
+	               <AlternativeValue objective="size" value="200.0"/>
 	               <Description name="BestWestern">Balcony with city views. Complimentary wireless Internet access. 42-inch LCD TV. Pay movies. Coffee/tea maker. Fridge and microwave. Private bathroom. Shower/tub combination. Complimentary toiletries. Hair dryer. Safe. Desk. Complimentary newspapers. This room is Non-Smoking.</Description>
 	          </Alternative>
 	          <Alternative name="Hyatt">
@@ -93,41 +93,41 @@
 	<Users>
 		<User name="Aaron Mishkin">
 			<Weights>
-				<Weight objective="area" domain-value="0.2"/>
-				<Weight objective="internet-access" domain-value="0.1"/>
-				<Weight objective="rate" domain-value="0.3"/>
-				<Weight objective="skytrain-distance" domain-value="0.2"/>
-				<Weight objective="size" domain-value="0.2"/>
+				<Weight objective="area" value="0.2"/>
+				<Weight objective="internet-access" value="0.1"/>
+				<Weight objective="rate" value="0.3"/>
+				<Weight objective="skytrain-distance" value="0.2"/>
+				<Weight objective="size" value="0.2"/>
 			</Weights>
 			<ScoreFunctions>
-				<ScoreFunction objective="area">
-					<ValueScore score="0.25" domain-value="nightlife"/>
-					<ValueScore score="0.5" domain-value="beach"/>
-					<ValueScore score="1" domain-value="airport"/>
+				<ScoreFunction objective="area" type="discrete">
+					<Score value="0.25" domain-element="nightlife"/>
+					<Score value="0.5" domain-element="beach"/>
+					<Score value="1" domain-element="airport"/>
 				</ScoreFunction>
-				<ScoreFunction objective="skytrain-distance">
-					<ValueScore score="1" domain-value="2"/>
-					<ValueScore score="0.2" domain-value="7.0"/>
-					<ValueScore score="0" domain-value="9.0"/>
+				<ScoreFunction objective="skytrain-distance" type="continuous">
+					<Score value="1" domain-element="2"/>
+					<Score value="0.2" domain-element="7.0"/>
+					<Score value="0" domain-element="9.0"/>
 				</ScoreFunction>
 				<ScoreFunction objective="size">
-					<ValueScore score="1" domain-value="200.0"/>
-					<ValueScore score="0.8" domain-value="237.5"/>
-					<ValueScore score="0.6" domain-value="275.0"/>
-					<ValueScore score="0.4" domain-value="312.5"/>
-					<ValueScore score="0.2" domain-value="350.0"/>
+					<Score value="1" domain-element="200.0" type="continuous"/>
+					<Score value="0.8" domain-element="237.5"/>
+					<Score value="0.6" domain-element="275.0"/>
+					<Score value="0.4" domain-element="312.5"/>
+					<Score value="0.2" domain-element="350.0"/>
 				</ScoreFunction>
-				<ScoreFunction objective="sinternet-access">
-					<ValueScore score="0" domain-value="none"/>
-					<ValueScore score="1" domain-value="highspeed"/>
-					<ValueScore score="0.5" domain-value="lowspeed"/>				
+				<ScoreFunction objective="sinternet-access" type="discrete">
+					<Score value="0" domain-element="none"/>
+					<Score value="1" domain-element="highspeed"/>
+					<Score value="0.5" domain-element="lowspeed"/>				
 				</ScoreFunction>
 				<ScoreFunction objective="rate">
-					<ValueScore score="1" domain-value="100.0"/>
-					<ValueScore score="0.75" domain-value="125.0"/>
-					<ValueScore score="0.5" domain-value="150.0"/>
-					<ValueScore score="0.25" domain-value="175.0"/>
-					<ValueScore score="0" domain-value="200.0"/>
+					<Score value="1" domain-element="100.0" type="continuous"/>
+					<Score value="0.75" domain-element="125.0"/>
+					<Score value="0.5" domain-element="150.0"/>
+					<Score value="0.25" domain-element="175.0"/>
+					<Score value="0" domain-element="200.0"/>
 				</ScoreFunction>
 			</ScoreFunctions>
 		</User>
