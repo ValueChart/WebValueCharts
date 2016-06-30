@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-06-28 17:26:04
+* @Last Modified time: 2016-06-30 15:33:22
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -254,8 +254,8 @@ export class ObjectiveChartRenderer {
 					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
 		}
-
-		this.renderEventsService.summaryChartDispatcher['Rendering-Over']();
+		// TODO: Remove the any wrapper when typings for d3 are updated.
+		(<any> this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
 	}
 
 	toggleDomainLabels(): void {

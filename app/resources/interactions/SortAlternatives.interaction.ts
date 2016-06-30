@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:51:40
+* @Last Modified time: 2016-06-30 15:36:12
 */
 
 import { Injectable } 												from '@angular/core';
@@ -117,13 +117,13 @@ export class SortAlternativesInteraction {
 	sortAlternativesManually(enableSorting: boolean): void {
 		var alternativeBoxes = d3.selectAll('.alternative-box');
 
-		var dragToSort = d3.behavior.drag();
+		var dragToSort = d3.drag();
 
 		if (enableSorting) {
 			dragToSort
-				.on('dragstart', this.startSortAlternatives)
+				.on('start', this.startSortAlternatives)
 				.on('drag', this.sortAlternatives)
-				.on('dragend', this.endSortAlternatives);
+				.on('end', this.endSortAlternatives);
 		} 
 		
 		alternativeBoxes.call(dragToSort);
@@ -158,7 +158,7 @@ export class SortAlternativesInteraction {
 		this.newAlternativeIndex = this.currentAlternativeIndex;
 		this.jumpPoints = [0];	
 
-		this.siblingBoxes[0].forEach((alternativeBox: Element) => {
+		this.siblingBoxes.nodes().forEach((alternativeBox: Element) => {
 			if (alternativeBox !== undefined) {
 				let selection: d3.Selection<any> = d3.select(alternativeBox);
 				let jumpPoint: number = (+selection.attr(this.renderConfigService.dimensionOne) / 2) + +selection.attr(this.renderConfigService.coordinateOne);
@@ -196,7 +196,7 @@ export class SortAlternativesInteraction {
 
 		d3.selectAll('.alternative-box[alternative=' + d.getName() + ']').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
 
-		this.cellsToMove[0].forEach((cell: Element) => {
+		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
 			var previousTransform: string = cellSelection.attr('transform');
 			cellSelection.attr('transform', this.renderConfigService.incrementTransform(previousTransform, deltaCoordOne,0));

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 11:28:54
+* @Last Modified time: 2016-06-30 15:53:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -67,13 +67,13 @@ export class ReorderObjectivesInteraction {
 		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-outline');
 		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-text');
 
-		var dragToReorder = d3.behavior.drag();
+		var dragToReorder: d3.Drag<VCLabelData> = d3.drag();
 
 		if (enableReordering) {
 			dragToReorder
-				.on('dragstart', this.startReorderObjectives)
+				.on('start', this.startReorderObjectives)
 				.on('drag', this.reorderObjectives)
-				.on('dragend', this.endReorderObjectives);
+				.on('end', this.endReorderObjectives);
 		} 
 
 		labelOutlines.call(dragToReorder);
@@ -116,11 +116,11 @@ export class ReorderObjectivesInteraction {
 		this.maxCoordinateTwo = +parentOutline.attr(this.renderConfigService.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label we are reordering.
 		this.objectiveCoordTwoOffset = +currentOutline.attr(this.renderConfigService.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label we are reordering.
 		
-		this.currentObjectiveIndex = this.siblingContainers[0].indexOf(this.containerToReorder.node());						// Determine the position of the label we are reordering in the list of siblings.
+		this.currentObjectiveIndex = this.siblingContainers.nodes().indexOf(this.containerToReorder.node());						// Determine the position of the label we are reordering in the list of siblings.
 		this.newObjectiveIndex = this.currentObjectiveIndex;
 		this.jumpPoints = [0];																								// Initialize the list of points which define what position the label we are reordering has been moved to.
 
-		this.siblingContainers.select('rect')[0].forEach((el: Element) => {
+		this.siblingContainers.select('rect').nodes().forEach((el: Element) => {
 			if (el !== undefined) {
 				// For each of the labels that the label we are reordering can be switched with, determine its Coordinate Two midpoint. This is used to determine what position the label we are reordering has been moved to.
 				let selection: d3.Selection<any> = d3.select(el);
