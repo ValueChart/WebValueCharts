@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-29 18:29:42
+* @Last Modified time: 2016-06-29 21:12:47
 */
 
 // Application Classes:
@@ -29,7 +29,7 @@ var XMLTestString: string = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone
 declare var expect: any;
 
 
-describe('XMLValueChartParser', () => {
+describe('ValueChartsPlusParser', () => {
 	var valueChartParser: ValueChartsPlusParser;
 	var xmlDocParser: DOMParser;
 	var xmlDocument: Document;

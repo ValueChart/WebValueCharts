@@ -1,4 +1,84 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-06-29 21:10:50
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-06-29 21:59:18
+*/
+
+// Application Classes:
+import { WebValueChartsParser } 								from '../../app/resources/utilities/WebValueChartsParser';
+
+// Model Classes:
+import { IndividualValueChart }									from '../../app/resources/model/IndividualValueChart';
+import { Alternative }											from '../../app/resources/model/Alternative';
+import { User } 												from '../../app/resources/model/User';
+import { Objective } 											from '../../app/resources/model/Objective';
+import { PrimitiveObjective } 									from '../../app/resources/model/PrimitiveObjective';
+import { AbstractObjective } 									from '../../app/resources/model/AbstractObjective';
+import { CategoricalDomain }									from '../../app/resources/model/CategoricalDomain';
+import { ContinuousDomain }										from '../../app/resources/model/ContinuousDomain';
+import { WeightMap } 											from '../../app/resources/model/WeightMap';
+import { ScoreFunctionMap } 									from '../../app/resources/model/ScoreFunctionMap';
+import { ContinuousScoreFunction } 								from '../../app/resources/model/ContinuousScoreFunction';
+import { DiscreteScoreFunction } 								from '../../app/resources/model/DiscreteScoreFunction';
+
+
+
+declare var expect: any;
+
+
+describe('WebValueChartsParser', () => {
+	var valueChartParser: WebValueChartsParser;
+	var xmlDocParser: DOMParser;
+	var xmlDocument: Document;
+
+	before(function() {
+		valueChartParser = new WebValueChartsParser();
+		xmlDocParser = new DOMParser();
+		xmlDocument = xmlDocParser.parseFromString(XMLTestString, 'application/xml');
+	});
+
+
+	describe('parseScoreFunction(scoreFunctionElement: Element): ScoreFunction', () => {
+		var areaScoreFunctionElement: Element;
+		var areaObjectiveScores: any[]
+
+		var sizeScoreFunctionElement: Element;
+		var sizeObjectiveScores: any[];
+
+		before(function() {
+			areaScoreFunctionElement = xmlDocument.querySelector('ScoreFunction[objective=area]');
+			areaObjectiveScores = [{domainElement: 'nightlife', score: 0.25}, {domainElement: 'beach', score: 0.5}, {domainElement: 'airport', score: 1}];
+
+			sizeScoreFunctionElement = xmlDocument.querySelector('ScoreFunction[objective=size]');
+			sizeObjectiveScores = [{domainElement: 200.0, score: 1}, {domainElement: 237.5, score: 0.8}, {domainElement: 275.0, score: 0.6}, {domainElement: 312.5, score: 0.4}, {domainElement: 350.0, score: 0.2}];
+		});
+
+		it('should correctly parse a continuous ScoreFunction from the XML', () => {
+			var areaScoreFunction = valueChartParser.parseScoreFunction(areaScoreFunctionElement);
+
+			areaObjectiveScores.forEach((objectiveScore: any) => {
+				expect(areaScoreFunction.getScore(objectiveScore.domainElement)).to.equal(objectiveScore.score);
+			});
+		});
+
+		it('should correctly parse a discrete ScoreFunction from the XML', () => {
+			var sizeScoreFunction = valueChartParser.parseScoreFunction(sizeScoreFunctionElement);
+
+			sizeObjectiveScores.forEach((objectiveScore: any) => {
+				expect(sizeScoreFunction.getScore(objectiveScore.domainElement)).to.equal(objectiveScore.score);
+			});
+		});
+
+	});
+
+});
+
+
+
+// Test Resources:
+var XMLTestString: string = 
+`<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0">
 	<ChartStructure>
 		<Objectives>
@@ -11,7 +91,7 @@
 	                    </Description>
 	                </Objective>
 	                <Objective name="skytrain-distance" type="primitive" color="#7D3C98">
-	                    <Domain type="continuous" unit="blocks" min="2.0" max="9.0"/>
+	                    <Domain type="continuous" unit="blocks" min="1.0" max="9.0"/>
 	                    <Description>
 	                    	Description Information Goes Here
 	                    </Description>
@@ -106,8 +186,7 @@
 					<Score value="1" domain-element="airport"/>
 				</ScoreFunction>
 				<ScoreFunction objective="skytrain-distance" type="continuous">
-					<Score value="1" domain-element="1.0"/>
-					<Score value="0.6" domain-element="2.0"/>
+					<Score value="1" domain-element="2"/>
 					<Score value="0.2" domain-element="7.0"/>
 					<Score value="0" domain-element="9.0"/>
 				</ScoreFunction>
@@ -133,4 +212,9 @@
 			</ScoreFunctions>
 		</User>
 	</Users>
-</ValueCharts>
+</ValueCharts>`
+
+
+
+
+

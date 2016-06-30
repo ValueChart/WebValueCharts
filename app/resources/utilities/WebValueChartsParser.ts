@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-29 18:30:39
+* @Last Modified time: 2016-06-29 22:19:31
 */
 
 // Model Classes
@@ -72,7 +72,7 @@ export class WebValueChartsParser {
 
 			let type: string = objectiveElement.getAttribute('type');
 			let name: string = objectiveElement.getAttribute('name');
-			let description: string = objectiveElement.querySelector('description').innerHTML;
+			let description: string = objectiveElement.querySelector('Description').innerHTML;
 
 			if (type === 'abstract') {
 				objective = new AbstractObjective(name, description);
@@ -86,6 +86,7 @@ export class WebValueChartsParser {
 
 				(<PrimitiveObjective> objective).setDomain(this.parseDomain(domainElement));
 			}
+			objectives.push(objective);
 		}
 
 		return objectives;
@@ -113,7 +114,7 @@ export class WebValueChartsParser {
 		return domain;
 	}
 
-	parseAlternatives(alternativesParentElement: Element, primitveObjectives: PrimitiveObjective[]): Alternative[] {
+	parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
 		var alternatives: Alternative[] = [];
 
 		var alternativeElements: NodeListOf<Element> = alternativesParentElement.querySelectorAll('Alternative');
@@ -128,21 +129,23 @@ export class WebValueChartsParser {
 
 			let alternativeValueElements: NodeListOf<Element> = alternativeElement.querySelectorAll('AlternativeValue');
 
-			for (var i = 0; i < alternativeValueElements.length; i++) {
-				let alternativeValueElement: Element = alternativeValueElements[i];
+			for (var j = 0; j < alternativeValueElements.length; j++) {
+				let alternativeValueElement: Element = alternativeValueElements[j];
 
 				let objectiveName: string = alternativeValueElement.getAttribute('objective');
-				let domainValue:string = alternativeValueElement.getAttribute('value');
+				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
-				alternative.setObjectiveValue(objectiveName, domainValue);
 
-				let correspondingObjective: PrimitiveObjective = primitveObjectives.find((objective: PrimitiveObjective) => {
+				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
 					return objective.getName() === objectiveName;
 				});
 
 				if (correspondingObjective.getDomainType() === 'categorical') {
-					(<CategoricalDomain> correspondingObjective.getDomain()).addElement(domainValue);
+					(<CategoricalDomain> correspondingObjective.getDomain()).addElement(<string> domainValue);
+				} else if (correspondingObjective.getDomainType() === 'continuous') {
+					domainValue = +domainValue;											// Convert the domain value to a number
 				}
+				alternative.setObjectiveValue(objectiveName, domainValue);
 			}
 
 			alternatives.push(alternative);
@@ -169,6 +172,8 @@ export class WebValueChartsParser {
 
 			let scoreFunctionsParentElement = userElement.querySelector('ScoreFunctions');
 			user.setScoreFunctionMap(this.parseScoreFunctionMap(scoreFunctionsParentElement));
+
+			users.push(user);
 		}
 
 		return users;
@@ -193,7 +198,7 @@ export class WebValueChartsParser {
 	parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
-		var scoreFunctionElements: NodeListOf<Element> = scoreFunctionsParentElement.querySelectorAll('Score');
+		var scoreFunctionElements: NodeListOf<Element> = scoreFunctionsParentElement.querySelectorAll('ScoreFunction');
 
 		for (var i = 0; i < scoreFunctionElements.length; i++) {
 			let scoreFunctionElement: Element = scoreFunctionElements[i];

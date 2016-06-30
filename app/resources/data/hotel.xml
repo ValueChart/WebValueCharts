@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts name="Hotel" version="1.0" creator="">
+<ValueCharts problem="Hotel" version="1.0">
      <Description></Description>
      <Colors>
           <Color b="94" g="102" name="area" r="1"/>
