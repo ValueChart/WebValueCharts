@@ -14,7 +14,7 @@ import { ValueChart } 	from '../../model/ValueChart';
 @Component({
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
-	directives: [ROUTER_DIRECTIVES]
+	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService]
 })
 export class CreateValueChartComponent implements OnInit {
