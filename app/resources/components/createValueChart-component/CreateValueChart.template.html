@@ -1,0 +1,47 @@
+<div class="">
+	<div class="flex-column creation-page">
+		<div class="flex-row column-container col-xs-12">
+			<div class="col-xs-10">
+                <div class="form-group">
+                	<div *ngIf="step === creationStepsService.BASICS">
+                        <label class="control-label">Chart name.</label>
+                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
+                        
+                        <label class="control-label">Chart description.</label>
+                        <textarea  maxlength="100" class="form-control" [(ngModel)]="valueChartDescription"></textarea>
+                        <label class="control-label">What kind of chart would you like to create?</label>
+                        
+                        <div class="radio">
+                        <label><input type="radio" (click)="isGroupValueChart = false" [checked]="isGroupValueChart === false">Individual ValueChart</label>
+                        </div>
+                        <div class="radio">
+                        <label><input type="radio" (click)="isGroupValueChart = true" [checked]="isGroupValueChart === true">Group ValueChart</label>
+                        </div>
+                    </div>
+                    <div *ngIf="step === creationStepsService.OBJECTIVES">
+                        <h4>Add Objectives</h4>
+                    </div>
+                    <div *ngIf="step === creationStepsService.ALTERNATIVES">
+                        <h4>Add Alternatives</h4>
+                    </div>
+                    <div *ngIf="step === creationStepsService.PREFERENCES">
+                        <h4>Set Preferences</h4>
+                    </div>
+                    <div *ngIf="step === creationStepsService.PRIORITIES">
+                        <h4>Set Priorities</h4>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-success btn-lg pull-left" [routerLink]="['/create']" style="margin: 5px 10px;">Home</a>
+                    <input class="btn btn-success btn-lg pull-left" type="button" value="<< Back" [disabled]="disableBackButton()" (click)="back()" style="margin: 5px 10px;" />
+                    <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" (click)="next()" style="margin: 5px 10px;"  />
+                    <input class="btn btn-success btn-lg pull-right" type="button" value="Save To File" [disabled]="disableSaveButton()" (click)="save()" style="margin: 5px 10px;" />
+                </div>
+
+                <div class="form-group">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

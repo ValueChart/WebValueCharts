@@ -29,26 +29,16 @@ export class CreateComponent {
 		private valueChartParser: XMLValueChartParser, 
 		private currentUserService: CurrentUserService) {	}
 
-	uploadValueChart(event: Event) {
-		var xmlFile: File = (<HTMLInputElement> event.target).files[0];
-
-		var reader: FileReader = new FileReader();
-		reader.onload = (fileReaderEvent: ProgressEvent) => {
-			if (event.isTrusted) {
-				var xmlString = (<FileReader>fileReaderEvent.target).result;
-				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				this.router.navigate(['/view/ValueChart']); 
-			}
-		};
-
-		reader.readAsText(xmlFile);
-	}
-
-	uploadGroupValueChart(event: Event): void {
-		// TODO: Implement uploading Group ValueCharts
+	goToValueChart(event: Event): void {
+		this.uploadValueChart(event,['/view/ValueChart']);
 	}
 
 	addUserToExistingChart(event: Event) {
+		// Second parameter specifies use case for CreateValueChart workflow
+		this.uploadValueChart(event,['/createValueChart','newUser']);
+	}
+
+	uploadValueChart(event: Event, route: String[]) {
 		var xmlFile: File = (<HTMLInputElement> event.target).files[0];
 
 		var reader: FileReader = new FileReader();
@@ -56,10 +46,9 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				this.router.navigate(['/buildCVF']); 
+				this.router.navigate(route);
 			}
 		};
-
 		reader.readAsText(xmlFile);
 	}
 

@@ -11,9 +11,6 @@ import { Router, ROUTER_DIRECTIVES }						from '@angular/router';
 import { TemplateRef, ViewContainerRef, ElementRef }		from '@angular/core';
 
 // Application classes
-import { RegisterComponent }								from '../register-component/Register.component';
-import { CreateComponent }									from '../create-component/Create.component';
-import { ValueChartViewerComponent }						from '../valueChartViewer-component/ValueChartViewer.component';
 import { XMLValueChartParser } 								from '../../services/XMLValueChartParser.service';
 import { ChartDataService }									from '../../services/ChartData.service';
 import { RenderConfigService }								from '../../services/RenderConfig.service';
