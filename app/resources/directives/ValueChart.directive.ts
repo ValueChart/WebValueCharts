@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:54:46
+* @Last Modified time: 2016-06-30 15:50:53
 */
 
 
@@ -86,6 +86,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
+
 		// Configure the size of the user viewport. This will be scaled to fit the browser window
 		this.viewportWidth = 1700;
 		this.viewportHeight = 850;
@@ -113,7 +114,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	createValueChart(): void {
 		// Create the SVG base element, and set it to dynamically fit to the viewport:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
-			.classed({ 'ValueChart': true, 'svg-content-responsive': true })
+			.classed('ValueChart svg-content-responsive', true)
 			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
@@ -198,13 +199,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	detectDataOrderChanges(): void {
-		if (this.changeDetectionService.rowOrderChanged		||
-			this.changeDetectionService.alternativeOrderChanged
-			) {
-				this.changeDetectionService.rowOrderChanged = false;
+		if (this.changeDetectionService.alternativeOrderChanged) {
 				this.changeDetectionService.alternativeOrderChanged = false;
 
-				this.updateDataRowsDisplay();
+				this.updateAlternativeOrder();
+		} 
+		if (this.changeDetectionService.rowOrderChanged) {
+			this.changeDetectionService.rowOrderChanged = false;
+			this.changeDetectionService.alternativeOrderChanged = false;
+			this.updateRowOrder();
 		}
 	}
 
@@ -285,7 +288,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
-	updateDataRowsDisplay(): void {
+	updateAlternativeOrder(): void {
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.chartDataService.updateWeightOffsets();
@@ -294,6 +297,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 
+	}
+
+	updateRowOrder(): void {
+		// Destroy the previous label area.
+		(<Element>d3.select('.label-root-container').node()).remove();
+		// Rebuild and re-render the label area.
+		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.renderConfigService.viewOrientation, this.chartDataService.primitiveObjectives);
+		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
+		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
+		this.updateAlternativeOrder()
 	}
 
 	updateOrientation(): void {

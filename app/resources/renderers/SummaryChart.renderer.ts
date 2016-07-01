@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:51:38
+* @Last Modified time: 2016-06-30 15:34:41
 */
 
 import { Injectable } 												from '@angular/core';
@@ -194,21 +194,19 @@ export class SummaryChartRenderer {
 
 
 	renderUtilityAxis(viewOrientation: string): void {
-		var uilityScale = d3.scale.linear()
+		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
 			.domain([0, 100])
 			
 
-		var utilityAxis: any = d3.svg.axis()
-			.scale(uilityScale)
-			.ticks(10)
+		var utilityAxis: any;
 
 		if (viewOrientation === 'vertical') {
 			uilityScale.range([this.renderConfigService.dimensionTwoSize, 0]);
-			utilityAxis.orient("left"); // Render it as a y axis with the ticks to the left of the axis.
+			utilityAxis = d3.axisLeft(uilityScale);
 		}
 		else {
 			uilityScale.range([0, this.renderConfigService.dimensionTwoSize]);
-			utilityAxis.orient("top"); // Render it as an x-axis with the ticks above the axis.
+			utilityAxis = d3.axisTop(uilityScale);
 		}
 
 		this.utilityAxisContainer
@@ -271,7 +269,7 @@ export class SummaryChartRenderer {
 		var maxScore: number = 0;
 		var bestTotalScore: d3.Selection<any>;
 
-		(<any>this.chart.selectAll('.summary-score-total')[0]).forEach((element: Element) => {
+		this.chart.selectAll('.summary-score-total').nodes().forEach((element: Element) => {
 			if (element.nodeName === 'text') {
 				let selection: d3.Selection<any> = d3.select(element);
 				let score: number = calculateTotalScore(selection.datum());

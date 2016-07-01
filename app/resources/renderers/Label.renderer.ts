@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:51:39
+* @Last Modified time: 2016-06-30 14:44:10
 */
 
 import { Injectable } 												from '@angular/core';
@@ -277,9 +277,9 @@ export class LabelRenderer {
 				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			});
 
-		var dragToResizeWeights = d3.behavior.drag();
+		var dragToResizeWeights = d3.drag();
 
-		dragToResizeWeights.on('dragstart', (d: any, i: number) => {
+		dragToResizeWeights.on('start', (d: any, i: number) => {
 			// Save the current state of the Weight Map.
 			this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
 		})
@@ -301,7 +301,7 @@ export class LabelRenderer {
 				.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getName() + '-scorefunction'; })
 
 		// Use the ScoreFunctionRenderer to create each score function.
-		newScoreFunctionPlots[0].forEach((scoreFunctionPlot: Element) => {
+		newScoreFunctionPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			var el: d3.Selection<any> = d3.select(scoreFunctionPlot);
 			var datum: PrimitiveObjective = el.data()[0];
 
@@ -329,9 +329,10 @@ export class LabelRenderer {
 
 
 		// Select all the score function plot containers:
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction');
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction')
+			.data(data);
 
-		scoreFunctionsPlots[0].forEach((scoreFunctionPlot: Element) => {
+		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
 			objectiveWeight = this.chartDataService.weightMap.getObjectiveWeight(datum.getName());

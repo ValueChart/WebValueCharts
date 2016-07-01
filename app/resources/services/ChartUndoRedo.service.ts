@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:35:38
+* @Last Modified time: 2016-06-30 11:28:31
 */
 
 
@@ -172,8 +172,10 @@ export class ChartUndoRedoService {
 
 		this.chartDataService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
 		this.chartDataService.updateLabelData();
+		this.chartDataService.primitiveObjectives = this.chartDataService.getValueChart().getAllPrimitiveObjectives();
 
 		this.changeDetectionService.rowOrderChanged = true;
+
 	}
 
 }

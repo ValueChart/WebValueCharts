@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:08:18
+* @Last Modified time: 2016-06-30 15:20:40
 */
 
 import { Injectable } 					from '@angular/core';
@@ -37,7 +37,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public pointLabelContainer: d3.Selection<any>;
 	public pointLabels: d3.Selection<any>;
 
-	private heightScale: any;
+	private heightScale: d3.Linear<number, number>;
 
 	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
 		super(chartDataService, chartUndoRedoService);
@@ -116,7 +116,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	renderContinuousPlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ContinuousScoreFunction, domainElements: number[], viewOrientation: string): void {
 		var pointRadius = this.labelOffset / 2;
 
-		this.heightScale = d3.scale.linear()
+		this.heightScale = d3.scaleLinear()
 			.domain([0, 1])
 			.range([0, this.domainAxisCoordinateTwo - pointRadius]);
 
@@ -153,9 +153,9 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo + '2', (d: (string | number), i: number) => { return calculatePointCoordinateTwo(domainElements[i + 1]); });
 
 
-		var dragToResizeScores = d3.behavior.drag();
+		var dragToResizeScores = d3.drag();
 
-		this.plottedPoints.call(dragToResizeScores.on('dragstart', (d: any, i: number) => {
+		this.plottedPoints.call(dragToResizeScores.on('start', (d: any, i: number) => {
 			// Save the current state of the ScoreFunction.
 			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 		}));

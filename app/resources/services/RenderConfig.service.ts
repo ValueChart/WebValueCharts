@@ -2,12 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 22:27:32
+* @Last Modified time: 2016-06-30 15:21:00
 */
 
 import { Injectable } 												from '@angular/core';
 
+// d3
+import * as d3 														from 'd3';
 
+// Application Classes
 import { ChartDataService }											from './ChartData.service';
 
 @Injectable()
@@ -27,7 +30,7 @@ export class RenderConfigService {
 	public dimensionOneSize: number; // Width (or Height) of a major element of a ValueChart (objective chart, labels, and summary chart)
 	public dimensionTwoSize: number; // Height (or Width) of a major element of a ValueChart (objective chart, labels, and summary chart)
 
-	public dimensionTwoScale: any; // Linear scale between domain [0,1] and range [0, dimensionTwoSize]
+	public dimensionTwoScale: d3.Linear<number, number>; // Linear scale between domain [0,1] and range [0, dimensionTwoSize]
 
 	public viewConfiguration: any = {};
 
@@ -70,12 +73,12 @@ export class RenderConfigService {
 	recalculateDimensionTwoScale(viewOrientation: string): void {
 		if (viewOrientation === 'vertical') {
 
-			this.dimensionTwoScale = d3.scale.linear()
+			this.dimensionTwoScale = d3.scaleLinear()
 				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_HEIGHT]);
 		} else if (viewOrientation === 'horizontal') {
 			
-			this.dimensionTwoScale = d3.scale.linear()
+			this.dimensionTwoScale = d3.scaleLinear()
 				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_WIDTH]);
 		}

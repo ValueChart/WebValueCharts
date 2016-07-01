@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:27:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 10:25:09
+* @Last Modified time: 2016-06-29 21:27:37
 */
 
 
@@ -15,9 +15,12 @@ export class ContinuousDomain implements Domain {
 	private minValue: number;
 	private maxValue: number;
 
-	constructor(minValue: number, maxValue: number) {
-		this.minValue = minValue;
-		this.maxValue = maxValue;
+	constructor(minValue?: number, maxValue?: number) {
+		if (minValue !== undefined)
+			this.minValue = minValue;
+		if (maxValue !== undefined)
+			this.maxValue = maxValue;
+		
 		this.type = 'continuous';
 	}
 

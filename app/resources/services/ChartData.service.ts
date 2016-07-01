@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:54:45
+* @Last Modified time: 2016-06-30 15:49:36
 */
 
 import { Injectable } 							from '@angular/core';
+
+// d3
+import * as d3 									from 'd3';
 
 // Application Classes:
 import { AlternativeOrderRecord }				from '../model/Records';
@@ -24,6 +27,7 @@ import { CategoricalDomain }					from '../model/CategoricalDomain';
 import { IntervalDomain }						from '../model/IntervalDomain';
 import { ContinuousDomain }						from '../model/ContinuousDomain';
 import { ScoreFunctionMap }						from '../model/ScoreFunctionMap';
+import { ScoreFunction }						from '../model/ScoreFunction';
 
 import {VCRowData, VCCellData, VCLabelData}		from '../model/ChartDataTypes';
 	
@@ -196,22 +200,41 @@ export class ChartDataService {
 	}
 
 	updateStackedBarOffsets(viewOrientation: string) {
-		var stack = d3.layout.stack()
-			.x((d: any, i: number) => { return i; })
-			.y((d: any) => { 
-				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-				return (score * this.weightMap.getObjectiveWeight(d.objective.getName())); })
-			.out((d: any, y0: number) => {
-				d.offset = y0;
-			});
 
+		var rowDataCopy: VCRowData[] = this.rowData.slice(0, this.rowData.length);
+
+		// In the vertical orientation rows are rendered going to down; rows with smaller indices are rendered above those with larger indices. 
+		// This means that rows with smaller indices must be stacked above rows with larger indices in the stacked bar chart. So in the vertical
+		// orientation we must reverse the order in which we calculate offsets. Otherwise, the earlier rows will have smaller offsets and the
+		// stacked bar chart will be rendered in reverse. This is not a problem in the horizontal orientation since rows are rendered left to right
+		// in that configuration, meaning that the default row order can be used to calculate offsets.
 		if (viewOrientation === 'vertical') {
-			stack.order('reverse');
+			rowDataCopy.reverse();
 		}
 
-		for (var i: number = 0; i < this.rowData[0].cells.length; i++) {
-			stack.values((d: any) => { return d.cells[i].userScores; })
-			stack(<any>this.rowData);
+		for (var i = 0; i < rowDataCopy.length; i++) {
+			var currentRow: VCRowData = rowDataCopy[i];
+
+			for (var j = 0; j < currentRow.cells.length; j++) {
+				var currentCell: VCCellData = currentRow.cells[j];
+
+				for (var k = 0; k < currentCell.userScores.length; k++) {
+					var currentUserScore = currentCell.userScores[k];
+					var previousWeightedScore: number;
+					var previousOffset: number;
+					if (i === 0) {
+						previousOffset = 0;
+						previousWeightedScore = 0;
+					} else {
+						let previousUserScore = rowDataCopy[i-1].cells[j].userScores[k];
+						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * this.weightMap.getObjectiveWeight(previousUserScore.objective.getName());
+						previousOffset = previousUserScore.offset;
+					}
+
+					currentUserScore.offset = previousOffset + previousWeightedScore;
+				}
+			}
 		}
 	}
 

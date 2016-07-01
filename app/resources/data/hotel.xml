@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts problem="Hotel">
+<ValueCharts problem="Hotel" version="1.0">
+     <Description></Description>
      <Colors>
           <Color b="94" g="102" name="area" r="1"/>
           <Color b="207" g="169" name="skytrain-distance" r="103"/>

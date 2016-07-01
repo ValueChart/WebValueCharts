@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:08:17
+* @Last Modified time: 2016-06-30 15:20:48
 */
 
 import { Injectable } 					from '@angular/core';
@@ -36,7 +36,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public barLabelContainer: d3.Selection<any>;
 	public barLabels: d3.Selection<any>;
 
-	private heightScale: any;
+	private heightScale: d3.Linear<number, number>;
 	private domainElements: any;
 
 	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
@@ -108,7 +108,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: DiscreteScoreFunction, viewOrientation: string): void {
 		var barWidth: number = (this.dimensionOneSize / this.domainSize) / 3;
-		this.heightScale = d3.scale.linear()
+		this.heightScale = d3.scaleLinear()
 			.domain([0, 1]);
 		if (viewOrientation === 'vertical') {
 			this.heightScale.range([0, this.domainAxisCoordinateTwo - this.utilityAxisMaxCoordinateTwo]);
@@ -151,10 +151,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			});
 
-		var dragToChangeScore = d3.behavior.drag();
+		var dragToChangeScore = d3.drag();
 
 		// Save the old ScoreFunction 
-		this.barTops.call(dragToChangeScore.on('dragstart', (d: any, i: number) => {
+		this.barTops.call(dragToChangeScore.on('start', (d: any, i: number) => {
 			// Save the current state of the ScoreFunction.
 			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 		}));

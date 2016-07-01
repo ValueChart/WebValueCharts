@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-27 17:43:13
+* @Last Modified time: 2016-06-30 14:44:10
 */
 
 import { Injectable } 															from '@angular/core';
+
+// d3
+import * as d3 																	from 'd3';
 
 // Application Classes:
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';

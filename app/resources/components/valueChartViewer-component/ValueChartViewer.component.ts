@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 17:44:36
+* @Last Modified time: 2016-06-30 14:44:10
 */
 
 import { Component }															from '@angular/core';
@@ -105,7 +105,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	ngOnInit() {
 		this.valueChart = this.currentUserService.getValueChart();
-
 		this.$ = $;
 
 		// Redirect back to Create page if the ValueChart is not initialized.
