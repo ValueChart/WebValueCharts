@@ -60,9 +60,11 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	next() {
-		this.step = this.creationStepsService.next(this.step);
 		if (this.step === this.creationStepsService.PRIORITIES) {
-			this.router.navigate(['/view/ValueChart']);
+			//this.router.navigate(['/view/ValueChart']);
+		}
+		else {
+			this.step = this.creationStepsService.next(this.step);
 		}
 	}
 
