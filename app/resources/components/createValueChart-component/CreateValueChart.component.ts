@@ -60,24 +60,18 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	next() {
-		if (this.step === this.creationStepsService.PRIORITIES) {
+		if (this.step === this.creationStepsService.BASICS) {
+			this.currentUserService.getValueChart().setName(this.valueChartName);
+			this.currentUserService.getValueChart().setDescription(this.valueChartDescription);
+		}
+		else if (this.step === this.creationStepsService.PRIORITIES) {
 			//this.router.navigate(['/view/ValueChart']);
 		}
-		else {
-			this.step = this.creationStepsService.next(this.step);
-		}
+		this.step = this.creationStepsService.next(this.step);
 	}
 
 	save() {
 		// TODO: save to file using XML writer service
-	}
-
-	setValueChartName(name: string): void {
-		this.currentUserService.getValueChart().setName(name);
-	}
-
-	setValueChartDescription(description: string): void {
-		this.currentUserService.getValueChart().setDescription(description);
 	}
 
 	disableBackButton() : boolean {

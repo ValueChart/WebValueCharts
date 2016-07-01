@@ -17,7 +17,9 @@ export class CreationStepsService {
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
 		this.nextStep[this.ALTERNATIVES] = this.PREFERENCES;
 		this.nextStep[this.PREFERENCES] = this.PRIORITIES;
+		this.nextStep[this.PRIORITIES] = this.PRIORITIES;
 		
+		this.previousStep[this.BASICS] = this.BASICS;
 		this.previousStep[this.OBJECTIVES] = this.BASICS;
 		this.previousStep[this.ALTERNATIVES] = this.OBJECTIVES;
 		this.previousStep[this.PREFERENCES] = this.ALTERNATIVES;
