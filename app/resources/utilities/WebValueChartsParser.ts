@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-29 22:19:31
+* @Last Modified time: 2016-07-01 16:14:59
 */
 
 // Model Classes
@@ -99,7 +99,8 @@ export class WebValueChartsParser {
 		if (type === 'continuous') {
 			let min: number = +domainElement.getAttribute('min');
 			let max: number = +domainElement.getAttribute('max');
-			domain = new ContinuousDomain(min, max);
+			let unit: string = domainElement.getAttribute('unit');
+			domain = new ContinuousDomain(min, max, unit);
 		} else if (type === 'categorical') {
 			let ordered: boolean = (domainElement.getAttribute('ordered') === 'true');
 			domain = new CategoricalDomain(ordered)

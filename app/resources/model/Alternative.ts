@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 15:20:20
+* @Last Modified time: 2016-07-01 16:05:57
 */
 
 export class Alternative {
@@ -35,6 +35,20 @@ export class Alternative {
 
 	getObjectiveValue(objectiveName: string): string | number {
 		return this.objectiveValues.get(objectiveName);
+	}
+
+	getAllObjectiveValuePairs(): {objectiveName: string, value: string | number}[] {
+		var objectiveValuePairs: {objectiveName: string, value: string | number}[] = [];
+
+		var mapIterator: Iterator<string> = this.objectiveValues.keys();
+		var iteratorElement: IteratorResult<string> = mapIterator.next();
+
+		while (iteratorElement.done === false) {
+			objectiveValuePairs.push({ objectiveName: iteratorElement.value, value: this.objectiveValues.get(iteratorElement.value) });
+			iteratorElement = mapIterator.next();
+		}
+
+		return objectiveValuePairs;
 	}
 
 	setObjectiveValue(objectiveName: string, value: string | number): void {

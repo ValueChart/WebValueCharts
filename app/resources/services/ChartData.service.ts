@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:49:36
+* @Last Modified time: 2016-07-01 15:04:12
 */
 
 import { Injectable } 							from '@angular/core';
@@ -352,7 +352,7 @@ export class ChartDataService {
 		} else if (objective.getDomainType() === 'interval') {
 			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
 		} else {
-			domainElements = this.getElementsFromContinuousDomain((<ContinuousDomain> objective.getDomain()))
+			domainElements = this.scoreFunctionMap.getObjectiveScoreFunction(objective.getName()).getAllElements();
 		}
 
 		return domainElements;

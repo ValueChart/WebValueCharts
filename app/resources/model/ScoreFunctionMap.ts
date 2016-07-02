@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-11 14:53:56
+* @Last Modified time: 2016-07-01 14:07:31
 */
 
 import { ScoreFunction } 			from './ScoreFunction';
@@ -30,6 +30,20 @@ export class ScoreFunctionMap {
 		}
 
 		return scoreFunctions;
+	}
+
+	getAllKeyScoreFunctionPairs(): {key: string, scoreFunction: ScoreFunction}[] {
+		var scoreFunctionKeyPairs: {key: string, scoreFunction: ScoreFunction}[] = [];
+
+		var scoreFunctionIterator: Iterator<string> = this.scoreFunctions.keys();
+		var iteratorElement: IteratorResult<string> = scoreFunctionIterator.next();
+
+		while (iteratorElement.done === false) {
+			scoreFunctionKeyPairs.push({ key: iteratorElement.value, scoreFunction: this.scoreFunctions.get(iteratorElement.value) });
+			iteratorElement = scoreFunctionIterator.next();
+		}
+
+		return scoreFunctionKeyPairs;
 	}
 
 	getObjectiveScoreFunction(objectiveName: string): ScoreFunction {

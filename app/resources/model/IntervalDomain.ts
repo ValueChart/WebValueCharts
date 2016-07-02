@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-01 11:59:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:29:07
+* @Last Modified time: 2016-07-01 16:19:21
 */
 
 import { Domain } 			from './Domain';
@@ -36,6 +36,14 @@ export class IntervalDomain implements Domain {
 	setRange(range: number[]): void {
 		this.min = range[0];
 		this.max = range[1];
+	}
+
+	getMinValue(): number {
+		return this.min;
+	}
+
+	getMaxValue(): number {
+		return this.max;
 	}
 
 	getElements(): number[] {

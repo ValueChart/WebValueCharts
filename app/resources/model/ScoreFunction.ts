@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:07:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 10:11:59
+* @Last Modified time: 2016-07-01 13:47:01
 */
 
 import { Memento }										from './Memento';
@@ -15,6 +15,20 @@ export abstract class ScoreFunction implements Memento {
 	constructor() {
 		this.elementScoreMap = new Map<number | string, number>();
 	}
+
+	getAllElements(): (string | number)[] {
+		var elements: (string | number)[] = [];
+
+		var elementIterator: Iterator<number | string> = this.elementScoreMap.keys();
+		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
+
+		while (iteratorElement.done === false) {
+			elements.push(iteratorElement.value);
+			iteratorElement = elementIterator.next();
+		}
+		return elements;
+	}
+
 
 	getElementScoreMap(): Map<number | string, number> {
 		return this.elementScoreMap;
