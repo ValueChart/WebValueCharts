@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 17:05:05
+* @Last Modified time: 2016-07-02 13:09:34
 */
 
 // Model Classes
@@ -40,6 +40,7 @@ export class ValueChartXMLEncoder {
 		xmlDocument.appendChild(xmlProcessingInstruction);
 
 		var valueChartElement: Element = this.convertValueChartIntoElement(valueChart, xmlDocument);
+		xmlDocument.appendChild(valueChartElement);
 		var valueChartXMLString: string = this.serializer.serializeToString(xmlDocument);
 		
 		return valueChartXMLString;

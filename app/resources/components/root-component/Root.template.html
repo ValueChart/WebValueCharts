@@ -1,12 +1,15 @@
 <div>
 	<div>
-		<navbar class="navbar navbar-default navbar-fixed-top"> 
+		<navbar class="navbar navbar-default navbar-fixed-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" [routerLink]="['/register']">ValueCharts</a>	
+					<a class="navbar-brand" [routerLink]="['/register']">ValueCharts</a>
 				</div>
+				<ul class="nav navbar-nav navbar-right">
+					<ExportValueChart></ExportValueChart>
+				</ul>
 			</div>
 		</navbar>
-	<div>
-	<router-outlet></router-outlet>
-</div>
+		<div>
+			<router-outlet></router-outlet>
+		</div>

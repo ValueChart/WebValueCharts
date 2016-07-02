@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 09:52:26
+* @Last Modified time: 2016-07-02 12:49:32
 */
 
 import { Component } 										from '@angular/core';
@@ -12,15 +12,13 @@ import { TemplateRef, ViewContainerRef, ElementRef }		from '@angular/core';
 
 // Application classes
 import { XMLValueChartParser } 								from '../../services/XMLValueChartParser.service';
-import { ChartDataService }									from '../../services/ChartData.service';
-import { RenderConfigService }								from '../../services/RenderConfig.service';
 import { CurrentUserService }								from '../../services/CurrentUser.service';
-
+import { ExportValueChartComponent }						from '../exportValueChart-component/ExportValueChart.component';
 
 @Component({
 	selector: 'root',
 	templateUrl: 'app/resources/components/root-component/Root.template.html',
-	directives: [ROUTER_DIRECTIVES],
+	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
 				ViewContainerRef,
