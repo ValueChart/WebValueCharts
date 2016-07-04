@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 09:57:51
+* @Last Modified time: 2016-07-04 14:51:34
 */
 
 import { Component }										from '@angular/core';
@@ -10,7 +10,6 @@ import { ROUTER_DIRECTIVES }								from '@angular/router';
 
 // Application Classes
 import { CurrentUserService }								from '../../services/CurrentUser.service';
-
 
 @Component({
 	selector: 'register',

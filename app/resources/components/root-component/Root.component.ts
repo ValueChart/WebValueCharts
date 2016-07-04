@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-02 12:49:32
+* @Last Modified time: 2016-07-04 14:52:00
 */
 
 import { Component } 										from '@angular/core';
@@ -13,6 +13,7 @@ import { TemplateRef, ViewContainerRef, ElementRef }		from '@angular/core';
 // Application classes
 import { XMLValueChartParser } 								from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }								from '../../services/CurrentUser.service';
+
 import { ExportValueChartComponent }						from '../exportValueChart-component/ExportValueChart.component';
 
 @Component({
