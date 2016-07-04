@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-24 10:11:28
+* @Last Modified time: 2016-07-04 13:09:18
 */
 
 import { provideRouter, RouterConfig } 		from '@angular/router';
@@ -15,7 +15,8 @@ import { ValueChartViewerComponent }		from './resources/components/valueChartVie
 
 
 export const routes: RouterConfig = [
-	{ path: '', redirectTo: '/register', terminal: true },	// Redirect from the base URL to /register.
+	{ path: 'WebValueCharts/*', redirectTo: 'register', terminal: true},
+	{ path: '', redirectTo: 'register', terminal: true },	// Redirect from the base URL to /register.
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'create', component: CreateComponent },
 	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent },
