@@ -14,7 +14,7 @@ import * as $																	from 'jquery';
 
 // Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';
-import { ValueChartXMLEncoder }								from '../../utilities/ValueChartXMlEncoder';
+import { ValueChartXMLEncoder }								from '../../utilities/ValueChartXMLEncoder';
 
 // Model Classes:
 import { ValueChart }										from '../../model/ValueChart';

@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-07-01 17:04:33
 */
 
-import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMlEncoder';
+import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMLEncoder';
 import { WebValueChartsParser }									from '../../app/resources/utilities/WebValueChartsParser';
 
 // Model Classes:
