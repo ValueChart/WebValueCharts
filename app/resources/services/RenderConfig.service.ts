@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:21:00
+* @Last Modified time: 2016-07-05 12:41:46
 */
 
 import { Injectable } 												from '@angular/core';
@@ -74,12 +74,12 @@ export class RenderConfigService {
 		if (viewOrientation === 'vertical') {
 
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
+				.domain([0, this.chartDataService.maximumWeightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_HEIGHT]);
 		} else if (viewOrientation === 'horizontal') {
 			
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.chartDataService.weightMap.getWeightTotal()])
+				.domain([0, this.chartDataService.maximumWeightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_WIDTH]);
 		}
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:38:07
+* @Last Modified time: 2016-07-05 12:59:00
 */
 
 
@@ -142,7 +142,6 @@ export class ChartUndoRedoService {
 		var currentWeightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
 		stateRecords.push(currentWeightMap);
 		this.chartDataService.currentUser.setWeightMap(weightMapRecord);
-		this.chartDataService.weightMap = weightMapRecord;
 	}
 
 	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, stateRecords: Memento[]): void {
@@ -153,7 +152,6 @@ export class ChartUndoRedoService {
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
 		this.chartDataService.currentUser.getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
-		this.chartDataService.scoreFunctionMap.setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
 	}
 
 	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, stateRecords: Memento[]): void {

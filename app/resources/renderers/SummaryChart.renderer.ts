@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:14:41
+* @Last Modified time: 2016-07-05 12:53:39
 */
 
 import { Injectable } 												from '@angular/core';
@@ -243,7 +243,7 @@ export class SummaryChartRenderer {
 
 		var calculateTotalScore = (d: UserScoreData) => {
 			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
+			var score = scoreFunction.getScore(d.value) * (this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName()));
 			return score + d.offset;
 		};
 
@@ -251,7 +251,7 @@ export class SummaryChartRenderer {
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: UserScoreData, i: number) => { return Math.round(100 * (calculateTotalScore(d)) / this.chartDataService.weightMap.getWeightTotal()); })
+			.text((d: UserScoreData, i: number) => { return Math.round(100 * (calculateTotalScore(d)) / this.chartDataService.maximumWeightMap.getWeightTotal()); })
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
@@ -302,8 +302,8 @@ export class SummaryChartRenderer {
 			
 
 		userScores.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
-				var objectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-				var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+				var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
+				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 
 				if (viewOrientation == 'vertical')
 					// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
@@ -337,7 +337,7 @@ export class SummaryChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		var objectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+		var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};

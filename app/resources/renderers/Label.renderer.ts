@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:08:59
+* @Last Modified time: 2016-07-05 13:49:15
 */
 
 import { Injectable } 												from '@angular/core';
@@ -256,7 +256,7 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
@@ -272,17 +272,11 @@ export class LabelRenderer {
 				return (i === 0) ? 0 : this.determineLabelWidth(d);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
-			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset)
-			.style('cursor', () => {
-				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
-			});
+			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset);
 
-		var dragToResizeWeights = d3.drag();
-
-		dragToResizeWeights.on('start', this.resizeWeightsInteraction.resizeWeightsStart)
-			.on('drag', this.resizeWeightsInteraction.resizeWeights);
-
-		labelDividers.call(dragToResizeWeights);
+		// If the ValueChart is an individualValueChart, toggle the labelDividers. TODO: Can this be extracted from LabelRenderer?
+		var isIndividualChart: boolean = this.chartDataService.getValueChart().isIndividual();
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(isIndividualChart, labelDividers);
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -312,7 +306,7 @@ export class LabelRenderer {
 	}
 	// This function calls uses the ScoreFunctionRenderer to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {
-		var scoreFunctionMap: ScoreFunctionMap = this.chartDataService.scoreFunctionMap;
+		var scoreFunctionMap: ScoreFunctionMap = this.chartDataService.currentUser.getScoreFunctionMap();
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
@@ -332,7 +326,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.chartDataService.weightMap.getObjectiveWeight(datum.getName());
+			objectiveWeight = this.chartDataService.maximumWeightMap.getObjectiveWeight(datum.getName());
 			scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(datum.getName());
 			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^

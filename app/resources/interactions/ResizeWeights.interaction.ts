@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:09:00
+* @Last Modified time: 2016-07-05 13:51:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -62,9 +62,25 @@ export class ResizeWeightsInteraction {
 		}
 	}
 
+	toggleDragToResizeWeights(enableResizing: boolean, labelDividers: d3.Selection<any>): void {
+		var dragToResizeWeights = d3.drag();
+		
+		if (enableResizing) {
+			dragToResizeWeights
+				.on('start', this.resizeWeightsStart)
+				.on('drag', this.resizeWeights);
+		}
+
+		labelDividers.style('cursor', () => {
+				return (enableResizing) ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+			});
+
+		labelDividers.call(dragToResizeWeights);
+	}
+
 	resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
+		this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.maximumWeightMap);
 	}
 
 	// Event handler for resizing weights by dragging label edges.

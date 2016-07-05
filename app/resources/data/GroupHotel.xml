@@ -107,8 +107,9 @@
 				</ScoreFunction>
 				<ScoreFunction objective="skytrain-distance" type="continuous">
 					<Score value="1" domain-element="1"/>
-					<Score value="0.6" domain-element="2"/>
-					<Score value="0.2" domain-element="7"/>
+					<Score value="0.5" domain-element="3"/>
+					<Score value="0.2" domain-element="5"/>
+					<Score value="0.1" domain-element="7"/>
 					<Score value="0" domain-element="9"/>
 				</ScoreFunction>
 				<ScoreFunction objective="size" type="continuous">
@@ -148,9 +149,10 @@
 				</ScoreFunction>
 				<ScoreFunction objective="skytrain-distance" type="continuous">
 					<Score value="1" domain-element="1"/>
-					<Score value="1" domain-element="2"/>
-					<Score value="0" domain-element="7"/>
-					<Score value="0" domain-element="9"/>
+					<Score value="0.8" domain-element="3"/>
+					<Score value="0.6" domain-element="5"/>
+					<Score value="0.4" domain-element="7"/>
+					<Score value="0.2" domain-element="9"/>
 				</ScoreFunction>
 				<ScoreFunction objective="size" type="continuous">
 					<Score value="0" domain-element="200"/>

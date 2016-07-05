@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:09:00
+* @Last Modified time: 2016-07-05 13:28:36
 */
 
 
@@ -153,6 +153,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.detectInteractionConfigChanges();
 	}
 
+	// Methods for Detecting Changes:
 
 	detectValueChartChanges(): void {
 		// Check for changes to the ValueChart fields. This is NOT deep.
@@ -216,7 +217,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	detectViewConfigChanges(): void {
 		if (this.previousOrientation !== this.viewOrientation) {
 			this.previousOrientation = this.viewOrientation;
-			this.updateOrientation();
+			this.updateViewOrientation();
 		}
 
 		if (this.renderConfigService.viewConfiguration.displayScoreFunctions !== this.changeDetectionService.previousViewConfig.displayScoreFunctions) {
@@ -275,29 +276,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 	}
 
+	// Methods for Handling Changes:
+
 	updateValueChartDisplay(): void {
+		this.chartDataService.updateAllChartData(this.viewOrientation);
+
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-		this.chartDataService.updateWeightOffsets();
-		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
-		
-		this.chartDataService.getLabelData().forEach((labelDatum: LabelData) => {
-			this.chartDataService.updateLabelDataWeights(labelDatum);
-		});
 
 		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
-	}
-
-	updateAlternativeOrder(): void {
-		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-
-		this.chartDataService.updateWeightOffsets();
-		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
-		
-		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
-
 	}
 
 	updateRowOrder(): void {
@@ -311,7 +299,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.updateAlternativeOrder()
 	}
 
-	updateOrientation(): void {
+	updateAlternativeOrder(): void {
+		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+
+		this.chartDataService.updateWeightOffsets();
+		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
+		
+		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
+
+	}
+
+	updateViewOrientation(): void {
 		this.renderConfigService.configureViewOrientation(this.viewOrientation);
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
@@ -325,6 +324,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	updateScoreFunctionDisplay(): void {
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
 	}
+
+
+
 
 
 

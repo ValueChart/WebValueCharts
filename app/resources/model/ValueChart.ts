@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:14:37
+* @Last Modified time: 2016-07-05 12:36:05
 */
 
 import { Objective } 															from './Objective';
@@ -180,6 +180,30 @@ export class ValueChart {
 		}
 	}
 
+	getMaximumWeightMap(): WeightMap {
+		if (this.users.length === 1)
+			return this.users[0].getWeightMap();
+
+		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
+		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
+		var maximumWeightMap = new WeightMap();
+
+		this.users.forEach((user: User) => {
+			let normalizedUserWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
+			for (var i = 0; i < normalizedUserWeights.length; i++) {
+				if (combinedWeights[i] < normalizedUserWeights[i]) {
+					combinedWeights[i] = normalizedUserWeights[i];
+				}
+			}
+		});
+
+		for (var i = 0; i < primitiveObjectives.length; i++) {
+			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+		}
+		
+		return maximumWeightMap;
+	}
+
 	getAverageUser(): User {
 		this.calculateAverageUser();
 		return this.averageUser;
@@ -204,7 +228,7 @@ export class ValueChart {
 		var averageWeightMap = new WeightMap();
 
 		this.users.forEach((user: User) => {
-			let normalizedUserWeights = user.getWeightMap().getNormalizedWeights(primitiveObjectives);
+			let normalizedUserWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
 			for (var i = 0; i < normalizedUserWeights.length; i++) {
 				combinedWeights[i] += normalizedUserWeights[i];
 			}

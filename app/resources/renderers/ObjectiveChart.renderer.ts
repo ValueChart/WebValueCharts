@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-05 11:31:20
+* @Last Modified time: 2016-07-05 12:37:57
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -184,7 +184,7 @@ export class ObjectiveChartRenderer {
 			})																																					// this is because the heights of the previous rows are proportional to their weights.
 			.attr(this.renderConfigService.dimensionOne, this.renderConfigService.dimensionOneSize)
 			.attr(this.renderConfigService.dimensionTwo, (d: RowData) => {
-				var objectiveWeight: number = this.chartDataService.weightMap.getObjectiveWeight(d.objective.getName());
+				var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 				return this.renderConfigService.dimensionTwoScale(objectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
@@ -233,7 +233,7 @@ export class ObjectiveChartRenderer {
 				.text((d: CellData, i: number) => { return d.value })
 				.attr(this.renderConfigService.coordinateOne, (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / 3)
 				.attr(this.renderConfigService.coordinateTwo, (d: CellData, i: number) => {
-					var weight: number = this.chartDataService.weightMap.getObjectiveWeight(d.userScores[0].objective.getName());
+					var weight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());
 					return (viewOrientation === 'vertical') ? this.renderConfigService.dimensionTwoScale(weight) - domainLabelCoord : domainLabelCoord;
 				});
 
@@ -249,7 +249,7 @@ export class ObjectiveChartRenderer {
 		if (viewOrientation === 'vertical') {
 			userScores
 				.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
-					var objectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+					var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 					var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
@@ -274,7 +274,7 @@ export class ObjectiveChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers; };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		var objectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+		var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 		var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};
