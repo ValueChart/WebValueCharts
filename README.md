@@ -2,6 +2,8 @@
 
 Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of visualizations and interactive techniques intended to support decision-makers in preferential choice. More information about ValueCharts can be found [here](http://www.cs.ubc.ca/group/iui/VALUECHARTS/)
 
+An up-to-date version of ValueCharts can be found [here](https://www.cs.ubc.ca/~amishkin/ValueCharts/). The XML files in app/resources/data can be uploaded and used as dummy models to explore the application's current functionality.
+
 ### Checking Out the Project
 
 You must have git installed to checkout the project. Once you have git:
