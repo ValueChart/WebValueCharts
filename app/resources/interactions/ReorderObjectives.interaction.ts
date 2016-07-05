@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:53:00
+* @Last Modified time: 2016-07-05 10:23:18
 */
 
 import { Injectable } 												from '@angular/core';
@@ -100,7 +100,7 @@ export class ReorderObjectivesInteraction {
 		this.chartUndoRedoService.saveObjectivesRecord(this.chartDataService.getValueChart().getRootObjectives());
 
 		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');						// The container that holds the container for the label we are reordering.
-		this.siblingContainers = this.parentContainer.selectAll('g[parent=' + this.parentObjectiveName + ']');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
+		this.siblingContainers = this.parentContainer.selectAll('g[parent="' + this.parentObjectiveName + '"]');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
 																													// Note: siblingsConatiners includes containerToReorder.
 		// Set all the siblings that are NOT being moved to be partially transparent.
 		this.siblingContainers.style('opacity', 0.5);

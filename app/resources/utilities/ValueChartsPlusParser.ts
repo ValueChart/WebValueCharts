@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:45:12
+* @Last Modified time: 2016-07-05 10:24:02
 */
 
 // Model Classes
@@ -110,7 +110,7 @@ export class ValueChartsPlusParser {
 		user.setWeightMap(new WeightMap());
 
 		objectives.forEach((objective: PrimitiveObjective) => {
-			var objectiveElement = xmlDocument.querySelector('Criterion[name=' + objective.getName() + ']');
+			var objectiveElement = xmlDocument.querySelector('Criterion[name="' + objective.getName() + '"]');
 			// The + here allows quick conversion from string to number
 			user.getWeightMap().setObjectiveWeight(objective.getName(), +objectiveElement.getAttribute('weight'));
 			var domainElement: any = objectiveElement.querySelector('Domain');
@@ -177,7 +177,7 @@ export class ValueChartsPlusParser {
 
 	setObjectiveColors(xmlDocument: Document, objectives: PrimitiveObjective[]): void {
 		objectives.forEach((objective: PrimitiveObjective) => {
-			let color: Element = xmlDocument.querySelector('Color[name=' + objective.getName() + ']');
+			let color: Element = xmlDocument.querySelector('Color[name="' + objective.getName() + '"]');
 			objective.setColor('rgb(' + color.getAttribute('r') + ', ' + color.getAttribute('g') + ', ' + color.getAttribute('b') + ')');
 		});
 	}

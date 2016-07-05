@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:36:12
+* @Last Modified time: 2016-07-05 10:28:41
 */
 
 import { Injectable } 												from '@angular/core';
@@ -141,9 +141,9 @@ export class SortAlternativesInteraction {
 
 		this.siblingBoxes = d3.selectAll('.alternative-box');
 
-		this.cellsToMove = d3.selectAll('.cell[alternative=' + d.getName() + ']');
-		this.alternativeLabelToMove = d3.select('.objective-alternative-label[alternative=' + d.getName() + ']'); 
-		this.totalScoreLabelToMove = d3.select('.summary-scoretotal-subcontainer[alternative=' + d.getName() + ']');
+		this.cellsToMove = d3.selectAll('.cell[alternative="' + d.getName() + '"]');
+		this.alternativeLabelToMove = d3.select('.objective-alternative-label[alternative="' + d.getName() + '"]'); 
+		this.totalScoreLabelToMove = d3.select('.summary-scoretotal-subcontainer[alternative="' + d.getName() + '"]');
 
 		d3.selectAll('.cell').style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
@@ -194,7 +194,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.alternative-box[alternative=' + d.getName() + ']').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.alternative-box[alternative="' + d.getName() + '"]').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
@@ -222,6 +222,10 @@ export class SortAlternativesInteraction {
 				var temp: VCCellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
 				row.cells.splice(this.newAlternativeIndex, 0, temp);
 			});
+		} else {
+			// No changes were made, so delete the undo/redo record that was created when dragging started. State should not be 
+			// saved when no changes are made.
+			this.chartUndoRedoService.deleteNewestRecord();
 		}
 
 		d3.selectAll('.cell').style('opacity', 1);

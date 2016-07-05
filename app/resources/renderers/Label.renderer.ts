@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 14:44:10
+* @Last Modified time: 2016-07-05 10:23:49
 */
 
 import { Injectable } 												from '@angular/core';
@@ -137,7 +137,7 @@ export class LabelRenderer {
 	updateLabelSpace(labelData: VCLabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
-		var labelSpaces = this.rootContainer.selectAll('g[parent=' + parentName + ']').data(labelData).order();
+		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
 		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
 		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.label-scorefunction-container');
@@ -209,7 +209,7 @@ export class LabelRenderer {
 		labelData.forEach((labelDatum: VCLabelData, index: number) => {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
-			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent=' + labelDatum.objective.getName() + ']');	// Get all sub label containers whose parent is the current label
+			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getName() + '"]');	// Get all sub label containers whose parent is the current label
 			
 			let scaledWeightOffset: number = this.renderConfigService.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
@@ -279,11 +279,8 @@ export class LabelRenderer {
 
 		var dragToResizeWeights = d3.drag();
 
-		dragToResizeWeights.on('start', (d: any, i: number) => {
-			// Save the current state of the Weight Map.
-			this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
-		})
-		.on('drag', this.resizeWeightsInteraction.resizeWeights);
+		dragToResizeWeights.on('start', this.resizeWeightsInteraction.resizeWeightsStart)
+			.on('drag', this.resizeWeightsInteraction.resizeWeights);
 
 		labelDividers.call(dragToResizeWeights);
 	}

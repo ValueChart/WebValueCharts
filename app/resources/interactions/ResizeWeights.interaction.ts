@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:24:32
+* @Last Modified time: 2016-07-05 10:10:06
 */
 
 import { Injectable } 												from '@angular/core';
@@ -60,6 +60,11 @@ export class ResizeWeightsInteraction {
 				this.chartDataService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
 		}
+	}
+
+	resizeWeightsStart = (d: any, i: number) => {
+		// Save the current state of the Weight Map.
+		this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
 	}
 
 	// Event handler for resizing weights by dragging label edges.
