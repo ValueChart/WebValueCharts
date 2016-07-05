@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:20:48
+* @Last Modified time: 2016-07-04 21:25:57
 */
 
 import { Injectable } 					from '@angular/core';
@@ -17,7 +17,6 @@ import { ScoreFunctionRenderer }		from './ScoreFunction.renderer';
 
 // Model Classes
 import { ValueChart }					from '../model/ValueChart';
-import { IndividualValueChart }			from '../model/IndividualValueChart';
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { ScoreFunction }				from '../model/ScoreFunction';

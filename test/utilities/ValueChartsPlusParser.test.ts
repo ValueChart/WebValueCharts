@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-29 21:12:47
+* @Last Modified time: 2016-07-04 22:47:22
 */
 
 // Application Classes:
 import { ValueChartsPlusParser} 								from '../../app/resources/utilities/ValueChartsPlusParser';
 
 // Model Classes:
-import { IndividualValueChart }									from '../../app/resources/model/IndividualValueChart';
+import { ValueChart }											from '../../app/resources/model/ValueChart';
 import { Alternative }											from '../../app/resources/model/Alternative';
 import { User } 												from '../../app/resources/model/User';
 import { Objective } 											from '../../app/resources/model/Objective';
@@ -139,7 +139,7 @@ describe('ValueChartsPlusParser', () => {
 		var alternativeElements: Element[];
 
 		before(function() {
-			var valueChart: IndividualValueChart = new IndividualValueChart('', '', '');
+			var valueChart: ValueChart = new ValueChart('', '', '');
 			valueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
 			objectives = valueChart.getAllPrimitiveObjectives();
 
@@ -199,7 +199,7 @@ describe('ValueChartsPlusParser', () => {
 		var internetAccess: PrimitiveObjective;
 
 		before(function() {
-			var valueChart: IndividualValueChart = new IndividualValueChart('', '', '');
+			var valueChart: ValueChart = new ValueChart('', '', '');
 			valueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
 			objectives = valueChart.getAllPrimitiveObjectives();
 
@@ -288,7 +288,7 @@ describe('ValueChartsPlusParser', () => {
 		var objectiveColors: any;
 
 		before(function() {
-			var tempValueChart: IndividualValueChart = new IndividualValueChart('', '', '');
+			var tempValueChart: ValueChart = new ValueChart('', '', '');
 			tempValueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
 			objectives = tempValueChart.getAllPrimitiveObjectives();
 			objectiveElements = (<any>xmlDocument.querySelector('Criteria')).children[0];
@@ -305,14 +305,14 @@ describe('ValueChartsPlusParser', () => {
 		})
 		
 		it('should parse the xml (in string form) to produce a complete ValueChart', () => {
-			var valueChart: IndividualValueChart = valueChartParser.parseValueChart(xmlDocument);
+			var valueChart: ValueChart = valueChartParser.parseValueChart(xmlDocument);
 			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
 			var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativeElements, objectives);
 			var rootObjectives: Objective[] = valueChartParser.parseObjectives([objectiveElements]);
 
 			expect(valueChart.getName()).to.equal('Hotel');
 			expect(valueChart.getAlternatives()).to.deep.equal(alternatives);
-			expect(valueChart.getUser()).to.deep.equal(user);
+			expect(valueChart.getUsers()[0]).to.deep.equal(user);
 			expect(valueChart.getRootObjectives()).to.have.length(1);
 			expect(valueChart.getRootObjectives()[0].getName()).to.equal('Hotel');
 

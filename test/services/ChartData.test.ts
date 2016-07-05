@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 15:05:19
+* @Last Modified time: 2016-07-04 22:52:42
 */
 
 // Application Classes:
@@ -13,7 +13,6 @@ import * as d3 														from 'd3';
 
 // Model Classes:
 import { ValueChart }												from '../../app/resources/model/ValueChart';
-import { IndividualValueChart }										from '../../app/resources/model/IndividualValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
 import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
 

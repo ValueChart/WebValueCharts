@@ -1,15 +1,13 @@
-import { Component }				from '@angular/core';
-import { OnInit }					from '@angular/core';
-import { Router, ActivatedRoute, ROUTER_DIRECTIVES }				from '@angular/router';
+import { Component }													from '@angular/core';
+import { OnInit }														from '@angular/core';
+import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // Application classes:
-import { CurrentUserService }			from '../../services/CurrentUser.service';
-import { CreationStepsService }			from '../../services/CreationSteps.service';
+import { CurrentUserService }											from '../../services/CurrentUser.service';
+import { CreationStepsService }											from '../../services/CreationSteps.service';
 
 // Model Classes
-import { IndividualValueChart } 	from '../../model/IndividualValueChart';
-import { GroupValueChart } 	from '../../model/GroupValueChart';
-import { ValueChart } 	from '../../model/ValueChart';
+import { ValueChart } 													from '../../model/ValueChart';
 
 @Component({
 	selector: 'createValueChart',
@@ -52,7 +50,7 @@ export class CreateValueChartComponent implements OnInit {
 
     	// Create new ValueChart with a temporary name and description
     	// TODO: Change model so that there is just one ValueCharts class
-    	this.currentUserService.setValueChart(new IndividualValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription));
+    	this.currentUserService.setValueChart(new ValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription));
   	}
 
 	back() {

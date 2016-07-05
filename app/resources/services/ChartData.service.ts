@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 15:04:12
+* @Last Modified time: 2016-07-04 22:35:46
 */
 
 import { Injectable } 							from '@angular/core';
@@ -12,11 +12,10 @@ import * as d3 									from 'd3';
 
 // Application Classes:
 import { AlternativeOrderRecord }				from '../model/Records';
+import { CurrentUserService }					from './CurrentUser.service';
 
 // Model Classes
 import { ValueChart }							from '../model/ValueChart';
-import { IndividualValueChart }					from '../model/IndividualValueChart';
-import { GroupValueChart }						from '../model/GroupValueChart';
 import { Objective }							from '../model/Objective';
 import { PrimitiveObjective }					from '../model/PrimitiveObjective';
 import { AbstractObjective }					from '../model/AbstractObjective';
@@ -40,10 +39,14 @@ import {VCRowData, VCCellData, VCLabelData}		from '../model/ChartDataTypes';
 export class ChartDataService {
 
 	private valueChart: ValueChart;
+	public primitiveObjectives: PrimitiveObjective[];
+
+	public users: User[];
+	public currentUser: User;
+	public numUsers: number;
+
 	public weightMap: WeightMap;
 	public scoreFunctionMap: ScoreFunctionMap;
-	public primitiveObjectives: PrimitiveObjective[];
-	public numUsers: number;
 
 	public alternatives: Alternative[];
 	public numAlternatives: number;
@@ -53,20 +56,18 @@ export class ChartDataService {
 
 	private originalAlternativeOrder: AlternativeOrderRecord;
 
-	constructor() { }
+	constructor(private currentUserService: CurrentUserService) { }
 
 	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
 		this.valueChart = valueChart;
 
-		if (this.valueChart.type === 'individual') {
-			this.weightMap = (<IndividualValueChart>this.valueChart).getUser().getWeightMap();
-			this.scoreFunctionMap = (<IndividualValueChart>this.valueChart).getUser().getScoreFunctionMap();
-			this.numUsers = 1;
-		} else {
-			this.weightMap = (<GroupValueChart>this.valueChart).calculateAverageWeightMap();
-			this.numUsers = (<GroupValueChart>this.valueChart).getUsers().length;
-		}
+		this.users = this.valueChart.getUsers();
+		this.currentUser = this.currentUserService.user;
+		this.numUsers = this.valueChart.getUsers().length;
+
+		this.weightMap = this.currentUser.getWeightMap();
+		this.scoreFunctionMap = this.currentUser.getScoreFunctionMap();
 
 		this.numAlternatives = this.valueChart.getAlternatives().length;
 		this.alternatives = this.valueChart.getAlternatives();
@@ -143,12 +144,7 @@ export class ChartDataService {
 
 	getCellData(objective: PrimitiveObjective): VCCellData[] {
 		var users: User[];
-
-		if (this.valueChart.type === 'group') {
-			users = (<GroupValueChart>this.valueChart).getUsers();
-		} else {
-			users = [(<IndividualValueChart>this.valueChart).getUser()];
-		}
+		users = this.valueChart.getUsers();
 
 		var objectiveValues: any[] = this.valueChart.getAlternativeValuesforObjective(objective);
 

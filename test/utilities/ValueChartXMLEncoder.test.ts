@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 17:04:33
+* @Last Modified time: 2016-07-04 22:50:11
 */
 
 import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMLEncoder';
 import { WebValueChartsParser }									from '../../app/resources/utilities/WebValueChartsParser';
 
 // Model Classes:
-import { IndividualValueChart }									from '../../app/resources/model/IndividualValueChart';
+import { ValueChart }									from '../../app/resources/model/ValueChart';
 import { Alternative }											from '../../app/resources/model/Alternative';
 import { User } 												from '../../app/resources/model/User';
 import { Objective } 											from '../../app/resources/model/Objective';
@@ -34,7 +34,7 @@ describe('ValueChartXMlEncoder', () => {
 	var xmlSerializer: XMLSerializer;
 
 	var xmlDocument: Document;
-	var valueChart: IndividualValueChart;
+	var valueChart: ValueChart;
 
 	var valueChartXMLEncoder: ValueChartXMLEncoder;
 
@@ -44,7 +44,7 @@ describe('ValueChartXMlEncoder', () => {
 		xmlSerializer = new XMLSerializer();
 
 		xmlDocument = xmlDocParser.parseFromString(XMLTestString, 'application/xml');
-		valueChart = <IndividualValueChart> valueChartParser.parseValueChart(xmlDocument);
+		valueChart = valueChartParser.parseValueChart(xmlDocument);
 
 		valueChartXMLEncoder = new ValueChartXMLEncoder();
 	});
@@ -56,7 +56,7 @@ describe('ValueChartXMlEncoder', () => {
 			var rateScoreFunctionXMLString: string;
 			
 			before(function() {
-				rateScoreFunction = valueChart.getUser().getScoreFunctionMap().getObjectiveScoreFunction('rate');
+				rateScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction('rate');
 				rateScoreFunctionXMLString = '<ScoreFunction objective="rate" type="continuous"><Score value="1" domain-element="100"/><Score value="0.75" domain-element="125"/><Score value="0.5" domain-element="150"/><Score value="0.25" domain-element="175"/><Score value="0" domain-element="200"/></ScoreFunction>';
 			});	
 
@@ -73,7 +73,7 @@ describe('ValueChartXMlEncoder', () => {
 			var internetAccessScoreFunctionXMLString: string;
 			
 			before(function() {
-				internetAccessScoreFuction = valueChart.getUser().getScoreFunctionMap().getObjectiveScoreFunction('internet-access');
+				internetAccessScoreFuction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction('internet-access');
 				internetAccessScoreFunctionXMLString = '<ScoreFunction objective="internet-access" type="discrete"><Score value="0" domain-element="none"/><Score value="1" domain-element="highspeed"/><Score value="0.5" domain-element="lowspeed"/></ScoreFunction>';
 			});	
 
@@ -89,7 +89,7 @@ describe('ValueChartXMlEncoder', () => {
 		var scoreFunctionMapXMLString: string;
 
 		before(function() {
-			scoreFunctionMap = valueChart.getUser().getScoreFunctionMap();
+			scoreFunctionMap = valueChart.getUsers()[0].getScoreFunctionMap();
 			scoreFunctionMapXMLString = '<ScoreFunctions><ScoreFunction objective="area" type="discrete"><Score value="0.25" domain-element="nightlife"/><Score value="0.5" domain-element="beach"/><Score value="1" domain-element="airport"/></ScoreFunction><ScoreFunction objective="skytrain-distance" type="continuous"><Score value="1" domain-element="1"/><Score value="0.6" domain-element="2"/><Score value="0.2" domain-element="7"/><Score value="0" domain-element="9"/></ScoreFunction><ScoreFunction objective="size" type="continuous"><Score value="1" domain-element="200"/><Score value="0.8" domain-element="237.5"/><Score value="0.6" domain-element="275"/><Score value="0.4" domain-element="312.5"/><Score value="0.2" domain-element="350"/></ScoreFunction><ScoreFunction objective="internet-access" type="discrete"><Score value="0" domain-element="none"/><Score value="1" domain-element="highspeed"/><Score value="0.5" domain-element="lowspeed"/></ScoreFunction><ScoreFunction objective="rate" type="continuous"><Score value="1" domain-element="100"/><Score value="0.75" domain-element="125"/><Score value="0.5" domain-element="150"/><Score value="0.25" domain-element="175"/><Score value="0" domain-element="200"/></ScoreFunction></ScoreFunctions>';
 		});
 
@@ -104,7 +104,7 @@ describe('ValueChartXMlEncoder', () => {
 		var weightMapXMLString: string;
 
 		before(function() {
-			weightMap = valueChart.getUser().getWeightMap();
+			weightMap = valueChart.getUsers()[0].getWeightMap();
 			weightMapXMLString = '<Weights><Weight objective="area" value="0.2"/><Weight objective="internet-access" value="0.1"/><Weight objective="rate" value="0.3"/><Weight objective="skytrain-distance" value="0.2"/><Weight objective="size" value="0.2"/></Weights>';
 		});
 
@@ -119,7 +119,7 @@ describe('ValueChartXMlEncoder', () => {
 		var userXMLString: string;
 
 		before(function() {
-			user = valueChart.getUser();
+			user = valueChart.getUsers()[0];
 			userXMLString = '<Users><User name="Aaron Mishkin"><Weights><Weight objective="area" value="0.2"/><Weight objective="internet-access" value="0.1"/><Weight objective="rate" value="0.3"/><Weight objective="skytrain-distance" value="0.2"/><Weight objective="size" value="0.2"/></Weights><ScoreFunctions><ScoreFunction objective="area" type="discrete"><Score value="0.25" domain-element="nightlife"/><Score value="0.5" domain-element="beach"/><Score value="1" domain-element="airport"/></ScoreFunction><ScoreFunction objective="skytrain-distance" type="continuous"><Score value="1" domain-element="1"/><Score value="0.6" domain-element="2"/><Score value="0.2" domain-element="7"/><Score value="0" domain-element="9"/></ScoreFunction><ScoreFunction objective="size" type="continuous"><Score value="1" domain-element="200"/><Score value="0.8" domain-element="237.5"/><Score value="0.6" domain-element="275"/><Score value="0.4" domain-element="312.5"/><Score value="0.2" domain-element="350"/></ScoreFunction><ScoreFunction objective="internet-access" type="discrete"><Score value="0" domain-element="none"/><Score value="1" domain-element="highspeed"/><Score value="0.5" domain-element="lowspeed"/></ScoreFunction><ScoreFunction objective="rate" type="continuous"><Score value="1" domain-element="100"/><Score value="0.75" domain-element="125"/><Score value="0.5" domain-element="150"/><Score value="0.25" domain-element="175"/><Score value="0" domain-element="200"/></ScoreFunction></ScoreFunctions></User></Users>';
 		});
 

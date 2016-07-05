@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 10:55:47
+* @Last Modified time: 2016-07-04 22:49:47
 */
 
 // Application Classes:
 import { WebValueChartsParser } 								from '../../app/resources/utilities/WebValueChartsParser';
 
 // Model Classes:
-import { IndividualValueChart }									from '../../app/resources/model/IndividualValueChart';
+import { ValueChart }									from '../../app/resources/model/ValueChart';
 import { Alternative }											from '../../app/resources/model/Alternative';
 import { User } 												from '../../app/resources/model/User';
 import { Objective } 											from '../../app/resources/model/Objective';
@@ -245,14 +245,14 @@ describe('WebValueChartsParser', () => {
 
 		describe('parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[]', () => {
 			var alternativesParentElement: Element;
-			var valueChart: IndividualValueChart;
+			var valueChart: ValueChart;
 			var primitiveObjectives: PrimitiveObjective[];
 
 			var alternativeValues: any[];
 
 			beforeEach(function() {
 				var rootObjectives = valueChartParser.parseObjectives(xmlDocument.querySelector('Objectives'));
-				valueChart = new IndividualValueChart('','','');
+				valueChart = new ValueChart('','','');
 				valueChart.setRootObjectives(rootObjectives);
 				primitiveObjectives = valueChart.getAllPrimitiveObjectives();
 

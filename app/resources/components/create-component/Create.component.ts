@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 14:51:46
+* @Last Modified time: 2016-07-04 21:25:39
 */
 
 import { Component }									from '@angular/core';
@@ -13,8 +13,6 @@ import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.s
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 
-// Model Classes
-import { IndividualValueChart } 						from '../../model/IndividualValueChart';
 
 @Component({
 	selector: 'create',

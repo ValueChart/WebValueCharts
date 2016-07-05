@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-29 11:48:43
+* @Last Modified time: 2016-07-04 22:45:12
 */
 
 // Model Classes
-import { IndividualValueChart } 											from '../model/IndividualValueChart';
+import { ValueChart }														from '../model/ValueChart';
 import { User }																from '../model/User';
 import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
@@ -25,13 +25,13 @@ export class ValueChartsPlusParser {
 
 	constructor() { }
 
-	parseValueChart(xmlDocument: Document): IndividualValueChart {
+	parseValueChart(xmlDocument: Document): ValueChart {
 
 		var objectivesParentElement: Element = xmlDocument.querySelector('Criteria');	
 		var alternativesParentElement: Element = xmlDocument.querySelector('Alternatives');
 		var valueChartName: string = xmlDocument.querySelector('ValueCharts').getAttribute('problem');
 
-		var valueChart: IndividualValueChart = new IndividualValueChart(valueChartName, '', '');	
+		var valueChart: ValueChart = new ValueChart(valueChartName, '', '');	
 
 		valueChart.setRootObjectives(this.parseObjectives(<Element[]> (<any> objectivesParentElement).children));
 
@@ -39,7 +39,7 @@ export class ValueChartsPlusParser {
 
 		valueChart.setAlternatives(this.parseAlternatives((<any> alternativesParentElement).children, primitiveObjectives));
 
-		valueChart.setUser(this.parseUser(xmlDocument, primitiveObjectives));
+		valueChart.setUsers([this.parseUser(xmlDocument, primitiveObjectives)]);
 
 		this.setObjectiveColors(xmlDocument, primitiveObjectives);
 

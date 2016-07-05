@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 11:28:31
+* @Last Modified time: 2016-07-04 22:38:07
 */
 
 
@@ -15,7 +15,6 @@ import { ChangeDetectionService }		from './ChangeDetection.service';
 // Model Classes
 import { ValueChart }					from '../model/ValueChart';
 import { Alternative }					from '../model/Alternative';
-import { IndividualValueChart }			from '../model/IndividualValueChart';
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { WeightMap }					from '../model/WeightMap';
@@ -137,17 +136,23 @@ export class ChartUndoRedoService {
 	}
 
 	weightMapChange(weightMapRecord: WeightMap, stateRecords: Memento[]): void {
-		var currentWeightMap: WeightMap = this.chartDataService.weightMap;
+		if (!this.chartDataService.currentUser)
+			return;
+
+		var currentWeightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
 		stateRecords.push(currentWeightMap);
-		// TODO: Why isn't this.chartDataService.weightMap the same reference as chartDataService.valueChart.user.weightMap?
+		this.chartDataService.currentUser.setWeightMap(weightMapRecord);
 		this.chartDataService.weightMap = weightMapRecord;
-		(<IndividualValueChart> this.chartDataService.getValueChart()).getUser().setWeightMap(weightMapRecord);
 	}
 
 	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, stateRecords: Memento[]): void {
-		var currentScoreFunction: ScoreFunction = this.chartDataService.scoreFunctionMap.getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
+		if (!this.chartDataService.currentUser)
+			return;
+
+		var currentScoreFunction: ScoreFunction = this.chartDataService.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
+		this.chartDataService.currentUser.getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
 		this.chartDataService.scoreFunctionMap.setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
 	}
 

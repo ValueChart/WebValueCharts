@@ -2,13 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-02 13:09:34
+* @Last Modified time: 2016-07-04 21:23:21
 */
 
 // Model Classes
 import { ValueChart } 														from '../model/ValueChart';
-import { IndividualValueChart } 											from '../model/IndividualValueChart';
-import { GroupValueChart } 													from '../model/GroupValueChart';
 import { User }																from '../model/User';
 import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
@@ -65,7 +63,7 @@ export class ValueChartXMLEncoder {
 
 		chartStructureElement.appendChild(this.convertAlternativesIntoElement(valueChart.getAlternatives(), xmlDocument));
 
-		valueChartElement.appendChild(this.convertUsersIntoElement([(<IndividualValueChart> valueChart).getUser()], xmlDocument));
+		valueChartElement.appendChild(this.convertUsersIntoElement(valueChart.getUsers(), xmlDocument));
 
 		return valueChartElement;
 	}

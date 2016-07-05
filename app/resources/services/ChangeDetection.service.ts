@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 11:41:54
+* @Last Modified time: 2016-07-04 21:28:56
 */
 
 import { Injectable } 															from '@angular/core';
@@ -10,9 +10,8 @@ import { KeyValueDiffers, KeyValueDiffer }										from '@angular/core';
 
 // Model Classes: 
 import { ValueChart } 															from '../model/ValueChart';
-import { IndividualValueChart } 												from '../model/IndividualValueChart';
 import { ScoreFunction } 														from '../model/ScoreFunction';
-
+import { User }																	from '../model/User';
 
 @Injectable()
 export class ChangeDetectionService { 
@@ -27,10 +26,9 @@ export class ChangeDetectionService {
 
 	// Differs:
 	public valueChartDiffer: KeyValueDiffer;
-	public userDiffer: KeyValueDiffer;
-	public weightMapDiffer: KeyValueDiffer;
-	public scoreFunctionMapDiffer: KeyValueDiffer;
-	public scoreFunctionDiffer: KeyValueDiffer;
+	public userDiffers: KeyValueDiffer[];
+	public weightMapDiffers: KeyValueDiffer[];
+	public scoreFunctionMapDiffers: KeyValueDiffer[];
 	public scoreFunctionDiffers: KeyValueDiffer[];
 
 	// Interaction Toggles
@@ -39,19 +37,29 @@ export class ChangeDetectionService {
 
 	initDiffers(valueChart: ValueChart): void {
 		this.valueChartDiffer = this.objectDiffers.find({}).create(null);
-		this.userDiffer = this.objectDiffers.find({}).create(null);
-		this.weightMapDiffer = this.objectDiffers.find({}).create(null);
-		this.scoreFunctionMapDiffer = this.objectDiffers.find({}).create(null);
 
-		var user = (<IndividualValueChart>valueChart).getUser();
-		var scoreFunctionMap = user.getScoreFunctionMap();
-		var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
+		var users = valueChart.getUsers();
 
+		this.userDiffers = [];
+		this.weightMapDiffers = [];
+		this.scoreFunctionMapDiffers = [];
 		this.scoreFunctionDiffers = [];
+		// Initialize Differs for 
+		users.forEach((user: User) => {
+			let userDiffer = this.objectDiffers.find({}).create(null);
+			this.userDiffers.push(userDiffer);
 
-		scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
-			let scoreFunctionDiffer = this.objectDiffers.find({}).create(null);
-			this.scoreFunctionDiffers.push(scoreFunctionDiffer);
+			let weightMapDiffer = this.objectDiffers.find({}).create(null);
+			this.weightMapDiffers.push(weightMapDiffer);
+
+			let scoreFunctionMapDiffer = this.objectDiffers.find({}).create(null);
+			this.scoreFunctionMapDiffers.push(scoreFunctionMapDiffer);
+
+			var scoreFunctions: ScoreFunction[] = user.getScoreFunctionMap().getAllScoreFunctions();
+			scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
+				let scoreFunctionDiffer = this.objectDiffers.find({}).create(null);
+				this.scoreFunctionDiffers.push(scoreFunctionDiffer);
+			});
 		});
 	}
 

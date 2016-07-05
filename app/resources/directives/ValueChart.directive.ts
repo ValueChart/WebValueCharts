@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:50:53
+* @Last Modified time: 2016-07-04 22:37:51
 */
 
 
@@ -30,8 +30,6 @@ import { SetColorsInteraction }													from '../interactions/SetColors.inte
 
 // Model Classes
 import { ValueChart } 															from '../model/ValueChart';
-import { GroupValueChart } 														from '../model/GroupValueChart';
-import { IndividualValueChart } 												from '../model/IndividualValueChart';
 import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 import { WeightMap }															from '../model/WeightMap';
 import { User }																	from '../model/User';
@@ -47,8 +45,8 @@ import {VCRowData, VCCellData, VCLabelData}										from '../model/ChartDataTyp
 export class ValueChartDirective implements OnInit, DoCheck {
 
 	private isInitialized: boolean;
-	// Inputs to the directive.
-	private valueChart: ValueChart;		// A ValueChart. Can be an IndividualValueChart or a GroupValueChart
+
+	private valueChart: ValueChart;
 
 	private previousOrientation: string;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
@@ -163,32 +161,36 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.chartDataService.setValueChart(this.valueChart);
 			this.updateValueChartDisplay();
 		}
-		// Check for changes to the User fields. This is NOT deep.
-		var user = (<IndividualValueChart>this.valueChart).getUser();
-		var userChanges = this.changeDetectionService.userDiffer.diff(user);
-		if (userChanges) {
-			this.updateValueChartDisplay();
-		}
-		// Check for changes to the WeightMap. This is NOT deep, and only checks the internal mappings of the WeightMap.
-		var internalWeightMap = user.getWeightMap().getInternalWeightMap();
-		var weightMapChanges = this.changeDetectionService.weightMapDiffer.diff(internalWeightMap);
-		if (weightMapChanges) {
-			this.updateValueChartDisplay();
-		}
 
-		// Check for changes to the ScoreFunctions. This is NOT deep, and only checks the internal mappings of the ScoreFunctions.
-		var scoreFunctionMap = user.getScoreFunctionMap();
-		var scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffer.diff(scoreFunctionMap);
-		if (scoreFunctionMapChanges) {
-			this.updateValueChartDisplay();
-		}
+		// Check the User Models for Changes:
 
-		var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
-		scoreFunctions.forEach((scoreFunction: ScoreFunction, index: number) => {
-			var scoreFunctionChanges = this.changeDetectionService.scoreFunctionDiffers[index].diff(scoreFunction.getElementScoreMap());
-			if (scoreFunctionChanges) {
+		this.chartDataService.getValueChart().getUsers().forEach((user: User, i: number) => {
+			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
+			if (userChanges) {
 				this.updateValueChartDisplay();
 			}
+
+			let internalWeightMap = user.getWeightMap().getInternalWeightMap();
+			let weightMapChanges = this.changeDetectionService.weightMapDiffers[i].diff(internalWeightMap);
+			if (weightMapChanges) {
+				this.updateValueChartDisplay();
+			}
+
+			let scoreFunctionMap = user.getScoreFunctionMap();
+			let scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffers[i].diff(scoreFunctionMap);
+			if (scoreFunctionMapChanges) {
+				this.updateValueChartDisplay();
+			}
+
+			var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
+			scoreFunctions.forEach((scoreFunction: ScoreFunction, j: number) => {
+				var functionIndex: number = j + (i * scoreFunctions.length)
+				var scoreFunctionChanges = this.changeDetectionService.scoreFunctionDiffers[functionIndex].diff(scoreFunction.getElementScoreMap());
+				if (scoreFunctionChanges) {
+					this.updateValueChartDisplay();
+				}
+			});
+
 		});
 
 		if (this.changeDetectionService.colorsHaveChanged) {
@@ -275,7 +277,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	updateValueChartDisplay(): void {
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-
 		this.chartDataService.updateWeightOffsets();
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 		

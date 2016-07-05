@@ -2,13 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 16:14:59
+* @Last Modified time: 2016-07-04 22:03:53
 */
 
 // Model Classes
 import { ValueChart } 														from '../model/ValueChart';
-import { IndividualValueChart } 											from '../model/IndividualValueChart';
-import { GroupValueChart } 													from '../model/GroupValueChart';
 import { User }																from '../model/User';
 import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
@@ -40,13 +38,7 @@ export class WebValueChartsParser {
 		var usersParentElement: Element = valueChartElement.querySelector('Users');
 		var users: User[] = this.parseUsers(usersParentElement);
 
-		if (users.length > 1) {
-			valueChart = new GroupValueChart(valueChartName, valueChartDescription, valueChartCreator);
-			(<GroupValueChart> valueChart).setUsers(users);
-		} else {
-			valueChart = new IndividualValueChart(valueChartName, valueChartDescription, valueChartCreator);
-			(<IndividualValueChart> valueChart).setUser(users[0]);
-		}
+		valueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
 		var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');

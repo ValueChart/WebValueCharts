@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 14:44:10
+* @Last Modified time: 2016-07-04 22:24:32
 */
 
 import { Injectable } 												from '@angular/core';
@@ -44,12 +44,12 @@ export class ResizeWeightsInteraction {
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
 				// Save the current state of the Weight Map.
-				this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.weightMap);
+				this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.currentUser.getWeightMap());
 
 				// Calculate the correct weight increment.
-				var totalWeight: number = this.chartDataService.weightMap.getWeightTotal();
+				var totalWeight: number = this.chartDataService.currentUser.getWeightMap().getWeightTotal();
 				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.chartDataService.weightMap.getObjectiveWeight(labelDatum.objective.getName());
+				var previousWeight: number = this.chartDataService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -57,14 +57,14 @@ export class ResizeWeightsInteraction {
 					pumpAmount = 0 - previousWeight;
 				}
 
-				this.chartDataService.weightMap.setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
+				this.chartDataService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
 		}
 	}
 
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: VCLabelData, i: number) => {
-		var weightMap: WeightMap = this.chartDataService.weightMap;
+		var weightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');
