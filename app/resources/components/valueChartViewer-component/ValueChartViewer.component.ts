@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 14:44:10
+* @Last Modified time: 2016-07-05 16:40:05
 */
 
 import { Component }															from '@angular/core';
@@ -36,6 +36,10 @@ import { ResizeWeightsInteraction }												from '../../interactions/ResizeWe
 import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../../interactions/SetColors.interaction';
 
+import { SummaryChartDefinitions }												from '../../services/SummaryChartDefinitions.service';
+import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
+import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
+
 // Model Classes
 import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
@@ -61,7 +65,12 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ReorderObjectivesInteraction,
 		ResizeWeightsInteraction,
 		SortAlternativesInteraction,
-		SetColorsInteraction]
+		SetColorsInteraction,
+
+	// Definitions:
+		SummaryChartDefinitions,
+		ObjectiveChartDefinitions,
+		LabelDefinitions]
 })
 export class ValueChartViewerComponent implements OnInit {
 
@@ -101,7 +110,10 @@ export class ValueChartViewerComponent implements OnInit {
 		private router: Router,
 		private currentUserService: CurrentUserService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private renderEventsService: RenderEventsService) { }
+		private renderEventsService: RenderEventsService,
+		private summaryChartDefinitions: SummaryChartDefinitions,
+		private objectiveChartDefinitions: ObjectiveChartDefinitions,
+		private labelDefinitions: LabelDefinitions) { }
 
 	ngOnInit() {
 		this.valueChart = this.currentUserService.getValueChart();
@@ -146,7 +158,7 @@ export class ValueChartViewerComponent implements OnInit {
 	resizeDetailBox(): void {
 		// When the window is resized, set the height of the detail box to be 50px less than the height of summary chart.
 		var alternativeDetailBox: any = $('#alternative-detail-box')[0];
-		var summaryOutline: any = $('.summary-outline')[0];
+		var summaryOutline: any = $('.' + this.summaryChartDefinitions.OUTLINE)[0];
 		if (summaryOutline) {
 			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
 			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
@@ -154,7 +166,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		if (this.orientation === 'horizontal') {
 			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.label-outline')[0];
+			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 			if (labelOutline) {
 				// Offset the detail box to the left if the ValueChart is in horizontal orientation.
 				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
@@ -163,10 +175,10 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	linkAlternativeLabelsToDetailBox = () => {
-		d3.selectAll('.objective-alternative-label')
+		d3.selectAll('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL)
 			.classed('alternative-link', true);
 
-		$('.objective-alternative-label').click((eventObject: Event) => {
+		$('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
 			var selection: d3.Selection<any> = d3.select(eventObject.target);
 			this.expandAlternative(selection.datum());
 		});
@@ -208,7 +220,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		if (this.orientation === 'horizontal') {
 			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.label-outline')[0];
+			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 
 			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
 		}

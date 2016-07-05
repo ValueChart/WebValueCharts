@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:28:36
+* @Last Modified time: 2016-07-05 16:43:39
 */
 
 
@@ -27,6 +27,9 @@ import { ReorderObjectivesInteraction }											from '../interactions/ReorderO
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../interactions/SetColors.interaction';
+
+import { LabelDefinitions }														from '../services/LabelDefinitions.service';
+
 
 // Model Classes
 import { ValueChart } 															from '../model/ValueChart';
@@ -78,7 +81,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private sortAlternativesInteraction: SortAlternativesInteraction,
-		private setColorsInteraction: SetColorsInteraction) { 
+		private setColorsInteraction: SetColorsInteraction,
+
+		private labelDefinitions: LabelDefinitions) { 
 	}
 	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
@@ -283,14 +288,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
-		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.chartDataService.primitiveObjectives);
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
 	updateRowOrder(): void {
 		// Destroy the previous label area.
-		(<Element>d3.select('.label-root-container').node()).remove();
+		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
 		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.renderConfigService.viewOrientation, this.chartDataService.primitiveObjectives);

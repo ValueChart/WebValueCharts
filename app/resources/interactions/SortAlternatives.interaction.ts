@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:09:00
+* @Last Modified time: 2016-07-05 16:37:53
 */
 
 import { Injectable } 												from '@angular/core';
@@ -17,6 +17,9 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 
+import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
+import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
+import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -24,7 +27,7 @@ import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 import { Alternative }												from '../model/Alternative';
 
-import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
 
 
 
@@ -57,7 +60,10 @@ export class SortAlternativesInteraction {
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private changeDetectionService: ChangeDetectionService) { }
+		private changeDetectionService: ChangeDetectionService,
+		private summaryChartDefinitions: SummaryChartDefinitions,
+		private objectiveChartDefinitions: ObjectiveChartDefinitions,
+		private labelDefinitions: LabelDefinitions) { }
 
 	toggleAlternativeSorting(sortingType: string): void {
 		// Toggle Dragging to sort objectives:
@@ -87,8 +93,8 @@ export class SortAlternativesInteraction {
 	}
 
 	sortAlternativesByObjective(enableSorting: boolean): void {
-		var objectiveLabels: JQuery = $('.label-subcontainer-outline');
-		var objectiveText: JQuery = $('.label-subcontainer-text');
+		var objectiveLabels: JQuery = $('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
+		var objectiveText: JQuery = $('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
 
 		objectiveLabels.off('dblclick');
 		objectiveText.off('dblclick');
@@ -115,7 +121,7 @@ export class SortAlternativesInteraction {
 	}
 
 	sortAlternativesManually(enableSorting: boolean): void {
-		var alternativeBoxes = d3.selectAll('.alternative-box');
+		var alternativeBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
 
 		var dragToSort = d3.drag();
 
@@ -139,13 +145,13 @@ export class SortAlternativesInteraction {
 		this.alternativeBox = d3.select((<any> d3.event).sourceEvent.target)
 		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.renderConfigService.dimensionOne);
 
-		this.siblingBoxes = d3.selectAll('.alternative-box');
+		this.siblingBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
 
-		this.cellsToMove = d3.selectAll('.cell[alternative="' + d.getName() + '"]');
-		this.alternativeLabelToMove = d3.select('.objective-alternative-label[alternative="' + d.getName() + '"]'); 
-		this.totalScoreLabelToMove = d3.select('.summary-scoretotal-subcontainer[alternative="' + d.getName() + '"]');
+		this.cellsToMove = d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getName() + '"]');
+		this.alternativeLabelToMove = d3.select('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getName() + '"]'); 
+		this.totalScoreLabelToMove = d3.select('.' + this.summaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getName() + '"]');
 
-		d3.selectAll('.cell').style('opacity', 0.25);
+		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
 
 		for (var i = 0; i < this.chartDataService.alternatives.length; i++) {
@@ -194,7 +200,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.alternative-box[alternative="' + d.getName() + '"]').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE +  '[alternative="' + d.getName() + '"]').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
@@ -228,7 +234,7 @@ export class SortAlternativesInteraction {
 			this.chartUndoRedoService.deleteNewestRecord();
 		}
 
-		d3.selectAll('.cell').style('opacity', 1);
+		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 1);
 		this.changeDetectionService.alternativeOrderChanged = true;
 	}
 

@@ -171,8 +171,8 @@
 		  <h4>{{detailBoxHeader}}</h4>
 		</div>
 		<div class="well well-lg" id="alternative-detail-box" 
-				[style.height.px]="$('.summary-outline')[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
-				[style.width.px]="$('.summary-outline')[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET"> 
+				[style.height.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
+				[style.width.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET"> 
 			<div *ngFor="let alternative of alternatives">
 				<div class="col-sm-12"> 
 					<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxHeader === 'Alternatives'">

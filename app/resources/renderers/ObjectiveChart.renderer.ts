@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-05 12:37:57
+* @Last Modified time: 2016-07-05 16:38:08
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -18,6 +18,8 @@ import * as d3 														from 'd3';
 import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
+
+import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
 
 // Model Classes
 import { User }														from '../model/User';
@@ -56,25 +58,26 @@ export class ObjectiveChartRenderer {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
-		private renderEventsService: RenderEventsService) { }
+		private renderEventsService: RenderEventsService,
+		private defs: ObjectiveChartDefinitions) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
 	createObjectiveChart(el: d3.Selection<any>, rows: RowData[]): void {
 		// Create the root container for the objective chart.
 		this.chart = el.append('g')
-			.classed('objective-chart', true);
+			.classed(this.defs.CHART, true);
 		// Create the container for the row outlines.
 		this.rowOutlinesContainer = this.chart.append('g')
-			.classed('objective-row-outlines-container', true);
+			.classed(this.defs.ROW_OUTLINES_CONTAINER, true);
 		// Create the container to hold the rows.
 		this.rowsContainer = this.chart.append('g')
-			.classed('objective-rows-container', true);
+			.classed(this.defs.ROWS_CONTAINER, true);
 		// Create the container to hold the labels for the alternatives
 		this.alternativeLabelsContainer = this.chart.append('g')
-			.classed('objective-alt-labels-container', true);
+			.classed(this.defs.ALTERNATIVE_LABELS_CONTAINER, true);
 
 		this.alternativeBoxesContainer = this.chart.append('g')
-			.classed('objective-alternative-boxes-container', true);
+			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 
 		this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer, rows);
@@ -83,62 +86,61 @@ export class ObjectiveChartRenderer {
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
 	createObjectiveRows(rowsContainer: d3.Selection<any>, rowOutlinesContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, alternativeLabelsContainer: d3.Selection<any>, rows: RowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
-		rowOutlinesContainer.selectAll('.objective-row-outline')
+		rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE)
 			.data(rows)
 			.enter().append('rect')
-				.classed('objective-row-outline', true)
+				.classed(this.defs.ROW_OUTLINE, true)
 				.classed('valuechart-outline', true);
 
 		// Create the containers to hold the new rows.
-		rowsContainer.selectAll('.objective-row')
+		rowsContainer.selectAll('.' + this.defs.ROW)
 			.data(rows)
 			.enter().append('g')
-				.classed('objective-row', true);
+				.classed(this.defs.ROW, true);
 
-		alternativeLabelsContainer.selectAll('.objective-alternative-label')
+		alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL)
 			.data(this.chartDataService.alternatives)
 			.enter().append('text')
-				.classed('objective-alternative-label', true);
+				.classed(this.defs.ALTERNATIVE_LABEL, true);
 
-		boxesContainer.selectAll('.objective-alternative-box')
+		boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
 			.data(this.chartDataService.alternatives)
 			.enter().append('rect')
-				.classed('valuechart-dividing-line', true)
-				.classed('objective-alternative-box', true)
-				.classed('alternative-box', true);
+				.classed(this.defs.ALTERNATIVE_BOX, true)
+				.classed(this.defs.CHART_ALTERNATIVE, true);
 
 		// Select all the row outlines (not just the new ones as is done above), and save them as a class field. The same goes for the next two lines, respectively
-		this.rowOutlines = rowOutlinesContainer.selectAll('.objective-row-outline');
-		this.rows = rowsContainer.selectAll('.objective-row');
-		this.alternativeBoxes = boxesContainer.selectAll('.objective-alternative-box');
-		this.alternativeLabels = alternativeLabelsContainer.selectAll('.objective-alternative-label');
+		this.rowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE);
+		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
+		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+		this.alternativeLabels = alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL);
 
 		this.createObjectiveCells(this.rows)
 	}
 	// This function creates the cells that compose each row of the objective chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
 	createObjectiveCells(objectiveRows: d3.Selection<SVGGElement>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
-		objectiveRows.selectAll('.objective-cell')
+		objectiveRows.selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
 			.enter().append('g')
-				.classed('objective-cell', true)
-				.classed('cell', true);
+				.classed(this.defs.CELL, true)
+				.classed(this.defs.CHART_CELL, true);
 
 
-		this.cells = objectiveRows.selectAll('.objective-cell');
+		this.cells = objectiveRows.selectAll('.' + this.defs.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		this.cells.selectAll('.objective-user-scores')
+		this.cells.selectAll('.' + this.defs.USER_SCORE)
 			.data((d: CellData) => { return d.userScores; })
 			.enter().append('rect')
-				.classed('objective-user-scores', true);
+				.classed(this.defs.USER_SCORE, true);
 
-		this.objectiveDomainLabels = this.cells.selectAll('.objective-domain-label')
+		this.objectiveDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; })
 			.enter().append('text')
-				.classed('objective-domain-label', true);
+				.classed(this.defs.DOMAIN_LABEL, true);
 
-		this.userScores = this.cells.selectAll('.objective-user-scores');
+		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
 	}
 
 	updateObjectiveChart(rows: RowData[], viewOrientation: string): void {
@@ -149,13 +151,13 @@ export class ObjectiveChartRenderer {
 
 		var alternativeLabelsToUpdate = this.alternativeLabels.data(this.chartDataService.alternatives);
 
-		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.objective-alternative-box')
+		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
 			.data(this.chartDataService.alternatives);
 
-		var cellsToUpdate = rowsToUpdate.selectAll('.objective-cell')
+		var cellsToUpdate = rowsToUpdate.selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
 
-		var userScoresToUpdate = cellsToUpdate.selectAll('.objective-user-scores')
+		var userScoresToUpdate = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 
@@ -228,7 +230,7 @@ export class ObjectiveChartRenderer {
 
 		var domainLabelCoord: number = 5;
 
-		cells.selectAll('.objective-domain-label')
+		cells.selectAll('.' + this.defs.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; })
 				.text((d: CellData, i: number) => { return d.value })
 				.attr(this.renderConfigService.coordinateOne, (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / 3)

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 14:44:10
+* @Last Modified time: 2016-07-05 16:42:10
 */
 
 import { Injectable } 															from '@angular/core';
@@ -13,6 +13,8 @@ import * as d3 																	from 'd3';
 // Application Classes:
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
 
+import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+
 // Model Classes: 
 import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 
@@ -21,10 +23,12 @@ import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 @Injectable()
 export class SetColorsInteraction {
 
-	constructor(private changeDetectionService: ChangeDetectionService) { } 
+	constructor(
+		private changeDetectionService: ChangeDetectionService, 
+		private labelDefinitions: LabelDefinitions) { } 
 
 	toggleSettingObjectiveColors(setObjectiveColors: boolean): void {
-		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
+		var primitiveObjectiveLabels: JQuery = $('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		primitiveObjectiveLabels.off('click');
 		if (setObjectiveColors) {
 			primitiveObjectiveLabels.click((eventObject: Event) => {

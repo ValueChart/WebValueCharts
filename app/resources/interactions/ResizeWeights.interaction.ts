@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:51:00
+* @Last Modified time: 2016-07-05 16:41:24
 */
 
 import { Injectable } 												from '@angular/core';
@@ -16,6 +16,8 @@ import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+
+import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -36,10 +38,11 @@ export class ResizeWeightsInteraction {
 		private ngZone: NgZone,
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
-		private chartUndoRedoService: ChartUndoRedoService) { }
+		private chartUndoRedoService: ChartUndoRedoService,
+		private labelDefinitions: LabelDefinitions) { }
 
 	togglePump(pumpType: string): void {
-		var primitiveObjectiveLabels: JQuery = $('.label-primitive-objective');
+		var primitiveObjectiveLabels: JQuery = $('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		primitiveObjectiveLabels.off('click');
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {

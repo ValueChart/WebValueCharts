@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:49:15
+* @Last Modified time: 2016-07-05 16:44:02
 */
 
 import { Injectable } 												from '@angular/core';
@@ -24,6 +24,9 @@ import { ReorderObjectivesInteraction }								from '../interactions/ReorderObje
 
 import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.interaction';
 
+import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+
+
 // Model Classes
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
@@ -32,7 +35,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
 
 
 
@@ -60,6 +63,7 @@ export class LabelRenderer {
 		private chartDataService: ChartDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
+		private defs: LabelDefinitions,
 		private ngZone: NgZone) { 
 	}
 
@@ -67,25 +71,25 @@ export class LabelRenderer {
 	createLabelSpace(el: d3.Selection<any>, labelData: LabelData[], objectiveData: PrimitiveObjective[]): void {
 		// Create the root container which will hold all label related SVG elements.
 		this.rootContainer = el.append('g')
-			.classed('label-root-container', true)
+			.classed(this.defs.ROOT_CONTAINER, true)
 
 		// Create the outline box for the label area. Append the styles here because they will not change.
 		this.labelSpaceOutline = this.rootContainer.append('g')
-			.classed('label-outline-container', true)
+			.classed(this.defs.OUTLINE_CONTAINER, true)
 			.append('rect')
-				.classed('label-outline', true)
+				.classed(this.defs.OUTLINE, true)
 				.classed('valuechart-outline', true);
 
 		// Create the container which will hold all labels.
 		this.labelContainer = this.rootContainer.append('g')
-			.classed('label-labels-container', true);
+			.classed(this.defs.LABELS_CONTAINER, true);
 
 		// Create the container which will the hold Score Functions plots for each PrimitiveObjective.
 		this.scoreFunctionContainer = this.rootContainer.append('g')
-			.classed('label-scorefunction-container', true);
+			.classed('' + this.defs.SCORE_FUNCTIONS_CONTAINER, true);
 
 		// Recursively create the labels based on the Objective structure.
-		this.createLabels(el, this.labelContainer, labelData, 'rootcontainer');
+		this.createLabels(el, this.labelContainer, labelData, this.defs.ROOT_CONTAINER_NAME);
 
 		// Create the score Functions.
 		this.createScoreFunctions(this.scoreFunctionContainer, objectiveData);
@@ -94,27 +98,27 @@ export class LabelRenderer {
 	// This function recursively creates labels for an array of Objectives that have been put into labelData format.
 	createLabels(el: d3.Selection<any>, labelContainer: d3.Selection<any>, labelData: LabelData[], parentName: string): void {
 		// Create a new container for each element in labelData.
-		var newLabelContainers: d3.Selection<any> = labelContainer.selectAll('g[parent=parentName]')
+		var newLabelContainers: d3.Selection<any> = labelContainer.selectAll('g[parent=' + parentName + ']')
 			.data(labelData)
 			.enter().append('g')
-				.classed('label-subcontainer', true)
+				.classed(this.defs.LABEL_SUBCONTAINER, true)
 				.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-container' })
-				.attr('parent', parentName);	// Set the name parent objective on the 'g', or 'rootcontainer' if it has not parent objective. 
+				.attr('parent', parentName);	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
 
 		// Append an outline rectangle for label container that was just created.
 		newLabelContainers.append('rect')
-			.classed('label-subcontainer-outline', true)
+			.classed(this.defs.SUBCONTAINER_OUTLINE, true)
 			.classed('valuechart-label-outline', true)
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-outline' });
 
 		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
 		newLabelContainers.append('text')
-			.classed('label-subcontainer-text', true)
+			.classed('' + this.defs.SUBCONTAINER_TEXT, true)
 			.classed('valuechart-label-text', true)
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-text' });
 
 		newLabelContainers.append('line')
-			.classed('label-subcontainer-divider', true)
+			.classed(this.defs.SUBCONTAINER_DIVIDER, true)
 			.classed('valuechart-label-divider', true)
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-divider' });
 
@@ -123,10 +127,10 @@ export class LabelRenderer {
 		labelData.forEach((labelDatum: LabelData) => {
 			if (labelDatum.subLabelData === undefined) {
 				el.select('#label-' + labelDatum.objective.getName() + '-outline')
-					.classed('label-primitive-objective', true);
+					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
 
 				el.select('#label-' + labelDatum.objective.getName() + '-text')
-					.classed('label-primitive-objective', true);
+					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
 				return;	
 			}
 
@@ -140,7 +144,7 @@ export class LabelRenderer {
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
 		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
-		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.label-scorefunction-container');
+		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
 		if (this.displayScoreFunctions) {
 			// Render the score function plots.
@@ -173,10 +177,10 @@ export class LabelRenderer {
 			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize);
 
 		// Render the labels, starting with the labels for the highest level AbstractObjectives, which are in the 'g' directly under the root container.
-		var labelSpaces = this.rootContainer.selectAll('g[parent=rootcontainer]');
+		var labelSpaces = this.rootContainer.selectAll('g[parent="' + this.defs.ROOT_CONTAINER_NAME + '"]');
 		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
 
-		var scoreFunctionContainer: d3.Selection<any>  = this.rootContainer.select('.label-scorefunction-container');
+		var scoreFunctionContainer: d3.Selection<any>  = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
 		if (this.displayScoreFunctions) {
 			// Render the score function plots.
@@ -198,11 +202,11 @@ export class LabelRenderer {
 			weightSum += labelData[i].weight;
 		}
 
-		this.renderLabelOutline(labelSpaces.select('.label-subcontainer-outline'), weightOffsets, viewOrientation);	// Render the outlining rectangle.
+		this.renderLabelOutline(labelSpaces.select('.' + this.defs.SUBCONTAINER_OUTLINE), weightOffsets, viewOrientation);	// Render the outlining rectangle.
 
-		this.renderLabelText(labelSpaces.select('.label-subcontainer-text'), weightOffsets, viewOrientation)	// Render the text within the label
+		this.renderLabelText(labelSpaces.select('.' + this.defs.SUBCONTAINER_TEXT), weightOffsets, viewOrientation)	// Render the text within the label
 
-		this.renderLabelDividers(labelSpaces.select('.label-subcontainer-divider'), weightOffsets, viewOrientation);
+		this.renderLabelDividers(labelSpaces.select('.' + this.defs.SUBCONTAINER_DIVIDER), weightOffsets, viewOrientation);
 
 
 		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
@@ -285,10 +289,10 @@ export class LabelRenderer {
 		
 		this.scoreFunctionRenderers = {}
 
-		var newScoreFunctionPlots: d3.Selection<any> = scoreFunctionContainer.selectAll('.label-scorefunction')
+		var newScoreFunctionPlots: d3.Selection<any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(data)
 			.enter().append('g')
-				.classed('label-scorefunction', true)
+				.classed(this.defs.SCORE_FUNCTION, true)
 				.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getName() + '-scorefunction'; })
 
 		// Use the ScoreFunctionRenderer to create each score function.
@@ -320,7 +324,7 @@ export class LabelRenderer {
 
 
 		// Select all the score function plot containers:
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.label-scorefunction')
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(data);
 
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {

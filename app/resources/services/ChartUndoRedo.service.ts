@@ -2,28 +2,28 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 12:59:00
+* @Last Modified time: 2016-07-05 15:00:44
 */
 
 
-import { Injectable } 					from '@angular/core';
+import { Injectable } 														from '@angular/core';
 
 // Application Classes
-import { ChartDataService }				from './ChartData.service';
-import { ChangeDetectionService }		from './ChangeDetection.service';
+import { ChartDataService }													from './ChartData.service';
+import { ChangeDetectionService }											from './ChangeDetection.service';
 
 // Model Classes
-import { ValueChart }					from '../model/ValueChart';
-import { Alternative }					from '../model/Alternative';
-import { Objective }					from '../model/Objective';
-import { PrimitiveObjective }			from '../model/PrimitiveObjective';
-import { WeightMap }					from '../model/WeightMap';
-import { ScoreFunction }				from '../model/ScoreFunction';
+import { ValueChart }														from '../model/ValueChart';
+import { Alternative }														from '../model/Alternative';
+import { Objective }														from '../model/Objective';
+import { PrimitiveObjective }												from '../model/PrimitiveObjective';
+import { WeightMap }														from '../model/WeightMap';
+import { ScoreFunction }													from '../model/ScoreFunction';
 
-import { Memento }						from '../model/Memento';
-import { AlternativeOrderRecord }		from '../model/Records';
-import { ScoreFunctionRecord }			from '../model/Records';
-import { ObjectivesRecord }				from '../model/Records';
+import { Memento }															from '../model/Memento';
+import { AlternativeOrderRecord }											from '../model/Records';
+import { ScoreFunctionRecord }												from '../model/Records';
+import { ObjectivesRecord }													from '../model/Records';
 
 
 @Injectable()

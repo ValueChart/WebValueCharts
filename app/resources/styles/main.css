@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 17:45:37
+* @Last Modified time: 2016-07-05 14:28:30
 */
 
 /* Global Styles */
@@ -130,13 +130,10 @@
     stroke-width: 1;   
 }
 
-.valuechart-dividing-line {
-    stroke: grey;
-    stroke-width: 1;   
-}
-
 .alternative-box {
     fill: rgba(255, 255, 255, 0);
+    stroke: grey;
+    stroke-width: 2;  
 }
 
 .valuechart-label-text {
