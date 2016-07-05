@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 12:53:39
+* @Last Modified time: 2016-07-05 14:15:51
 */
 
 import { Injectable } 												from '@angular/core';
@@ -241,46 +241,51 @@ export class SummaryChartRenderer {
 
 	renderScoreTotalLabels(scoreTotals: d3.Selection<any>, viewOrientation: string): void {
 
-		var calculateTotalScore = (d: UserScoreData) => {
-			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName()));
-			return score + d.offset;
-		};
-
 		var verticalOffset: number = 15;
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: UserScoreData, i: number) => { return Math.round(100 * (calculateTotalScore(d)) / this.chartDataService.maximumWeightMap.getWeightTotal()); })
+			.text((d: UserScoreData, i: number) => { return Math.round(100 * (this.calculateTotalScore(d)) / this.chartDataService.maximumWeightMap.getWeightTotal()); })
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
 			})
 			.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
 				return (viewOrientation === 'vertical') ?
-					this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(calculateTotalScore(d)) - verticalOffset
+					this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(this.calculateTotalScore(d)) - verticalOffset
 					:
-					(this.renderConfigService.dimensionTwoScale(calculateTotalScore(d)) + verticalOffset);
+					(this.renderConfigService.dimensionTwoScale(this.calculateTotalScore(d)) + verticalOffset);
 			})
-			.attr(this.renderConfigService.coordinateTwo + '1', calculateTotalScore)
+			.attr(this.renderConfigService.coordinateTwo + '1', this.calculateTotalScore)
 			.style('font-size', 22)
 			.classed('best-score-label', false);
 
-		var maxScore: number = 0;
-		var bestTotalScore: d3.Selection<any>;
 
+			this.highlightBestUserScores();
+	}
+
+	highlightBestUserScores() {
+		var maxUserScores: any = {};
+		this.chartDataService.users.forEach((user: User) => {
+			maxUserScores[user.getUsername()] = 0;
+		});
+
+		var bestTotalScoreSelections: any = {};
 		this.chart.selectAll('.summary-score-total').nodes().forEach((element: Element) => {
 			if (element.nodeName === 'text') {
 				let selection: d3.Selection<any> = d3.select(element);
-				let score: number = calculateTotalScore(selection.datum());
-				if (score > maxScore) {
-					maxScore = score;
-					bestTotalScore = selection;
+				let userScore: UserScoreData = selection.datum();
+				let scoreValue: number = this.calculateTotalScore(userScore);
+				if (scoreValue > maxUserScores[userScore.user.getUsername()]) {
+					maxUserScores[userScore.user.getUsername()] = scoreValue;
+					bestTotalScoreSelections[userScore.user.getUsername()] = selection;
 				}
 			}
 		});
 
-		bestTotalScore.classed('best-score-label', true);
+		this.chartDataService.users.forEach((user: User) => {
+			bestTotalScoreSelections[user.getUsername()].classed('best-score-label', true);
+		});
 	}
 
 
@@ -341,5 +346,11 @@ export class SummaryChartRenderer {
 		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 	};
+
+	calculateTotalScore = (d: UserScoreData) => {
+			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+			var score = scoreFunction.getScore(d.value) * (this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName()));
+			return score + d.offset;
+		};
 
 }
