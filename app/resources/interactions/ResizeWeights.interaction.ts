@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 10:10:06
+* @Last Modified time: 2016-07-05 11:09:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -25,7 +25,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
 
 
 
@@ -48,7 +48,7 @@ export class ResizeWeightsInteraction {
 
 				// Calculate the correct weight increment.
 				var totalWeight: number = this.chartDataService.currentUser.getWeightMap().getWeightTotal();
-				var labelDatum: VCLabelData = d3.select(eventObject.target).datum();
+				var labelDatum: LabelData = d3.select(eventObject.target).datum();
 				var previousWeight: number = this.chartDataService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
@@ -68,14 +68,14 @@ export class ResizeWeightsInteraction {
 	}
 
 	// Event handler for resizing weights by dragging label edges.
-	resizeWeights = (d: VCLabelData, i: number) => {
+	resizeWeights = (d: LabelData, i: number) => {
 		var weightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
 		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
-		var siblings: VCLabelData[] = (<VCLabelData>parentContainer.data()[0]).subLabelData;
+		var siblings: LabelData[] = (<LabelData>parentContainer.data()[0]).subLabelData;
 
 		var combinedWeight: number = d.weight + siblings[i - 1].weight;
 

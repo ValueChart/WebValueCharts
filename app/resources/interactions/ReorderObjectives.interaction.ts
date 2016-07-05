@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 10:23:18
+* @Last Modified time: 2016-07-05 11:09:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -24,7 +24,7 @@ import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 
-import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
 
 
 
@@ -67,7 +67,7 @@ export class ReorderObjectivesInteraction {
 		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-outline');
 		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-text');
 
-		var dragToReorder: d3.Drag<VCLabelData> = d3.drag();
+		var dragToReorder: d3.Drag<LabelData> = d3.drag();
 
 		if (enableReordering) {
 			dragToReorder
@@ -82,7 +82,7 @@ export class ReorderObjectivesInteraction {
 
 	// This function is called when a user first beings to drag a label to rearrange the ordering of objectives. It contains all the logic required to initialize the drag,
 	// including determining the bounds that the label can be dragged in, the points where the label is considered to have switched positions, etc.
-	startReorderObjectives = (d: VCLabelData, i: number) => {
+	startReorderObjectives = (d: LabelData, i: number) => {
 		// Reset variables.
 		this.ignoreReorder = false;							// Whether the drag events should be ignored. If true, all further dragging of the current label will be ignored.
 		this.reorderObjectiveMouseOffset = undefined;		// Offset of the mouse from the Coordinate Two position of the label that is to be dragged. 
@@ -134,7 +134,7 @@ export class ReorderObjectivesInteraction {
 
 	// This function is called whenever a label that is being reordered is dragged by the user. It contains the logic which updates the
 	// position of the label so the user knows where they have dragged it to as well as the code that determines what position the label will be in when dragging ends.
-	reorderObjectives = (d: VCLabelData, i: number) => {
+	reorderObjectives = (d: LabelData, i: number) => {
 		// Do nothing if we are ignoring the current dragging of the label.
 		if (this.ignoreReorder) {
 			return;
@@ -195,19 +195,19 @@ export class ReorderObjectivesInteraction {
 
 	// This function is called when the label that is being reordered is released by the user, and dragging ends. It contains the logic for re-rendering the ValueChart according 
 	// to the labels new position.
-	endReorderObjectives = (d: VCLabelData, i: number) => {
+	endReorderObjectives = (d: LabelData, i: number) => {
 		// Do nothing if we are ignoring the current dragging of the label.
 		if (this.ignoreReorder) {
 			return;
 		}
 		// Get the label data for the siblings of the label we arranged. Note that this contains the label data for the label we rearranged.
-		var parentData: VCLabelData = this.parentContainer.datum();
+		var parentData: LabelData = this.parentContainer.datum();
 
 
 		// Move the label data for the label we rearranged to its new position in the array of labels.
 		if (this.newObjectiveIndex !== this.currentObjectiveIndex) {
 			// Reorder the label data.
-			let temp: VCLabelData = parentData.subLabelData.splice(this.currentObjectiveIndex, 1)[0];
+			let temp: LabelData = parentData.subLabelData.splice(this.currentObjectiveIndex, 1)[0];
 			parentData.subLabelData.splice(this.newObjectiveIndex, 0, temp);
 
 			// Reorder the Objectives
@@ -220,7 +220,7 @@ export class ReorderObjectivesInteraction {
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.
-		var labelData: VCLabelData[] = d3.select('g[parent=rootcontainer]').data();
+		var labelData: LabelData[] = d3.select('g[parent=rootcontainer]').data();
 
 		// Retrieve the objective ordering from the ordering of the label data.
 		var primitiveObjectives: PrimitiveObjective[] = this.getOrderedObjectives(labelData);
@@ -234,9 +234,9 @@ export class ReorderObjectivesInteraction {
 	}
 
 	// This function extracts the ordering of objectives from the ordering of labels.
-	getOrderedObjectives(labelData: VCLabelData[]): PrimitiveObjective[] {
+	getOrderedObjectives(labelData: LabelData[]): PrimitiveObjective[] {
 		var primitiveObjectives: PrimitiveObjective[] = [];
-		labelData.forEach((labelDatum: VCLabelData) => {
+		labelData.forEach((labelDatum: LabelData) => {
 			if (labelDatum.depthOfChildren === 0) {
 				primitiveObjectives.push(<PrimitiveObjective>labelDatum.objective);
 			} else {

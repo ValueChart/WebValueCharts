@@ -2,33 +2,33 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:35:46
+* @Last Modified time: 2016-07-05 11:32:48
 */
 
-import { Injectable } 							from '@angular/core';
+import { Injectable } 										from '@angular/core';
 
 // d3
-import * as d3 									from 'd3';
+import * as d3 												from 'd3';
 
 // Application Classes:
-import { AlternativeOrderRecord }				from '../model/Records';
-import { CurrentUserService }					from './CurrentUser.service';
+import { AlternativeOrderRecord }							from '../model/Records';
+import { CurrentUserService }								from './CurrentUser.service';
 
 // Model Classes
-import { ValueChart }							from '../model/ValueChart';
-import { Objective }							from '../model/Objective';
-import { PrimitiveObjective }					from '../model/PrimitiveObjective';
-import { AbstractObjective }					from '../model/AbstractObjective';
-import { User }									from '../model/User';	
-import { Alternative }							from '../model/Alternative';
-import { WeightMap }							from '../model/WeightMap';
-import { CategoricalDomain }					from '../model/CategoricalDomain';
-import { IntervalDomain }						from '../model/IntervalDomain';
-import { ContinuousDomain }						from '../model/ContinuousDomain';
-import { ScoreFunctionMap }						from '../model/ScoreFunctionMap';
-import { ScoreFunction }						from '../model/ScoreFunction';
+import { ValueChart }										from '../model/ValueChart';
+import { Objective }										from '../model/Objective';
+import { PrimitiveObjective }								from '../model/PrimitiveObjective';
+import { AbstractObjective }								from '../model/AbstractObjective';
+import { User }												from '../model/User';	
+import { Alternative }										from '../model/Alternative';
+import { WeightMap }										from '../model/WeightMap';
+import { CategoricalDomain }								from '../model/CategoricalDomain';
+import { IntervalDomain }									from '../model/IntervalDomain';
+import { ContinuousDomain }									from '../model/ContinuousDomain';
+import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
+import { ScoreFunction }									from '../model/ScoreFunction';
 
-import {VCRowData, VCCellData, VCLabelData}		from '../model/ChartDataTypes';
+import {RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
 	
 // This class serves two purposes:
 // 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
@@ -51,8 +51,8 @@ export class ChartDataService {
 	public alternatives: Alternative[];
 	public numAlternatives: number;
 
-	private rowData: VCRowData[];
-	private labelData: VCLabelData[];
+	private rowData: RowData[];
+	private labelData: LabelData[];
 
 	private originalAlternativeOrder: AlternativeOrderRecord;
 
@@ -63,7 +63,7 @@ export class ChartDataService {
 		this.valueChart = valueChart;
 
 		this.users = this.valueChart.getUsers();
-		this.currentUser = this.currentUserService.user;
+		this.currentUser = this.getCurrentUser();
 		this.numUsers = this.valueChart.getUsers().length;
 
 		this.weightMap = this.currentUser.getWeightMap();
@@ -79,20 +79,32 @@ export class ChartDataService {
 		this.generateRowData();
 	}
 
+	getCurrentUser(): User {
+		// Obviously we should have it so that two usernames are same.
+		var user: User = this.valueChart.getUsers().filter((user: User) => {
+			return user.getUsername() === this.currentUserService.getUsername();
+		})[0];
+
+		if (!user)
+			user = this.valueChart.getUsers()[0];
+
+		return user;
+	}
+
 	getValueChart(): ValueChart {
 		return this.valueChart;
 	}
 
-	getLabelDatum(objective: Objective, depth: number): VCLabelData {
-		var labelData: VCLabelData;
+	getLabelDatum(objective: Objective, depth: number): LabelData {
+		var labelData: LabelData;
 
 		if (objective.objectiveType === 'abstract') {
 			var weight = 0;
-			var children: VCLabelData[] = [];
+			var children: LabelData[] = [];
 			var maxDepthOfChildren: number = 0;
 
 			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let labelDatum: VCLabelData = this.getLabelDatum(subObjective, depth + 1);
+				let labelDatum: LabelData = this.getLabelDatum(subObjective, depth + 1);
 				weight += labelDatum.weight;
 				if (labelDatum.depthOfChildren > maxDepthOfChildren)
 					maxDepthOfChildren = labelDatum.depthOfChildren;
@@ -107,7 +119,7 @@ export class ChartDataService {
 		return labelData;
 	}
 
-	getLabelData(): VCLabelData[] {
+	getLabelData(): LabelData[] {
 		if (this.labelData) {
 			return this.labelData;
 		}
@@ -123,10 +135,10 @@ export class ChartDataService {
 		});
 	}
 
-	updateLabelDataWeights(labelDatum: VCLabelData): void {
+	updateLabelDataWeights(labelDatum: LabelData): void {
 		if (labelDatum.depthOfChildren !== 0) {
 			labelDatum.weight = 0;
-			labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
+			labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
 				this.updateLabelDataWeights(subLabelDatum);
 				labelDatum.weight += subLabelDatum.weight;
 			});
@@ -142,7 +154,7 @@ export class ChartDataService {
 		});
 	}
 
-	getCellData(objective: PrimitiveObjective): VCCellData[] {
+	getCellData(objective: PrimitiveObjective): CellData[] {
 		var users: User[];
 		users = this.valueChart.getUsers();
 
@@ -152,7 +164,7 @@ export class ChartDataService {
 			objectiveValue.userScores = [];
 			for (var i: number = 0; i < users.length; i++) {
 
-				var userScore: { user: User; value: string | number; objective: Objective; } = {
+				var userScore: UserScoreData = {
 					objective: objective,
 					user: users[i],
 					value: objectiveValue.value
@@ -165,7 +177,7 @@ export class ChartDataService {
 		return objectiveValues;
 	}
 
-	getRowData(): VCRowData[] {
+	getRowData(): RowData[] {
 		if (this.rowData) {
 			return this.rowData;
 		}
@@ -197,7 +209,7 @@ export class ChartDataService {
 
 	updateStackedBarOffsets(viewOrientation: string) {
 
-		var rowDataCopy: VCRowData[] = this.rowData.slice(0, this.rowData.length);
+		var rowDataCopy: RowData[] = this.rowData.slice(0, this.rowData.length);
 
 		// In the vertical orientation rows are rendered going to down; rows with smaller indices are rendered above those with larger indices. 
 		// This means that rows with smaller indices must be stacked above rows with larger indices in the stacked bar chart. So in the vertical
@@ -209,13 +221,13 @@ export class ChartDataService {
 		}
 
 		for (var i = 0; i < rowDataCopy.length; i++) {
-			var currentRow: VCRowData = rowDataCopy[i];
+			var currentRow: RowData = rowDataCopy[i];
 
 			for (var j = 0; j < currentRow.cells.length; j++) {
-				var currentCell: VCCellData = currentRow.cells[j];
+				var currentCell: CellData = currentRow.cells[j];
 
 				for (var k = 0; k < currentCell.userScores.length; k++) {
-					var currentUserScore = currentCell.userScores[k];
+					var currentUserScore: UserScoreData = currentCell.userScores[k];
 					var previousWeightedScore: number;
 					var previousOffset: number;
 					if (i === 0) {
@@ -224,7 +236,7 @@ export class ChartDataService {
 					} else {
 						let previousUserScore = rowDataCopy[i-1].cells[j].userScores[k];
 						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
-						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * this.weightMap.getObjectiveWeight(previousUserScore.objective.getName());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getName());
 						previousOffset = previousUserScore.offset;
 					}
 
@@ -237,7 +249,7 @@ export class ChartDataService {
 	reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
 		var desiredIndices: any = {};
 
-		this.rowData.sort((a: VCRowData, b: VCRowData) => {
+		this.rowData.sort((a: RowData, b: RowData) => {
 			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
 			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
 
@@ -252,7 +264,7 @@ export class ChartDataService {
 	}
 
 	reorderAllCells(cellIndices: number[]): void {
-		this.rowData.forEach((row: VCRowData, index: number) => {
+		this.rowData.forEach((row: RowData, index: number) => {
 			row.cells = d3.permute(row.cells, cellIndices);
 		});
 
@@ -276,7 +288,7 @@ export class ChartDataService {
 	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
 	// seeing as the weight of the previous rows depends on the their weights.
 
-	generateCellOrderByObjectiveScore(rowsToReorder: VCRowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
+	generateCellOrderByObjectiveScore(rowsToReorder: RowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
 		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
@@ -285,7 +297,7 @@ export class ChartDataService {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
 				var scoreFunction = this.scoreFunctionMap.getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
 				var weight: number = this.weightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
-				rowsToReorder[i].cells.forEach((cell: VCCellData, index: number) => {
+				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
 			}
@@ -328,9 +340,9 @@ export class ChartDataService {
 		return cellIndices; 
 	}
 
-	calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
+	calculateMinLabelWidth(labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
 		var maxDepthOfChildren = 0;
-		labelData.forEach((labelDatum: VCLabelData) => {
+		labelData.forEach((labelDatum: LabelData) => {
 			if (labelDatum.depthOfChildren > maxDepthOfChildren)
 				maxDepthOfChildren = labelDatum.depthOfChildren;
 		});
@@ -371,13 +383,13 @@ export class ChartDataService {
 		return elements;
 	}
 
-	incrementAbstractObjectiveWeight(labelDatum: VCLabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
+	incrementAbstractObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
 
-		var children: VCLabelData[] = labelDatum.subLabelData;
+		var children: LabelData[] = labelDatum.subLabelData;
 		var childrenWeightTotal: number = 0;
 		var nonZeroChildren: number = 0;
 
-		children.forEach((child:VCLabelData) => {
+		children.forEach((child:LabelData) => {
 			if (child.weight !== 0) {
 				childrenWeightTotal += child.weight;
 				nonZeroChildren++;
@@ -390,7 +402,7 @@ export class ChartDataService {
 			weightIncrement = weightIncrement / children.length;
 		}
 
-		children.forEach((child: VCLabelData) => {
+		children.forEach((child: LabelData) => {
 			let childMax: number = maxWeight;
 			if (childrenWeightTotal !== 0 && child.weight !== 0) {
 				childMax = maxWeight * (child.weight / childrenWeightTotal);

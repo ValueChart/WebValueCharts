@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 10:23:49
+* @Last Modified time: 2016-07-05 11:08:59
 */
 
 import { Injectable } 												from '@angular/core';
@@ -32,7 +32,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
 
 
 
@@ -64,7 +64,7 @@ export class LabelRenderer {
 	}
 
 	// Create the base containers and elements for the labels.
-	createLabelSpace(el: d3.Selection<any>, labelData: VCLabelData[], objectiveData: PrimitiveObjective[]): void {
+	createLabelSpace(el: d3.Selection<any>, labelData: LabelData[], objectiveData: PrimitiveObjective[]): void {
 		// Create the root container which will hold all label related SVG elements.
 		this.rootContainer = el.append('g')
 			.classed('label-root-container', true)
@@ -92,35 +92,35 @@ export class LabelRenderer {
 	}
 
 	// This function recursively creates labels for an array of Objectives that have been put into labelData format.
-	createLabels(el: d3.Selection<any>, labelContainer: d3.Selection<any>, labelData: VCLabelData[], parentName: string): void {
+	createLabels(el: d3.Selection<any>, labelContainer: d3.Selection<any>, labelData: LabelData[], parentName: string): void {
 		// Create a new container for each element in labelData.
 		var newLabelContainers: d3.Selection<any> = labelContainer.selectAll('g[parent=parentName]')
 			.data(labelData)
 			.enter().append('g')
 				.classed('label-subcontainer', true)
-				.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-container' })
+				.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-container' })
 				.attr('parent', parentName);	// Set the name parent objective on the 'g', or 'rootcontainer' if it has not parent objective. 
 
 		// Append an outline rectangle for label container that was just created.
 		newLabelContainers.append('rect')
 			.classed('label-subcontainer-outline', true)
 			.classed('valuechart-label-outline', true)
-			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-outline' });
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-outline' });
 
 		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
 		newLabelContainers.append('text')
 			.classed('label-subcontainer-text', true)
 			.classed('valuechart-label-text', true)
-			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-text' });
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-text' });
 
 		newLabelContainers.append('line')
 			.classed('label-subcontainer-divider', true)
 			.classed('valuechart-label-divider', true)
-			.attr('id', (d: VCLabelData) => { return 'label-' + d.objective.getName() + '-divider' });
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getName() + '-divider' });
 
 
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
-		labelData.forEach((labelDatum: VCLabelData) => {
+		labelData.forEach((labelDatum: LabelData) => {
 			if (labelDatum.subLabelData === undefined) {
 				el.select('#label-' + labelDatum.objective.getName() + '-outline')
 					.classed('label-primitive-objective', true);
@@ -134,7 +134,7 @@ export class LabelRenderer {
 		});
 	}
 
-	updateLabelSpace(labelData: VCLabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
+	updateLabelSpace(labelData: LabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
@@ -152,7 +152,7 @@ export class LabelRenderer {
 	}
 
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
-	renderLabelSpace(labelData: VCLabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
+	renderLabelSpace(labelData: LabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
@@ -189,7 +189,7 @@ export class LabelRenderer {
 	}
 
 	// This function recursively renders labels for an array of Objectives that have been put into labelData format. It works very similarly to createLabels.
-	renderLabels(labelSpaces: d3.Selection<any>, labelData: VCLabelData[], viewOrientation: string, isDataUpdate: boolean): void {
+	renderLabels(labelSpaces: d3.Selection<any>, labelData: LabelData[], viewOrientation: string, isDataUpdate: boolean): void {
 		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
 		var weightOffsets: number[] = [];
 		var weightSum: number = 0;	// The weight offset for the first objective at this level is 0.
@@ -206,7 +206,7 @@ export class LabelRenderer {
 
 
 		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
-		labelData.forEach((labelDatum: VCLabelData, index: number) => {
+		labelData.forEach((labelDatum: LabelData, index: number) => {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
 			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getName() + '"]');	// Get all sub label containers whose parent is the current label
@@ -227,17 +227,17 @@ export class LabelRenderer {
 		// Render the styles of the outline rectangle.
 
 		labelOutlines.style('fill', 'white')
-			.style('stroke', (d: VCLabelData) => {
+			.style('stroke', (d: LabelData) => {
 				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
 			});
 
 		labelOutlines
 			.attr(this.renderConfigService.dimensionOne, this.determineLabelWidth)
 			.attr(this.renderConfigService.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
-			.attr(this.renderConfigService.dimensionTwo, (d: VCLabelData, i: number) => {
+			.attr(this.renderConfigService.dimensionTwo, (d: LabelData, i: number) => {
 				return Math.max(this.renderConfigService.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
 			})
-			.attr(this.renderConfigService.coordinateTwo, ((d: VCLabelData, i: number) => {
+			.attr(this.renderConfigService.coordinateTwo, ((d: LabelData, i: number) => {
 				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
 			}));
 	}
@@ -250,25 +250,25 @@ export class LabelRenderer {
 		labelTexts.attr(this.renderConfigService.coordinateOne, () => {
 				return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2); 
 			})
-			.attr(this.renderConfigService.coordinateTwo, (d: VCLabelData, i: number) => {
+			.attr(this.renderConfigService.coordinateTwo, (d: LabelData, i: number) => {
 				return (viewOrientation === "vertical") ?
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 2) + textOffset
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: VCLabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.weightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
 	renderLabelDividers(labelDividers: d3.Selection<any>, weightOffsets: number[], viewOrientation: string): void {
 
-		var calculateDimensionTwoOffset = (d: VCLabelData, i: number) => {
+		var calculateDimensionTwoOffset = (d: LabelData, i: number) => {
 			return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
 		};
 
 		labelDividers
 			.attr(this.renderConfigService.coordinateOne + '1', 0)
-			.attr(this.renderConfigService.coordinateOne + '2', (d: VCLabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
+			.attr(this.renderConfigService.coordinateOne + '2', (d: LabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
 				return (i === 0) ? 0 : this.determineLabelWidth(d);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
@@ -363,7 +363,7 @@ export class LabelRenderer {
 
 	// Anonymous functions for setting selection attributes that are used enough to be made class fields
 
-	determineLabelWidth = (d: VCLabelData) => {		 // Expand the last label to fill the rest of the space.
+	determineLabelWidth = (d: LabelData) => {		 // Expand the last label to fill the rest of the space.
 		var scoreFunctionOffset: number = ((this.displayScoreFunctions) ? this.labelWidth : 0);
 		var retValue = (d.depthOfChildren === 0) ?
 			(this.renderConfigService.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:37:51
+* @Last Modified time: 2016-07-05 11:09:00
 */
 
 
@@ -35,7 +35,7 @@ import { WeightMap }															from '../model/WeightMap';
 import { User }																	from '../model/User';
 import { ScoreFunction }														from '../model/ScoreFunction';
 
-import {VCRowData, VCCellData, VCLabelData}										from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}										from '../model/ChartDataTypes';
 
 
 @Directive({
@@ -280,7 +280,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.chartDataService.updateWeightOffsets();
 		this.chartDataService.updateStackedBarOffsets(this.viewOrientation);
 		
-		this.chartDataService.getLabelData().forEach((labelDatum: VCLabelData) => {
+		this.chartDataService.getLabelData().forEach((labelDatum: LabelData) => {
 			this.chartDataService.updateLabelDataWeights(labelDatum);
 		});
 

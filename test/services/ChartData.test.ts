@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:52:42
+* @Last Modified time: 2016-07-05 11:08:59
 */
 
 // Application Classes:
@@ -16,7 +16,7 @@ import { ValueChart }												from '../../app/resources/model/ValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
 import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
 
-import {VCRowData, VCCellData, VCLabelData}							from '../../app/resources/model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../../app/resources/model/ChartDataTypes';
 
 
 
@@ -37,7 +37,7 @@ describe('ChartDataService', () => {
 	var valueChartParser: XMLValueChartParser;
 	var valueChart: IndividualValueChart;
 
-	var labelData: VCLabelData[];
+	var labelData: LabelData[];
 
 	before(function() {
 		chartDataService = new ChartDataService();
@@ -49,9 +49,9 @@ describe('ChartDataService', () => {
 
 	// ============================== Data Formatting Methods ===================================
 
-	describe('getLabelData(valueChart: ValueChart): VCLabelData[]', () => {
+	describe('getLabelData(valueChart: ValueChart): LabelData[]', () => {
 
-		it('it should convert the objective hierarchy into a hierarchy of VCLabelData', () => {
+		it('it should convert the objective hierarchy into a hierarchy of LabelData', () => {
 			labelData = chartDataService.getLabelData();
 
 			expect(labelData).to.have.length(1); 							// The objective hierarchy from the XMLTestString has one root objective.
@@ -61,11 +61,11 @@ describe('ChartDataService', () => {
 			expect(labelData[0].weight).to.equal(1);
 
 
-			var children: VCLabelData[] = labelData[0].subLabelData;
+			var children: LabelData[] = labelData[0].subLabelData;
 
 			expect(children).to.have.length(3);
 
-			children.forEach((labelDatum: VCLabelData) => {
+			children.forEach((labelDatum: LabelData) => {
 				expect(labelDatum.depth).to.equal(1);
 
 				if (labelDatum.objective.getName() === 'rate') {
@@ -77,7 +77,7 @@ describe('ChartDataService', () => {
 					expect(labelDatum.subLabelData).to.have.length(2);
 
 					var childrenWeightTotal: number = 0;
-					labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
+					labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
 						expect(subLabelDatum.depth).to.equal(2);
 						expect(subLabelDatum.depthOfChildren).to.equal(0);
 						expect(subLabelDatum.subLabelData).to.be.undefined;
@@ -99,7 +99,7 @@ describe('ChartDataService', () => {
 		});
 	});
 
-	describe('updateLabelData(labelDatum: VCLabelData)', () => {
+	describe('updateLabelData(labelDatum: LabelData)', () => {
 		
 		context('when some of the PrimitiveObjective weights are changed', () => {
 			before(function() {
@@ -110,17 +110,17 @@ describe('ChartDataService', () => {
 			});
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
-				labelData.forEach((labelDatum: VCLabelData) => {
+				labelData.forEach((labelDatum: LabelData) => {
 					chartDataService.updateLabelDataWeights(labelDatum);
 				});
 
-				var children: VCLabelData[] = labelData[0].subLabelData;
+				var children: LabelData[] = labelData[0].subLabelData;
 
 				expect(children).to.have.length(3);
 				expect(labelData[0].weight).to.equal(1);
 
 
-				children.forEach((labelDatum: VCLabelData) => {
+				children.forEach((labelDatum: LabelData) => {
 					expect(labelDatum.depth).to.equal(1);
 
 					if (labelDatum.objective.getName() === 'rate') {
@@ -132,7 +132,7 @@ describe('ChartDataService', () => {
 						expect(labelDatum.subLabelData).to.have.length(2);
 
 						var childrenWeightTotal: number = 0;
-						labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
+						labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
 							expect(subLabelDatum.depth).to.equal(2);
 							expect(subLabelDatum.depthOfChildren).to.equal(0);
 							expect(subLabelDatum.subLabelData).to.be.undefined;
@@ -166,17 +166,17 @@ describe('ChartDataService', () => {
 			});
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
-				labelData.forEach((labelDatum: VCLabelData) => {
+				labelData.forEach((labelDatum: LabelData) => {
 					chartDataService.updateLabelDataWeights(labelDatum);
 				});
 
-				var children: VCLabelData[] = labelData[0].subLabelData;
+				var children: LabelData[] = labelData[0].subLabelData;
 
 				expect(children).to.have.length(3);
 				expect(labelData[0].weight).to.be.closeTo(3.385, roundingError);
 
 
-				children.forEach((labelDatum: VCLabelData) => {
+				children.forEach((labelDatum: LabelData) => {
 					expect(labelDatum.depth).to.equal(1);
 
 					if (labelDatum.objective.getName() === 'rate') {
@@ -188,7 +188,7 @@ describe('ChartDataService', () => {
 						expect(labelDatum.subLabelData).to.have.length(2);
 
 						var childrenWeightTotal: number = 0;
-						labelDatum.subLabelData.forEach((subLabelDatum: VCLabelData) => {
+						labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
 							expect(subLabelDatum.depth).to.equal(2);
 							expect(subLabelDatum.depthOfChildren).to.equal(0);
 							expect(subLabelDatum.subLabelData).to.be.undefined;
@@ -211,7 +211,7 @@ describe('ChartDataService', () => {
 		});
 	});
 
-	describe('getCellData(valueChart: ValueChart, objective: PrimitiveObjective): VCCellData[]', () => {
+	describe('getCellData(valueChart: ValueChart, objective: PrimitiveObjective): CellData[]', () => {
 
 		var rate: PrimitiveObjective;
 		var alternativeNames: string[];
@@ -230,11 +230,11 @@ describe('ChartDataService', () => {
 
 		it('should format the alternative values for the given objective into cells, where each cell has one user score for each user.', () => {
 
-			var cellData: VCCellData[] = chartDataService.getCellData(rate);
+			var cellData: CellData[] = chartDataService.getCellData(rate);
 
 			expect(cellData).to.have.length(6);
 
-			cellData.forEach((cell: VCCellData, index: number) => {
+			cellData.forEach((cell: CellData, index: number) => {
 				expect(cell.alternative.getName()).to.equal(alternativeNames[index]);
 				expect(cell.value).to.equal(values[index]);
 				// This ValueChart is an Individual ValueChart so it should have only one user, and only one user score per alternative.
@@ -245,7 +245,7 @@ describe('ChartDataService', () => {
 
 	});
 
-	describe('getRowData(valueChart: ValueChart): VCRowData[]', () => {
+	describe('getRowData(valueChart: ValueChart): RowData[]', () => {
 
 		var objectiveNames: string[];
 
@@ -257,16 +257,16 @@ describe('ChartDataService', () => {
 		it(`should format the obejctives from the given ValueChart into rows, where each row is divided one cell for Alernative in the ValueChart
 			and each cell has one user score for each user`, () => {
 
-			var rows: VCRowData[] = chartDataService.getRowData();
+			var rows: RowData[] = chartDataService.getRowData();
 
 			expect(rows).to.have.length(5);				// There are five objectives in the hotel ValueChart, so the data should have five rows.
 
-			rows.forEach((row: VCRowData, index: number) => {
+			rows.forEach((row: RowData, index: number) => {
 				expect(row.cells).to.have.length(6);	// There are six alternatives in the hotel ValueChart, so each row should have 6 cells.
 
 				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Each row should have the correct objective. Note: The row ordering here comes form the ordering inside the ValueChart, which comes from the XML data.
 			
-				row.cells.forEach((cell: VCCellData) => {
+				row.cells.forEach((cell: CellData) => {
 					expect(cell.userScores).to.have.length(1);	// The ValueChart only has one user, so each cell should have on user score.
 				});	
 			});
@@ -276,11 +276,11 @@ describe('ChartDataService', () => {
 
 	// ============================== Data Manipulation Methods ===================================
 
-	describe('calculateWeightOffsets(rows: VCRowData[]): VCRowData[]', () => {
+	describe('calculateWeightOffsets(rows: RowData[]): RowData[]', () => {
 
 		var objectiveNames: string[];
 		var weightOffsets: number[];
-		var rows: VCRowData[];
+		var rows: RowData[];
 
 		before(function() {
 			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
@@ -295,16 +295,16 @@ describe('ChartDataService', () => {
 
 			chartDataService.updateWeightOffsets();
 
-			rows.forEach((row: VCRowData, index: number) => {
+			rows.forEach((row: RowData, index: number) => {
 				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Verify the ordering of objectives in the row data.
 				expect(row.weightOffset).to.be.closeTo(weightOffsets[index], roundingError);			// Verify that the weights offsets were computed correctly.
 			});
 		});
 	});
 
-	describe('calculateMinLabelWidth(labelData: VCLabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number', () => {
+	describe('calculateMinLabelWidth(labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number', () => {
 
-		var labelData: VCLabelData[];
+		var labelData: LabelData[];
 		var dimensionOneSize: number;
 
 		before(function() {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 15:46:32
+* @Last Modified time: 2016-07-05 11:13:22
 */
 
 import { Objective }					from '../model/Objective';
@@ -11,27 +11,29 @@ import { Alternative }					from '../model/Alternative';
 import { User }							from '../model/User';	
 
 
-export interface VCRowData {
+export interface RowData {
 	objective: PrimitiveObjective;
 	weightOffset: number;
-	cells: VCCellData[];
+	cells: CellData[];
 }
 
-export interface VCCellData {
+export interface CellData {
 	alternative: Alternative;
 	value: (string | number);
-	userScores: {
-		user: User,
-		objective: Objective,
-		value: (string | number);
-		offset?: number
-	}[];
+	userScores: UserScoreData[];
 }
 
-export interface VCLabelData {
+export interface UserScoreData {
+	user: User,
+	objective: PrimitiveObjective,
+	value: (string | number);
+	offset?: number
+}
+
+export interface LabelData {
 	objective: Objective;
 	weight: number;
 	depth: number;
 	depthOfChildren: number;
-	subLabelData?: VCLabelData[]
+	subLabelData?: LabelData[]
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 10:28:41
+* @Last Modified time: 2016-07-05 11:09:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -24,7 +24,7 @@ import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 import { Alternative }												from '../model/Alternative';
 
-import {VCRowData, VCCellData, VCLabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
 
 
 
@@ -218,8 +218,8 @@ export class SortAlternativesInteraction {
 			alternatives.splice(this.newAlternativeIndex, 0, temp);
 
 
-			this.chartDataService.getRowData().forEach((row: VCRowData) => {
-				var temp: VCCellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
+			this.chartDataService.getRowData().forEach((row: RowData) => {
+				var temp: CellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
 				row.cells.splice(this.newAlternativeIndex, 0, temp);
 			});
 		} else {
