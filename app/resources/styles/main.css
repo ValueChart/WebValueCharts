@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 11:48:49
+* @Last Modified time: 2016-07-06 13:55:05
 */
 
 /* Global Styles */
@@ -119,6 +119,10 @@
 .alternative-link:hover {
     fill: #23527c !important;
     text-decoration: underline;
+}
+
+.users-list {
+    top: 16rem;
 }
 
 

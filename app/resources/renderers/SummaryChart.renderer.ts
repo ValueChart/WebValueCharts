@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 11:45:33
+* @Last Modified time: 2016-07-06 13:27:31
 */
 
 import { Injectable } 												from '@angular/core';
@@ -311,7 +311,12 @@ export class SummaryChartRenderer {
 
 		// Position and give heights and widths to the user scores.
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => { return d.objective.getColor(); })
+			.style('fill', (d: UserScoreData, i: number) => { 
+				if (this.chartDataService.getValueChart().isIndividual())
+					return d.objective.getColor(); 
+				else 
+					return this.renderConfigService.userColors[d.user.getUsername()];
+			})
 			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING; })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); })

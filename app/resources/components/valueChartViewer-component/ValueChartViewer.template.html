@@ -54,8 +54,6 @@
 							type="button" id="alternative-sort-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 							Sort Alternatives
 							<span class="caret"></span>
-
-							<!-- (click)="toggleSortAlternatives(!sortAlternatives)" -->
 						</button>
 						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="alternative-sort-dropdown">
 						    <li>
@@ -159,6 +157,23 @@
 						 	   </a>
 						    </li>
 						 </ul>
+					</div>
+				</div>
+				<div class="form-group pull-right" *ngIf="!valueChart.isIndividual()">
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" type="button" id="users-dropdown" data-toggle="dropdown" 
+						aria-haspopup="true" aria-expanded="true">
+						User List
+						<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="users-dropdown">
+						    <li *ngFor="let user of valueChart.getUsers(); let i = index ">
+						 	   <a href="javascript:void(0)">
+						 	   		{{user.getUsername()}}
+						 	  		<span class="glyphicon glyphicon-stop pull-right" aria-hidden="true" [style.color]="renderConfigService.kellyColors[i]"></span>
+						 	   </a>
+						    </li>
+						</ul>
 					</div>
 				</div>
 			</div>

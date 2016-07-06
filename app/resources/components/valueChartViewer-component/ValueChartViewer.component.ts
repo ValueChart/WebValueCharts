@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:40:05
+* @Last Modified time: 2016-07-06 14:13:04
 */
 
 import { Component }															from '@angular/core';
@@ -109,6 +109,7 @@ export class ValueChartViewerComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
+		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private renderEventsService: RenderEventsService,
 		private summaryChartDefinitions: SummaryChartDefinitions,

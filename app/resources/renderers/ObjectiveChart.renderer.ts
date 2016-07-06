@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-06 11:55:18
+* @Last Modified time: 2016-07-06 13:27:18
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -268,7 +268,12 @@ export class ObjectiveChartRenderer {
 
 	renderUserScores(userScores: d3.Selection<any>, viewOrientation: string): void {
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => { return d.objective.getColor(); })
+			.style('fill', (d: UserScoreData, i: number) => { 
+				if (this.chartDataService.getValueChart().isIndividual())
+					return d.objective.getColor(); 
+				else 
+					return this.renderConfigService.userColors[d.user.getUsername()];
+			})
 			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING; })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); });

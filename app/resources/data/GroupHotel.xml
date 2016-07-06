@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0">
+<ValueCharts name="Hotel" creator="Aaron" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
@@ -91,7 +91,7 @@
 	    </Alternatives>
 	</ChartStructure>
 	<Users>
-		<User name="Aaron Mishkin">
+		<User name="Aaron">
 			<Weights>
 				<Weight objective="area" value="0.2"/>
 				<Weight objective="internet-access" value="0.1"/>
@@ -133,7 +133,7 @@
 				</ScoreFunction>
 			</ScoreFunctions>
 		</User>
-		<User name="Samuel Hutchinson">
+		<User name="Samuel">
 			<Weights>
 				<Weight objective="area" value="0.05"/>
 				<Weight objective="internet-access" value="0.4"/>
