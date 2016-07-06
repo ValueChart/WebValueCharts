@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-05 16:38:08
+* @Last Modified time: 2016-07-06 10:08:05
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -255,6 +255,8 @@ export class ObjectiveChartRenderer {
 					var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return this.renderConfigService.dimensionTwoScale(objectiveWeight) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
 				});
+		} else {
+			userScores.attr(this.renderConfigService.coordinateTwo, 0);
 		}
 		// TODO: Remove the any wrapper when typings for d3 are updated.
 		(<any> this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');

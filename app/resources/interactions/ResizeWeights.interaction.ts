@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 17:06:51
+* @Last Modified time: 2016-07-05 17:47:26
 */
 
 import { Injectable } 												from '@angular/core';
@@ -27,7 +27,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
 
 
 
