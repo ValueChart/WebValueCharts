@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 10:03:44
+* @Last Modified time: 2016-07-06 11:45:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -32,6 +32,8 @@ import {RowData, CellData, UserScoreData}							from '../model/ChartDataTypes';
 @Injectable()
 export class SummaryChartRenderer {
 
+	private USER_SCORE_SPACING: number = 10;
+
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
 	public chart: d3.Selection<any>;						// The 'g' element that contains all the elements making up the summary chart.
 	public outline: d3.Selection<any>;						// The 'rect' element that outlines the summary chart.
@@ -46,6 +48,8 @@ export class SummaryChartRenderer {
 	public alternativeBoxesContainer: d3.Selection<any>;
 	public alternativeBoxes: d3.Selection<any>;
 
+	private summaryChartScale: any;
+
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private chartDataService: ChartDataService,
@@ -53,6 +57,7 @@ export class SummaryChartRenderer {
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
 	createSummaryChart(el: d3.Selection<any>, rows: RowData[]): void {
+
 		// Create the base container for the chart.
 		this.chart = el.append('g')
 			.classed(this.defs.CHART, true);
@@ -166,6 +171,9 @@ export class SummaryChartRenderer {
 	// This function positions and gives widths + heights to the elements created by the createSummaryChart method.
 	renderSummaryChart(rows: RowData[], viewOrientation: string): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
+		this.summaryChartScale = d3.scaleLinear()
+			.range([0, this.renderConfigService.VALUECHART_HEIGHT]);
+
 		this.chart
 			.attr('transform', () => {
 				if (viewOrientation == 'vertical')
@@ -246,16 +254,18 @@ export class SummaryChartRenderer {
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: UserScoreData, i: number) => { return Math.round(100 * (this.calculateTotalScore(d)) / this.chartDataService.maximumWeightMap.getWeightTotal()); })
+			.text((d: UserScoreData, i: number) => { return Math.round(100 * (this.calculateTotalScore(d)) / d.user.getWeightMap().getWeightTotal()); })
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
 			})
 			.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
+				this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
+
 				return (viewOrientation === 'vertical') ?
-					this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(this.calculateTotalScore(d)) - verticalOffset
+					this.renderConfigService.dimensionTwoSize - this.summaryChartScale(this.calculateTotalScore(d)) - verticalOffset
 					:
-					(this.renderConfigService.dimensionTwoScale(this.calculateTotalScore(d)) + verticalOffset);
+					(this.summaryChartScale(this.calculateTotalScore(d)) + verticalOffset);
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', this.calculateTotalScore)
 			.style('font-size', 22)
@@ -302,20 +312,20 @@ export class SummaryChartRenderer {
 		// Position and give heights and widths to the user scores.
 		userScores
 			.style('fill', (d: UserScoreData, i: number) => { return d.objective.getColor(); })
-			.attr(this.renderConfigService.dimensionOne, this.calculateUserScoreDimensionOne)
+			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING; })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
-			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i); })
+			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); })
 			
 
 		userScores.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
-				var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
+				var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-
+				this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
 				if (viewOrientation == 'vertical')
 					// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
-					return (this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(d.offset)) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
+					return (this.renderConfigService.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
 				else
-					return this.renderConfigService.dimensionTwoScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
+					return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 			});
 	}
 
@@ -343,14 +353,16 @@ export class SummaryChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
+		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
+		this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
+
+		return this.summaryChartScale(score * userObjectiveWeight);
 	};
 
 	calculateTotalScore = (d: UserScoreData) => {
 			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName()));
+			var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
 			return score + d.offset;
 		};
 

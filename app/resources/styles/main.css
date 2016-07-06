@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 14:28:30
+* @Last Modified time: 2016-07-06 11:48:49
 */
 
 /* Global Styles */
@@ -159,6 +159,12 @@
 .scorefunction-bar {
     fill: white;
     stroke-width: 1;
+}
+
+.objective-weight-outline {
+    fill: transparent;
+    stroke: red;
+    stroke-width: 3px;
 }
 
 

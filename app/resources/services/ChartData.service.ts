@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:26:40
+* @Last Modified time: 2016-07-06 11:11:32
 */
 
 import { Injectable } 										from '@angular/core';
@@ -249,7 +249,7 @@ export class ChartDataService {
 					} else {
 						let previousUserScore = rowDataCopy[i-1].cells[j].userScores[k];
 						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
-						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * this.maximumWeightMap.getObjectiveWeight(previousUserScore.objective.getName());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getName());
 						previousOffset = previousUserScore.offset;
 					}
 
