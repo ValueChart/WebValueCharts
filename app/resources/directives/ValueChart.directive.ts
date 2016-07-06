@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:43:39
+* @Last Modified time: 2016-07-05 17:04:07
 */
 
 
@@ -131,6 +131,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.summaryChartRenderer.createSummaryChart(this.el, this.chartDataService.getRowData());
 		this.summaryChartRenderer.renderSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.chartDataService.getValueChart().isIndividual());
 	}
 
 	initChangeDetection(): void {
@@ -301,6 +302,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.renderConfigService.viewOrientation, this.chartDataService.primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.chartDataService.getValueChart().isIndividual());
 		this.updateAlternativeOrder()
 	}
 
@@ -312,7 +314,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
-
 	}
 
 	updateViewOrientation(): void {

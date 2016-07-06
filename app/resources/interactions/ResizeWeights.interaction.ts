@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:41:24
+* @Last Modified time: 2016-07-05 17:06:51
 */
 
 import { Injectable } 												from '@angular/core';
@@ -65,8 +65,8 @@ export class ResizeWeightsInteraction {
 		}
 	}
 
-	toggleDragToResizeWeights(enableResizing: boolean, labelDividers: d3.Selection<any>): void {
-		var dragToResizeWeights = d3.drag();
+	toggleDragToResizeWeights(enableResizing: boolean): void {
+		var dragToResizeWeights: d3.Drag<{}> = d3.drag();
 		
 		if (enableResizing) {
 			dragToResizeWeights
@@ -74,11 +74,31 @@ export class ResizeWeightsInteraction {
 				.on('drag', this.resizeWeights);
 		}
 
+		var labelSpaces = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
+			.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
+
+		this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, enableResizing);
+
+	}
+
+	toggleResizingForSublabels(labelSpaces: d3.Selection<any>, dragToResizeWeights: d3.Drag<{}>, enableResizing: boolean) {
+		var labelDividers: d3.Selection<any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
+
 		labelDividers.style('cursor', () => {
 				return (enableResizing) ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
 			});
 
 		labelDividers.call(dragToResizeWeights);
+
+		labelSpaces.data().forEach((labelDatum: LabelData, index: number) => {
+			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
+				return;
+
+			let subLabelSpaces: d3.Selection<any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
+				.selectAll('g[parent="' + labelDatum.objective.getName() + '"]');	// Get all sub label containers whose parent is the current label
+			
+			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, enableResizing);	// Toggle dragging for the sub labels.
+		});
 	}
 
 	resizeWeightsStart = (d: any, i: number) => {

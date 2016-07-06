@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:44:02
+* @Last Modified time: 2016-07-05 17:02:54
 */
 
 import { Injectable } 												from '@angular/core';
@@ -277,10 +277,6 @@ export class LabelRenderer {
 			})
 			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
 			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset);
-
-		// If the ValueChart is an individualValueChart, toggle the labelDividers. TODO: Can this be extracted from LabelRenderer?
-		var isIndividualChart: boolean = this.chartDataService.getValueChart().isIndividual();
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(isIndividualChart, labelDividers);
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
