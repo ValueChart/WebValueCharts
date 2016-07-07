@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:25:39
+* @Last Modified time: 2016-07-06 18:30:21
 */
 
 import { Component }									from '@angular/core';
@@ -28,7 +28,7 @@ export class CreateComponent {
 		private currentUserService: CurrentUserService) {	}
 
 	goToValueChart(event: Event): void {
-		this.uploadValueChart(event,['/view/ValueChart']);
+		this.uploadValueChart(event,['/view/']);
 	}
 
 	addUserToExistingChart(event: Event) {
@@ -44,6 +44,8 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
+				if (route[0] === '/view/')
+					route[0] = route + this.currentUserService.getValueChart().getName();
 				this.router.navigate(route);
 			}
 		};

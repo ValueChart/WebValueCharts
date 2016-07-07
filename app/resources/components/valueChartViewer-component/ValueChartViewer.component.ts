@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 14:13:04
+* @Last Modified time: 2016-07-06 19:16:24
 */
 
 import { Component }															from '@angular/core';
@@ -95,13 +95,18 @@ export class ValueChartViewerComponent implements OnInit {
 	setObjectiveColors: boolean;
 
 	// Detail Box 
-	detailBoxHeader: string;
+	detailBoxAlternativeTab: string;
 	alternativeObjectives: string[];
 	alternativeObjectiveValues: (string | number)[];
 
 	DETAIL_BOX_WIDTH_OFFSET: number = -50;
 	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
 	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.3;
+
+	detailBoxCurrentTab: string;
+	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
+	DETAIL_BOX_USERS_TAB: string = 'users';
+
 
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
@@ -144,7 +149,8 @@ export class ValueChartViewerComponent implements OnInit {
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
 
-		this.detailBoxHeader = 'Alternatives';
+		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
 
@@ -188,7 +194,7 @@ export class ValueChartViewerComponent implements OnInit {
 	// Detail Box:
 
 	expandAlternative(alternative: Alternative): void {
-		this.detailBoxHeader = alternative.getName();
+		this.detailBoxAlternativeTab = alternative.getName();
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.alternativeObjectives[index] = objective.getName();
@@ -199,7 +205,7 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	collapseAlternative(): void {
-		this.detailBoxHeader = 'Alternatives';
+		this.detailBoxAlternativeTab = 'Alternatives';
 		this.resizeDetailBox();
 	}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 13:55:05
+* @Last Modified time: 2016-07-06 19:12:23
 */
 
 /* Global Styles */
@@ -110,6 +110,22 @@
 
 #alternative-detail-box {
     overflow-y: scroll;
+}
+
+.detail-toolbar {
+
+}
+
+#alternative-header-container {
+    position: relative;
+    top: 5rem;
+    z-index: -10;
+}
+
+#user-list-header-container {
+    position: relative;
+    top: 5rem;
+    z-index: -10;
 }
 
 .toolbar-row {
