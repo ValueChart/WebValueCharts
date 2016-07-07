@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 19:12:23
+* @Last Modified time: 2016-07-06 19:38:43
 */
 
 /* Global Styles */
@@ -113,7 +113,12 @@
 }
 
 .detail-toolbar {
+    left: 2px;
+    position: relative;
+}
 
+.detail-box-tab {
+    outline: none !important;
 }
 
 #alternative-header-container {

@@ -167,13 +167,13 @@
 		[class.detail-box-vertical]="orientation === 'vertical'">
 		<form class="form-inline col-xs-5" class="detail-toolbar">
 			<div class="form-group pull-left">
-				<button class="btn btn-lg btn-default" id="alternative-header-container" 
+				<button class="btn btn-lg btn-default detail-box-tab" id="alternative-header-container" 
 					(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 				  <h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
 				</button>
 			</div>
 			<div class="form-group pull-left" *ngIf="!valueChart.isIndividual()">
-				<button class="btn btn-lg btn-default" id="user-list-header-container" 
+				<button class="btn btn-lg btn-default detail-box-tab" id="user-list-header-container" 
 					(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 				  <h5 id="user-list-headers">User List</h5>
 				</button>
