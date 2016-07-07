@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 11:38:23
+* @Last Modified time: 2016-07-07 16:44:06
 */
 
 import { Component }									from '@angular/core';
@@ -13,6 +13,10 @@ import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.s
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 
+// Sample Data:
+import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCharts';
+
+
 
 @Component({
 	selector: 'create',
@@ -22,10 +26,19 @@ import { CurrentUserService }							from '../../services/CurrentUser.service';
 })
 export class CreateComponent {
 
+	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Individual Water Management', type: 'Individual' }]
+
 	constructor(
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
-		private currentUserService: CurrentUserService) {	}
+		private currentUserService: CurrentUserService) {
+	}
+
+	selectDemoValueChart(demoChart: any): void {
+		this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
+		var parameters = this.currentUserService.getValueChart().getName();
+		this.router.navigate(['/view/', parameters]);
+	}
 
 	goToValueChart(event: Event): void {
 		this.uploadValueChart(event,['/view/']);

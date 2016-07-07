@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 15:24:13
+* @Last Modified time: 2016-07-07 16:31:29
 */
 
 /* Global Styles */
@@ -72,6 +72,10 @@
     height: 200%;
     position: relative;
     top: 5rem;
+}
+
+.demo-table {
+    top: 15rem;
 }
 
 /* SVG */
