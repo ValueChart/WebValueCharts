@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-02 13:18:34
+* @Last Modified time: 2016-07-07 10:39:46
 */
 
 // Angular Classes:
@@ -29,7 +29,7 @@ import { ValueChart }										from '../../model/ValueChart';
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
 						(click)="downloadValueChart()">
-						Download ValueChart
+						Export ValueChart
 					</a>
 				</div>
 				`

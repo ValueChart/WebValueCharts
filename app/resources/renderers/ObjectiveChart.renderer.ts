@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-06 13:27:18
+* @Last Modified time: 2016-07-07 12:56:47
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -90,75 +90,99 @@ export class ObjectiveChartRenderer {
 	// This function creates the individual rows that make up the summary chart. Each row is for one primitive objective in the ValueChart
 	createObjectiveRows(rowsContainer: d3.Selection<any>, rowOutlinesContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, alternativeLabelsContainer: d3.Selection<any>, rows: RowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
-		rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE)
-			.data(rows)
-			.enter().append('rect')
-				.classed(this.defs.ROW_OUTLINE, true)
-				.classed('valuechart-outline', true);
+		var updateRowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE)
+			.data(rows);
+
+		updateRowOutlines.exit().remove();	
+		updateRowOutlines.enter().append('rect')
+			.classed(this.defs.ROW_OUTLINE, true)
+			.classed('valuechart-outline', true);
+
+		this.rowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE);
+
 
 		// Create the containers to hold the new rows.
-		rowsContainer.selectAll('.' + this.defs.ROW)
-			.data(rows)
-			.enter().append('g')
-				.classed(this.defs.ROW, true);
+		var updateRowContainers = rowsContainer.selectAll('.' + this.defs.ROW)
+			.data(rows);
 
-		alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL)
-			.data(this.chartDataService.alternatives)
-			.enter().append('text')
-				.classed(this.defs.ALTERNATIVE_LABEL, true);
+		updateRowContainers.exit().remove();
+		updateRowContainers.enter().append('g')
+			.classed(this.defs.ROW, true);
 
-		boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(this.chartDataService.alternatives)
-			.enter().append('rect')
-				.classed(this.defs.ALTERNATIVE_BOX, true)
-				.classed(this.defs.CHART_ALTERNATIVE, true);
-
-		// Select all the row outlines (not just the new ones as is done above), and save them as a class field. The same goes for the next two lines, respectively
-		this.rowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE);
 		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
-		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+
+
+		var updateAlternativeLabels = alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL)
+			.data(this.chartDataService.alternatives);
+
+		updateAlternativeLabels.exit().remove();
+		updateAlternativeLabels.enter().append('text')
+			.classed(this.defs.ALTERNATIVE_LABEL, true);
+
 		this.alternativeLabels = alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL);
+
+
+		var updateBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+			.data(this.chartDataService.alternatives);
+
+		updateBoxes.exit().remove();
+		updateBoxes.enter().append('rect')
+			.classed(this.defs.ALTERNATIVE_BOX, true)
+			.classed(this.defs.CHART_ALTERNATIVE, true);
+
+		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+
+
 
 		this.createObjectiveCells(this.rows)
 	}
 	// This function creates the cells that compose each row of the objective chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
 	createObjectiveCells(objectiveRows: d3.Selection<SVGGElement>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
-		objectiveRows.selectAll('.' + this.defs.CELL)
-			.data((d: RowData) => { return d.cells; })
-			.enter().append('g')
-				.classed(this.defs.CELL, true)
-				.classed(this.defs.CHART_CELL, true);
+		var updateCells = objectiveRows.selectAll('.' + this.defs.CELL)
+			.data((d: RowData) => { return d.cells; });
+
+		updateCells.exit().remove();
+		updateCells.enter().append('g')
+			.classed(this.defs.CELL, true)
+			.classed(this.defs.CHART_CELL, true);
 
 
 		this.cells = objectiveRows.selectAll('.' + this.defs.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		this.cells.append('g')
-			.classed(this.defs.USER_SCORES_CONTAINER, true)
-			.selectAll('.' + this.defs.USER_SCORE)
-				.data((d: CellData) => { return d.userScores; })
-				.enter().append('rect')
-					.classed(this.defs.USER_SCORE, true);
+		var updateUserScores = this.cells.selectAll('.' + this.defs.USER_SCORE)
+			.data((d: CellData) => { return d.userScores; });
 
-		this.cells.append('g')
-			.classed(this.defs.WEIGHT_OUTLINES_CONTAINER, true)
-			.selectAll('.' + this.defs.WEIGHT_OUTLINE)
-				.data((d: CellData) => { return d.userScores; })
-				.enter().append('rect')
-					.classed(this.defs.WEIGHT_OUTLINE, true);
-
-		this.cells.selectAll('.' + this.defs.DOMAIN_LABEL)
-			.data((d: CellData) => { return [d]; })
-			.enter().append('text')
-				.classed(this.defs.DOMAIN_LABEL, true);
+		updateUserScores.exit().remove();
+		updateUserScores.enter().append('rect')
+			.classed(this.defs.USER_SCORE, true);
 
 		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
+
+
+		var updateWeightColumns = this.cells.selectAll('.' + this.defs.WEIGHT_OUTLINE)
+			.data((d: CellData) => { return d.userScores; });
+
+		updateWeightColumns.exit().remove();
+		updateWeightColumns.enter().append('rect')
+			.classed(this.defs.WEIGHT_OUTLINE, true);
+
 		this.weightColumns = this.cells.selectAll('.' + this.defs.WEIGHT_OUTLINE);
+
+
+		var updateDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL)
+			.data((d: CellData) => { return [d]; });
+
+		updateDomainLabels.exit().remove();	
+		updateDomainLabels.enter().append('text')
+				.classed(this.defs.DOMAIN_LABEL, true);
+
 		this.objectiveDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL);
 	}
 
 	updateObjectiveChart(rows: RowData[], viewOrientation: string): void {
+
 		var rowOutlinesToUpdate = this.rowOutlines
 			.data(rows);
 
@@ -274,7 +298,7 @@ export class ObjectiveChartRenderer {
 				else 
 					return this.renderConfigService.userColors[d.user.getUsername()];
 			})
-			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING; })
+			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); });
 
@@ -296,11 +320,11 @@ export class ObjectiveChartRenderer {
 		var calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
 			let weightDimensionTwoOffset: number = 2;
 			let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-			return this.renderConfigService.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset;
+			return Math.max(this.renderConfigService.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);
 		}
 
 		weightColumns
-			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - (this.USER_SCORE_SPACING + 1); })
+			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - (this.USER_SCORE_SPACING + 1), 0); })
 			.attr(this.renderConfigService.dimensionTwo, (d: UserScoreData, i: number) => { return calculateWeightColumnDimensionTwo(d,i); })
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + ((this.USER_SCORE_SPACING + 1) / 2); })
 			.style('stroke-dasharray', (d: UserScoreData, i: number) => { 

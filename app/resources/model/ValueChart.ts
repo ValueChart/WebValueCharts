@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 12:36:05
+* @Last Modified time: 2016-07-07 11:23:18
 */
 
 import { Objective } 															from './Objective';
@@ -19,14 +19,12 @@ import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 
 export class ValueChart {
 
-	public type: string;
 	private name: string;
 	private description: string;
 	private creator: string;
 	private rootObjectives: Objective[];
 	private alternatives: Alternative[];
-	protected users: User[];
-	private averageUser: User;
+	private users: User[];
 
 	constructor(name: string, description: string, creator: string, users?: User[]) {
 		this.name = name;
@@ -204,22 +202,28 @@ export class ValueChart {
 		return maximumWeightMap;
 	}
 
-	getAverageUser(): User {
-		this.calculateAverageUser();
-		return this.averageUser;
+	getAverageValueChart(): ValueChart {
+		var averageValueChart: ValueChart = new ValueChart(this.name + ' Average', this.description, this.creator, [this.getAverageUser()]);
+		averageValueChart.setRootObjectives(this.rootObjectives);
+		averageValueChart.setAlternatives(this.alternatives);
+		return averageValueChart;
 	}
 
-	calculateAverageUser(): void {
+	getAverageUser(): User {
+		var averageUser: User = new User('Average User');
+
 		if (this.users.length === 1) {
-			this.averageUser = new User("AverageUser");
-			this.averageUser.setWeightMap(this.users[0].getWeightMap());
-			this.averageUser.setScoreFunctionMap(this.users[0].getScoreFunctionMap());
+			averageUser = new User("AverageUser");
+			averageUser.setWeightMap(this.users[0].getWeightMap());
+			averageUser.setScoreFunctionMap(this.users[0].getScoreFunctionMap());
 			return;
 		}
 
-		this.averageUser = new User("AverageUser");
-		this.averageUser.setWeightMap(this.calculateAverageWeightMap()); 
-		this.averageUser.setScoreFunctionMap(this.calculateAverageScoreFunctionMap());
+		averageUser = new User("AverageUser");
+		averageUser.setWeightMap(this.calculateAverageWeightMap()); 
+		averageUser.setScoreFunctionMap(this.calculateAverageScoreFunctionMap());
+
+		return averageUser;
 	}
 
 	calculateAverageWeightMap(): WeightMap {
@@ -245,22 +249,22 @@ export class ValueChart {
 		var averageScoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
 
-		primitiveObjectives.forEach((objective: Objective) => {
+		primitiveObjectives.forEach((objective: PrimitiveObjective) => {
 			let scoreFunctions: ScoreFunction[] = [];
 			this.users.forEach((user: User) => {
 				let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				scoreFunctions.push(scoreFunction);
 			});
-			let averageScoreFunction = this.getAverageScoreFunction(scoreFunctions, objective);
+			let averageScoreFunction = this.calculateAverageScoreFunction(scoreFunctions, objective);
 			averageScoreFunctionMap.setObjectiveScoreFunction(objective.getName(), averageScoreFunction);
 		});
 
 		return averageScoreFunctionMap;
 	}
 
-	getAverageScoreFunction(scoreFunctions: ScoreFunction[], objective: Objective): ScoreFunction {
+	calculateAverageScoreFunction(scoreFunctions: ScoreFunction[], objective: PrimitiveObjective): ScoreFunction {
 		var averageScoreFunction: ScoreFunction;
-		if (objective.objectiveType === 'continuous') {
+		if (objective.getDomainType() === 'continuous') {
 			averageScoreFunction = new ContinuousScoreFunction();
 		} else {
 			averageScoreFunction = new DiscreteScoreFunction();

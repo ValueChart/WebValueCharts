@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 19:16:24
+* @Last Modified time: 2016-07-07 12:59:50
 */
 
 import { Component }															from '@angular/core';
-import { OnInit }																from '@angular/core';
-import { Router }																from '@angular/router';
+import { OnInit, OnDestroy }													from '@angular/core';
+import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router';
 
 // JQuery
 import * as $																	from 'jquery';
@@ -49,7 +49,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 @Component({
 	selector: 'create',
 	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
-	directives: [ValueChartDirective],
+	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:
 		ChartDataService,
@@ -76,6 +76,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 	private PUMP_OFF: string = 'none';
 	private ALTERNATIVE_SORT_OFF: string = 'none';
+
+	sub: any;
 
 	valueChart: ValueChart;
 	alternatives: Alternative[];
@@ -107,12 +109,15 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	DETAIL_BOX_USERS_TAB: string = 'users';
 
+	chartType: string;
+
 
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
 	
 	constructor(
 		private router: Router,
+		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
@@ -122,7 +127,20 @@ export class ValueChartViewerComponent implements OnInit {
 		private labelDefinitions: LabelDefinitions) { }
 
 	ngOnInit() {
-		this.valueChart = this.currentUserService.getValueChart();
+
+		this.sub = this.route.params.subscribe(params => {
+		    let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
+		     
+		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
+		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
+		     	this.chartType = 'average';
+		    } else {
+				this.valueChart = this.currentUserService.getValueChart();
+				this.chartType = 'normal';
+			}
+
+		});
+
 		this.$ = $;
 
 		// Redirect back to Create page if the ValueChart is not initialized.
@@ -160,6 +178,13 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 
 		this.renderEventsService.summaryChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
+	}
+
+	ngOnDestroy() {
+ 		this.sub.unsubscribe();
+
+ 		// Delete the ValueChart
+ 		$('ValueChart').remove();
 	}
 
 	resizeDetailBox(): void {

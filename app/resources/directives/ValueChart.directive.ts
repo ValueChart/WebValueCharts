@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 17:04:07
+* @Last Modified time: 2016-07-07 12:52:46
 */
 
 
@@ -166,7 +166,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		var valueChartChanges = this.changeDetectionService.valueChartDiffer.diff(this.valueChart);
 		if (valueChartChanges) {
 			this.chartDataService.setValueChart(this.valueChart);
-			this.updateValueChartDisplay();
+			this.chartDataService.updateAllChartData(this.viewOrientation);
+			// Configure the Render Service:
+			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+			this.renderConfigService.configureViewOrientation(this.viewOrientation);
+
+			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.chartDataService.getRowData());
+			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.chartDataService.getRowData());
+
+			this.updateRowOrder()
 		}
 
 		// Check the User Models for Changes:

@@ -127,37 +127,47 @@
 						</button>
 						  <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="displayOptions-dropdown">
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
 						 	   		Utility Graphs
 						 	  		<span *ngIf="displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
 						 	   		Domain Values
 						 	  		<span *ngIf="displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
 						 	   		Utility Scale
 						 	  		<span *ngIf="displayScales" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
+						 	  	<a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
 						 	   		Total Scores
 						 	  		<span *ngIf="displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	  	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
 						 	   		Score Labels
 						 	  		<span *ngIf="displayScoreFunctionValueLabels" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						 </ul>
 					</div>
+				</div>
+				<div class="form-group pull-right" *ngIf="!valueChart.isIndividual() && chartType === 'normal'">
+					<a class="btn btn-default" [routerLink]="['/view', valueChart.getName() + '-average']" id="view-average-chart">
+						View Average Chart
+					</a>
+				</div>
+				<div class="form-group pull-right" *ngIf="chartType === 'average'">
+					<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" id="view-normal-chart">
+						View Group Chart
+					</a>
 				</div>
 			</div>
 		</form>

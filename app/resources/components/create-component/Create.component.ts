@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 18:30:21
+* @Last Modified time: 2016-07-07 11:38:23
 */
 
 import { Component }									from '@angular/core';
@@ -44,9 +44,10 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
+				var parameters = '';
 				if (route[0] === '/view/')
-					route[0] = route + this.currentUserService.getValueChart().getName();
-				this.router.navigate(route);
+					parameters = this.currentUserService.getValueChart().getName();
+				this.router.navigate([route[0], parameters]);
 			}
 		};
 		reader.readAsText(xmlFile);

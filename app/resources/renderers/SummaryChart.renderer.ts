@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 13:27:31
+* @Last Modified time: 2016-07-07 12:52:03
 */
 
 import { Injectable } 												from '@angular/core';
@@ -90,37 +90,48 @@ export class SummaryChartRenderer {
 	// and the rows are stacked on each other in order to create a stacked bar chart. 
 	createSummaryChartRows(rowsContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, scoreTotalsContainer: d3.Selection<any>, rows: RowData[]): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
-		var newRows: d3.Selection<any> = rowsContainer.selectAll('.' + this.defs.ROW)
-			.data(rows)
-			.enter().append('g')
-				.classed(this.defs.ROW, true);
+		var updateRows = rowsContainer.selectAll('.' + this.defs.ROW)
+			.data(rows);
+
+		updateRows.exit().remove();
+		updateRows.enter().append('g')
+			.classed(this.defs.ROW, true);
+
+		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
 
 		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
+		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+			.data((rows[0].cells));
 
-		var subContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.data((rows[0].cells))
-			.enter().append('g')
-				.classed(this.defs.SCORE_TOTAL_SUBCONTAINER, true);
+		updateSubContainers.exit().remove();
+		updateSubContainers.enter().append('g')
+			.classed(this.defs.SCORE_TOTAL_SUBCONTAINER, true);
 
-		subContainers.selectAll('.' + this.defs.SCORE_TOTAL)
-			.data((d: CellData) => { return d.userScores; })
-			.enter().append('text')
-				.classed(this.defs.SCORE_TOTAL, true);
-
-		boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(this.chartDataService.alternatives)
-			.enter().append('rect')
-				.classed(this.defs.ALTERNATIVE_BOX, true)
-				.classed(this.defs.CHART_ALTERNATIVE, true);
-
-
-		// Save all the rows as a field of the class. This is done separately from creating the rows as newRows is the selection of newly created rows containers,
-		// NOT all row containers. A similar argument explains why the dividing lines are saved here as well.
-		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
-		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
 		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER);
+
+
+		var updateScoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL)
+			.data((d: CellData) => { return d.userScores; });
+
+		updateScoreTotals.exit().remove();
+		updateScoreTotals.enter().append('text')
+			.classed(this.defs.SCORE_TOTAL, true);
+
 		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL);
+
+
+		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+			.data(this.chartDataService.alternatives);
+
+		updateAlternativeBoxes.exit().remove();
+		updateAlternativeBoxes.enter().append('rect')
+			.classed(this.defs.ALTERNATIVE_BOX, true)
+			.classed(this.defs.CHART_ALTERNATIVE, true);
+
+		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+
+
 
 		this.createSummaryChartCells(this.rows);
 	}
@@ -128,20 +139,24 @@ export class SummaryChartRenderer {
 	// This function creates the cells that compose each row of the summary chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
 	createSummaryChartCells(stackedBarRows: d3.Selection<any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
-		stackedBarRows.selectAll('.' + this.defs.CELL)
-			.data((d: RowData) => { return d.cells; })
-			.enter().append('g')
-				.classed(this.defs.CELL, true)
-				.classed(this.defs.CHART_CELL, true);
+		var updateCells = stackedBarRows.selectAll('.' + this.defs.CELL)
+			.data((d: RowData) => { return d.cells; });
+
+		updateCells.exit().remove();
+		updateCells.enter().append('g')
+			.classed(this.defs.CELL, true)
+			.classed(this.defs.CHART_CELL, true);
 
 		// Save all the cells as a field of the class.
 		this.cells = stackedBarRows.selectAll('.' + this.defs.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		this.cells.selectAll('.' + this.defs.USER_SCORE)
-			.data((d: CellData, i: number) => { return d.userScores; })
-			.enter().append('rect')
-				.classed(this.defs.USER_SCORE, true);
+		var updateUserScores = this.cells.selectAll('.' + this.defs.USER_SCORE)
+			.data((d: CellData, i: number) => { return d.userScores; });
+
+		updateUserScores.exit().remove();
+		updateUserScores.enter().append('rect')
+			.classed(this.defs.USER_SCORE, true);
 
 		// Save all the user scores bars as a field of the class.
 		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
@@ -317,7 +332,7 @@ export class SummaryChartRenderer {
 				else 
 					return this.renderConfigService.userColors[d.user.getUsername()];
 			})
-			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING; })
+			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); })
 			
