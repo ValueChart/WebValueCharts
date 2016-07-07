@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 12:59:50
+* @Last Modified time: 2016-07-07 14:28:10
 */
 
 import { Component }															from '@angular/core';
@@ -247,7 +247,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// View Configuration Options:
 
-	setOrientation(viewOrientation: string): void{
+	setOrientation(viewOrientation: string): void {
 		this.orientation = viewOrientation;
 
 		if (this.orientation === 'horizontal') {

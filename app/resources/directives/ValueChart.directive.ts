@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 12:52:46
+* @Last Modified time: 2016-07-07 14:32:59
 */
 
 
@@ -18,6 +18,7 @@ import { ChartDataService}														from '../services/ChartData.service';
 import { RenderConfigService }													from '../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
+
 
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
@@ -71,6 +72,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private elementRef: ElementRef,
 		// Services:
 		private chartDataService: ChartDataService,
+		private chartUndoRedoService: ChartUndoRedoService,
 		private renderConfigService: RenderConfigService,
 		private changeDetectionService: ChangeDetectionService,
 		// Renderers:
@@ -163,10 +165,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	detectValueChartChanges(): void {
 		// Check for changes to the ValueChart fields. This is NOT deep.
-		var valueChartChanges = this.changeDetectionService.valueChartDiffer.diff(this.valueChart);
-		if (valueChartChanges) {
+		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
+			this.chartUndoRedoService.clearRedo();
+			this.chartUndoRedoService.clearUndo();			
+
 			this.chartDataService.setValueChart(this.valueChart);
 			this.chartDataService.updateAllChartData(this.viewOrientation);
+			this.initChangeDetection()
 			// Configure the Render Service:
 			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 			this.renderConfigService.configureViewOrientation(this.viewOrientation);
