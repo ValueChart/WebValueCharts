@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 16:44:06
+* @Last Modified time: 2016-07-07 16:53:13
 */
 
 import { Component }									from '@angular/core';
@@ -26,7 +26,7 @@ import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCh
 })
 export class CreateComponent {
 
-	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Individual Water Management', type: 'Individual' }]
+	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Wastewater Management', type: 'Individual' }]
 
 	constructor(
 		private router: Router,
