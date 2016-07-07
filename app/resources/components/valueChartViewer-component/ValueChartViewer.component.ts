@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 14:28:10
+* @Last Modified time: 2016-07-07 15:26:10
 */
 
 import { Component }															from '@angular/core';
@@ -130,7 +130,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.sub = this.route.params.subscribe(params => {
 		    let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
-		     
+		    this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+		    
 		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
 		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
 		     	this.chartType = 'average';

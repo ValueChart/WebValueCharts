@@ -6,10 +6,26 @@
 					<a class="navbar-brand" [routerLink]="['/register']">ValueCharts</a>
 				</div>
 				<ul class="nav navbar-nav navbar-right">
-					<ExportValueChart></ExportValueChart>
+					<form class="form-inline navbar-form col-xs-12">
+						<div class="form-group navbar-group" *ngIf="currentUserService.getValueChart() && !currentUserService.getValueChart().isIndividual() && chartType === 'normal'">
+							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName() + '-average']" (click)="chartType = 'average'" id="view-average-chart">
+								View Average Chart
+							</a>
+						</div>
+						<div class="form-group navbar-group" *ngIf="currentUserService.getValueChart() && chartType === 'average'">
+							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" (click)="chartType = 'normal'" id="view-normal-chart">
+								View Group Chart
+							</a>
+						</div>
+						<div class="form-group navbar-group">
+							<ExportValueChart></ExportValueChart>
+						</div>
+					</form>
 				</ul>
 			</div>
 		</navbar>
 		<div>
 			<router-outlet></router-outlet>
 		</div>
+	</div>
+</div>

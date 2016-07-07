@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 14:52:00
+* @Last Modified time: 2016-07-07 15:02:27
 */
 
 import { Component } 										from '@angular/core';
@@ -27,7 +27,9 @@ import { ExportValueChartComponent }						from '../exportValueChart-component/Ex
 })
 export class RootComponent implements OnInit {
 
-	constructor(private router: Router) {}
+	chartType: string = 'normal';
+
+	constructor(private router: Router, private currentUserService: CurrentUserService) {}
 	
 	ngOnInit() {	}
 

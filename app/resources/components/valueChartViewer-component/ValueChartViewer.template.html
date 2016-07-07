@@ -3,29 +3,29 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="col-xs-4">
-				<div class="form-group">
+				<div class="form-group valuechart-toolbar-group">
 					<button class="btn btn-default" (click)="editObjectiveModel()">
 						Edit Objective Model
 					</button>
 				</div>
-				<div class="form-group">
+				<div class="form-group valuechart-toolbar-group">
 					<button class="btn btn-default" (click)="editPreferenceModel()">
 						Edit Preference Model
 					</button>
 				</div>
 			</div>
 			<div class="col-xs-8"> 
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canRedo()" (click)="redoChartChange()">
 						Redo
 					</button>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canUndo()" (click)="undoChartChange()">
 						Undo
 					</button>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<div class="dropdown" *ngIf="currentUserService.getValueChart().isIndividual()">	
 						<button class="btn btn-default dropdown-toggle" type="button" id="pump-dropdown" data-toggle="dropdown" 
 						aria-haspopup="true" aria-expanded="true" [class.active]="pumpWeights !== 'none'">
@@ -48,7 +48,7 @@
 						 </ul>
 					</div>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<div class="dropdown">
 						<button class="btn btn-default dropdown-toggle" [class.active]="sortAlternatives === 'objective' || sortAlternatives === 'manual'"
 							type="button" id="alternative-sort-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -81,12 +81,12 @@
 						</ul>
 					</div>			
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.active]="reorderObjectives" (click)="toggleReorderObjectives(!reorderObjectives)">
 						Reorder Objectives
 					</button>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.active]="setObjectiveColors" (click)="toggleSetObjectiveColors(!setObjectiveColors)">
 						Set Objective Colors
 					</button>
@@ -159,16 +159,6 @@
 						 </ul>
 					</div>
 				</div>
-				<div class="form-group pull-right" *ngIf="!valueChart.isIndividual() && chartType === 'normal'">
-					<a class="btn btn-default" [routerLink]="['/view', valueChart.getName() + '-average']" id="view-average-chart">
-						View Average Chart
-					</a>
-				</div>
-				<div class="form-group pull-right" *ngIf="chartType === 'average'">
-					<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" id="view-normal-chart">
-						View Group Chart
-					</a>
-				</div>
 			</div>
 		</form>
 	</div>
@@ -176,13 +166,13 @@
 		[class.detail-box-horizontal]="orientation === 'horizontal'" 
 		[class.detail-box-vertical]="orientation === 'vertical'">
 		<form class="form-inline col-xs-5" class="detail-toolbar">
-			<div class="form-group pull-left">
+			<div class="form-group valuechart-toolbar-group pull-left">
 				<button class="btn btn-lg btn-default detail-box-tab" id="alternative-header-container" 
 					(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 				  <h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
 				</button>
 			</div>
-			<div class="form-group pull-left" *ngIf="!valueChart.isIndividual()">
+			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChart.isIndividual()">
 				<button class="btn btn-lg btn-default detail-box-tab" id="user-list-header-container" 
 					(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 				  <h5 id="user-list-headers">User List</h5>
