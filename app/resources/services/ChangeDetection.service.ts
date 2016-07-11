@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 14:20:40
+* @Last Modified time: 2016-07-11 13:00:30
 */
 
 import { Injectable } 															from '@angular/core';
@@ -64,7 +64,6 @@ export class ChangeDetectionService {
 	}
 
 	initPreviousViewConfig(viewConfig: any): void {
-
 		this.previousViewConfig.displayScoreFunctions			= viewConfig.displayScoreFunctions;
 		this.previousViewConfig.displayDomainValues 				= viewConfig.displayDomainValues;
 		this.previousViewConfig.displayScales 					= viewConfig.displayScales;
@@ -73,6 +72,7 @@ export class ChangeDetectionService {
 	}
 
 	initPreviousInteractionConfig(interactionConfig: any) {
+		this.previousInteractionConfig.weightResizeType = interactionConfig.weightResizeType;
 		this.previousInteractionConfig.reorderObjectives = interactionConfig.reorderObjectives;
 		this.previousInteractionConfig.sortAlternatives = interactionConfig.sortAlternatives;
 		this.previousInteractionConfig.pumpWeights = interactionConfig.pumpWeights; 

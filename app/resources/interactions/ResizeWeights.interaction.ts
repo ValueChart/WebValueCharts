@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:03:34
+* @Last Modified time: 2016-07-11 14:45:38
 */
 
 import { Injectable } 												from '@angular/core';
@@ -33,6 +33,8 @@ import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
 
 @Injectable()
 export class ResizeWeightsInteraction {
+
+	private resizeType: string;
 
 	constructor(
 		private ngZone: NgZone,
@@ -65,10 +67,10 @@ export class ResizeWeightsInteraction {
 		}
 	}
 
-	toggleDragToResizeWeights(enableResizing: boolean): void {
+	toggleDragToResizeWeights(resizeType: string): void {
 		var dragToResizeWeights: d3.Drag<{}> = d3.drag();
-		
-		if (enableResizing) {
+		this.resizeType = resizeType;
+		if (resizeType !== 'none') {
 			dragToResizeWeights
 				.on('start', this.resizeWeightsStart)
 				.on('drag', this.resizeWeights);
@@ -77,15 +79,15 @@ export class ResizeWeightsInteraction {
 		var labelSpaces = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
 			.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
 
-		this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, enableResizing);
+		this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
 
 	}
 
-	toggleResizingForSublabels(labelSpaces: d3.Selection<any>, dragToResizeWeights: d3.Drag<{}>, enableResizing: boolean) {
+	toggleResizingForSublabels(labelSpaces: d3.Selection<any>, dragToResizeWeights: d3.Drag<{}>, resizeType: string) {
 		var labelDividers: d3.Selection<any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-				return (enableResizing) ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+				return (resizeType !== 'none') ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
 			});
 
 		labelDividers.call(dragToResizeWeights);
@@ -97,7 +99,7 @@ export class ResizeWeightsInteraction {
 			let subLabelSpaces: d3.Selection<any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
 				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 			
-			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, enableResizing);	// Toggle dragging for the sub labels.
+			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, resizeType);	// Toggle dragging for the sub labels.
 		});
 	}
 
@@ -114,27 +116,47 @@ export class ResizeWeightsInteraction {
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
 		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
-		var siblings: LabelData[] = (<LabelData>parentContainer.data()[0]).subLabelData;
-
-		var combinedWeight: number = d.weight + siblings[i - 1].weight;
-
-		var currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
-		var siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
+		var siblings: LabelData[] = (<LabelData> parentContainer.datum()).subLabelData;
 
 		// Run inside the angular zone so that change detection is triggered.
 		this.ngZone.run(() => {
+			if (this.resizeType === 'neighbor') {
+				let combinedWeight: number = d.weight + siblings[i - 1].weight;
 
-			if (d.objective.objectiveType === 'abstract') {
-				this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
+				let siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
+				let currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
+
+				if (d.objective.objectiveType === 'abstract') {
+					this.chartDataService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
+				} else {
+					weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
+				}
+
+				if (siblings[i - 1].objective.objectiveType === 'abstract') {
+					this.chartDataService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
+				} else {
+					weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
+				}
 			} else {
-				weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
-			}
+				let combinedWeight: number = (<LabelData> parentContainer.datum()).weight;
+				let siblingsToIncrease: LabelData[] = [];
+				let siblingsToDecrease: LabelData[] = [];
 
+				if (deltaWeight < 0) {
 
-			if (siblings[i - 1].objective.objectiveType === 'abstract') {
-				this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
-			} else {
-				weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
+					siblingsToIncrease = siblings.slice(0, i);
+					siblingsToDecrease = siblings.slice(i);
+
+					this.chartDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
+					this.chartDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
+
+				} else {
+					siblingsToIncrease = siblings.slice(i);
+					siblingsToDecrease = siblings.slice(0, i);
+
+					this.chartDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
+					this.chartDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
+				}
 			}
 		});
 	};

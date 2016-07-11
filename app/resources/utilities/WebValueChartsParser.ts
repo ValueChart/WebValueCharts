@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:19:25
+* @Last Modified time: 2016-07-11 13:13:37
 */
 
 // Model Classes
@@ -131,11 +131,8 @@ export class WebValueChartsParser {
 
 
 				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
-					console.log(objective);
 					return objective.getId() === objectiveId;
 				});
-
-				console.log(correspondingObjective);
 
 				if (correspondingObjective.getDomainType() === 'categorical') {
 					(<CategoricalDomain> correspondingObjective.getDomain()).addElement(<string> domainValue);

@@ -159,6 +159,29 @@
 						 </ul>
 					</div>
 				</div>
+				<div class="form-group pull-right" *ngIf="valueChart.isIndividual()">
+					<div class="dropdown">	
+						<button class="btn btn-default dropdown-toggle" type="button" id="weightResizeType-dropdown" data-toggle="dropdown" 
+						aria-haspopup="true" aria-expanded="true">
+							Weight Resize Strategy
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="weightResizeType-dropdown">
+						    <li [class.disabled]="weightResizeType === RESIZE_NEIGHBOR">
+						 	   <a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_NEIGHBOR)">
+						 	   		Adjacent Only
+						 	  		<span *ngIf="weightResizeType === RESIZE_NEIGHBOR" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+						 	   </a>
+						    </li>
+						    <li [class.disabled]="weightResizeType === RESIZE_SIBLINGS">
+						    	<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_SIBLINGS)">
+						    		All
+						    		<span *ngIf="weightResizeType === RESIZE_SIBLINGS" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+								</a>
+						    </li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</form>
 	</div>
@@ -225,6 +248,7 @@
 			[displayScales]="displayScales" 
 			[displayTotalScores]="displayTotalScores"
 			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
+			[weightResizeType]="weightResizeType"
 			[reorderObjectives]="reorderObjectives"
 			[sortAlternatives]="sortAlternatives"
 			[pumpWeights]="pumpWeights"

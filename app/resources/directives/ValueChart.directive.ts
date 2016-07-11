@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 14:32:59
+* @Last Modified time: 2016-07-11 13:41:29
 */
 
 
@@ -127,13 +127,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Render the ValueChart:
 		this.labelRenderer.createLabelSpace(this.el, this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.chartDataService.getRowData());
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 
 		this.summaryChartRenderer.createSummaryChart(this.el, this.chartDataService.getRowData());
 		this.summaryChartRenderer.renderSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.chartDataService.getValueChart().isIndividual());
 	}
 
 	initChangeDetection(): void {
@@ -271,6 +271,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	detectInteractionConfigChanges(): void {
+		if (this.interactionConfig.weightResizeType !== this.changeDetectionService.previousInteractionConfig.weightResizeType) {
+			this.changeDetectionService.previousInteractionConfig.weightResizeType = this.interactionConfig.weightResizeType;
+
+			this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
+		}
+
 		if (this.interactionConfig.reorderObjectives !== this.changeDetectionService.previousInteractionConfig.reorderObjectives) {
 			this.changeDetectionService.previousInteractionConfig.reorderObjectives = this.interactionConfig.reorderObjectives;
 			// Toggle Dragging to sort objectives:
@@ -315,7 +321,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.renderConfigService.viewOrientation, this.chartDataService.primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.chartDataService.getValueChart().isIndividual());
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.updateAlternativeOrder()
 	}
 
@@ -398,6 +404,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	// Interactions:
+
+	@Input() set weightResizeType(value: any) {
+		this.interactionConfig.weightResizeType = <string> value;
+	}
 
 	@Input() set reorderObjectives(value: any) {
 		this.interactionConfig.reorderObjectives = <boolean> value;

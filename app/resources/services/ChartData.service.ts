@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:11:12
+* @Last Modified time: 2016-07-11 14:19:21
 */
 
 import { Injectable } 										from '@angular/core';
@@ -396,36 +396,35 @@ export class ChartDataService {
 		return elements;
 	}
 
-	incrementAbstractObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
+	incrementObjectivesWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
 
-		var children: LabelData[] = labelDatum.subLabelData;
-		var childrenWeightTotal: number = 0;
-		var nonZeroChildren: number = 0;
+		var weightTotal: number = 0;
+		var nonZeroWeights: number = 0;
 
-		children.forEach((child:LabelData) => {
+		labelData.forEach((child:LabelData) => {
 			if (child.weight !== 0) {
-				childrenWeightTotal += child.weight;
-				nonZeroChildren++;
+				weightTotal += child.weight;
+				nonZeroWeights++;
 			}
 		});
 
-		if (nonZeroChildren && weightIncrement < 0) {
-			weightIncrement = weightIncrement / nonZeroChildren;
+		if (nonZeroWeights && weightIncrement < 0) {
+			weightIncrement = weightIncrement / nonZeroWeights;
 		} else {
-			weightIncrement = weightIncrement / children.length;
+			weightIncrement = weightIncrement / labelData.length;
 		}
 
-		children.forEach((child: LabelData) => {
-			let childMax: number = maxWeight;
-			if (childrenWeightTotal !== 0 && child.weight !== 0) {
-				childMax = maxWeight * (child.weight / childrenWeightTotal);
+		labelData.forEach((labelDatum: LabelData) => {
+			let labelDatumMax: number = maxWeight;
+			if (weightTotal !== 0 && labelDatum.weight !== 0) {
+				labelDatumMax = maxWeight * (labelDatum.weight / weightTotal);
 			}
 
-			if (child.subLabelData === undefined) {
-				var newWeight = Math.max(Math.min(child.weight + weightIncrement, childMax), 0);
-				weightMap.setObjectiveWeight(child.objective.getId(), newWeight);
+			if (labelDatum.subLabelData === undefined) {
+				var newWeight = Math.max(Math.min(labelDatum.weight + weightIncrement, labelDatumMax), 0);
+				weightMap.setObjectiveWeight(labelDatum.objective.getId(), newWeight);
 			} else {
-				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, childMax);
+				this.incrementObjectivesWeights(labelDatum.subLabelData, weightMap, weightIncrement, labelDatumMax);
 			}
 		});
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:07:46
+* @Last Modified time: 2016-07-11 13:39:52
 */
 
 import { Injectable } 												from '@angular/core';
@@ -189,7 +189,6 @@ export class LabelRenderer {
 		} else {
 			scoreFunctionContainer.style('display', 'none');
 		}
-		
 	}
 
 	// This function recursively renders labels for an array of Objectives that have been put into labelData format. It works very similarly to createLabels.

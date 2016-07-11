@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:02:26
+* @Last Modified time: 2016-07-11 13:34:24
 */
 
 import { Component }															from '@angular/core';
@@ -77,6 +77,10 @@ export class ValueChartViewerComponent implements OnInit {
 	private PUMP_OFF: string = 'none';
 	private ALTERNATIVE_SORT_OFF: string = 'none';
 
+	private RESIZE_NEIGHBOR: string = 'neighbor';
+	private RESIZE_SIBLINGS: string = 'siblings';
+	private NO_RESIZING: string = 'none';
+
 	sub: any;
 
 	valueChart: ValueChart;
@@ -91,6 +95,7 @@ export class ValueChartViewerComponent implements OnInit {
 	displayScoreFunctionValueLabels: boolean;
 
 	// ValueChart Interactions Configuration:
+	weightResizeType: string;
 	reorderObjectives: boolean;
 	sortAlternatives: string;
 	pumpWeights: string;
@@ -162,11 +167,13 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayScoreFunctionValueLabels = false;
 
 		// Interactions
-
+		this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 		this.reorderObjectives = false;
 		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
+
+		// Detail Box
 
 		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 		this.detailBoxAlternativeTab = 'Alternatives';
@@ -286,7 +293,15 @@ export class ValueChartViewerComponent implements OnInit {
 		// TODO: Implement Editing of Preference Model.
 	}
 
+
+
+
 	// Interaction Toggles
+
+	setWeightResizeType(resizeType: string): void {
+		this.weightResizeType = resizeType;
+	}
+
 
 	toggleReorderObjectives(newVal: boolean): void {
 		this.reorderObjectives = newVal;
