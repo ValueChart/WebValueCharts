@@ -3,7 +3,7 @@
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
 <<<<<<< 1b4b6a52117393309f3580747e5ebb8b5883a181
-* @Last Modified time: 2016-07-11 12:08:15
+* @Last Modified time: 2016-07-11 17:20:47
 =======
 * @Last Modified time: 2016-06-13 16:38:20
 >>>>>>> Add labels for alternatives to Objective Chart.
@@ -296,7 +296,7 @@ export class ObjectiveChartRenderer {
 				if (this.chartDataService.getValueChart().isIndividual())
 					return d.objective.getColor(); 
 				else 
-					return this.renderConfigService.userColors[d.user.getUsername()];
+					return d.user.color;
 			})
 			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)

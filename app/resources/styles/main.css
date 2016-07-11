@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 16:31:29
+* @Last Modified time: 2016-07-11 17:18:36
 */
 
 /* Global Styles */
@@ -207,6 +207,11 @@
 
 
 /* Override bootstrap default styles*/
+
+input[type=color] {
+    background: none;
+    border: 0px;
+}
 
 body {
 	/*overflow: hidden;*/

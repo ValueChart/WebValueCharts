@@ -126,7 +126,7 @@
 							<span class="caret"></span>
 						</button>
 						  <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="displayOptions-dropdown">
-						    <li>
+						    <li *ngIf="valueChart.isIndividual()">
 						 	   	<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
 						 	   		Utility Graphs
 						 	  		<span *ngIf="displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
@@ -233,7 +233,7 @@
 			    <div *ngFor="let user of valueChart.getUsers(); let i = index ">
 			 	   <h5>
 			 	   		{{user.getUsername()}}
-			 	  		<span class="glyphicon glyphicon-stop pull-right" aria-hidden="true" [style.color]="renderConfigService.kellyColors[i]"></span>
+			 	  		<span class="pull-right"><input type="color" value="{{renderConfigService.kellyColors[i]}}" (change)="setUserColor(user, $event.target.value)"></span>
 			 	   </h5>
 			    </div>
 			</div>

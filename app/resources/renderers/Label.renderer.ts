@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 13:39:52
+* @Last Modified time: 2016-07-11 17:04:46
 */
 
 import { Injectable } 												from '@angular/core';
@@ -231,7 +231,8 @@ export class LabelRenderer {
 
 		labelOutlines.style('fill', 'white')
 			.style('stroke', (d: LabelData) => {
-				return (d.depthOfChildren === 0) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';	// PrimitiveObjective's should have their own color. Abstract Objectives should be gray.
+				// PrimitiveObjective's should have their own color unless the ValueChart has multiple users. Abstract Objectives should always be gray.
+				return (d.depthOfChildren === 0 && this.chartDataService.getValueChart().isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
 			});
 
 		labelOutlines

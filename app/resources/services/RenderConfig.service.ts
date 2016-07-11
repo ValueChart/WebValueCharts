@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-06 13:48:16
+* @Last Modified time: 2016-07-11 17:30:34
 */
 
 import { Injectable } 												from '@angular/core';
@@ -40,7 +40,7 @@ export class RenderConfigService {
 	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
 	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']
 
-	public userColors: any;
+	public userColorsAssigned: boolean;
 
 
 	constructor(private chartDataService: ChartDataService) { }
@@ -74,11 +74,15 @@ export class RenderConfigService {
 		}
 
 		// Assign a color to each user in the ValueChart
-		if (!this.userColors) {
-			this.userColors = {};
+		if (!this.userColorsAssigned) {
+			var numKellyColorsUsed: number = 0;
 			this.chartDataService.users.forEach((user: User, index: number) => {
-				this.userColors[user.getUsername()] = this.kellyColors[index];
+				if (!user.color) {
+					user.color = this.kellyColors[numKellyColorsUsed];
+					numKellyColorsUsed++;
+				}
 			});
+			this.userColorsAssigned = true;
 		}
 	}
 

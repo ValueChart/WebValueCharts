@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:12:13
+* @Last Modified time: 2016-07-11 17:23:30
 */
 
 // Model Classes
@@ -143,6 +143,7 @@ export class ValueChartXMLEncoder {
 		users.forEach((user: User) => {
 			let userElement: Element = xmlDocument.createElement('User');
 			userElement.setAttribute('name', user.getUsername());
+			userElement.setAttribute('color', user.color);
 			userElement.appendChild(this.convertWeightMapIntoElement(user.getWeightMap(), xmlDocument));
 			userElement.appendChild(this.convertScoreFunctionMapIntoElement(user.getScoreFunctionMap(), xmlDocument));
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:09:33
+* @Last Modified time: 2016-07-11 17:20:58
 */
 
 import { Injectable } 												from '@angular/core';
@@ -330,7 +330,7 @@ export class SummaryChartRenderer {
 				if (this.chartDataService.getValueChart().isIndividual())
 					return d.objective.getColor(); 
 				else 
-					return this.renderConfigService.userColors[d.user.getUsername()];
+					return d.user.color;
 			})
 			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)

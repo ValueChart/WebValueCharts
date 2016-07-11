@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 13:34:24
+* @Last Modified time: 2016-07-11 17:31:26
 */
 
 import { Component }															from '@angular/core';
@@ -41,6 +41,7 @@ import { ObjectiveChartDefinitions }											from '../../services/ObjectiveCha
 import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
 
 // Model Classes
+import { User }																	from '../../model/User';
 import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
 import { PrimitiveObjective } 													from '../../model/PrimitiveObjective';
@@ -126,6 +127,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
+		private changeDetectionService: ChangeDetectionService,
 		private renderEventsService: RenderEventsService,
 		private summaryChartDefinitions: SummaryChartDefinitions,
 		private objectiveChartDefinitions: ObjectiveChartDefinitions,
@@ -160,7 +162,11 @@ export class ValueChartViewerComponent implements OnInit {
 		// View Configuration
 
 		this.orientation = 'vertical';
-		this.displayScoreFunctions = true;
+		if (this.valueChart.isIndividual())
+			this.displayScoreFunctions = true;
+		else {
+			this.displayScoreFunctions = false;
+		}
 		this.displayTotalScores = true;
 		this.displayScales = false;
 		this.displayDomainValues = false;
@@ -193,6 +199,11 @@ export class ValueChartViewerComponent implements OnInit {
 
  		// Destroy the ValueChart
  		$('ValueChart').remove();
+	}
+
+	setUserColor(user: User, color: string): void {
+		user.color = color;
+		this.changeDetectionService.colorsHaveChanged = true;
 	}
 
 	resizeDetailBox(): void {
