@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 11:23:18
+* @Last Modified time: 2016-07-11 12:04:51
 */
 
 import { Objective } 															from './Objective';
@@ -149,7 +149,7 @@ export class ValueChart {
 		var alternativeValues: { value: (string | number), alternative: Alternative }[] = [];
 
 		this.alternatives.forEach((alternative: Alternative) => {
-			alternativeValues.push({ value: alternative.getObjectiveValue(objective.getName()), alternative: alternative });
+			alternativeValues.push({ value: alternative.getObjectiveValue(objective.getId()), alternative: alternative });
 		});
 
 		return alternativeValues;
@@ -196,7 +196,7 @@ export class ValueChart {
 		});
 
 		for (var i = 0; i < primitiveObjectives.length; i++) {
-			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getId(), combinedWeights[i]);
 		}
 		
 		return maximumWeightMap;
@@ -240,7 +240,7 @@ export class ValueChart {
 
 		for (var i = 0; i < primitiveObjectives.length; i++) {
 			let averageWeight = combinedWeights[i] / this.users.length;
-			averageWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), averageWeight);
+			averageWeightMap.setObjectiveWeight(primitiveObjectives[i].getId(), averageWeight);
 		}
 		return averageWeightMap;
 	}
@@ -252,11 +252,11 @@ export class ValueChart {
 		primitiveObjectives.forEach((objective: PrimitiveObjective) => {
 			let scoreFunctions: ScoreFunction[] = [];
 			this.users.forEach((user: User) => {
-				let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 				scoreFunctions.push(scoreFunction);
 			});
 			let averageScoreFunction = this.calculateAverageScoreFunction(scoreFunctions, objective);
-			averageScoreFunctionMap.setObjectiveScoreFunction(objective.getName(), averageScoreFunction);
+			averageScoreFunctionMap.setObjectiveScoreFunction(objective.getId(), averageScoreFunction);
 		});
 
 		return averageScoreFunctionMap;

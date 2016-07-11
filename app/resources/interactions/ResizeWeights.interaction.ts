@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 17:47:26
+* @Last Modified time: 2016-07-11 12:03:34
 */
 
 import { Injectable } 												from '@angular/core';
@@ -52,7 +52,7 @@ export class ResizeWeightsInteraction {
 				// Calculate the correct weight increment.
 				var totalWeight: number = this.chartDataService.currentUser.getWeightMap().getWeightTotal();
 				var labelDatum: LabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.chartDataService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+				var previousWeight: number = this.chartDataService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -60,7 +60,7 @@ export class ResizeWeightsInteraction {
 					pumpAmount = 0 - previousWeight;
 				}
 
-				this.chartDataService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
+				this.chartDataService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
 			});
 		}
 	}
@@ -95,7 +95,7 @@ export class ResizeWeightsInteraction {
 				return;
 
 			let subLabelSpaces: d3.Selection<any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
-				.selectAll('g[parent="' + labelDatum.objective.getName() + '"]');	// Get all sub label containers whose parent is the current label
+				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 			
 			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, enableResizing);	// Toggle dragging for the sub labels.
 		});
@@ -111,7 +111,7 @@ export class ResizeWeightsInteraction {
 		var weightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
-		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getName() + '-container');
+		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
 		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
 		var siblings: LabelData[] = (<LabelData>parentContainer.data()[0]).subLabelData;
@@ -127,14 +127,14 @@ export class ResizeWeightsInteraction {
 			if (d.objective.objectiveType === 'abstract') {
 				this.chartDataService.incrementAbstractObjectiveWeight(d, weightMap, deltaWeight, combinedWeight);
 			} else {
-				weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
+				weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
 			}
 
 
 			if (siblings[i - 1].objective.objectiveType === 'abstract') {
 				this.chartDataService.incrementAbstractObjectiveWeight(siblings[i - 1], weightMap, -1 * deltaWeight, combinedWeight);
 			} else {
-				weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
+				weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
 			}
 		});
 	};

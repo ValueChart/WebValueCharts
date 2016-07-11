@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:23:21
+* @Last Modified time: 2016-07-11 12:12:13
 */
 
 // Model Classes
@@ -72,6 +72,7 @@ export class ValueChartXMLEncoder {
 		var objectiveElement = xmlDocument.createElement('Objective');
 		objectiveElement.setAttribute('name', objective.getName());
 		objectiveElement.setAttribute('type', objective.objectiveType);
+		objectiveElement.setAttribute('id', objective.getId());
 
 		if (objective.objectiveType === 'abstract') {
 			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {

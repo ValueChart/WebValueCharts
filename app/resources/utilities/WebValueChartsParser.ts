@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:03:53
+* @Last Modified time: 2016-07-11 12:19:25
 */
 
 // Model Classes
@@ -64,14 +64,15 @@ export class WebValueChartsParser {
 
 			let type: string = objectiveElement.getAttribute('type');
 			let name: string = objectiveElement.getAttribute('name');
+			let id: string = objectiveElement.getAttribute('id') || name;
 			let description: string = objectiveElement.querySelector('Description').innerHTML;
 
 			if (type === 'abstract') {
-				objective = new AbstractObjective(name, description);
+				objective = new AbstractObjective(name, description, id);
 				(<AbstractObjective> objective).setDirectSubObjectives(this.parseObjectives(objectiveElement));
 			} else {
 				let color: string = objectiveElement.getAttribute('color');
-				objective = new PrimitiveObjective(name, description);
+				objective = new PrimitiveObjective(name, description, id);
 				(<PrimitiveObjective> objective).setColor(color);
 
 				let domainElement: Element = objectiveElement.querySelector('Domain');
@@ -125,20 +126,23 @@ export class WebValueChartsParser {
 			for (var j = 0; j < alternativeValueElements.length; j++) {
 				let alternativeValueElement: Element = alternativeValueElements[j];
 
-				let objectiveName: string = alternativeValueElement.getAttribute('objective');
+				let objectiveId: string = alternativeValueElement.getAttribute('objective');
 				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
 
 				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
-					return objective.getName() === objectiveName;
+					console.log(objective);
+					return objective.getId() === objectiveId;
 				});
+
+				console.log(correspondingObjective);
 
 				if (correspondingObjective.getDomainType() === 'categorical') {
 					(<CategoricalDomain> correspondingObjective.getDomain()).addElement(<string> domainValue);
 				} else if (correspondingObjective.getDomainType() === 'continuous') {
 					domainValue = +domainValue;											// Convert the domain value to a number
 				}
-				alternative.setObjectiveValue(objectiveName, domainValue);
+				alternative.setObjectiveValue(objectiveId, domainValue);
 			}
 
 			alternatives.push(alternative);

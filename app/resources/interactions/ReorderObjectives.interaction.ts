@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:43:47
+* @Last Modified time: 2016-07-11 12:02:46
 */
 
 import { Injectable } 												from '@angular/core';
@@ -91,7 +91,7 @@ export class ReorderObjectivesInteraction {
 		this.reorderObjectiveMouseOffset = undefined;		// Offset of the mouse from the Coordinate Two position of the label that is to be dragged. 
 		this.totalCoordTwoChange = 0;						// The Coordinate Two distance that the label has been moved so far.
 
-		this.containerToReorder = d3.select('#label-' + d.objective.getName() + '-container');			// The container that holds the label we are reordering.
+		this.containerToReorder = d3.select('#label-' + d.objective.getId() + '-container');			// The container that holds the label we are reordering.
 		this.parentObjectiveName = (<Element>this.containerToReorder.node()).getAttribute('parent');	// The name of the parent objective for the label we are reordering.
 
 		// If the selected label is the root label, then it is not possible to reorder, and all further drag events for this selection should be ignored.
@@ -257,7 +257,7 @@ export class ReorderObjectivesInteraction {
 				this.adjustScoreFunctionPosition(container, deltaCoordinateTwo, subObjective);
 			});
 		} else {
-			var scoreFunction: d3.Selection<any> = this.labelRenderer.rootContainer.select('#label-' + objective.getName() + '-scorefunction');
+			var scoreFunction: d3.Selection<any> = this.labelRenderer.rootContainer.select('#label-' + objective.getId() + '-scorefunction');
 			let previousTransform: string = scoreFunction.attr('transform');
 			let scoreFunctionTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
 			scoreFunction.attr('transform', scoreFunctionTransform);

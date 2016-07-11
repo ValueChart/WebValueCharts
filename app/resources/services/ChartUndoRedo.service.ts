@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 14:30:36
+* @Last Modified time: 2016-07-11 12:11:31
 */
 
 
@@ -71,7 +71,7 @@ export class ChartUndoRedoService {
 		// Record the type of change has been made.
 		this.undoChangeTypes.push(this.SCORE_FUNCTION_CHANGE);
 
-		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getName(), scoreFunction);
+		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getId(), scoreFunction);
 
 		// Save the copy that was just created, along with the name of the objective that it maps to.
 		this.undoStateRecords.push(scoreFunctionRecord);

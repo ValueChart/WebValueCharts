@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:52:01
+* @Last Modified time: 2016-07-11 12:21:06
 */
 
 import { Objective } 			from './Objective';
@@ -16,14 +16,19 @@ export class AbstractObjective implements Objective {
 
 	public objectiveType: string;
 	private name: string;
+	private id: string;
 	private description: string;
 	private subObjectives: Objective[];
 
-	constructor(name: string, description: string) {
+	constructor(name: string, description: string, id?: string) {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'abstract';
 		this.subObjectives = [];
+		this.id = id;
+
+		if (id === undefined)
+			this.id = name;
 	}
 
 	getName(): string {
@@ -32,6 +37,14 @@ export class AbstractObjective implements Objective {
 
 	setName(name: string): void {
 		this.name = name;
+	}
+
+	getId(): string {
+		return this.id;
+	}
+
+	setId(id: string) {
+		this.id = id;
 	}
 
 	getDescription(): string {
@@ -90,7 +103,7 @@ export class AbstractObjective implements Objective {
 
 	getMemento(): Memento {
 		// Create a new AbstractObjective object.
-		var abstractObjectiveCopy: AbstractObjective = new AbstractObjective(this.name, this.description);
+		var abstractObjectiveCopy: AbstractObjective = new AbstractObjective(this.name, this.description, this.id);
 		// Copy over all the properties from the AbstractObjective that is being copied. Note that this does NOT create a new domain Objective, it merely preservers the reference.
 		Object.assign(abstractObjectiveCopy, this);
 		var subObjectives: Objective[] = []

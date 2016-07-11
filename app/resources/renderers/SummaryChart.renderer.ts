@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 12:52:03
+* @Last Modified time: 2016-07-11 12:09:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -338,8 +338,8 @@ export class SummaryChartRenderer {
 			
 
 		userScores.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
-				var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+				var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
+				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
 				this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
 				if (viewOrientation == 'vertical')
 					// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
@@ -373,16 +373,16 @@ export class SummaryChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
+		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
+		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
 		this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
 
 		return this.summaryChartScale(score * userObjectiveWeight);
 	};
 
 	calculateTotalScore = (d: UserScoreData) => {
-			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
+			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId());
+			var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getId()));
 			return score + d.offset;
 		};
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:25:57
+* @Last Modified time: 2016-07-11 12:06:03
 */
 
 import { Injectable } 					from '@angular/core';
@@ -53,11 +53,11 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
 		this.barContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-bars-container', true)
-			.attr('id', 'scorefunction-' + objective.getName() + '-bars-container');
+			.attr('id', 'scorefunction-' + objective.getId() + '-bars-container');
 
 		this.barLabelContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-pointlabels-container', true)
-			.attr('id', 'scorefunction-' + objective.getName() + '-pointlabels-container');
+			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
 
 		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective, domainElements);
 	}
@@ -69,7 +69,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('rect')
 			.classed('scorefunction-bar', true)
 			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objective.getName() + '-' + d + '-bar';
+				return 'scorefunction-' + objective.getId() + '-' + d + '-bar';
 			});
 
 		this.utilityBars = barContainer.selectAll('.scorefunction-bar');
@@ -79,7 +79,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('text')
 			.classed('scorefunction-point-labels', true)
 			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objective.getName() + '-' + d + '-label';
+				return 'scorefunction-' + objective.getId() + '-' + d + '-label';
 			});
 
 		this.barLabels = labelContainer.selectAll('.scorefunction-point-labels');
@@ -90,7 +90,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('rect')
 				.classed('scorefunction-bartop', true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getName() + '-' + d + '-bartop';
+					return 'scorefunction-' + objective.getId() + '-' + d + '-bartop';
 				});
 
 		this.barTops = barContainer.selectAll('.scorefunction-bartop');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 15:53:22
+* @Last Modified time: 2016-07-11 12:02:26
 */
 
 import { Component }															from '@angular/core';
@@ -223,8 +223,8 @@ export class ValueChartViewerComponent implements OnInit {
 		this.detailBoxAlternativeTab = alternative.getName();
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			this.alternativeObjectives[index] = objective.getName();
-			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
+			this.alternativeObjectives[index] = objective.getId();
+			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getId());
 		});
 
 		this.resizeDetailBox();

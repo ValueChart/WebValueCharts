@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 15:20:40
+* @Last Modified time: 2016-07-11 12:05:47
 */
 
 import { Injectable } 					from '@angular/core';
@@ -52,15 +52,15 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Create the continuous score function specific element containers
 		this.linesContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-fitline-container', true)
-			.attr('id', 'scorefunction-' + objective.getName() + '-fitline-container');
+			.attr('id', 'scorefunction-' + objective.getId() + '-fitline-container');
 
 		this.pointsContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-points-container', true)
-			.attr('id','scorefunction-' + objective.getName() + '-points-container');
+			.attr('id','scorefunction-' + objective.getId() + '-points-container');
 
 		this.pointLabelContainer = plotElementsContainer.append('g')
 			.classed('scorefunction-pointlabels-container', true)
-			.attr('id', 'scorefunction-' + objective.getName() + '-pointlabels-container');
+			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
 
 
 		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, this.pointLabelContainer, objective, domainElements);
@@ -73,7 +73,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('circle')
 				.classed('scorefunction-point', true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getName() + '-' + d + '-point';
+					return 'scorefunction-' + objective.getId() + '-' + d + '-point';
 				});
 
 		this.plottedPoints = pointsContainer.selectAll('.scorefunction-point');
@@ -83,7 +83,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('text')
 				.classed('scorefunction-point-labels', true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getName() + '-' + d + '-label';
+					return 'scorefunction-' + objective.getId() + '-' + d + '-label';
 				});
 
 		this.pointLabels = labelsContainer.selectAll('.scorefunction-point-labels');
@@ -98,7 +98,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('line')
 				.classed('scorefunction-fitline', true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getName() + '-' + d + '-fitline';
+					return 'scorefunction-' + objective.getId() + '-' + d + '-fitline';
 				});
 
 		this.fitLines = linesContainer.selectAll('.scorefunction-fitline');
