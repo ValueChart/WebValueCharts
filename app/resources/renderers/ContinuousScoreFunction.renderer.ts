@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:05:47
+* @Last Modified time: 2016-07-12 12:49:45
 */
 
 import { Injectable } 					from '@angular/core';
@@ -39,6 +39,18 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	private heightScale: d3.Linear<number, number>;
 
+	public static defs: any = {
+		FITLINES_CONTAINER: 'scorefunction-fitlines-container',
+		FITLINE: 'scorefunction-fitline',
+
+		POINTS_CONTAINER: 'scorefunction-points-container',
+		POINT: 'scorefunction-point',
+
+		POINT_LABELS_CONTAINER: 'scorefunction-point-labels-container',
+		POINT_LABEL: 'scorefunction-point-label',
+
+	}
+
 	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
 		super(chartDataService, chartUndoRedoService);
 	}
@@ -51,16 +63,16 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		
 		// Create the continuous score function specific element containers
 		this.linesContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-fitline-container', true)
-			.attr('id', 'scorefunction-' + objective.getId() + '-fitline-container');
+			.classed(ContinuousScoreFunctionRenderer.defs.FITLINES_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objective.getId() + '-fitlines-container');
 
 		this.pointsContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-points-container', true)
+			.classed(ContinuousScoreFunctionRenderer.defs.POINTS_CONTAINER, true)
 			.attr('id','scorefunction-' + objective.getId() + '-points-container');
 
 		this.pointLabelContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-pointlabels-container', true)
-			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
+			.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objective.getId() + '-point-labels-container');
 
 
 		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, this.pointLabelContainer, objective, domainElements);
@@ -68,40 +80,40 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	createContinuousPlotElements(pointsContainer: d3.Selection<any>, linesContainer: d3.Selection<any>, labelsContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		pointsContainer.selectAll('.scorefunction-point')
+		pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
 			.data(domainElements)
 			.enter().append('circle')
-				.classed('scorefunction-point', true)
+				.classed(ContinuousScoreFunctionRenderer.defs.POINT, true)
 				.attr('id', (d: (string | number)) => {
 					return 'scorefunction-' + objective.getId() + '-' + d + '-point';
 				});
 
-		this.plottedPoints = pointsContainer.selectAll('.scorefunction-point');
+		this.plottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT);
 
-		labelsContainer.selectAll('.scorefunction-point-labels')
+		labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL)
 			.data(domainElements)
 			.enter().append('text')
-				.classed('scorefunction-point-labels', true)
+				.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABEL, true)
 				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objective.getId() + '-' + d + '-label';
+					return 'scorefunction-' + objective.getId() + '-' + d + 'point-label';
 				});
 
-		this.pointLabels = labelsContainer.selectAll('.scorefunction-point-labels');
+		this.pointLabels = labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL);
 
 		// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
 		// To do this, we simply remove the last domain element from the list before we create the lines.
 		domainElements.pop();
 
 		// Create a slope line for each new adjacent pair of elements in the Objective's domain. Note that this is all elements when the plot is first created.
-		linesContainer.selectAll('.scorefunction-fitline')
+		linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE)
 			.data(domainElements)
 			.enter().append('line')
-				.classed('scorefunction-fitline', true)
+				.classed(ContinuousScoreFunctionRenderer.defs.FITLINE, true)
 				.attr('id', (d: (string | number)) => {
 					return 'scorefunction-' + objective.getId() + '-' + d + '-fitline';
 				});
 
-		this.fitLines = linesContainer.selectAll('.scorefunction-fitline');
+		this.fitLines = linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE);
 	}
 
 	// This method overrides the rednerPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 

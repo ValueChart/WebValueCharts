@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 12:36:36
+* @Last Modified time: 2016-07-12 12:42:21
 */
 
 import { Injectable } 					from '@angular/core';
@@ -61,7 +61,7 @@ export abstract class ScoreFunctionRenderer {
 		PLOT_CONTAINER: 'scorefunction-plot-container',
 
 		DOMAIN_LABELS_CONTAINER: 'scorefunction-plot-domain-labels-container',
-		DOMAIN_LABELS: 'scorefunction-domain-labels',
+		DOMAIN_LABEL: 'scorefunction-domain-labels',
 
 		PLOT_ELEMENTS_CONTAINER: 'scorefunction-plot-elements-container',
 
@@ -139,15 +139,15 @@ export abstract class ScoreFunctionRenderer {
 		var objectiveId = objective.getId();
 
 		// Create one label for each element of the PrimitiveObjective's domain.
-		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABELS)
+		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
 			.data(domainElements)
 			.enter().append('text')
-				.classed(ScoreFunctionRenderer.defs.DOMAIN_LABELS, true)
+				.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
 				.attr('id', (d: (string | number)) => {
 					return 'scorefunction-' + objectiveId + '-' + d + '-label';
 				});
 
-		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABELS);
+		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL);
 	}
 
 	// This function renders the elements created by createScoreFunction

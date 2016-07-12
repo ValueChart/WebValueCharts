@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:06:03
+* @Last Modified time: 2016-07-12 12:45:21
 */
 
 import { Injectable } 					from '@angular/core';
@@ -38,6 +38,15 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	private heightScale: d3.Linear<number, number>;
 	private domainElements: any;
 
+	public static defs: any = {
+		BARS_CONTAINER: 'scorefunction-bars-container',
+		BAR: 'scorefunction-bar',
+		BAR_TOP: 'scorefunction-bartop', 
+
+		POINT_LABELS_CONTAINER: 'scorefunction-point-labels-container',
+		POINT_LABEL: 'scorefunction-point-label',
+	}
+
 	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
 		super(chartDataService, chartUndoRedoService);
 	}
@@ -52,11 +61,11 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
 		this.barContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-bars-container', true)
+			.classed(DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-bars-container');
 
 		this.barLabelContainer = plotElementsContainer.append('g')
-			.classed('scorefunction-pointlabels-container', true)
+			.classed(DiscreteScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
 
 		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective, domainElements);
@@ -64,36 +73,36 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	createDiscretePlotElements(barContainer: d3.Selection<any>, labelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barContainer.selectAll('.scorefunction-bar')
+		barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
 			.data(domainElements)
 			.enter().append('rect')
-			.classed('scorefunction-bar', true)
-			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objective.getId() + '-' + d + '-bar';
-			});
+				.classed(DiscreteScoreFunctionRenderer.defs.BAR, true)
+				.attr('id', (d: (string | number)) => {
+					return 'scorefunction-' + objective.getId() + '-' + d + '-bar';
+				});
 
-		this.utilityBars = barContainer.selectAll('.scorefunction-bar');
+		this.utilityBars = barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR);
 
-		labelContainer.selectAll('.scorefunction-point-labels')
+		labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.POINT_LABEL)
 			.data(domainElements)
 			.enter().append('text')
-			.classed('scorefunction-point-labels', true)
-			.attr('id', (d: (string | number)) => {
-				return 'scorefunction-' + objective.getId() + '-' + d + '-label';
-			});
+				.classed(DiscreteScoreFunctionRenderer.defs.POINT_LABEL, true)
+				.attr('id', (d: (string | number)) => {
+					return 'scorefunction-' + objective.getId() + '-' + d + '-label';
+				});
 
-		this.barLabels = labelContainer.selectAll('.scorefunction-point-labels');
+		this.barLabels = labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.POINT_LABEL);
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barContainer.selectAll('.scorefunction-bartop')
+		barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
 			.data(domainElements)
 			.enter().append('rect')
-				.classed('scorefunction-bartop', true)
+				.classed(DiscreteScoreFunctionRenderer.defs.BAR_TOP, true)
 				.attr('id', (d: (string | number)) => {
 					return 'scorefunction-' + objective.getId() + '-' + d + '-bartop';
 				});
 
-		this.barTops = barContainer.selectAll('.scorefunction-bartop');
+		this.barTops = barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
 
 	}
 
