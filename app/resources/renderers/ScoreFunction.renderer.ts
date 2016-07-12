@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:08:58
+* @Last Modified time: 2016-07-12 12:36:36
 */
 
 import { Injectable } 					from '@angular/core';
@@ -13,7 +13,6 @@ import * as d3 							from 'd3';
 // Application Classes
 import { ChartDataService }				from '../services/ChartData.service';
 import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
-
 
 // Model Classes
 import { Objective }					from '../model/Objective';
@@ -55,8 +54,27 @@ export abstract class ScoreFunctionRenderer {
 
 	protected objective: PrimitiveObjective;
 
+	public static defs: any = {
+		OUTLINE_CONTAINER: 'scorefunction-outline-container',
+		PLOT_OUTLINE: 'scorefunction-plot-outline',
 
-	constructor(protected chartDataService: ChartDataService, protected chartUndoRedoService: ChartUndoRedoService) { }
+		PLOT_CONTAINER: 'scorefunction-plot-container',
+
+		DOMAIN_LABELS_CONTAINER: 'scorefunction-plot-domain-labels-container',
+		DOMAIN_LABELS: 'scorefunction-domain-labels',
+
+		PLOT_ELEMENTS_CONTAINER: 'scorefunction-plot-elements-container',
+
+		AXES_CONTAINER: 'scorefunction-axes-container',
+		UTILITY_AXIS_CONTAINER: 'scorefunction-utility-axis',
+		DOMAIN_AXIS: 'scorefunction-domain-axis'
+
+	};
+
+
+	constructor(
+			protected chartDataService: ChartDataService, 
+			protected chartUndoRedoService: ChartUndoRedoService) { }
 
 	// This function creates the base containers and elements for a score function plot.s
 	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective): void {
@@ -68,16 +86,17 @@ export abstract class ScoreFunctionRenderer {
 
 		// Create the a container for the plot outlines, and the plot outlines itself.
 		this.plotOutline = el.append('g')
-			.classed('scorefunction-' + objectiveId + '-outline-container', true)
+			.classed(ScoreFunctionRenderer.defs.OUTLINE_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-outline-container')
 			.append('rect')
-				.classed('scorefunction-' + objectiveId + '-outline', true)
-				.style('fill', 'white')
-				.style('stroke-width', 1)
-				.style('stroke', 'grey');
+				.classed(ScoreFunctionRenderer.defs.PLOT_OUTLINE, true)
+				.attr('id', 'scorefunction-' + objectiveId + '-outline')
+				.classed('valuechart-outline', true);
 
 		// Create a container to hold all the elements of the plot.
 		this.plotContainer = el.append('g')
-			.classed('scorefunction-' + objectiveId + '-plot-container', true);
+			.classed(ScoreFunctionRenderer.defs.PLOT_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-plot-container');
 
 		this.createScoreFunctionAxis(this.plotContainer, objectiveId);
 
@@ -85,10 +104,12 @@ export abstract class ScoreFunctionRenderer {
 		var domainElements: (string | number)[] = this.chartDataService.getDomainElements(objective);
 
 		this.domainLabelContainer = this.plotContainer.append('g')								// Create a container to hold the domain axis labels.
-			.classed('scorefunction-' + objectiveId + '-domainlabels-container', true);
+			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABELS_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-domain-labels-container');
 
 		this.plotElementsContainer = this.plotContainer.append('g')								// create a container to hold all the elements of the plot, like points, lines, bars, etc.
-			.classed('scorefunction-' + objectiveId + '-plotelements-container', true);
+			.classed(ScoreFunctionRenderer.defs.PLOT_ELEMENTS_CONTAINER, true)
+			.classed('scorefunction-' + objectiveId + '-plot-elements-container', true);
 
 		this.createPlot(this.plotElementsContainer, this.domainLabelContainer, objective, domainElements);
 	}
@@ -98,26 +119,18 @@ export abstract class ScoreFunctionRenderer {
 	createScoreFunctionAxis(plotContainer: d3.Selection<any>, objectiveId: string): void {
 		
 		this.axisContainer = plotContainer.append('g')
-			.classed('scorefunction-' + objectiveId + '-axis-container', true);
+			.classed(ScoreFunctionRenderer.defs.AXES_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-axes-container');
 
 		this.axisContainer.append('line')
-			.classed('scorefunction-' + objectiveId + '-x-axis', true)
+			.classed(ScoreFunctionRenderer.defs.DOMAIN_AXIS, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-domain-axis')
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
 
-		this.axisContainer.append('line')
-			.classed('scorefunction-' + objectiveId + '-y-axis', true)
-			.style('stroke-width', 1)
-			.style('stroke', 'black');
-
-		this.utilityLabelContainer = plotContainer.append('g')
-			.classed('scorefunction-' + objectiveId + '-utilitylabel-container', true);
-
-		this.utilityLabelContainer.append('text')
-			.classed('scorefunction-' + objectiveId + '-0-label', true);
-
-		this.utilityLabelContainer.append('text')
-			.classed('scorefunction-' + objectiveId + '-1-label', true);
+		this.axisContainer.append('g')
+			.classed(ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container'); 
 	}
 
 	// This function creates the domain labels for the domain element axis. DiscreteScoreFunction and ContinuousScoreFunction extend this method in order
@@ -126,15 +139,15 @@ export abstract class ScoreFunctionRenderer {
 		var objectiveId = objective.getId();
 
 		// Create one label for each element of the PrimitiveObjective's domain.
-		domainLabelContainer.selectAll('.scorefunction-' + objectiveId + '-domain-labels')
+		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABELS)
 			.data(domainElements)
 			.enter().append('text')
-				.classed('scorefunction-' + objectiveId + '-domain-labels', true)
+				.classed(ScoreFunctionRenderer.defs.DOMAIN_LABELS, true)
 				.attr('id', (d: (string | number)) => {
 					return 'scorefunction-' + objectiveId + '-' + d + '-label';
 				});
 
-		this.domainLabels = domainLabelContainer.selectAll('.scorefunction-' + objectiveId + '-domain-labels');
+		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABELS);
 	}
 
 	// This function renders the elements created by createScoreFunction
@@ -190,33 +203,43 @@ export abstract class ScoreFunctionRenderer {
 	// This function renders the elements created by createScoreFunctionAxis
 	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, utilityLabelContainer: d3.Selection<any>, objectiveId: string, viewOrientation: string): void {
 
-		axisContainer.select('.scorefunction-' + objectiveId + '-x-axis')
+		axisContainer.select('.' + ScoreFunctionRenderer.defs.DOMAIN_AXIS)
 			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
 			.attr(this.coordinateTwo + '1', this.domainAxisCoordinateTwo)
 			.attr(this.coordinateOne + '2', this.domainAxisMaxCoordinateOne)
 			.attr(this.coordinateTwo + '2', this.domainAxisCoordinateTwo);
 
-		axisContainer.select('.scorefunction-' + objectiveId + '-y-axis')
-			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
-			.attr(this.coordinateTwo + '1', this.domainAxisCoordinateTwo)
-			.attr(this.coordinateOne + '2', this.utilityAxisCoordinateOne)
-			.attr(this.coordinateTwo + '2', this.utilityAxisMaxCoordinateTwo);
 
-		var utilityLabelCoordinateOne: number;
-		if (viewOrientation === 'vertical')
-			utilityLabelCoordinateOne = this.utilityAxisCoordinateOne - this.labelOffset;
-		else 
-			utilityLabelCoordinateOne = this.utilityAxisCoordinateOne;
+		// Delete the elements of the previous scale:
+		var elements: any = (<any> axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].remove();
+		}
 
-		utilityLabelContainer.select('.scorefunction-' + objectiveId + '-0-label')
-			.text('0')
-			.attr(this.coordinateOne, utilityLabelCoordinateOne)
-			.attr(this.coordinateTwo, (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo + (this.labelOffset / 2) : this.domainAxisCoordinateTwo);
+		// Create the new Scale:
+		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
+			.domain([0, 1])
 
-		utilityLabelContainer.select('.scorefunction-' + objectiveId + '-1-label')
-			.text('1')
-			.attr(this.coordinateOne, utilityLabelCoordinateOne)
-			.attr(this.coordinateTwo, (viewOrientation === 'vertical') ? this.utilityAxisMaxCoordinateTwo + this.labelOffset : this.utilityAxisMaxCoordinateTwo - (this.labelOffset));
+		var utilityScaleHeight: number = (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo - this.utilityAxisMaxCoordinateTwo) : (this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo);
+
+		var utilityAxis: any;
+
+		if (viewOrientation === 'vertical') {
+			uilityScale.range([utilityScaleHeight, 0]);
+			utilityAxis = d3.axisLeft(uilityScale);
+		} else {
+			uilityScale.range([0, utilityScaleHeight]);
+			utilityAxis = d3.axisTop(uilityScale);
+		}
+
+		utilityAxis.ticks(1);
+
+		axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER)
+			.attr('transform', () => { 
+				return 'translate(' + ((viewOrientation === 'vertical') ? ((this.utilityAxisCoordinateOne + 4) + ',' + (this.utilityAxisMaxCoordinateTwo - .5) +')') : ((this.domainAxisCoordinateTwo - .5) + ', ' + (this.utilityAxisCoordinateOne + 4) + ')'));
+			})
+			.call(utilityAxis)
+			.style('font-size', 8);
 	}
 
 	// This function renders the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
