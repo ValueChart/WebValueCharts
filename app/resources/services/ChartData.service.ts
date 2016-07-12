@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 14:19:21
+* @Last Modified time: 2016-07-12 13:40:19
 */
 
 import { Injectable } 										from '@angular/core';
@@ -28,7 +28,8 @@ import { ContinuousDomain }									from '../model/ContinuousDomain';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
 
-import {RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
+import { RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements }				from '../model/ChartDataTypes';
 	
 // This class serves two purposes:
 // 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
@@ -365,8 +366,9 @@ export class ChartDataService {
 		return dimensionOneSize / maxDepthOfChildren;
 	}
 
-	getDomainElements(objective: PrimitiveObjective): (string | number)[] {
-		var domainElements: (string | number)[];
+	getAllUsersDomainElements(objective: PrimitiveObjective): UserDomainElements[] {
+		var allUsersDomainElements: UserDomainElements[] = [];
+		var domainElements: (string | number)[] = [];
 
 		if (objective.getDomainType() === 'categorical') {
 			domainElements = (<CategoricalDomain> objective.getDomain()).getElements();
@@ -376,7 +378,17 @@ export class ChartDataService {
 			domainElements = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 		}
 
-		return domainElements;
+		this.users.forEach((user: User) => {
+			var userDomainElements: UserDomainElements = { user: user, elements: [] };
+
+			domainElements.forEach((domainElement: string | number) => {
+				userDomainElements.elements.push({ user: user, element: domainElement });
+			});
+
+			allUsersDomainElements.push(userDomainElements);
+		});
+
+		return allUsersDomainElements;
 	}
 
 

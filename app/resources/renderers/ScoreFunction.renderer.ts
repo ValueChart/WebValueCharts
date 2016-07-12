@@ -2,24 +2,26 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 12:42:21
+* @Last Modified time: 2016-07-12 14:22:46
 */
 
-import { Injectable } 					from '@angular/core';
+import { Injectable } 									from '@angular/core';
 
 // d3
-import * as d3 							from 'd3';
+import * as d3 											from 'd3';
 
 // Application Classes
-import { ChartDataService }				from '../services/ChartData.service';
-import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
+import { ChartDataService }								from '../services/ChartData.service';
+import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 
 // Model Classes
-import { Objective }					from '../model/Objective';
-import { PrimitiveObjective }			from '../model/PrimitiveObjective';
-import { ScoreFunction }				from '../model/ScoreFunction';
-import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
-import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
+import { Objective }									from '../model/Objective';
+import { PrimitiveObjective }							from '../model/PrimitiveObjective';
+import { ScoreFunction }								from '../model/ScoreFunction';
+import { ContinuousScoreFunction }						from '../model/ContinuousScoreFunction';
+import { DiscreteScoreFunction }						from '../model/DiscreteScoreFunction';
+
+import { DomainElement, UserDomainElements } 			from '../model/ChartDataTypes';
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
 // axis, labels, and base containers of a ScoreFunction.
@@ -37,6 +39,9 @@ export abstract class ScoreFunctionRenderer {
 	public plotElementsContainer: d3.Selection<any>;				// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
 	public axisContainer: d3.Selection<any>;						// The 'g' element that conntains the y and x axis.
 	public utilityLabelContainer: d3.Selection<any>;				// The 'g' element that contains the labels for utility axis.
+	public userContainers: d3.Selection<any>;
+
+
 
 	protected utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
 	protected domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
@@ -53,12 +58,16 @@ export abstract class ScoreFunctionRenderer {
 	protected dimensionTwoSize: number;
 
 	protected objective: PrimitiveObjective;
+	protected usersDomainElements: any;
+
 
 	public static defs: any = {
 		OUTLINE_CONTAINER: 'scorefunction-outline-container',
 		PLOT_OUTLINE: 'scorefunction-plot-outline',
 
 		PLOT_CONTAINER: 'scorefunction-plot-container',
+
+		USER_CONTAINER: 'scorefunction-user-container',
 
 		DOMAIN_LABELS_CONTAINER: 'scorefunction-plot-domain-labels-container',
 		DOMAIN_LABEL: 'scorefunction-domain-labels',
@@ -101,7 +110,8 @@ export abstract class ScoreFunctionRenderer {
 		this.createScoreFunctionAxis(this.plotContainer, objectiveId);
 
 		// TODO: should make this method a member of PrimitiveObjective?
-		var domainElements: (string | number)[] = this.chartDataService.getDomainElements(objective);
+		var usersDomainElements: UserDomainElements[] = this.chartDataService.getAllUsersDomainElements(objective);
+		this.usersDomainElements = usersDomainElements.slice();
 
 		this.domainLabelContainer = this.plotContainer.append('g')								// Create a container to hold the domain axis labels.
 			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABELS_CONTAINER, true)
@@ -111,7 +121,7 @@ export abstract class ScoreFunctionRenderer {
 			.classed(ScoreFunctionRenderer.defs.PLOT_ELEMENTS_CONTAINER, true)
 			.classed('scorefunction-' + objectiveId + '-plot-elements-container', true);
 
-		this.createPlot(this.plotElementsContainer, this.domainLabelContainer, objective, domainElements);
+		this.createPlot(this.plotElementsContainer, this.domainLabelContainer, objective, usersDomainElements);
 	}
 
 	// This function creates the axis of a score function plot, both x and y, and creates the utility axis labels.
@@ -135,27 +145,30 @@ export abstract class ScoreFunctionRenderer {
 
 	// This function creates the domain labels for the domain element axis. DiscreteScoreFunction and ContinuousScoreFunction extend this method in order
 	// to create the specific elements they need.
-	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, domainElements: (string | number)[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId = objective.getId();
+
+		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
+			.data(usersDomainElements)
+			.enter().append('g')
+				.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
+				.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.user.getUsername().replace(/\s+/g, '') + '-container'; });
 
 		// Create one label for each element of the PrimitiveObjective's domain.
 		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
-			.data(domainElements)
+			.data(usersDomainElements[0].elements)
 			.enter().append('text')
 				.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
-				.attr('id', (d: (string | number)) => {
-					return 'scorefunction-' + objectiveId + '-' + d + '-label';
+				.attr('id', (d: DomainElement) => {
+					return 'scorefunction-' + objectiveId + '-' + d.element + '-label';
 				});
 
 		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL);
 	}
 
 	// This function renders the elements created by createScoreFunction
-	renderScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, width: number, height: number, viewOrientation: string): void {
+	renderScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, width: number, height: number, viewOrientation: string): void {
 		var objectiveId: string = objective.getId();
-
-		var domainElements: (number | string)[] = this.chartDataService.getDomainElements(objective);
-		var domainSize: number = domainElements.length;
 
 		if (viewOrientation === 'vertical') {
 			this.dimensionOne = 'width';
@@ -197,7 +210,7 @@ export abstract class ScoreFunctionRenderer {
 
 		this.renderScoreFunctionAxis(this.axisContainer, this.utilityLabelContainer, objectiveId, viewOrientation);
 
-		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, scoreFunction, domainElements, viewOrientation);			
+		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);			
 	}
 
 	// This function renders the elements created by createScoreFunctionAxis
@@ -244,9 +257,9 @@ export abstract class ScoreFunctionRenderer {
 
 	// This function renders the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
 	// to render their specific elements.
-	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, scoreFunction: ScoreFunction, domainElements: (number | string)[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 
-		this.domainSize = domainElements.length;
+		this.domainSize = usersDomainElements[0].elements.length;
 
 		var labelCoordinateOneOffset: number;
 		var labelCoordinateTwo: number;
@@ -260,9 +273,9 @@ export abstract class ScoreFunctionRenderer {
 		}
 
 		domainLabels
-			.attr(this.coordinateOne, (d: (string | number), i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+			.attr(this.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 			.attr(this.coordinateTwo, labelCoordinateTwo)
-			.text((d: (string | number)) => { return d; })
+			.text((d: DomainElement) => { return d.element; })
 			.style('font-size', '9px');
 	}
 
@@ -272,6 +285,6 @@ export abstract class ScoreFunctionRenderer {
 
 	// Anonymous functions that are used often enough to be made class fields:
 
-	calculatePlotElementCoordinateOne = (d: (string | number), i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
+	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
 
 }

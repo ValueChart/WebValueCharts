@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:04:46
+* @Last Modified time: 2016-07-12 13:39:06
 */
 
 import { Injectable } 												from '@angular/core';
@@ -306,14 +306,12 @@ export class LabelRenderer {
 	}
 	// This function calls uses the ScoreFunctionRenderer to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {
-		var scoreFunctionMap: ScoreFunctionMap = this.chartDataService.currentUser.getScoreFunctionMap();
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
 		var el: d3.Selection<any>;
 		var datum: PrimitiveObjective;
 		var objectiveWeight: number;
-		var scoreFunction: ScoreFunction;
 		var dimensionOneTransform: number;
 		var dimensionTwoTransform: number;
 
@@ -327,7 +325,6 @@ export class LabelRenderer {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
 			objectiveWeight = this.chartDataService.maximumWeightMap.getObjectiveWeight(datum.getId());
-			scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(datum.getId());
 			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
 
@@ -342,7 +339,7 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(el, datum, scoreFunction, width, height, viewOrientation);
+			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(el, datum, width, height, viewOrientation);
 			this.scoreFunctionRenderers[datum.getId()].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
 
 			weightOffset += objectiveWeight;
