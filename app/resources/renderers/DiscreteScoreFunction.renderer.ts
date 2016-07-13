@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 14:10:12
+* @Last Modified time: 2016-07-13 15:53:43
 */
 
 import { Injectable } 									from '@angular/core';
@@ -109,6 +109,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// like bars for the bar chart that is used to represent element scores.
 	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
+		var labelCoordinateOneOffset: number;
+		if (viewOrientation === 'vertical') {
+			labelCoordinateOneOffset = this.labelOffset + 5;
+		} else {
+			labelCoordinateOneOffset = (1.5 * this.labelOffset) + 5;
+		}
+
+		domainLabels.attr(this.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 
 		this.renderDiscretePlot(plotElementsContainer, objective, viewOrientation);
 	}

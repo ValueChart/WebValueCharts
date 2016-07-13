@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 14:07:32
+* @Last Modified time: 2016-07-13 15:59:26
 */
 
 import { Injectable } 					from '@angular/core';
@@ -138,12 +138,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.heightScale = d3.scaleLinear()
 			.domain([0, 1])
-			.range([0, this.domainAxisCoordinateTwo - pointRadius]);
 
 		if (viewOrientation === 'vertical') {
-			this.heightScale.range([0, this.domainAxisCoordinateTwo - pointRadius]);
+			this.heightScale.range([0, (this.domainAxisCoordinateTwo) - this.utilityAxisMaxCoordinateTwo]);
 		} else {
-			this.heightScale.range([this.domainAxisCoordinateTwo, this.utilityAxisMaxCoordinateTwo - pointRadius]);
+			this.heightScale.range([this.domainAxisCoordinateTwo, this.utilityAxisMaxCoordinateTwo]);
 		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.

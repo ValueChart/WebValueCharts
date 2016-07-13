@@ -2,10 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 12:39:12
+* @Last Modified time: 2016-07-13 14:59:27
 */
 
 import { Injectable } 												from '@angular/core';
+import { ApplicationRef } 												from '@angular/core';
 
 // JQuery
 import * as $														from 'jquery';
@@ -40,7 +41,8 @@ export class ExpandScoreFunctionInteraction {
 
 	constructor(
 		private chartDataService: ChartDataService,
-		private chartUndoRedoService: ChartUndoRedoService) { }
+		private chartUndoRedoService: ChartUndoRedoService,
+		private applicationRef: ApplicationRef) { }
 
 	toggleExpandScoreFunction(enableExpanding: boolean) {
 		var ScoreFunctionPlots: JQuery = $('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE);
@@ -58,12 +60,12 @@ export class ExpandScoreFunctionInteraction {
 		// correctly unless the navigation to them is initiated by Angular.
 
 		// Pass relevant data to the pop-up by attaching it to the window object.
-		(<any> window).users = users;
+		console.log(users);
 		(<any> window).objectiveToPlot = objective;
 		(<any> window).chartDataService = this.chartDataService;
 		(<any> window).chartUndoRedoService = this.chartUndoRedoService;
 
-
+		(<any> window).applicationRef = this.applicationRef;
 
 		var popup: any = window.open(this.SCORE_FUNCTION_ROUTE,
 					'Expanded' + objective.getName() + 'ScoreFunction',

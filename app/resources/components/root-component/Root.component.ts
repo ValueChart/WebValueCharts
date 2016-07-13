@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 10:25:10
+* @Last Modified time: 2016-07-13 16:02:52
 */
 
 import { Component } 										from '@angular/core';
@@ -31,6 +31,6 @@ export class RootComponent implements OnInit {
 
 	constructor(private router: Router, private currentUserService: CurrentUserService) {}
 	
-	ngOnInit() {	}
+	ngOnInit() { }
 
 }

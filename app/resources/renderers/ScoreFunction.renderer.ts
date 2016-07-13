@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 14:22:46
+* @Last Modified time: 2016-07-13 15:45:52
 */
 
 import { Injectable } 									from '@angular/core';
@@ -48,7 +48,7 @@ export abstract class ScoreFunctionRenderer {
 	protected utilityAxisMaxCoordinateTwo: number;			// The y coordinate of the top of the y-axis
 	protected domainAxisMaxCoordinateOne: number;			// The x coordinate of the rightmost end of the x-axis.
 
-	protected labelOffset: number = 10;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
+	protected labelOffset: number = 15;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
 
 	protected dimensionOne: string;
 	protected dimensionTwo: string;
@@ -268,8 +268,8 @@ export abstract class ScoreFunctionRenderer {
 			labelCoordinateOneOffset = this.labelOffset;
 			labelCoordinateTwo = this.domainAxisCoordinateTwo + this.labelOffset - 2;
 		} else {
-			labelCoordinateOneOffset = (2 * this.labelOffset);
-			labelCoordinateTwo = this.domainAxisCoordinateTwo - (this.labelOffset * 2);
+			labelCoordinateOneOffset = (1.5 * this.labelOffset);
+			labelCoordinateTwo = this.domainAxisCoordinateTwo - (this.labelOffset);
 		}
 
 		domainLabels
