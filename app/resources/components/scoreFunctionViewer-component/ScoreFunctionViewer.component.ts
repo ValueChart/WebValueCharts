@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 15:27:51
+* @Last Modified time: 2016-07-13 16:41:49
 */
 
 import { Component }													from '@angular/core';
@@ -28,7 +28,7 @@ import { UserDomainElements, DomainElement }							from '../../model/ChartDataTy
 
 @Component({
 	selector: 'ScoreFunction',
-	templateUrl: '/app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
+	templateUrl: './app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
 	directives: []
 })
 export class ScoreFunctionViewerComponent implements OnInit, DoCheck {

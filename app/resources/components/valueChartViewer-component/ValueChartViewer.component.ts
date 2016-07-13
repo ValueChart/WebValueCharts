@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 10:26:09
+* @Last Modified time: 2016-07-13 16:41:39
 */
 
 import { Component }															from '@angular/core';
@@ -51,7 +51,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 @Component({
 	selector: 'create',
-	templateUrl: '/app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
+	templateUrl: './app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:

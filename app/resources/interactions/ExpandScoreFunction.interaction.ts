@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 14:59:27
+* @Last Modified time: 2016-07-13 16:44:00
 */
 
 import { Injectable } 												from '@angular/core';
@@ -60,7 +60,6 @@ export class ExpandScoreFunctionInteraction {
 		// correctly unless the navigation to them is initiated by Angular.
 
 		// Pass relevant data to the pop-up by attaching it to the window object.
-		console.log(users);
 		(<any> window).objectiveToPlot = objective;
 		(<any> window).chartDataService = this.chartDataService;
 		(<any> window).chartUndoRedoService = this.chartUndoRedoService;

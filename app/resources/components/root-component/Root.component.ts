@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:02:52
+* @Last Modified time: 2016-07-13 16:41:21
 */
 
 import { Component } 										from '@angular/core';
@@ -18,7 +18,7 @@ import { ExportValueChartComponent }						from '../exportValueChart-component/Ex
 
 @Component({
 	selector: 'root',
-	templateUrl: '/app/resources/components/root-component/Root.template.html',
+	templateUrl: './app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
