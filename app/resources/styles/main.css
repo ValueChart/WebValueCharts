@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 10:50:30
+* @Last Modified time: 2016-07-13 12:25:31
 */
 
 /* Global Styles */
@@ -48,8 +48,8 @@
     margin-bottom: 0px !important;
 }
 
-.navbar-form {
-    margin: 8px !important;
+.center-form {
+    padding: 8px !important;
 }
 
 /* Creation Page Styles */

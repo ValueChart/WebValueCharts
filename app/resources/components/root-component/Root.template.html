@@ -2,22 +2,22 @@
 	<div>
 		<navbar class="navbar navbar-default navbar-fixed-top">
 			<div class="container-fluid">
-				<div class="navbar-header">
+				<div class="navbar-header col-xs-2">
 					<a class="navbar-brand" [routerLink]="['/register']">ValueCharts</a>
 				</div>
-				<ul class="nav navbar-nav navbar-right">
-					<form class="form-inline navbar-form col-xs-12">
-						<div class="form-group navbar-group" *ngIf="currentUserService.getValueChart() && !currentUserService.getValueChart().isIndividual() && chartType === 'normal'">
+				<ul class="nav pull-right col-xs-10">
+					<form class="form-inline center-form pull-right">
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && !currentUserService.getValueChart().isIndividual() && chartType === 'normal'">
 							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName() + '-average']" (click)="chartType = 'average'" id="view-average-chart">
 								View Average Chart
 							</a>
 						</div>
-						<div class="form-group navbar-group" *ngIf="currentUserService.getValueChart() && chartType === 'average'">
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && chartType === 'average'">
 							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" (click)="chartType = 'normal'" id="view-normal-chart">
 								View Group Chart
 							</a>
 						</div>
-						<div class="form-group navbar-group">
+						<div class="form-group navbar-group col-xs-6">
 							<ExportValueChart></ExportValueChart>
 						</div>
 					</form>
