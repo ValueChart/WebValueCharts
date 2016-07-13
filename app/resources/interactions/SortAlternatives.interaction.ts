@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:37:53
+* @Last Modified time: 2016-07-12 17:11:11
 */
 
 import { Injectable } 												from '@angular/core';
@@ -99,24 +99,9 @@ export class SortAlternativesInteraction {
 		objectiveLabels.off('dblclick');
 		objectiveText.off('dblclick');
 
-		var sortByObjective = (eventObject: Event) => {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
-
-			var objective: Objective = (<any>eventObject.target).__data__.objective;
-			var objectivesToReorderBy: PrimitiveObjective[];
-			if (objective.objectiveType === 'abstract') {
-				objectivesToReorderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
-			} else {
-				objectivesToReorderBy = [<PrimitiveObjective> objective];
-			}
-			var cellIndices: number[] = this.chartDataService.generateCellOrderByObjectiveScore(this.chartDataService.getRowData(), objectivesToReorderBy)
-			this.chartDataService.reorderAllCells(cellIndices);
-			this.changeDetectionService.alternativeOrderChanged = true;
-		}
-
 		if (enableSorting) {
-			objectiveLabels.dblclick(sortByObjective);
-			objectiveText.dblclick(sortByObjective);
+			objectiveLabels.dblclick(this.sortByObjective);
+			objectiveText.dblclick(this.sortByObjective);
 		}
 	}
 
@@ -134,6 +119,21 @@ export class SortAlternativesInteraction {
 		
 		alternativeBoxes.call(dragToSort);
 	}
+
+	sortByObjective = (eventObject: Event) => {
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+
+			var objective: Objective = (<any>eventObject.target).__data__.objective;
+			var objectivesToReorderBy: PrimitiveObjective[];
+			if (objective.objectiveType === 'abstract') {
+				objectivesToReorderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
+			} else {
+				objectivesToReorderBy = [<PrimitiveObjective> objective];
+			}
+			var cellIndices: number[] = this.chartDataService.generateCellOrderByObjectiveScore(this.chartDataService.getRowData(), objectivesToReorderBy)
+			this.chartDataService.reorderAllCells(cellIndices);
+			this.changeDetectionService.alternativeOrderChanged = true;
+		}
 
 	startSortAlternatives = (d: Alternative, i: number) => {
 		this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);

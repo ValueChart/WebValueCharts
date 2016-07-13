@@ -11,7 +11,7 @@ import { ValueChart } 													from '../../model/ValueChart';
 
 @Component({
 	selector: 'createValueChart',
-	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
+	templateUrl: '/app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService]
 })
@@ -37,7 +37,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.valueChartDescription = "";
 		this.isGroupValueChart = false;
 
-		// Bind purpose to correponding URL parameter
+		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
     	
     	// Set initial step according to purpose

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 13:41:29
+* @Last Modified time: 2016-07-13 10:10:23
 */
 
 
@@ -28,6 +28,7 @@ import { ReorderObjectivesInteraction }											from '../interactions/ReorderO
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../interactions/SetColors.interaction';
+import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
 
 import { LabelDefinitions }														from '../services/LabelDefinitions.service';
 
@@ -84,6 +85,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private sortAlternativesInteraction: SortAlternativesInteraction,
 		private setColorsInteraction: SetColorsInteraction,
+		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction,
 
 		private labelDefinitions: LabelDefinitions) { 
 	}
@@ -128,6 +130,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.createLabelSpace(this.el, this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.chartDataService.getRowData());
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);

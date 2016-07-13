@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:18:36
+* @Last Modified time: 2016-07-13 10:50:30
 */
 
 /* Global Styles */
@@ -53,6 +53,28 @@
 }
 
 /* Creation Page Styles */
+
+a.upload {
+    display: block;
+}
+
+.file-upload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+.file-upload input.upload {
+    position: absolute;
+    top: -13px;
+    height: 45px;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
 
 .column-container {
     justify-content: space-around !important;

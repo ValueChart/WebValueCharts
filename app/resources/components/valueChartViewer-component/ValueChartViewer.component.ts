@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 14:27:20
+* @Last Modified time: 2016-07-13 10:26:09
 */
 
 import { Component }															from '@angular/core';
@@ -35,6 +35,8 @@ import { ReorderObjectivesInteraction }											from '../../interactions/Reord
 import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../../interactions/SetColors.interaction';
+import { ExpandScoreFunctionInteraction }										from '../../interactions/ExpandScoreFunction.interaction';
+
 
 import { SummaryChartDefinitions }												from '../../services/SummaryChartDefinitions.service';
 import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
@@ -49,7 +51,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 @Component({
 	selector: 'create',
-	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
+	templateUrl: '/app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:
@@ -67,6 +69,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ResizeWeightsInteraction,
 		SortAlternativesInteraction,
 		SetColorsInteraction,
+		ExpandScoreFunctionInteraction,
 
 	// Definitions:
 		SummaryChartDefinitions,
