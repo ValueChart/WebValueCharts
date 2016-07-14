@@ -2,12 +2,20 @@ import { Component }													from '@angular/core';
 import { OnInit }														from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
+import * as d3 from 'd3';
+//import * as jstree from 'jstree';
+
 // Application classes:
 import { CurrentUserService }											from '../../services/CurrentUser.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
+import { AbstractObjective }											from '../../model/AbstractObjective';
+import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
+import { CategoricalDomain }											from '../../model/CategoricalDomain';
+import { ContinuousDomain }												from '../../model/ContinuousDomain';
+import { Alternative }													from '../../model/Alternative';
 
 @Component({
 	selector: 'createValueChart',
@@ -19,11 +27,14 @@ export class CreateValueChartComponent implements OnInit {
 	purpose: string; // "newChart" or "newUser"
 	step: string;
 	sub: any;
-
-	// Bound ValueChart properties
+	treeData: string[];
 	valueChartName: string;
 	valueChartDescription: string;
 	isGroupValueChart: boolean;
+    valueChart: ValueChart;
+    alternatives: { [altID: string]: Alternative; };
+    isSelected: { [altID: string]: boolean; };
+    alternativesCount: number;
 	
 	constructor(
 		private router: Router,
@@ -36,8 +47,12 @@ export class CreateValueChartComponent implements OnInit {
 		this.valueChartName = "";
 		this.valueChartDescription = "";
 		this.isGroupValueChart = false;
+		this.treeData = ["item1","item2","item3"];
+		this.alternatives = {};
+		this.isSelected = {};
+		this.alternativesCount = 0;
 
-		// Bind purpose to correponding URL parameter
+		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
     	
     	// Set initial step according to purpose
@@ -49,8 +64,44 @@ export class CreateValueChartComponent implements OnInit {
     	}
 
     	// Create new ValueChart with a temporary name and description
-    	// TODO: Change model so that there is just one ValueCharts class
-    	this.currentUserService.setValueChart(new ValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription));
+    	this.valueChart = new ValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription);
+    	this.currentUserService.setValueChart(this.valueChart);
+  	
+    	// Temporary: create some Objectives
+    	let location = new PrimitiveObjective("location","");
+    	let internet = new PrimitiveObjective("internet","");
+    	let pool = new PrimitiveObjective("pool","");
+    	let amenities = new AbstractObjective("amenities","");
+    	let other = new AbstractObjective("other","");
+    	amenities.addSubObjective(internet);
+    	amenities.addSubObjective(pool);
+    	other.addSubObjective(location);
+
+    	let locdom = new CategoricalDomain(false);
+    	locdom.addElement("downtown");
+    	locdom.addElement("highway");
+    	let intdom = new CategoricalDomain(false);
+    	intdom.addElement("none");
+    	intdom.addElement("low");
+    	intdom.addElement("high");
+    	let pooldom = new CategoricalDomain(false);
+    	pooldom.addElement("no");
+    	pooldom.addElement("yes");
+
+    	location.setDomain(locdom);
+    	internet.setDomain(intdom);
+    	pool.setDomain(pooldom);
+
+    	let hotel1 = new Alternative("Hotel 1","");
+    	hotel1.setObjectiveValue("location","downtown");
+    	hotel1.setObjectiveValue("internet","high");
+    	hotel1.setObjectiveValue("pool","no");
+
+    	this.valueChart.setRootObjectives([amenities,other]);
+    	this.alternatives[this.alternativesCount] = hotel1;
+    	this.isSelected[this.alternativesCount] = true;
+    	this.alternativesCount = this.alternativesCount + 1;
+
   	}
 
 	back() {
@@ -59,8 +110,15 @@ export class CreateValueChartComponent implements OnInit {
 
 	next() {
 		if (this.step === this.creationStepsService.BASICS) {
-			this.currentUserService.getValueChart().setName(this.valueChartName);
-			this.currentUserService.getValueChart().setDescription(this.valueChartDescription);
+			this.valueChart.setName(this.valueChartName);
+			this.valueChart.setDescription(this.valueChartDescription);
+		}
+		else if (this.step == this.creationStepsService.ALTERNATIVES) {
+			let alternatives: Alternative[] = [];
+			for (let altID of this.altKeys()) {
+				alternatives.push((this.alternatives[altID]));
+			}
+			this.valueChart.setAlternatives(alternatives);
 		}
 		else if (this.step === this.creationStepsService.PRIORITIES) {
 			//this.router.navigate(['/view/ValueChart']);
@@ -91,8 +149,42 @@ export class CreateValueChartComponent implements OnInit {
 		return text;
 	}
 
+	altKeys() : Array<string> {
+    	return Object.keys(this.alternatives);
+  	}
+
+	addEmptyAlternative() {
+		this.alternatives[this.alternativesCount] = new Alternative("","");
+		this.isSelected[this.alternativesCount] = false;
+		this.alternativesCount = this.alternativesCount + 1;
+	}
+
+	deleteAlternatives() {
+		for (let key of this.altKeys()) {
+			if (this.isSelected[key]) {
+				delete this.alternatives[key];
+				delete this.isSelected[key];
+			}
+		}
+	}
+
+	allSelected() : boolean {
+		for (let key of this.altKeys()) {
+			if (!this.isSelected[key]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	toggleSelectAll() {
+		let allSelected = this.allSelected();
+		for (let key of this.altKeys()) {
+			this.isSelected[key] = !allSelected;
+		}
+	}
+
 	ngOnDestroy() {
 		this.sub.unsubscribe();
 	}
-
 }
