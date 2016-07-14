@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 14:40:00
+* @Last Modified time: 2016-07-13 11:20:28
 */
 
 import { provideRouter, RouterConfig } 		from '@angular/router';
@@ -13,12 +13,15 @@ import { CreateComponent }					from './resources/components/create-component/Cre
 import { CreateValueChartComponent }		from './resources/components/createValueChart-component/CreateValueChart.component';
 import { ValueChartViewerComponent }		from './resources/components/valueChartViewer-component/ValueChartViewer.component';
 
+import { ScoreFunctionViewerComponent }		from './resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.component';
+
 
 export const routes: RouterConfig = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'create', component: CreateComponent },
 	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent },
-	{ path: 'view/ValueChart', component: ValueChartViewerComponent },
+	{ path: 'view/:ValueChart', component: ValueChartViewerComponent },
+	{ path: 'expandScoreFunction', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register:
 	{ path: '', redirectTo: '/register', pathMatch: 'prefix'}
 ];

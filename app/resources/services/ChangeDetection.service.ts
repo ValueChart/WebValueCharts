@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:28:56
+* @Last Modified time: 2016-07-11 13:00:30
 */
 
 import { Injectable } 															from '@angular/core';
@@ -17,6 +17,8 @@ import { User }																	from '../model/User';
 export class ChangeDetectionService { 
 
 	// Public flags that can be set to notify the ValueChart directive about changes.
+	public previousValueChart: ValueChart;
+
 	public rowOrderChanged: boolean;
 	public alternativeOrderChanged: boolean;
 	public colorsHaveChanged: boolean;
@@ -25,7 +27,6 @@ export class ChangeDetectionService {
 	public previousInteractionConfig: any = {};
 
 	// Differs:
-	public valueChartDiffer: KeyValueDiffer;
 	public userDiffers: KeyValueDiffer[];
 	public weightMapDiffers: KeyValueDiffer[];
 	public scoreFunctionMapDiffers: KeyValueDiffer[];
@@ -36,8 +37,7 @@ export class ChangeDetectionService {
 	constructor(private objectDiffers: KeyValueDiffers) { }
 
 	initDiffers(valueChart: ValueChart): void {
-		this.valueChartDiffer = this.objectDiffers.find({}).create(null);
-
+		this.previousValueChart = valueChart;
 		var users = valueChart.getUsers();
 
 		this.userDiffers = [];
@@ -64,7 +64,6 @@ export class ChangeDetectionService {
 	}
 
 	initPreviousViewConfig(viewConfig: any): void {
-
 		this.previousViewConfig.displayScoreFunctions			= viewConfig.displayScoreFunctions;
 		this.previousViewConfig.displayDomainValues 				= viewConfig.displayDomainValues;
 		this.previousViewConfig.displayScales 					= viewConfig.displayScales;
@@ -73,6 +72,7 @@ export class ChangeDetectionService {
 	}
 
 	initPreviousInteractionConfig(interactionConfig: any) {
+		this.previousInteractionConfig.weightResizeType = interactionConfig.weightResizeType;
 		this.previousInteractionConfig.reorderObjectives = interactionConfig.reorderObjectives;
 		this.previousInteractionConfig.sortAlternatives = interactionConfig.sortAlternatives;
 		this.previousInteractionConfig.pumpWeights = interactionConfig.pumpWeights; 

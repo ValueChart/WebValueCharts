@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:25:39
+* @Last Modified time: 2016-07-13 16:41:12
 */
 
 import { Component }									from '@angular/core';
@@ -13,22 +13,34 @@ import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.s
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 
+// Sample Data:
+import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCharts';
+
+
 
 @Component({
 	selector: 'create',
-	templateUrl: 'app/resources/components/create-component/Create.template.html',
-	styleUrls: ['app/resources/components/create-component/Create.style.css'],
+	templateUrl: './app/resources/components/create-component/Create.template.html',
 	directives: [ROUTER_DIRECTIVES]
 })
 export class CreateComponent {
 
+	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Wastewater Management', type: 'Individual' }]
+
 	constructor(
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
-		private currentUserService: CurrentUserService) {	}
+		private currentUserService: CurrentUserService) {
+	}
+
+	selectDemoValueChart(demoChart: any): void {
+		this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
+		var parameters = this.currentUserService.getValueChart().getName();
+		this.router.navigate(['/view/', parameters]);
+	}
 
 	goToValueChart(event: Event): void {
-		this.uploadValueChart(event,['/view/ValueChart']);
+		this.uploadValueChart(event,['/view/']);
 	}
 
 	addUserToExistingChart(event: Event) {
@@ -44,7 +56,10 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				this.router.navigate(route);
+				var parameters = '';
+				if (route[0] === '/view/')
+					parameters = this.currentUserService.getValueChart().getName();
+				this.router.navigate([route[0], parameters]);
 			}
 		};
 		reader.readAsText(xmlFile);

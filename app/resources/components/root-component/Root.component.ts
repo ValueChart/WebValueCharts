@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 14:52:00
+* @Last Modified time: 2016-07-13 16:41:21
 */
 
 import { Component } 										from '@angular/core';
@@ -18,7 +18,7 @@ import { ExportValueChartComponent }						from '../exportValueChart-component/Ex
 
 @Component({
 	selector: 'root',
-	templateUrl: 'app/resources/components/root-component/Root.template.html',
+	templateUrl: './app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
@@ -27,8 +27,10 @@ import { ExportValueChartComponent }						from '../exportValueChart-component/Ex
 })
 export class RootComponent implements OnInit {
 
-	constructor(private router: Router) {}
+	chartType: string = 'normal';
+
+	constructor(private router: Router, private currentUserService: CurrentUserService) {}
 	
-	ngOnInit() {	}
+	ngOnInit() { }
 
 }

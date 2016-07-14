@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:28:36
+* @Last Modified time: 2016-07-13 10:10:23
 */
 
 
@@ -19,6 +19,7 @@ import { RenderConfigService }													from '../services/RenderConfig.servic
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
 
+
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
@@ -27,6 +28,10 @@ import { ReorderObjectivesInteraction }											from '../interactions/ReorderO
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../interactions/SetColors.interaction';
+import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
+
+import { LabelDefinitions }														from '../services/LabelDefinitions.service';
+
 
 // Model Classes
 import { ValueChart } 															from '../model/ValueChart';
@@ -68,6 +73,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private elementRef: ElementRef,
 		// Services:
 		private chartDataService: ChartDataService,
+		private chartUndoRedoService: ChartUndoRedoService,
 		private renderConfigService: RenderConfigService,
 		private changeDetectionService: ChangeDetectionService,
 		// Renderers:
@@ -78,7 +84,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private sortAlternativesInteraction: SortAlternativesInteraction,
-		private setColorsInteraction: SetColorsInteraction) { 
+		private setColorsInteraction: SetColorsInteraction,
+		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction,
+
+		private labelDefinitions: LabelDefinitions) { 
 	}
 	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
@@ -120,6 +129,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Render the ValueChart:
 		this.labelRenderer.createLabelSpace(this.el, this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.chartDataService.getRowData());
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
@@ -157,10 +168,21 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	detectValueChartChanges(): void {
 		// Check for changes to the ValueChart fields. This is NOT deep.
-		var valueChartChanges = this.changeDetectionService.valueChartDiffer.diff(this.valueChart);
-		if (valueChartChanges) {
+		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
+			this.chartUndoRedoService.clearRedo();
+			this.chartUndoRedoService.clearUndo();			
+
 			this.chartDataService.setValueChart(this.valueChart);
-			this.updateValueChartDisplay();
+			this.chartDataService.updateAllChartData(this.viewOrientation);
+			this.initChangeDetection()
+			// Configure the Render Service:
+			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
+			this.renderConfigService.configureViewOrientation(this.viewOrientation);
+
+			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.chartDataService.getRowData());
+			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.chartDataService.getRowData());
+
+			this.updateRowOrder()
 		}
 
 		// Check the User Models for Changes:
@@ -252,6 +274,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	detectInteractionConfigChanges(): void {
+		if (this.interactionConfig.weightResizeType !== this.changeDetectionService.previousInteractionConfig.weightResizeType) {
+			this.changeDetectionService.previousInteractionConfig.weightResizeType = this.interactionConfig.weightResizeType;
+
+			this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
+		}
+
 		if (this.interactionConfig.reorderObjectives !== this.changeDetectionService.previousInteractionConfig.reorderObjectives) {
 			this.changeDetectionService.previousInteractionConfig.reorderObjectives = this.interactionConfig.reorderObjectives;
 			// Toggle Dragging to sort objectives:
@@ -283,19 +311,20 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
-		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), 'rootcontainer', this.viewOrientation, this.chartDataService.primitiveObjectives);
+		this.labelRenderer.updateLabelSpace(this.chartDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.chartDataService.primitiveObjectives);
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
 	}
 
 	updateRowOrder(): void {
 		// Destroy the previous label area.
-		(<Element>d3.select('.label-root-container').node()).remove();
+		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
 		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.chartDataService.getLabelData(), this.chartDataService.primitiveObjectives);
 		this.labelRenderer.renderLabelSpace(this.chartDataService.getLabelData(), this.renderConfigService.viewOrientation, this.chartDataService.primitiveObjectives);
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.updateAlternativeOrder()
 	}
 
@@ -307,7 +336,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		
 		this.objectiveChartRenderer.updateObjectiveChart(this.chartDataService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.chartDataService.getRowData(), this.viewOrientation);
-
 	}
 
 	updateViewOrientation(): void {
@@ -379,6 +407,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	// Interactions:
+
+	@Input() set weightResizeType(value: any) {
+		this.interactionConfig.weightResizeType = <string> value;
+	}
 
 	@Input() set reorderObjectives(value: any) {
 		this.interactionConfig.reorderObjectives = <boolean> value;

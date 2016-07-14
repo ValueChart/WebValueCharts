@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 11:09:00
+* @Last Modified time: 2016-07-11 12:02:46
 */
 
 import { Injectable } 												from '@angular/core';
@@ -18,6 +18,8 @@ import { ChangeDetectionService}									from '../services/ChangeDetection.servi
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelRenderer }											from '../renderers/Label.renderer';
+
+import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
 // Model Classes
 import { Objective }												from '../model/Objective';
@@ -60,12 +62,13 @@ export class ReorderObjectivesInteraction {
 		private chartDataService: ChartDataService,
 		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private labelRenderer: LabelRenderer) { }
+		private labelRenderer: LabelRenderer,
+		private labelDefinitions: LabelDefinitions) { }
 
 
 	toggleObjectiveReordering(enableReordering: boolean): void {
-		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-outline');
-		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.label-subcontainer-text');
+		var labelOutlines: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
+		var labelTexts: d3.Selection<any> = this.labelRenderer.rootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
 
 		var dragToReorder: d3.Drag<LabelData> = d3.drag();
 
@@ -88,11 +91,11 @@ export class ReorderObjectivesInteraction {
 		this.reorderObjectiveMouseOffset = undefined;		// Offset of the mouse from the Coordinate Two position of the label that is to be dragged. 
 		this.totalCoordTwoChange = 0;						// The Coordinate Two distance that the label has been moved so far.
 
-		this.containerToReorder = d3.select('#label-' + d.objective.getName() + '-container');			// The container that holds the label we are reordering.
+		this.containerToReorder = d3.select('#label-' + d.objective.getId() + '-container');			// The container that holds the label we are reordering.
 		this.parentObjectiveName = (<Element>this.containerToReorder.node()).getAttribute('parent');	// The name of the parent objective for the label we are reordering.
 
 		// If the selected label is the root label, then it is not possible to reorder, and all further drag events for this selection should be ignored.
-		if (this.parentObjectiveName === 'rootcontainer') {
+		if (this.parentObjectiveName === this.labelDefinitions.ROOT_CONTAINER_NAME) {
 			this.ignoreReorder = true;
 			return;
 		}
@@ -107,7 +110,7 @@ export class ReorderObjectivesInteraction {
 		this.containerToReorder.style('opacity', 1);
 
 		// Just until the location of score functions is fixed.
-		this.labelRenderer.scoreFunctionContainer.selectAll('.label-scorefunction').style('opacity', 0.5);
+		this.labelRenderer.scoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 0.5);
 
 		var parentOutline: d3.Selection<any> = this.parentContainer.select('rect'); 		// Select the rect that outlines the parent label of the label we are reordering.
 		var currentOutline: d3.Selection<any> = this.containerToReorder.select('rect');		// Select the rect that outlines the label we are reordering.
@@ -220,7 +223,7 @@ export class ReorderObjectivesInteraction {
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.
-		var labelData: LabelData[] = d3.select('g[parent=rootcontainer]').data();
+		var labelData: LabelData[] = d3.select('g[parent=' + this.labelDefinitions.ROOT_CONTAINER_NAME + ']').data();
 
 		// Retrieve the objective ordering from the ordering of the label data.
 		var primitiveObjectives: PrimitiveObjective[] = this.getOrderedObjectives(labelData);
@@ -254,7 +257,7 @@ export class ReorderObjectivesInteraction {
 				this.adjustScoreFunctionPosition(container, deltaCoordinateTwo, subObjective);
 			});
 		} else {
-			var scoreFunction: d3.Selection<any> = this.labelRenderer.rootContainer.select('#label-' + objective.getName() + '-scorefunction');
+			var scoreFunction: d3.Selection<any> = this.labelRenderer.rootContainer.select('#label-' + objective.getId() + '-scorefunction');
 			let previousTransform: string = scoreFunction.attr('transform');
 			let scoreFunctionTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
 			scoreFunction.attr('transform', scoreFunctionTransform);

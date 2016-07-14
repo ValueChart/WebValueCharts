@@ -2,14 +2,30 @@
 	<div>
 		<navbar class="navbar navbar-default navbar-fixed-top">
 			<div class="container-fluid">
-				<div class="navbar-header">
+				<div class="navbar-header col-xs-2">
 					<a class="navbar-brand" [routerLink]="['/register']">ValueCharts</a>
 				</div>
-				<ul class="nav navbar-nav navbar-right">
-					<ExportValueChart></ExportValueChart>
+				<ul class="nav pull-right col-xs-10">
+					<form class="form-inline center-form pull-right">
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && !currentUserService.getValueChart().isIndividual() && chartType === 'normal' && router.url.indexOf('view/') !== -1">
+							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName() + '-average']" (click)="chartType = 'average'" id="view-average-chart">
+								View Average Chart
+							</a>
+						</div>
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && chartType === 'average' && router.url.indexOf('view/') !== -1">
+							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" (click)="chartType = 'normal'" id="view-normal-chart">
+								View Group Chart
+							</a>
+						</div>
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && router.url.indexOf('view/') !== -1">
+							<ExportValueChart></ExportValueChart>
+						</div>
+					</form>
 				</ul>
 			</div>
 		</navbar>
 		<div>
 			<router-outlet></router-outlet>
 		</div>
+	</div>
+</div>

@@ -3,30 +3,30 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="col-xs-4">
-				<div class="form-group">
+				<div class="form-group valuechart-toolbar-group">
 					<button class="btn btn-default" (click)="editObjectiveModel()">
 						Edit Objective Model
 					</button>
 				</div>
-				<div class="form-group">
+				<div class="form-group valuechart-toolbar-group">
 					<button class="btn btn-default" (click)="editPreferenceModel()">
 						Edit Preference Model
 					</button>
 				</div>
 			</div>
 			<div class="col-xs-8"> 
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canRedo()" (click)="redoChartChange()">
 						Redo
 					</button>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canUndo()" (click)="undoChartChange()">
 						Undo
 					</button>
 				</div>
-				<div class="form-group pull-right">
-					<div class="dropdown">	
+				<div class="form-group valuechart-toolbar-group pull-right">
+					<div class="dropdown" *ngIf="currentUserService.getValueChart().isIndividual()">	
 						<button class="btn btn-default dropdown-toggle" type="button" id="pump-dropdown" data-toggle="dropdown" 
 						aria-haspopup="true" aria-expanded="true" [class.active]="pumpWeights !== 'none'">
 							Pump
@@ -48,14 +48,12 @@
 						 </ul>
 					</div>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<div class="dropdown">
 						<button class="btn btn-default dropdown-toggle" [class.active]="sortAlternatives === 'objective' || sortAlternatives === 'manual'"
 							type="button" id="alternative-sort-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 							Sort Alternatives
 							<span class="caret"></span>
-
-							<!-- (click)="toggleSortAlternatives(!sortAlternatives)" -->
 						</button>
 						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="alternative-sort-dropdown">
 						    <li>
@@ -83,20 +81,20 @@
 						</ul>
 					</div>			
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.active]="reorderObjectives" (click)="toggleReorderObjectives(!reorderObjectives)">
 						Reorder Objectives
 					</button>
 				</div>
-				<div class="form-group pull-right">
+				<div class="form-group valuechart-toolbar-group pull-right">
 					<button class="btn btn-default" [class.active]="setObjectiveColors" (click)="toggleSetObjectiveColors(!setObjectiveColors)">
 						Set Objective Colors
 					</button>
 				</div>
 			</div>
 		</form>
-		<form class="form-inline col-xs-12 toolbar-row">
-			<div class="col-xs-offset-4 col-xs-8"> 
+		<form class="form-inline col-xs-8 col-xs-offset-4 toolbar-row">
+			<div class=""> 
 				<div class="form-group pull-right">
 					<div class="dropdown">	
 						<button class="btn btn-default dropdown-toggle" type="button" id="orientation-dropdown" data-toggle="dropdown" 
@@ -128,37 +126,60 @@
 							<span class="caret"></span>
 						</button>
 						  <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="displayOptions-dropdown">
-						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
+						    <li *ngIf="valueChart.isIndividual()">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
 						 	   		Utility Graphs
 						 	  		<span *ngIf="displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
 						 	   		Domain Values
 						 	  		<span *ngIf="displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
 						 	   		Utility Scale
 						 	  		<span *ngIf="displayScales" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
+						 	  	<a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
 						 	   		Total Scores
 						 	  		<span *ngIf="displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	  	</a>
 						    </li>
 						    <li>
-						 	   <a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
+						 	   	<a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
 						 	   		Score Labels
 						 	  		<span *ngIf="displayScoreFunctionValueLabels" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-						 	   </a>
+						 	   	</a>
 						    </li>
 						 </ul>
+					</div>
+				</div>
+				<div class="form-group pull-right" *ngIf="valueChart.isIndividual()">
+					<div class="dropdown">	
+						<button class="btn btn-default dropdown-toggle" type="button" id="weightResizeType-dropdown" data-toggle="dropdown" 
+						aria-haspopup="true" aria-expanded="true">
+							Weight Resize Strategy
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="weightResizeType-dropdown">
+						    <li [class.disabled]="weightResizeType === RESIZE_NEIGHBOR">
+						 	   <a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_NEIGHBOR)">
+						 	   		Adjacent Only
+						 	  		<span *ngIf="weightResizeType === RESIZE_NEIGHBOR" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+						 	   </a>
+						    </li>
+						    <li [class.disabled]="weightResizeType === RESIZE_SIBLINGS">
+						    	<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_SIBLINGS)">
+						    		All
+						    		<span *ngIf="weightResizeType === RESIZE_SIBLINGS" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+								</a>
+						    </li>
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -167,33 +188,54 @@
 	<div id="detail-box" class="detail-box"
 		[class.detail-box-horizontal]="orientation === 'horizontal'" 
 		[class.detail-box-vertical]="orientation === 'vertical'">
-		<div class="page-header">
-		  <h4>{{detailBoxHeader}}</h4>
-		</div>
+		<form class="form-inline col-xs-5" class="detail-toolbar">
+			<div class="form-group valuechart-toolbar-group pull-left">
+				<button class="btn btn-lg btn-default detail-box-tab" id="alternative-header-container" 
+					(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
+				  <h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
+				</button>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChart.isIndividual()">
+				<button class="btn btn-lg btn-default detail-box-tab" id="user-list-header-container" 
+					(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
+				  <h5 id="user-list-headers">User List</h5>
+				</button>
+			</div>
+		</form>
 		<div class="well well-lg" id="alternative-detail-box" 
-				[style.height.px]="$('.summary-outline')[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
-				[style.width.px]="$('.summary-outline')[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET"> 
-			<div *ngFor="let alternative of alternatives">
-				<div class="col-sm-12"> 
-					<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxHeader === 'Alternatives'">
-						{{alternative.getName()}}
-					</a>
-				</div>
-				<div *ngIf="detailBoxHeader === alternative.getName()">
-					<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
-						<div>
-							<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
-							<span class="col-xl-8 col-md-7">{{value}}</span>
+				[style.height.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
+				[style.width.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET"> 
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
+				<div *ngFor="let alternative of alternatives">
+					<div class="col-sm-12"> 
+						<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxAlternativeTab === 'Alternatives'">
+							{{alternative.getName()}}
+						</a>
+					</div>
+					<div *ngIf="detailBoxAlternativeTab === alternative.getName()">
+						<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
+							<div>
+								<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
+								<span class="col-xl-8 col-md-7">{{value}}</span>
+							</div>
+						</div>
+						<div> 
+							<span class="col-xl-4 col-md-5"><b>Description</b></span>
+							<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
 						</div>
 					</div>
-					<div> 
-						<span class="col-xl-4 col-md-5"><b>Description</b></span>
-						<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
-					</div>
+				</div>
+				<div *ngIf="detailBoxAlternativeTab !== 'Alternatives'">
+					<button class="btn btn-default" (click)="collapseAlternative()">Back</button>
 				</div>
 			</div>
-			<div>
-				<button class="btn btn-default" (click)="collapseAlternative()" *ngIf="detailBoxHeader !== 'Alternatives'">Back</button>
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
+			    <div *ngFor="let user of valueChart.getUsers(); let i = index ">
+			 	   <h5>
+			 	   		{{user.getUsername()}}
+			 	  		<span class="pull-right"><input type="color" value="{{renderConfigService.kellyColors[i]}}" (change)="setUserColor(user, $event.target.value)"></span>
+			 	   </h5>
+			    </div>
 			</div>
 		</div>
 	</div>
@@ -206,6 +248,7 @@
 			[displayScales]="displayScales" 
 			[displayTotalScores]="displayTotalScores"
 			[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
+			[weightResizeType]="weightResizeType"
 			[reorderObjectives]="reorderObjectives"
 			[sortAlternatives]="sortAlternatives"
 			[pumpWeights]="pumpWeights"

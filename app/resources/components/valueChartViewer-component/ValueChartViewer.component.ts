@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-30 14:44:10
+* @Last Modified time: 2016-07-13 16:41:39
 */
 
 import { Component }															from '@angular/core';
-import { OnInit }																from '@angular/core';
-import { Router }																from '@angular/router';
+import { OnInit, OnDestroy }													from '@angular/core';
+import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router';
 
 // JQuery
 import * as $																	from 'jquery';
@@ -35,8 +35,15 @@ import { ReorderObjectivesInteraction }											from '../../interactions/Reord
 import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../../interactions/SetColors.interaction';
+import { ExpandScoreFunctionInteraction }										from '../../interactions/ExpandScoreFunction.interaction';
+
+
+import { SummaryChartDefinitions }												from '../../services/SummaryChartDefinitions.service';
+import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
+import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
 
 // Model Classes
+import { User }																	from '../../model/User';
 import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
 import { PrimitiveObjective } 													from '../../model/PrimitiveObjective';
@@ -44,8 +51,8 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 @Component({
 	selector: 'create',
-	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
-	directives: [ValueChartDirective],
+	templateUrl: './app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
+	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:
 		ChartDataService,
@@ -61,12 +68,24 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ReorderObjectivesInteraction,
 		ResizeWeightsInteraction,
 		SortAlternativesInteraction,
-		SetColorsInteraction]
+		SetColorsInteraction,
+		ExpandScoreFunctionInteraction,
+
+	// Definitions:
+		SummaryChartDefinitions,
+		ObjectiveChartDefinitions,
+		LabelDefinitions]
 })
 export class ValueChartViewerComponent implements OnInit {
 
 	private PUMP_OFF: string = 'none';
 	private ALTERNATIVE_SORT_OFF: string = 'none';
+
+	private RESIZE_NEIGHBOR: string = 'neighbor';
+	private RESIZE_SIBLINGS: string = 'siblings';
+	private NO_RESIZING: string = 'none';
+
+	sub: any;
 
 	valueChart: ValueChart;
 	alternatives: Alternative[];
@@ -80,13 +99,14 @@ export class ValueChartViewerComponent implements OnInit {
 	displayScoreFunctionValueLabels: boolean;
 
 	// ValueChart Interactions Configuration:
+	weightResizeType: string;
 	reorderObjectives: boolean;
 	sortAlternatives: string;
 	pumpWeights: string;
 	setObjectiveColors: boolean;
 
 	// Detail Box 
-	detailBoxHeader: string;
+	detailBoxAlternativeTab: string;
 	alternativeObjectives: string[];
 	alternativeObjectiveValues: (string | number)[];
 
@@ -94,17 +114,44 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
 	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.3;
 
+	detailBoxCurrentTab: string;
+	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
+	DETAIL_BOX_USERS_TAB: string = 'users';
+
+	chartType: string;
+
+
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
 	
 	constructor(
 		private router: Router,
+		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
+		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private renderEventsService: RenderEventsService) { }
+		private changeDetectionService: ChangeDetectionService,
+		private renderEventsService: RenderEventsService,
+		private summaryChartDefinitions: SummaryChartDefinitions,
+		private objectiveChartDefinitions: ObjectiveChartDefinitions,
+		private labelDefinitions: LabelDefinitions) { }
 
 	ngOnInit() {
-		this.valueChart = this.currentUserService.getValueChart();
+
+		this.sub = this.route.params.subscribe(params => {
+		    let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
+		    this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+
+		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
+		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
+		     	this.chartType = 'average';
+		    } else {
+				this.valueChart = this.currentUserService.getValueChart();
+				this.chartType = 'normal';
+			}
+
+		});
+
 		this.$ = $;
 
 		// Redirect back to Create page if the ValueChart is not initialized.
@@ -119,19 +166,23 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.orientation = 'vertical';
 		this.displayScoreFunctions = true;
+
 		this.displayTotalScores = true;
 		this.displayScales = false;
 		this.displayDomainValues = false;
 		this.displayScoreFunctionValueLabels = false;
 
 		// Interactions
-
+		this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 		this.reorderObjectives = false;
 		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
 
-		this.detailBoxHeader = 'Alternatives';
+		// Detail Box
+
+		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
 
@@ -143,10 +194,22 @@ export class ValueChartViewerComponent implements OnInit {
 		this.renderEventsService.summaryChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
 
+	ngOnDestroy() {
+ 		this.sub.unsubscribe();
+
+ 		// Destroy the ValueChart
+ 		$('ValueChart').remove();
+	}
+
+	setUserColor(user: User, color: string): void {
+		user.color = color;
+		this.changeDetectionService.colorsHaveChanged = true;
+	}
+
 	resizeDetailBox(): void {
 		// When the window is resized, set the height of the detail box to be 50px less than the height of summary chart.
 		var alternativeDetailBox: any = $('#alternative-detail-box')[0];
-		var summaryOutline: any = $('.summary-outline')[0];
+		var summaryOutline: any = $('.' + this.summaryChartDefinitions.OUTLINE)[0];
 		if (summaryOutline) {
 			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
 			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
@@ -154,7 +217,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		if (this.orientation === 'horizontal') {
 			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.label-outline')[0];
+			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 			if (labelOutline) {
 				// Offset the detail box to the left if the ValueChart is in horizontal orientation.
 				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
@@ -163,10 +226,10 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	linkAlternativeLabelsToDetailBox = () => {
-		d3.selectAll('.objective-alternative-label')
+		d3.selectAll('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL)
 			.classed('alternative-link', true);
 
-		$('.objective-alternative-label').click((eventObject: Event) => {
+		$('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
 			var selection: d3.Selection<any> = d3.select(eventObject.target);
 			this.expandAlternative(selection.datum());
 		});
@@ -175,18 +238,18 @@ export class ValueChartViewerComponent implements OnInit {
 	// Detail Box:
 
 	expandAlternative(alternative: Alternative): void {
-		this.detailBoxHeader = alternative.getName();
+		this.detailBoxAlternativeTab = alternative.getName();
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			this.alternativeObjectives[index] = objective.getName();
-			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
+			this.alternativeObjectives[index] = objective.getId();
+			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getId());
 		});
 
 		this.resizeDetailBox();
 	}
 
 	collapseAlternative(): void {
-		this.detailBoxHeader = 'Alternatives';
+		this.detailBoxAlternativeTab = 'Alternatives';
 		this.resizeDetailBox();
 	}
 
@@ -203,12 +266,12 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// View Configuration Options:
 
-	setOrientation(viewOrientation: string): void{
+	setOrientation(viewOrientation: string): void {
 		this.orientation = viewOrientation;
 
 		if (this.orientation === 'horizontal') {
 			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.label-outline')[0];
+			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 
 			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
 		}
@@ -241,7 +304,15 @@ export class ValueChartViewerComponent implements OnInit {
 		// TODO: Implement Editing of Preference Model.
 	}
 
+
+
+
 	// Interaction Toggles
+
+	setWeightResizeType(resizeType: string): void {
+		this.weightResizeType = resizeType;
+	}
+
 
 	toggleReorderObjectives(newVal: boolean): void {
 		this.reorderObjectives = newVal;

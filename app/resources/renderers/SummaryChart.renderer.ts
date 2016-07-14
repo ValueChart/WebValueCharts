@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 12:53:39
+* @Last Modified time: 2016-07-11 17:20:58
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,6 +13,7 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ChartDataService }											from '../services/ChartData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 
 // Model Classes
 import { User }														from '../model/User';
@@ -31,13 +32,15 @@ import {RowData, CellData, UserScoreData}							from '../model/ChartDataTypes';
 @Injectable()
 export class SummaryChartRenderer {
 
+	private USER_SCORE_SPACING: number = 10;
+
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
-	public chart: d3.Selection<any>;					// The 'g' element that contains all the elements making up the summary chart.
-	public outline: d3.Selection<any>;					// The 'rect' element that outlines the summary chart.
-	public rowsContainer: d3.Selection<any>;			// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any>;						// The collection of all 'g' elements s.t. each element is a row container.
-	public cells: d3.Selection<any>;					// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: d3.Selection<any>;				// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public chart: d3.Selection<any>;						// The 'g' element that contains all the elements making up the summary chart.
+	public outline: d3.Selection<any>;						// The 'rect' element that outlines the summary chart.
+	public rowsContainer: d3.Selection<any>;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public rows: d3.Selection<any>;							// The collection of all 'g' elements s.t. each element is a row container.
+	public cells: d3.Selection<any>;						// The collection of all 'g' elements s.t. each element is a cell container.
+	public userScores: d3.Selection<any>;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	public scoreTotalsContainer: d3.Selection<any>;
 	public scoreTotalsSubContainers: d3.Selection<any>;
 	public scoreTotals: d3.Selection<any>;
@@ -45,36 +48,40 @@ export class SummaryChartRenderer {
 	public alternativeBoxesContainer: d3.Selection<any>;
 	public alternativeBoxes: d3.Selection<any>;
 
+	private summaryChartScale: any;
+
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService) { }
+		private chartDataService: ChartDataService,
+		private defs: SummaryChartDefinitions) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
 	createSummaryChart(el: d3.Selection<any>, rows: RowData[]): void {
+
 		// Create the base container for the chart.
 		this.chart = el.append('g')
-			.classed('summary-chart', true);
+			.classed(this.defs.CHART, true);
 
 		// Create the rectangle which acts as an outline for the chart.
 		this.outline = this.chart.append('g')
-			.classed('summary-outline-container', true)
+			.classed(this.defs.OUTLINE_CONTAINER, true)
 			.append('rect')
-			.classed('summary-outline', true)
+			.classed(this.defs.OUTLINE, true)
 			.classed('valuechart-outline', true)
 
 		// Create the container that holds all the row containers.
 		this.rowsContainer = this.chart.append('g')
-			.classed('summary-rows-container', true);
+			.classed(this.defs.ROWS_CONTAINER, true);
 
 		this.scoreTotalsContainer = this.chart.append('g')
-			.classed('summary-scoretotals-container', true);
+			.classed(this.defs.SCORE_TOTAL_CONTAINER, true);
 
 		this.utilityAxisContainer = this.chart.append('g')
-			.classed('summary-utilityaxis-container', true)
+			.classed(this.defs.UTILITY_AXIS_CONTAINER, true)
 			.classed('utility-axis', true);
 
 		this.alternativeBoxesContainer = this.chart.append('g')
-			.classed('summary-alternative-boxes-container', true);
+			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, rows);
 	}
@@ -83,38 +90,48 @@ export class SummaryChartRenderer {
 	// and the rows are stacked on each other in order to create a stacked bar chart. 
 	createSummaryChartRows(rowsContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, scoreTotalsContainer: d3.Selection<any>, rows: RowData[]): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
-		var newRows: d3.Selection<any> = rowsContainer.selectAll('.summary-row')
-			.data(rows)
-			.enter().append('g')
-				.classed('summary-row', true);
+		var updateRows = rowsContainer.selectAll('.' + this.defs.ROW)
+			.data(rows);
+
+		updateRows.exit().remove();
+		updateRows.enter().append('g')
+			.classed(this.defs.ROW, true);
+
+		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
 
 		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
+		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+			.data((rows[0].cells));
 
-		var subContainers = scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
-			.data((rows[0].cells))
-			.enter().append('g')
-				.classed('summary-scoretotal-subcontainer', true);
+		updateSubContainers.exit().remove();
+		updateSubContainers.enter().append('g')
+			.classed(this.defs.SCORE_TOTAL_SUBCONTAINER, true);
 
-		subContainers.selectAll('.summary-score-total')
-			.data((d: CellData) => { return d.userScores; })
-			.enter().append('text')
-				.classed('summary-score-total', true);
-
-		boxesContainer.selectAll('.summary-alternative-box')
-			.data(this.chartDataService.alternatives)
-			.enter().append('rect')
-				.classed('valuechart-dividing-line', true)
-				.classed('summary-alternative-box', true)
-				.classed('alternative-box', true);
+		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER);
 
 
-		// Save all the rows as a field of the class. This is done separately from creating the rows as newRows is the selection of newly created rows containers,
-		// NOT all row containers. A similar argument explains why the dividing lines are saved here as well.
-		this.rows = rowsContainer.selectAll('.summary-row');
-		this.alternativeBoxes = boxesContainer.selectAll('.summary-alternative-box');
-		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer');
-		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.summary-score-total');
+		var updateScoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL)
+			.data((d: CellData) => { return d.userScores; });
+
+		updateScoreTotals.exit().remove();
+		updateScoreTotals.enter().append('text')
+			.classed(this.defs.SCORE_TOTAL, true);
+
+		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL);
+
+
+		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+			.data(this.chartDataService.alternatives);
+
+		updateAlternativeBoxes.exit().remove();
+		updateAlternativeBoxes.enter().append('rect')
+			.classed(this.defs.ALTERNATIVE_BOX, true)
+			.classed(this.defs.CHART_ALTERNATIVE, true);
+
+		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+
+
 
 		this.createSummaryChartCells(this.rows);
 	}
@@ -122,41 +139,45 @@ export class SummaryChartRenderer {
 	// This function creates the cells that compose each row of the summary chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective)
 	createSummaryChartCells(stackedBarRows: d3.Selection<any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
-		stackedBarRows.selectAll('.summary-cell')
-			.data((d: RowData) => { return d.cells; })
-			.enter().append('g')
-				.classed('summary-cell', true)
-				.classed('cell', true);
+		var updateCells = stackedBarRows.selectAll('.' + this.defs.CELL)
+			.data((d: RowData) => { return d.cells; });
+
+		updateCells.exit().remove();
+		updateCells.enter().append('g')
+			.classed(this.defs.CELL, true)
+			.classed(this.defs.CHART_CELL, true);
 
 		// Save all the cells as a field of the class.
-		this.cells = stackedBarRows.selectAll('.summary-cell');
+		this.cells = stackedBarRows.selectAll('.' + this.defs.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		this.cells.selectAll('.summary-user-scores')
-			.data((d: CellData, i: number) => { return d.userScores; })
-			.enter().append('rect')
-				.classed('summary-user-scores', true);
+		var updateUserScores = this.cells.selectAll('.' + this.defs.USER_SCORE)
+			.data((d: CellData, i: number) => { return d.userScores; });
+
+		updateUserScores.exit().remove();
+		updateUserScores.enter().append('rect')
+			.classed(this.defs.USER_SCORE, true);
 
 		// Save all the user scores bars as a field of the class.
-		this.userScores = this.cells.selectAll('.summary-user-scores');
+		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
 	}
 
 	updateSummaryChart(rows: RowData[], viewOrientation: string): void {
 
 		var alternatives: Alternative[] = this.chartDataService.alternatives;
 
-		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.summary-cell')
+		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
 			
-		var userScoresToUpdate: d3.Selection<any> = cellsToUpdate.selectAll('.summary-user-scores')
+		var userScoresToUpdate: d3.Selection<any> = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
 			.data((d: CellData, i: number) => { return d.userScores; });
 
-		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.summary-alternative-box')
+		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
 			.data(alternatives);
 
-		var scoreTotalsToUpdate: d3.Selection<any> = this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
+		var scoreTotalsToUpdate: d3.Selection<any> = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; })
-			.selectAll('.summary-score-total')
+			.selectAll('.' + this.defs.SCORE_TOTAL)
 				.data((d: CellData) => { return d.userScores; });
 
 		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
@@ -165,6 +186,9 @@ export class SummaryChartRenderer {
 	// This function positions and gives widths + heights to the elements created by the createSummaryChart method.
 	renderSummaryChart(rows: RowData[], viewOrientation: string): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
+		this.summaryChartScale = d3.scaleLinear()
+			.range([0, this.renderConfigService.VALUECHART_HEIGHT]);
+
 		this.chart
 			.attr('transform', () => {
 				if (viewOrientation == 'vertical')
@@ -177,13 +201,13 @@ export class SummaryChartRenderer {
 			.attr(this.renderConfigService.dimensionOne, this.renderConfigService.dimensionOneSize)
 			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize);
 
-		this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
+		this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; })
-				.selectAll('.summary-score-total')
+				.selectAll('.' + this.defs.SCORE_TOTAL)
 				.data((d: CellData) => { return d.userScores; });
 
-		this.scoreTotals = this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
-			.selectAll('.summary-score-total');
+		this.scoreTotals = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+			.selectAll('.' + this.defs.SCORE_TOTAL);
 		
 		this.renderUtilityAxis(viewOrientation);
 
@@ -226,7 +250,7 @@ export class SummaryChartRenderer {
 			.attr('id', (d: Alternative) => { return 'summary-' + d.getName() + '-box'});
 
 
-		this.scoreTotalsContainer.selectAll('.summary-scoretotal-subcontainer')
+		this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.attr('transform', (d: CellData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
 			})
@@ -241,46 +265,53 @@ export class SummaryChartRenderer {
 
 	renderScoreTotalLabels(scoreTotals: d3.Selection<any>, viewOrientation: string): void {
 
-		var calculateTotalScore = (d: UserScoreData) => {
-			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-			var score = scoreFunction.getScore(d.value) * (this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName()));
-			return score + d.offset;
-		};
-
 		var verticalOffset: number = 15;
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: UserScoreData, i: number) => { return Math.round(100 * (calculateTotalScore(d)) / this.chartDataService.maximumWeightMap.getWeightTotal()); })
+			.text((d: UserScoreData, i: number) => { return Math.round(100 * (this.calculateTotalScore(d)) / d.user.getWeightMap().getWeightTotal()); })
 			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
 			})
 			.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
+				this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
+
 				return (viewOrientation === 'vertical') ?
-					this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(calculateTotalScore(d)) - verticalOffset
+					this.renderConfigService.dimensionTwoSize - this.summaryChartScale(this.calculateTotalScore(d)) - verticalOffset
 					:
-					(this.renderConfigService.dimensionTwoScale(calculateTotalScore(d)) + verticalOffset);
+					(this.summaryChartScale(this.calculateTotalScore(d)) + verticalOffset);
 			})
-			.attr(this.renderConfigService.coordinateTwo + '1', calculateTotalScore)
+			.attr(this.renderConfigService.coordinateTwo + '1', this.calculateTotalScore)
 			.style('font-size', 22)
-			.classed('best-score-label', false);
+			.classed(this.defs.BEST_SCORE, false);
 
-		var maxScore: number = 0;
-		var bestTotalScore: d3.Selection<any>;
 
-		this.chart.selectAll('.summary-score-total').nodes().forEach((element: Element) => {
+			this.highlightBestUserScores();
+	}
+
+	highlightBestUserScores() {
+		var maxUserScores: any = {};
+		this.chartDataService.users.forEach((user: User) => {
+			maxUserScores[user.getUsername()] = 0;
+		});
+
+		var bestTotalScoreSelections: any = {};
+		this.chart.selectAll('.' + this.defs.SCORE_TOTAL).nodes().forEach((element: Element) => {
 			if (element.nodeName === 'text') {
 				let selection: d3.Selection<any> = d3.select(element);
-				let score: number = calculateTotalScore(selection.datum());
-				if (score > maxScore) {
-					maxScore = score;
-					bestTotalScore = selection;
+				let userScore: UserScoreData = selection.datum();
+				let scoreValue: number = this.calculateTotalScore(userScore);
+				if (scoreValue > maxUserScores[userScore.user.getUsername()]) {
+					maxUserScores[userScore.user.getUsername()] = scoreValue;
+					bestTotalScoreSelections[userScore.user.getUsername()] = selection;
 				}
 			}
 		});
 
-		bestTotalScore.classed('best-score-label', true);
+		this.chartDataService.users.forEach((user: User) => {
+			bestTotalScoreSelections[user.getUsername()].classed(this.defs.BEST_SCORE, true);
+		});
 	}
 
 
@@ -295,21 +326,26 @@ export class SummaryChartRenderer {
 
 		// Position and give heights and widths to the user scores.
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => { return d.objective.getColor(); })
-			.attr(this.renderConfigService.dimensionOne, this.calculateUserScoreDimensionOne)
+			.style('fill', (d: UserScoreData, i: number) => { 
+				if (this.chartDataService.getValueChart().isIndividual())
+					return d.objective.getColor(); 
+				else 
+					return d.user.color;
+			})
+			.attr(this.renderConfigService.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
 			.attr(this.renderConfigService.dimensionTwo, this.calculateUserScoreDimensionTwo)
-			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i); })
+			.attr(this.renderConfigService.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); })
 			
 
 		userScores.attr(this.renderConfigService.coordinateTwo, (d: UserScoreData, i: number) => {
-				var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
-				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-
+				var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
+				var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
+				this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
 				if (viewOrientation == 'vertical')
 					// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
-					return (this.renderConfigService.dimensionTwoSize - this.renderConfigService.dimensionTwoScale(d.offset)) - this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
+					return (this.renderConfigService.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
 				else
-					return this.renderConfigService.dimensionTwoScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
+					return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 			});
 	}
 
@@ -337,9 +373,17 @@ export class SummaryChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		var objectiveWeight: number = this.chartDataService.maximumWeightMap.getObjectiveWeight(d.objective.getName());
-		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-		return this.renderConfigService.dimensionTwoScale(score * objectiveWeight);
+		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
+		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
+		this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
+
+		return this.summaryChartScale(score * userObjectiveWeight);
 	};
+
+	calculateTotalScore = (d: UserScoreData) => {
+			var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId());
+			var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getId()));
+			return score + d.offset;
+		};
 
 }

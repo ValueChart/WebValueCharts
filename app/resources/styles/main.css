@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 17:45:37
+* @Last Modified time: 2016-07-13 15:39:29
 */
 
 /* Global Styles */
@@ -44,7 +44,37 @@
 	position: relative;
 }
 
+.navbar-group {
+    margin-bottom: 0px !important;
+}
+
+.center-form {
+    padding: 8px !important;
+}
+
 /* Creation Page Styles */
+
+a.upload {
+    display: block;
+}
+
+.file-upload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+.file-upload input.upload {
+    position: absolute;
+    top: -13px;
+    height: 45px;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
 
 .column-container {
     justify-content: space-around !important;
@@ -65,6 +95,22 @@
     position: relative;
     top: 5rem;
 }
+
+.demo-table {
+    top: 15rem;
+}
+
+/* Score Function Viewer Styles */
+
+.score-function-viewer {
+    top: 10rem !important;
+}
+
+.score-function-title {
+    position: relative;
+    top: 5rem;
+}
+
 
 /* SVG */
 
@@ -112,6 +158,27 @@
     overflow-y: scroll;
 }
 
+.detail-toolbar {
+    left: 2px;
+    position: relative;
+}
+
+.detail-box-tab {
+    outline: none !important;
+}
+
+#alternative-header-container {
+    position: relative;
+    top: 5rem;
+    z-index: -10;
+}
+
+#user-list-header-container {
+    position: relative;
+    top: 5rem;
+    z-index: -10;
+}
+
 .toolbar-row {
     bottom: 3rem;
 }
@@ -119,6 +186,10 @@
 .alternative-link:hover {
     fill: #23527c !important;
     text-decoration: underline;
+}
+
+.users-list {
+    top: 16rem;
 }
 
 
@@ -130,13 +201,10 @@
     stroke-width: 1;   
 }
 
-.valuechart-dividing-line {
-    stroke: grey;
-    stroke-width: 1;   
-}
-
 .alternative-box {
     fill: rgba(255, 255, 255, 0);
+    stroke: grey;
+    stroke-width: 2;  
 }
 
 .valuechart-label-text {
@@ -164,9 +232,20 @@
     stroke-width: 1;
 }
 
+.objective-weight-outline {
+    fill: transparent;
+    stroke: red;
+    stroke-width: 3px;
+}
+
 
 
 /* Override bootstrap default styles*/
+
+input[type=color] {
+    background: none;
+    border: 0px;
+}
 
 body {
 	/*overflow: hidden;*/
@@ -182,7 +261,7 @@ input {
 
 }
 
-.form-group {
+.valuechart-toolbar-group {
 	margin-bottom: 4rem !important;
 }
 

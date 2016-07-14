@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 13:26:40
+* @Last Modified time: 2016-07-12 13:40:19
 */
 
 import { Injectable } 										from '@angular/core';
@@ -28,7 +28,8 @@ import { ContinuousDomain }									from '../model/ContinuousDomain';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
 
-import {RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
+import { RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements }				from '../model/ChartDataTypes';
 	
 // This class serves two purposes:
 // 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
@@ -126,7 +127,7 @@ export class ChartDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
 		} else if (objective.objectiveType === 'primitive') {
-			labelData =  { 'objective': objective, 'weight': this.maximumWeightMap.getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0};
+			labelData =  { 'objective': objective, 'weight': this.maximumWeightMap.getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
 		}
 
 		return labelData;
@@ -156,7 +157,7 @@ export class ChartDataService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = this.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getId());
 		}
 	}
 
@@ -216,7 +217,7 @@ export class ChartDataService {
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.maximumWeightMap.getObjectiveWeight(this.rowData[i].objective.getName());
+			weightOffset += this.maximumWeightMap.getObjectiveWeight(this.rowData[i].objective.getId());
 		}
 	}
 
@@ -248,8 +249,8 @@ export class ChartDataService {
 						previousWeightedScore = 0;
 					} else {
 						let previousUserScore = rowDataCopy[i-1].cells[j].userScores[k];
-						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
-						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * this.maximumWeightMap.getObjectiveWeight(previousUserScore.objective.getName());
+						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getId());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getId());
 						previousOffset = previousUserScore.offset;
 					}
 
@@ -263,11 +264,11 @@ export class ChartDataService {
 		var desiredIndices: any = {};
 
 		this.rowData.sort((a: RowData, b: RowData) => {
-			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
-			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
+			let aIndex = desiredIndices[a.objective.getId()] || primitiveObjectives.indexOf(a.objective);
+			let bIndex = desiredIndices[b.objective.getId()] || primitiveObjectives.indexOf(b.objective);
 
-			desiredIndices[a.objective.getName()] = aIndex;
-			desiredIndices[b.objective.getName()] = bIndex;
+			desiredIndices[a.objective.getId()] = aIndex;
+			desiredIndices[b.objective.getId()] = bIndex;
 
 			if (aIndex < bIndex)
 				return -1;
@@ -308,8 +309,8 @@ export class ChartDataService {
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = this.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
+				var scoreFunction = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
+				var weight: number = this.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getId());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
@@ -365,18 +366,29 @@ export class ChartDataService {
 		return dimensionOneSize / maxDepthOfChildren;
 	}
 
-	getDomainElements(objective: PrimitiveObjective): (string | number)[] {
-		var domainElements: (string | number)[];
+	getAllUsersDomainElements(objective: PrimitiveObjective): UserDomainElements[] {
+		var allUsersDomainElements: UserDomainElements[] = [];
+		var domainElements: (string | number)[] = [];
 
 		if (objective.getDomainType() === 'categorical') {
 			domainElements = (<CategoricalDomain> objective.getDomain()).getElements();
 		} else if (objective.getDomainType() === 'interval') {
 			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
 		} else {
-			domainElements = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+			domainElements = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 		}
 
-		return domainElements;
+		this.users.forEach((user: User) => {
+			var userDomainElements: UserDomainElements = { user: user, elements: [] };
+
+			domainElements.forEach((domainElement: string | number) => {
+				userDomainElements.elements.push({ user: user, element: domainElement });
+			});
+
+			allUsersDomainElements.push(userDomainElements);
+		});
+
+		return allUsersDomainElements;
 	}
 
 
@@ -396,36 +408,35 @@ export class ChartDataService {
 		return elements;
 	}
 
-	incrementAbstractObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
+	incrementObjectivesWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
 
-		var children: LabelData[] = labelDatum.subLabelData;
-		var childrenWeightTotal: number = 0;
-		var nonZeroChildren: number = 0;
+		var weightTotal: number = 0;
+		var nonZeroWeights: number = 0;
 
-		children.forEach((child:LabelData) => {
+		labelData.forEach((child:LabelData) => {
 			if (child.weight !== 0) {
-				childrenWeightTotal += child.weight;
-				nonZeroChildren++;
+				weightTotal += child.weight;
+				nonZeroWeights++;
 			}
 		});
 
-		if (nonZeroChildren && weightIncrement < 0) {
-			weightIncrement = weightIncrement / nonZeroChildren;
+		if (nonZeroWeights && weightIncrement < 0) {
+			weightIncrement = weightIncrement / nonZeroWeights;
 		} else {
-			weightIncrement = weightIncrement / children.length;
+			weightIncrement = weightIncrement / labelData.length;
 		}
 
-		children.forEach((child: LabelData) => {
-			let childMax: number = maxWeight;
-			if (childrenWeightTotal !== 0 && child.weight !== 0) {
-				childMax = maxWeight * (child.weight / childrenWeightTotal);
+		labelData.forEach((labelDatum: LabelData) => {
+			let labelDatumMax: number = maxWeight;
+			if (weightTotal !== 0 && labelDatum.weight !== 0) {
+				labelDatumMax = maxWeight * (labelDatum.weight / weightTotal);
 			}
 
-			if (child.subLabelData === undefined) {
-				var newWeight = Math.max(Math.min(child.weight + weightIncrement, childMax), 0);
-				weightMap.setObjectiveWeight(child.objective.getName(), newWeight);
+			if (labelDatum.subLabelData === undefined) {
+				var newWeight = Math.max(Math.min(labelDatum.weight + weightIncrement, labelDatumMax), 0);
+				weightMap.setObjectiveWeight(labelDatum.objective.getId(), newWeight);
 			} else {
-				this.incrementAbstractObjectiveWeight(child, weightMap, weightIncrement, childMax);
+				this.incrementObjectivesWeights(labelDatum.subLabelData, weightMap, weightIncrement, labelDatumMax);
 			}
 		});
 	}
