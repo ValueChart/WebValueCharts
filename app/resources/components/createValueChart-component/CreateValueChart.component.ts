@@ -65,7 +65,6 @@ export class CreateValueChartComponent implements OnInit {
 
     	// Create new ValueChart with a temporary name and description
     	this.valueChart = new ValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription);
-    	this.currentUserService.setValueChart(this.valueChart);
   	
     	// Temporary: create some Objectives
     	let location = new PrimitiveObjective("location","");
@@ -121,7 +120,9 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChart.setAlternatives(alternatives);
 		}
 		else if (this.step === this.creationStepsService.PRIORITIES) {
+			this.currentUserService.setValueChart(this.valueChart);
 			//this.router.navigate(['/view/ValueChart']);
+
 		}
 		this.step = this.creationStepsService.next(this.step);
 	}
