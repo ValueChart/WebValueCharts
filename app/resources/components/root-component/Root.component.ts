@@ -2,19 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:41:21
+* @Last Modified time: 2016-07-18 15:34:00
 */
 
-import { Component } 										from '@angular/core';
-import { OnInit } 											from '@angular/core';
-import { Router, ROUTER_DIRECTIVES }						from '@angular/router';
-import { TemplateRef, ViewContainerRef, ElementRef }		from '@angular/core';
+import { Component } 												from '@angular/core';
+import { OnInit } 													from '@angular/core';
+import { Router, ROUTER_DIRECTIVES }								from '@angular/router';
+import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
+import { ApplicationRef } 											from '@angular/core';
+
 
 // Application classes
-import { XMLValueChartParser } 								from '../../services/XMLValueChartParser.service';
-import { CurrentUserService }								from '../../services/CurrentUser.service';
+import { XMLValueChartParser } 										from '../../services/XMLValueChartParser.service';
+import { CurrentUserService }										from '../../services/CurrentUser.service';
 
-import { ExportValueChartComponent }						from '../exportValueChart-component/ExportValueChart.component';
+import { ExportValueChartComponent }								from '../exportValueChart-component/ExportValueChart.component';
 
 @Component({
 	selector: 'root',
@@ -29,8 +31,10 @@ export class RootComponent implements OnInit {
 
 	chartType: string = 'normal';
 
-	constructor(private router: Router, private currentUserService: CurrentUserService) {}
+	constructor(private router: Router, private currentUserService: CurrentUserService, private applicationRef: ApplicationRef) {}
 	
-	ngOnInit() { }
+	ngOnInit() { 
+		(<any> window).angularAppRef = this.applicationRef;
+	}
 
 }

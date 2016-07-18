@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 15:59:26
+* @Last Modified time: 2016-07-18 15:49:34
 */
 
 import { Injectable } 					from '@angular/core';
@@ -155,10 +155,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr('c' + this.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
-			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
-			.style('cursor', () => {
-				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
-			});
+			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
 
 		this.pointLabels
 			.text((d: any, i: number) => { 
@@ -180,35 +177,47 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]); 
 			});
 
+		this.toggleDragToChangeScore(this.chartDataService.getValueChart().isIndividual(), objective, viewOrientation);
+	}
 
+	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {
 		var dragToResizeScores = d3.drag();
 
-		this.plottedPoints.call(dragToResizeScores.on('start', (d: DomainElement, i: number) => {
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			// Save the current state of the ScoreFunction.
-			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
-		}));
+		if (enableDragging) {
+			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				// Save the current state of the ScoreFunction.
+				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
+			});
 
-		// Assign the callback function for when the points are dragged. Note that this must be done inside a anonymous function because we require
-		// access to the scope defined by the renderContinuousPlot method.
-		this.plottedPoints.call(dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			var score: number;
-			// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-			if (viewOrientation === 'vertical') {
-				// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-				score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+			dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				var score: number;
+				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
+				if (viewOrientation === 'vertical') {
+					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
+					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+				} else {
+					// No need to do anything with offsets here because x is already left to right.
+					score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+				}
+				score = Math.max(0, Math.min(score, 1)); // Normalize the score to be between 0 and 1.
+
+				// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
+				// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
+				this.ngZone.run(() => { scoreFunction.setElementScore(<number> d.element, score) });
+			});
+		}
+
+		this.plottedPoints.call(dragToResizeScores);
+
+		this.plottedPoints.style('cursor', () => {
+			if (!enableDragging) {
+				return 'auto';
 			} else {
-				// No need to do anything with offsets here because x is already left to right.
-				score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			}
-			score = Math.max(0, Math.min(score, 1)); // Normalize the score to be between 0 and 1.
-
-			// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
-			// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
-			this.ngZone.run(() => { scoreFunction.setElementScore(<number> d.element, score) });
-
-		}));
+		});
 	}
 
 	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {

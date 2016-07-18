@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 15:53:43
+* @Last Modified time: 2016-07-18 15:49:39
 */
 
 import { Injectable } 									from '@angular/core';
@@ -174,41 +174,49 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
-			.style('fill', (d: DomainElement) => { return ((this.usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
-			.style('cursor', () => {
-				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
-			});
+			.style('fill', (d: DomainElement) => { return ((this.usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
 
+		this.toggleDragToChangeScore(this.chartDataService.getValueChart().isIndividual(), objective, viewOrientation);
+	}
+
+	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {
 		var dragToChangeScore = d3.drag();
 
-		// Save the old ScoreFunction 
-		this.barTops.call(dragToChangeScore.on('start', (d: DomainElement, i: number) => {
-			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			// Save the current state of the ScoreFunction.
-			this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
-		}));
+		if (enableDragging) {
+			dragToChangeScore.on('start', (d: DomainElement, i: number) => {
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				// Save the current state of the ScoreFunction.
+				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
+			});
 
-		
-		// Assign the callback function for when the bar tops are dragged. Note that this must be done inside a anonymous function because we require
-		// access to the scope defined by the renderDiscretePlot method.
-		this.barTops.call(dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
-			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			var score: number;
-			// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-			if (viewOrientation === 'vertical') {
-				// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-				score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+			dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				var score: number;
+				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
+				if (viewOrientation === 'vertical') {
+					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
+					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+				} else {
+					// No need to do anything with offsets here because x is already left to right.
+					score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+				}
+				score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
+
+				// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
+				// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
+				this.ngZone.run(() => { scoreFunction.setElementScore(<string> d.element, score) });
+			});
+		}
+
+		this.barTops.call(dragToChangeScore);
+
+		this.barTops.style('cursor', () => {
+			if (!enableDragging) {
+				return 'auto';
 			} else {
-				// No need to do anything with offsets here because x is already left to right.
-				score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			}
-			score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
-
-			// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
-			// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
-			this.ngZone.run(() => { scoreFunction.setElementScore(<string> d.element, score) });
-
-		}));
+		});
 	}
 
 	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {

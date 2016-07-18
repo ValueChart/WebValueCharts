@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:11:31
+* @Last Modified time: 2016-07-18 15:42:52
 */
 
 
@@ -127,7 +127,8 @@ export class ChartUndoRedoService {
 		this.redoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.undoStateRecords.pop();
 		(<any> this)[changeType](stateRecord, this.redoStateRecords);
-
+		if ((<any> window).childWindows.scoreFunctionViewer)
+			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
 	redo(): void {
@@ -138,6 +139,8 @@ export class ChartUndoRedoService {
 		this.undoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.redoStateRecords.pop();
 		(<any> this)[changeType](stateRecord, this.undoStateRecords);
+		if ((<any> window).childWindows.scoreFunctionViewer)
+			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
 	weightMapChange(weightMapRecord: WeightMap, stateRecords: Memento[]): void {

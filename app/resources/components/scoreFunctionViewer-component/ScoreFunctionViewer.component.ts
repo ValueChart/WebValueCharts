@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:41:49
+* @Last Modified time: 2016-07-18 15:34:25
 */
 
 import { Component }													from '@angular/core';
@@ -50,6 +50,7 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
 
 	ngOnInit() {
 
+
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
 
 		this.objectiveToDisplay = (<any> window.opener).objectiveToPlot;
@@ -59,6 +60,7 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
 		this.users = this.chartDataService.users
 
 		this.initChangeDetection();
+
 
 		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
 			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
@@ -108,7 +110,7 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
 			if (scoreFunctionChange) {
 				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
 				// Trigger change detection in the main application:
-				(<any> window.opener).applicationRef.tick();
+				(<any> window.opener).angularAppRef.tick();
 
 				this.previousScoreFunctions[index] = currentScoreFunction.getMemento();
 			}

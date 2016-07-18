@@ -2,11 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:53:53
+* @Last Modified time: 2016-07-18 15:41:52
 */
 
 import { Injectable } 												from '@angular/core';
-import { ApplicationRef } 												from '@angular/core';
 
 // JQuery
 import * as $														from 'jquery';
@@ -30,19 +29,17 @@ import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { UserDomainElements, DomainElement }						from '../model/ChartDataTypes';
 
 
-
-
-
 @Injectable()
 export class ExpandScoreFunctionInteraction {
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'expandScoreFunction';
 	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';
 
+	public popUpRef: any;
+
 	constructor(
 		private chartDataService: ChartDataService,
-		private chartUndoRedoService: ChartUndoRedoService,
-		private applicationRef: ApplicationRef) { }
+		private chartUndoRedoService: ChartUndoRedoService) { }
 
 	toggleExpandScoreFunction(enableExpanding: boolean) {
 		var ScoreFunctionPlots: JQuery = $('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE);
@@ -64,12 +61,12 @@ export class ExpandScoreFunctionInteraction {
 		(<any> window).chartDataService = this.chartDataService;
 		(<any> window).chartUndoRedoService = this.chartUndoRedoService;
 
-		(<any> window).applicationRef = this.applicationRef;
-
-		var popup: any = window.open(this.SCORE_FUNCTION_ROUTE,
+		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
 					'Expanded' + objective.getName() + 'ScoreFunction',
 					this.WINDOW_OPTIONS);
 
+		(<any> window).childWindows = (<any> window).childWindows || { };
+		(<any> window).childWindows.scoreFunctionViewer = this.popUpRef;
 
 	}
 
