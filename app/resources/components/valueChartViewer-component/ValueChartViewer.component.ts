@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:41:39
+* @Last Modified time: 2016-07-19 10:28:11
 */
 
 import { Component }															from '@angular/core';
@@ -165,7 +165,7 @@ export class ValueChartViewerComponent implements OnInit {
 		// View Configuration
 
 		this.orientation = 'vertical';
-		this.displayScoreFunctions = true;
+		this.displayScoreFunctions = this.valueChart.isIndividual();
 
 		this.displayTotalScores = true;
 		this.displayScales = false;

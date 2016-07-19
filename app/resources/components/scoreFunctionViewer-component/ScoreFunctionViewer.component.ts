@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:34:25
+* @Last Modified time: 2016-07-19 09:37:10
 */
 
 import { Component }													from '@angular/core';
@@ -31,7 +31,7 @@ import { UserDomainElements, DomainElement }							from '../../model/ChartDataTy
 	templateUrl: './app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
 	directives: []
 })
-export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
+export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy {
 
 	private scoreFunctionPlotContainer: d3.Selection<any>;
 
@@ -45,18 +45,23 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
 
 	private previousScoreFunctions: ScoreFunction[];
 
+	private opener: Window;
+
 
 	constructor(private ngZone: NgZone) { }
 
 	ngOnInit() {
-
-
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
 
-		this.objectiveToDisplay = (<any> window.opener).objectiveToPlot;
+		if (window) {
+			this.opener = window.opener;
 
-		this.chartDataService = (<any> window.opener).chartDataService;
-		this.chartUndoRedoService = (<any> window.opener).chartUndoRedoService;
+			this.objectiveToDisplay = (<any> window.opener).objectiveToPlot;
+			this.chartDataService = (<any> window.opener).chartDataService;
+			this.chartUndoRedoService = (<any> window.opener).chartUndoRedoService;
+		}
+
+
 		this.users = this.chartDataService.users
 
 		this.initChangeDetection();
@@ -110,10 +115,19 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck {
 			if (scoreFunctionChange) {
 				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
 				// Trigger change detection in the main application:
-				(<any> window.opener).angularAppRef.tick();
+				if (window) {
+					(<any> window.opener).angularAppRef.tick();
+				} else {
+					this.ngOnDestroy();	// Remove the reference to this window from the parent window, seeing as this window has been destroyed.
+				}
 
 				this.previousScoreFunctions[index] = currentScoreFunction.getMemento();
 			}
 		})
+	}
+
+	ngOnDestroy() {
+		// Remove the ScoreFunction viewer form the parent window's list of children.
+		(<any> this.opener).childWindows.scoreFunctionViewer = null;
 	}
 }

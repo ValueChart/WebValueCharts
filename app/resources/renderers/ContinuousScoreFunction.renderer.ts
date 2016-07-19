@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:49:34
+* @Last Modified time: 2016-07-19 10:32:05
 */
 
 import { Injectable } 					from '@angular/core';
@@ -134,7 +134,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	renderContinuousPlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
-		var pointRadius = this.labelOffset / 2;
+		var pointRadius = this.labelOffset / 2.5;
+		var pointOffset = 3;
 
 		this.heightScale = d3.scaleLinear()
 			.domain([0, 1])
@@ -152,24 +153,27 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		};
 
 		this.plottedPoints
-			.attr('c' + this.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr('c' + this.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
 			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
-			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
+			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
+			.style('fill-opacity', 0.5)
+			.style('stroke-width', 1)
+			.style('stroke', 'black');
 
 		this.pointLabels
 			.text((d: any, i: number) => { 
 				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100; 
 			})
-			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 2; })
+			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
 			.attr(this.coordinateTwo, calculatePointCoordinateTwo)
 			.style('font-size', 8);
 
 		this.fitLines
-			.attr(this.coordinateOne + '1', this.calculatePlotElementCoordinateOne)
+			.attr(this.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
 			.attr(this.coordinateTwo + '1', calculatePointCoordinateTwo)
-			.attr(this.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1); })
+			.attr(this.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
 			.attr(this.coordinateTwo + '2', (d: DomainElement, i: number) => { 
 				var userElements = usersDomainElements.find((userElements: UserDomainElements) => {
 					return userElements.user.getUsername() === d.user.getUsername();

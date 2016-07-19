@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:49:39
+* @Last Modified time: 2016-07-19 10:40:25
 */
 
 import { Injectable } 									from '@angular/core';
@@ -109,6 +109,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// like bars for the bar chart that is used to represent element scores.
 	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
+		
 		var labelCoordinateOneOffset: number;
 		if (viewOrientation === 'vertical') {
 			labelCoordinateOneOffset = this.labelOffset + 5;
@@ -117,12 +118,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 
 		domainLabels.attr(this.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
-
-		this.renderDiscretePlot(plotElementsContainer, objective, viewOrientation);
+		
+		this.renderDiscretePlot(plotElementsContainer, objective, usersDomainElements, viewOrientation);
 	}
 
-	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, viewOrientation: string): void {
-		var barWidth: number = (this.dimensionOneSize / this.domainSize) / 3;
+	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+		var barWidth: number = ((this.dimensionOneSize / this.domainSize) / usersDomainElements.length) / 2;
 
 		this.userContainers
 			.attr('transform', (d: UserDomainElements, i: number) => {
@@ -153,28 +154,28 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(this.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo;
 			})
-			.style('stroke', (d: DomainElement) => { return ((this.usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
+			.style('stroke', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
 
 		this.barLabels
 			.text((d: any, i: number) => { 
 				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				return Math.round(100 * scoreFunction.getScore(d.element)) / 100; 
 			})
-			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + barWidth + 2; })
+			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
 			.attr(this.coordinateTwo, (d: DomainElement) => {
-				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : calculateBarDimensionTwo(d) + 30;
+				return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			})
 			.style('font-size', 8);
 
 
 		this.barTops
-			.attr(this.dimensionTwo, this.labelOffset)
 			.attr(this.dimensionOne, barWidth)
+			.attr(this.dimensionTwo, this.labelOffset)
 			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(this.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
-			.style('fill', (d: DomainElement) => { return ((this.usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
+			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
 
 		this.toggleDragToChangeScore(this.chartDataService.getValueChart().isIndividual(), objective, viewOrientation);
 	}
