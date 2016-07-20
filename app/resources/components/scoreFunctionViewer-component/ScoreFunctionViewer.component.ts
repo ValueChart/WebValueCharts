@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 22:54:30
+* @Last Modified time: 2016-07-20 11:33:03
 */
 
 import { Component }													from '@angular/core';
@@ -17,9 +17,12 @@ import * as d3 															from 'd3';
 import { ScoreFunctionRenderer }										from '../../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../../renderers/ContinuousScoreFunction.renderer';
+import { ScoreDistributionChartRenderer }								from '../../renderers/ScoreDistributionChart.renderer';
+
 import { ValueChartService }											from '../../services/ValueChart.service';
 import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
+
 
 // Model Classes:
 import { ScoreFunction }												from '../../model/ScoreFunction';
@@ -43,8 +46,8 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 
 	private scoreFunctionPlotContainer: d3.Selection<any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
-	private distributionPlotContainer: d3.Selection<any>;
-	private distributionRenderer: any;
+	private scoreDistributionChartContainer: d3.Selection<any>;
+	private scoreDistributionChartRenderer: ScoreDistributionChartRenderer;
 
 	private users: User[];
 	private objectiveToDisplay: PrimitiveObjective;
@@ -62,7 +65,7 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 		this.sub = this.route.params.subscribe(params => this.viewType = params['viewType']);
 
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
-		this.distributionPlotContainer = d3.select('.score-distribution-plot');
+		this.scoreDistributionChartContainer = d3.select('.score-distribution-plot');
 
 		if (window) {
 			this.opener = window.opener;
@@ -109,16 +112,18 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 	}
 
 	initDistributionPlot(): void {
-
+		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.scoreFunctionViewerService);
+		this.scoreDistributionChartRenderer.createScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay);
+		this.scoreDistributionChartRenderer.renderScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, 300, 300, 'vertical');
 	}
 
 	configureDisplay(): void {
 		if (this.viewType === 'plot') {
 			this.scoreFunctionPlotContainer.attr('display', 'block');
-			this.distributionPlotContainer.attr('display', 'none');
+			this.scoreDistributionChartContainer.attr('display', 'none');
 		} else if (this.viewType == 'distribution') {
 			this.scoreFunctionPlotContainer.attr('display', 'none');
-			this.distributionPlotContainer.attr('display', 'block');
+			this.scoreDistributionChartContainer.attr('display', 'block');
 		}
 	}
 
