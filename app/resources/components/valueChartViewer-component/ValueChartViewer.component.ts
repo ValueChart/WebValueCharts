@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 19:06:44
+* @Last Modified time: 2016-07-20 16:38:04
 */
 
 import { Component }															from '@angular/core';
@@ -149,9 +149,12 @@ export class ValueChartViewerComponent implements OnInit {
 		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
 		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
 		     	this.chartType = 'average';
+		     	this.weightResizeType = this.RESIZE_NEIGHBOR;
+
 		    } else {
 				this.valueChart = this.currentUserService.getValueChart();
 				this.chartType = 'normal';
+				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 			}
 
 		});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 10:10:23
+* @Last Modified time: 2016-07-20 16:26:52
 */
 
 
@@ -176,8 +176,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.chartUndoRedoService.clearUndo();			
 
 			this.valueChartService.setValueChart(this.valueChart);
-			this.valueChartViewerService.updateAllValueChart(this.viewOrientation);
-			this.initChangeDetection()
+			this.valueChartViewerService.initialize();
+			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
+			this.initChangeDetection();
 			// Configure the Render Service:
 			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 			this.renderConfigService.configureViewOrientation(this.viewOrientation);
@@ -310,7 +311,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Methods for Handling Changes:
 
 	updateValueChartDisplay(): void {
-		this.valueChartViewerService.updateAllValueChart(this.viewOrientation);
+		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
