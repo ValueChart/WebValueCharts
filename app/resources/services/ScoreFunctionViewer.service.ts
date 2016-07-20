@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 11:35:02
+* @Last Modified time: 2016-07-20 14:10:35
 */
 
 import { Injectable } 															from '@angular/core';
@@ -77,7 +77,7 @@ export class ScoreFunctionViewerService {
 				firstQuartile: d3.quantile(userScores, 0.25),
 				median: d3.median(userScores),
 				thirdQuartile: d3.quantile(userScores, 0.75),
-				max: d3.min(userScores),
+				max: d3.max(userScores),
 		};
 
 		return elementScoresSummary;
