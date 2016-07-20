@@ -19,7 +19,7 @@ import { Alternative }													from '../../model/Alternative';
 
 @Component({
 	selector: 'createValueChart',
-	templateUrl: './app/resources/components/createValueChart-component/CreateValueChart.template.html',
+	templateUrl: '/app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService]
 })
@@ -186,6 +186,6 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	ngOnDestroy() {
-		this.sub.unsubscribe();
+		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 	}
 }

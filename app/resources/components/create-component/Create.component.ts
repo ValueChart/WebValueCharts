@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 16:41:12
+* @Last Modified time: 2016-07-19 19:06:19
 */
 
 import { Component }									from '@angular/core';
@@ -20,7 +20,7 @@ import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCh
 
 @Component({
 	selector: 'create',
-	templateUrl: './app/resources/components/create-component/Create.template.html',
+	templateUrl: '/app/resources/components/create-component/Create.template.html',
 	directives: [ROUTER_DIRECTIVES]
 })
 export class CreateComponent {

@@ -8,21 +8,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<!-- Defines the base URL for all relative URLs in the document.
 			 Needed for Angular Routing to work in HTML5 mode. -->
-		<base href=".">
+		<base href="http://localhost:3000">
 		<!-- Load Style Sheets -->
-		<link rel="stylesheet" href="./app/resources/styles/main.css">
-		<link rel="stylesheet" href="./app/vendors/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="/app/resources/styles/main.css">
+		<link rel="stylesheet" href="/app/vendors/bootstrap/dist/css/bootstrap.css">
 
 		<!--  Load JavaScript libraries -->
 		<!-- Polyfill(s) for browsers that do not meet ES6 -->
-		<script src="./node_modules/core-js/client/shim.min.js"></script>
-  		<script src="./node_modules/zone.js/dist/zone.js"></script>
-    	<script src="./node_modules/reflect-metadata/Reflect.js"></script>
-    	<script src="./node_modules/systemjs/dist/system.src.js"></script>
-		<script src="./app/vendors/jquery/dist/jquery.min.js"></script>
-		<script src="./app/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="/node_modules/core-js/client/shim.min.js"></script>
+  		<script src="/node_modules/zone.js/dist/zone.js"></script>
+    	<script src="/node_modules/reflect-metadata/Reflect.js"></script>
+    	<script src="/node_modules/systemjs/dist/system.src.js"></script>
+		<script src="/app/vendors/jquery/dist/jquery.min.js"></script>
+		<script src="/app/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
 		<!--  Configure SystemJS -->
-		<script src="./systemjs.config.js"></script>
+		<script src="/systemjs.config.js"></script>
 		<script>
 			System.import('app').catch(function(err){ console.error(err); });
 		</script>

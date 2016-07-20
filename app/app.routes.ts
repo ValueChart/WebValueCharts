@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 11:20:28
+* @Last Modified time: 2016-07-19 19:17:40
 */
 
 import { provideRouter, RouterConfig } 		from '@angular/router';
@@ -21,7 +21,7 @@ export const routes: RouterConfig = [
 	{ path: 'create', component: CreateComponent },
 	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent },
 	{ path: 'view/:ValueChart', component: ValueChartViewerComponent },
-	{ path: 'expandScoreFunction', component: ScoreFunctionViewerComponent },
+	{ path: 'scoreFunction/:viewType', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register:
 	{ path: '', redirectTo: '/register', pathMatch: 'prefix'}
 ];

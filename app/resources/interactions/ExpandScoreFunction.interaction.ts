@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:41:52
+* @Last Modified time: 2016-07-19 19:17:16
 */
 
 import { Injectable } 												from '@angular/core';
@@ -32,7 +32,7 @@ import { UserDomainElements, DomainElement }						from '../model/ChartDataTypes'
 @Injectable()
 export class ExpandScoreFunctionInteraction {
 
-	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'expandScoreFunction';
+	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';
 	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';
 
 	public popUpRef: any;

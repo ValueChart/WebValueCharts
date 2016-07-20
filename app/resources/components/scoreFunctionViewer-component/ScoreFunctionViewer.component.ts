@@ -2,12 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 09:37:10
+* @Last Modified time: 2016-07-19 19:52:51
 */
 
 import { Component }													from '@angular/core';
 import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
 import { NgZone }														from '@angular/core';
+import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // d3
 import * as d3 															from 'd3';
@@ -28,30 +29,38 @@ import { UserDomainElements, DomainElement }							from '../../model/ChartDataTy
 
 @Component({
 	selector: 'ScoreFunction',
-	templateUrl: './app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
+	templateUrl: '/app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
 	directives: []
 })
 export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy {
-
-	private scoreFunctionPlotContainer: d3.Selection<any>;
-
-	private users: User[];
-	private objectiveToDisplay: PrimitiveObjective;
+	private sub: any;
+	private opener: Window;
 
 	private chartDataService: ChartDataService;
 	private chartUndoRedoService: ChartUndoRedoService;
 
+	private scoreFunctionPlotContainer: d3.Selection<any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
+	private distributionPlotContainer: d3.Selection<any>;
+	private distributionRenderer: any;
 
+	private users: User[];
+	private objectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunctions: ScoreFunction[];
 
-	private opener: Window;
+	private viewType: string;
+	private previousViewType: string;
 
-
-	constructor(private ngZone: NgZone) { }
+	constructor(
+		private ngZone: NgZone, 
+		private router: Router,
+		private route: ActivatedRoute) { }
 
 	ngOnInit() {
+		this.sub = this.route.params.subscribe(params => this.viewType = params['viewType']);
+
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
+		this.distributionPlotContainer = d3.select('.score-distribution-plot');
 
 		if (window) {
 			this.opener = window.opener;
@@ -65,27 +74,48 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 		this.users = this.chartDataService.users
 
 		this.initChangeDetection();
+		this.initScoreFunctionPlot();
+		this.initDistributionPlot();
 
-
-		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
-		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
-
-		}
-
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
-		this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
-
+		this.configureDisplay();
 	}
 
 	initChangeDetection(): void {
+
+		this.previousViewType = this.viewType;
+
 		this.previousScoreFunctions = [];
 
 		this.users.forEach((user: User) => {
 			let currentScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
 			this.previousScoreFunctions.push(currentScoreFunction);
 		});
+	}
+
+	initScoreFunctionPlot(): void {
+
+		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+		} else {
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+		}
+
+		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
+		this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
+	}
+
+	initDistributionPlot(): void {
+
+	}
+
+	configureDisplay(): void {
+		if (this.viewType === 'plot') {
+			this.scoreFunctionPlotContainer.attr('display', 'block');
+			this.distributionPlotContainer.attr('display', 'none');
+		} else if (this.viewType == 'distribution') {
+			this.scoreFunctionPlotContainer.attr('display', 'none');
+			this.distributionPlotContainer.attr('display', 'block');
+		}
 	}
 
 	detectScoreFunctionChange(previousScoreFunction: ScoreFunction, currentScoreFunction: ScoreFunction): boolean {
@@ -105,8 +135,13 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 		return false;
 	}
 
-
 	ngDoCheck() {
+
+		if (this.viewType !== this.previousViewType) {
+			this.previousViewType = this.viewType;
+			this.configureDisplay();
+		}
+
 
 		this.users.forEach((user: User, index: number) => {
 			let currentScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
@@ -129,5 +164,6 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 	ngOnDestroy() {
 		// Remove the ScoreFunction viewer form the parent window's list of children.
 		(<any> this.opener).childWindows.scoreFunctionViewer = null;
+		this.sub.unsubscribe();											// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 	}
 }

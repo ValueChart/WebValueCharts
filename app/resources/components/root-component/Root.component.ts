@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:34:00
+* @Last Modified time: 2016-07-19 19:56:59
 */
 
 import { Component } 												from '@angular/core';
@@ -20,7 +20,7 @@ import { ExportValueChartComponent }								from '../exportValueChart-component/
 
 @Component({
 	selector: 'root',
-	templateUrl: './app/resources/components/root-component/Root.template.html',
+	templateUrl: '/app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
@@ -31,10 +31,34 @@ export class RootComponent implements OnInit {
 
 	chartType: string = 'normal';
 
+
+	private switchScoreFunctionViewText: string = 'Score Distributions';
+
 	constructor(private router: Router, private currentUserService: CurrentUserService, private applicationRef: ApplicationRef) {}
 	
 	ngOnInit() { 
 		(<any> window).angularAppRef = this.applicationRef;
+
+		if (this.router.url.indexOf('expandScoreFunction') === -1) {
+			this.router.navigate(['expandScoreFunction', 'plot']);		
+		}
+	}
+
+	isGroupChart(): boolean {																						
+		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
+				(window.opener && !(<any> window.opener).chartDataService.getValueChart().isIndividual()); 					// Check to see if this is a pop-up window
+	}
+
+	switchScoreFunctionView() {
+
+		if (this.router.url.indexOf('distribution') === -1) {
+			this.router.navigate(['scoreFunction', 'distribution']);		
+			this.switchScoreFunctionViewText = 'Plot';
+		} else {
+			this.router.navigate(['scoreFunction', 'plot']);	
+			this.switchScoreFunctionViewText = 'Score Distributions';
+		}
+
 	}
 
 }
