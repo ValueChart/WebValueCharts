@@ -2,26 +2,26 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 09:20:00
+* @Last Modified time: 2016-07-19 22:21:38
 */
 
-import { Injectable } 									from '@angular/core';
+import { Injectable } 												from '@angular/core';
 
 // d3
-import * as d3 											from 'd3';
+import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService }								from '../services/ChartData.service';
-import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
+import { ChartDataService }											from '../services/ChartData.service';
+import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 // Model Classes
-import { Objective }									from '../model/Objective';
-import { PrimitiveObjective }							from '../model/PrimitiveObjective';
-import { ScoreFunction }								from '../model/ScoreFunction';
-import { ContinuousScoreFunction }						from '../model/ContinuousScoreFunction';
-import { DiscreteScoreFunction }						from '../model/DiscreteScoreFunction';
+import { Objective }												from '../model/Objective';
+import { PrimitiveObjective }										from '../model/PrimitiveObjective';
+import { ScoreFunction }											from '../model/ScoreFunction';
+import { ContinuousScoreFunction }									from '../model/ContinuousScoreFunction';
+import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 
-import { DomainElement, UserDomainElements } 			from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements } 						from '../model/ChartDataTypes';
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
 // axis, labels, and base containers of a ScoreFunction.
@@ -30,6 +30,8 @@ import { DomainElement, UserDomainElements } 			from '../model/ChartDataTypes';
 export abstract class ScoreFunctionRenderer {
 
 	protected domainSize: number;					// The number of domain elements the score function needs to plot.
+
+	// d3 Selections saved as fields to avoid parsing the DOM when unnecessary. 
 
 	public rootContainer: d3.Selection<any>;						// The 'g' element that is the root container of the score function plot.
 	public plotOutline: d3.Selection<any>;						// The 'rect' element that is used to outline the score function plot
@@ -109,7 +111,6 @@ export abstract class ScoreFunctionRenderer {
 
 		this.createScoreFunctionAxis(this.plotContainer, objectiveId);
 
-		// TODO: should make this method a member of PrimitiveObjective?
 		var usersDomainElements: UserDomainElements[] = this.chartDataService.getAllUsersDomainElements(objective);
 		this.usersDomainElements = usersDomainElements.slice();
 
