@@ -12,7 +12,7 @@ import * as d3 												from 'd3';
 
 // Application Classes:
 import { AlternativeOrderRecord }							from '../model/Records';
-import { CurrentUserService }								from './CurrentUser.service';
+import { ValueChartService }								from './ValueChart.service';
 
 // Model Classes
 import { ValueChart }										from '../model/ValueChart';
@@ -22,85 +22,31 @@ import { AbstractObjective }								from '../model/AbstractObjective';
 import { User }												from '../model/User';	
 import { Alternative }										from '../model/Alternative';
 import { WeightMap }										from '../model/WeightMap';
-import { CategoricalDomain }								from '../model/CategoricalDomain';
-import { IntervalDomain }									from '../model/IntervalDomain';
-import { ContinuousDomain }									from '../model/ContinuousDomain';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
 
-import { RowData, CellData, UserScoreData, LabelData}		from '../model/ChartDataTypes';
-import { DomainElement, UserDomainElements }				from '../model/ChartDataTypes';
+import { RowData, CellData, UserScoreData, LabelData}		from '../types/ValueChartViewer.types.ts';
 	
-// This class serves two purposes:
-// 		1. It stores the state of a ValueChartDirective's ValueChart, and exposes this state to the renderer classes. Renderer classes are allowed to modify 
-//			this state as a way of initiating change detection in ValueChartDirective, thus trigging re-rendering. 
-//		2. It contains methods for converting a ValueChartDirective's ValueChart into a format suitable for d3, and for updating this data in response to user actions.
+// This class contains methods for converting a ValueChartDirective's ValueChart into a format suitable for d3, 
+// and for updating this data in response to user actions.
 
 @Injectable()
-export class ChartDataService {
+export class ValueChartViewerService {
 
-	private valueChart: ValueChart;
-	public primitiveObjectives: PrimitiveObjective[];
-
-	public users: User[];
-	public currentUser: User;
-	public numUsers: number;
-
-	// This is either: a - the current user's WeightMap if the ValueChart has one user; b - a WeightMap where each objective weight is the maximum weight assigned to the objective by a user.
-	public maximumWeightMap: WeightMap;
-
-	public alternatives: Alternative[];
-	public numAlternatives: number;
-
+	private originalAlternativeOrder: AlternativeOrderRecord;
 	private rowData: RowData[];
 	private labelData: LabelData[];
 
-	private originalAlternativeOrder: AlternativeOrderRecord;
+	constructor(private valueChartService: ValueChartService) { }
 
-	constructor(private currentUserService: CurrentUserService) { }
-
-	// Initialize Service fields based on the passed-in ValueChart.
-	setValueChart(valueChart: ValueChart): void {
-		this.valueChart = valueChart;
-
-		this.users = this.valueChart.getUsers();
-		this.currentUser = this.getCurrentUser();
-		this.numUsers = this.valueChart.getUsers().length;
-
-		this.updateMaximumWeightMap();
-
-		this.numAlternatives = this.valueChart.getAlternatives().length;
-		this.alternatives = this.valueChart.getAlternatives();
-		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
-
-		this.originalAlternativeOrder = new AlternativeOrderRecord(this.alternatives);
-
+	initialize() {
+		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.alternatives);
 		this.generateLabelData();
 		this.generateRowData();
 	}
 
-	getValueChart(): ValueChart {
-		return this.valueChart;
-	}
-
-	getCurrentUser(): User {
-		// Obviously we should have it so that two usernames are never the same.
-		var user: User = this.valueChart.getUsers().filter((user: User) => {
-			return user.getUsername() === this.currentUserService.getUsername();
-		})[0];
-
-		if (!user)
-			user = this.valueChart.getUsers()[0];
-
-		return user;
-	}
-	
-	updateMaximumWeightMap(): void {
-		this.maximumWeightMap = this.valueChart.getMaximumWeightMap();
-	}
-
-	updateAllChartData(viewOrientation: string): void {
-		this.updateMaximumWeightMap();
+	updateAllValueChart(viewOrientation: string): void {
+		this.valueChartService.updateMaximumWeightMap();
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
 		
@@ -127,7 +73,7 @@ export class ChartDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
 		} else if (objective.objectiveType === 'primitive') {
-			labelData =  { 'objective': objective, 'weight': this.maximumWeightMap.getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
+			labelData =  { 'objective': objective, 'weight': this.valueChartService.maximumWeightMap.getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
 		}
 
 		return labelData;
@@ -144,7 +90,7 @@ export class ChartDataService {
 	generateLabelData(): void {
 		this.labelData = [];
 
-		this.valueChart.getRootObjectives().forEach((objective: Objective) => {
+		this.valueChartService.getValueChart().getRootObjectives().forEach((objective: Objective) => {
 			this.labelData.push(this.getLabelDatum(objective, 0));
 		});
 	}
@@ -157,22 +103,22 @@ export class ChartDataService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getId());
+			labelDatum.weight = this.valueChartService.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getId());
 		}
 	}
 
 	updateLabelData(): void {
 		// Use splice so as to avoid changing the array reference.
-		this.valueChart.getRootObjectives().forEach((objective: Objective, index: number) => {
+		this.valueChartService.getValueChart().getRootObjectives().forEach((objective: Objective, index: number) => {
 			this.labelData[index] = this.getLabelDatum(objective, 0);
 		});
 	}
 
 	getCellData(objective: PrimitiveObjective): CellData[] {
 		var users: User[];
-		users = this.valueChart.getUsers();
+		users = this.valueChartService.getValueChart().getUsers();
 
-		var objectiveValues: any[] = this.valueChart.getAlternativeValuesforObjective(objective);
+		var objectiveValues: any[] = this.valueChartService.getValueChart().getAlternativeValuesforObjective(objective);
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
@@ -203,7 +149,7 @@ export class ChartDataService {
 	generateRowData(): void {
 		this.rowData = [];
 
-		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+		this.valueChartService.getValueChart().getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.rowData.push({
 				objective: objective,
 				weightOffset: 0,
@@ -217,7 +163,7 @@ export class ChartDataService {
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.maximumWeightMap.getObjectiveWeight(this.rowData[i].objective.getId());
+			weightOffset += this.valueChartService.maximumWeightMap.getObjectiveWeight(this.rowData[i].objective.getId());
 		}
 	}
 
@@ -282,13 +228,13 @@ export class ChartDataService {
 			row.cells = d3.permute(row.cells, cellIndices);
 		});
 
-		this.alternatives = d3.permute(this.alternatives, cellIndices);
+		this.valueChartService.alternatives = d3.permute(this.valueChartService.alternatives, cellIndices);
 	}
 
 	resetCellOrder(): void {
 		var cellIndices: number[] = [];
 
-		this.alternatives.forEach((alternative: Alternative, index: number) => {
+		this.valueChartService.alternatives.forEach((alternative: Alternative, index: number) => {
 			cellIndices[this.originalAlternativeOrder.alternativeIndexMap[alternative.getName()]] = index;
 		});
 
@@ -309,8 +255,8 @@ export class ChartDataService {
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
-				var weight: number = this.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getId());
+				var scoreFunction = this.valueChartService.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
+				var weight: number = this.valueChartService.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getId());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
@@ -335,12 +281,12 @@ export class ChartDataService {
 
 	generateCellOrderAlphabetically(): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(this.numAlternatives);
+		var cellIndices: number[] = d3.range(this.valueChartService.numAlternatives);
 
 		cellIndices.sort((a: number, b: number) => {
 
-			var aName: string = this.alternatives[a].getName().toLowerCase();
-			var bName: string = this.alternatives[b].getName().toLowerCase();
+			var aName: string = this.valueChartService.alternatives[a].getName().toLowerCase();
+			var bName: string = this.valueChartService.alternatives[b].getName().toLowerCase();
 
 			if (aName === bName) {
 				return 0;						// Do not change the ordering of a and b.
@@ -364,48 +310,6 @@ export class ChartDataService {
 		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
 
 		return dimensionOneSize / maxDepthOfChildren;
-	}
-
-	getAllUsersDomainElements(objective: PrimitiveObjective): UserDomainElements[] {
-		var allUsersDomainElements: UserDomainElements[] = [];
-		var domainElements: (string | number)[] = [];
-
-		if (objective.getDomainType() === 'categorical') {
-			domainElements = (<CategoricalDomain> objective.getDomain()).getElements();
-		} else if (objective.getDomainType() === 'interval') {
-			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
-		} else {
-			domainElements = this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
-		}
-
-		this.users.forEach((user: User) => {
-			var userDomainElements: UserDomainElements = { user: user, elements: [] };
-
-			domainElements.forEach((domainElement: string | number) => {
-				userDomainElements.elements.push({ user: user, element: domainElement });
-			});
-
-			allUsersDomainElements.push(userDomainElements);
-		});
-
-		return allUsersDomainElements;
-	}
-
-
-	getElementsFromContinuousDomain(continouousDomain: ContinuousDomain): number[] {
-		var range: number[] = continouousDomain.getRange()
-		var increment = (range[1] - range[0]) / 4;
-		var element = range[0];
-
-		var elements: number[] = [];
-
-		while (element <= range[1]) {
-
-			elements.push(Math.round(element * 100) / 100);
-			element += increment;
-		}
-
-		return elements;
 	}
 
 	incrementObjectivesWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {

@@ -14,7 +14,7 @@ import * as d3 														from 'd3';
 
 // Application Classes:
 
-import { ChartDataService }											from '../services/ChartData.service';
+import { ValueChartService }										from '../services/ValueChart.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 
@@ -26,7 +26,7 @@ import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 
-import { UserDomainElements, DomainElement }						from '../model/ChartDataTypes';
+import { UserDomainElements, DomainElement }						from '../types/ScoreFunctionViewer.types';
 
 
 @Injectable()
@@ -38,7 +38,7 @@ export class ExpandScoreFunctionInteraction {
 	public popUpRef: any;
 
 	constructor(
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) { }
 
 	toggleExpandScoreFunction(enableExpanding: boolean) {
@@ -58,7 +58,7 @@ export class ExpandScoreFunctionInteraction {
 
 		// Pass relevant data to the pop-up by attaching it to the window object.
 		(<any> window).objectiveToPlot = objective;
-		(<any> window).chartDataService = this.chartDataService;
+		(<any> window).valueChartService = this.valueChartService;
 		(<any> window).chartUndoRedoService = this.chartUndoRedoService;
 
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
@@ -73,6 +73,6 @@ export class ExpandScoreFunctionInteraction {
 	expandScoreFunction = (eventObject: Event) => {
 		var objective: PrimitiveObjective = d3.select(eventObject.target).datum();
 
-		this.openPopUp(this.chartDataService.users, objective);
+		this.openPopUp(this.valueChartService.users, objective);
 	}
 }

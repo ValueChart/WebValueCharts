@@ -12,7 +12,8 @@ import * as d3 														from 'd3';
 import * as $														from 'jquery';
 
 // Application Classes
-import { ChartDataService }											from '../services/ChartData.service';
+import { ValueChartService }										from '../services/ValueChart.service';
+import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
@@ -27,7 +28,7 @@ import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 import { Alternative }												from '../model/Alternative';
 
-import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
 
 
 
@@ -58,7 +59,8 @@ export class SortAlternativesInteraction {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
+		private valueChartViewerService: ValueChartViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
 		private summaryChartDefinitions: SummaryChartDefinitions,
@@ -71,18 +73,18 @@ export class SortAlternativesInteraction {
 			this.sortAlternativesByObjective(true);
 
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
 
-			this.chartDataService.reorderAllCells(this.chartDataService.generateCellOrderAlphabetically());
+			this.valueChartViewerService.reorderAllCells(this.valueChartViewerService.generateCellOrderAlphabetically());
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_MANUALLY) {
 			this.sortAlternativesManually(true);
 
 		} else if (sortingType === this.RESET_SORT) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
 
-			this.chartDataService.resetCellOrder();
+			this.valueChartViewerService.resetCellOrder();
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_OFF) {
@@ -121,7 +123,7 @@ export class SortAlternativesInteraction {
 	}
 
 	sortByObjective = (eventObject: Event) => {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
 
 			var objective: Objective = (<any>eventObject.target).__data__.objective;
 			var objectivesToReorderBy: PrimitiveObjective[];
@@ -130,13 +132,13 @@ export class SortAlternativesInteraction {
 			} else {
 				objectivesToReorderBy = [<PrimitiveObjective> objective];
 			}
-			var cellIndices: number[] = this.chartDataService.generateCellOrderByObjectiveScore(this.chartDataService.getRowData(), objectivesToReorderBy)
-			this.chartDataService.reorderAllCells(cellIndices);
+			var cellIndices: number[] = this.valueChartViewerService.generateCellOrderByObjectiveScore(this.valueChartViewerService.getRowData(), objectivesToReorderBy)
+			this.valueChartViewerService.reorderAllCells(cellIndices);
 			this.changeDetectionService.alternativeOrderChanged = true;
 		}
 
 	startSortAlternatives = (d: Alternative, i: number) => {
-		this.chartUndoRedoService.saveAlternativeOrderRecord(this.chartDataService.alternatives);
+		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
 
 		this.minCoordOne = 0;
 		this.maxCoordOne = this.renderConfigService.dimensionOneSize;
@@ -154,8 +156,8 @@ export class SortAlternativesInteraction {
 		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
 
-		for (var i = 0; i < this.chartDataService.alternatives.length; i++) {
-			if (this.chartDataService.alternatives[i].getName() === d.getName()) {
+		for (var i = 0; i < this.valueChartService.alternatives.length; i++) {
+			if (this.valueChartService.alternatives[i].getName() === d.getName()) {
 				this.currentAlternativeIndex = i;
 				break;
 			}
@@ -217,14 +219,14 @@ export class SortAlternativesInteraction {
 	}
 
 	endSortAlternatives = (d: Alternative, i: number) => {
-		var alternatives = this.chartDataService.alternatives;
+		var alternatives = this.valueChartService.alternatives;
 
 		if (this.newAlternativeIndex !== this.currentAlternativeIndex) {
 			var temp: Alternative = alternatives.splice(this.currentAlternativeIndex, 1)[0];
 			alternatives.splice(this.newAlternativeIndex, 0, temp);
 
 
-			this.chartDataService.getRowData().forEach((row: RowData) => {
+			this.valueChartViewerService.getRowData().forEach((row: RowData) => {
 				var temp: CellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
 				row.cells.splice(this.newAlternativeIndex, 0, temp);
 			});

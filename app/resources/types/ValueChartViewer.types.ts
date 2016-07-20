@@ -37,13 +37,3 @@ export interface LabelData {
 	depthOfChildren: number;
 	subLabelData?: LabelData[]
 }
-
-export interface DomainElement {
-	element: (string | number);
-	user: User;
-}
-
-export interface UserDomainElements {
-	elements: DomainElement[];
-	user: User;
-}

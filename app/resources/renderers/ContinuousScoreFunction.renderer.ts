@@ -13,7 +13,8 @@ import { NgZone }						from '@angular/core';
 import * as d3 							from 'd3';
 
 // Application Classes
-import { ChartDataService }				from '../services/ChartData.service';
+import { ValueChartService }			from '../services/ValueChart.service';
+import { ScoreFunctionViewerService }	from '../services/ScoreFunctionViewer.service';
 import { ScoreFunctionRenderer }		from './ScoreFunction.renderer';
 import { ChartUndoRedoService }			from '../services/ChartUndoRedo.service';
 
@@ -25,7 +26,7 @@ import { ScoreFunction }				from '../model/ScoreFunction';
 import { ContinuousScoreFunction }		from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }		from '../model/DiscreteScoreFunction';
 
-import { DomainElement, UserDomainElements } 			from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements } 			from '../types/ScoreFunctionViewer.types';
 
 
 // This class contains the logic for creating and rendering the a ContinuousScoreFunction for an Objective as a scatter plot chart. 
@@ -54,8 +55,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-	constructor(chartDataService: ChartDataService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
-		super(chartDataService, chartUndoRedoService);
+	constructor(valueChartService: ValueChartService, scoreFunctionViewerService: ScoreFunctionViewerService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
+		super(valueChartService, scoreFunctionViewerService, chartUndoRedoService);
 	}
 
 	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
@@ -181,7 +182,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]); 
 			});
 
-		this.toggleDragToChangeScore(this.chartDataService.getValueChart().isIndividual(), objective, viewOrientation);
+		this.toggleDragToChangeScore(this.valueChartService.getValueChart().isIndividual(), objective, viewOrientation);
 	}
 
 	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {

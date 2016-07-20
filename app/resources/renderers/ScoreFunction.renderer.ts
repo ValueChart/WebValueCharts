@@ -11,7 +11,8 @@ import { Injectable } 									from '@angular/core';
 import * as d3 											from 'd3';
 
 // Application Classes
-import { ChartDataService }								from '../services/ChartData.service';
+import { ValueChartService }							from '../services/ValueChart.service';
+import { ScoreFunctionViewerService }					from '../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 
 // Model Classes
@@ -21,7 +22,7 @@ import { ScoreFunction }								from '../model/ScoreFunction';
 import { ContinuousScoreFunction }						from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }						from '../model/DiscreteScoreFunction';
 
-import { DomainElement, UserDomainElements } 			from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements } 			from '../types/ScoreFunctionViewer.types';
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
 // axis, labels, and base containers of a ScoreFunction.
@@ -82,7 +83,8 @@ export abstract class ScoreFunctionRenderer {
 
 
 	constructor(
-			protected chartDataService: ChartDataService, 
+			protected valueChartService: ValueChartService, 
+			protected scoreFunctionViewerService: ScoreFunctionViewerService,
 			protected chartUndoRedoService: ChartUndoRedoService) { }
 
 	// This function creates the base containers and elements for a score function plot.s
@@ -110,7 +112,7 @@ export abstract class ScoreFunctionRenderer {
 		this.createScoreFunctionAxis(this.plotContainer, objectiveId);
 
 		// TODO: should make this method a member of PrimitiveObjective?
-		var usersDomainElements: UserDomainElements[] = this.chartDataService.getAllUsersDomainElements(objective);
+		var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(objective);
 		this.usersDomainElements = usersDomainElements.slice();
 
 		this.domainLabelContainer = this.plotContainer.append('g')								// Create a container to hold the domain axis labels.
@@ -286,5 +288,4 @@ export abstract class ScoreFunctionRenderer {
 	// Anonymous functions that are used often enough to be made class fields:
 
 	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
-
 }

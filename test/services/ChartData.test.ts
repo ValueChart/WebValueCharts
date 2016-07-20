@@ -6,7 +6,7 @@
 */
 
 // Application Classes:
-import { ChartDataService }											from '../../app/resources/services/ChartData.service';
+import { ValueChartService }											from '../../app/resources/services/ValueChart.service';
 import { XMLValueChartParser } 										from '../../app/resources/services/XMLValueChartParser.service';
 
 import * as d3 														from 'd3';
@@ -16,7 +16,7 @@ import { ValueChart }												from '../../app/resources/model/ValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
 import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
 
-import {RowData, CellData, LabelData}							from '../../app/resources/model/ChartDataTypes';
+import {RowData, CellData, LabelData}							from '../../app/resources/types/ValueChartViewer.types';
 
 
 
@@ -29,21 +29,21 @@ declare var expect: any;
 // The Chart data service is now using Angular's dependency injection for some of its dependencies. This is conflicting with Karma. TODO: Fix this.
 
 /*
-describe('ChartDataService', () => {
+describe('ValueChartService', () => {
 
 	var roundingError: number = 0.0001;
 
-	var chartDataService: ChartDataService;
+	var valueChartService: ValueChartService;
 	var valueChartParser: XMLValueChartParser;
 	var valueChart: IndividualValueChart;
 
 	var labelData: LabelData[];
 
 	before(function() {
-		chartDataService = new ChartDataService();
+		valueChartService = new ValueChartService();
 		valueChartParser = new XMLValueChartParser();
 		valueChart = <IndividualValueChart> valueChartParser.parseValueChart(XMLTestString);
-		chartDataService.setValueChart(valueChart);
+		valueChartService.setValueChart(valueChart);
 	});
 
 
@@ -52,7 +52,7 @@ describe('ChartDataService', () => {
 	describe('getLabelData(valueChart: ValueChart): LabelData[]', () => {
 
 		it('it should convert the objective hierarchy into a hierarchy of LabelData', () => {
-			labelData = chartDataService.getLabelData();
+			labelData = valueChartService.getLabelData();
 
 			expect(labelData).to.have.length(1); 							// The objective hierarchy from the XMLTestString has one root objective.
 			expect(labelData[0].objective.getName()).to.equal('Hotel');		// The root objective from the XMLTestString should be 'Hotel'
@@ -104,14 +104,14 @@ describe('ChartDataService', () => {
 		context('when some of the PrimitiveObjective weights are changed', () => {
 			before(function() {
 				var weightMap: WeightMap = valueChart.getUser().getWeightMap();
-				chartDataService.setValueChart(valueChart);
+				valueChartService.setValueChart(valueChart);
 				weightMap.setObjectiveWeight('size', 0.1);
 				weightMap.setObjectiveWeight('rate', 0.14);
 			});
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
 				labelData.forEach((labelDatum: LabelData) => {
-					chartDataService.updateLabelDataWeights(labelDatum);
+					valueChartService.updateLabelDataWeights(labelDatum);
 				});
 
 				var children: LabelData[] = labelData[0].subLabelData;
@@ -156,7 +156,7 @@ describe('ChartDataService', () => {
 
 		context('when all of the PrimitiveObjective weights are changed', () => {
 			before(function() {
-				chartDataService.setValueChart(valueChart);
+				valueChartService.setValueChart(valueChart);
 				var weightMap: WeightMap = valueChart.getUser().getWeightMap();
 				weightMap.setObjectiveWeight('size', 0.2);
 				weightMap.setObjectiveWeight('rate', 0.75);
@@ -167,7 +167,7 @@ describe('ChartDataService', () => {
 
 			it('should update the labeld data with the new weights without changing the structure of the data', () => {
 				labelData.forEach((labelDatum: LabelData) => {
-					chartDataService.updateLabelDataWeights(labelDatum);
+					valueChartService.updateLabelDataWeights(labelDatum);
 				});
 
 				var children: LabelData[] = labelData[0].subLabelData;
@@ -219,7 +219,7 @@ describe('ChartDataService', () => {
 
 		before(function() {
 			// Get the rate objective.
-			chartDataService.setValueChart(valueChart);
+			valueChartService.setValueChart(valueChart);
 			rate = valueChart.getAllPrimitiveObjectives().filter((objective: PrimitiveObjective) => {
 				return objective.getName() === 'rate';
 			})[0];
@@ -230,7 +230,7 @@ describe('ChartDataService', () => {
 
 		it('should format the alternative values for the given objective into cells, where each cell has one user score for each user.', () => {
 
-			var cellData: CellData[] = chartDataService.getCellData(rate);
+			var cellData: CellData[] = valueChartService.getCellData(rate);
 
 			expect(cellData).to.have.length(6);
 
@@ -250,14 +250,14 @@ describe('ChartDataService', () => {
 		var objectiveNames: string[];
 
 		before(function() {
-			chartDataService.setValueChart(valueChart);
+			valueChartService.setValueChart(valueChart);
 			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
 		});
 
 		it(`should format the obejctives from the given ValueChart into rows, where each row is divided one cell for Alernative in the ValueChart
 			and each cell has one user score for each user`, () => {
 
-			var rows: RowData[] = chartDataService.getRowData();
+			var rows: RowData[] = valueChartService.getRowData();
 
 			expect(rows).to.have.length(5);				// There are five objectives in the hotel ValueChart, so the data should have five rows.
 
@@ -284,8 +284,8 @@ describe('ChartDataService', () => {
 
 		before(function() {
 			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
-			chartDataService.setValueChart(valueChart);
-			rows = chartDataService.getRowData();
+			valueChartService.setValueChart(valueChart);
+			rows = valueChartService.getRowData();
 			objectiveNames = ['area', 'skytrain-distance', 'size', 'internet-access', 'rate'];
 			weightOffsets = [0, 0.46, 0.55, 0.59, 0.80];	// These weight offsets were found by summing the weights of all previous rows in the ordering for each row.
 															// The weights are ordered the same as the objective names.
@@ -293,7 +293,7 @@ describe('ChartDataService', () => {
 
 		it('should calculate the weight offset of each row as the sum of the weights of the rows coming before it in the array of rows.', () => {
 
-			chartDataService.updateWeightOffsets();
+			valueChartService.updateWeightOffsets();
 
 			rows.forEach((row: RowData, index: number) => {
 				expect(row.objective.getName()).to.equal(objectiveNames[index]);	// Verify the ordering of objectives in the row data.
@@ -309,20 +309,20 @@ describe('ChartDataService', () => {
 
 		before(function() {
 			valueChart = <IndividualValueChart>valueChartParser.parseValueChart(XMLTestString);
-			chartDataService.setValueChart(valueChart);
-			labelData = chartDataService.getLabelData();
+			valueChartService.setValueChart(valueChart);
+			labelData = valueChartService.getLabelData();
 		});
 
 		context('when score functions are being rendered', () => {
 
 			it('should calculate the proper width of the labels with an offset left for the score functions', () => {
 				dimensionOneSize = 100;
-				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
+				var labelWidth = valueChartService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
 				var expectedLabelWidth = (dimensionOneSize / 4);	// The max depth of the labels is 3, + 1 for the score function = 3.
 				expect(labelWidth).to.equal(expectedLabelWidth);
 
 				dimensionOneSize = 567;
-				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
+				var labelWidth = valueChartService.calculateMinLabelWidth(labelData, dimensionOneSize, true);
 				var expectedLabelWidth = (dimensionOneSize / 4);	// The max depth of the labels is 3, + 1 for the score function = 3.
 				expect(labelWidth).to.equal(expectedLabelWidth);
 			});
@@ -332,12 +332,12 @@ describe('ChartDataService', () => {
 
 			it('should calculate the proper width of the labels with no offset left', () => {
 				dimensionOneSize = 100;
-				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
+				var labelWidth = valueChartService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
 				var expectedLabelWidth = (dimensionOneSize / 3);	// The max depth of the labels is 3, and with no score function the labels should fill all available space.
 				expect(labelWidth).to.equal(expectedLabelWidth);
 
 				dimensionOneSize = 567;
-				var labelWidth = chartDataService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
+				var labelWidth = valueChartService.calculateMinLabelWidth(labelData, dimensionOneSize, false);
 				var expectedLabelWidth = (dimensionOneSize / 3);	// The max depth of the labels is 3, and with no score function the labels should fill all available space.
 				expect(labelWidth).to.equal(expectedLabelWidth);
 			});

@@ -11,7 +11,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService }											from '../services/ChartData.service';
+import { ValueChartService }											from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 
@@ -21,7 +21,7 @@ import { Alternative }												from '../model/Alternative';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 
-import {RowData, CellData, UserScoreData}							from '../model/ChartDataTypes';
+import {RowData, CellData, UserScoreData}							from '../types/ValueChartViewer.types';
 
 
 // This class renders a ValueChart's Alternatives into a stacked bar chart that summarizes the utility of each Alternative based on
@@ -52,7 +52,7 @@ export class SummaryChartRenderer {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
 		private defs: SummaryChartDefinitions) { }
 
 	// This function creates the base containers and elements for the Alternative Summary Chart of a ValueChart.
@@ -99,7 +99,7 @@ export class SummaryChartRenderer {
 
 		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
 
-		var alternatives: Alternative[] = this.chartDataService.alternatives;
+		var alternatives: Alternative[] = this.valueChartService.alternatives;
 
 		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.data((rows[0].cells));
@@ -122,7 +122,7 @@ export class SummaryChartRenderer {
 
 
 		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(this.chartDataService.alternatives);
+			.data(this.valueChartService.alternatives);
 
 		updateAlternativeBoxes.exit().remove();
 		updateAlternativeBoxes.enter().append('rect')
@@ -164,7 +164,7 @@ export class SummaryChartRenderer {
 
 	updateSummaryChart(rows: RowData[], viewOrientation: string): void {
 
-		var alternatives: Alternative[] = this.chartDataService.alternatives;
+		var alternatives: Alternative[] = this.valueChartService.alternatives;
 
 		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
@@ -242,7 +242,7 @@ export class SummaryChartRenderer {
 	// containers here because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 	renderSummaryChartRows(alternativeBoxes: d3.Selection<any>, scoreTotals: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		alternativeBoxes
-			.attr(this.renderConfigService.dimensionOne, (d: CellData, i: number) => { return this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives; })
+			.attr(this.renderConfigService.dimensionOne, (d: CellData, i: number) => { return this.renderConfigService.dimensionOneSize / this.valueChartService.numAlternatives; })
 			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize)
 			.attr(this.renderConfigService.coordinateOne, this.calculateCellCoordinateOne)
 			.attr(this.renderConfigService.coordinateTwo, 0)
@@ -292,7 +292,7 @@ export class SummaryChartRenderer {
 
 	highlightBestUserScores() {
 		var maxUserScores: any = {};
-		this.chartDataService.users.forEach((user: User) => {
+		this.valueChartService.users.forEach((user: User) => {
 			maxUserScores[user.getUsername()] = 0;
 		});
 
@@ -309,7 +309,7 @@ export class SummaryChartRenderer {
 			}
 		});
 
-		this.chartDataService.users.forEach((user: User) => {
+		this.valueChartService.users.forEach((user: User) => {
 			bestTotalScoreSelections[user.getUsername()].classed(this.defs.BEST_SCORE, true);
 		});
 	}
@@ -327,7 +327,7 @@ export class SummaryChartRenderer {
 		// Position and give heights and widths to the user scores.
 		userScores
 			.style('fill', (d: UserScoreData, i: number) => { 
-				if (this.chartDataService.getValueChart().isIndividual())
+				if (this.valueChartService.getValueChart().isIndividual())
 					return d.objective.getColor(); 
 				else 
 					return d.user.color;
@@ -368,9 +368,9 @@ export class SummaryChartRenderer {
 	// Anonymous functions that are used often enough to be made class fields:
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
-	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives); }; 
+	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.renderConfigService.dimensionOneSize / this.valueChartService.numAlternatives); }; 
 	// The width (or height) should be such that the user scores for one cell fill that cell.
-	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.chartDataService.numAlternatives) / this.chartDataService.numUsers };
+	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.renderConfigService.dimensionOneSize / this.valueChartService.numAlternatives) / this.valueChartService.numUsers };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());

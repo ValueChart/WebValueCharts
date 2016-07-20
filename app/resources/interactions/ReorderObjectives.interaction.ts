@@ -12,7 +12,8 @@ import { NgZone }													from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService}											from '../services/ChartData.service';
+import { ValueChartService}											from '../services/ValueChart.service';
+import { ValueChartViewerService}									from '../services/ValueChartViewer.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -26,7 +27,7 @@ import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 
-import {RowData, CellData, LabelData}							from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
 
 
 
@@ -59,7 +60,8 @@ export class ReorderObjectivesInteraction {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
+		private valueChartViewerService: ValueChartViewerService,
 		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelRenderer: LabelRenderer,
@@ -100,7 +102,7 @@ export class ReorderObjectivesInteraction {
 			return;
 		}
 
-		this.chartUndoRedoService.saveObjectivesRecord(this.chartDataService.getValueChart().getRootObjectives());
+		this.chartUndoRedoService.saveObjectivesRecord(this.valueChartService.getValueChart().getRootObjectives());
 
 		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');						// The container that holds the container for the label we are reordering.
 		this.siblingContainers = this.parentContainer.selectAll('g[parent="' + this.parentObjectiveName + '"]');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
@@ -230,8 +232,8 @@ export class ReorderObjectivesInteraction {
 
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
-		this.chartDataService.reorderRows(primitiveObjectives);
-		this.chartDataService.primitiveObjectives = primitiveObjectives;
+		this.valueChartViewerService.reorderRows(primitiveObjectives);
+		this.valueChartService.primitiveObjectives = primitiveObjectives;
 
 		this.changeDetectionService.rowOrderChanged = true;
 	}

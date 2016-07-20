@@ -21,7 +21,9 @@ import { CurrentUserService }													from '../../services/CurrentUser.servi
 
 import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 
-import { ChartDataService }														from '../../services/ChartData.service';
+import { ValueChartService }													from '../../services/ValueChart.service';
+import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
+import { ScoreFunctionViewerService }											from '../../services/ScoreFunctionViewer.service';
 import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
@@ -55,7 +57,9 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:
-		ChartDataService,
+		ValueChartService,
+		ValueChartViewerService,
+		ScoreFunctionViewerService,
 		RenderConfigService,
 		ChartUndoRedoService,
 		ChangeDetectionService,

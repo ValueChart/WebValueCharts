@@ -17,14 +17,15 @@ import * as d3 															from 'd3';
 import { ScoreFunctionRenderer }										from '../../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../../renderers/ContinuousScoreFunction.renderer';
-import { ChartDataService }												from '../../services/ChartData.service';
+import { ValueChartService }											from '../../services/ValueChart.service';
+import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 
 // Model Classes:
 import { ScoreFunction }												from '../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
 import { User }															from '../../model/User';
-import { UserDomainElements, DomainElement }							from '../../model/ChartDataTypes';
+import { UserDomainElements, DomainElement }							from '../../types/ScoreFunctionViewer.types';
 
 
 @Component({
@@ -36,7 +37,8 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 	private sub: any;
 	private opener: Window;
 
-	private chartDataService: ChartDataService;
+	private valueChartService: ValueChartService;
+	private scoreFunctionViewerService: ScoreFunctionViewerService;
 	private chartUndoRedoService: ChartUndoRedoService;
 
 	private scoreFunctionPlotContainer: d3.Selection<any>;
@@ -66,12 +68,12 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 			this.opener = window.opener;
 
 			this.objectiveToDisplay = (<any> window.opener).objectiveToPlot;
-			this.chartDataService = (<any> window.opener).chartDataService;
+			this.valueChartService = (<any> window.opener).valueChartService;
 			this.chartUndoRedoService = (<any> window.opener).chartUndoRedoService;
 		}
 
 
-		this.users = this.chartDataService.users
+		this.users = this.valueChartService.users
 
 		this.initChangeDetection();
 		this.initScoreFunctionPlot();
@@ -95,9 +97,9 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 	initScoreFunctionPlot(): void {
 
 		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 		}
 
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
