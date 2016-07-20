@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 19:56:59
+* @Last Modified time: 2016-07-19 22:51:14
 */
 
 import { Component } 												from '@angular/core';
@@ -46,7 +46,7 @@ export class RootComponent implements OnInit {
 
 	isGroupChart(): boolean {																						
 		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
-				(window.opener && !(<any> window.opener).chartDataService.getValueChart().isIndividual()); 					// Check to see if this is a pop-up window
+				(window.opener && !(<any> window.opener).valueChartService.getValueChart().isIndividual()); 					// Check to see if this is a pop-up window
 	}
 
 	switchScoreFunctionView() {

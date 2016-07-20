@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 22:35:00
+* @Last Modified time: 2016-07-19 22:43:13
 */
 
 // Angular Resources:
@@ -16,7 +16,7 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 import { ContinuousScoreFunction }									from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 
-import { DomainElement, UserDomainElements } 						from '../model/ChartDataTypes';
+import { DomainElement, UserDomainElements } 						from '../types/ScoreFunctionViewer.types';
 
 
 

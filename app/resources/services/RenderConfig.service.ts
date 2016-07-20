@@ -11,7 +11,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ChartDataService }											from './ChartData.service';
+import { ValueChartService }											from './ValueChart.service';
 
 // Model Classes:
 import { User }														from '../model/User';
@@ -43,7 +43,7 @@ export class RenderConfigService {
 	public userColorsAssigned: boolean;
 
 
-	constructor(private chartDataService: ChartDataService) { }
+	constructor(private valueChartService: ValueChartService) { }
 
 	// This function configures the variables used for height, width, x, and y attributes of SVG elements.
 	// Whenever defining height and width attributes, the attributes should be set using dimensionOne, and dimensionTwo
@@ -76,7 +76,7 @@ export class RenderConfigService {
 		// Assign a color to each user in the ValueChart
 		if (!this.userColorsAssigned) {
 			var numKellyColorsUsed: number = 0;
-			this.chartDataService.users.forEach((user: User, index: number) => {
+			this.valueChartService.users.forEach((user: User, index: number) => {
 				if (!user.color) {
 					user.color = this.kellyColors[numKellyColorsUsed];
 					numKellyColorsUsed++;
@@ -90,12 +90,12 @@ export class RenderConfigService {
 		if (viewOrientation === 'vertical') {
 
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.chartDataService.maximumWeightMap.getWeightTotal()])
+				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_HEIGHT]);
 		} else if (viewOrientation === 'horizontal') {
 			
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.chartDataService.maximumWeightMap.getWeightTotal()])
+				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
 				.range([0, this.VALUECHART_WIDTH]);
 		}
 	}

@@ -14,7 +14,8 @@ import * as d3 														from 'd3';
 import * as $														from 'jquery';
 
 // Application Classes
-import { ChartDataService }											from '../services/ChartData.service';
+import { ValueChartService }										from '../services/ValueChart.service';
+import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -29,7 +30,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
 
 
 
@@ -41,7 +42,8 @@ export class ResizeWeightsInteraction {
 	constructor(
 		private ngZone: NgZone,
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
+		private valueChartViewerService: ValueChartViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { }
 
@@ -51,12 +53,12 @@ export class ResizeWeightsInteraction {
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
 				// Save the current state of the Weight Map.
-				this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.currentUser.getWeightMap());
+				this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.currentUser.getWeightMap());
 
 				// Calculate the correct weight increment.
-				var totalWeight: number = this.chartDataService.currentUser.getWeightMap().getWeightTotal();
+				var totalWeight: number = this.valueChartService.currentUser.getWeightMap().getWeightTotal();
 				var labelDatum: LabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.chartDataService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
+				var previousWeight: number = this.valueChartService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -64,7 +66,7 @@ export class ResizeWeightsInteraction {
 					pumpAmount = 0 - previousWeight;
 				}
 
-				this.chartDataService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
+				this.valueChartService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
 			});
 		}
 	}
@@ -107,12 +109,12 @@ export class ResizeWeightsInteraction {
 
 	resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.chartDataService.maximumWeightMap);
+		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.maximumWeightMap);
 	}
 
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: LabelData, i: number) => {
-		var weightMap: WeightMap = this.chartDataService.currentUser.getWeightMap();
+		var weightMap: WeightMap = this.valueChartService.currentUser.getWeightMap();
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
@@ -129,13 +131,13 @@ export class ResizeWeightsInteraction {
 				let currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
 
 				if (d.objective.objectiveType === 'abstract') {
-					this.chartDataService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
 				} else {
 					weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
 				}
 
 				if (siblings[i - 1].objective.objectiveType === 'abstract') {
-					this.chartDataService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
 				} else {
 					weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
 				}
@@ -149,15 +151,15 @@ export class ResizeWeightsInteraction {
 					siblingsToIncrease = siblings.slice(0, i);
 					siblingsToDecrease = siblings.slice(i);
 
-					this.chartDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
-					this.chartDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
 
 				} else {
 					siblingsToIncrease = siblings.slice(i);
 					siblingsToDecrease = siblings.slice(0, i);
 
-					this.chartDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
-					this.chartDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
+					this.valueChartViewerService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
 				}
 			}
 		});

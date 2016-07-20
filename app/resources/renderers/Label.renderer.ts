@@ -13,7 +13,9 @@ import * as d3 														from 'd3';
 import * as $														from 'jquery';
 
 // Application Classes
-import { ChartDataService }											from '../services/ChartData.service';
+import { ValueChartService }										from '../services/ValueChart.service';
+import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
+import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
@@ -35,7 +37,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {RowData, CellData, LabelData}								from '../model/ChartDataTypes';
+import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
 
 
 
@@ -60,7 +62,9 @@ export class LabelRenderer {
 
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private chartDataService: ChartDataService,
+		private valueChartService: ValueChartService,
+		private valueChartViewerService: ValueChartViewerService,
+		private scoreFunctionViewerService: ScoreFunctionViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private defs: LabelDefinitions,
@@ -160,7 +164,7 @@ export class LabelRenderer {
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
-		this.labelWidth = this.chartDataService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
+		this.labelWidth = this.valueChartViewerService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
@@ -232,7 +236,7 @@ export class LabelRenderer {
 		labelOutlines.style('fill', 'white')
 			.style('stroke', (d: LabelData) => {
 				// PrimitiveObjective's should have their own color unless the ValueChart has multiple users. Abstract Objectives should always be gray.
-				return (d.depthOfChildren === 0 && this.chartDataService.getValueChart().isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
+				return (d.depthOfChildren === 0 && this.valueChartService.getValueChart().isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
 			});
 
 		labelOutlines
@@ -260,7 +264,7 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.chartDataService.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
@@ -297,9 +301,9 @@ export class LabelRenderer {
 			var datum: PrimitiveObjective = el.data()[0];
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 			else 
-				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.chartDataService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 
 			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum);	
 		});
@@ -324,7 +328,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.chartDataService.maximumWeightMap.getObjectiveWeight(datum.getId());
+			objectiveWeight = this.valueChartService.maximumWeightMap.getObjectiveWeight(datum.getId());
 			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
 
