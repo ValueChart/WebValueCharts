@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 22:51:14
+* @Last Modified time: 2016-07-20 09:17:39
 */
 
 import { Component } 												from '@angular/core';
@@ -38,6 +38,7 @@ export class RootComponent implements OnInit {
 	
 	ngOnInit() { 
 		(<any> window).angularAppRef = this.applicationRef;
+		(<any> window).childWindows = {};
 
 		if (this.router.url.indexOf('expandScoreFunction') === -1) {
 			this.router.navigate(['expandScoreFunction', 'plot']);		
