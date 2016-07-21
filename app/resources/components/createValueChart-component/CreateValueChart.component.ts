@@ -19,7 +19,7 @@ import { Alternative }													from '../../model/Alternative';
 
 @Component({
 	selector: 'createValueChart',
-	templateUrl: '/app/resources/components/createValueChart-component/CreateValueChart.template.html',
+	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService]
 })

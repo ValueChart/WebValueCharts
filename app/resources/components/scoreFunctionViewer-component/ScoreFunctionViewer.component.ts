@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 11:33:03
+* @Last Modified time: 2016-07-21 11:37:32
 */
 
 import { Component }													from '@angular/core';
@@ -33,7 +33,7 @@ import { UserDomainElements, DomainElement }							from '../../types/ScoreFuncti
 
 @Component({
 	selector: 'ScoreFunction',
-	templateUrl: '/app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
+	templateUrl: 'app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
 	directives: []
 })
 export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy {
