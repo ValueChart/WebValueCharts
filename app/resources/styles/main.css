@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 14:09:00
+* @Last Modified time: 2016-07-21 17:38:59
 */
 
 /* Global Styles */
@@ -122,10 +122,10 @@ a.upload {
 
 .svg-content-responsive {
     position: absolute;
-    height: 83%;
-    width: 90%;
-    top: 15rem;
-    left: 10%;
+    height: 75%;
+    width: 95%;
+    top: 14rem;
+    left: 5%;
 }
 
 /* ValueChart Viewer Styles */
@@ -154,7 +154,7 @@ a.upload {
 }
 
 .detail-box-vertical {
-    left: 10% !important;
+    left: 5% !important;
 }
 
 .detail-box-horizontal {

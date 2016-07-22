@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:30:34
+* @Last Modified time: 2016-07-21 17:20:28
 */
 
 import { Injectable } 												from '@angular/core';
@@ -19,8 +19,10 @@ import { User }														from '../model/User';
 @Injectable()
 export class RenderConfigService {
 
-	public VALUECHART_WIDTH: number = 800;	// Width of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
-	public VALUECHART_HEIGHT: number = 400;	// Height of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
+	public CHART_COMPONENT_RATIO: number = 0.47;
+
+	public CHART_COMPONENT_WIDTH: number;	// Width of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
+	public CHART_COMPONENT_HEIGHT: number;	// Height of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
 
 	public viewOrientation: string;	// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
 
@@ -50,8 +52,12 @@ export class RenderConfigService {
 	// The same goes for x and y positions. This insures that when the orientation of the graph changes, the x and y,
 	// and height, and width attributes are switched. Note that the size of the graph -  width: 500, height: 300 - does not change,
 	// although the which variable represents that dimension does.
-	configureViewOrientation(viewOrientation: string): void {
+	configureViewOrientation(viewOrientation: string, chartWidth: number, chartHeight: number): void {
 		this.viewOrientation = viewOrientation;
+		this.CHART_COMPONENT_WIDTH = chartWidth * this.CHART_COMPONENT_RATIO;
+		this.CHART_COMPONENT_HEIGHT = chartHeight * this.CHART_COMPONENT_RATIO;
+
+		console.log(this.CHART_COMPONENT_WIDTH, this.CHART_COMPONENT_HEIGHT);
 
 		if (viewOrientation === 'vertical') {
 			// We want to render the ValueChart horizontally
@@ -60,8 +66,8 @@ export class RenderConfigService {
 			this.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
 			this.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-			this.dimensionOneSize = this.VALUECHART_WIDTH;	// This is the width of the graph
-			this.dimensionTwoSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
+			this.dimensionOneSize = this.CHART_COMPONENT_WIDTH;	// This is the width of the graph
+			this.dimensionTwoSize = this.CHART_COMPONENT_HEIGHT;	// This is the height of the graph
 
 		} else if (viewOrientation === 'horizontal') {
 			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
@@ -69,8 +75,8 @@ export class RenderConfigService {
 			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
 			this.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-			this.dimensionOneSize = this.VALUECHART_HEIGHT;	// This is the height of the graph
-			this.dimensionTwoSize = this.VALUECHART_WIDTH;	// This is the width of the graph
+			this.dimensionOneSize = this.CHART_COMPONENT_HEIGHT;	// This is the height of the graph
+			this.dimensionTwoSize = this.CHART_COMPONENT_WIDTH;	// This is the width of the graph
 		}
 
 		// Assign a color to each user in the ValueChart
@@ -91,12 +97,12 @@ export class RenderConfigService {
 
 			this.dimensionTwoScale = d3.scaleLinear()
 				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
-				.range([0, this.VALUECHART_HEIGHT]);
+				.range([0, this.CHART_COMPONENT_HEIGHT]);
 		} else if (viewOrientation === 'horizontal') {
 			
 			this.dimensionTwoScale = d3.scaleLinear()
 				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
-				.range([0, this.VALUECHART_WIDTH]);
+				.range([0, this.CHART_COMPONENT_WIDTH]);
 		}
 	}
 

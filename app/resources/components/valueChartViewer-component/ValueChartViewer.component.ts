@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 11:37:26
+* @Last Modified time: 2016-07-21 17:44:55
 */
 
 import { Component }															from '@angular/core';
@@ -116,7 +116,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	DETAIL_BOX_WIDTH_OFFSET: number = -50;
 	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
-	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.3;
+	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.15;
 
 	detailBoxCurrentTab: string;
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
@@ -280,7 +280,7 @@ export class ValueChartViewerComponent implements OnInit {
 			let detailBoxContainer: any = $('.detail-box')[0];
 			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 
-			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
+			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
 		}
 	}
 

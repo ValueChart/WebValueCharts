@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:20:58
+* @Last Modified time: 2016-07-21 16:44:31
 */
 
 import { Injectable } 												from '@angular/core';
@@ -187,7 +187,9 @@ export class SummaryChartRenderer {
 	renderSummaryChart(rows: RowData[], viewOrientation: string): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
 		this.summaryChartScale = d3.scaleLinear()
-			.range([0, this.renderConfigService.VALUECHART_HEIGHT]);
+			.range([0, this.renderConfigService.CHART_COMPONENT_HEIGHT]);
+
+		console.log(this.renderConfigService.CHART_COMPONENT_HEIGHT);
 
 		this.chart
 			.attr('transform', () => {

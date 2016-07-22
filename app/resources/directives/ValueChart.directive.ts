@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 16:26:52
+* @Last Modified time: 2016-07-21 17:54:46
 */
 
 
@@ -46,7 +46,20 @@ import {RowData, CellData, LabelData}										from '../types/ValueChartViewer.t
 
 @Directive({
 	selector: 'ValueChart',
-	inputs: ['data', 'orientation']
+	inputs: ['data', 
+			'orientation',
+			'width',
+			'height',
+			'displayScoreFunctions',
+			'displayDomainValues',
+			'displayScales',
+			'displayTotalScores',
+			'displayScoreFunctionValueLabels',
+			'weightResizeType',
+			'reorderObjectives',
+			'sortAlternatives',
+			'pumpWeights',
+			'setObjectiveColors',]
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -57,9 +70,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private previousOrientation: string;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
-	// Height and width of the viewport for use with viewBox attribute of the root SVG element
-	private viewportWidth: number;
-	private viewportHeight: number;
+	private chartWidth: number;
+	private chartHeight: number;
 
 	// Interaction Toggles
 	private interactionConfig: any = {};
@@ -96,10 +108,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
 
-		// Configure the size of the user viewport. This will be scaled to fit the browser window
-		this.viewportWidth = 1700;
-		this.viewportHeight = 850;
-
 		// Configure the ValueChartViewerService.
 		this.valueChartService.setValueChart(this.valueChart);
 		this.valueChartViewerService.initialize();
@@ -108,8 +116,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 
 		// Configure the Render Service:
+		this.renderConfigService.configureViewOrientation(this.viewOrientation, this.chartWidth, this.chartHeight);
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+
+		console.log(this.chartWidth, this.chartHeight, this.renderConfigService);
 
 		// Initialize Change Detection:
 		this.initChangeDetection();
@@ -125,7 +135,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Create the SVG base element, and set it to dynamically fit to the viewport:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed('ValueChart svg-content-responsive', true)
-			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
+			.attr('viewBox', '0 -10' + ' ' + this.chartWidth + ' ' + this.chartHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
 
@@ -181,7 +191,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.initChangeDetection();
 			// Configure the Render Service:
 			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-			this.renderConfigService.configureViewOrientation(this.viewOrientation);
+			this.renderConfigService.configureViewOrientation(this.viewOrientation, this.chartWidth, this.chartHeight);
 
 			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
 			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
@@ -343,7 +353,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	updateViewOrientation(): void {
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+		this.renderConfigService.configureViewOrientation(this.viewOrientation, this.chartWidth, this.chartHeight);
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
@@ -375,6 +385,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() set orientation(value: any) {
 		this.viewOrientation = <string> value;
 	}
+
+	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives orientation attribute.
+	@Input() set width(value: any) {
+		this.chartWidth = <number> value;
+	}
+
+	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives orientation attribute.
+	@Input() set height(value: any) {
+		this.chartHeight = <number> value;
+	}
+
 
 	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.
