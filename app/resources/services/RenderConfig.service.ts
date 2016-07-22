@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 17:20:28
+* @Last Modified time: 2016-07-21 21:47:44
 */
 
 import { Injectable } 												from '@angular/core';
@@ -11,7 +11,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Application Classes
-import { ValueChartService }											from './ValueChart.service';
+import { ValueChartService }										from './ValueChart.service';
 
 // Model Classes:
 import { User }														from '../model/User';
@@ -21,21 +21,7 @@ export class RenderConfigService {
 
 	public CHART_COMPONENT_RATIO: number = 0.47;
 
-	public CHART_COMPONENT_WIDTH: number;	// Width of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
-	public CHART_COMPONENT_HEIGHT: number;	// Height of a a single ValueChart component (like an Objective chart, summary chart, or label area.)
-
 	public viewOrientation: string;	// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
-
-	public dimensionOne: string; // Width when in 'vertical' Orientation, Height when in 'horizontal' Orientation
-	public dimensionTwo: string; // Height when in 'vertical' Orientation, Width when in 'horizontal' Orientation
-	
-	public coordinateOne: string; // x when in 'vertical' Orientation, y when in 'horizontal' Orientation
-	public coordinateTwo: string; // y when in 'vertical' Orientation, x when in 'horizontal' Orientation
-
-	public dimensionOneSize: number; // Width (or Height) of a major element of a ValueChart (objective chart, labels, and summary chart)
-	public dimensionTwoSize: number; // Height (or Width) of a major element of a ValueChart (objective chart, labels, and summary chart)
-
-	public dimensionTwoScale: d3.Linear<number, number>; // Linear scale between domain [0,1] and range [0, dimensionTwoSize]
 
 	public viewConfiguration: any = {};
 
@@ -52,33 +38,41 @@ export class RenderConfigService {
 	// The same goes for x and y positions. This insures that when the orientation of the graph changes, the x and y,
 	// and height, and width attributes are switched. Note that the size of the graph -  width: 500, height: 300 - does not change,
 	// although the which variable represents that dimension does.
-	configureViewOrientation(viewOrientation: string, chartWidth: number, chartHeight: number): void {
-		this.viewOrientation = viewOrientation;
-		this.CHART_COMPONENT_WIDTH = chartWidth * this.CHART_COMPONENT_RATIO;
-		this.CHART_COMPONENT_HEIGHT = chartHeight * this.CHART_COMPONENT_RATIO;
-
-		console.log(this.CHART_COMPONENT_WIDTH, this.CHART_COMPONENT_HEIGHT);
+	updateViewConfig(viewConfig: any, viewOrientation: string, componentWidth: number, componentHeight: number): void {
+		viewConfig.viewOrientation = viewOrientation;
+		viewConfig.chartComponentWidth = componentWidth;
+		viewConfig.chartComponentHeight = componentHeight;
 
 		if (viewOrientation === 'vertical') {
 			// We want to render the ValueChart horizontally
-			this.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
-			this.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
-			this.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
-			this.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
+			viewConfig.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
+			viewConfig.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
+			viewConfig.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
+			viewConfig.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-			this.dimensionOneSize = this.CHART_COMPONENT_WIDTH;	// This is the width of the graph
-			this.dimensionTwoSize = this.CHART_COMPONENT_HEIGHT;	// This is the height of the graph
+			viewConfig.dimensionOneSize = viewConfig.chartComponentWidth;	// This is the width of the graph
+			viewConfig.dimensionTwoSize = viewConfig.chartComponentHeight;	// This is the height of the graph
+
+			viewConfig.dimensionTwoScale = d3.scaleLinear()
+				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
+				.range([0, componentHeight]);
 
 		} else if (viewOrientation === 'horizontal') {
-			this.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
-			this.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
-			this.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
-			this.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
+			viewConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
+			viewConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
+			viewConfig.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
+			viewConfig.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-			this.dimensionOneSize = this.CHART_COMPONENT_HEIGHT;	// This is the height of the graph
-			this.dimensionTwoSize = this.CHART_COMPONENT_WIDTH;	// This is the width of the graph
+			viewConfig.dimensionOneSize = viewConfig.chartComponentHeight;	// This is the height of the graph
+			viewConfig.dimensionTwoSize = viewConfig.chartComponentWidth;	// This is the width of the graph
+
+			viewConfig.dimensionTwoScale = d3.scaleLinear()
+				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
+				.range([0, componentWidth]);
 		}
+	}
 
+	initObjectiveColors(): void {
 		// Assign a color to each user in the ValueChart
 		if (!this.userColorsAssigned) {
 			var numKellyColorsUsed: number = 0;
@@ -89,20 +83,6 @@ export class RenderConfigService {
 				}
 			});
 			this.userColorsAssigned = true;
-		}
-	}
-
-	recalculateDimensionTwoScale(viewOrientation: string): void {
-		if (viewOrientation === 'vertical') {
-
-			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
-				.range([0, this.CHART_COMPONENT_HEIGHT]);
-		} else if (viewOrientation === 'horizontal') {
-			
-			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
-				.range([0, this.CHART_COMPONENT_WIDTH]);
 		}
 	}
 

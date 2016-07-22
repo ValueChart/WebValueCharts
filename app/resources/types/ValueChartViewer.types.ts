@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 12:55:17
+* @Last Modified time: 2016-07-21 21:56:34
 */
 
 import { Objective }					from '../model/Objective';
@@ -36,4 +36,20 @@ export interface LabelData {
 	depth: number;
 	depthOfChildren: number;
 	subLabelData?: LabelData[]
+}
+
+export interface ViewConfig {
+	viewOrientation: string;
+	chartComponentWidth: number;
+	chartComponentHeight: number;
+	dimensionOne: string;
+	dimensionTwo: string;
+	coordinateOne: string;
+	coordinateTwo: string;
+
+	dimensionOneSize: number;
+	dimensionTwoSize: number;
+
+	dimensionTwoScale: any;
+
 }

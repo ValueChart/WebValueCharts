@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 13:39:06
+* @Last Modified time: 2016-07-21 22:04:31
 */
 
 import { Injectable } 												from '@angular/core';
@@ -24,8 +24,6 @@ import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreF
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
 import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
 
-import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.interaction';
-
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
 
@@ -37,7 +35,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
-import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
+import {RowData, CellData, LabelData, ViewConfig}					from '../types/ValueChartViewer.types';
 
 
 
@@ -48,14 +46,16 @@ import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.typ
 @Injectable()
 export class LabelRenderer {
 
+	public viewConfig: ViewConfig = <ViewConfig> {};
+
 	// d3 selections that are saved to avoid searching the DOM every time they are needed.
 	public rootContainer: d3.Selection<any>;				// the 'g' element that is the root container of the Label area.
 	public labelSpaceOutline: d3.Selection<any>;			// the 'rect' element that is the outline of the label area.
 	public labelContainer: d3.Selection<any>;				// the 'g' element that contains the hierarchical label structure.
 	public scoreFunctionContainer: d3.Selection<any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
-	private labelWidth: number;				// The min of the labels, calculated based on maximum depth of the objective hierarchy and the amount of 
-											// space that the label area occupies.
+	private labelWidth: number;								// The min of the labels, calculated based on maximum depth of the objective hierarchy and the amount of 
+															// space that the label area occupies.
 	private displayScoreFunctions: boolean;
 
 	public scoreFunctionRenderers: any;
@@ -66,7 +66,6 @@ export class LabelRenderer {
 		private valueChartViewerService: ValueChartViewerService,
 		private scoreFunctionViewerService: ScoreFunctionViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private defs: LabelDefinitions,
 		private ngZone: NgZone) { 
 	}
@@ -142,7 +141,9 @@ export class LabelRenderer {
 		});
 	}
 
-	updateLabelSpace(labelData: LabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
+	updateLabelSpace(width: number, height: number, labelData: LabelData[], parentName: string, viewOrientation: string, objective: PrimitiveObjective[]) {
+		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
+
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
@@ -160,25 +161,26 @@ export class LabelRenderer {
 	}
 
 	// This function positions and gives widths + heights to the elements created by the createLabelSpace method.
-	renderLabelSpace(labelData: LabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
+	renderLabelSpace(width: number, height: number, labelData: LabelData[], viewOrientation: string, objective: PrimitiveObjective[]): void {
+		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
-		this.labelWidth = this.valueChartViewerService.calculateMinLabelWidth(labelData, this.renderConfigService.dimensionOneSize, this.displayScoreFunctions);
+		this.labelWidth = this.valueChartViewerService.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
 			.attr('transform', () => {
 				if (viewOrientation === 'vertical')
-					return 'translate(0,' + (this.renderConfigService.dimensionTwoSize + 10) + ')';	
+					return 'translate(0,' + (this.viewConfig.dimensionTwoSize + 10) + ')';	
 				else
 					return 'translate(0,0)';
 			});
-			
+
 		// Set the width and height of labelSpaceOutline 'rect' to the width and hight of the label area.
 		this.labelSpaceOutline
-			.attr(this.renderConfigService.dimensionOne, this.renderConfigService.dimensionOneSize)
-			.attr(this.renderConfigService.dimensionTwo, this.renderConfigService.dimensionTwoSize);
+			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
+			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
 
 		// Render the labels, starting with the labels for the highest level AbstractObjectives, which are in the 'g' directly under the root container.
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + this.defs.ROOT_CONTAINER_NAME + '"]');
@@ -218,7 +220,7 @@ export class LabelRenderer {
 				return;
 			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 			
-			let scaledWeightOffset: number = this.renderConfigService.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
+			let scaledWeightOffset: number = this.viewConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 			if (isDataUpdate)
@@ -240,13 +242,13 @@ export class LabelRenderer {
 			});
 
 		labelOutlines
-			.attr(this.renderConfigService.dimensionOne, this.determineLabelWidth)
-			.attr(this.renderConfigService.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
-			.attr(this.renderConfigService.dimensionTwo, (d: LabelData, i: number) => {
-				return Math.max(this.renderConfigService.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
+			.attr(this.viewConfig.dimensionOne, this.determineLabelWidth)
+			.attr(this.viewConfig.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
+			.attr(this.viewConfig.dimensionTwo, (d: LabelData, i: number) => {
+				return Math.max(this.viewConfig.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
 			})
-			.attr(this.renderConfigService.coordinateTwo, ((d: LabelData, i: number) => {
-				return this.renderConfigService.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
+			.attr(this.viewConfig.coordinateTwo, ((d: LabelData, i: number) => {
+				return this.viewConfig.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
 			}));
 	}
 
@@ -255,14 +257,14 @@ export class LabelRenderer {
 
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
-		labelTexts.attr(this.renderConfigService.coordinateOne, () => {
+		labelTexts.attr(this.viewConfig.coordinateOne, () => {
 				return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2); 
 			})
-			.attr(this.renderConfigService.coordinateTwo, (d: LabelData, i: number) => {
+			.attr(this.viewConfig.coordinateTwo, (d: LabelData, i: number) => {
 				return (viewOrientation === "vertical") ?
-					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 2) + textOffset
+					this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 2) + textOffset
 					:
-					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
+					this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
 			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
@@ -271,16 +273,16 @@ export class LabelRenderer {
 	renderLabelDividers(labelDividers: d3.Selection<any>, weightOffsets: number[], viewOrientation: string): void {
 
 		var calculateDimensionTwoOffset = (d: LabelData, i: number) => {
-			return this.renderConfigService.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
+			return this.viewConfig.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
 		};
 
 		labelDividers
-			.attr(this.renderConfigService.coordinateOne + '1', 0)
-			.attr(this.renderConfigService.coordinateOne + '2', (d: LabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
+			.attr(this.viewConfig.coordinateOne + '1', 0)
+			.attr(this.viewConfig.coordinateOne + '2', (d: LabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
 				return (i === 0) ? 0 : this.determineLabelWidth(d);
 			})
-			.attr(this.renderConfigService.coordinateTwo + '1', calculateDimensionTwoOffset)
-			.attr(this.renderConfigService.coordinateTwo + '2', calculateDimensionTwoOffset);
+			.attr(this.viewConfig.coordinateTwo + '1', calculateDimensionTwoOffset)
+			.attr(this.viewConfig.coordinateTwo + '2', calculateDimensionTwoOffset);
 	}
 
 	// This function creates a score function plot for each Primitive Objective in the ValueChart using the ScoreFunctionRenderer.
@@ -329,17 +331,17 @@ export class LabelRenderer {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
 			objectiveWeight = this.valueChartService.maximumWeightMap.getObjectiveWeight(datum.getId());
-			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
-			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
+			dimensionOneTransform = (this.viewConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
+			dimensionTwoTransform = this.viewConfig.dimensionTwoScale(weightOffset);				// ^^
 
 			// Place the score function plot in the correct location.
 			el.attr('transform', this.renderConfigService.generateTransformTranslation(viewOrientation, dimensionOneTransform, dimensionTwoTransform));
 
 			if (viewOrientation === 'vertical') {
 				width = this.labelWidth;
-				height = this.renderConfigService.dimensionTwoScale(objectiveWeight);
+				height = this.viewConfig.dimensionTwoScale(objectiveWeight);
 			} else {
-				width = this.renderConfigService.dimensionTwoScale(objectiveWeight);
+				width = this.viewConfig.dimensionTwoScale(objectiveWeight);
 				height = this.labelWidth;
 			}
 
@@ -361,7 +363,7 @@ export class LabelRenderer {
 	determineLabelWidth = (d: LabelData) => {		 // Expand the last label to fill the rest of the space.
 		var scoreFunctionOffset: number = ((this.displayScoreFunctions) ? this.labelWidth : 0);
 		var retValue = (d.depthOfChildren === 0) ?
-			(this.renderConfigService.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
+			(this.viewConfig.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
 			:
 			this.labelWidth;
 

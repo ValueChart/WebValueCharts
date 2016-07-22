@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 17:11:11
+* @Last Modified time: 2016-07-21 21:33:16
 */
 
 import { Injectable } 												from '@angular/core';
@@ -17,6 +17,8 @@ import { ValueChartViewerService }									from '../services/ValueChartViewer.se
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
+
+import { SummaryChartRenderer }										from '../renderers/SummaryChart.renderer';
 
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
@@ -58,6 +60,7 @@ export class SortAlternativesInteraction {
 	private jumpPoints: number[];
 
 	constructor(
+		private summaryChartRenderer: SummaryChartRenderer,
 		private renderConfigService: RenderConfigService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService,
@@ -141,11 +144,11 @@ export class SortAlternativesInteraction {
 		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
 
 		this.minCoordOne = 0;
-		this.maxCoordOne = this.renderConfigService.dimensionOneSize;
+		this.maxCoordOne = this.summaryChartRenderer.viewConfig.dimensionOneSize;
 		this.totalCoordOneChange = 0;
 
 		this.alternativeBox = d3.select((<any> d3.event).sourceEvent.target)
-		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.renderConfigService.dimensionOne);
+		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.dimensionOne);
 
 		this.siblingBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
 
@@ -169,17 +172,17 @@ export class SortAlternativesInteraction {
 		this.siblingBoxes.nodes().forEach((alternativeBox: Element) => {
 			if (alternativeBox !== undefined) {
 				let selection: d3.Selection<any> = d3.select(alternativeBox);
-				let jumpPoint: number = (+selection.attr(this.renderConfigService.dimensionOne) / 2) + +selection.attr(this.renderConfigService.coordinateOne);
+				let jumpPoint: number = (+selection.attr(this.summaryChartRenderer.viewConfig.dimensionOne) / 2) + +selection.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
 				this.jumpPoints.push(jumpPoint);
 			}
 		});
 
-		this.jumpPoints.push(this.renderConfigService.dimensionOneSize);
+		this.jumpPoints.push(this.summaryChartRenderer.viewConfig.dimensionOneSize);
 	}
 
 	sortAlternatives = (d: Alternative, i: number) => {
-		var deltaCoordOne: number = (<any>d3.event)['d' + this.renderConfigService.coordinateOne];
-		var currentCoordOne: number = +this.alternativeBox.attr(this.renderConfigService.coordinateOne);
+		var deltaCoordOne: number = (<any>d3.event)['d' + this.summaryChartRenderer.viewConfig.coordinateOne];
+		var currentCoordOne: number = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
 		
 		if (currentCoordOne + deltaCoordOne < 0) {
 			deltaCoordOne = 0 - currentCoordOne;
@@ -202,7 +205,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE +  '[alternative="' + d.getName() + '"]').attr(this.renderConfigService.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE +  '[alternative="' + d.getName() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
@@ -211,7 +214,7 @@ export class SortAlternativesInteraction {
 		});
 
 		if (this.alternativeLabelToMove)
-			this.alternativeLabelToMove.attr(this.renderConfigService.coordinateOne, +this.alternativeLabelToMove.attr(this.renderConfigService.coordinateOne) + deltaCoordOne);
+			this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne, +this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne) + deltaCoordOne);
 
 		if (this.totalScoreLabelToMove) 
 			this.totalScoreLabelToMove.attr('transform', this.renderConfigService.incrementTransform(this.totalScoreLabelToMove.attr('transform'), deltaCoordOne, 0));
