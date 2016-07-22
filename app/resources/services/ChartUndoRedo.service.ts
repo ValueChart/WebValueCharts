@@ -10,7 +10,7 @@ import { Injectable } 														from '@angular/core';
 
 // Application Classes
 import { ValueChartService }												from './ValueChart.service';
-import { ValueChartViewerService }											from './ValueChartViewer.service';
+//import { ValueChartViewerService }											from './ValueChartViewer.service';
 import { ChangeDetectionService }											from './ChangeDetection.service';
 
 // Model Classes
@@ -44,7 +44,7 @@ export class ChartUndoRedoService {
 
 	constructor(
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
+		//private valueChartViewerService: ValueChartViewerService,
 		private changeDetectionService: ChangeDetectionService) {
 		this.undoChangeTypes = [];
 		this.redoChangeTypes = [];
@@ -146,26 +146,26 @@ export class ChartUndoRedoService {
 	}
 
 	weightMapChange(weightMapRecord: WeightMap, stateRecords: Memento[]): void {
-		if (!this.valueChartService.currentUser)
+		if (!this.valueChartService.getCurrentUser())
 			return;
 
-		var currentWeightMap: WeightMap = this.valueChartService.currentUser.getWeightMap();
+		var currentWeightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
 		stateRecords.push(currentWeightMap);
-		this.valueChartService.currentUser.setWeightMap(weightMapRecord);
+		this.valueChartService.getCurrentUser().setWeightMap(weightMapRecord);
 	}
 
 	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, stateRecords: Memento[]): void {
-		if (!this.valueChartService.currentUser)
+		if (!this.valueChartService.getCurrentUser())
 			return;
 
-		var currentScoreFunction: ScoreFunction = this.valueChartService.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
+		var currentScoreFunction: ScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
-		this.valueChartService.currentUser.getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+		this.valueChartService.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
 	}
 
 	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, stateRecords: Memento[]): void {
-		var alternatives: Alternative[] = this.valueChartService.alternatives;
+		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
 		stateRecords.push(new AlternativeOrderRecord(alternatives));
 
 		var cellIndices: number[] = [];
@@ -174,18 +174,18 @@ export class ChartUndoRedoService {
 			cellIndices[alternativeOrderRecord.alternativeIndexMap[alternative.getName()]] = index;
 		});
 
-		this.valueChartViewerService.reorderAllCells(cellIndices);
+		//this.valueChartViewerService.reorderAllCells(cellIndices);
 		this.changeDetectionService.alternativeOrderChanged = true;
 	}
 
 	objectivesChange(objectivesRecord: ObjectivesRecord, stateRecords: Memento[]): void {
-		var currentObjectives: Objective[] = this.valueChartService.getValueChart().getRootObjectives();
+		var currentObjectives: Objective[] = this.valueChartService.getRootObjectives();
 
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 
 		this.valueChartService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
-		this.valueChartViewerService.updateLabelData();
-		this.valueChartService.primitiveObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives();
+		//this.valueChartViewerService.updateLabelData();
+		this.valueChartService.resetPrimitiveObjectives();
 
 		this.changeDetectionService.rowOrderChanged = true;
 

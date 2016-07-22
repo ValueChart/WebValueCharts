@@ -236,7 +236,7 @@ export class LabelRenderer {
 		labelOutlines.style('fill', 'white')
 			.style('stroke', (d: LabelData) => {
 				// PrimitiveObjective's should have their own color unless the ValueChart has multiple users. Abstract Objectives should always be gray.
-				return (d.depthOfChildren === 0 && this.valueChartService.getValueChart().isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
+				return (d.depthOfChildren === 0 && this.valueChartService.isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
 			});
 
 		labelOutlines
@@ -264,7 +264,7 @@ export class LabelRenderer {
 					:
 					this.renderConfigService.dimensionTwoScale(weightOffsets[i]) + (this.renderConfigService.dimensionTwoScale(d.weight) / 5) + textOffset;
 			})
-			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
+			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 
@@ -328,7 +328,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.valueChartService.maximumWeightMap.getObjectiveWeight(datum.getId());
+			objectiveWeight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(datum.getId());
 			dimensionOneTransform = (this.renderConfigService.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.renderConfigService.dimensionTwoScale(weightOffset);				// ^^
 

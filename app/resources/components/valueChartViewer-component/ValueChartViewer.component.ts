@@ -52,7 +52,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 
 @Component({
-	selector: 'create',
+	selector: 'ValueChartViewer',
 	templateUrl: '/app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [

@@ -78,7 +78,7 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 		}
 
 
-		this.users = this.valueChartService.users
+		this.users = this.valueChartService.getUsers()
 
 		this.initChangeDetection();
 		this.initScoreFunctionPlot();

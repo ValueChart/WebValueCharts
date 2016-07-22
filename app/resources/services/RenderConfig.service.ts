@@ -76,7 +76,7 @@ export class RenderConfigService {
 		// Assign a color to each user in the ValueChart
 		if (!this.userColorsAssigned) {
 			var numKellyColorsUsed: number = 0;
-			this.valueChartService.users.forEach((user: User, index: number) => {
+			this.valueChartService.getUsers().forEach((user: User, index: number) => {
 				if (!user.color) {
 					user.color = this.kellyColors[numKellyColorsUsed];
 					numKellyColorsUsed++;
@@ -90,12 +90,12 @@ export class RenderConfigService {
 		if (viewOrientation === 'vertical') {
 
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
+				.domain([0, this.valueChartService.getMaximumWeightMap().getWeightTotal()])
 				.range([0, this.VALUECHART_HEIGHT]);
 		} else if (viewOrientation === 'horizontal') {
 			
 			this.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.maximumWeightMap.getWeightTotal()])
+				.domain([0, this.valueChartService.getMaximumWeightMap().getWeightTotal()])
 				.range([0, this.VALUECHART_WIDTH]);
 		}
 	}

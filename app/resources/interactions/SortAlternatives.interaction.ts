@@ -73,7 +73,7 @@ export class SortAlternativesInteraction {
 			this.sortAlternativesByObjective(true);
 
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
 			this.valueChartViewerService.reorderAllCells(this.valueChartViewerService.generateCellOrderAlphabetically());
 			this.changeDetectionService.alternativeOrderChanged = true;
@@ -82,7 +82,7 @@ export class SortAlternativesInteraction {
 			this.sortAlternativesManually(true);
 
 		} else if (sortingType === this.RESET_SORT) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
 			this.valueChartViewerService.resetCellOrder();
 			this.changeDetectionService.alternativeOrderChanged = true;
@@ -123,7 +123,7 @@ export class SortAlternativesInteraction {
 	}
 
 	sortByObjective = (eventObject: Event) => {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
+			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
 			var objective: Objective = (<any>eventObject.target).__data__.objective;
 			var objectivesToReorderBy: PrimitiveObjective[];
@@ -138,7 +138,7 @@ export class SortAlternativesInteraction {
 		}
 
 	startSortAlternatives = (d: Alternative, i: number) => {
-		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.alternatives);
+		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
 		this.minCoordOne = 0;
 		this.maxCoordOne = this.renderConfigService.dimensionOneSize;
@@ -156,8 +156,8 @@ export class SortAlternativesInteraction {
 		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
 
-		for (var i = 0; i < this.valueChartService.alternatives.length; i++) {
-			if (this.valueChartService.alternatives[i].getName() === d.getName()) {
+		for (var i = 0; i < this.valueChartService.getAlternatives().length; i++) {
+			if (this.valueChartService.getAlternatives()[i].getName() === d.getName()) {
 				this.currentAlternativeIndex = i;
 				break;
 			}
@@ -219,7 +219,7 @@ export class SortAlternativesInteraction {
 	}
 
 	endSortAlternatives = (d: Alternative, i: number) => {
-		var alternatives = this.valueChartService.alternatives;
+		var alternatives = this.valueChartService.getAlternatives();
 
 		if (this.newAlternativeIndex !== this.currentAlternativeIndex) {
 			var temp: Alternative = alternatives.splice(this.currentAlternativeIndex, 1)[0];
