@@ -2,11 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 13:00:30
+* @Last Modified time: 2016-07-25 14:03:01
 */
 
 import { Injectable } 															from '@angular/core';
 import { KeyValueDiffers, KeyValueDiffer }										from '@angular/core';
+
+// Application Classes:
+import { ChartUndoRedoService }													from './ChartUndoRedo.service';
+
 
 // Model Classes: 
 import { ValueChart } 															from '../model/ValueChart';
@@ -34,7 +38,13 @@ export class ChangeDetectionService {
 
 	// Interaction Toggles
 
-	constructor(private objectDiffers: KeyValueDiffers) { }
+	constructor(
+		private objectDiffers: KeyValueDiffers,
+		private chartUndoRedoService: ChartUndoRedoService) {
+
+			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_ALTERNATIVE_ORDER_CHANGED, () => { this.alternativeOrderChanged = true; });
+			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_OBJECTIVES_CHANGED, 		() => { this.rowOrderChanged = true; });
+		}
 
 	initDiffers(valueChart: ValueChart): void {
 		this.previousValueChart = valueChart;

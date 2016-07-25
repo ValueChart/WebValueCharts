@@ -2,27 +2,34 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 13:40:19
+* @Last Modified time: 2016-07-25 14:42:47
 */
 
 import { Injectable } 										from '@angular/core';
 
 // Application Classes:
 import { CurrentUserService }								from './CurrentUser.service';
+import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 
 // Model Classes
 import { ValueChart }										from '../model/ValueChart';
+import { Objective }										from '../model/Objective';
 import { PrimitiveObjective }								from '../model/PrimitiveObjective';
 import { User }												from '../model/User';	
+import { ScoreFunction }									from '../model/ScoreFunction';	
 import { Alternative }										from '../model/Alternative';
 import { WeightMap }										from '../model/WeightMap';
 import { ContinuousDomain }									from '../model/ContinuousDomain';
+
+// Type Definitions:
+import { ValueChartStateContainer }							from '../types/StateContainer.types';
+import { ScoreFunctionRecord }								from '../types/Record.types';
 	
 // This class stores the state of a ValueChart and exposes this state to the renderer classes. Renderer classes are allowed to modify 
 // this state as a way of initiating change detection. 
 
 @Injectable()
-export class ValueChartService {
+export class ValueChartService implements ValueChartStateContainer {
 
 	private valueChart: ValueChart;
 	public primitiveObjectives: PrimitiveObjective[];
@@ -37,7 +44,13 @@ export class ValueChartService {
 	public alternatives: Alternative[];
 	public numAlternatives: number;
 
-	constructor(private currentUserService: CurrentUserService) { }
+	constructor(
+		private currentUserService: CurrentUserService,
+		private chartUndoRedoService: ChartUndoRedoService) {
+
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
+	}
 
 	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
@@ -58,6 +71,10 @@ export class ValueChartService {
 		return this.valueChart;
 	}
 
+	currentUserIsDefined(): boolean {
+		return this.currentUser !== undefined;
+	}
+
 	getCurrentUser(): User {
 		// Obviously we should have it so that two usernames are never the same.
 		var user: User = this.valueChart.getUsers().filter((user: User) => {
@@ -68,6 +85,24 @@ export class ValueChartService {
 			user = this.valueChart.getUsers()[0];
 
 		return user;
+	}
+
+	getCurrentUserScoreFunction(objectiveName: string): ScoreFunction {
+		if (this.currentUser)
+			return this.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objectiveName);
+	}
+
+	getCurrentUserWeightMap(): WeightMap {
+		if (this.currentUser)
+			return this.currentUser.getWeightMap();
+	}
+
+	getAlternatives(): Alternative[] {
+		return this.alternatives;
+	}
+
+	getRootObjectives(): Objective[] {
+		return this.valueChart.getRootObjectives();
 	}
 	
 	updateMaximumWeightMap(): void {
@@ -88,5 +123,13 @@ export class ValueChartService {
 		}
 
 		return elements;
+	}
+
+	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
+		this.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+	}
+
+	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
+		this.currentUser.setWeightMap(weightMapRecord);
 	}
 }

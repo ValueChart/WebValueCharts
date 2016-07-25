@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 16:17:03
+* @Last Modified time: 2016-07-25 14:43:13
 */
 
 import { Injectable } 										from '@angular/core';
@@ -11,8 +11,8 @@ import { Injectable } 										from '@angular/core';
 import * as d3 												from 'd3';
 
 // Application Classes:
-import { AlternativeOrderRecord }							from '../model/Records';
 import { ValueChartService }								from './ValueChart.service';
+import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 
 // Model Classes
 import { ValueChart }										from '../model/ValueChart';
@@ -26,6 +26,11 @@ import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
 
 import { RowData, CellData, UserScoreData, LabelData}		from '../types/ValueChartViewer.types.ts';
+
+// Types:
+import { ObjectivesRecord }									from '../types/Record.types';
+import { AlternativeOrderRecord }							from '../types/Record.types';
+
 	
 // This class contains methods for converting a ValueChartDirective's ValueChart into a format suitable for d3, 
 // and for updating this data in response to user actions.
@@ -37,7 +42,15 @@ export class ValueChartViewerService {
 	private rowData: RowData[];
 	private labelData: LabelData[];
 
-	constructor(private valueChartService: ValueChartService) { }
+	constructor(
+		private valueChartService: ValueChartService,
+		private chartUndoRedoService: ChartUndoRedoService) {
+			
+			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
+			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);	
+		}
+
+
 
 	initialize() {
 		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.alternatives);
@@ -344,6 +357,19 @@ export class ValueChartViewerService {
 			}
 		});
 	}
+
+	changeAlternativesOrder = (cellIndices: number[]) => {
+		this.reorderAllCells(cellIndices);
+	}
+
+	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
+		this.valueChartService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
+		this.updateLabelData();
+		this.valueChartService.primitiveObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives();
+		this.generateRowData();
+	}
+
+
 
 }
 
