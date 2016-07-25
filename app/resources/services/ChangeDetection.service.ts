@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 14:03:01
+* @Last Modified time: 2016-07-25 15:21:24
 */
 
 import { Injectable } 															from '@angular/core';
@@ -29,6 +29,9 @@ export class ChangeDetectionService {
 
 	public previousViewConfig: any = {};
 	public previousInteractionConfig: any = {};
+
+	public previousWidth: number;
+	public previousHeight: number;
 
 	// Differs:
 	public userDiffers: KeyValueDiffer[];

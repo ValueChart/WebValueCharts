@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 21:45:19
+* @Last Modified time: 2016-07-25 16:13:02
 */
 
 
@@ -118,8 +118,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.valueChartViewerService.updateWeightOffsets();
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 
-		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
-		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
+		this.calculateDefaultComponentSize();
 
 		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.renderConfigService.initObjectiveColors();
@@ -132,6 +131,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// ValueChart Setup is complete:
 		this.isInitialized = true;	
+	}
+
+	calculateDefaultComponentSize() {
+		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
+		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
 	}
 
 	createValueChart(): void {
@@ -160,6 +164,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// View Configuration
 		this.previousOrientation = this.viewOrientation;
 		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfiguration);
+		this.changeDetectionService.previousWidth = this.chartWidth;
+		this.changeDetectionService.previousHeight = this.chartHeight;
 
 		// Interactions:
 		this.changeDetectionService.initPreviousInteractionConfig(this.interactionConfig)
@@ -257,6 +263,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	detectViewConfigChanges(): void {
 		if (this.previousOrientation !== this.viewOrientation) {
 			this.previousOrientation = this.viewOrientation;
+			this.updateViewOrientation();
+		}
+
+		if (this.changeDetectionService.previousWidth !== this.chartWidth || this.changeDetectionService.previousHeight !== this.chartHeight) {
+			this.changeDetectionService.previousWidth = this.chartWidth;
+			this.changeDetectionService.previousHeight = this.chartHeight;
+			this.el.attr('viewBox', '0 -10' + ' ' + this.chartWidth + ' ' + this.chartHeight);
+			this.calculateDefaultComponentSize();
 			this.updateViewOrientation();
 		}
 
