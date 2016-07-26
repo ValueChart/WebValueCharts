@@ -1,6 +1,7 @@
 // Import the express typings:
 import * as Express from 'express';
-
+import * as MongoDB from 'mongodb';
+import * as Monk from 'monk';
 
 // Import Node Modules:
 var express = require('express');
@@ -9,10 +10,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongo = require('mongodb');
+var monk = require('monk');
+
+
+
 
 var routes: Express.Router = require('./routes/index');
 
 var backend: Express.Application = express();
+var db: Monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
 
 // uncomment after placing your favicon in /public
@@ -25,6 +32,12 @@ backend.use(cookieParser());
 
 backend.use(express.static(__dirname));
 
+
+// Attach the database to the request object
+backend.use(function(req,res,next) {
+    (<any> req).db = db;
+    next();
+});
 
 backend.use('/', routes);
 
