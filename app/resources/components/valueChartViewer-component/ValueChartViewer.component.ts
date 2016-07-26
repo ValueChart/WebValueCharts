@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 17:44:55
+* @Last Modified time: 2016-07-25 16:26:39
 */
 
 import { Component }															from '@angular/core';
@@ -93,6 +93,9 @@ export class ValueChartViewerComponent implements OnInit {
 	private RESIZE_SIBLINGS: string = 'siblings';
 	private NO_RESIZING: string = 'none';
 
+	private valueChartWidth: number;
+	private valueChartHeight: number;
+
 	sub: any;
 
 	valueChart: ValueChart;
@@ -136,6 +139,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService,
 		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
@@ -163,6 +167,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		});
 
+		this.resizeValueChart();
 		this.$ = $;
 
 		// Redirect back to Create page if the ValueChart is not initialized.
@@ -200,6 +205,7 @@ export class ValueChartViewerComponent implements OnInit {
 		// Resize the alternative detail box whenever the window is resized.
 		$(window).resize((eventObjective: Event) => {
 			this.resizeDetailBox();
+			this.resizeValueChart()
 		});
 
 		this.renderEventsService.summaryChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
@@ -215,6 +221,11 @@ export class ValueChartViewerComponent implements OnInit {
 	setUserColor(user: User, color: string): void {
 		user.color = color;
 		this.changeDetectionService.colorsHaveChanged = true;
+	}
+
+	resizeValueChart(): void {
+		this.valueChartWidth = ($(window).width() * 0.95) * 1.5;
+		this.valueChartHeight = ($(window).height() * 0.75) * 1.5;
 	}
 
 	resizeDetailBox(): void {
@@ -268,11 +279,11 @@ export class ValueChartViewerComponent implements OnInit {
 	// Undo and Redo:
 
 	undoChartChange(): void {
-		this.chartUndoRedoService.undo();
+		this.chartUndoRedoService.undo(this.valueChartService);
 	}
 
 	redoChartChange(): void {
-		this.chartUndoRedoService.redo();
+		this.chartUndoRedoService.redo(this.valueChartService);
 	}
 
 	// View Configuration Options:

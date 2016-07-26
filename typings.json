@@ -4,8 +4,11 @@
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
     "jquery": "registry:dt/jquery#1.10.0+20160417213236",
     "mocha": "registry:dt/mocha#2.2.5+20160317120654",
-    "node": "registry:dt/node#4.0.0+20160509154515"
-  },
-  "dependencies": {
+    "node": "registry:dt/node#4.0.0+20160509154515",
+    "express": "registry:dt/express#4.0.0+20160708185218",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#4.0.0+20160715232503",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "node": "registry:dt/node#6.0.0+20160720070758",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
   }
 }

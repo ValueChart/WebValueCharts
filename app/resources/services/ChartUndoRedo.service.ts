@@ -2,16 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-18 15:42:52
+* @Last Modified time: 2016-07-25 14:42:34
 */
 
 
 import { Injectable } 														from '@angular/core';
 
-// Application Classes
-import { ValueChartService }												from './ValueChart.service';
-//import { ValueChartViewerService }											from './ValueChartViewer.service';
-import { ChangeDetectionService }											from './ChangeDetection.service';
+// d3
+import * as d3 																	from 'd3';
 
 // Model Classes
 import { ValueChart }														from '../model/ValueChart';
@@ -22,18 +20,24 @@ import { WeightMap }														from '../model/WeightMap';
 import { ScoreFunction }													from '../model/ScoreFunction';
 
 import { Memento }															from '../model/Memento';
-import { AlternativeOrderRecord }											from '../model/Records';
-import { ScoreFunctionRecord }												from '../model/Records';
-import { ObjectivesRecord }													from '../model/Records';
+
+// Types:
+import { ValueChartStateContainer }											from '../types/StateContainer.types';
+import { AlternativeOrderRecord }											from '../types/Record.types';
+import { ScoreFunctionRecord }												from '../types/Record.types';
+import { ObjectivesRecord }													from '../types/Record.types';
 
 
 @Injectable()
 export class ChartUndoRedoService {
 
-	private SCORE_FUNCTION_CHANGE = 'scoreFunctionChange';
-	private WEIGHT_MAP_CHANGE = 'weightMapChange';
-	private ALTERNATIVE_ORDER_CHANGE = 'alternativeOrderChange';
-	private OBJECTIVES_CHANGE = 'objectivesChange';
+	public SCORE_FUNCTION_CHANGE: string = 'scoreFunctionChange';
+	public WEIGHT_MAP_CHANGE: string = 'weightMapChange';
+	public ALTERNATIVE_ORDER_CHANGE: string = 'alternativeOrderChange';
+	public OBJECTIVES_CHANGE: string = 'objectivesChange';
+
+	public SET_ALTERNATIVE_ORDER_CHANGED: string = 'setAlternativeOrderChanged';
+	public SET_OBJECTIVES_CHANGED: string = 'setObjectivesChanged';
 
 	private undoChangeTypes: string[];
 	private redoChangeTypes: string[];
@@ -41,15 +45,22 @@ export class ChartUndoRedoService {
 	private undoStateRecords: Memento[];
 	private redoStateRecords: Memento[];
 
+	public undoRedoDispatcher: d3.Dispatch;
 
-	constructor(
-		private valueChartService: ValueChartService,
-		//private valueChartViewerService: ValueChartViewerService,
-		private changeDetectionService: ChangeDetectionService) {
+	constructor() {
 		this.undoChangeTypes = [];
 		this.redoChangeTypes = [];
 		this.undoStateRecords = [];
 		this.redoStateRecords = [];
+
+		// Create a custom event dispatcher, with one event for each kind of change.
+		this.undoRedoDispatcher = d3.dispatch(
+			this.SCORE_FUNCTION_CHANGE, 
+			this.WEIGHT_MAP_CHANGE, 
+			this.ALTERNATIVE_ORDER_CHANGE, 
+			this.OBJECTIVES_CHANGE,
+			this.SET_ALTERNATIVE_ORDER_CHANGED, 
+			this.SET_OBJECTIVES_CHANGED);
 	}
 
 	clearRedo(): void {
@@ -121,51 +132,53 @@ export class ChartUndoRedoService {
 		return this.redoChangeTypes.length !== 0;
 	}
 
-	undo(): void {
+	undo(currentStateContainer: ValueChartStateContainer): void {
 		if (!this.canUndo())
 			return;
 
 		var changeType: string = this.undoChangeTypes.pop();
 		this.redoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.undoStateRecords.pop();
-		(<any> this)[changeType](stateRecord, this.redoStateRecords);
+		(<any> this)[changeType](stateRecord, currentStateContainer, this.redoStateRecords);
 		if ((<any> window).childWindows.scoreFunctionViewer)
 			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	redo(): void {
+	redo(currentStateContainer: ValueChartStateContainer): void {
 		if (!this.canRedo()) 
 			return;
 
 		var changeType = this.redoChangeTypes.pop();
 		this.undoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.redoStateRecords.pop();
-		(<any> this)[changeType](stateRecord, this.undoStateRecords);
+		(<any> this)[changeType](stateRecord, currentStateContainer, this.undoStateRecords);
 		if ((<any> window).childWindows.scoreFunctionViewer)
 			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	weightMapChange(weightMapRecord: WeightMap, stateRecords: Memento[]): void {
-		if (!this.valueChartService.getCurrentUser())
+	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+		if (!currentStateContainer.currentUserIsDefined())
 			return;
 
-		var currentWeightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
-		stateRecords.push(currentWeightMap);
-		this.valueChartService.getCurrentUser().setWeightMap(weightMapRecord);
-	}
-
-	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, stateRecords: Memento[]): void {
-		if (!this.valueChartService.getCurrentUser())
-			return;
-
-		var currentScoreFunction: ScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
+		var currentScoreFunction: ScoreFunction = currentStateContainer.getCurrentUserScoreFunction(scoreFunctionRecord.objectiveName);
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
-		this.valueChartService.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+		// Dispatch the ScoreFunctionChange event, notifying any listeners and passing the scoreFunctionRecord as a parameter.
+		(<any> this.undoRedoDispatcher).call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
 	}
 
-	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, stateRecords: Memento[]): void {
-		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
+	weightMapChange(weightMapRecord: WeightMap, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+		if (!currentStateContainer.currentUserIsDefined())
+			return;
+
+		var currentWeightMap: WeightMap = currentStateContainer.getCurrentUserWeightMap();
+		stateRecords.push(currentWeightMap);
+		
+		(<any> this.undoRedoDispatcher).call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
+	}
+
+	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+		var alternatives: Alternative[] = currentStateContainer.getAlternatives();
 		stateRecords.push(new AlternativeOrderRecord(alternatives));
 
 		var cellIndices: number[] = [];
@@ -174,21 +187,17 @@ export class ChartUndoRedoService {
 			cellIndices[alternativeOrderRecord.alternativeIndexMap[alternative.getName()]] = index;
 		});
 
-		//this.valueChartViewerService.reorderAllCells(cellIndices);
-		this.changeDetectionService.alternativeOrderChanged = true;
+		(<any> this.undoRedoDispatcher).call(this.ALTERNATIVE_ORDER_CHANGE, {}, cellIndices);
+		(<any> this.undoRedoDispatcher).call(this.SET_ALTERNATIVE_ORDER_CHANGED);
 	}
 
-	objectivesChange(objectivesRecord: ObjectivesRecord, stateRecords: Memento[]): void {
-		var currentObjectives: Objective[] = this.valueChartService.getRootObjectives();
+	objectivesChange(objectivesRecord: ObjectivesRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+		var currentObjectives: Objective[] = currentStateContainer.getRootObjectives();
 
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 
-		this.valueChartService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
-		//this.valueChartViewerService.updateLabelData();
-		this.valueChartService.resetPrimitiveObjectives();
-
-		this.changeDetectionService.rowOrderChanged = true;
-
+		(<any> this.undoRedoDispatcher).call(this.OBJECTIVES_CHANGE, {}, objectivesRecord);
+		(<any> this.undoRedoDispatcher).call(this.SET_OBJECTIVES_CHANGED);
 	}
 
 }

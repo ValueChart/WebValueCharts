@@ -57,6 +57,8 @@ app/resources/**/*.js
 app/main.js
 app/app.routes.js
 test/**/*.js
+routes/*.js
+backend.js
 
 ### Apache Server ###
 .htaccess
