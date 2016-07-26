@@ -200,7 +200,7 @@ export class ValueChartService implements ValueChartStateContainer {
   			if (obj.getDomainType() === 'categorical') {
   				scoreFunction = new DiscreteScoreFunction();
   				let dom = (<CategoricalDomain>obj.getDomain()).getElements();
-  				let increment = dom.length - 1 / 1.0;
+  				let increment = 1.0 / (dom.length - 1);
   				let currentScore = 0;
   				for (let item of dom) {
   					scoreFunction.setElementScore(item, currentScore);

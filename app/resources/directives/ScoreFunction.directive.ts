@@ -41,10 +41,8 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
 
 	private objectiveToDisplay: PrimitiveObjective;
+	private previousObjectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunction: ScoreFunction;
-
-	private viewType: string;
-	private previousViewType: string;
 
 	private user: User;
 
@@ -69,10 +67,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initChangeDetection(): void {
 
-		this.previousViewType = this.viewType;
-
 		let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
 		this.previousScoreFunction = currentScoreFunction;
+		this.previousObjectiveToDisplay = this.objectiveToDisplay;
 	}
 
 	initScoreFunctionPlot(): void {
@@ -97,30 +94,28 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
 
 		while (iteratorElement.done === false) {
-
 			if (previousScoreFunction.getScore(iteratorElement.value) !== currentScoreFunction.getScore(iteratorElement.value)) {
 				return true;
 			}
-
 			iteratorElement = elementIterator.next();
 		}
-
 		return false;
 	}
 
 	ngDoCheck() {
 
-		if (this.viewType !== this.previousViewType) {
-			this.previousViewType = this.viewType;
-			this.configureDisplay();
+		if (this.previousObjectiveToDisplay !== this.objectiveToDisplay) {
+			this.initScoreFunctionPlot();
 		}
 
-		let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
-		var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
+		else {
+			let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
+			var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
 
-		if (scoreFunctionChange) {
-			this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
-			this.previousScoreFunction = currentScoreFunction.getMemento();
+			if (scoreFunctionChange) {
+				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
+				this.previousScoreFunction = currentScoreFunction.getMemento();
+			}
 		}
 	}
 
