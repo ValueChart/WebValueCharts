@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 17:38:59
+* @Last Modified by:   Emily Hindalong
+* @Last Modified time: 2016-07-26 15:49:23
 */
 
 /* Global Styles */
@@ -120,12 +120,20 @@ a.upload {
 
 /* SVG */
 
-.svg-content-responsive {
+.svg-content-valuechart {
     position: absolute;
     height: 75%;
     width: 95%;
     top: 14rem;
     left: 5%;
+}
+
+.svg-content-createvaluechart {
+    position: relative;
+    height: 30%;
+    width: 30%;
+    top: 1rem;
+    left: 1%;
 }
 
 /* ValueChart Viewer Styles */

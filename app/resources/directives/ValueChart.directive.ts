@@ -141,7 +141,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	createValueChart(): void {
 		// Create the SVG base element, and set it to dynamically fit to the viewport:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
-			.classed('ValueChart svg-content-responsive', true)
+			.classed('ValueChart svg-content-valuechart', true)
 			.attr('viewBox', '0 -10' + ' ' + this.chartWidth + ' ' + this.chartHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
