@@ -102,7 +102,7 @@ export class SummaryChartRenderer {
 
 		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);
 
-		var alternatives: Alternative[] = this.valueChartService.alternatives;
+		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
 
 		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.data((rows[0].cells));
@@ -125,7 +125,7 @@ export class SummaryChartRenderer {
 
 
 		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(this.valueChartService.alternatives);
+			.data(this.valueChartService.getAlternatives());
 
 		updateAlternativeBoxes.exit().remove();
 		updateAlternativeBoxes.enter().append('rect')
@@ -168,7 +168,7 @@ export class SummaryChartRenderer {
 	updateSummaryChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
 
-		var alternatives: Alternative[] = this.valueChartService.alternatives;
+		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
 
 		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
@@ -248,7 +248,7 @@ export class SummaryChartRenderer {
 	// containers here because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 	renderSummaryChartRows(alternativeBoxes: d3.Selection<any>, scoreTotals: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
 		alternativeBoxes
-			.attr(this.viewConfig.dimensionOne, (d: CellData, i: number) => { return this.viewConfig.dimensionOneSize / this.valueChartService.numAlternatives; })
+			.attr(this.viewConfig.dimensionOne, (d: CellData, i: number) => { return this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives(); })
 			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize)
 			.attr(this.viewConfig.coordinateOne, this.calculateCellCoordinateOne)
 			.attr(this.viewConfig.coordinateTwo, 0)
@@ -298,7 +298,7 @@ export class SummaryChartRenderer {
 
 	highlightBestUserScores() {
 		var maxUserScores: any = {};
-		this.valueChartService.users.forEach((user: User) => {
+		this.valueChartService.getUsers().forEach((user: User) => {
 			maxUserScores[user.getUsername()] = 0;
 		});
 
@@ -315,7 +315,7 @@ export class SummaryChartRenderer {
 			}
 		});
 
-		this.valueChartService.users.forEach((user: User) => {
+		this.valueChartService.getUsers().forEach((user: User) => {
 			bestTotalScoreSelections[user.getUsername()].classed(this.defs.BEST_SCORE, true);
 		});
 	}
@@ -333,7 +333,7 @@ export class SummaryChartRenderer {
 		// Position and give heights and widths to the user scores.
 		userScores
 			.style('fill', (d: UserScoreData, i: number) => { 
-				if (this.valueChartService.getValueChart().isIndividual())
+				if (this.valueChartService.isIndividual())
 					return d.objective.getColor(); 
 				else 
 					return d.user.color;
@@ -374,9 +374,9 @@ export class SummaryChartRenderer {
 	// Anonymous functions that are used often enough to be made class fields:
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
-	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.viewConfig.dimensionOneSize / this.valueChartService.numAlternatives); }; 
+	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()); }; 
 	// The width (or height) should be such that the user scores for one cell fill that cell.
-	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.viewConfig.dimensionOneSize / this.valueChartService.numAlternatives) / this.valueChartService.numUsers };
+	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / this.valueChartService.getNumUsers() };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());

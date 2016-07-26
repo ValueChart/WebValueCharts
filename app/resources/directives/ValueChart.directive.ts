@@ -143,8 +143,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 		// Render the ValueChart:
-		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.primitiveObjectives);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.primitiveObjectives);
+		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
@@ -205,7 +206,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Check the User Models for Changes:
 
-		this.valueChartService.getValueChart().getUsers().forEach((user: User, i: number) => {
+		this.valueChartService.getUsers().forEach((user: User, i: number) => {
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
 				this.updateValueChartDisplay();
@@ -327,7 +328,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	updateValueChartDisplay(): void {
 		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 
-		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.primitiveObjectives);
+		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
@@ -336,8 +337,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Destroy the previous label area.
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
-		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.valueChartViewerService.getLabelData(), this.valueChartService.primitiveObjectives);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.renderConfigService.viewOrientation, this.valueChartService.primitiveObjectives);
+		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.renderConfigService.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
@@ -356,13 +357,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.viewOrientation);
 		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
 	updateScoreFunctionDisplay(): void {
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.primitiveObjectives);
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
 
 

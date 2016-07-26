@@ -178,7 +178,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
 
-		this.toggleDragToChangeScore(this.valueChartService.getValueChart().isIndividual(), objective, viewOrientation);
+		this.toggleDragToChangeScore(this.valueChartService.isIndividual(), objective, viewOrientation);
 	}
 
 	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {

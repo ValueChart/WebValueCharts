@@ -73,6 +73,6 @@ export class ExpandScoreFunctionInteraction {
 	expandScoreFunction = (eventObject: Event) => {
 		var objective: PrimitiveObjective = d3.select(eventObject.target).datum();
 
-		this.openPopUp(this.valueChartService.users, objective);
+		this.openPopUp(this.valueChartService.getUsers(), objective);
 	}
 }

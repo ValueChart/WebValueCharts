@@ -47,7 +47,7 @@ export class RootComponent implements OnInit {
 
 	isGroupChart(): boolean {																						
 		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
-				(window.opener && !(<any> window.opener).valueChartService.getValueChart().isIndividual()); 					// Check to see if this is a pop-up window
+				(window.opener && !(<any> window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
 	}
 
 	switchScoreFunctionView() {

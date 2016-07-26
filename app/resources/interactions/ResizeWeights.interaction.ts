@@ -54,12 +54,12 @@ export class ResizeWeightsInteraction {
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
 				// Save the current state of the Weight Map.
-				this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.currentUser.getWeightMap());
+				this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getCurrentUser().getWeightMap());
 
 				// Calculate the correct weight increment.
-				var totalWeight: number = this.valueChartService.currentUser.getWeightMap().getWeightTotal();
+				var totalWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getWeightTotal();
 				var labelDatum: LabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.valueChartService.currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
+				var previousWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -67,7 +67,7 @@ export class ResizeWeightsInteraction {
 					pumpAmount = 0 - previousWeight;
 				}
 
-				this.valueChartService.currentUser.getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
+				this.valueChartService.getCurrentUser().getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
 			});
 		}
 	}
@@ -110,12 +110,12 @@ export class ResizeWeightsInteraction {
 
 	resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.maximumWeightMap);
+		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getMaximumWeightMap());
 	}
 
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: LabelData, i: number) => {
-		var weightMap: WeightMap = this.valueChartService.currentUser.getWeightMap();
+		var weightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
 		var deltaWeight: number = this.labelRenderer.viewConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.labelRenderer.viewConfig.coordinateTwo]);
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
