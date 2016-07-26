@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 19:05:08
+* @Last Modified time: 2016-07-21 11:37:18
 */
 
 import { Component }										from '@angular/core';
@@ -13,7 +13,7 @@ import { CurrentUserService }								from '../../services/CurrentUser.service';
 
 @Component({
 	selector: 'register',
-	templateUrl: '/app/resources/components/register-component/Register.template.html',
+	templateUrl: 'app/resources/components/register-component/Register.template.html',
 	directives: [ROUTER_DIRECTIVES]
 })
 export class RegisterComponent {

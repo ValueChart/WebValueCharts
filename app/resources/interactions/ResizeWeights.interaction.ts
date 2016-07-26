@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-12 17:08:24
+* @Last Modified time: 2016-07-21 21:27:30
 */
 
 import { Injectable } 												from '@angular/core';
@@ -42,6 +42,7 @@ export class ResizeWeightsInteraction {
 	constructor(
 		private ngZone: NgZone,
 		private renderConfigService: RenderConfigService,
+		private labelRenderer: LabelRenderer,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
@@ -115,7 +116,11 @@ export class ResizeWeightsInteraction {
 	// Event handler for resizing weights by dragging label edges.
 	resizeWeights = (d: LabelData, i: number) => {
 		var weightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
+<<<<<<< HEAD
 		var deltaWeight: number = this.renderConfigService.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.renderConfigService.coordinateTwo]);
+=======
+		var deltaWeight: number = this.labelRenderer.viewConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.labelRenderer.viewConfig.coordinateTwo]);
+>>>>>>> b991a1e
 
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');

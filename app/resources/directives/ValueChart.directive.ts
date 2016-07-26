@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-13 10:10:23
+* @Last Modified time: 2016-07-21 21:45:19
 */
 
 
@@ -41,12 +41,25 @@ import { WeightMap }															from '../model/WeightMap';
 import { User }																	from '../model/User';
 import { ScoreFunction }														from '../model/ScoreFunction';
 
-import {RowData, CellData, LabelData}										from '../types/ValueChartViewer.types';
+import {RowData, CellData, LabelData}											from '../types/ValueChartViewer.types';
 
 
 @Directive({
 	selector: 'ValueChart',
-	inputs: ['data', 'orientation']
+	inputs: ['data', 
+			'orientation',
+			'width',
+			'height',
+			'displayScoreFunctions',
+			'displayDomainValues',
+			'displayScales',
+			'displayTotalScores',
+			'displayScoreFunctionValueLabels',
+			'weightResizeType',
+			'reorderObjectives',
+			'sortAlternatives',
+			'pumpWeights',
+			'setObjectiveColors',]
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -57,15 +70,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private previousOrientation: string;
 	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
 
-	// Height and width of the viewport for use with viewBox attribute of the root SVG element
-	private viewportWidth: number;
-	private viewportHeight: number;
+	private chartWidth: number;
+	private chartHeight: number;
 
 	// Interaction Toggles
 	private interactionConfig: any = {};
 
 	// Fields for d3 collections that should be saved for later manipulation
 	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
+
+	private defaultChartComponentWidth: number;
+	private defaultChartComponentHeight: number;
 
 	constructor(
 		// Angular Resources:
@@ -96,10 +111,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
 
-		// Configure the size of the user viewport. This will be scaled to fit the browser window
-		this.viewportWidth = 1700;
-		this.viewportHeight = 850;
-
 		// Configure the ValueChartViewerService.
 		this.valueChartService.setValueChart(this.valueChart);
 		this.valueChartViewerService.initialize();
@@ -107,9 +118,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.valueChartViewerService.updateWeightOffsets();
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 
-		// Configure the Render Service:
-		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
+		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
+		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
+
+		this.renderConfigService.viewOrientation = this.viewOrientation;
+		this.renderConfigService.initObjectiveColors();
 
 		// Initialize Change Detection:
 		this.initChangeDetection();
@@ -125,21 +138,26 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Create the SVG base element, and set it to dynamically fit to the viewport:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed('ValueChart svg-content-responsive', true)
-			.attr('viewBox', '0 -10' + ' ' + this.viewportWidth + ' ' + this.viewportHeight)
+			.attr('viewBox', '0 -10' + ' ' + this.chartWidth + ' ' + this.chartHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
 
 		// Render the ValueChart:
 		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+<<<<<<< HEAD
 		this.labelRenderer.renderLabelSpace(this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+=======
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+
+>>>>>>> b991a1e
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.valueChartViewerService.getRowData());
-		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
+		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.viewOrientation);
 
 		this.summaryChartRenderer.createSummaryChart(this.el, this.valueChartViewerService.getRowData());
-		this.summaryChartRenderer.renderSummaryChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
 	initChangeDetection(): void {
@@ -176,11 +194,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.chartUndoRedoService.clearUndo();			
 
 			this.valueChartService.setValueChart(this.valueChart);
-			this.valueChartViewerService.updateAllValueChart(this.viewOrientation);
-			this.initChangeDetection()
+			this.valueChartViewerService.initialize();
+			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
+			this.initChangeDetection();
 			// Configure the Render Service:
-			this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-			this.renderConfigService.configureViewOrientation(this.viewOrientation);
+			this.renderConfigService.viewOrientation = this.viewOrientation;
+			this.renderConfigService.initObjectiveColors();
+
 
 			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
 			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
@@ -310,13 +330,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Methods for Handling Changes:
 
 	updateValueChartDisplay(): void {
-		this.valueChartViewerService.updateAllValueChart(this.viewOrientation);
+		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 
+<<<<<<< HEAD
 		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
 
 		this.labelRenderer.updateLabelSpace(this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.updateObjectiveChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
 		this.summaryChartRenderer.updateSummaryChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
+=======
+		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+>>>>>>> b991a1e
 	}
 
 	updateRowOrder(): void {
@@ -324,7 +350,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
 		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+<<<<<<< HEAD
 		this.labelRenderer.renderLabelSpace(this.valueChartViewerService.getLabelData(), this.renderConfigService.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+=======
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.renderConfigService.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+>>>>>>> b991a1e
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
@@ -332,21 +362,18 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	updateAlternativeOrder(): void {
-		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-
 		this.valueChartViewerService.updateWeightOffsets();
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 		
-		this.objectiveChartRenderer.updateObjectiveChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
+		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
 	updateViewOrientation(): void {
-		this.renderConfigService.configureViewOrientation(this.viewOrientation);
-		this.renderConfigService.recalculateDimensionTwoScale(this.viewOrientation);
-
+		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 
+<<<<<<< HEAD
 		this.labelRenderer.renderLabelSpace(this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.renderObjectiveChart(this.viewOrientation);
 		this.summaryChartRenderer.renderSummaryChart(this.valueChartViewerService.getRowData(), this.viewOrientation);
@@ -354,6 +381,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	updateScoreFunctionDisplay(): void {
 		this.labelRenderer.renderLabelSpace(this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+=======
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.viewOrientation);
+		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+	}
+
+	updateScoreFunctionDisplay(): void {
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+>>>>>>> b991a1e
 	}
 
 
@@ -374,6 +410,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() set orientation(value: any) {
 		this.viewOrientation = <string> value;
 	}
+
+	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives orientation attribute.
+	@Input() set width(value: any) {
+		this.chartWidth = <number> value;
+	}
+
+	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives orientation attribute.
+	@Input() set height(value: any) {
+		this.chartHeight = <number> value;
+	}
+
 
 	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.

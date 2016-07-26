@@ -56,12 +56,21 @@
                         <select class="form-control" [(ngModel)]="selectedObjective">
                             <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                         </select>
+<<<<<<< HEAD
                             <ScoreFunctionDirective
                                 [objective]="valueChartService.getObjective(selectedObjective)">
                                 <svg class="svg-content-responsive score-function-viewer" viewBox="0 -10, 300, 315" preserveAspectRatio="xMinYMin meet">
                                     <g class="expanded-score-function"></g>
                                 </svg>
                             </ScoreFunctionDirective>              
+=======
+                        <ScoreFunctionDirective
+                            [objective]="valueChartService.getObjective(selectedObjective)">
+                            <svg class="svg-content-responsive score-function-viewer" viewBox="0 0, 1000, 1000" preserveAspectRatio="xMinYMin meet">
+                                <g class="expanded-score-function"></g>
+                            </svg>
+                        </ScoreFunctionDirective>              
+>>>>>>> b991a1e
                     </div>
                     <div *ngIf="step === creationStepsService.PRIORITIES">
                         <h4>Set Priorities</h4>

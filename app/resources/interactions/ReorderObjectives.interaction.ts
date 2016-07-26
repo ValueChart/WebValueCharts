@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:02:46
+* @Last Modified time: 2016-07-21 21:26:06
 */
 
 import { Injectable } 												from '@angular/core';
@@ -117,9 +117,9 @@ export class ReorderObjectivesInteraction {
 		var parentOutline: d3.Selection<any> = this.parentContainer.select('rect'); 		// Select the rect that outlines the parent label of the label we are reordering.
 		var currentOutline: d3.Selection<any> = this.containerToReorder.select('rect');		// Select the rect that outlines the label we are reordering.
 
-		this.objectiveDimensionTwo = +currentOutline.attr(this.renderConfigService.dimensionTwo);							// Determine the Dimension Two (height if vertical, width of horizontal) of the label we are moving.
-		this.maxCoordinateTwo = +parentOutline.attr(this.renderConfigService.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label we are reordering.
-		this.objectiveCoordTwoOffset = +currentOutline.attr(this.renderConfigService.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label we are reordering.
+		this.objectiveDimensionTwo = +currentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo);							// Determine the Dimension Two (height if vertical, width of horizontal) of the label we are moving.
+		this.maxCoordinateTwo = +parentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label we are reordering.
+		this.objectiveCoordTwoOffset = +currentOutline.attr(this.labelRenderer.viewConfig.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label we are reordering.
 		
 		this.currentObjectiveIndex = this.siblingContainers.nodes().indexOf(this.containerToReorder.node());						// Determine the position of the label we are reordering in the list of siblings.
 		this.newObjectiveIndex = this.currentObjectiveIndex;
@@ -129,12 +129,12 @@ export class ReorderObjectivesInteraction {
 			if (el !== undefined) {
 				// For each of the labels that the label we are reordering can be switched with, determine its Coordinate Two midpoint. This is used to determine what position the label we are reordering has been moved to.
 				let selection: d3.Selection<any> = d3.select(el);
-				let jumpPoint: number = (+selection.attr(this.renderConfigService.dimensionTwo) / 2) + +selection.attr(this.renderConfigService.coordinateTwo);
+				let jumpPoint: number = (+selection.attr(this.labelRenderer.viewConfig.dimensionTwo) / 2) + +selection.attr(this.labelRenderer.viewConfig.coordinateTwo);
 				this.jumpPoints.push(jumpPoint);
 			}
 		});
 
-		this.jumpPoints.push(this.renderConfigService.dimensionTwoSize);
+		this.jumpPoints.push(this.labelRenderer.viewConfig.dimensionTwoSize);
 	}
 
 	// This function is called whenever a label that is being reordered is dragged by the user. It contains the logic which updates the
@@ -147,7 +147,7 @@ export class ReorderObjectivesInteraction {
 		// Get the change in Coordinate Two from the d3 event. Note that although we are getting coordinateTwo, not dCoordinateTwo, this is the still the change.
 		// The reason for this is because when a label is dragged, the transform of label container is changed, which can changes cooordinateTwo of the outline rectangle inside the container.
 		// THis change is equal to deltaCoordinateTwo, meaning d3.event.cooordinateTwo is reset to 0 at the end of cooordinateTwo drag event, making cooordinateTwo really dCoordinateTwo
-		var deltaCoordinateTwo: number = (<any>d3.event)[this.renderConfigService.coordinateTwo];
+		var deltaCoordinateTwo: number = (<any>d3.event)[this.labelRenderer.viewConfig.coordinateTwo];
 
 		// If we have not yet determined the mouse offset, then this is the first drag event that has been fired, and the mouse offset from 0 should the current mouse position.
 		if (this.reorderObjectiveMouseOffset === undefined) {

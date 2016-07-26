@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 19:06:44
+* @Last Modified time: 2016-07-21 17:44:55
 */
 
 import { Component }															from '@angular/core';
@@ -53,7 +53,11 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 @Component({
 	selector: 'ValueChartViewer',
+<<<<<<< HEAD
 	templateUrl: '/app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
+=======
+	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
+>>>>>>> b991a1e
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 	// Services:
@@ -116,7 +120,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	DETAIL_BOX_WIDTH_OFFSET: number = -50;
 	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
-	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.3;
+	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.15;
 
 	detailBoxCurrentTab: string;
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
@@ -149,9 +153,12 @@ export class ValueChartViewerComponent implements OnInit {
 		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
 		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
 		     	this.chartType = 'average';
+		     	this.weightResizeType = this.RESIZE_NEIGHBOR;
+
 		    } else {
 				this.valueChart = this.currentUserService.getValueChart();
 				this.chartType = 'normal';
+				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 			}
 
 		});
@@ -277,7 +284,7 @@ export class ValueChartViewerComponent implements OnInit {
 			let detailBoxContainer: any = $('.detail-box')[0];
 			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 
-			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * 1.3) + 'px';
+			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
 		}
 	}
 

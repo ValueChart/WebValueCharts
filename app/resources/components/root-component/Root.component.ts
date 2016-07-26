@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 09:17:39
+* @Last Modified time: 2016-07-21 11:37:07
 */
 
 import { Component } 												from '@angular/core';
@@ -20,7 +20,7 @@ import { ExportValueChartComponent }								from '../exportValueChart-component/
 
 @Component({
 	selector: 'root',
-	templateUrl: '/app/resources/components/root-component/Root.template.html',
+	templateUrl: 'app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [XMLValueChartParser, 
 				TemplateRef, 
@@ -54,7 +54,7 @@ export class RootComponent implements OnInit {
 
 		if (this.router.url.indexOf('distribution') === -1) {
 			this.router.navigate(['scoreFunction', 'distribution']);		
-			this.switchScoreFunctionViewText = 'Plot';
+			this.switchScoreFunctionViewText = 'User Scores';
 		} else {
 			this.router.navigate(['scoreFunction', 'plot']);	
 			this.switchScoreFunctionViewText = 'Score Distributions';
