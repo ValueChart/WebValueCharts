@@ -102,7 +102,7 @@ export class ReorderObjectivesInteraction {
 			return;
 		}
 
-		this.chartUndoRedoService.saveObjectivesRecord(this.valueChartService.getValueChart().getRootObjectives());
+		this.chartUndoRedoService.saveObjectivesRecord(this.valueChartService.getRootObjectives());
 
 		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');						// The container that holds the container for the label we are reordering.
 		this.siblingContainers = this.parentContainer.selectAll('g[parent="' + this.parentObjectiveName + '"]');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
@@ -233,7 +233,7 @@ export class ReorderObjectivesInteraction {
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.valueChartViewerService.reorderRows(primitiveObjectives);
-		this.valueChartService.primitiveObjectives = primitiveObjectives;
+		this.valueChartService.setPrimitivesObjectives(primitiveObjectives);
 
 		this.changeDetectionService.rowOrderChanged = true;
 	}

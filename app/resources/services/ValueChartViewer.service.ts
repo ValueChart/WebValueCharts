@@ -53,13 +53,12 @@ export class ValueChartViewerService {
 
 
 	initialize() {
-		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.alternatives);
+		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.getAlternatives());
 		this.generateLabelData();
 		this.generateRowData();
 	}
 
 	updateAllValueChartData(viewOrientation: string): void {
-		this.valueChartService.updateMaximumWeightMap();
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
 		
@@ -86,7 +85,7 @@ export class ValueChartViewerService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
 		} else if (objective.objectiveType === 'primitive') {
-			labelData =  { 'objective': objective, 'weight': this.valueChartService.maximumWeightMap.getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
+			labelData =  { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
 		}
 
 		return labelData;
@@ -103,7 +102,7 @@ export class ValueChartViewerService {
 	generateLabelData(): void {
 		this.labelData = [];
 
-		this.valueChartService.getValueChart().getRootObjectives().forEach((objective: Objective) => {
+		this.valueChartService.getRootObjectives().forEach((objective: Objective) => {
 			this.labelData.push(this.getLabelDatum(objective, 0));
 		});
 	}
@@ -116,22 +115,22 @@ export class ValueChartViewerService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.valueChartService.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getId());
+			labelDatum.weight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getId());
 		}
 	}
 
 	updateLabelData(): void {
 		// Use splice so as to avoid changing the array reference.
-		this.valueChartService.getValueChart().getRootObjectives().forEach((objective: Objective, index: number) => {
+		this.valueChartService.getRootObjectives().forEach((objective: Objective, index: number) => {
 			this.labelData[index] = this.getLabelDatum(objective, 0);
 		});
 	}
 
 	getCellData(objective: PrimitiveObjective): CellData[] {
 		var users: User[];
-		users = this.valueChartService.getValueChart().getUsers();
+		users = this.valueChartService.getUsers();
 
-		var objectiveValues: any[] = this.valueChartService.getValueChart().getAlternativeValuesforObjective(objective);
+		var objectiveValues: any[] = this.valueChartService.getAlternativeValuesforObjective(objective);
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
@@ -162,7 +161,7 @@ export class ValueChartViewerService {
 	generateRowData(): void {
 		this.rowData = [];
 
-		this.valueChartService.getValueChart().getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+		this.valueChartService.getPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.rowData.push({
 				objective: objective,
 				weightOffset: 0,
@@ -176,7 +175,7 @@ export class ValueChartViewerService {
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.valueChartService.maximumWeightMap.getObjectiveWeight(this.rowData[i].objective.getId());
+			weightOffset += this.valueChartService.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getId());
 		}
 	}
 
@@ -241,13 +240,13 @@ export class ValueChartViewerService {
 			row.cells = d3.permute(row.cells, cellIndices);
 		});
 
-		this.valueChartService.alternatives = d3.permute(this.valueChartService.alternatives, cellIndices);
+		this.valueChartService.setAlternatives(d3.permute(this.valueChartService.getAlternatives(), cellIndices));
 	}
 
 	resetCellOrder(): void {
 		var cellIndices: number[] = [];
 
-		this.valueChartService.alternatives.forEach((alternative: Alternative, index: number) => {
+		this.valueChartService.getAlternatives().forEach((alternative: Alternative, index: number) => {
 			cellIndices[this.originalAlternativeOrder.alternativeIndexMap[alternative.getName()]] = index;
 		});
 
@@ -268,8 +267,8 @@ export class ValueChartViewerService {
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.valueChartService.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
-				var weight: number = this.valueChartService.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getId());
+				var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
+				var weight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getId());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
@@ -294,12 +293,12 @@ export class ValueChartViewerService {
 
 	generateCellOrderAlphabetically(): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(this.valueChartService.numAlternatives);
+		var cellIndices: number[] = d3.range(this.valueChartService.getNumAlternatives());
 
 		cellIndices.sort((a: number, b: number) => {
 
-			var aName: string = this.valueChartService.alternatives[a].getName().toLowerCase();
-			var bName: string = this.valueChartService.alternatives[b].getName().toLowerCase();
+			var aName: string = this.valueChartService.getAlternatives()[a].getName().toLowerCase();
+			var bName: string = this.valueChartService.getAlternatives()[b].getName().toLowerCase();
 
 			if (aName === bName) {
 				return 0;						// Do not change the ordering of a and b.
@@ -365,7 +364,7 @@ export class ValueChartViewerService {
 	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
 		this.valueChartService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
 		this.updateLabelData();
-		this.valueChartService.primitiveObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives();
+		this.valueChartService.resetPrimitiveObjectives();
 		this.generateRowData();
 	}
 

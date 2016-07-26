@@ -6,11 +6,18 @@ import * as d3 from 'd3';
 //import * as jstree from 'jstree';
 
 // Application classes:
+import { ScoreFunctionDirective }										from '../../directives/ScoreFunction.directive';
 import { CurrentUserService }											from '../../services/CurrentUser.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
+import { ValueChartService }											from '../../services/ValueChart.service';
+import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
+import { User }															from '../../model/User';
+import { WeightMap }													from '../../model/WeightMap';
+import { ScoreFunctionMap }												from '../../model/ScoreFunctionMap';
+import { Objective }													from '../../model/Objective';
 import { AbstractObjective }											from '../../model/AbstractObjective';
 import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
 import { CategoricalDomain }											from '../../model/CategoricalDomain';
@@ -20,13 +27,14 @@ import { Alternative }													from '../../model/Alternative';
 @Component({
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
-	directives: [ROUTER_DIRECTIVES],
-	providers: [CreationStepsService]
+	directives: [ROUTER_DIRECTIVES, ScoreFunctionDirective],
+	providers: [CreationStepsService, ValueChartService, ChartUndoRedoService]
 })
 export class CreateValueChartComponent implements OnInit {
 	purpose: string; // "newChart" or "newUser"
 	step: string;
 	sub: any;
+	userName: string;
 	treeData: string[];
 	valueChartName: string;
 	valueChartDescription: string;
@@ -35,15 +43,18 @@ export class CreateValueChartComponent implements OnInit {
     alternatives: { [altID: string]: Alternative; };
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
+    selectedObjective: string;
 	
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
-		private creationStepsService: CreationStepsService) { }
+		private creationStepsService: CreationStepsService,
+		private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
 		// Initialize ValueChart properties
+		this.userName = this.currentUserService.getUsername();
 		this.valueChartName = "";
 		this.valueChartDescription = "";
 		this.isGroupValueChart = false;
@@ -64,7 +75,8 @@ export class CreateValueChartComponent implements OnInit {
     	}
 
     	// Create new ValueChart with a temporary name and description
-    	this.valueChart = new ValueChart(this.currentUserService.getUsername(),this.valueChartName,this.valueChartDescription);
+    	this.valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
+    	this.valueChart.addUser(new User(this.userName));
   	
     	// Temporary: create some Objectives
     	let location = new PrimitiveObjective("location","");
@@ -100,7 +112,9 @@ export class CreateValueChartComponent implements OnInit {
     	this.alternatives[this.alternativesCount] = hotel1;
     	this.isSelected[this.alternativesCount] = true;
     	this.alternativesCount = this.alternativesCount + 1;
+    	this.selectedObjective = "location";
 
+    	this.valueChartService.setValueChart(this.valueChart);
   	}
 
 	back() {
@@ -112,7 +126,15 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChart.setName(this.valueChartName);
 			this.valueChart.setDescription(this.valueChartDescription);
 		}
-		else if (this.step == this.creationStepsService.ALTERNATIVES) {
+		else if (this.step === this.creationStepsService.OBJECTIVES) {
+			// Initialize User's WeightMap
+    		this.valueChartService.getCurrentUser().setWeightMap(this.valueChartService.getInitialWeightMap());
+
+    		// Initialize User's ScoreFunctionMap
+    		this.valueChartService.getCurrentUser().setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
+
+		}
+		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
 			for (let altID of this.altKeys()) {
 				alternatives.push((this.alternatives[altID]));
@@ -184,6 +206,8 @@ export class CreateValueChartComponent implements OnInit {
 			this.isSelected[key] = !allSelected;
 		}
 	}
+
+
 
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.

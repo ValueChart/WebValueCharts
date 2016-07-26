@@ -39,10 +39,10 @@ export class ScoreFunctionViewerService {
 		} else if (objective.getDomainType() === 'interval') {
 			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
 		} else {
-			domainElements = this.valueChartService.currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
+			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 		}
 
-		this.valueChartService.users.forEach((user: User) => {
+		this.valueChartService.getUsers().forEach((user: User) => {
 			var userDomainElements: UserDomainElements = { user: user, elements: [] };
 
 			domainElements.forEach((domainElement: string | number) => {
@@ -58,7 +58,7 @@ export class ScoreFunctionViewerService {
 	getElementUserScoresSummary(objectiveId: string, element: (number | string)): ElementUserScoresSummary {
 		var userScores: number[] = [];
 
-		this.valueChartService.users.forEach((user: User) => {
+		this.valueChartService.getUsers().forEach((user: User) => {
 			let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objectiveId);
 			userScores.push(scoreFunction.getScore(element));
 		});
@@ -86,7 +86,7 @@ export class ScoreFunctionViewerService {
 	getAllElementUserScoresSummaries(objective: PrimitiveObjective): ElementUserScoresSummary[] { 
 		var elementUserScoresSummaries: ElementUserScoresSummary[] = []; 
 
-		var scoreFunction: ScoreFunction = this.valueChartService.users[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+		var scoreFunction: ScoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 		scoreFunction.getAllElements().forEach((element: (number | string)) => {
 			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getId(), element));
 		});

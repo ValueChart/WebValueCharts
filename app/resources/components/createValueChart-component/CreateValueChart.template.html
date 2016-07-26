@@ -53,7 +53,17 @@
                           </table>
                     </div>
                     <div *ngIf="step === creationStepsService.PREFERENCES">
-                        <h4>Set Preferences</h4>
+                        <select class="form-control" [(ngModel)]="selectedObjective">
+                            <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+                        </select>
+                        <div>
+                            <ScoreFunctionDirective
+                                [objective]="valueChartService.getObjective(selectedObjective)">
+                                <svg class="svg-content-responsive score-function-viewer" viewBox="0 0, 50, 50" preserveAspectRatio="xMinYMin meet">
+                                    <g class="expanded-score-function"></g>
+                                </svg>
+                            </ScoreFunctionDirective>  
+                        </div>           
                     </div>
                     <div *ngIf="step === creationStepsService.PRIORITIES">
                         <h4>Set Priorities</h4>

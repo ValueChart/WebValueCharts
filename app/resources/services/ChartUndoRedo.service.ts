@@ -178,7 +178,7 @@ export class ChartUndoRedoService {
 	}
 
 	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
-		var alternatives: Alternative[] = currentStateContainer.getAlternatives();;
+		var alternatives: Alternative[] = currentStateContainer.getAlternatives();
 		stateRecords.push(new AlternativeOrderRecord(alternatives));
 
 		var cellIndices: number[] = [];

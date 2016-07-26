@@ -182,7 +182,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]); 
 			});
 
-		this.toggleDragToChangeScore(this.valueChartService.getValueChart().isIndividual(), objective, viewOrientation);
+		this.toggleDragToChangeScore(this.valueChartService.isIndividual(), objective, viewOrientation);
 	}
 
 	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {
