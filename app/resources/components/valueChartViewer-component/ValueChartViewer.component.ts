@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 22:10:30
+* @Last Modified time: 2016-07-27 12:23:06
 */
 
 import { Component }															from '@angular/core';
@@ -146,7 +146,8 @@ export class ValueChartViewerComponent implements OnInit {
 		private renderEventsService: RenderEventsService,
 		private summaryChartDefinitions: SummaryChartDefinitions,
 		private objectiveChartDefinitions: ObjectiveChartDefinitions,
-		private labelDefinitions: LabelDefinitions) { }
+		private labelDefinitions: LabelDefinitions,
+		private groupVcHttpService: GroupVcHttpService) { }
 
 	ngOnInit() {
 
@@ -166,7 +167,7 @@ export class ValueChartViewerComponent implements OnInit {
 			}
 
 		});
-		
+
 		this.resizeValueChart();
 		this.$ = $;
 

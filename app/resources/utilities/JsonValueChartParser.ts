@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 22:09:02
+* @Last Modified time: 2016-07-27 12:23:36
 */
 
 // Model Classes
@@ -28,11 +28,13 @@ export class JsonValueChartParser {
 
 	parseValueChart(jsonObject: any): ValueChart {
 
-		var users = jsonObject.users;
-		jsonObject.users = [];
-
 		var valueChart: ValueChart = new ValueChart(jsonObject.name, jsonObject.description, jsonObject.creator);
 		// Copy over all the properties from the WeightMap that is being saved.
+
+		// Parse Users
+		for (var i = 0; i < jsonObject.users.length; i++) {
+			jsonObject.users[i] = this.parseUser(jsonObject.users[i]);
+		}
 		
 		// Parse Root Objectives
 		for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
@@ -94,5 +96,53 @@ export class JsonValueChartParser {
 
 		return alternative;
 	}
+
+	parseUser(jsonObject: any): User {
+		var user: User = new User(jsonObject.username);
+
+		jsonObject.weightMap = this.parseWeightMap(jsonObject.weightMap);
+		jsonObject.scoreFunctionMap = this.parseScoreFunctionMap(jsonObject.scoreFunctionMap);
+
+		Object.assign(user, jsonObject);
+
+		return user;
+	}
+
+	parseWeightMap(jsonObject: any): WeightMap {
+		var weightMap: WeightMap = new WeightMap();
+
+		for (var i = 0; i < jsonObject.weights.length; i++) {
+			weightMap.setObjectiveWeight(jsonObject.weights[i][0], jsonObject.weights[i][1]);
+		}
+
+		return weightMap;
+	}
+
+	parseScoreFunctionMap(jsonObject: any): ScoreFunctionMap {
+		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
+
+		for (var i = 0; i < jsonObject.scoreFunctions.length; i++) {
+			scoreFunctionMap.setObjectiveScoreFunction(jsonObject.scoreFunctions[i][0], this.parseScoreFunction(jsonObject.scoreFunctions[i][1])); 
+		}
+		return scoreFunctionMap;
+	}
+
+	parseScoreFunction(jsonObject: any): ScoreFunction {	
+		var scoreFunction: ScoreFunction;
+
+		if (jsonObject.type === 'continuous') {
+			scoreFunction = new ContinuousScoreFunction(jsonObject.minDomainValue, jsonObject.maxDomainValue);
+		} else {
+			scoreFunction = new DiscreteScoreFunction();
+		}
+
+		for (var i = 0; i < jsonObject.elementScoreMap.length; i++) {
+			scoreFunction.setElementScore(jsonObject.elementScoreMap[i][0], jsonObject.elementScoreMap[i][1]);
+		}
+
+		return scoreFunction;
+	}
+
+
 
 }

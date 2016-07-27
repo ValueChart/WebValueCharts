@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 22:10:46
+* @Last Modified time: 2016-07-27 11:59:11
 */
 
 import '../../rxjs-operators';
@@ -31,7 +31,7 @@ export class GroupVcHttpService {
 
 	createGroupValueChart(valueChart: ValueChart, chartPassword: string): Observable<ValueChart> {
 		// Attach the password to the ValueChart.
-		(<any> ValueChart).password = chartPassword;
+		valueChart.password = chartPassword;
 
 		let body = JSON.stringify(valueChart);
     	let headers = new Headers({ 'Content-Type': 'application/json' });
@@ -42,9 +42,15 @@ export class GroupVcHttpService {
 	                    .catch(this.handleError);
 	}
 
-	getGroupValueChart(id: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl)
+	getGroupValueChart(id: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + '/' + id + '?' + password)
 	                    .map(this.extractValueChartData)
+	                    .catch(this.handleError);
+	}
+
+	getValueChartStructure(id: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + '/' + id + '/structure?' + password)
+			            .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
 

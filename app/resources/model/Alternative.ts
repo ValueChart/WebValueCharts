@@ -2,18 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 16:05:57
+* @Last Modified time: 2016-07-27 12:19:08
 */
 
 export class Alternative {
 
 	private name: string;
-	private desciption: string;
+	private description: string;
 	private objectiveValues: Map<string, string | number>;
 
 	constructor(name: string, description: string) {
 		this.name = name;
-		this.desciption = description;
+		this.description = description;
 		this.objectiveValues = new Map<string, string | number>();
 	}
 
@@ -26,11 +26,11 @@ export class Alternative {
 	}
 
 	getDescription(): string {
-		return this.desciption;
+		return this.description;
 	}
 
-	setDescription(desciption: string): void {
-		this.desciption = desciption;
+	setDescription(description: string): void {
+		this.description = description;
 	}
 
 	getObjectiveValue(objectiveName: string): string | number {
