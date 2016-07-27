@@ -84,6 +84,11 @@ export class CreateValueChartComponent implements OnInit {
     	let pool = new PrimitiveObjective("pool","");
     	let amenities = new AbstractObjective("amenities","");
     	let other = new AbstractObjective("other","");
+
+    	location.setColor("red");
+    	internet.setColor("green");
+    	pool.setColor("blue");
+
     	amenities.addSubObjective(internet);
     	amenities.addSubObjective(pool);
     	other.addSubObjective(location);
@@ -112,7 +117,7 @@ export class CreateValueChartComponent implements OnInit {
     	this.alternatives[this.alternativesCount] = hotel1;
     	this.isSelected[this.alternativesCount] = true;
     	this.alternativesCount = this.alternativesCount + 1;
-    	this.selectedObjective = "location";
+    	this.selectedObjective = "internet";
 
     	this.valueChartService.setValueChart(this.valueChart);
   	}

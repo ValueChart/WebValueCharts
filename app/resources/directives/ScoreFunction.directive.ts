@@ -106,6 +106,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 		if (this.previousObjectiveToDisplay !== this.objectiveToDisplay) {
 			this.initScoreFunctionPlot();
+			this.previousObjectiveToDisplay = this.objectiveToDisplay;
 		}
 
 		else {

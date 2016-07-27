@@ -17,7 +17,12 @@ export class User {
 	private scoreFunctionMap: ScoreFunctionMap; 
 
 	constructor(username: string) {
-		this.username = username;
+		if (username !== undefined) {
+			this.username = username;
+		}
+		else {
+			this.username = "";
+		}
 	}
 
 	getUsername(): string {

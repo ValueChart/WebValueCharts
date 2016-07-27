@@ -53,6 +53,7 @@
                           </table>
                     </div>
                     <div *ngIf="step === creationStepsService.PREFERENCES">
+                         <label class="control-label">Select Objective:</label>
                         <select class="form-control" [(ngModel)]="selectedObjective">
                             <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                         </select>
