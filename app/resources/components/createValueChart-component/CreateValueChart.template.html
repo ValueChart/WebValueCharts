@@ -45,7 +45,7 @@
                                         </select>
                                     </div>
                                     <div *ngIf="obj.getDomain().type === 'continuous'">
-                                        {{alt.getName()}}
+                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),+m.value)"/>
                                     </div>   
                                 </th>
                               </tr>

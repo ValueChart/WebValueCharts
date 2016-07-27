@@ -211,6 +211,14 @@ export class ValueChartService implements ValueChartStateContainer {
   				let min = (<ContinuousDomain>obj.getDomain()).getMinValue();
   				let max = (<ContinuousDomain>obj.getDomain()).getMaxValue();
   				scoreFunction = new ContinuousScoreFunction(min,max);
+  				// Add three evenly-space points between min and max
+  				let increment = (max - min) / 4.0;
+  				let slope = 1.0 / (max - min);
+  				scoreFunction.setElementScore(min, 0);
+  				scoreFunction.setElementScore(min + increment, slope * increment);
+  				scoreFunction.setElementScore(min + 2*increment, slope * 2*increment);
+  				scoreFunction.setElementScore(min + 3*increment, slope * 3*increment);
+  				scoreFunction.setElementScore(max, 1);
   			}
   			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
   		}

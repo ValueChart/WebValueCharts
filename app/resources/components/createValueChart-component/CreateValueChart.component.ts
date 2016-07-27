@@ -79,20 +79,24 @@ export class CreateValueChartComponent implements OnInit {
     	this.valueChart.addUser(new User(this.userName));
   	
     	// Temporary: create some Objectives
+    	let rate = new PrimitiveObjective("rate","");
     	let location = new PrimitiveObjective("location","");
     	let internet = new PrimitiveObjective("internet","");
     	let pool = new PrimitiveObjective("pool","");
     	let amenities = new AbstractObjective("amenities","");
     	let other = new AbstractObjective("other","");
 
+    	rate.setColor("green")
     	location.setColor("red");
-    	internet.setColor("green");
+    	internet.setColor("purple");
     	pool.setColor("blue");
 
     	amenities.addSubObjective(internet);
     	amenities.addSubObjective(pool);
     	other.addSubObjective(location);
+    	other.addSubObjective(rate);
 
+    	let ratedom = new ContinuousDomain(30,300,"CAD");
     	let locdom = new CategoricalDomain(false);
     	locdom.addElement("downtown");
     	locdom.addElement("highway");
@@ -104,11 +108,13 @@ export class CreateValueChartComponent implements OnInit {
     	pooldom.addElement("no");
     	pooldom.addElement("yes");
 
+    	rate.setDomain(ratedom);
     	location.setDomain(locdom);
     	internet.setDomain(intdom);
     	pool.setDomain(pooldom);
 
     	let hotel1 = new Alternative("Hotel 1","");
+    	hotel1.setObjectiveValue("rate",140);
     	hotel1.setObjectiveValue("location","downtown");
     	hotel1.setObjectiveValue("internet","high");
     	hotel1.setObjectiveValue("pool","no");
