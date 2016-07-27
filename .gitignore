@@ -55,6 +55,7 @@ typings
 
 app/resources/**/*.js
 app/main.js
+app/rxjs-operators.js
 app/app.routes.js
 test/**/*.js
 routes/*.js

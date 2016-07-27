@@ -1,3 +1,11 @@
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-07-26 14:49:33
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-07-26 14:53:22
+*/
+
+
 // Import the express typings:
 import * as Express from 'express';
 import * as MongoDB from 'mongodb';
@@ -13,10 +21,11 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 var monk = require('monk');
 
+// Important Routers:
+var indexRoutes: Express.Router = require('./routes/Index.routes');
+var groupRoutes: Express.Router = require('./routes/Group.routes');
 
 
-
-var routes: Express.Router = require('./routes/index');
 
 var backend: Express.Application = express();
 var db: Monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
@@ -39,7 +48,9 @@ backend.use(function(req,res,next) {
     next();
 });
 
-backend.use('/', routes);
+// Attach routers to manage specific URIs
+backend.use('/', indexRoutes);
+backend.use('/group', groupRoutes);
 
 // catch 404 errors and redirect the request to the index.html file.
 backend.use(function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 16:26:39
+* @Last Modified time: 2016-07-26 22:10:30
 */
 
 import { Component }															from '@angular/core';
@@ -49,6 +49,10 @@ import { User }																	from '../../model/User';
 import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
 import { PrimitiveObjective } 													from '../../model/PrimitiveObjective';
+
+
+// Temporary
+import { GroupVcHttpService }										from '../../services/GroupVcHttp.service';
 
 
 @Component({
@@ -162,7 +166,7 @@ export class ValueChartViewerComponent implements OnInit {
 			}
 
 		});
-
+		
 		this.resizeValueChart();
 		this.$ = $;
 
