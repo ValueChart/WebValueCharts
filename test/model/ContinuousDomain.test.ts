@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:37:49
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 13:41:14
+* @Last Modified time: 2016-07-28 10:44:41
 */
 
 
 import { ContinuousDomain } 	from "../../app/resources/model/ContinuousDomain";
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 
 describe('ContinuousDomain', () => {

@@ -2,12 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-01 11:59:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:26:11
+* @Last Modified time: 2016-07-28 10:44:57
 */
 
 import { IntervalDomain } from '../../app/resources/model/IntervalDomain';
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 describe('IntervalDomain', () => {
 	var intervalDomain: IntervalDomain;

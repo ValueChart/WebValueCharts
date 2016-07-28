@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 12:01:19
+* @Last Modified time: 2016-07-28 10:44:38
 */
 
 // Import CategoricalDomain, the class to be tested.
@@ -11,7 +11,8 @@ import { CategoricalDomain } from '../../app/resources/model/CategoricalDomain';
 // Chai (and therefore the function 'expect') is injected by Karma AFTER the typescript code is compiled. This means that TypeScript looks 
 // for a declarations for expect before there is one. This statement declares expect as a variable in the namespace, but still allows it to 
 // be overwritten when Chai is injected. This isn't necessary, but fixes the annoying compiler errors.
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 // This declares the test suite for the CategoricalDomain class
 describe('CategoricalDomain', () => {

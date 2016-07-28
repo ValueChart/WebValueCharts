@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:14:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-05 15:29:39
+* @Last Modified time: 2016-07-28 10:45:03
 */
 
 import { ScoreFunctionMap } 			from '../../app/resources/model/ScoreFunctionMap';
@@ -13,7 +13,8 @@ import { ContinuousScoreFunction } 		from '../../app/resources/model/ContinuousS
 
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 
 describe('ScoreFunctionMap', () => {

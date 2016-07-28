@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 16:33:48
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-31 15:50:29
+* @Last Modified time: 2016-07-28 10:44:49
 */
 
 import { DiscreteScoreFunction } 		from '../../app/resources/model/DiscreteScoreFunction';
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 
 describe('DiscreteScoreFunction', () => {

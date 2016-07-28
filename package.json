@@ -11,7 +11,9 @@
     "lite": "lite-server",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "typings": "typings"
+    "typings": "typings",
+    "pretest": "tsc",
+    "test": "mocha test.js"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.4",
@@ -42,16 +44,11 @@
     "chai": "^3.5.0",
     "concurrently": "^2.0.0",
     "connect-history-api-fallback": "^1.2.0",
-    "karma": "^0.13.22",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-mocha": "^1.0.1",
-    "karma-systemjs": "^0.14.0",
-    "karma-typescript-preprocessor2": "^1.1.1",
+    "glob": "^7.0.5",
     "lite-server": "^2.2.0",
     "mocha": "^2.5.2",
     "supertest": "^1.2.0",
     "typescript": "^1.8.10",
-    "typings": "^1.0.4"
+    "typings": "^1.0.4",
   }
 }

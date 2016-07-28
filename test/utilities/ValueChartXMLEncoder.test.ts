@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:50:11
+* @Last Modified time: 2016-07-28 10:44:24
 */
 
 import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMLEncoder';
@@ -24,7 +24,8 @@ import { ContinuousScoreFunction } 								from '../../app/resources/model/Conti
 import { DiscreteScoreFunction } 								from '../../app/resources/model/DiscreteScoreFunction';
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+;
 
 
 describe('ValueChartXMlEncoder', () => {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 21:18:36
+* @Last Modified time: 2016-07-28 10:44:27
 */
 
 
@@ -15,7 +15,8 @@ import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective'
 import { WeightMap }			from '../../app/resources/model/WeightMap';
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+;
 
 describe('ValueChart', () => {
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-08 13:03:11
+* @Last Modified time: 2016-07-28 10:45:00
 */
 
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
@@ -10,7 +10,8 @@ import { CategoricalDomain } 		from '../../app/resources/model/CategoricalDomain
 import { ContinuousDomain } 		from '../../app/resources/model/ContinuousDomain';
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+
 
 describe('PrimitiveObjective', () => {
 	var primitiveObjective: PrimitiveObjective;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 18:29:33
+* @Last Modified time: 2016-07-28 10:01:11
 */
 
 // =========================================================================================================================================
@@ -15,24 +15,14 @@
 // the second set execute it with the given parameters.
 (function(global) {
 
-	var paths = {
-		'*': 						  'node_modules/*',
-		'*': 					 	  'node_modules/**/*'
-	}
-
 	// This is a map of package names to their locations in our project structure. This is necessary for SystemJS to know how to load packages.
 	var map = {
-		'systemjs': 				  'node_modules/systemjs/dist/system.js',
-		'system-polyfills': 		  'node_modules/systemjs/dist/system-polyfills.js',
-		'typescript': 				  'node_modules/typescript/bin',
 		'app':                        'app', // 'dist',
 		'rxjs':                       'node_modules/rxjs',
 		'@angular':                   'node_modules/@angular',
 		'd3': 						  'app/vendors/d3',
 		'jquery': 					  'app/vendors/jquery/dist',
-		'supertest': 				  'node_modules/supertest/',
-		'mocha': 					  'node_modules/mocha/bin',
-		'*':   					      'app/**/*'
+		'supertest': 				  'node_modules/supertest'
 	};
 
 	// Defines default extensions and files.
@@ -41,9 +31,7 @@
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
 		'd3':						  { main:'d3.js', defaultExtension: 'js' },
-		'jquery':					  { main:'jquery.js', defaultExtension: 'js'},
-		'supertest': 				  { main: 'index.js', defaultExtension: 'js'},
-		'*': 						  { defaultExtension: 'js' }
+		'jquery':					  { main:'jquery.js', defaultExtension: 'js'}
 	};
 
 
@@ -66,7 +54,6 @@
 
 	var config = {
 		map: map,
-		// paths: paths,
 		packages: packages
 	};
 

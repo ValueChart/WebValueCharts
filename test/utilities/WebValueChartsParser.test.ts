@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-04 22:49:47
+* @Last Modified time: 2016-07-28 10:44:21
 */
 
 // Application Classes:
@@ -24,7 +24,8 @@ import { DiscreteScoreFunction } 								from '../../app/resources/model/Discret
 
 
 
-declare var expect: any;
+var expect: any = require('chai').expect;
+;
 
 
 describe('WebValueChartsParser', () => {

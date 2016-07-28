@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-05-27 16:10:03
+* @Last Modified time: 2016-07-28 10:48:51
 */
 
 
@@ -10,7 +10,7 @@ import { User } 				from '../../app/resources/model/User';
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
 import { ScoreFunctionMap } 	from '../../app/resources/model/ScoreFunctionMap';
 
-declare var expect: any;
+var expect: any = require('chai').expect;
 
 
 describe('User', () => {
