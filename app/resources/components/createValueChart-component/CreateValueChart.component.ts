@@ -125,7 +125,7 @@ export class CreateValueChartComponent implements OnInit {
     	valueChart.setRootObjectives([amenities,other]);
     	this.alternatives[this.alternativesCount] = hotel1;
     	this.isSelected[this.alternativesCount] = true;
-    	this.alternativesCount = this.alternativesCount + 1;
+    	this.alternativesCount++;
     	this.selectedObjective = "internet";
 
     	this.valueChartService.setValueChart(valueChart);
@@ -199,7 +199,7 @@ export class CreateValueChartComponent implements OnInit {
 	addEmptyAlternative() {
 		this.alternatives[this.alternativesCount] = new Alternative("","");
 		this.isSelected[this.alternativesCount] = false;
-		this.alternativesCount = this.alternativesCount + 1;
+		this.alternativesCount++;
 	}
 
 	deleteAlternatives() {
@@ -263,20 +263,24 @@ export class CreateValueChartComponent implements OnInit {
 
 	getWeightMapFromRanks() : WeightMap {
 		let weights = new WeightMap();
-		let remaining = 1.0;
-		let counter = 0;
-		// Just do something stupid for now
+		let rank = 1;
+		let numObjectives = this.rankedObjectives.length;
 		for (let obj of this.rankedObjectives) {
-			if (counter === (this.rankedObjectives.length - 1)) {
-				weights.setObjectiveWeight(obj,remaining);
-			}
-			else {
-				weights.setObjectiveWeight(obj,0.6*remaining);
-				remaining = 0.4*remaining;
-			}
-			counter++;
+			let weight = this.computeSum(rank,numObjectives) / numObjectives;
+			weights.setObjectiveWeight(obj,weight);
+			rank++;
 		}
 		return weights;
+	}
+
+	private computeSum(k: number, K: number) {
+		let sum = 0.0;
+		let i = k;
+		while (i <= K) {
+			sum += 1/i;
+			i++;
+		}
+		return sum;
 	}
 
 	ngOnDestroy() {

@@ -81,6 +81,16 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getRootObjectives();
 	}
 
+	getAbstractObjectives() : AbstractObjective[] {
+		let abstractObjs : AbstractObjective[] = [];
+		for (let obj of this.valueChart.getAllObjectives()) {
+			if (obj.objectiveType === "abstract") {
+				abstractObjs.push(<AbstractObjective>obj);
+			}
+		}
+		return abstractObjs;
+	}
+
 	getPrimitiveObjectives(): PrimitiveObjective[] {
 		return this.primitiveObjectives;
 	}
