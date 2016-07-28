@@ -39,11 +39,12 @@ export class CreateValueChartComponent implements OnInit {
 	valueChartName: string;
 	valueChartDescription: string;
 	isGroupValueChart: boolean;
-    valueChart: ValueChart;
     alternatives: { [altID: string]: Alternative; };
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
     selectedObjective: string;
+    rankedObjectives: string[];
+    isRanked: { [objName: string]: boolean; }; // really need to split this code up...
 	
 	constructor(
 		private router: Router,
@@ -62,6 +63,8 @@ export class CreateValueChartComponent implements OnInit {
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;
+		this.rankedObjectives = [];
+		this.isRanked = {};
 
 		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
@@ -75,8 +78,8 @@ export class CreateValueChartComponent implements OnInit {
     	}
 
     	// Create new ValueChart with a temporary name and description
-    	this.valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
-    	this.valueChart.addUser(new User(this.userName));
+    	let valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
+    	valueChart.addUser(new User(this.userName));
   	
     	// Temporary: create some Objectives
     	let rate = new PrimitiveObjective("rate","");
@@ -119,13 +122,13 @@ export class CreateValueChartComponent implements OnInit {
     	hotel1.setObjectiveValue("internet","high");
     	hotel1.setObjectiveValue("pool","no");
 
-    	this.valueChart.setRootObjectives([amenities,other]);
+    	valueChart.setRootObjectives([amenities,other]);
     	this.alternatives[this.alternativesCount] = hotel1;
     	this.isSelected[this.alternativesCount] = true;
     	this.alternativesCount = this.alternativesCount + 1;
     	this.selectedObjective = "internet";
 
-    	this.valueChartService.setValueChart(this.valueChart);
+    	this.valueChartService.setValueChart(valueChart);
   	}
 
 	back() {
@@ -134,8 +137,8 @@ export class CreateValueChartComponent implements OnInit {
 
 	next() {
 		if (this.step === this.creationStepsService.BASICS) {
-			this.valueChart.setName(this.valueChartName);
-			this.valueChart.setDescription(this.valueChartDescription);
+			this.valueChartService.getValueChart().setName(this.valueChartName);
+			this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			// Initialize User's WeightMap
@@ -150,11 +153,17 @@ export class CreateValueChartComponent implements OnInit {
 			for (let altID of this.altKeys()) {
 				alternatives.push((this.alternatives[altID]));
 			}
-			this.valueChart.setAlternatives(alternatives);
+			this.valueChartService.setAlternatives(alternatives);
+		}
+		else if (this.step === this.creationStepsService.PREFERENCES) {
+			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+				this.isRanked[obj] = false;
+			}
 		}
 		else if (this.step === this.creationStepsService.PRIORITIES) {
-			this.currentUserService.setValueChart(this.valueChart);
-			//this.router.navigate(['/view/ValueChart']);
+			this.valueChartService.getCurrentUser().setWeightMap(this.getWeightMapFromRanks());
+			this.currentUserService.setValueChart(this.valueChartService.getValueChart());
+			this.router.navigate(['/view/ValueChart']);
 
 		}
 		this.step = this.creationStepsService.next(this.step);
@@ -218,7 +227,57 @@ export class CreateValueChartComponent implements OnInit {
 		}
 	}
 
+	getPrioritiesText() : string {
+		if (this.rankedObjectives.length === 0) {
+			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
+		}
+		else if (this.rankedObjectives.length < this.valueChartService.getPrimitiveObjectives().length) {
+			return "From the remaining objectives, which would you prefer to change next from the worst value to the best value?";
+		}
+		else {
+			return "All done! Click 'View Chart' to proceed.";
+		}
+	}
 
+	getUnrankedObjectives() : string[] {
+		let unrankedObjectives : string[] = [];
+		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+			if (!this.isRanked[obj]) {
+				unrankedObjectives.push(obj);
+			}
+		}
+		return unrankedObjectives;
+	}
+
+	rankObjective(primObj: string) {
+		this.rankedObjectives.push(primObj);
+		this.isRanked[primObj] = true;
+	}
+
+	resetRanks() {
+		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+			this.isRanked[obj] = false;
+		}
+		this.rankedObjectives = [];
+	}
+
+	getWeightMapFromRanks() : WeightMap {
+		let weights = new WeightMap();
+		let remaining = 1.0;
+		let counter = 0;
+		// Just do something stupid for now
+		for (let obj of this.rankedObjectives) {
+			if (counter === (this.rankedObjectives.length - 1)) {
+				weights.setObjectiveWeight(obj,remaining);
+			}
+			else {
+				weights.setObjectiveWeight(obj,0.6*remaining);
+				remaining = 0.4*remaining;
+			}
+			counter++;
+		}
+		return weights;
+	}
 
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.

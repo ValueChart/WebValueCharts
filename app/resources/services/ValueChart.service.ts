@@ -173,6 +173,24 @@ export class ValueChartService implements ValueChartStateContainer {
 		return primObj;
 	}
 
+	getBestOutcome(objName: string) : string | number {
+		let scoreFunction : ScoreFunction = this.getCurrentUserScoreFunction(objName);
+		for (let outcome of scoreFunction.getAllElements()) {
+			if (scoreFunction.getScore(outcome) === 1) {
+				return outcome;
+			}
+		}
+	}
+
+	getWorstOutcome(objName: string) : string | number {
+		let scoreFunction : ScoreFunction = this.getCurrentUserScoreFunction(objName);
+		for (let outcome of scoreFunction.getAllElements()) {
+			if (scoreFunction.getScore(outcome) === 0) {
+				return outcome;
+			}
+		}
+	}
+
 	// Create initial weight map for the Objective hierarchy with evenly distributed weights
 	getInitialWeightMap(): WeightMap {
 		let weightMap: WeightMap = new WeightMap();
@@ -192,7 +210,7 @@ export class ValueChartService implements ValueChartStateContainer {
   	}
 
   	// Set up initial ScoreFunctions
-  	// Scores for categorical varaibles are evenly space between 0 and 1
+  	// Scores for categorical variables are evenly space between 0 and 1
   	getInitialScoreFunctionMap(): ScoreFunctionMap {
   		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
   		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
