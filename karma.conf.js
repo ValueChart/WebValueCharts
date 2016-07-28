@@ -2,13 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-01 11:16:24
+* @Last Modified time: 2016-07-27 18:23:46
 */
 
 // Karma configuration
 // Generated on Tue May 24 2016 09:31:07 GMT-0700 (PDT)
-
-var webpackConfig = require('./webpack.config');
 
 module.exports = function(config) {
   config.set({
@@ -16,35 +14,38 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
+    plugins: ['karma-systemjs', 'karma-mocha', 'karma-chai', 'karma-chrome-launcher'],
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['systemjs', 'mocha', 'chai'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/reflect-metadata/Reflect.js', // Need to load this so that type annotations work in the test browser
-      'test/**/*.ts'
+      'app/resources/model/**/*.js',
+      'app/resources/utilities/**/*.js',
+      'test/**/*.js'
     ],
+
+    transpiler: null,
 
 
     // list of files to exclude
     exclude: [
     ],
 
-
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'test/**/*.ts': ['webpack']
+    systemjs: {
+        // Path to your SystemJS configuration file 
+        configFile: './systemjs.config.js',
+     
+        // Patterns for files that you want Karma to make available, but not loaded until a module requests them. eg. Third-party libraries. 
+        serveFiles: [
+            'node_modules/**/*'
+        ],
     },
 
-
-    webpack: {
-      module: webpackConfig.module,
-      resolve: webpackConfig.resolve
-    },
+    preprocessors: { },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'

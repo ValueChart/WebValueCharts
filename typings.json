@@ -10,6 +10,8 @@
     "mongodb": "registry:dt/mongodb#2.1.0+20160602142941",
     "monk": "registry:dt/monk#1.0.1+20160121205919",
     "node": "registry:dt/node#6.0.0+20160720070758",
-    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157",
+    "superagent": "registry:dt/superagent#1.4.0+20160724070541",
+    "supertest": "registry:dt/supertest#1.1.0+20160724070541"
   }
 }

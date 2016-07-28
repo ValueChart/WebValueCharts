@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 12:23:23
+* @Last Modified time: 2016-07-27 15:42:54
 */
 
 // Import the express typings:
@@ -30,9 +30,60 @@ router.post('/ValueCharts', function(req: Express.Request, res: Express.Response
 	});
 });
 
-router.get('/ValueCharts/:id/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.get('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	var chartId: string = req.params.id;
+	var chartId: string = req.params.chart;
+	
+	var password: string = req.query.password;
+
+	groupVcCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(404)
+				.json({ data: JSON.stringify(err) });
+
+		} else {
+			res.location('/group/ValueCharts/' + doc._id)
+				.status(200)
+				.json({ data: JSON.stringify(doc) });
+		}
+	});
+});
+
+router.put('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var chartId: string = req.params.chart;
+
+	groupVcCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: JSON.stringify(err) });
+
+		} else {
+			res.location('/group/ValueCharts/' + doc._id)
+				.status(200)
+				.json({ data: JSON.stringify(doc) });
+		}
+	});
+});
+
+router.delete('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var chartId: string = req.params.chart;
+
+	groupVcCollection.remove({ _id: chartId }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(404)
+				.json({ data: JSON.stringify(err) });
+		} else {		
+			res.status(200)
+				.json({ data: JSON.stringify(doc) });
+		}
+	});
+});
+
+router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var chartId: string = req.params.chart;
 
 	var password: string = req.query.password;
 
@@ -52,53 +103,59 @@ router.get('/ValueCharts/:id/structure', function(req: Express.Request, res: Exp
 	});
 });
 
-router.get('/ValueCharts/:id', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.put('/ValueCharts/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	var chartId: string = req.params.id;
-	
-	var password: string = req.query.password;
+	var chartId: string = req.params.chart;
 
-	groupVcCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(404)
 				.json({ data: JSON.stringify(err) });
-
 		} else {
-			res.location('/group/ValueCharts/' + doc._id)
-				.status(200)
-				.json({ data: JSON.stringify(doc) });
+			// Attach the users to the structure object.
+			req.body.users = doc.users;
+
+			groupVcCollection.update({ _id: chartId }, (req.body), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: JSON.stringify(err) });
+
+				} else {
+					// Remove the users from the ValueChart so that it only contains the objectives and alternatives
+					doc.users = undefined;
+
+					res.location('/group/ValueCharts/' + doc._id)
+						.status(200)
+						.json({ data: JSON.stringify(doc) });
+				}
+			});
 		}
 	});
 });
 
-router.put('/ValueCharts/:id', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.post('/ValueCharts/:chart/users', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	var chartId: string = req.params.id;
+	var chartId: string = req.params.chart;
 
-	groupVcCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
-		if (err) {
-			res.status(400)
-				.json({ data: JSON.stringify(err) });
-
-		} else {
-			res.location('/group/ValueCharts/' + doc._id)
-				.status(200)
-				.json({ data: JSON.stringify(doc) });
-		}
-	});
-});
-
-router.delete('/ValueCharts/:id', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	var chartId: string = req.params.id;
-
-	groupVcCollection.remove({ _id: chartId }, function(err: Error, doc: any) {
+	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(404)
 				.json({ data: JSON.stringify(err) });
-		} else {		
-			res.status(200)
-				.json({ data: JSON.stringify(doc) });
+		} else {
+			// Attach the users to the structure object.
+			doc.users.push(req.body);
+
+			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: JSON.stringify(err) });
+
+				} else {
+					res.location('/group/ValueCharts/' + doc._id)
+						.status(200)
+						.json({ data: JSON.stringify(req.body) });
+				}
+			});
 		}
 	});
 });
