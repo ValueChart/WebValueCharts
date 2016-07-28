@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:26
+* @Last Modified time: 2016-07-28 13:14:58
 */
 
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
 
-var expect: any = require('chai').expect;
-;
+import { expect }				from 'chai';
+
 
 
 describe('WeightMap', () => {

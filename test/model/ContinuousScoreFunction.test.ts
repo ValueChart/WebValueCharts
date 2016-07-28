@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 16:33:37
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:46
+* @Last Modified time: 2016-07-28 13:16:07
 */
 
 import { ContinuousScoreFunction } 		from '../../app/resources/model/ContinuousScoreFunction';
 
 
-var expect: any = require('chai').expect;
+import { expect }						from 'chai';
+
 
 
 

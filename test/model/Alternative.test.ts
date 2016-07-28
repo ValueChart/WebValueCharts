@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:32
+* @Last Modified time: 2016-07-28 13:15:11
 */
 
 
@@ -10,8 +10,8 @@ import { Alternative }			from '../../app/resources/model/Alternative';
 import { PrimitiveObjective }	from '../../app/resources/model/PrimitiveObjective';
 
 
-var expect: any = require('chai').expect;
-;
+import { expect }				from 'chai';
+
 
 
 

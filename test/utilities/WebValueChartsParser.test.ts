@@ -2,14 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:21
+* @Last Modified time: 2016-07-28 16:28:35
 */
+
+// Import Node Libraries: 
+import { expect }												from 'chai';
 
 // Application Classes:
 import { WebValueChartsParser } 								from '../../app/resources/utilities/WebValueChartsParser';
 
 // Model Classes:
-import { ValueChart }									from '../../app/resources/model/ValueChart';
+import { ValueChart }											from '../../app/resources/model/ValueChart';
 import { Alternative }											from '../../app/resources/model/Alternative';
 import { User } 												from '../../app/resources/model/User';
 import { Objective } 											from '../../app/resources/model/Objective';
@@ -23,10 +26,7 @@ import { ContinuousScoreFunction } 								from '../../app/resources/model/Conti
 import { DiscreteScoreFunction } 								from '../../app/resources/model/DiscreteScoreFunction';
 
 
-
-var expect: any = require('chai').expect;
-;
-
+/*
 
 describe('WebValueChartsParser', () => {
 	var valueChartParser: WebValueChartsParser;
@@ -272,7 +272,7 @@ describe('WebValueChartsParser', () => {
 			it('should parse all of the alternatives from the XML document', () => {
 				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement, primitiveObjectives);
 
-				expect(alternatives).to.have.length('6');
+				expect(alternatives).to.have.length(6);
 
 				for (var i = 0; i < alternativeValues.length; i++) {
 					expect(alternatives[i].getName()).to.equal(alternativeValues[i].alternativeName);
@@ -473,7 +473,5 @@ var XMLTestString: string =
 	</Users>
 </ValueCharts>`
 
-
-
-
+*/
 

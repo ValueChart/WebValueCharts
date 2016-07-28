@@ -2,15 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 09:05:58
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:30
+* @Last Modified time: 2016-07-28 13:14:39
 */
 
 import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective';
 import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
 import { Objective } 			from '../../app/resources/model/Objective';
 
-var expect: any = require('chai').expect;
-;
+import { expect }				from 'chai';
+
 
 describe('AbstractObjective', () => {
 	var rootObjectve: AbstractObjective;

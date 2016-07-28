@@ -2,14 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:44:24
+* @Last Modified time: 2016-07-28 16:27:55
 */
+// Import Node Libraries:
+import { expect }												from 'chai';
 
+
+// Utilities:
 import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMLEncoder';
 import { WebValueChartsParser }									from '../../app/resources/utilities/WebValueChartsParser';
 
 // Model Classes:
-import { ValueChart }									from '../../app/resources/model/ValueChart';
+import { ValueChart }											from '../../app/resources/model/ValueChart';
 import { Alternative }											from '../../app/resources/model/Alternative';
 import { User } 												from '../../app/resources/model/User';
 import { Objective } 											from '../../app/resources/model/Objective';
@@ -24,10 +28,7 @@ import { ContinuousScoreFunction } 								from '../../app/resources/model/Conti
 import { DiscreteScoreFunction } 								from '../../app/resources/model/DiscreteScoreFunction';
 
 
-var expect: any = require('chai').expect;
-;
-
-
+/*
 describe('ValueChartXMlEncoder', () => {
 
 	var valueChartParser: WebValueChartsParser;
@@ -370,3 +371,6 @@ var XMLTestString: string =
 		</User>
 	</Users>
 </ValueCharts>`
+
+*/
+

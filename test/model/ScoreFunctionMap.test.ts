@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:14:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 10:45:03
+* @Last Modified time: 2016-07-28 13:16:21
 */
 
 import { ScoreFunctionMap } 			from '../../app/resources/model/ScoreFunctionMap';
@@ -12,8 +12,9 @@ import { DiscreteScoreFunction } 		from '../../app/resources/model/DiscreteScore
 import { ContinuousScoreFunction } 		from '../../app/resources/model/ContinuousScoreFunction';
 
 
+	
+import { expect }						from 'chai';
 
-var expect: any = require('chai').expect;
 
 
 
