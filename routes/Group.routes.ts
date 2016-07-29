@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 15:42:54
+* @Last Modified time: 2016-07-28 18:27:09
 */
 
 // Import the express typings:
@@ -36,13 +36,16 @@ router.get('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 	
 	var password: string = req.query.password;
 
-	groupVcCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+	groupVcCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(404)
 				.json({ data: JSON.stringify(err) });
 
 		} else {
-			res.location('/group/ValueCharts/' + doc._id)
+
+			console.log(doc);
+
+			res.location('/group/ValueCharts/' + chartId)
 				.status(200)
 				.json({ data: JSON.stringify(doc) });
 		}
@@ -59,9 +62,10 @@ router.put('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 				.json({ data: JSON.stringify(err) });
 
 		} else {
-			res.location('/group/ValueCharts/' + doc._id)
+			req.body._id = chartId;
+			res.location('/group/ValueCharts/' + chartId)
 				.status(200)
-				.json({ data: JSON.stringify(doc) });
+				.json({ data: JSON.stringify(req.body) });
 		}
 	});
 });
@@ -87,7 +91,7 @@ router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 
 	var password: string = req.query.password;
 
-	groupVcCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+	groupVcCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(404)
 				.json({ data: JSON.stringify(err) });
@@ -96,7 +100,7 @@ router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 			// Remove the users from the ValueChart so that it only contains the objectives and alternatives
 			doc.users = undefined;
 
-			res.location('/group/ValueCharts/' + doc._id)
+			res.location('/group/ValueCharts/' + chartId)
 				.status(200)
 				.json({ data: JSON.stringify(doc) });
 		}
@@ -124,9 +128,9 @@ router.put('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 					// Remove the users from the ValueChart so that it only contains the objectives and alternatives
 					doc.users = undefined;
 
-					res.location('/group/ValueCharts/' + doc._id)
+					res.location('/group/ValueCharts/' + chartId)
 						.status(200)
-						.json({ data: JSON.stringify(doc) });
+						.json({ data: JSON.stringify(req.body) });
 				}
 			});
 		}
@@ -151,7 +155,7 @@ router.post('/ValueCharts/:chart/users', function(req: Express.Request, res: Exp
 						.json({ data: JSON.stringify(err) });
 
 				} else {
-					res.location('/group/ValueCharts/' + doc._id)
+					res.location('/group/ValueCharts/' + chartId)
 						.status(200)
 						.json({ data: JSON.stringify(req.body) });
 				}
