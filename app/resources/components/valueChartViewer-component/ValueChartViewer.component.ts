@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 16:52:16
+* @Last Modified time: 2016-07-28 21:02:10
 */
 
 import { Component }															from '@angular/core';
@@ -167,8 +167,6 @@ export class ValueChartViewerComponent implements OnInit {
 			}
 
 		});
-
-		this.groupVcHttpService.createGroupValueChart(this.valueChart, 'ThisIsATestPassword').subscribe( valuechart => console.log(valuechart));
 
 		this.resizeValueChart();
 		this.$ = $;
