@@ -16,8 +16,6 @@ import { CurrentUserService }							from '../../services/CurrentUser.service';
 // Sample Data:
 import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCharts';
 
-
-
 @Component({
 	selector: 'create',
 	templateUrl: 'app/resources/components/create-component/Create.template.html',
@@ -40,7 +38,8 @@ export class CreateComponent {
 	}
 
 	goToValueChart(event: Event): void {
-		this.uploadValueChart(event,['/view/']);
+		var parameters = this.currentUserService.getValueChart().getName();
+		this.uploadValueChart(event,['/view/',parameters]);
 	}
 
 	addUserToExistingChart(event: Event) {
@@ -56,10 +55,7 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				var parameters = '';
-				if (route[0] === '/view/')
-					parameters = this.currentUserService.getValueChart().getName();
-				this.router.navigate([route[0], parameters]);
+				this.router.navigate(route);
 			}
 		};
 		reader.readAsText(xmlFile);
