@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 12:34:38
+* @Last Modified time: 2016-07-29 16:21:10
 */
 
 // Import the express typings:
@@ -14,7 +14,7 @@ var path = require('path');
 var express = require('express');
 var router: Express.Router = express.Router();
 
-router.post('/ValueCharts', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.post('/', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 
 	groupVcCollection.insert(req.body, function(err: Error, doc: any) {
@@ -24,7 +24,7 @@ router.post('/ValueCharts', function(req: Express.Request, res: Express.Response
 
 		} else {
 			if (doc) {
-				res.location('/group/ValueCharts/' + doc._id)
+				res.location('/ValueCharts/' + doc._id)
 					.status(201)
 					.json({ data: JSON.stringify(doc) });
 			} else {
@@ -34,7 +34,7 @@ router.post('/ValueCharts', function(req: Express.Request, res: Express.Response
 	});
 });
 
-router.get('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.get('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	
@@ -47,7 +47,7 @@ router.get('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 
 		} else {
 			if (doc) {
-				res.location('/group/ValueCharts/' + chartId)
+				res.location('/ValueCharts/' + chartId)
 					.status(200)
 					.json({ data: JSON.stringify(doc) });
 			} else {
@@ -57,7 +57,7 @@ router.get('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 	});
 });
 
-router.put('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.put('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -69,7 +69,7 @@ router.put('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 		} else {
 			if (doc) {
 				req.body._id = chartId;
-				res.location('/group/ValueCharts/' + chartId)
+				res.location('/ValueCharts/' + chartId)
 					.status(200)
 					.json({ data: JSON.stringify(req.body) });
 			} else {
@@ -79,7 +79,7 @@ router.put('/ValueCharts/:chart', function(req: Express.Request, res: Express.Re
 	});
 });
 
-router.delete('/ValueCharts/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.delete('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -97,7 +97,7 @@ router.delete('/ValueCharts/:chart', function(req: Express.Request, res: Express
 	});
 });
 
-router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.get('/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -113,7 +113,7 @@ router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 			if (doc) {
 				// Remove the users from the ValueChart so that it only contains the objectives and alternatives
 				doc.users = undefined;
-				res.location('/group/ValueCharts/' + chartId + '/structure')
+				res.location('/ValueCharts/' + chartId + '/structure')
 					.status(200)
 					.json({ data: JSON.stringify(doc) });
 			} else {
@@ -123,7 +123,7 @@ router.get('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 	});
 });
 
-router.put('/ValueCharts/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.put('/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -146,7 +146,7 @@ router.put('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 						req.body.users = undefined;
 						req.body._id = foundDocument._id;
 
-						res.location('/group/ValueCharts/' + chartId + '/structure')
+						res.location('/ValueCharts/' + chartId + '/structure')
 							.status(200)
 							.json({ data: JSON.stringify(req.body) });
 					}
@@ -158,7 +158,7 @@ router.put('/ValueCharts/:chart/structure', function(req: Express.Request, res: 
 	});
 });
 
-router.post('/ValueCharts/:chart/users', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.post('/:chart/users', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -176,7 +176,7 @@ router.post('/ValueCharts/:chart/users', function(req: Express.Request, res: Exp
 							.json({ data: JSON.stringify(err) });
 
 					} else {
-						res.location('/group/ValueCharts/' + chartId + '/users' + req.body.username)
+						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(201)
 							.json({ data: JSON.stringify(req.body) });
 					}
@@ -188,7 +188,7 @@ router.post('/ValueCharts/:chart/users', function(req: Express.Request, res: Exp
 	});
 });
 
-router.get('/ValueCharts/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.get('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;
@@ -209,7 +209,7 @@ router.get('/ValueCharts/:chart/users/:username', function(req: Express.Request,
 					return;
 				}
 
-				res.location('/group/ValueCharts/' + chartId + '/users' + user.username)
+				res.location('/ValueCharts/' + chartId + '/users' + user.username)
 							.status(200)
 							.json({ data: JSON.stringify(user) });
 
@@ -220,7 +220,7 @@ router.get('/ValueCharts/:chart/users/:username', function(req: Express.Request,
 	});
 });
 
-router.put('/ValueCharts/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.put('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;
@@ -248,7 +248,7 @@ router.put('/ValueCharts/:chart/users/:username', function(req: Express.Request,
 							.json({ data: JSON.stringify(err) });
 
 					} else {
-						res.location('/group/ValueCharts/' + chartId + '/users' + req.body.username)
+						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(200)
 							.json({ data: JSON.stringify(req.body) });
 					}
@@ -260,7 +260,7 @@ router.put('/ValueCharts/:chart/users/:username', function(req: Express.Request,
 	});
 });
 
-router.delete('/ValueCharts/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+router.delete('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;

@@ -7,7 +7,7 @@
   "scripts": {
     "postinstall": "typings install",
     "start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
-    "server": "node ./bin/www",
+    "backend": "node backend.js",
     "lite": "lite-server",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
@@ -31,6 +31,7 @@
     "core-js": "^2.4.0",
     "debug": "^2.2.0",
     "express": "^4.14.0",
+    "express-ws": "^2.0.0-rc.1",
     "mongodb": "^2.2.4",
     "monk": "^3.1.0",
     "morgan": "^1.6.1",

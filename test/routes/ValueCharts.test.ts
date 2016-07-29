@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 12:35:44
+* @Last Modified time: 2016-07-29 13:52:33
 */
 
 // Require Node Libraries:
@@ -23,7 +23,7 @@ import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMa
 import { JsonGroupHotel }						from '../TestData/ValueChartsData';
 
 
-describe('Group.routes', () => {
+describe('ValueCharts.routes', () => {
 
 	var valueChartParser: JsonValueChartParser;
 	var user: request.SuperTest<request.Test>;
@@ -44,7 +44,7 @@ describe('Group.routes', () => {
 
 		describe('Method: Post', () => {
 			it('return a copy of the created resource along with status code 201 if the creation was a succcess', (done) => {
-				user.post('group/ValueCharts').send(JsonGroupHotel)
+				user.post('ValueCharts').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(201)
@@ -74,7 +74,7 @@ describe('Group.routes', () => {
 		describe('Method: Get', () => {
 			context('when the ValueChart exists', () => {
 				it('should retrieve the ValueChart along with status code 200', (done) => {
-					user.get('group/ValueCharts/' + id + '?password=' + password)
+					user.get('ValueCharts/' + id + '?password=' + password)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
@@ -96,7 +96,7 @@ describe('Group.routes', () => {
 
 			context('when the ValueChart does not exist', () => {
 				it('should return status code 404', (done) => {
-					user.get('group/ValueCharts/' + 'e910f9c9c759bb6d76faa975' + '?password=' + password)
+					user.get('ValueCharts/' + 'e910f9c9c759bb6d76faa975' + '?password=' + password)
 						.expect(404)
 						.end(function(err, res) {
 					        if (err) return done(err);
@@ -116,7 +116,7 @@ describe('Group.routes', () => {
 			})
 
 			it('should replace the ValueChart, and return the new representation along with status code 200', (done) => {
-				user.put('group/ValueCharts/' + id).send(JsonGroupHotel)
+				user.put('ValueCharts/' + id).send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -140,7 +140,7 @@ describe('Group.routes', () => {
 
 			context('when the ValueChart exists', () => {
 				it('should return status code 200', (done) => {
-					user.delete('group/ValueCharts/' + id)
+					user.delete('ValueCharts/' + id)
 						.expect(200)
 						.end(function(err, res) {
 					        if (err) return done(err);
@@ -151,7 +151,7 @@ describe('Group.routes', () => {
 
 		context('when the ValueChart does not exist', () => {
 				it('should return status code 404', (done) => {
-					user.delete('group/ValueCharts/' + 'e910f9c9c759bb6d76faa975')
+					user.delete('ValueCharts/' + 'e910f9c9c759bb6d76faa975')
 						.expect(404)
 						.end(function(err, res) {
 					        if (err) return done(err);
@@ -166,7 +166,7 @@ describe('Group.routes', () => {
 	describe('Route: /ValueCharts/:Chart/structure', () => {
 
 		before(function(done) {
-			user.post('group/ValueCharts').send(JsonGroupHotel)
+			user.post('ValueCharts').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect((res: request.Response) => {
 						var valueChartResponse = JSON.parse(res.body.data);
@@ -179,7 +179,7 @@ describe('Group.routes', () => {
 
 		describe('Method: Get', () => {
 			it('should retrieve the ValueChart structure along with status code 200', (done) => {
-				user.get('group/ValueCharts/' + id + '/structure?password=' + password)
+				user.get('ValueCharts/' + id + '/structure?password=' + password)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -208,7 +208,7 @@ describe('Group.routes', () => {
 			});
 
 			it('should replace the ValueChart structure and return the new representation with status code 200', (done) => {
-				user.put('group/ValueCharts/' + id + '/structure').send(JsonGroupHotel)
+				user.put('ValueCharts/' + id + '/structure').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -246,7 +246,7 @@ describe('Group.routes', () => {
 		describe('Method: Post', () => {
 			
 			it('should add the user to the ValueChart and return the added user with status code 201', (done) => {
-				user.post('group/ValueCharts/' + id + '/users/').send(argileJson)
+				user.post('ValueCharts/' + id + '/users/').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(201)
@@ -271,7 +271,7 @@ describe('Group.routes', () => {
 		describe('Method: Get', () => {
 			context('when the user exists', () => {
 				it('should get the user along with status code 200', (done) => {
-					user.get('group/ValueCharts/' + id + '/users/Argile')
+					user.get('ValueCharts/' + id + '/users/Argile')
 						.set('Accept', 'application/json')
 							.expect('Content-Type', /json/)
 							.expect(200)
@@ -290,7 +290,7 @@ describe('Group.routes', () => {
 
 			context('when the user does not exist', () => {
 				it('should return status code 404', (done) => {
-					user.get('group/ValueCharts/' + id + '/users/Niel')
+					user.get('ValueCharts/' + id + '/users/Niel')
 						.set('Accept', 'application/json')
 							.expect(404)
 						    .end(function(err, res) {
@@ -315,7 +315,7 @@ describe('Group.routes', () => {
 			});	
 
 			it('should replace the user in the ValueChart and return the new representation with status code 200', (done) => {
-				user.put('group/ValueCharts/' + id + '/users/Argile').send(argileJson)
+				user.put('ValueCharts/' + id + '/users/Argile').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
@@ -337,7 +337,7 @@ describe('Group.routes', () => {
 		describe('Method: Delete', () => {
 			context('when the user exists', () => {
 				it('should delete the user and return status code 200', (done) => {
-					user.delete('group/ValueCharts/' + id + '/users/Argile')
+					user.delete('ValueCharts/' + id + '/users/Argile')
 						.set('Accept', 'application/json')
 							.expect(200)
 						    .end(function(err, res) {
@@ -348,7 +348,7 @@ describe('Group.routes', () => {
 			});
 			context('when the user does not exist', () => {
 				it('should return status code 404', (done) => {
-					user.delete('group/ValueCharts/' + id + '/users/Niel')
+					user.delete('ValueCharts/' + id + '/users/Niel')
 						.set('Accept', 'application/json')
 							.expect(404)
 						    .end(function(err, res) {

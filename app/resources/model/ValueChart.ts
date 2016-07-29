@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 11:55:31
+* @Last Modified time: 2016-07-29 14:41:38
 */
 
 import { Objective } 															from './Objective';
@@ -26,6 +26,7 @@ export class ValueChart {
 	private alternatives: Alternative[];
 	private users: User[];
 
+	public id: string;
 	public password: string;
 
 	constructor(name: string, description: string, creator: string, users?: User[]) {

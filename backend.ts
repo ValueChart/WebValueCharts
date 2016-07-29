@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 14:53:22
+* @Last Modified time: 2016-07-29 16:13:46
 */
 
 
@@ -21,15 +21,20 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 var monk = require('monk');
 
-// Important Routers:
+//  Routers:
 var indexRoutes: Express.Router = require('./routes/Index.routes');
-var groupRoutes: Express.Router = require('./routes/Group.routes');
+var groupRoutes: Express.Router = require('./routes/ValueCharts.routes');
+var hostRoutes: Express.Router = require('./routes/Host.routes');
 
 
 
 var backend: Express.Application = express();
+
 var db: Monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
+var expressWs = require('express-ws')(backend);
+
+expressWs.applyTo(hostRoutes);
 
 // uncomment after placing your favicon in /public
 // backend.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -50,7 +55,39 @@ backend.use(function(req,res,next) {
 
 // Attach routers to manage specific URIs
 backend.use('/', indexRoutes);
-backend.use('/group', groupRoutes);
+backend.use('/ValueCharts', groupRoutes);
+// backend.use('/host', hostRoutes);
+
+
+
+
+(<any> backend).ws('/host/:chart', function(ws: any, req: Express.Request) {
+
+	var chartId: string = req.params.chart;
+
+	console.log('websocket connection received! The ChartID is: ' + chartId);
+
+	// This fires when new connection to this socket is opened.
+	ws.on('open', () => {
+		console.log('The socket has been opened');
+	})
+
+	// This fires whenever the socket receives a message.
+	ws.on('message', (msg: string) => {
+		console.log('The socket has received a message');
+		ws.send('message received. Message was: ' + msg);
+	});
+
+	// This fires when the socket is closed.
+	ws.on('close', () => {
+		console.log('The socket has been closed')
+	});
+});
+
+
+
+
+
 
 // catch 404 errors and redirect the request to the index.html file.
 backend.use(function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
@@ -64,7 +101,6 @@ backend.use(function(req: Express.Request, res: Express.Response, next: Express.
 
 	res.sendFile('index.html', options);
 });
-
 
 
 // error handlers:
@@ -91,5 +127,7 @@ backend.use(function(err: any, req: Express.Request, res: Express.Response, next
 	});
 });
 
-
 module.exports = backend;
+
+
+backend.listen(3000);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 21:02:10
+* @Last Modified time: 2016-07-29 16:23:25
 */
 
 import { Component }															from '@angular/core';
@@ -52,7 +52,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 
 
 // Temporary
-import { GroupVcHttpService }										from '../../services/GroupVcHttp.service';
+import { GroupVcHttpService }													from '../../services/GroupVcHttp.service';
 
 
 @Component({

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 11:59:11
+* @Last Modified time: 2016-07-29 16:14:03
 */
 
 import '../../rxjs-operators';
@@ -22,8 +22,12 @@ import { JsonValueChartParser }										from '../utilities/JsonValueChartParser
 @Injectable()
 export class GroupVcHttpService {
 
-	private valueChartsUrl: string = 'group/ValueCharts';
+	private valueChartsUrl: string = 'ValueCharts';
+	private hostUrl: string = 'host';
+
 	private valueChartParser: JsonValueChartParser;
+
+	private hostWebSocket: WebSocket;
 
 	constructor (private http: Http) {
 		this.valueChartParser = new JsonValueChartParser();
@@ -69,5 +73,15 @@ export class GroupVcHttpService {
 	handleError = (error: any, caught: Observable<ValueChart> ): Observable<ValueChart> => {
 		return caught;
 	}
+
+	initiateHosting(id: string): void {
+		this.hostWebSocket = new WebSocket('ws://' + window.location.host + '/' + this.hostUrl + '/' + id);
+
+		this.hostWebSocket.onopen = (event: any) => { console.log('sending a websocket message'); this.hostWebSocket.send('This is a test Message'); }
+
+		this.hostWebSocket.onmessage = (event: any) => { console.log(event.data); }
+	}
+
+
 
 }
