@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 18:24:50
+* @Last Modified time: 2016-07-28 19:21:43
 */
 
 // Require Node Libraries:
@@ -90,8 +90,6 @@ describe('Group.routes', () => {
 			context('when the ValueChart does not exist', () => {
 				it('should return status code 404', (done) => {
 					user.get('group/ValueCharts/' + 'e910f9c9c759bb6d76faa975' + '?password=' + password)
-						.set('Accept', 'application/json')
-						.expect('Content-Type', /json/)
 						.expect(404)
 						.end(function(err, res) {
 					        if (err) return done(err);
