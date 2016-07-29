@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:21:10
+* @Last Modified time: 2016-07-29 16:54:27
 */
 
 // Import the express typings:
@@ -13,6 +13,8 @@ import * as Monk from 'monk';
 var path = require('path');
 var express = require('express');
 var router: Express.Router = express.Router();
+var hostEventEmitter = require('../utilities/HostEventEmitters');
+
 
 router.post('/', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');

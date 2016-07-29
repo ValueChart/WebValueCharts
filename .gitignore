@@ -59,6 +59,7 @@ app/rxjs-operators.js
 app/app.routes.js
 test/**/*.js
 routes/*.js
+utilities/*.js
 backend.js
 
 ### Apache Server ###

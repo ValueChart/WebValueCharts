@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:13:46
+* @Last Modified time: 2016-07-29 16:57:43
 */
 
 
@@ -24,17 +24,13 @@ var monk = require('monk');
 //  Routers:
 var indexRoutes: Express.Router = require('./routes/Index.routes');
 var groupRoutes: Express.Router = require('./routes/ValueCharts.routes');
-var hostRoutes: Express.Router = require('./routes/Host.routes');
-
-
+var hostEventEmitter = require('./utilities/HostEventEmitters');
 
 var backend: Express.Application = express();
 
 var db: Monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
 var expressWs = require('express-ws')(backend);
-
-expressWs.applyTo(hostRoutes);
 
 // uncomment after placing your favicon in /public
 // backend.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -56,7 +52,6 @@ backend.use(function(req,res,next) {
 // Attach routers to manage specific URIs
 backend.use('/', indexRoutes);
 backend.use('/ValueCharts', groupRoutes);
-// backend.use('/host', hostRoutes);
 
 
 
@@ -70,6 +65,22 @@ backend.use('/ValueCharts', groupRoutes);
 	// This fires when new connection to this socket is opened.
 	ws.on('open', () => {
 		console.log('The socket has been opened');
+
+		// Initialize event listeners:
+		hostEventEmitter.on(hostEventEmitter.USER_ADDED_EVENT, (user: any) => {
+			console.log('A user has been added');
+		});
+
+		hostEventEmitter.on(hostEventEmitter.USER_REMOVED_EVENT, (username: string) => {
+			console.log('A user has been removed');
+
+		});
+
+		hostEventEmitter.on(hostEventEmitter.USER_CHANGED_EVENT, (user: any) => {
+			console.log('A user has been changed');
+
+		});
+
 	})
 
 	// This fires whenever the socket receives a message.
