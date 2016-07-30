@@ -2,33 +2,28 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:57:43
+* @Last Modified time: 2016-07-29 21:04:45
 */
 
-
-// Import the express typings:
-import * as Express from 'express';
-import * as MongoDB from 'mongodb';
-import * as Monk from 'monk';
-
-// Import Node Modules:
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongo = require('mongodb');
-var monk = require('monk');
+// Import Libraries and Middlware:
+import * as express 								from 'express';
+import * as mongo 									from 'mongodb';
+import * as monk									from 'monk';
+import * as path 									from 'path';
+import * as favicon 								from 'serve-favicon';
+import * as logger 									from 'morgan';
+import * as cookieParser 							from 'cookie-parser';
+import * as bodyParser 								from 'body-parser';
 
 //  Routers:
-var indexRoutes: Express.Router = require('./routes/Index.routes');
-var groupRoutes: Express.Router = require('./routes/ValueCharts.routes');
-var hostEventEmitter = require('./utilities/HostEventEmitters');
+import { indexRoutes } 								from './routes/Index.routes';
+import { valueChartRoutes } 						from './routes/ValueCharts.routes';
 
-var backend: Express.Application = express();
+import { HostEventEmitter, hostEventEmitter } 		from './utilities/HostEventEmitters';
 
-var db: Monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
+var backend: express.Application = express();
+
+var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
 var expressWs = require('express-ws')(backend);
 
@@ -51,12 +46,12 @@ backend.use(function(req,res,next) {
 
 // Attach routers to manage specific URIs
 backend.use('/', indexRoutes);
-backend.use('/ValueCharts', groupRoutes);
+backend.use('/ValueCharts', valueChartRoutes);
 
 
 
 
-(<any> backend).ws('/host/:chart', function(ws: any, req: Express.Request) {
+(<any> backend).ws('/host/:chart', function(ws: any, req: express.Request) {
 
 	var chartId: string = req.params.chart;
 
@@ -67,16 +62,16 @@ backend.use('/ValueCharts', groupRoutes);
 		console.log('The socket has been opened');
 
 		// Initialize event listeners:
-		hostEventEmitter.on(hostEventEmitter.USER_ADDED_EVENT, (user: any) => {
+		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT, (user: any) => {
 			console.log('A user has been added');
 		});
 
-		hostEventEmitter.on(hostEventEmitter.USER_REMOVED_EVENT, (username: string) => {
+		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT, (username: string) => {
 			console.log('A user has been removed');
 
 		});
 
-		hostEventEmitter.on(hostEventEmitter.USER_CHANGED_EVENT, (user: any) => {
+		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT, (user: any) => {
 			console.log('A user has been changed');
 
 		});
@@ -101,7 +96,7 @@ backend.use('/ValueCharts', groupRoutes);
 
 
 // catch 404 errors and redirect the request to the index.html file.
-backend.use(function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+backend.use(function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var options = {
 		root: __dirname,  // base directory should be /built/public
 		headers: {
@@ -119,7 +114,7 @@ backend.use(function(req: Express.Request, res: Express.Response, next: Express.
 // development error handler
 // will print stacktrace
 if (backend.get('env') === 'development') {
-	backend.use(function(err: any, req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+	backend.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
 		res.status(err.status || 500);
 		res.json({
 			message: err.message,
@@ -130,7 +125,7 @@ if (backend.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-backend.use(function(err: any, req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+backend.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
 	res.status(err.status || 500);
 	res.json({
 		message: err.message,

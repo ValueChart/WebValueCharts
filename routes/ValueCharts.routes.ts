@@ -2,21 +2,22 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:54:27
+* @Last Modified time: 2016-07-29 20:59:49
 */
 
-// Import the express typings:
-import * as Express from 'express';
-import * as MongoDB from 'mongodb';
-import * as Monk from 'monk';
 
-var path = require('path');
-var express = require('express');
-var router: Express.Router = express.Router();
-var hostEventEmitter = require('../utilities/HostEventEmitters');
+// Import Libraries and Express Middleware:
+import * as express 						from 'express';
+import * as path 							from 'path';
+import * as MongoDB 						from 'mongodb';
+import * as Monk 							from 'monk';
 
+// Import Application Classes:
+import { HostEventEmitter, hostEventEmitter }	from '../utilities/HostEventEmitters';
 
-router.post('/', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+export var valueChartRoutes: express.Router = express.Router();
+
+valueChartRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 
 	groupVcCollection.insert(req.body, function(err: Error, doc: any) {
@@ -36,7 +37,7 @@ router.post('/', function(req: Express.Request, res: Express.Response, next: Exp
 	});
 });
 
-router.get('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	
@@ -59,7 +60,7 @@ router.get('/:chart', function(req: Express.Request, res: Express.Response, next
 	});
 });
 
-router.put('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -81,7 +82,7 @@ router.put('/:chart', function(req: Express.Request, res: Express.Response, next
 	});
 });
 
-router.delete('/:chart', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -99,7 +100,7 @@ router.delete('/:chart', function(req: Express.Request, res: Express.Response, n
 	});
 });
 
-router.get('/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -125,7 +126,7 @@ router.get('/:chart/structure', function(req: Express.Request, res: Express.Resp
 	});
 });
 
-router.put('/:chart/structure', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -160,7 +161,7 @@ router.put('/:chart/structure', function(req: Express.Request, res: Express.Resp
 	});
 });
 
-router.post('/:chart/users', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.post('/:chart/users', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 
@@ -178,6 +179,8 @@ router.post('/:chart/users', function(req: Express.Request, res: Express.Respons
 							.json({ data: JSON.stringify(err) });
 
 					} else {
+						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT);
+
 						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(201)
 							.json({ data: JSON.stringify(req.body) });
@@ -190,7 +193,7 @@ router.post('/:chart/users', function(req: Express.Request, res: Express.Respons
 	});
 });
 
-router.get('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.get('/:chart/users/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;
@@ -222,7 +225,7 @@ router.get('/:chart/users/:username', function(req: Express.Request, res: Expres
 	});
 });
 
-router.put('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.put('/:chart/users/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;
@@ -262,7 +265,7 @@ router.put('/:chart/users/:username', function(req: Express.Request, res: Expres
 	});
 });
 
-router.delete('/:chart/users/:username', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+valueChartRoutes.delete('/:chart/users/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var chartId: string = req.params.chart;
 	var username: string = req.params.username;
@@ -300,5 +303,3 @@ router.delete('/:chart/users/:username', function(req: Express.Request, res: Exp
 		}
 	});
 });
-
-module.exports = router;

@@ -2,19 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 14:49:50
+* @Last Modified time: 2016-07-29 21:04:33
 */
 
 
 // Import the express typings:
-import * as Express from 'express';
+import * as express 						from 'express';
+import * as path 							from 'path';
 
-var path = require('path');
-var express = require('express');
-var router: Express.Router = express.Router();
+export var indexRoutes: express.Router = express.Router();
 
  // GET home page. 
-router.get('/', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+indexRoutes.get('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var options = {
 		root: path.join(__dirname, '../'),  // base directory should be /built/public
 		headers: {
@@ -27,7 +26,7 @@ router.get('/', function(req: Express.Request, res: Express.Response, next: Expr
 });
 
  // GET home page. 
-router.get('/register', function(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+indexRoutes.get('/register', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var options = {
 		root: path.join(__dirname, '../'),  // base directory should be /built/public
 		headers: {
@@ -38,5 +37,3 @@ router.get('/register', function(req: Express.Request, res: Express.Response, ne
 
 	res.sendFile('index.html', options);
 });
-
-module.exports = router;
