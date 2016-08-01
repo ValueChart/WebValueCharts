@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-31 17:04:57
+* @Last Modified time: 2016-08-01 16:23:14
 */
 
 // Import Types:
@@ -23,6 +23,7 @@ import { indexRoutes } 								from './routes/Index.routes';
 import { valueChartRoutes } 						from './routes/ValueCharts.routes';
 
 import { HostEventEmitter, hostEventEmitter } 		from './utilities/HostEventEmitters';
+import { HostConnectionStatus , hostConnections }	from './utilities/HostConnections';
 
 var backend: express.Application = express();
 
@@ -64,37 +65,45 @@ backend.use('/ValueCharts', valueChartRoutes);
 		var hostMessage: HostMessage = JSON.parse(msg);
 
 		switch (hostMessage.type) {
-			case "initialization":
+			case 'connection-init':
 				initEventListeners(hostMessage, chartId, ws);
-				ws.send(JSON.stringify({ data: 'open', chartId: chartId, type: 'connection-status' }));
+				hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', changesAccepted: true });
+				ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: 'connection-init' }));
+				
 				break;
-			
+			case 'change-status':
+				hostConnections.get(chartId).changesAccepted = hostMessage.data;
+				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: 'change-status' }));
+
+
+				break;
 			default:
-				// code...
+				
 				break;
 		}
 	});
 
 	// This fires when the socket is closed.
 	ws.on('close', () => {
-		console.log('The socket has been closed')
+		hostConnections.delete(chartId);
 	});
 });
-
-
 
 var initEventListeners = (jsonData: any, chartId: string, ws: any): void => {
 			// Initialize event listeners:
 		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
 			console.log('A user has been added');
+			ws.send(JSON.stringify({ type: 'user-added', data: user, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
 			console.log('A user has been removed');
+			ws.send(JSON.stringify({ type: 'user-removed', data: username, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
 			console.log('A user has been changed');
+			ws.send(JSON.stringify({ type: 'user-changed', data: user, chartId: chartId }));
 		});
 }
 

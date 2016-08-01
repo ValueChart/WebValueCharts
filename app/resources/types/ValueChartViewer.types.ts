@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 21:56:34
+* @Last Modified time: 2016-08-01 15:29:55
 */
 
 import { Objective }					from '../model/Objective';
@@ -24,8 +24,8 @@ export interface CellData {
 }
 
 export interface UserScoreData {
-	user: User,
-	objective: PrimitiveObjective,
+	user: User;
+	objective: PrimitiveObjective;
 	value: (string | number);
 	offset?: number
 }

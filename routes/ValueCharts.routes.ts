@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-30 13:56:51
+* @Last Modified time: 2016-08-01 15:03:31
 */
 
 
@@ -179,7 +179,8 @@ valueChartRoutes.post('/:chart/users', function(req: express.Request, res: expre
 							.json({ data: JSON.stringify(err) });
 
 					} else {
-						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId);
+						// Notify any clients hosting this ValueChart that a user has been added.
+						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
 
 						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(201)
@@ -253,6 +254,9 @@ valueChartRoutes.put('/:chart/users/:username', function(req: express.Request, r
 							.json({ data: JSON.stringify(err) });
 
 					} else {
+						// Notify any clients hosting this ValueChart that a user has been changed.
+						hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
+
 						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(200)
 							.json({ data: JSON.stringify(req.body) });
@@ -294,6 +298,9 @@ valueChartRoutes.delete('/:chart/users/:username', function(req: express.Request
 							.json({ data: JSON.stringify(err) });
 
 					} else {
+						// Notify any clients hosting this ValueChart that a user has been deleted.
+						hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, username);
+
 						res.sendStatus(200);
 					}
 				});
