@@ -2,8 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 21:04:45
+* @Last Modified time: 2016-07-31 17:04:57
 */
+
+// Import Types:
+import { HostMessage }							 	from './app/resources/types/HostMessage';
 
 // Import Libraries and Middlware:
 import * as express 								from 'express';
@@ -56,32 +59,20 @@ backend.use('/ValueCharts', valueChartRoutes);
 	var chartId: string = req.params.chart;
 
 	console.log('websocket connection received! The ChartID is: ' + chartId);
-
-	// This fires when new connection to this socket is opened.
-	ws.on('open', () => {
-		console.log('The socket has been opened');
-
-		// Initialize event listeners:
-		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT, (user: any) => {
-			console.log('A user has been added');
-		});
-
-		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT, (username: string) => {
-			console.log('A user has been removed');
-
-		});
-
-		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT, (user: any) => {
-			console.log('A user has been changed');
-
-		});
-
-	})
-
 	// This fires whenever the socket receives a message.
 	ws.on('message', (msg: string) => {
-		console.log('The socket has received a message');
-		ws.send('message received. Message was: ' + msg);
+		var hostMessage: HostMessage = JSON.parse(msg);
+
+		switch (hostMessage.type) {
+			case "initialization":
+				initEventListeners(hostMessage, chartId, ws);
+				ws.send(JSON.stringify({ data: 'open', chartId: chartId, type: 'connection-status' }));
+				break;
+			
+			default:
+				// code...
+				break;
+		}
 	});
 
 	// This fires when the socket is closed.
@@ -92,7 +83,20 @@ backend.use('/ValueCharts', valueChartRoutes);
 
 
 
+var initEventListeners = (jsonData: any, chartId: string, ws: any): void => {
+			// Initialize event listeners:
+		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
+			console.log('A user has been added');
+		});
 
+		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
+			console.log('A user has been removed');
+		});
+
+		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
+			console.log('A user has been changed');
+		});
+}
 
 
 // catch 404 errors and redirect the request to the index.html file.

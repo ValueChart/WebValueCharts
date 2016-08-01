@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:14:03
+* @Last Modified time: 2016-07-30 14:00:06
 */
 
 import '../../rxjs-operators';
@@ -77,9 +77,9 @@ export class GroupVcHttpService {
 	initiateHosting(id: string): void {
 		this.hostWebSocket = new WebSocket('ws://' + window.location.host + '/' + this.hostUrl + '/' + id);
 
-		this.hostWebSocket.onopen = (event: any) => { console.log('sending a websocket message'); this.hostWebSocket.send('This is a test Message'); }
+		this.hostWebSocket.onopen = (event: MessageEvent) => { console.log('sending a websocket message'); this.hostWebSocket.send('This is a test Message'); }
 
-		this.hostWebSocket.onmessage = (event: any) => { console.log(event.data); }
+		this.hostWebSocket.onmessage = (event: MessageEvent) => { console.log(event.data); }
 	}
 
 

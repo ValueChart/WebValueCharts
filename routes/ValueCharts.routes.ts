@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 20:59:49
+* @Last Modified time: 2016-07-30 13:56:51
 */
 
 
@@ -179,7 +179,7 @@ valueChartRoutes.post('/:chart/users', function(req: express.Request, res: expre
 							.json({ data: JSON.stringify(err) });
 
 					} else {
-						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT);
+						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId);
 
 						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 							.status(201)
