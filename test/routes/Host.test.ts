@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-01 16:22:01
+* @Last Modified time: 2016-08-02 10:47:11
 */
 
 // Require Node Libraries:
@@ -22,7 +22,7 @@ import { WeightMap }							from '../../app/resources/model/WeightMap';
 import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMap';
 
 // Import Types:
-import { HostMessage }							 from '../../app/resources/types/HostMessage';
+import { HostMessage,  MessageType}				from '../../app/resources/types/HostMessage';
 
 
 // Import Test Data:
@@ -60,13 +60,13 @@ describe('WebSocket: /Host', () => {
 		it('should send a message to the client confirming successful connection with the correct chart ID', (done) => {
 			hostWebSocket = new WebSocket(hostUrl + chartId);
 			
-			hostWebSocket.onopen = (event: MessageEvent) => { hostWebSocket.send(JSON.stringify({ type: 'connection-init', chartId: chartId, data: 'opening-connection'})); }
+			hostWebSocket.onopen = (event: MessageEvent) => { hostWebSocket.send(JSON.stringify({ type: MessageType.ConnectionInit, chartId: chartId, data: 'opening-connection'})); }
 
 			hostWebSocket.onmessage = (msg: MessageEvent) => {
 				var hostMessage: HostMessage = JSON.parse(msg.data);
 
 				expect(hostMessage.chartId).to.equal(chartId);
-				expect(hostMessage.type).to.equal('connection-init');
+				expect(hostMessage.type).to.equal(MessageType.ConnectionInit);
 				expect(hostMessage.data).to.equal('complete');
 				done();
 			};
@@ -81,12 +81,12 @@ describe('WebSocket: /Host', () => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
 					expect(hostMessage.chartId).to.equal(chartId);
-					expect(hostMessage.type).to.equal('change-status');
+					expect(hostMessage.type).to.equal(MessageType.ChangePermissions);
 					expect(hostMessage.data).to.equal(false);
 					done();
 				};
 
-				hostWebSocket.send(JSON.stringify({ type: 'change-status', data: false, chartId: chartId }));
+				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
 			});
 		});
 
@@ -96,12 +96,12 @@ describe('WebSocket: /Host', () => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
 					expect(hostMessage.chartId).to.equal(chartId);
-					expect(hostMessage.type).to.equal('change-status');
+					expect(hostMessage.type).to.equal(MessageType.ChangePermissions);
 					expect(hostMessage.data).to.equal(true);
 					done();
 				};
 
-				hostWebSocket.send(JSON.stringify({ type: 'change-status', data: true, chartId: chartId }));
+				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: true, chartId: chartId }));
 			});
 		});
 	});
@@ -137,7 +137,7 @@ describe('WebSocket: /Host', () => {
 			hostWebSocket.onmessage = (msg: MessageEvent) => { 
 				var hostMessage: HostMessage = JSON.parse(msg.data);
 
-				expect(hostMessage.type).to.equal('user-added');
+				expect(hostMessage.type).to.equal(MessageType.UserAdded);
 				expect(hostMessage.chartId).to.equal(chartId);
 				expect(hostMessage.data).to.deep.equal(argileJson);
 				done();
@@ -178,7 +178,7 @@ describe('WebSocket: /Host', () => {
 			hostWebSocket.onmessage = (msg: MessageEvent) => { 
 				var hostMessage: HostMessage = JSON.parse(msg.data);
 
-				expect(hostMessage.type).to.equal('user-changed');
+				expect(hostMessage.type).to.equal(MessageType.UserChanged);
 				expect(hostMessage.chartId).to.equal(chartId);
 				expect(hostMessage.data).to.deep.equal(argileJson);
 				done();
@@ -200,7 +200,7 @@ describe('WebSocket: /Host', () => {
 			hostWebSocket.onmessage = (msg: MessageEvent) => { 
 				var hostMessage: HostMessage = JSON.parse(msg.data);
 
-				expect(hostMessage.type).to.equal('user-removed');
+				expect(hostMessage.type).to.equal(MessageType.UserRemoved);
 				expect(hostMessage.chartId).to.equal(chartId);
 				expect(hostMessage.data).to.equal('Argile');
 				done();

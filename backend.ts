@@ -2,11 +2,8 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-01 16:23:14
+* @Last Modified time: 2016-08-02 10:47:34
 */
-
-// Import Types:
-import { HostMessage }							 	from './app/resources/types/HostMessage';
 
 // Import Libraries and Middlware:
 import * as express 								from 'express';
@@ -22,8 +19,11 @@ import * as bodyParser 								from 'body-parser';
 import { indexRoutes } 								from './routes/Index.routes';
 import { valueChartRoutes } 						from './routes/ValueCharts.routes';
 
+// Types and Utilities
 import { HostEventEmitter, hostEventEmitter } 		from './utilities/HostEventEmitters';
 import { HostConnectionStatus , hostConnections }	from './utilities/HostConnections';
+import { HostMessage, MessageType}					from './app/resources/types/HostMessage';
+
 
 var backend: express.Application = express();
 
@@ -65,16 +65,15 @@ backend.use('/ValueCharts', valueChartRoutes);
 		var hostMessage: HostMessage = JSON.parse(msg);
 
 		switch (hostMessage.type) {
-			case 'connection-init':
+			case MessageType.ConnectionInit:
 				initEventListeners(hostMessage, chartId, ws);
-				hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', changesAccepted: true });
-				ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: 'connection-init' }));
+				hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', userChangesAccepted: true });
+				ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
 				
 				break;
-			case 'change-status':
-				hostConnections.get(chartId).changesAccepted = hostMessage.data;
-				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: 'change-status' }));
-
+			case MessageType.ChangePermissions:
+				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
+				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: MessageType.ChangePermissions }));
 
 				break;
 			default:
@@ -93,17 +92,17 @@ var initEventListeners = (jsonData: any, chartId: string, ws: any): void => {
 			// Initialize event listeners:
 		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
 			console.log('A user has been added');
-			ws.send(JSON.stringify({ type: 'user-added', data: user, chartId: chartId }));
+			ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
 			console.log('A user has been removed');
-			ws.send(JSON.stringify({ type: 'user-removed', data: username, chartId: chartId }));
+			ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
 			console.log('A user has been changed');
-			ws.send(JSON.stringify({ type: 'user-changed', data: user, chartId: chartId }));
+			ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
 		});
 }
 
