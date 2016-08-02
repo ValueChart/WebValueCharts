@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-30 14:00:06
+* @Last Modified time: 2016-08-02 12:16:46
 */
 
 import '../../rxjs-operators';
@@ -14,10 +14,13 @@ import { Observable }     											from 'rxjs/Observable';
 
 // Model Classes:
 import { ValueChart }												from '../model/ValueChart';
+import { User }														from '../model/User';
 
 // Utility Classes: 
 import { JsonValueChartParser }										from '../utilities/JsonValueChartParser';
 
+// Types: 
+import { HostMessage, MessageType }									from '../types/HostMessage';
 
 @Injectable()
 export class GroupVcHttpService {
@@ -46,14 +49,14 @@ export class GroupVcHttpService {
 	                    .catch(this.handleError);
 	}
 
-	getGroupValueChart(id: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + '/' + id + '?' + password)
+	getGroupValueChart(chartId: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + '/' + chartId + '?' + password)
 	                    .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
 
-	getValueChartStructure(id: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + '/' + id + '/structure?' + password)
+	getValueChartStructure(chartId: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + '/' + chartId + '/structure?' + password)
 			            .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
@@ -73,15 +76,4 @@ export class GroupVcHttpService {
 	handleError = (error: any, caught: Observable<ValueChart> ): Observable<ValueChart> => {
 		return caught;
 	}
-
-	initiateHosting(id: string): void {
-		this.hostWebSocket = new WebSocket('ws://' + window.location.host + '/' + this.hostUrl + '/' + id);
-
-		this.hostWebSocket.onopen = (event: MessageEvent) => { console.log('sending a websocket message'); this.hostWebSocket.send('This is a test Message'); }
-
-		this.hostWebSocket.onmessage = (event: MessageEvent) => { console.log(event.data); }
-	}
-
-
-
 }

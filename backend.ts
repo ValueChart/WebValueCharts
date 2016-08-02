@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 11:46:55
+* @Last Modified time: 2016-08-02 11:49:59
 */
 
 // Import Libraries and Middlware:
@@ -85,7 +85,7 @@ backend.use('/ValueCharts', valueChartRoutes);
 
 	// This fires when the socket is closed.
 	ws.on('close', () => {
-		hostConnections.delete(chartId);
+		hostConnections.get(chartId).connectionStatus = 'closed';
 	});
 });
 
