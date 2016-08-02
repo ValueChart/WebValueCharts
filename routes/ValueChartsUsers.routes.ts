@@ -2,19 +2,33 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 11:00:24
+* @Last Modified time: 2016-08-02 11:46:46
 */
 
 // Import Libraries and Express Middleware:
-import * as express 						from 'express';
-import * as path 							from 'path';
-import * as MongoDB 						from 'mongodb';
-import * as Monk 							from 'monk';
+import * as express 								from 'express';
+import * as path 									from 'path';
+import * as MongoDB 								from 'mongodb';
+import * as Monk 									from 'monk';
 
 // Import Application Classes:
-import { HostEventEmitter, hostEventEmitter }	from '../utilities/HostEventEmitters';
+import { HostEventEmitter, hostEventEmitter }		from '../utilities/HostEventEmitters';
+import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
 
 export var valueChartUsersRoutes: express.Router = express.Router();
+
+valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var chartId: string = (<any> req).chartId;
+	var hostConnection: HostConnectionStatus = hostConnections.get(chartId);
+
+	// If the host connection is active, and user changes are not being accepted.
+	if (hostConnection && !hostConnection.userChangesAccepted) {
+		res.status(403)
+			.send('User Changes are Disabled by the Chart Owner');
+	} else {
+		next();
+	}
+});
 
 valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');

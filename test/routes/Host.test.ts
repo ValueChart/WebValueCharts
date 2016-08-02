@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 10:47:11
+* @Last Modified time: 2016-08-02 11:46:09
 */
 
 // Require Node Libraries:
@@ -73,10 +73,9 @@ describe('WebSocket: /Host', () => {
 		});
 	});
 
-	describe('Setting the change-status', () => {
+	describe('changing the userChangesAccepted setting', () => {
 		
-		context('when the change-status is set to false', () => {
-			it('should send a message to the client confirming the new change-status', (done) => {
+			it('should send a message to the client confirming the new status is false', (done) => {
 				hostWebSocket.onmessage = (msg: MessageEvent) => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
@@ -88,10 +87,8 @@ describe('WebSocket: /Host', () => {
 
 				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
 			});
-		});
 
-		context('when the change-status is set to true', () => {
-			it('should send a message to the client confirming the new change-status', (done) => {
+			it('should send a message to the client confirming the new status is true', (done) => {
 				hostWebSocket.onmessage = (msg: MessageEvent) => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
@@ -103,8 +100,70 @@ describe('WebSocket: /Host', () => {
 
 				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: true, chartId: chartId }));
 			});
+	});
+
+	describe('attempting to add/remove/change users when userChangesAccepted is false', () => {
+		var argile: User;
+		var argileJson: any;
+
+		before(function(done) {
+			argile = new User('Argile');
+			argile.setWeightMap(new WeightMap());
+			argile.setScoreFunctionMap(new ScoreFunctionMap());
+
+			argileJson = JSON.parse(JSON.stringify(argile));
+
+			hostWebSocket.onmessage = (msg: MessageEvent) => {
+				done();
+			};
+			hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
+		});	
+
+		context('when attempting to post a new user', () => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+				user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
+					.set('Accept', 'application/json')
+						.expect(403)
+						.end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+		});
+
+		context('when attempting to delete new user', () => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+				user.delete('ValueCharts/' + chartId + '/users/Argile')
+					.set('Accept', 'application/json')
+						.expect(403)
+						.end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+		});
+
+		context('when attempting to modify a user', () => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+				user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
+					.set('Accept', 'application/json')
+						.expect(403)
+						.end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+		});
+
+
+		after(function(done) {
+			hostWebSocket.onmessage = (msg: MessageEvent) => {
+				done();
+			};
+			hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: true, chartId: chartId }));
 		});
 	});
+
 
 	describe('Adding a user to a hosted ValueChart', () => {
 		var argile: User;

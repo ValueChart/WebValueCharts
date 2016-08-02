@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 10:47:34
+* @Last Modified time: 2016-08-02 11:46:55
 */
 
 // Import Libraries and Middlware:
@@ -26,7 +26,7 @@ import { HostMessage, MessageType}					from './app/resources/types/HostMessage';
 
 
 var backend: express.Application = express();
-
+// Retrieve the database via the connection url. development is the username and BackEndConstruction is the password.
 var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
 var expressWs = require('express-ws')(backend);
@@ -73,6 +73,7 @@ backend.use('/ValueCharts', valueChartRoutes);
 				break;
 			case MessageType.ChangePermissions:
 				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
+				console.log('host connection:', hostConnections.get(chartId));
 				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: MessageType.ChangePermissions }));
 
 				break;
@@ -91,17 +92,14 @@ backend.use('/ValueCharts', valueChartRoutes);
 var initEventListeners = (jsonData: any, chartId: string, ws: any): void => {
 			// Initialize event listeners:
 		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
-			console.log('A user has been added');
 			ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
-			console.log('A user has been removed');
 			ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
 		});
 
 		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
-			console.log('A user has been changed');
 			ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
 		});
 }
