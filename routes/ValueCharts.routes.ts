@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 11:05:41
+* @Last Modified time: 2016-08-03 12:25:44
 */
 
 
@@ -126,7 +126,7 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 	var password: string = req.query.password;
 
 
-	groupVcCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
+	groupVcCollection.findOne({ name: chartId, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: JSON.stringify(err) });
@@ -147,9 +147,9 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 
 valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var chartName: string = (<any> req).chartId;
 
-	groupVcCollection.findOne({ _id: chartId }, function (err: Error, foundDocument: any) {
+	groupVcCollection.findOne({ name: chartName }, function (err: Error, foundDocument: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: JSON.stringify(err) });
@@ -158,7 +158,7 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 			// Attach the users to the structure object.
 				req.body.users = foundDocument.users;
 
-				groupVcCollection.update({ _id: chartId }, (req.body), [], function(err: Error, doc: any) {
+				groupVcCollection.update({ _id: foundDocument._id }, (req.body), [], function(err: Error, doc: any) {
 					if (err) {
 						res.status(400)
 							.json({ data: JSON.stringify(err) });
@@ -168,7 +168,7 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 						req.body.users = undefined;
 						req.body._id = foundDocument._id;
 
-						res.location('/ValueCharts/' + chartId + '/structure')
+						res.location('/ValueCharts/' + chartName + '/structure')
 							.status(200)
 							.json({ data: JSON.stringify(req.body) });
 					}

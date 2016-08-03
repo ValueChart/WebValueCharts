@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 15:12:37
+* @Last Modified time: 2016-08-03 12:42:14
 */
 
 import '../../rxjs-operators';
@@ -49,13 +49,13 @@ export class GroupVcHttpService {
 	}
 
 	getGroupValueChart(chartId: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + '/' + chartId + '?' + password)
+		return this.http.get(this.valueChartsUrl + '/' + chartId + '?password=' + password)
 	                    .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
 
-	getValueChartStructure(chartId: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + '/' + chartId + '/structure?' + password)
+	getValueChartStructure(chartName: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + '/' + chartName + '/structure?password=' + password)
 			            .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
@@ -83,6 +83,6 @@ export class GroupVcHttpService {
 
 	// This method handles any errors from the request.
 	handleError = (error: any, caught: Observable<ValueChart> ): Observable<ValueChart> => {
-		return caught;
+		return;
 	}
 }

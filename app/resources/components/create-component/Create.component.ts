@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:39:05
+* @Last Modified time: 2016-08-03 12:46:06
 */
 
 import { Component }									from '@angular/core';
@@ -12,6 +12,10 @@ import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
+import { GroupVcHttpService }							from '../../services/GroupVcHttp.service';
+
+// Model Classes:
+import { ValueChart }									from '../../model/ValueChart';
 
 // Sample Data:
 import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCharts';
@@ -25,10 +29,24 @@ export class CreateComponent {
 
 	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Wastewater Management', type: 'Individual' }]
 
+	private valueChartName: string;
+	private valueChartPassword: string;
+
 	constructor(
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
-		private currentUserService: CurrentUserService) {
+		private currentUserService: CurrentUserService,
+		private groupVcHttpService: GroupVcHttpService) {
+	}
+
+	joinValueChart(chartName: string, chartPassword: string): void {
+		this.groupVcHttpService.getValueChartStructure(chartName, chartPassword).subscribe((valueChart: ValueChart) => { 
+			this.currentUserService.setValueChart(valueChart);
+			(<any> $('#close-chart-credentials-modal')).click();
+			console.log(valueChart);
+			this.router.navigate(['createValueChart', 'newUser']);
+
+		});
 	}
 
 	selectDemoValueChart(demoChart: any): void {
@@ -39,11 +57,6 @@ export class CreateComponent {
 
 	goToValueChart(event: Event): void {
 		this.uploadValueChart(event,['/view/']);
-	}
-
-	addUserToExistingChart(event: Event) {
-		// Second parameter specifies use case for CreateValueChart workflow
-		this.uploadValueChart(event,['/createValueChart','newUser']);
 	}
 
 	uploadValueChart(event: Event, route: String[]) {

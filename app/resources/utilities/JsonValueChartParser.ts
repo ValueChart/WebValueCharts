@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:16:58
+* @Last Modified time: 2016-08-03 12:27:53
 */
 
 // Model Classes
@@ -32,15 +32,19 @@ export class JsonValueChartParser {
 		// Copy over all the properties from the WeightMap that is being saved.
 		valueChart._id = jsonObject._id;
 		// Parse Users
-		for (var i = 0; i < jsonObject.users.length; i++) {
-			jsonObject.users[i] = this.parseUser(jsonObject.users[i]);
+		if (jsonObject.users) {
+			for (var i = 0; i < jsonObject.users.length; i++) {
+				jsonObject.users[i] = this.parseUser(jsonObject.users[i]);
+			}
+		} else {
+			jsonObject.users = [];
 		}
 		
 		// Parse Root Objectives
 		for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
 			jsonObject.rootObjectives[i] = this.parseObjective(jsonObject.rootObjectives[i]);
 		}
-
+		// Parse Alternatives
 		for (var i = 0; i < jsonObject.alternatives.length; i++) {
 			jsonObject.alternatives[i] = this.parseAlternative(jsonObject.alternatives[i]);
 		}

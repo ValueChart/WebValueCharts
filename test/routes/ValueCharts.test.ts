@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-30 13:59:16
+* @Last Modified time: 2016-08-03 12:33:34
 */
 
 // Require Node Libraries:
@@ -179,7 +179,7 @@ describe('ValueCharts.routes', () => {
 
 		describe('Method: Get', () => {
 			it('should retrieve the ValueChart structure along with status code 200', (done) => {
-				user.get('ValueCharts/' + chartId + '/structure?password=' + password)
+				user.get('ValueCharts/' + 'HotelSelectionProblem' + '/structure?password=' + password)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -208,7 +208,7 @@ describe('ValueCharts.routes', () => {
 			});
 
 			it('should replace the ValueChart structure and return the new representation with status code 200', (done) => {
-				user.put('ValueCharts/' + chartId + '/structure').send(JsonGroupHotel)
+				user.put('ValueCharts/' + 'HotelSelectionProblem' + '/structure').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)

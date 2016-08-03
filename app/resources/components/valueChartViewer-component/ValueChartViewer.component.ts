@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 17:55:44
+* @Last Modified time: 2016-08-03 12:11:34
 */
 
 import { Component }															from '@angular/core';
@@ -29,6 +29,7 @@ import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.s
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 import { RenderEventsService }													from '../../services/RenderEvents.service';
 import { HostService }															from '../../services/Host.service';
+import { GroupVcHttpService }													from '../../services/GroupVcHttp.service';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -51,9 +52,6 @@ import { ValueChart } 															from '../../model/ValueChart';
 import { Alternative } 															from '../../model/Alternative';
 import { PrimitiveObjective } 													from '../../model/PrimitiveObjective';
 
-
-// Temporary
-import { GroupVcHttpService }													from '../../services/GroupVcHttp.service';
 
 
 @Component({
