@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 15:49:53
+* @Last Modified time: 2016-08-03 13:29:18
 */
 
 // =========================================================================================================================================
@@ -46,6 +46,7 @@
 		'@angular/router-deprecated',
 		'@angular/testing',
 		'@angular/upgrade',
+		'@angular/forms'
 	];
 
 	angularPackages.forEach(function(pkgName) {

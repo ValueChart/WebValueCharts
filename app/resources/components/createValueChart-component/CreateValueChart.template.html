@@ -5,10 +5,10 @@
                 <div class="form-group">
                 	<div *ngIf="step === creationStepsService.BASICS">
                         <label class="control-label">Chart name.</label>
-                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
+                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" name="valueChartName" maxlength="100" />
                         <label class="control-label">Chart description.</label>
-                        <textarea  maxlength="100" class="form-control" [(ngModel)]="valueChartDescription"></textarea>
-                        <label><input type="checkbox" [(ngModel)]="isGroupValueChart" style="margin: 5px 10px;">Group ValueChart</label>
+                        <textarea  maxlength="100" class="form-control" [(ngModel)]="valueChartDescription" name="valueChartDescription"></textarea>
+                        <label><input type="checkbox" [(ngModel)]="isGroupValueChart" name="isGroupValueChart" style="margin: 5px 10px;">Group ValueChart</label>
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
                         <h4>Add Objectives</h4>
@@ -29,22 +29,22 @@
                             <tbody>
                               <tr *ngFor="let altID of altKeys()">
                                 <th>
-                                    <input type="checkbox" #t [(ngModel)]="isSelected[altID]" />
+                                    <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
                                 </th>
                                 <th>
-                                    <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value)"/>
+                                    <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" name="name" (ngModelChange)="alternatives[altID].setName(n.value)"/>
                                 </th>
                                 <th>
-                                    <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
+                                    <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" name="description" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
                                 </th>
                                 <th *ngFor="let obj of valueChartService.getPrimitiveObjectives()">
                                     <div *ngIf="obj.getDomain().type === 'categorical'">
-                                        <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
+                                        <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="{{obj.getName()}}" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
                                             <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
                                         </select>
                                     </div>
                                     <div *ngIf="obj.getDomain().type === 'continuous'">
-                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),+m.value)"/>
+                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="value" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),+m.value)"/>
                                     </div>   
                                 </th>
                               </tr>
@@ -53,7 +53,7 @@
                     </div>
                     <div *ngIf="step === creationStepsService.PREFERENCES">
                          <label class="control-label">Select Objective:</label>
-                        <select class="form-control" [(ngModel)]="selectedObjective">
+                        <select class="form-control" [(ngModel)]="selectedObjective" name="selectedObjective">
                             <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                         </select>
                         <div>
