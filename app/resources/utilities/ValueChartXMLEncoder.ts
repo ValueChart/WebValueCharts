@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:23:30
+* @Last Modified time: 2016-08-02 16:19:58
 */
 
 // Model Classes
@@ -50,6 +50,7 @@ export class ValueChartXMLEncoder {
 		valueChartElement.setAttribute('name', valueChart.getName());
 		valueChartElement.setAttribute('creator', valueChart.getCreator());
 		valueChartElement.setAttribute('version', '2.0');
+		valueChartElement.setAttribute('id', valueChart._id);
 
 		var chartStructureElement: Element = xmlDocument.createElement('ChartStructure');
 		valueChartElement.appendChild(chartStructureElement);

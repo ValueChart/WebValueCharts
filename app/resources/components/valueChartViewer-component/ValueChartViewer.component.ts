@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-29 16:23:25
+* @Last Modified time: 2016-08-02 17:55:44
 */
 
 import { Component }															from '@angular/core';
@@ -28,6 +28,7 @@ import { RenderConfigService }													from '../../services/RenderConfig.ser
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 import { RenderEventsService }													from '../../services/RenderEvents.service';
+import { HostService }															from '../../services/Host.service';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -68,6 +69,7 @@ import { GroupVcHttpService }													from '../../services/GroupVcHttp.servi
 		ChartUndoRedoService,
 		ChangeDetectionService,
 		RenderEventsService,
+		HostService,
 	// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
@@ -147,7 +149,8 @@ export class ValueChartViewerComponent implements OnInit {
 		private summaryChartDefinitions: SummaryChartDefinitions,
 		private objectiveChartDefinitions: ObjectiveChartDefinitions,
 		private labelDefinitions: LabelDefinitions,
-		private groupVcHttpService: GroupVcHttpService) { }
+		private groupVcHttpService: GroupVcHttpService,
+		private hostService: HostService) { }
 
 	ngOnInit() {
 
@@ -258,6 +261,12 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 	};
 
+	// Host ValueChart:
+
+	hostValueChart(): void {
+		
+	}
+
 	// Detail Box:
 
 	expandAlternative(alternative: Alternative): void {
@@ -326,8 +335,6 @@ export class ValueChartViewerComponent implements OnInit {
 	editPreferenceModel(): void {
 		// TODO: Implement Editing of Preference Model.
 	}
-
-
 
 
 	// Interaction Toggles

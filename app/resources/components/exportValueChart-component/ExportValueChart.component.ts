@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 10:39:46
+* @Last Modified time: 2016-08-02 16:47:40
 */
 
 // Angular Classes:
@@ -65,7 +65,6 @@ export class ExportValueChartComponent implements OnInit{
 
 		this.downloadLink.attr('href', valueChartObjectURL);
 		this.downloadLink.click();
-		// this.downloadLink.attr('href', 'javascript:void(0)');
 	}
 
 	convertValueChartIntoObjectURL(valueChart: ValueChart): string {

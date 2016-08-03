@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 11:46:09
+* @Last Modified time: 2016-08-02 15:06:00
 */
 
 // Require Node Libraries:
@@ -273,6 +273,18 @@ describe('WebSocket: /Host', () => {
 			hostWebSocket.close(1000);
 			done();
 		});
+	});
+
+
+	after(function(done) {
+		// Delete the ValueChart used for testing.
+		user.delete('ValueCharts/' + chartId)
+			.set('Accept', 'application/json')
+			.expect(200)
+			.end(function(err, res) {
+		        if (err) return done(err);
+		        done();
+		    });
 	});
 
 

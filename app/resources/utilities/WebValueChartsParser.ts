@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:24:03
+* @Last Modified time: 2016-08-02 16:19:12
 */
 
 // Model Classes
@@ -39,6 +39,7 @@ export class WebValueChartsParser {
 		var users: User[] = this.parseUsers(usersParentElement);
 
 		valueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
+		valueChart._id = valueChartElement.getAttribute('id');
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
 		var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');

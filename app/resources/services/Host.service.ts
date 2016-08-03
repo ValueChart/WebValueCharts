@@ -2,10 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 12:20:52
+* @Last Modified time: 2016-08-02 16:14:59
 */
 
 import { Injectable } 												from '@angular/core';
+
+// Application Classes:
+import { ValueChartService }										from './ValueChart.service';
 
 // Model Classes:
 import { ValueChart }												from '../model/ValueChart';
@@ -19,18 +22,17 @@ import { HostMessage, MessageType }									from '../types/HostMessage';
 
 @Injectable()
 export class HostService {
+	private hostUrl: string = 'host';
 
 	public hostWebSocket: WebSocket;
-	private  hostedValueChart: ValueChart;
 
 	private valueChartParser: JsonValueChartParser;
 
-	constructor() { 
+	constructor(private valueChartService: ValueChartService) { 
 			this.valueChartParser = new JsonValueChartParser();
 	}
 
-	hostGroupValueChart(chartId: string, valueChart: ValueChart): WebSocket {
-		this.hostedValueChart = valueChart;
+	hostGroupValueChart(chartId: string): WebSocket {
 		this.hostWebSocket = new WebSocket('ws://' + window.location.host + '/' + this.hostUrl + '/' + chartId);
 		// Send initialization message:
 		this.hostWebSocket.onopen = (event: MessageEvent) => { 
@@ -53,7 +55,7 @@ export class HostService {
 
 	hostMessageHandler = (msg: MessageEvent) => {
 		var hostMessage: HostMessage = JSON.parse(msg.data);
-
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		switch (hostMessage.type) {
 			case MessageType.ConnectionInit:
 				
@@ -65,28 +67,28 @@ export class HostService {
 
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				this.hostedValueChart.addUser(newUser);
+				valueChart.addUser(newUser);
 				
 				break;
 
 			case MessageType.UserChanged:
 				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				var userIndex: number = this.hostedValueChart.getUsers().findIndex((user: User) => {
+				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
 					return user.getUsername() === updatedUser.getUsername();
 				});
 				// Delete the old version of the user and replace it with the new one.
-				this.hostedValueChart.getUsers().splice(userIndex, 1, updatedUser);
+				valueChart.getUsers().splice(userIndex, 1, updatedUser);
 				
 				break;
 
 			case MessageType.UserRemoved:
 				var userToDelete: string = hostMessage.data;
 
-				var userIndex: number = this.hostedValueChart.getUsers().findIndex((user: User) => {
+				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
 				// Delete the user from the ValueChart
-				this.hostedValueChart.getUsers().splice(userIndex, 1);
+				valueChart.getUsers().splice(userIndex, 1);
 
 				break;
 			default:

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 12:16:46
+* @Last Modified time: 2016-08-02 15:12:37
 */
 
 import '../../rxjs-operators';
@@ -26,7 +26,6 @@ import { HostMessage, MessageType }									from '../types/HostMessage';
 export class GroupVcHttpService {
 
 	private valueChartsUrl: string = 'ValueCharts';
-	private hostUrl: string = 'host';
 
 	private valueChartParser: JsonValueChartParser;
 
@@ -60,6 +59,16 @@ export class GroupVcHttpService {
 			            .map(this.extractValueChartData)
 	                    .catch(this.handleError);
 	}
+
+	setValueChartStructure(chartId: string, valueChart: ValueChart): Observable<ValueChart> {	
+		let body = JSON.stringify(valueChart);
+    	let headers = new Headers({ 'Content-Type': 'application/json' });
+    	let options = new RequestOptions({ headers: headers });
+
+    	return this.http.put(this.valueChartsUrl + '/' + chartId + '/structure', body, options)
+	                    .map(this.extractValueChartData)
+	                    .catch(this.handleError);
+	}	
 
 	// This method extracts the data from the response object and returns it as an observable.l
 	extractData = (res: Response): ValueChart => {
