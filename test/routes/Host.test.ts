@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 15:06:00
+* @Last Modified time: 2016-08-03 16:08:25
 */
 
 // Require Node Libraries:
@@ -38,8 +38,6 @@ describe('WebSocket: /Host', () => {
 
 
 	before(function(done) {
-		console.log(WebSocket);
-
 		user = request.agent('http://localhost:3000/');
 
 		user.post('ValueCharts').send(JsonGroupHotel)

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 11:49:59
+* @Last Modified time: 2016-08-03 16:07:24
 */
 
 // Import Libraries and Middlware:
@@ -59,7 +59,6 @@ backend.use('/ValueCharts', valueChartRoutes);
 
 	var chartId: string = req.params.chart;
 
-	console.log('websocket connection received! The ChartID is: ' + chartId);
 	// This fires whenever the socket receives a message.
 	ws.on('message', (msg: string) => {
 		var hostMessage: HostMessage = JSON.parse(msg);
@@ -73,7 +72,6 @@ backend.use('/ValueCharts', valueChartRoutes);
 				break;
 			case MessageType.ChangePermissions:
 				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
-				console.log('host connection:', hostConnections.get(chartId));
 				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: MessageType.ChangePermissions }));
 
 				break;

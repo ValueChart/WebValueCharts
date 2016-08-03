@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 12:25:44
+* @Last Modified time: 2016-08-03 16:08:04
 */
 
 
@@ -38,7 +38,6 @@ valueChartRoutes.all('/:chart/*', function(req: express.Request, res: express.Re
 
 valueChartRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-
 	groupVcCollection.insert(req.body, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)

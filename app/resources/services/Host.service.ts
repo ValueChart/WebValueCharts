@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:14:59
+* @Last Modified time: 2016-08-03 15:57:02
 */
 
 import { Injectable } 												from '@angular/core';
@@ -24,6 +24,7 @@ import { HostMessage, MessageType }									from '../types/HostMessage';
 export class HostService {
 	private hostUrl: string = 'host';
 
+	public userChangesAccepted: boolean = true;
 	public hostWebSocket: WebSocket;
 
 	private valueChartParser: JsonValueChartParser;
@@ -45,11 +46,13 @@ export class HostService {
 	}	
 
 	setUserChangesAccepted(userChangesAccepted: boolean, chartId: string): void {
-		this.hostWebSocket.send({ type: MessageType.ChangePermissions, chartId: chartId, data: userChangesAccepted });
+		this.userChangesAccepted = userChangesAccepted;
+		this.hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, chartId: chartId, data: userChangesAccepted }));
 	}
 
 	endCurrentHosting(): void {
 		this.hostWebSocket.close(1000);
+		this.hostWebSocket = null;
 	}
 
 

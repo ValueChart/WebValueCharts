@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 12:46:06
+* @Last Modified time: 2016-08-03 14:04:57
 */
 
 import { Component }									from '@angular/core';
@@ -31,22 +31,27 @@ export class CreateComponent {
 
 	private valueChartName: string;
 	private valueChartPassword: string;
+	private invalidCredentials: boolean;
 
 	constructor(
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
 		private currentUserService: CurrentUserService,
-		private groupVcHttpService: GroupVcHttpService) {
-	}
+		private groupVcHttpService: GroupVcHttpService) { }
 
 	joinValueChart(chartName: string, chartPassword: string): void {
-		this.groupVcHttpService.getValueChartStructure(chartName, chartPassword).subscribe((valueChart: ValueChart) => { 
-			this.currentUserService.setValueChart(valueChart);
-			(<any> $('#close-chart-credentials-modal')).click();
-			console.log(valueChart);
-			this.router.navigate(['createValueChart', 'newUser']);
-
-		});
+		this.groupVcHttpService.getValueChartStructure(chartName, chartPassword)
+			.subscribe(
+				(valueChart: ValueChart) => { 
+					this.currentUserService.setValueChart(valueChart);
+					(<any> $('#close-chart-credentials-modal')).click();
+					this.router.navigate(['createValueChart', 'newUser']);
+				},
+				// Handle Server Errors (like not finding the ValueChart)
+				(error) => { 
+					if (error === '404 - Not Found')
+						this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
+				});
 	}
 
 	selectDemoValueChart(demoChart: any): void {

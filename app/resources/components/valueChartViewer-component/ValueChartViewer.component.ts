@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 12:11:34
+* @Last Modified time: 2016-08-03 16:07:38
 */
 
 import { Component }															from '@angular/core';
@@ -129,7 +129,7 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	DETAIL_BOX_USERS_TAB: string = 'users';
 
-	chartType: string;
+	chartType: string;	
 
 
 	// Save Jquery as a field of the class so that it is exposed to the template.
@@ -261,9 +261,30 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// Host ValueChart:
 
-	hostValueChart(): void {
+	hostValueChart(chartName: string): void {
+		// Close the Modal
+		(<any> $('#close-host-chart-modal')).click();
 		
+		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
+		if (!this.valueChart._id) {
+			this.groupVcHttpService.createGroupValueChart(this.valueChart)
+				.subscribe(
+					(valueChart: ValueChart) => { 
+						// Set the id of the ValueChart.
+						this.valueChart._id = valueChart._id;
+						// Host the ValueChart.
+						this.hostService.hostGroupValueChart(valueChart._id);
+					},
+					// Handle Server Errors
+					(error) => { 
+						console.log(error);
+					});
+		} else {
+			this.hostService.hostGroupValueChart(this.valueChart._id);
+		}
 	}
+
+
 
 	// Detail Box:
 
