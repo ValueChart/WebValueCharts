@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:07:38
+* @Last Modified time: 2016-08-03 16:41:20
 */
 
 import { Component }															from '@angular/core';
@@ -284,6 +284,25 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 	}
 
+	// ValueChart Member:
+
+	submitPreferences(): void {
+		var currentUser: User = this.valueChartService.getCurrentUser();
+
+		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
+		// that has been retrieved from the server.
+		this.groupVcHttpService.updateUser(this.valueChart._id, currentUser)
+			.subscribe(
+				// User Successfully Added!
+				(user: User) => { 
+					console.log(user);
+				},
+				// Handle Server Errors
+				(error) => { 
+					console.log(error);
+					// Add something to handle when the host has disabled user changes
+				});
+	}
 
 
 	// Detail Box:

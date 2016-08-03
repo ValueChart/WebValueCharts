@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:08:16
+* @Last Modified time: 2016-08-03 16:41:04
 */
 
 // Import Libraries and Express Middleware:
@@ -107,10 +107,11 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 				var userIndex: number = doc.users.findIndex((user: any) => {
 					return user.username === username;
 				});
-
 				if (userIndex === -1) {
+					// Add the user if it does not exist yet. 
 					doc.users.push(req.body);
 				} else {
+					// Replace the old representation of the user.
 					doc.users.splice(userIndex, 1, req.body);
 				}
 

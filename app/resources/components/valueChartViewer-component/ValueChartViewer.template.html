@@ -12,32 +12,41 @@
 				Edit Preference Model
 				</button>
 			</div>
-			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!hostService.hostWebSocket">
-				<button class="btn btn-primary" data-toggle="modal" data-target="#host-chart-modal">
-				Host ValueChart
-				</button>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="hostService.hostWebSocket">
-				<div class="btn-group">
-					<button type="button" class="btn btn-danger" (click)="hostService.endCurrentHosting()">Stop Hosting</button>
-					<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="caret"></span>
-					<span class="sr-only">Toggle Dropdown</span>
+			<div *ngIf="!currentUserService.isHost()">
+				<div class="form-group valuechart-toolbar-group pull-left" >
+					<button class="btn btn-success" (click)="submitPreferences()">
+					Submit Preferences
 					</button>
-					<ul class="dropdown-menu">
-						<li [class.disabled]="hostService.userChangesAccepted">
-							<a href="javascript:void(0)" (click)="hostService.setUserChangesAccepted(true, valueChart._id)">
-								Users Unlocked
-								<span *ngIf="hostService.userChangesAccepted" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-						<li [class.disabled]="!hostService.userChangesAccepted">
-							<a href="javascript:void(0)" (click)="hostService.setUserChangesAccepted(false, valueChart._id)">
-								Users Locked
-								<span *ngIf="!hostService.userChangesAccepted" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-					</ul>
+				</div>
+			</div>
+			<div *ngIf="currentUserService.isHost()">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!hostService.hostWebSocket">
+					<button class="btn btn-success" data-toggle="modal" data-target="#host-chart-modal">
+					Host ValueChart
+					</button>
+				</div>
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="hostService.hostWebSocket">
+					<div class="btn-group">
+						<button type="button" class="btn btn-danger" (click)="hostService.endCurrentHosting()">Stop Hosting</button>
+						<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<ul class="dropdown-menu">
+							<li [class.disabled]="hostService.userChangesAccepted">
+								<a href="javascript:void(0)" (click)="hostService.setUserChangesAccepted(true, valueChart._id)">
+									Users Unlocked
+									<span *ngIf="hostService.userChangesAccepted" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+								</a>
+							</li>
+							<li [class.disabled]="!hostService.userChangesAccepted">
+								<a href="javascript:void(0)" (click)="hostService.setUserChangesAccepted(false, valueChart._id)">
+									Users Locked
+									<span *ngIf="!hostService.userChangesAccepted" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+								</a>
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-right">

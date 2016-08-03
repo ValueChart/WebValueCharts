@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 15:36:46
+* @Last Modified time: 2016-08-03 16:32:44
 */
 
 import '../../rxjs-operators';
@@ -35,6 +35,8 @@ export class GroupVcHttpService {
 		this.valueChartParser = new JsonValueChartParser();
 	}
 
+	// ValueChart Methods:
+
 	createGroupValueChart(valueChart: ValueChart): Observable<ValueChart> {
 
 		if (!valueChart._id)
@@ -55,6 +57,8 @@ export class GroupVcHttpService {
 			.catch(this.handleError);
 	}
 
+	// ValueChart Structure Methods:
+
 	getValueChartStructure(chartName: string, password: string): Observable<ValueChart> {
 		return this.http.get(this.valueChartsUrl + chartName + '/structure?password=' + password)
 			.map(this.extractValueChartData)
@@ -71,6 +75,36 @@ export class GroupVcHttpService {
 			.catch(this.handleError);
 	}
 
+	// ValueChart User Methods:
+
+	addUserToChart(chartId: string, user: User): Observable<User> {
+		let body = JSON.stringify(user);
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.post(this.valueChartsUrl + chartId + '/users', body, options)
+			.map(this.extractUserData)
+			.catch(this.handleError);
+	}
+
+	updateUser(chartId: string, user: User): Observable<User> {
+		let body = JSON.stringify(user);
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.put(this.valueChartsUrl + chartId + '/users/' + user.getUsername(), body, options)
+			.map(this.extractUserData)
+			.catch(this.handleError);
+	}
+
+	deleteUser(chartId: string, username: string): Observable<User> {
+		return this.http.delete(this.valueChartsUrl + chartId + '/users/' + username)
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
+	// Helper Functions: 
+
 	// This method extracts the data from the response object and returns it as an observable.l
 	extractData = (res: Response): ValueChart => {
 		let body = res.json();
@@ -82,8 +116,13 @@ export class GroupVcHttpService {
 		return this.valueChartParser.parseValueChart(JSON.parse(body.data));
 	}
 
+	extractUserData = (res: Response): User => {
+		let body = res.json();
+		return this.valueChartParser.parseUser(body.data);
+	}
+
 	// This method handles any errors from the request.
-	handleError = (error: any, caught: Observable<ValueChart>): Observable<any> => {
+	handleError = (error: any, caught: Observable<any>): Observable<any> => {
 		let errMsg = (error.message) ? error.message :
 			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
 		return Observable.throw(errMsg);
