@@ -69,66 +69,73 @@ export class CreateValueChartComponent implements OnInit {
 		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
     	
-    	// Set initial step according to purpose
+    	// Initialize according to purpose
     	if (this.purpose == "newUser") {
     		this.step = this.creationStepsService.PREFERENCES;
+    		let valueChart = this.currentUserService.getValueChart();
+    		valueChart.addUser(new User(this.userName));
+    		this.valueChartService.setValueChart(valueChart);
+    		this.initializeUser();
+    		this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
     	}
     	else {
     		this.step = this.creationStepsService.BASICS;
+
+	    	// Create new ValueChart with a temporary name and description
+	    	let valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
+	    	valueChart.addUser(new User(this.userName));
+	  	
+	    	// Temporary: create some Objectives
+	    	let rate = new PrimitiveObjective("rate","");
+	    	let location = new PrimitiveObjective("location","");
+	    	let internet = new PrimitiveObjective("internet","");
+	    	let pool = new PrimitiveObjective("pool","");
+	    	let amenities = new AbstractObjective("amenities","");
+	    	let other = new AbstractObjective("other","");
+
+	    	rate.setColor("green")
+	    	location.setColor("red");
+	    	internet.setColor("purple");
+	    	pool.setColor("blue");
+
+	    	amenities.addSubObjective(internet);
+	    	amenities.addSubObjective(pool);
+	    	other.addSubObjective(location);
+	    	other.addSubObjective(rate);
+
+	    	let ratedom = new ContinuousDomain(30,300,"CAD");
+	    	let locdom = new CategoricalDomain(false);
+	    	locdom.addElement("downtown");
+	    	locdom.addElement("highway");
+	    	let intdom = new CategoricalDomain(false);
+	    	intdom.addElement("none");
+	    	intdom.addElement("low");
+	    	intdom.addElement("high");
+	    	let pooldom = new CategoricalDomain(false);
+	    	pooldom.addElement("no");
+	    	pooldom.addElement("yes");
+
+	    	rate.setDomain(ratedom);
+	    	location.setDomain(locdom);
+	    	internet.setDomain(intdom);
+	    	pool.setDomain(pooldom);
+
+	    	let hotel1 = new Alternative("Hotel 1","");
+	    	hotel1.setObjectiveValue("rate",140);
+	    	hotel1.setObjectiveValue("location","downtown");
+	    	hotel1.setObjectiveValue("internet","high");
+	    	hotel1.setObjectiveValue("pool","no");
+
+	    	valueChart.setRootObjectives([amenities,other]);
+	    	this.alternatives[this.alternativesCount] = hotel1;
+	    	this.isSelected[this.alternativesCount] = true;
+	    	this.alternativesCount++;
+	    	this.selectedObjective = "internet";
+
+	    	this.currentUserService.setValueChart(valueChart);
+	    	this.valueChartService.setValueChart(valueChart);
     	}
-
-    	// Create new ValueChart with a temporary name and description
-    	let valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
-    	valueChart.addUser(new User(this.userName));
-  	
-    	// Temporary: create some Objectives
-    	let rate = new PrimitiveObjective("rate","");
-    	let location = new PrimitiveObjective("location","");
-    	let internet = new PrimitiveObjective("internet","");
-    	let pool = new PrimitiveObjective("pool","");
-    	let amenities = new AbstractObjective("amenities","");
-    	let other = new AbstractObjective("other","");
-
-    	rate.setColor("green")
-    	location.setColor("red");
-    	internet.setColor("purple");
-    	pool.setColor("blue");
-
-    	amenities.addSubObjective(internet);
-    	amenities.addSubObjective(pool);
-    	other.addSubObjective(location);
-    	other.addSubObjective(rate);
-
-    	let ratedom = new ContinuousDomain(30,300,"CAD");
-    	let locdom = new CategoricalDomain(false);
-    	locdom.addElement("downtown");
-    	locdom.addElement("highway");
-    	let intdom = new CategoricalDomain(false);
-    	intdom.addElement("none");
-    	intdom.addElement("low");
-    	intdom.addElement("high");
-    	let pooldom = new CategoricalDomain(false);
-    	pooldom.addElement("no");
-    	pooldom.addElement("yes");
-
-    	rate.setDomain(ratedom);
-    	location.setDomain(locdom);
-    	internet.setDomain(intdom);
-    	pool.setDomain(pooldom);
-
-    	let hotel1 = new Alternative("Hotel 1","");
-    	hotel1.setObjectiveValue("rate",140);
-    	hotel1.setObjectiveValue("location","downtown");
-    	hotel1.setObjectiveValue("internet","high");
-    	hotel1.setObjectiveValue("pool","no");
-
-    	valueChart.setRootObjectives([amenities,other]);
-    	this.alternatives[this.alternativesCount] = hotel1;
-    	this.isSelected[this.alternativesCount] = true;
-    	this.alternativesCount++;
-    	this.selectedObjective = "internet";
-
-    	this.valueChartService.setValueChart(valueChart);
+    	
   	}
 
 	back() {
@@ -141,12 +148,7 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
-			// Initialize User's WeightMap
-    		this.valueChartService.getCurrentUser().setWeightMap(this.valueChartService.getInitialWeightMap());
-
-    		// Initialize User's ScoreFunctionMap
-    		this.valueChartService.getCurrentUser().setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
-
+			this.initializeUser();
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
@@ -162,11 +164,19 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else if (this.step === this.creationStepsService.PRIORITIES) {
 			this.valueChartService.getCurrentUser().setWeightMap(this.getWeightMapFromRanks());
-			this.currentUserService.setValueChart(this.valueChartService.getValueChart());
+			
 			this.router.navigate(['/view/ValueChart']);
 
 		}
 		this.step = this.creationStepsService.next(this.step);
+	}
+
+	private initializeUser() {
+		// Initialize User's WeightMap
+		this.valueChartService.getCurrentUser().setWeightMap(this.valueChartService.getInitialWeightMap());
+
+		// Initialize User's ScoreFunctionMap
+		this.valueChartService.getCurrentUser().setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
 	}
 
 	save() {
