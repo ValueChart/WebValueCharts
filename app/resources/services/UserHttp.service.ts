@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 23:17:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 23:51:29
+* @Last Modified time: 2016-08-04 00:16:42
 */
 
 import '../../rxjs-operators';
@@ -19,8 +19,8 @@ export class UserHttpService {
 
 	constructor(private http: Http) { }
 
-	createNewUser(username: string, password: string): Observable<any> {
-		let body = JSON.stringify({ username: username, password: password });
+	createNewUser(username: string, password: string, email: string): Observable<any> {
+		let body = JSON.stringify({ username: username, password: password, email: email });
 		let headers = new Headers({ 'Content-Type': 'application/json' });
 		let options = new RequestOptions({ headers: headers });
 

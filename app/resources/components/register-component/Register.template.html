@@ -4,7 +4,7 @@
 	</div>
 	<div class="flex-column">
 		<h1 class="welcome-header col-sm-12 text-center">Welcome to ValueCharts</h1>
-		<form class="form-horizontal">
+		<form class="form-horizontal" *ngIf="state === 'login'">
 			<div class="form-group form-group-lg">
 				<label class="col-sm-4 control-label" for="name-input">Username</label>
 				<div class="col-sm-5 col-md-4">
@@ -22,12 +22,39 @@
 			</div>
 			<div class="form-group text-center">
 				<a class="btn btn-success btn-lg" (click)="login(username, password)" id="login-button">Login</a>
+				<a class="btn btn-success btn-lg" (click)="state = 'createAccount'" id="login-button">Create an Account</a>
 			</div>
 			<div class="form-group text-center">
 				<h3>Or</h3>
 			</div>
 			<div class="form-group text-center">
 				<a class="btn btn-success btn-lg" id="continue-button" data-toggle="modal" data-target="#temporary-user-modal">Continue as a Temporary User</a>
+			</div>
+		</form>
+		<form class="form-horizontal" *ngIf="state === 'createAccount'">
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="email-input">Email</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" id="email-input" placeholder="name" [(ngModel)]="email" name="email">
+				</div>
+			</div>
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="name-input">Username</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" id="name-input" placeholder="name" [(ngModel)]="username" name="username">
+				</div>
+			</div>
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="password-input">Password</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" type="password" id="password-input" placeholder="name" [(ngModel)]="password" name="password">
+				</div>
+			</div>
+			<div [hidden]="!invalidCredentials" class="alert alert-danger">
+				<span class="col-sm-offset-4">That username is not available</span>
+			</div>
+			<div class="form-group text-center">
+				<a class="btn btn-success btn-lg" (click)="createNewUser(username, password, email)" id="createUser-button">Create Account</a>
 			</div>
 		</form>
 		<div class="modal fade" id="temporary-user-modal" tabindex="-1" role="dialog">

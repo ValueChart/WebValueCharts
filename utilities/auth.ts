@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 22:13:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 23:05:38
+* @Last Modified time: 2016-08-04 00:36:47
 */
 import * as express 								from 'express';
 import * as Passport 								from 'passport';
@@ -20,10 +20,11 @@ var localRegistration = (username: string, password: string, req: express.Reques
 
 		users.findOne({ 'username': req.body.username }, function(error: Error, doc: any) {		// Need to add larger user. 
 			if (!doc) {
-				resolve(false);
+				users.insert(req.body, function(error: Error, doc: any) {
+					resolve(doc);
+				});	// Add the user to the database.
 			} else {
-				users.insert(req.body);	// Add the user to the database.
-				resolve(req.body);
+				resolve(false);
 			}
 		});
 	});
@@ -40,7 +41,7 @@ var localAuthentication = (username: string, password: string, req: express.Requ
 			if (!doc) {
 				resolve(false);
 			} else {
-				resolve(doc);
+				resolve(req.body);
 			}
 		});
 	});

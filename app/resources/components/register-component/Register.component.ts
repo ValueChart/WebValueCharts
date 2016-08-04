@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 00:02:22
+* @Last Modified time: 2016-08-04 00:16:23
 */
 
 import { Component }										from '@angular/core';
@@ -21,6 +21,7 @@ export class RegisterComponent {
 
 	private username: string;
 	private password: string;
+	private email: string;
 
 	private tempUserName: string;
 
@@ -34,8 +35,8 @@ export class RegisterComponent {
 		this.state = 'login';
 	}
 
-	createNewUser(username: string, password: string): void {
-		this.userHttpService.createNewUser(username, password)
+	createNewUser(username: string, password: string, email: string): void {
+		this.userHttpService.createNewUser(username, password, email)
 			.subscribe(
 				(user) => { 
 					this.setUsername(username);
