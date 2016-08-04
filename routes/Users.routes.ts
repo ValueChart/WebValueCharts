@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 14:16:00
+* @Last Modified time: 2016-08-04 16:52:18
 */
 
 // Import Libraries and Express Middleware:
@@ -27,6 +27,21 @@ usersRoutes.post('/login', passport.authenticate('local-signin'), function(req: 
 	res.status(200)
 		.json({ data: { username: req.user.username, password: req.user.password, loginResult: req.isAuthenticated() }});
 });
+
+// Login. Doesn't conform to REST principles, but is necessary.
+usersRoutes.get('/logout', passport.authenticate('local-signin'), function(req: express.Request, res: express.Response) {
+
+	var body: any = { data: { username: req.user.username, password: req.user.password, logoutResult: true } };
+
+	// Destroy the current user's session.
+	req.session.destroy(function (err) {
+		req.session = null;
+    	res.clearCookie('express.sid', { path: '/' });
+		req.logOut();
+		res.json(body);
+	});
+});
+
 
 
 usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -57,3 +72,5 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 		});
 	}
 });
+
+usersRoutes.put(/:user)
