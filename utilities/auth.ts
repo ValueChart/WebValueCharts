@@ -1,0 +1,90 @@
+/*
+* @Author: aaronpmishkin
+* @Date:   2016-08-03 22:13:59
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-08-03 23:05:38
+*/
+import * as express 								from 'express';
+import * as Passport 								from 'passport';
+import { Strategy }									from 'passport-local';
+import * as monk									from 'monk';
+
+var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
+
+
+var localRegistration = (username: string, password: string, req: express.Request) => {
+
+	var promise = new Promise(function(resolve, reject) {
+		
+		var users = (<any> req).db.get('Users');	
+
+		users.findOne({ 'username': req.body.username }, function(error: Error, doc: any) {		// Need to add larger user. 
+			if (!doc) {
+				resolve(false);
+			} else {
+				users.insert(req.body);	// Add the user to the database.
+				resolve(req.body);
+			}
+		});
+	});
+
+	return promise;
+}
+
+var localAuthentication = (username: string, password: string, req: express.Request) => {
+		
+	var promise = new Promise(function(resolve, reject) {
+
+		var users = (<any> req).db.get('Users');
+		users.findOne({ username: username, password: password }, function(error: Error, doc: any) {
+			if (!doc) {
+				resolve(false);
+			} else {
+				resolve(doc);
+			}
+		});
+	});
+
+	return promise;
+}
+
+// Configure Serialization for User Sessions:
+
+Passport.serializeUser(function(user, done) {
+	done(null, user._id);
+});
+
+Passport.deserializeUser(function(id, done) {
+	var users = db.get('Users');
+	users.find({ '_id': id }, function(e: any, user: any) {
+		done(e, user);
+	});
+});
+
+// Configure strategies for user signup and authentication
+
+Passport.use('local-signup', new Strategy({ passReqToCallback: true }, function(req, username, password, done) {
+    localRegistration(username, password, req).then(function(user: any) {
+		if (!user) {
+			done(null, false);
+		} else {
+			done(null, user);
+		}
+    }).catch(function(err) {
+		// Handle Error Signing Up Here.
+    });
+}));
+
+Passport.use('local-signin', new Strategy({ passReqToCallback: true }, function(req, username, password, done) {
+    localAuthentication(username, password, req).then(function(user: any) {
+		if (!user) {
+			done(null, false);
+		} else {
+			done(null, user);
+		}
+    }).catch(function(err) {
+		// Handle Error Authenticating Up Here.
+    });
+}));
+
+export var passport = Passport;

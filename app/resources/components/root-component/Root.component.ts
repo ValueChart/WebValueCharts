@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 19:46:06
+* @Last Modified time: 2016-08-03 23:23:16
 */
 
 import { Component } 												from '@angular/core';
@@ -16,6 +16,7 @@ import { ApplicationRef } 											from '@angular/core';
 import { XMLValueChartParser } 										from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { GroupVcHttpService }										from '../../services/GroupVcHttp.service';
+import { UserHttpService }											from '../../services/UserHttp.service';
 
 import { ExportValueChartComponent }								from '../exportValueChart-component/ExportValueChart.component';
 
@@ -27,7 +28,8 @@ import { ExportValueChartComponent }								from '../exportValueChart-component/
 				TemplateRef, 
 				ViewContainerRef,
 				CurrentUserService,
-				GroupVcHttpService]
+				GroupVcHttpService,
+				UserHttpService]
 })
 export class RootComponent implements OnInit {
 

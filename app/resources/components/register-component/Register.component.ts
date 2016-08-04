@@ -2,14 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 11:37:18
+* @Last Modified time: 2016-08-04 00:02:22
 */
 
 import { Component }										from '@angular/core';
-import { ROUTER_DIRECTIVES }								from '@angular/router';
+import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
 
 // Application Classes
 import { CurrentUserService }								from '../../services/CurrentUser.service';
+import { UserHttpService }									from '../../services/UserHttp.service';
 
 @Component({
 	selector: 'register',
@@ -18,12 +19,50 @@ import { CurrentUserService }								from '../../services/CurrentUser.service';
 })
 export class RegisterComponent {
 
-	username: string;
+	private username: string;
+	private password: string;
 
-	constructor(private currentUserService: CurrentUserService) {}
+	private tempUserName: string;
+
+	private state: string;
+	private invalidCredentials: boolean;
+
+	constructor(
+		private router: Router, 
+		private currentUserService: CurrentUserService, 
+		private userHttpService: UserHttpService) {
+		this.state = 'login';
+	}
+
+	createNewUser(username: string, password: string): void {
+		this.userHttpService.createNewUser(username, password)
+			.subscribe(
+				(user) => { 
+					this.setUsername(username);
+				},
+				(error) => { this.invalidCredentials = true; } 
+			);
+	}
+
+	login(username: string, password: string): void {
+		this.userHttpService.login(username, password)
+			.subscribe(
+				(user) => {
+					this.setUsername(username);
+				},
+				(error) => { this.invalidCredentials = true; }
+			);
+	}
+
+	continueAsTempUser(username: string): void {
+		(<any> $('#close-temporary-user-modal')).click();
+		this.setUsername(username);
+	}
+
 
 	setUsername(username: string): void {
 		this.currentUserService.setUsername(username);
+		this.router.navigate(['create']);
 	}
 
 

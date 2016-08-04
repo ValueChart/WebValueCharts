@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:07:24
+* @Last Modified time: 2016-08-03 23:37:41
 */
 
 // Import Libraries and Middlware:
@@ -14,14 +14,17 @@ import * as favicon 								from 'serve-favicon';
 import * as logger 									from 'morgan';
 import * as cookieParser 							from 'cookie-parser';
 import * as bodyParser 								from 'body-parser';
+import * as expressSession							from 'express-session';
 
 //  Routers:
 import { indexRoutes } 								from './routes/Index.routes';
 import { valueChartRoutes } 						from './routes/ValueCharts.routes';
+import { usersRoutes }								from './routes/Users.routes';
 
 // Types and Utilities
 import { HostEventEmitter, hostEventEmitter } 		from './utilities/HostEventEmitters';
-import { HostConnectionStatus , hostConnections }	from './utilities/HostConnections';
+import { HostConnectionStatus, hostConnections }	from './utilities/HostConnections';
+import { passport }									from './utilities/auth';
 import { HostMessage, MessageType}					from './app/resources/types/HostMessage';
 
 
@@ -37,25 +40,45 @@ var expressWs = require('express-ws')(backend);
 backend.use(logger('dev'));
 backend.use(bodyParser.json());
 backend.use(bodyParser.urlencoded({ extended: false }));
-backend.use(cookieParser());
-
+// Note that the secrete for cookie parser and expressSession MUST be the same.
+backend.use(cookieParser('ThisIsOurSecret'));
+// Initialize ExpressSession:
+backend.use(expressSession({
+	secret: 'ThisIsOurSecret',
+	cookie: {
+		maxAge: null,
+		secure: false,
+	},
+	resave: false,
+	saveUninitialized: true
+}));
+// Initialize Passport:
+backend.use(passport.initialize());
+backend.use(passport.session());
 backend.use(express.static(__dirname));
 
 
 // Attach the database to the request object
-backend.use(function(req,res,next) {
-    (<any> req).db = db;
+backend.use(function(req, res, next) {
+    (<any>req).db = db;
     next();
+});
+
+// Set the proper Access-Control headers for all responses.
+backend.all('*', function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.header('Access-Control-Allow-Credentials', (<any>true));
+	next();
 });
 
 // Attach routers to manage specific URIs
 backend.use('/', indexRoutes);
 backend.use('/ValueCharts', valueChartRoutes);
+backend.use('/Users', usersRoutes);
 
 
-
-
-(<any> backend).ws('/host/:chart', function(ws: any, req: express.Request) {
+(<any>backend).ws('/host/:chart', function(ws: any, req: express.Request) {
 
 	var chartId: string = req.params.chart;
 
@@ -68,7 +91,7 @@ backend.use('/ValueCharts', valueChartRoutes);
 				initEventListeners(hostMessage, chartId, ws);
 				hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', userChangesAccepted: true });
 				ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
-				
+
 				break;
 			case MessageType.ChangePermissions:
 				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
@@ -76,7 +99,7 @@ backend.use('/ValueCharts', valueChartRoutes);
 
 				break;
 			default:
-				
+
 				break;
 		}
 	});
@@ -88,18 +111,18 @@ backend.use('/ValueCharts', valueChartRoutes);
 });
 
 var initEventListeners = (jsonData: any, chartId: string, ws: any): void => {
-			// Initialize event listeners:
-		hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
-			ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
-		});
+	// Initialize event listeners:
+	hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
+		ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
+	});
 
-		hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
-			ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
-		});
+	hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
+		ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
+	});
 
-		hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
-			ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
-		});
+	hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
+		ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
+	});
 }
 
 

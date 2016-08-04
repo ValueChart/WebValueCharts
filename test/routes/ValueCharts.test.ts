@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 12:33:34
+* @Last Modified time: 2016-08-03 21:27:32
 */
 
 // Require Node Libraries:
@@ -23,7 +23,7 @@ import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMa
 import { JsonGroupHotel }						from '../TestData/ValueChartsData';
 
 
-describe('ValueCharts.routes', () => {
+describe('ValueCharts Routes', () => {
 
 	var valueChartParser: JsonValueChartParser;
 	var user: request.SuperTest<request.Test>;
