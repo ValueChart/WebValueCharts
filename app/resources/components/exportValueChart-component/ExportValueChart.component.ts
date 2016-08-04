@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:47:40
+* @Last Modified time: 2016-08-04 15:05:05
 */
 
 // Angular Classes:
@@ -58,7 +58,7 @@ export class ExportValueChartComponent implements OnInit{
 		}
 
 	}
-
+	
 	downloadValueChart(): void {
 		var valueChart: ValueChart = this.currentUserService.getValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:41:20
+* @Last Modified time: 2016-08-04 14:32:17
 */
 
 import { Component }															from '@angular/core';
@@ -267,7 +267,7 @@ export class ValueChartViewerComponent implements OnInit {
 		
 		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
 		if (!this.valueChart._id) {
-			this.groupVcHttpService.createGroupValueChart(this.valueChart)
+			this.groupVcHttpService.createValueChart(this.valueChart)
 				.subscribe(
 					(valueChart: ValueChart) => { 
 						// Set the id of the ValueChart.

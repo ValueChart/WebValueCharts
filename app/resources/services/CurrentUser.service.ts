@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:23:26
+* @Last Modified time: 2016-08-04 13:58:09
 */
 
 import { Injectable } 												from '@angular/core';
@@ -18,6 +18,7 @@ import { User }														from '../model/User';
 export class CurrentUserService {
 
 	private username: string; 				// The username of the current user.
+	private loggedIn: boolean;
 	private host: boolean;
 	private valueChart: ValueChart;
 	
@@ -43,8 +44,16 @@ export class CurrentUserService {
 		this.host = host;
 	}
 
+	setLoggedIn(loggedIn: boolean): void {
+		this.loggedIn = loggedIn;
+	}
+
 	isHost(): boolean {
 		return this.host;
+	}
+
+	isLoggedIn(): boolean {
+		return this.loggedIn;
 	}
 
 }

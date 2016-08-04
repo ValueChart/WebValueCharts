@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 00:16:23
+* @Last Modified time: 2016-08-04 13:59:31
 */
 
 import { Component }										from '@angular/core';
@@ -39,6 +39,7 @@ export class RegisterComponent {
 		this.userHttpService.createNewUser(username, password, email)
 			.subscribe(
 				(user) => { 
+					this.currentUserService.setLoggedIn(true);
 					this.setUsername(username);
 				},
 				(error) => { this.invalidCredentials = true; } 
@@ -49,6 +50,7 @@ export class RegisterComponent {
 		this.userHttpService.login(username, password)
 			.subscribe(
 				(user) => {
+					this.currentUserService.setLoggedIn(true);
 					this.setUsername(username);
 				},
 				(error) => { this.invalidCredentials = true; }
@@ -57,6 +59,7 @@ export class RegisterComponent {
 
 	continueAsTempUser(username: string): void {
 		(<any> $('#close-temporary-user-modal')).click();
+		this.currentUserService.setLoggedIn(false);
 		this.setUsername(username);
 	}
 

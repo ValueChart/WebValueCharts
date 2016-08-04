@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:32:44
+* @Last Modified time: 2016-08-04 14:49:24
 */
 
 import '../../rxjs-operators';
@@ -37,7 +37,7 @@ export class GroupVcHttpService {
 
 	// ValueChart Methods:
 
-	createGroupValueChart(valueChart: ValueChart): Observable<ValueChart> {
+	createValueChart(valueChart: ValueChart): Observable<ValueChart> {
 
 		if (!valueChart._id)
 			valueChart._id = undefined;
@@ -51,9 +51,15 @@ export class GroupVcHttpService {
 			.catch(this.handleError);
 	}
 
-	getGroupValueChart(chartId: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl+ chartId + '?password=' + password)
+	getValueChart(chartId: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + chartId + '?password=' + password)
 			.map(this.extractValueChartData)
+			.catch(this.handleError);
+	}
+
+	deleteValueChart(chartId: string): Observable<any> {
+		return this.http.delete(this.valueChartsUrl + chartId)
+			.map(this.extractBody)
 			.catch(this.handleError);
 	}
 
@@ -104,6 +110,10 @@ export class GroupVcHttpService {
 	}
 
 	// Helper Functions: 
+
+	extractBody = (res: Response): any => {
+		return res;
+	}
 
 	// This method extracts the data from the response object and returns it as an observable.l
 	extractData = (res: Response): ValueChart => {

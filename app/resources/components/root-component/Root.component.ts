@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 23:23:16
+* @Last Modified time: 2016-08-04 15:45:08
 */
 
 import { Component } 												from '@angular/core';
@@ -17,16 +17,18 @@ import { XMLValueChartParser } 										from '../../services/XMLValueChartParse
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { GroupVcHttpService }										from '../../services/GroupVcHttp.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
-
 import { ExportValueChartComponent }								from '../exportValueChart-component/ExportValueChart.component';
+import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEncoder';
+
 
 @Component({
 	selector: 'root',
 	templateUrl: 'app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
-	providers: [XMLValueChartParser, 
-				TemplateRef, 
+	providers: [TemplateRef, 
 				ViewContainerRef,
+				XMLValueChartParser,
+				ValueChartXMLEncoder,
 				CurrentUserService,
 				GroupVcHttpService,
 				UserHttpService]

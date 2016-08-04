@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:19:58
+* @Last Modified time: 2016-08-04 15:59:52
 */
 
 // Model Classes
@@ -12,7 +12,7 @@ import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
 import { PrimitiveObjective } 												from '../model/PrimitiveObjective';
 import { AbstractObjective } 												from '../model/AbstractObjective';
-import { Alternative } 														from '../model/Alternative'; 
+import { Alternative } 														from '../model/Alternative';
 import { ScoreFunctionMap }													from '../model/ScoreFunctionMap';
 import { ScoreFunction } 													from '../model/ScoreFunction';
 import { ContinuousScoreFunction } 											from '../model/ContinuousScoreFunction';
@@ -28,7 +28,7 @@ export class ValueChartXMLEncoder {
 	serializer: XMLSerializer;
 
 
-	constructor() { 
+	constructor() {
 		this.serializer = new XMLSerializer();
 	}
 
@@ -40,7 +40,7 @@ export class ValueChartXMLEncoder {
 		var valueChartElement: Element = this.convertValueChartIntoElement(valueChart, xmlDocument);
 		xmlDocument.appendChild(valueChartElement);
 		var valueChartXMLString: string = this.serializer.serializeToString(xmlDocument);
-		
+
 		return valueChartXMLString;
 	}
 
@@ -60,7 +60,7 @@ export class ValueChartXMLEncoder {
 
 		valueChart.getRootObjectives().forEach((objective: Objective) => {
 			objectivesParentElement.appendChild(this.convertObjectiveIntoElement(objective, xmlDocument));
-		});	
+		});
 
 		chartStructureElement.appendChild(this.convertAlternativesIntoElement(valueChart.getAlternatives(), xmlDocument));
 
@@ -76,12 +76,12 @@ export class ValueChartXMLEncoder {
 		objectiveElement.setAttribute('id', objective.getId());
 
 		if (objective.objectiveType === 'abstract') {
-			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
+			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
 				objectiveElement.appendChild(this.convertObjectiveIntoElement(subObjective, xmlDocument));
 			});
 		} else {
-			objectiveElement.setAttribute('color', (<PrimitiveObjective> objective).getColor());
-			objectiveElement.appendChild(this.convertDomainIntoElement((<PrimitiveObjective> objective).getDomain(), xmlDocument));
+			objectiveElement.setAttribute('color', (<PrimitiveObjective>objective).getColor());
+			objectiveElement.appendChild(this.convertDomainIntoElement((<PrimitiveObjective>objective).getDomain(), xmlDocument));
 
 			let descriptionElement: Element = xmlDocument.createElement('Description');
 			descriptionElement.innerHTML = objective.getDescription();
@@ -96,15 +96,15 @@ export class ValueChartXMLEncoder {
 		domainElement.setAttribute('type', domain.type);
 
 		if (domain.type === 'continuous') {
-			domainElement.setAttribute('unit', (<ContinuousDomain> domain).unit);
-			domainElement.setAttribute('min', '' + (<ContinuousDomain> domain).getMinValue());
-			domainElement.setAttribute('max', '' + (<ContinuousDomain> domain).getMaxValue());
+			domainElement.setAttribute('unit', (<ContinuousDomain>domain).unit);
+			domainElement.setAttribute('min', '' + (<ContinuousDomain>domain).getMinValue());
+			domainElement.setAttribute('max', '' + (<ContinuousDomain>domain).getMaxValue());
 		} else if (domain.type === 'categorical') {
-			domainElement.setAttribute('ordered', '' + (<CategoricalDomain> domain).ordered);
+			domainElement.setAttribute('ordered', '' + (<CategoricalDomain>domain).ordered);
 		} else if (domain.type === 'interval') {
-			domainElement.setAttribute('interval', '' + (<IntervalDomain> domain).getInterval());
-			domainElement.setAttribute('min', '' + (<IntervalDomain> domain).getMinValue());
-			domainElement.setAttribute('max', '' + (<IntervalDomain> domain).getMaxValue());
+			domainElement.setAttribute('interval', '' + (<IntervalDomain>domain).getInterval());
+			domainElement.setAttribute('min', '' + (<IntervalDomain>domain).getMinValue());
+			domainElement.setAttribute('max', '' + (<IntervalDomain>domain).getMaxValue());
 		}
 
 		return domainElement;
@@ -117,9 +117,9 @@ export class ValueChartXMLEncoder {
 			let alternativeElement = xmlDocument.createElement('Alternative');
 			alternativeElement.setAttribute('name', alternative.getName());
 
-			let objectiveValuePairs: {objectiveName: string, value: string | number}[]  = alternative.getAllObjectiveValuePairs();
+			let objectiveValuePairs: { objectiveName: string, value: string | number }[] = alternative.getAllObjectiveValuePairs();
 
-			objectiveValuePairs.forEach((pair: {objectiveName: string, value: string | number}) => {
+			objectiveValuePairs.forEach((pair: { objectiveName: string, value: string | number }) => {
 				let alternativeValueElement: Element = xmlDocument.createElement('AlternativeValue');
 
 				alternativeValueElement.setAttribute('objective', pair.objectiveName);
@@ -165,7 +165,7 @@ export class ValueChartXMLEncoder {
 		while (iteratorElement.done === false) {
 			let weightElement: Element = xmlDocument.createElement('Weight');
 			weightElement.setAttribute('objective', iteratorElement.value);
-			weightElement.setAttribute('value','' + weightMap.getNormalizedObjectiveWeight(iteratorElement.value));
+			weightElement.setAttribute('value', '' + weightMap.getNormalizedObjectiveWeight(iteratorElement.value));
 
 			weightsParentElement.appendChild(weightElement);
 			iteratorElement = mapIterator.next();
@@ -177,9 +177,9 @@ export class ValueChartXMLEncoder {
 	convertScoreFunctionMapIntoElement(scoreFunctionMap: ScoreFunctionMap, xmlDocument: XMLDocument): Element {
 		var scoreFunctionsParentElement: Element = xmlDocument.createElement('ScoreFunctions');
 
-		var scoreFunctionKeyPairs: {key: string, scoreFunction: ScoreFunction}[] = scoreFunctionMap.getAllKeyScoreFunctionPairs();	
-		
-		scoreFunctionKeyPairs.forEach((pair: {key: string, scoreFunction: ScoreFunction}) => {
+		var scoreFunctionKeyPairs: { key: string, scoreFunction: ScoreFunction }[] = scoreFunctionMap.getAllKeyScoreFunctionPairs();
+
+		scoreFunctionKeyPairs.forEach((pair: { key: string, scoreFunction: ScoreFunction }) => {
 			let scoreFunctionElement = this.convertScoreFunctionIntoElement(pair.scoreFunction, pair.key, xmlDocument);
 			scoreFunctionsParentElement.appendChild(scoreFunctionElement);
 		});
@@ -204,6 +204,27 @@ export class ValueChartXMLEncoder {
 		});
 
 		return scoreFunctionElement;
+	}
+
+	encodeUserWeights(valueChart: ValueChart): string {
+		var csvOutput: string = 'username,';
+		var primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
+
+		primitiveObjectives.forEach((objective: PrimitiveObjective) => {
+			csvOutput = csvOutput + objective.getName() + ',';
+		});
+
+		csvOutput = csvOutput + '\n';
+
+		valueChart.getUsers().forEach((user: User) => {
+			csvOutput = csvOutput + user.getUsername() + ',';
+			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
+				csvOutput = csvOutput + user.getWeightMap().getNormalizedObjectiveWeight(objective.getName()) + ',';
+			});
+			csvOutput = csvOutput + '\n';
+		});
+
+		return csvOutput;
 	}
 }
 

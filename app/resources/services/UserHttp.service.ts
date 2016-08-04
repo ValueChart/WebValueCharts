@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 23:17:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 00:16:42
+* @Last Modified time: 2016-08-04 13:20:49
 */
 
 import '../../rxjs-operators';
@@ -35,6 +35,12 @@ export class UserHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 		return this.http.post(this.usersUrl + 'login', body, options)
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
+	getUserValueCharts(username: string): Observable<any[]> {
+		return this.http.get(this.usersUrl + username + '/ValueCharts')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

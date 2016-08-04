@@ -1,0 +1,53 @@
+<div class="">
+	<div class="flex-column">
+		<h2 class="my-valuecharts-header text-center">My ValueCharts</h2>
+		<div class="col-xs-offset-1 col-xs-10 demo-table">
+			<div class="flex-row column-container well well-lg">
+				<table class="table table-hover">
+					<thead>
+						<th></th>
+						<th>Name</th>
+						<th>Password</th>
+						<th>Number of Users</th>
+					</thead>
+					<tbody>
+						<tr *ngFor="let chartSummary of valueChartSummaries; let i = index ">
+							<th score="row">{{i + 1}}</th>
+							<td>{{chartSummary.name}}</td>
+							<td>{{chartSummary.password}}</td>
+							<td>{{chartSummary.numUsers}}</td>
+							<td><button class="btn btn-sm btn-default" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
+							<td><button class="btn btn-sm btn-default" (click)="openExportChartModal(chartSummary._id, chartSummary.password)" type="button" data-toggle="modal" data-target="#export-modal">Export</button></td>
+							<td><button class="btn btn-sm btn-default" (click)="deleteValueChart(chartSummary._id)">Delete</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="export-modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" id="close-export-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">Export ValueChart</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-xs-offset-2 col-xs-4">
+							<ExportValueChart></ExportValueChart>
+						</div>
+						<div class="col-xs-6">
+							<a class="btn btn-default" id="download-user-weights"
+								download="{{getValueChartName()}}"
+								href="javascript:void(0)"
+								(click)="exportUserWeights()">
+								Export User Weights
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

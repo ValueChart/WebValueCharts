@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 23:44:50
+* @Last Modified time: 2016-08-04 14:27:32
 */
 
 /* Global Styles */
@@ -58,6 +58,10 @@ a.upload {
     display: block;
 }
 
+#my-valuecharts-button {
+    margin-left: 10px;
+}
+
 .file-upload {
     position: relative;
     overflow: hidden;
@@ -98,6 +102,11 @@ a.upload {
 
 .demo-table {
     top: 15rem;
+}
+
+.my-valuecharts-header {
+    top: 10rem;
+    position: relative;
 }
 
 /* Score Function Viewer Styles */
