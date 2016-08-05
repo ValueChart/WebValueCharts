@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:07:58
+* @Last Modified time: 2016-08-05 15:56:38
 */
 
 
@@ -38,17 +38,25 @@ valueChartRoutes.all('/:chart/*', function(req: express.Request, res: express.Re
 
 valueChartRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
-	groupVcCollection.insert(req.body, function(err: Error, doc: any) {
-		if (err) {
+	
+	groupVcCollection.count({ name: req.body.name }, function(err: Error, count: number) {
+		if (count !== 0) {
 			res.status(400)
-				.json({ data: err });
-
-		} else if (doc) {
-			res.location('/ValueCharts/' + doc._id)
-				.status(201)
-				.json({ data: doc });
+				.send('A ValueChart with that name already exists.');
 		} else {
-			res.sendStatus(404);				
+			groupVcCollection.insert(req.body, function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+
+				} else if (doc) {
+					res.location('/ValueCharts/' + doc._id)
+						.status(201)
+						.json({ data: doc });
+				} else {
+					res.sendStatus(404);				
+				}
+			});
 		}
 	});
 });

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 14:56:30
+* @Last Modified time: 2016-08-05 15:56:26
 */
 
 // Require Node Libraries:
@@ -36,6 +36,8 @@ describe('ValueCharts Routes', () => {
 	before(function() {
 		valueChartParser = new JsonValueChartParser();
 
+		JsonGroupHotel.name = 'TestHotel';
+
 		user = request.agent('http://localhost:3000/');
 	});
 
@@ -43,30 +45,45 @@ describe('ValueCharts Routes', () => {
 		var groupHotel: ValueChart;
 
 		describe('Method: Post', () => {
-			it('return a copy of the created resource along with status code 201 if the creation was a succcess', (done) => {
-				user.post('ValueCharts').send(JsonGroupHotel)
-					.set('Accept', 'application/json')
-					.expect('Content-Type', /json/)
-					.expect(201)
-					.expect((res: request.Response) => {
-						var valueChartResponse = res.body.data;
 
-						expect(valueChartResponse).to.not.be.undefined;
-						expect(valueChartResponse._id).to.not.be.undefined;
-						expect(valueChartResponse.name).to.equal('Hotel')
-						expect(valueChartResponse.users).to.have.length(1);
-						expect(valueChartResponse.alternatives).to.have.length(6);
+			context('when the ValuChartName is available', () => {
 
-						chartId = valueChartResponse._id;
+				it('return a copy of the created resource along with status code 201', (done) => {
+					user.post('ValueCharts').send(JsonGroupHotel)
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+						.expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
 
-					}).end(function(err, res) {
-				        if (err) return done(err);
-				        done();
-				    });
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse._id).to.not.be.undefined;
+							expect(valueChartResponse.name).to.equal('TestHotel')
+							expect(valueChartResponse.users).to.have.length(1);
+							expect(valueChartResponse.alternatives).to.have.length(6);
+
+							chartId = valueChartResponse._id;
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+				});
 			});
 
-		});
+			context('when the ValueChart name is already in use', () => {
 
+				it(' should return status code 400', (done) => {
+					user.post('ValueCharts').send(JsonGroupHotel)
+						.set('Accept', 'application/json')
+						.expect(400)
+						.end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+				});
+			});
+		});
 	});
 
 	describe('Route: /ValueCharts/:Chart', () => {
@@ -82,7 +99,7 @@ describe('ValueCharts Routes', () => {
 							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
-							expect(valueChartResponse.name).to.equal('Hotel')
+							expect(valueChartResponse.name).to.equal('TestHotel')
 							expect(valueChartResponse.users).to.have.length(1);
 							expect(valueChartResponse.alternatives).to.have.length(6);
 							expect(valueChartResponse._id).to.equal(chartId);
@@ -110,7 +127,7 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Put', () => {
 
 			before(function() {
-				JsonGroupHotel.name = 'HotelSelectionProblem';
+				JsonGroupHotel.name = 'TestHotelSelectionProblem';
 				JsonGroupHotel.users = [JsonGroupHotel.users[0], JsonGroupHotel.users[0]];
 				alternative = JsonGroupHotel.alternatives.pop();
 			})
@@ -125,7 +142,7 @@ describe('ValueCharts Routes', () => {
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse._id).to.equal(chartId);
-						expect(valueChartResponse.name).to.equal('HotelSelectionProblem')
+						expect(valueChartResponse.name).to.equal('TestHotelSelectionProblem')
 						expect(valueChartResponse.users).to.have.length(2);
 						expect(valueChartResponse.alternatives).to.have.length(5);
 
@@ -139,8 +156,7 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Delete', () => {
 
 			context('when the ValueChart exists', () => {
-				it('should return status code 200', (done) => {
-					user.delete('ValueCharts/' + chartId)
+				it('should return status code 200', (done) => {					user.delete('ValueCharts/' + chartId)
 						.expect(200)
 						.end(function(err, res) {
 					        if (err) return done(err);
@@ -150,7 +166,7 @@ describe('ValueCharts Routes', () => {
 			});
 
 		context('when the ValueChart does not exist', () => {
-				it('should return status code 200', (done) => {
+				it('should return status code 200 (because delete is idempotent', (done) => {
 					user.delete('ValueCharts/' + 'e910f9c9c759bb6d76faa975')
 						.expect(200)
 						.end(function(err, res) {
@@ -179,7 +195,7 @@ describe('ValueCharts Routes', () => {
 
 		describe('Method: Get', () => {
 			it('should retrieve the ValueChart structure along with status code 200', (done) => {
-				user.get('ValueCharts/' + 'HotelSelectionProblem' + '/structure?password=' + password)
+				user.get('ValueCharts/' + 'TestHotelSelectionProblem' + '/structure?password=' + password)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -187,7 +203,7 @@ describe('ValueCharts Routes', () => {
 						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
-						expect(valueChartResponse.name).to.equal('HotelSelectionProblem')
+						expect(valueChartResponse.name).to.equal('TestHotelSelectionProblem')
 						expect(valueChartResponse.users).to.be.undefined;
 						expect(valueChartResponse.alternatives).to.have.length(5);
 						expect(valueChartResponse.rootObjectives).to.have.length(1);
@@ -203,12 +219,12 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Put', () => {
 			before(function() {
 				JsonGroupHotel.alternatives.push(alternative);
-				JsonGroupHotel.name = 'Hotel';
+				JsonGroupHotel.name = 'TestHotel';
 				JsonGroupHotel.rootObjectives.push(JsonGroupHotel.rootObjectives[0].subObjectives[0]);
 			});
 
 			it('should replace the ValueChart structure and return the new representation with status code 200', (done) => {
-				user.put('ValueCharts/' + 'HotelSelectionProblem' + '/structure').send(JsonGroupHotel)
+				user.put('ValueCharts/' + 'TestHotelSelectionProblem' + '/structure').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -216,7 +232,7 @@ describe('ValueCharts Routes', () => {
 						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
-						expect(valueChartResponse.name).to.equal('Hotel')
+						expect(valueChartResponse.name).to.equal('TestHotel')
 						expect(valueChartResponse.users).to.be.undefined;
 						expect(valueChartResponse.alternatives).to.have.length(6);
 						expect(valueChartResponse.rootObjectives).to.have.length(2);
@@ -362,7 +378,7 @@ describe('ValueCharts Routes', () => {
 
 	after(function(done) {
 		// Remove the test ValueChart from the database.
-		user.delete('group/ValueCharts/' + chartId)
+		user.delete('ValueCharts/' + chartId)
 			.expect(200)
 			.end(function(err, res) {
 		        if (err) return done(err);

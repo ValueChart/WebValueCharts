@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 14:50:00
+* @Last Modified time: 2016-08-05 15:57:00
 */
 
 // Import Libraries and Express Middleware:
@@ -92,11 +92,8 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 	var usersCollection: Monk.Collection = (<any> req).db.get('Users');
 	var username = req.params.user;
 
-	console.log(req.user);
-
 	usersCollection.remove({ username: username }, function(err: Error, doc: any) {
 		if (err) {
-			console.log(err);
 			res.status(400)
 				.json({ data: err });
 		} else {

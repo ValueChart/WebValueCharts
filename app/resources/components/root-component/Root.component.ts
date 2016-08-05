@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 11:03:53
+* @Last Modified time: 2016-08-05 15:56:45
 */
 
 import { Component } 												from '@angular/core';
@@ -64,7 +64,6 @@ export class RootComponent implements OnInit {
 		this.userHttpService.logout()
 			.subscribe(logoutResult => { 
 				this.currentUserService.setLoggedIn(false);
-				console.log(logoutResult);
 				this.router.navigate(['/register']);
 			});
 
