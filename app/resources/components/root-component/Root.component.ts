@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:56:45
+* @Last Modified time: 2016-08-05 16:15:37
 */
 
 import { Component } 												from '@angular/core';
@@ -29,7 +29,6 @@ import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEnco
 				ViewContainerRef,
 				XMLValueChartParser,
 				ValueChartXMLEncoder,
-				CurrentUserService,
 				GroupVcHttpService,
 				UserHttpService]
 })
