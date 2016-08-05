@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 17:00:13
+* @Last Modified time: 2016-08-04 23:25:35
 */
 
 // Import Libraries and Express Middleware:
@@ -29,7 +29,7 @@ usersRoutes.post('/login', passport.authenticate('local-signin'), function(req: 
 });
 
 // Login. Doesn't conform to REST principles, but is necessary.
-usersRoutes.get('/logout', passport.authenticate('local-signin'), function(req: express.Request, res: express.Response) {
+usersRoutes.get('/logout', function(req: express.Request, res: express.Response) {
 
 	var body: any = { data: { username: req.user.username, password: req.user.password, logoutResult: true } };
 

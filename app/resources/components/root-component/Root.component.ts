@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 15:45:08
+* @Last Modified time: 2016-08-04 23:24:39
 */
 
 import { Component } 												from '@angular/core';
@@ -40,7 +40,11 @@ export class RootComponent implements OnInit {
 
 	private switchScoreFunctionViewText: string = 'Score Distributions';
 
-	constructor(private router: Router, private currentUserService: CurrentUserService, private applicationRef: ApplicationRef) {}
+	constructor(
+		private router: Router, 
+		private userHttpService: UserHttpService,
+		private currentUserService: CurrentUserService, 
+		private applicationRef: ApplicationRef) {}
 	
 	ngOnInit() { 
 		(<any> window).angularAppRef = this.applicationRef;
@@ -54,6 +58,15 @@ export class RootComponent implements OnInit {
 	isGroupChart(): boolean {																						
 		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
 				(window.opener && !(<any> window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
+	}
+
+	logout(): void {
+		this.userHttpService.logout()
+			.subscribe(logoutResult => { 
+				this.currentUserService.setLoggedIn(false);
+				this.router.navigate(['/register']);
+			});
+
 	}
 
 	switchScoreFunctionView() {

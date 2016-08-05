@@ -7,6 +7,11 @@
 				</div>
 				<ul class="nav pull-right col-xs-10">
 					<form class="form-inline center-form pull-right">
+						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.isLoggedIn()">
+							<a class="btn btn-default" (click)="logout()" id="log-out">
+								Log Out
+							</a>
+						</div>
 						<div class="form-group navbar-group col-xs-6" *ngIf="chartType === 'normal' && router.url.indexOf('view/') !== -1">
 							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName() + '-average']" (click)="chartType = 'average'" id="view-average-chart">
 								View Average Chart
