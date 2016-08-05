@@ -21,10 +21,6 @@ import { Alternative }										from '../model/Alternative';
 import { WeightMap }										from '../model/WeightMap';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
-import { DiscreteScoreFunction }							from '../model/DiscreteScoreFunction';
-import { ContinuousScoreFunction }							from '../model/ContinuousScoreFunction';
-import { CategoricalDomain }								from '../model/CategoricalDomain';
-import { ContinuousDomain }									from '../model/ContinuousDomain';
 
 // Type Definitions:
 import { ValueChartStateContainer }							from '../types/StateContainer.types';
@@ -141,22 +137,6 @@ export class ValueChartService implements ValueChartStateContainer {
 		if (this.currentUserIsDefined())
 			return this.getCurrentUser().getWeightMap();
 	}
-	
-	getElementsFromContinuousDomain(continouousDomain: ContinuousDomain): number[] {
-		var range: number[] = continouousDomain.getRange()
-		var increment = (range[1] - range[0]) / 4;
-		var element = range[0];
-
-		var elements: number[] = [];
-
-		while (element <= range[1]) {
-
-			elements.push(Math.round(element * 100) / 100);
-			element += increment;
-		}
-
-		return elements;
-	}
 
 	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
 		this.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
@@ -165,91 +145,4 @@ export class ValueChartService implements ValueChartStateContainer {
 	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
 		this.getCurrentUser().setWeightMap(weightMapRecord);
 	}
-
-	getObjective(name: string): Objective {
-		for (let obj of this.valueChart.getAllObjectives()) {
-			if (obj.getName() === name) {
-				return obj;
-			}
-		}
-		throw "Objective not found";
-	}
-
-	getPrimitiveObjectivesByName(): string[] {
-		let primObj: string[] = [];
-		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
-			primObj.push(obj.getName());	
-		}
-		return primObj;
-	}
-
-	getBestOutcome(objName: string) : string | number {
-		let scoreFunction : ScoreFunction = this.getCurrentUserScoreFunction(objName);
-		for (let outcome of scoreFunction.getAllElements()) {
-			if (scoreFunction.getScore(outcome) === 1) {
-				return outcome;
-			}
-		}
-	}
-
-	getWorstOutcome(objName: string) : string | number {
-		let scoreFunction : ScoreFunction = this.getCurrentUserScoreFunction(objName);
-		for (let outcome of scoreFunction.getAllElements()) {
-			if (scoreFunction.getScore(outcome) === 0) {
-				return outcome;
-			}
-		}
-	}
-
-	// Create initial weight map for the Objective hierarchy with evenly distributed weights
-	getInitialWeightMap(): WeightMap {
-		let weightMap: WeightMap = new WeightMap();
-    	this.initializeWeightMap(this.valueChart.getRootObjectives(),weightMap,1);
-    	return weightMap;
-	}
-
-	// Recursively add entries to weight map
-  	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
-  		let weight = parentWeight * 1.0 / objectives.length;
-  		for (let obj of objectives) {
-  			weightMap.setObjectiveWeight(obj.getName(),weight);
-  			if (obj.objectiveType === 'abstract') {
-  				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(),weightMap,weight);
-  			}	
-  		}
-  	}
-
-  	// Set up initial ScoreFunctions
-  	// Scores for categorical variables are evenly space between 0 and 1
-  	getInitialScoreFunctionMap(): ScoreFunctionMap {
-  		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
-  		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
-  			let scoreFunction: ScoreFunction;
-  			if (obj.getDomainType() === 'categorical') {
-  				scoreFunction = new DiscreteScoreFunction();
-  				let dom = (<CategoricalDomain>obj.getDomain()).getElements();
-  				let increment = 1.0 / (dom.length - 1);
-  				let currentScore = 0;
-  				for (let item of dom) {
-  					scoreFunction.setElementScore(item, currentScore);
-  					currentScore += increment;
-  				}			
-  			}
-  			else {
-  				let min = (<ContinuousDomain>obj.getDomain()).getMinValue();
-  				let max = (<ContinuousDomain>obj.getDomain()).getMaxValue();
-  				scoreFunction = new ContinuousScoreFunction(min,max);
-  				// Add three evenly-space points between min and max
-  				let increment = (max - min) / 4.0;
-  				let slope = 1.0 / (max - min);
-  				scoreFunction.setElementScore(min, 0);
-  				scoreFunction.setElementScore(min + increment, slope * increment);
-  				scoreFunction.setElementScore(min + 2*increment, slope * 2*increment);
-  				scoreFunction.setElementScore(min + 3*increment, slope * 3*increment);
-  				scoreFunction.setElementScore(max, 1);
-  			}
-  			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
-  		}
-  		return scoreFunctionMap;
-  	}
 }

@@ -23,6 +23,9 @@ import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
 import { CategoricalDomain }											from '../../model/CategoricalDomain';
 import { ContinuousDomain }												from '../../model/ContinuousDomain';
 import { Alternative }													from '../../model/Alternative';
+import { ScoreFunction }												from '../../model/ScoreFunction';
+import { DiscreteScoreFunction }										from '../../model/DiscreteScoreFunction';
+import { ContinuousScoreFunction }										from '../../model/ContinuousScoreFunction';
 
 @Component({
 	selector: 'createValueChart',
@@ -31,10 +34,11 @@ import { Alternative }													from '../../model/Alternative';
 	providers: [CreationStepsService, ValueChartService, ChartUndoRedoService]
 })
 export class CreateValueChartComponent implements OnInit {
+	valueChart: ValueChart;
+	user: User;
 	purpose: string; // "newChart" or "newUser"
 	step: string;
 	sub: any;
-	userName: string;
 	treeData: string[];
 	valueChartName: string;
 	valueChartDescription: string;
@@ -55,7 +59,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	ngOnInit() {
 		// Initialize ValueChart properties
-		this.userName = this.currentUserService.getUsername();
+		this.user = new User(this.currentUserService.getUsername());
 		this.valueChartName = "";
 		this.valueChartDescription = "";
 		this.isGroupValueChart = false;
@@ -72,18 +76,16 @@ export class CreateValueChartComponent implements OnInit {
     	// Initialize according to purpose
     	if (this.purpose == "newUser") {
     		this.step = this.creationStepsService.PREFERENCES;
-    		let valueChart = this.currentUserService.getValueChart();
-    		valueChart.addUser(new User(this.userName));
-    		this.valueChartService.setValueChart(valueChart);
+    		this.valueChart = this.currentUserService.getValueChart();
     		this.initializeUser();
-    		this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
+    		this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
     	}
-    	else {
+    	else if (this.purpose == "createValueChart") {
     		this.step = this.creationStepsService.BASICS;
 
 	    	// Create new ValueChart with a temporary name and description
-	    	let valueChart = new ValueChart(this.userName,this.valueChartName,this.valueChartDescription);
-	    	valueChart.addUser(new User(this.userName));
+	    	let valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
+	    	valueChart.addUser(new User(this.user.getUsername()));
 	  	
 	    	// Temporary: create some Objectives
 	    	let rate = new PrimitiveObjective("rate","");
@@ -131,11 +133,9 @@ export class CreateValueChartComponent implements OnInit {
 	    	this.isSelected[this.alternativesCount] = true;
 	    	this.alternativesCount++;
 	    	this.selectedObjective = "internet";
-
-	    	this.currentUserService.setValueChart(valueChart);
-	    	this.valueChartService.setValueChart(valueChart);
     	}
-    	
+    	this.valueChart.addUser(this.user);
+    	this.valueChartService.setValueChart(this.valueChart); // Needed for ScoreFunction plots
   	}
 
 	back() {
@@ -144,8 +144,8 @@ export class CreateValueChartComponent implements OnInit {
 
 	next() {
 		if (this.step === this.creationStepsService.BASICS) {
-			this.valueChartService.getValueChart().setName(this.valueChartName);
-			this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
+			this.valueChart.setName(this.valueChartName);
+			this.valueChart.setDescription(this.valueChartDescription);
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			this.initializeUser();
@@ -155,28 +155,29 @@ export class CreateValueChartComponent implements OnInit {
 			for (let altID of this.altKeys()) {
 				alternatives.push((this.alternatives[altID]));
 			}
-			this.valueChartService.setAlternatives(alternatives);
+			this.valueChart.setAlternatives(alternatives);
 		}
 		else if (this.step === this.creationStepsService.PREFERENCES) {
-			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+			for (let obj of this.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
 		}
 		else if (this.step === this.creationStepsService.PRIORITIES) {
-			this.valueChartService.getCurrentUser().setWeightMap(this.getWeightMapFromRanks());
-			
+			this.user.setWeightMap(this.getWeightMapFromRanks());
+			this.valueChart.addUser(this.user);
+			this.valueChartService.setValueChart(this.valueChart);
+			this.currentUserService.setValueChart(this.valueChart);
 			this.router.navigate(['/view/ValueChart']);
-
 		}
 		this.step = this.creationStepsService.next(this.step);
 	}
 
 	private initializeUser() {
 		// Initialize User's WeightMap
-		this.valueChartService.getCurrentUser().setWeightMap(this.valueChartService.getInitialWeightMap());
+		this.user.setWeightMap(this.getInitialWeightMap());
 
 		// Initialize User's ScoreFunctionMap
-		this.valueChartService.getCurrentUser().setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
+		this.user.setScoreFunctionMap(this.getInitialScoreFunctionMap());
 	}
 
 	save() {
@@ -241,7 +242,7 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.rankedObjectives.length === 0) {
 			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
 		}
-		else if (this.rankedObjectives.length < this.valueChartService.getPrimitiveObjectives().length) {
+		else if (this.rankedObjectives.length < this.valueChart.getAllPrimitiveObjectives().length) {
 			return "From the remaining objectives, which would you prefer to change next from the worst value to the best value?";
 		}
 		else {
@@ -251,7 +252,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	getUnrankedObjectives() : string[] {
 		let unrankedObjectives : string[] = [];
-		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+		for (let obj of this.getPrimitiveObjectivesByName()) {
 			if (!this.isRanked[obj]) {
 				unrankedObjectives.push(obj);
 			}
@@ -265,7 +266,7 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	resetRanks() {
-		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+		for (let obj of this.getPrimitiveObjectivesByName()) {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];
@@ -296,4 +297,92 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 	}
+
+	// ValueChart Utilities
+	getObjective(name: string): Objective {
+		for (let obj of this.valueChart.getAllObjectives()) {
+			if (obj.getName() === name) {
+				return obj;
+			}
+		}
+		throw "Objective not found";
+	}
+
+	getPrimitiveObjectivesByName(): string[] {
+		let primObj: string[] = [];
+		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
+			primObj.push(obj.getName());	
+		}
+		return primObj;
+	}
+
+	getBestOutcome(objName: string) : string | number {
+		let scoreFunction : ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+		for (let outcome of scoreFunction.getAllElements()) {
+			if (scoreFunction.getScore(outcome) === 1) {
+				return outcome;
+			}
+		}
+	}
+
+	getWorstOutcome(objName: string) : string | number {
+		let scoreFunction : ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+		for (let outcome of scoreFunction.getAllElements()) {
+			if (scoreFunction.getScore(outcome) === 0) {
+				return outcome;
+			}
+		}
+	}
+
+	// Create initial weight map for the Objective hierarchy with evenly distributed weights
+	getInitialWeightMap(): WeightMap {
+		let weightMap: WeightMap = new WeightMap();
+    	this.initializeWeightMap(this.valueChart.getRootObjectives(),weightMap,1);
+    	return weightMap;
+	}
+
+	// Recursively add entries to weight map
+  	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
+  		let weight = parentWeight * 1.0 / objectives.length;
+  		for (let obj of objectives) {
+  			weightMap.setObjectiveWeight(obj.getName(),weight);
+  			if (obj.objectiveType === 'abstract') {
+  				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(),weightMap,weight);
+  			}	
+  		}
+  	}
+
+  	// Set up initial ScoreFunctions
+  	// Scores for categorical variables are evenly space between 0 and 1
+  	getInitialScoreFunctionMap(): ScoreFunctionMap {
+  		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
+  		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
+  			let scoreFunction: ScoreFunction;
+  			if (obj.getDomainType() === 'categorical') {
+  				scoreFunction = new DiscreteScoreFunction();
+  				let dom = (<CategoricalDomain>obj.getDomain()).getElements();
+  				let increment = 1.0 / (dom.length - 1);
+  				let currentScore = 0;
+  				for (let item of dom) {
+  					scoreFunction.setElementScore(item, currentScore);
+  					currentScore += increment;
+  				}			
+  			}
+  			else {
+  				let min = (<ContinuousDomain>obj.getDomain()).getMinValue();
+  				let max = (<ContinuousDomain>obj.getDomain()).getMaxValue();
+  				scoreFunction = new ContinuousScoreFunction(min,max);
+  				// Add three evenly-space points between min and max
+  				let increment = (max - min) / 4.0;
+  				let slope = 1.0 / (max - min);
+  				scoreFunction.setElementScore(min, 0);
+  				scoreFunction.setElementScore(min + increment, slope * increment);
+  				scoreFunction.setElementScore(min + 2*increment, slope * 2*increment);
+  				scoreFunction.setElementScore(min + 3*increment, slope * 3*increment);
+  				scoreFunction.setElementScore(max, 1);
+  			}
+  			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
+  		}
+  		return scoreFunctionMap;
+  	}
 }

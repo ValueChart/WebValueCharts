@@ -23,7 +23,7 @@
                                 <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
                                 <th>Name</th>
                                 <th>Description</th>
-                                <th *ngFor="let objName of valueChartService.getPrimitiveObjectivesByName()">{{objName}}</th>
+                                <th *ngFor="let objName of getPrimitiveObjectivesByName()">{{objName}}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -37,7 +37,7 @@
                                 <th>
                                     <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" name="description" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
                                 </th>
-                                <th *ngFor="let obj of valueChartService.getPrimitiveObjectives()">
+                                <th *ngFor="let obj of getPrimitiveObjectives()">
                                     <div *ngIf="obj.getDomain().type === 'categorical'">
                                         <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="{{obj.getName()}}" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
                                             <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
@@ -54,10 +54,10 @@
                     <div *ngIf="step === creationStepsService.PREFERENCES">
                          <label class="control-label">Select Objective:</label>
                         <select class="form-control" [(ngModel)]="selectedObjective" name="selectedObjective">
-                            <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+                            <option *ngFor="let obj of getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                         </select>
                         <div>
-                            <ScoreFunctionDirective [objective]="valueChartService.getObjective(selectedObjective)">
+                            <ScoreFunctionDirective [objective]="getObjective(selectedObjective)">
                                 <svg class="svg-content-createvaluechart" viewBox="0 0, 300, 300" preserveAspectRatio="xMinYMin meet">
                                     <g class="expanded-score-function"></g>
                                 </svg>
@@ -79,8 +79,8 @@
                             <tbody>
                                 <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName)">
                                     <th>{{objName}}</th>
-                                    <th style="background-color: #ff8080">{{valueChartService.getWorstOutcome(objName)}}</th>
-                                    <th style="background-color: #70db70">{{valueChartService.getBestOutcome(objName)}}</th>
+                                    <th style="background-color: #ff8080">{{getWorstOutcome(objName)}}</th>
+                                    <th style="background-color: #70db70">{{getBestOutcome(objName)}}</th>
                                 </tr>
                             </tbody>
                         </table>
