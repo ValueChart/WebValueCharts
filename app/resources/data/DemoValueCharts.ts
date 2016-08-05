@@ -17,7 +17,7 @@ export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalon
 	                    </Description>
 					</Objective>
 					<Objective color="#7D3C98" name="skytrain-distance" type="primitive">
-						<Domain max="9" min="2" type="continuous" unit="blocks"/>
+						<Domain max="9" min="1" type="continuous" unit="blocks"/>
 						<Description>Description Information Goes Here
 	                    </Description>
 					</Objective>
@@ -153,7 +153,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 	                    </Description>
 					</Objective>
 					<Objective color="#7D3C98" name="skytrain-distance" type="primitive">
-						<Domain max="9" min="2" type="continuous" unit="blocks"/>
+						<Domain max="9" min="1" type="continuous" unit="blocks"/>
 						<Description>Description Information Goes Here
 	                    </Description>
 					</Objective>
