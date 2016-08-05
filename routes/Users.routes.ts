@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 16:52:18
+* @Last Modified time: 2016-08-04 17:00:13
 */
 
 // Import Libraries and Express Middleware:
@@ -73,4 +73,3 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 	}
 });
 
-usersRoutes.put(/:user)

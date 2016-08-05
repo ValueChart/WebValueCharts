@@ -7,20 +7,20 @@
 				</div>
 				<ul class="nav pull-right col-xs-10">
 					<form class="form-inline center-form pull-right">
-						<div class="form-group navbar-group col-xs-6" *ngIf="isGroupChart() && chartType === 'normal' && router.url.indexOf('view/') !== -1">
+						<div class="form-group navbar-group col-xs-6" *ngIf="chartType === 'normal' && router.url.indexOf('view/') !== -1">
 							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName() + '-average']" (click)="chartType = 'average'" id="view-average-chart">
 								View Average Chart
 							</a>
 						</div>
-						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && chartType === 'average' && router.url.indexOf('view/') !== -1">
+						<div class="form-group navbar-group col-xs-6" *ngIf="chartType === 'average' && router.url.indexOf('view/') !== -1">
 							<a class="btn btn-default" [routerLink]="['/view', currentUserService.getValueChart().getName()]" (click)="chartType = 'normal'" id="view-normal-chart">
 								View Group Chart
 							</a>
 						</div>
-						<div class="form-group navbar-group col-xs-6" *ngIf="currentUserService.getValueChart() && router.url.indexOf('view/') !== -1">
+						<div class="form-group navbar-group col-xs-6" *ngIf="router.url.indexOf('view/') !== -1">
 							<ExportValueChart></ExportValueChart>
 						</div>
-						<div class="form-group navbar-group col-xs-6" *ngIf="isGroupChart() && router.url.indexOf('scoreFunction') !== -1">
+						<div class="form-group navbar-group col-xs-6" *ngIf="router.url.indexOf('scoreFunction') !== -1">
 							<a class="btn btn-default" (click)="switchScoreFunctionView()">
 								{{ switchScoreFunctionViewText }}
 							</a>
