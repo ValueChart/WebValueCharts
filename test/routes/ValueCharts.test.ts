@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 21:27:32
+* @Last Modified time: 2016-08-05 14:56:30
 */
 
 // Require Node Libraries:
@@ -49,7 +49,7 @@ describe('ValueCharts Routes', () => {
 					.expect('Content-Type', /json/)
 					.expect(201)
 					.expect((res: request.Response) => {
-						var valueChartResponse = JSON.parse(res.body.data);
+						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse._id).to.not.be.undefined;
@@ -79,7 +79,7 @@ describe('ValueCharts Routes', () => {
 						.expect('Content-Type', /json/)
 						.expect(200)
 					    .expect((res: request.Response) => {
-							var valueChartResponse = JSON.parse(res.body.data);
+							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.name).to.equal('Hotel')
@@ -121,7 +121,7 @@ describe('ValueCharts Routes', () => {
 					.expect('Content-Type', /json/)
 					.expect(200)
 					.expect((res: request.Response) => {
-						var valueChartResponse = JSON.parse(res.body.data);
+						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse._id).to.equal(chartId);
@@ -150,9 +150,9 @@ describe('ValueCharts Routes', () => {
 			});
 
 		context('when the ValueChart does not exist', () => {
-				it('should return status code 404', (done) => {
+				it('should return status code 200', (done) => {
 					user.delete('ValueCharts/' + 'e910f9c9c759bb6d76faa975')
-						.expect(404)
+						.expect(200)
 						.end(function(err, res) {
 					        if (err) return done(err);
 					        done();
@@ -169,7 +169,7 @@ describe('ValueCharts Routes', () => {
 			user.post('ValueCharts').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect((res: request.Response) => {
-						var valueChartResponse = JSON.parse(res.body.data);
+						var valueChartResponse = res.body.data;
 						chartId = valueChartResponse._id;
 					}).end(function(err, res) {
 				        if (err) return done(err);
@@ -184,7 +184,7 @@ describe('ValueCharts Routes', () => {
 					.expect('Content-Type', /json/)
 					.expect(200)
 				    .expect((res: request.Response) => {
-						var valueChartResponse = JSON.parse(res.body.data);
+						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse.name).to.equal('HotelSelectionProblem')
@@ -213,7 +213,7 @@ describe('ValueCharts Routes', () => {
 					.expect('Content-Type', /json/)
 					.expect(200)
 				    .expect((res: request.Response) => {
-						var valueChartResponse = JSON.parse(res.body.data);
+						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse.name).to.equal('Hotel')
@@ -251,7 +251,7 @@ describe('ValueCharts Routes', () => {
 						.expect('Content-Type', /json/)
 						.expect(201)
 					    .expect((res: request.Response) => {
-							var valueChartResponse = JSON.parse(res.body.data);
+							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.equal('Argile');
@@ -276,7 +276,7 @@ describe('ValueCharts Routes', () => {
 							.expect('Content-Type', /json/)
 							.expect(200)
 						    .expect((res: request.Response) => {
-								var valueChartResponse = JSON.parse(res.body.data);
+								var valueChartResponse = res.body.data;
 
 								expect(valueChartResponse).to.not.be.undefined;
 								expect(valueChartResponse.username).to.equal('Argile');
@@ -320,7 +320,7 @@ describe('ValueCharts Routes', () => {
 						.expect('Content-Type', /json/)
 						.expect(200)
 					    .expect((res: request.Response) => {
-							var valueChartResponse = JSON.parse(res.body.data);
+							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.equal('Argile');
@@ -347,10 +347,10 @@ describe('ValueCharts Routes', () => {
 				});
 			});
 			context('when the user does not exist', () => {
-				it('should return status code 404', (done) => {
+				it('should return status code 200', (done) => {
 					user.delete('ValueCharts/' + chartId + '/users/Niel')
 						.set('Accept', 'application/json')
-							.expect(404)
+							.expect(200)
 						    .end(function(err, res) {
 						        if (err) return done(err);
 						        done();

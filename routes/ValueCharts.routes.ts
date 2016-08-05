@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:08:04
+* @Last Modified time: 2016-08-05 15:07:58
 */
 
 
@@ -41,16 +41,14 @@ valueChartRoutes.post('/', function(req: express.Request, res: express.Response,
 	groupVcCollection.insert(req.body, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
 
+		} else if (doc) {
+			res.location('/ValueCharts/' + doc._id)
+				.status(201)
+				.json({ data: doc });
 		} else {
-			if (doc) {
-				res.location('/ValueCharts/' + doc._id)
-					.status(201)
-					.json({ data: JSON.stringify(doc) });
-			} else {
-				res.sendStatus(404);				
-			}
+			res.sendStatus(404);				
 		}
 	});
 });
@@ -64,16 +62,14 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	groupVcCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
 
+		} else if (doc) {
+			res.location('/ValueCharts/' + chartId)
+				.status(200)
+				.json({ data: doc });
 		} else {
-			if (doc) {
-				res.location('/ValueCharts/' + chartId)
-					.status(200)
-					.json({ data: JSON.stringify(doc) });
-			} else {
-				res.sendStatus(404)
-			}
+			res.sendStatus(404)
 		}
 	});
 });
@@ -85,17 +81,15 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 	groupVcCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
 
+		} else if (doc) {
+			req.body._id = chartId;
+			res.location('/ValueCharts/' + chartId)
+				.status(200)
+				.json({ data: req.body });
 		} else {
-			if (doc) {
-				req.body._id = chartId;
-				res.location('/ValueCharts/' + chartId)
-					.status(200)
-					.json({ data: JSON.stringify(req.body) });
-			} else {
-				res.sendStatus(404);
-			}
+			res.sendStatus(404);
 		}
 	});
 });
@@ -107,13 +101,9 @@ valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.R
 	(<any> groupVcCollection).findOneAndDelete({ _id: chartId }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
 		} else {		
-			if (doc._id) {
-				res.sendStatus(200);
-			} else {
-				res.sendStatus(404);
-			}
+			res.sendStatus(200);
 		}
 	});
 });
@@ -128,18 +118,16 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 	groupVcCollection.findOne({ name: chartId, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
 
+		} else if (doc) {
+			// Remove the users from the ValueChart so that it only contains the objectives and alternatives
+			doc.users = undefined;
+			res.location('/ValueCharts/' + chartId + '/structure')
+				.status(200)
+				.json({ data: doc });
 		} else {
-			if (doc) {
-				// Remove the users from the ValueChart so that it only contains the objectives and alternatives
-				doc.users = undefined;
-				res.location('/ValueCharts/' + chartId + '/structure')
-					.status(200)
-					.json({ data: JSON.stringify(doc) });
-			} else {
-				return res.sendStatus(404);
-			}
+			return res.sendStatus(404);
 		}
 	});
 });
@@ -151,30 +139,28 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 	groupVcCollection.findOne({ name: chartName }, function (err: Error, foundDocument: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
-		} else {
-			if (foundDocument) {
+				.json({ data: err });
+		} else if (foundDocument) {
 			// Attach the users to the structure object.
-				req.body.users = foundDocument.users;
+			req.body.users = foundDocument.users;
 
-				groupVcCollection.update({ _id: foundDocument._id }, (req.body), [], function(err: Error, doc: any) {
-					if (err) {
-						res.status(400)
-							.json({ data: JSON.stringify(err) });
+			groupVcCollection.update({ _id: foundDocument._id }, (req.body), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
 
-					} else {
-						// Remove the users from the ValueChart so that it only contains the objectives and alternatives
-						req.body.users = undefined;
-						req.body._id = foundDocument._id;
+				} else {
+					// Remove the users from the ValueChart so that it only contains the objectives and alternatives
+					req.body.users = undefined;
+					req.body._id = foundDocument._id;
 
-						res.location('/ValueCharts/' + chartName + '/structure')
-							.status(200)
-							.json({ data: JSON.stringify(req.body) });
-					}
-				});
-			} else {
-				res.sendStatus(404);
-			}
+					res.location('/ValueCharts/' + chartName + '/structure')
+						.status(200)
+						.json({ data: req.body });
+				}
+			});
+		} else {
+			res.sendStatus(404);
 		}
 	});
 });

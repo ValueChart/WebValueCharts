@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:08:25
+* @Last Modified time: 2016-08-05 14:59:53
 */
 
 // Require Node Libraries:
@@ -45,7 +45,7 @@ describe('WebSocket: /Host', () => {
 			.expect('Content-Type', /json/)
 			.expect(201)
 			.expect((res: request.Response) => {
-				var valueChartResponse = JSON.parse(res.body.data);
+				var valueChartResponse = res.body.data;
 				chartId = valueChartResponse._id;
 			}).end(function(err, res) {
 		        if (err) return done(err);
@@ -182,7 +182,7 @@ describe('WebSocket: /Host', () => {
 						.expect('Content-Type', /json/)
 						.expect(201)
 					    .expect((res: request.Response) => {
-							var valueChartResponse = JSON.parse(res.body.data);
+							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.equal('Argile');
@@ -221,7 +221,7 @@ describe('WebSocket: /Host', () => {
 						.expect('Content-Type', /json/)
 						.expect(200)
 					    .expect((res: request.Response) => {
-							var valueChartResponse = JSON.parse(res.body.data);
+							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.deep.equal('Argile');

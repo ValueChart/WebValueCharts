@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 11:12:26
+* @Last Modified time: 2016-08-05 14:50:00
 */
 
 // Import Libraries and Express Middleware:
@@ -51,15 +51,14 @@ usersRoutes.get('/:user', function(req: express.Request, res: express.Response, 
 	} else {
 		usersCollection.findOne({ username: username }, function(err: Error, doc: any) {
 			if (err) {
-				res.sendStatus(400);
+				res.status(400)
+					.json({ data: err });
+			} else if (doc) {
+				res.status(200)
+					.location('/Users/' + username)
+					.json({ data: doc });
 			} else {
-				if (doc) {
-					res.status(200)
-						.location('/Users/' + username)
-						.json({ data: doc });
-				} else {
-					res.sendStatus(404);
-				}
+				res.sendStatus(404);
 			}
 		});
 	}
@@ -72,23 +71,38 @@ usersRoutes.put('/:user', function(req: express.Request, res: express.Response, 
 	if (!req.isAuthenticated() || username !== req.user[0].username) {
 		res.sendStatus(401);
 	} else {
-		usersCollection.update({ username: username }, (req.body), [] ,function(err: Error, doc: any) {
+		usersCollection.update({ username: username }, (req.body), [], function(err: Error, doc: any) {
 			if (err) {
 				res.status(400)
-					.json({ data: JSON.stringify(err) });
+					.json({ data: err });
 
+			} else if (doc) {
+				req.body._id = doc._id;
+				res.status(200)
+					.location('/Users/' + username)
+					.json({ data: req.body });
 			} else {
-				if (doc) {
-					req.body._id = doc._id;
-					res.status(200)
-						.location('/Users/' + username)
-						.json({ data: JSON.stringify(req.body) });
-				} else {
-					res.sendStatus(404);
-				}
+				res.sendStatus(404);
 			}
 		});
 	}
+});
+
+usersRoutes.delete('/:user', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var usersCollection: Monk.Collection = (<any> req).db.get('Users');
+	var username = req.params.user;
+
+	console.log(req.user);
+
+	usersCollection.remove({ username: username }, function(err: Error, doc: any) {
+		if (err) {
+			console.log(err);
+			res.status(400)
+				.json({ data: err });
+		} else {
+			res.sendStatus(200);
+		}
+	});
 });
 
 
@@ -96,25 +110,24 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
 	var username = req.params.user;
 
-	if (!req.isAuthenticated() || username !== req.user[0].username) {
+	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
 		res.sendStatus(401);
 	} else {
 		groupVcCollection.find({ creator: username }, function(err: Error, docs: any[]) {
 			if (err) {
-				res.sendStatus(400);
-			} else {
-				if (docs) {
-					var vcSummaries: any[] = [];
-					docs.forEach((doc: any) => {
-						vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password });
-					});
+				res.sendStatus(400)
+					.json({ data: err });
+			} else if (docs) {
+				var vcSummaries: any[] = [];
+				docs.forEach((doc: any) => {
+					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password });
+				});
 
-					res.status(200)
-						.location('/Users/' + username + '/ValueCharts')
-						.json({ data: vcSummaries });
-				} else {
-					res.sendStatus(404);
-				}
+				res.status(200)
+					.location('/Users/' + username + '/ValueCharts')
+					.json({ data: vcSummaries });
+			} else {
+				res.sendStatus(404);
 			}
 		});
 	}

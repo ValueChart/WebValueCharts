@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 14:49:24
+* @Last Modified time: 2016-08-05 14:57:52
 */
 
 import '../../rxjs-operators';
@@ -123,7 +123,7 @@ export class GroupVcHttpService {
 
 	extractValueChartData = (res: Response): ValueChart => {
 		let body = res.json();
-		return this.valueChartParser.parseValueChart(JSON.parse(body.data));
+		return this.valueChartParser.parseValueChart(body.data);
 	}
 
 	extractUserData = (res: Response): User => {

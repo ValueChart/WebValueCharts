@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:41:04
+* @Last Modified time: 2016-08-05 15:09:40
 */
 
 // Import Libraries and Express Middleware:
@@ -37,28 +37,26 @@ valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Resp
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
+				.json({ data: err });
+		} else if (doc) {
+			doc.users.push(req.body);
+
+			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+
+				} else {
+					// Notify any clients hosting this ValueChart that a user has been added.
+					hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
+
+					res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
+						.status(201)
+						.json({ data: req.body });
+				}
+			});
 		} else {
-			if (doc) {
-				doc.users.push(req.body);
-
-				groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
-					if (err) {
-						res.status(400)
-							.json({ data: JSON.stringify(err) });
-
-					} else {
-						// Notify any clients hosting this ValueChart that a user has been added.
-						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
-
-						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
-							.status(201)
-							.json({ data: JSON.stringify(req.body) });
-					}
-				});
-			} else {
-				res.sendStatus(404);
-			}
+			res.sendStatus(404);
 		}
 	});
 });
@@ -70,26 +68,24 @@ valueChartUsersRoutes.get('/:username', function(req: express.Request, res: expr
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
-		} else {
-			if (doc) {
-		
-				var user = doc.users.find((user: any) => {
-					return user.username === username;
-				});
+				.json({ data: err });
+		} else if (doc) {
+	
+			var user = doc.users.find((user: any) => {
+				return user.username === username;
+			});
 
-				if (!user) {
-					res.sendStatus(404);
-					return;
-				}
-
-				res.location('/ValueCharts/' + chartId + '/users' + user.username)
-							.status(200)
-							.json({ data: JSON.stringify(user) });
-
-			} else {
+			if (!user) {
 				res.sendStatus(404);
+				return;
 			}
+
+			res.location('/ValueCharts/' + chartId + '/users' + user.username)
+						.status(200)
+						.json({ data: user });
+
+		} else {
+			res.sendStatus(404);
 		}
 	});
 });
@@ -101,38 +97,36 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
-		} else {
-			if (doc) {
-				var userIndex: number = doc.users.findIndex((user: any) => {
-					return user.username === username;
-				});
-				if (userIndex === -1) {
-					// Add the user if it does not exist yet. 
-					doc.users.push(req.body);
-				} else {
-					// Replace the old representation of the user.
-					doc.users.splice(userIndex, 1, req.body);
-				}
-
-
-				groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
-					if (err) {
-						res.status(400)
-							.json({ data: JSON.stringify(err) });
-
-					} else {
-						// Notify any clients hosting this ValueChart that a user has been changed.
-						hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
-
-						res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
-							.status(200)
-							.json({ data: JSON.stringify(req.body) });
-					}
-				});
+				.json({ data: err });
+		} else if (doc) {
+			var userIndex: number = doc.users.findIndex((user: any) => {
+				return user.username === username;
+			});
+			if (userIndex === -1) {
+				// Add the user if it does not exist yet. 
+				doc.users.push(req.body);
 			} else {
-				res.sendStatus(404);
+				// Replace the old representation of the user.
+				doc.users.splice(userIndex, 1, req.body);
 			}
+
+
+			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+
+				} else {
+					// Notify any clients hosting this ValueChart that a user has been changed.
+					hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
+
+					res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
+						.status(200)
+						.json({ data: req.body });
+				}
+			});
+		} else {
+			res.sendStatus(404);
 		}
 	});
 });
@@ -144,36 +138,34 @@ valueChartUsersRoutes.delete('/:username', function(req: express.Request, res: e
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
-				.json({ data: JSON.stringify(err) });
-		} else {
-			if (doc) {
-		
-				var userIndex: number = doc.users.findIndex((user: any) => {
-					return user.username === username;
-				});
+				.json({ data: err });
+		} else if (doc) {
+	
+			var userIndex: number = doc.users.findIndex((user: any) => {
+				return user.username === username;
+			});
 
-				if (userIndex === -1) {
-					res.sendStatus(404);
-					return;
-				}
-
-				doc.users.splice(userIndex, 1);
-
-				groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
-					if (err) {
-						res.status(400)
-							.json({ data: JSON.stringify(err) });
-
-					} else {
-						// Notify any clients hosting this ValueChart that a user has been deleted.
-						hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, username);
-
-						res.sendStatus(200);
-					}
-				});
-			} else {
-				res.sendStatus(404);
+			if (userIndex === -1) {
+				res.sendStatus(200);
+				return;
 			}
+
+			doc.users.splice(userIndex, 1);
+
+			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+
+				} else {
+					// Notify any clients hosting this ValueChart that a user has been deleted.
+					hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, username);
+
+					res.sendStatus(200);
+				}
+			});
+		} else {
+			res.sendStatus(404);
 		}
 	});
 });
