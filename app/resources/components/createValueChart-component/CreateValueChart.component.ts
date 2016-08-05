@@ -80,12 +80,11 @@ export class CreateValueChartComponent implements OnInit {
     		this.initializeUser();
     		this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
     	}
-    	else if (this.purpose == "createValueChart") {
+    	else if (this.purpose == "newChart") {
     		this.step = this.creationStepsService.BASICS;
 
 	    	// Create new ValueChart with a temporary name and description
-	    	let valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
-	    	valueChart.addUser(new User(this.user.getUsername()));
+	    	this.valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
 	  	
 	    	// Temporary: create some Objectives
 	    	let rate = new PrimitiveObjective("rate","");
@@ -128,7 +127,7 @@ export class CreateValueChartComponent implements OnInit {
 	    	hotel1.setObjectiveValue("internet","high");
 	    	hotel1.setObjectiveValue("pool","no");
 
-	    	valueChart.setRootObjectives([amenities,other]);
+	    	this.valueChart.setRootObjectives([amenities,other]);
 	    	this.alternatives[this.alternativesCount] = hotel1;
 	    	this.isSelected[this.alternativesCount] = true;
 	    	this.alternativesCount++;
@@ -193,6 +192,11 @@ export class CreateValueChartComponent implements OnInit {
 		let enabled = (this.step === this.creationStepsService.PRIORITIES ||
 					 this.step === this.creationStepsService.ALTERNATIVES && this.isGroupValueChart);
 		return !enabled;
+	}
+
+	disableNextButton() : boolean {
+		return (this.step === this.creationStepsService.PRIORITIES &&
+				this.rankedObjectives.length !== this.valueChart.getAllPrimitiveObjectives().length);
 	}
 
 	nextButtonText() : string {
