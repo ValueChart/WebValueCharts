@@ -1,2 +1,40 @@
-<div>
+<div class="container-fluid">
+	<div class="flex-column">
+		<h2 class="my-account-header text-center">Account Management</h2>
+			<form class="form-horizontal">
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="email-input">Email</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" id="email-input" placeholder="email" [(ngModel)]="email" name="email">
+				</div>
+			</div>
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="name-input">Username</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" id="name-input" disabled="true" placeholder="name" [(ngModel)]="username" name="username">
+				</div>
+			</div>
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="password-input">Password</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" type="password" id="password-input" placeholder="password" (change)="validatePasswords(password, rePassword)" [(ngModel)]="password" name="password">
+				</div>
+			</div>
+			<div class="form-group form-group-lg">
+				<label class="col-sm-4 control-label" for="password-input">Re-enter Password</label>
+				<div class="col-sm-5 col-md-4">
+					<input class="form-control" type="password" id="re-password-input" placeholder="password" (change)="validatePasswords(password, rePassword)" [(ngModel)]="rePassword" name="re-password">
+				</div>
+			</div>
+			<div [hidden]="!invalidCredentials" class="alert alert-danger">
+				<span class="col-sm-offset-4">{{invalidMessage}}</span>
+			</div>
+			<div [hidden]="!credentialsUpdated" class="alert alert-success">
+				<span class="col-sm-offset-4">Account details successfully updated</span>
+			</div>
+			<div class="form-group text-center">
+				<a class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</a>
+			</div>
+		</form>
+	</div>
 </div>

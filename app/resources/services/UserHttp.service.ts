@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 23:17:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 16:53:20
+* @Last Modified time: 2016-08-05 10:57:03
 */
 
 import '../../rxjs-operators';
@@ -25,6 +25,23 @@ export class UserHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 		return this.http.post(this.usersUrl, body, options)
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
+	getUser(username: string): Observable<any> {
+		return this.http.get(this.usersUrl + username)
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
+
+	updateUser(username: string, password: string, email: string): Observable<any> {
+		let body = JSON.stringify({ username: username, password: password, email: email });
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.put(this.usersUrl + username, body, options)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 13:59:31
+* @Last Modified time: 2016-08-05 11:02:14
 */
 
 import { Component }										from '@angular/core';
@@ -21,12 +21,14 @@ export class RegisterComponent {
 
 	private username: string;
 	private password: string;
+	private rePassword: string;
 	private email: string;
 
 	private tempUserName: string;
 
 	private state: string;
 	private invalidCredentials: boolean;
+	private invalidMessage: string;
 
 	constructor(
 		private router: Router, 
@@ -42,7 +44,10 @@ export class RegisterComponent {
 					this.currentUserService.setLoggedIn(true);
 					this.setUsername(username);
 				},
-				(error) => { this.invalidCredentials = true; } 
+				(error) => { 
+					this.invalidMessage = 'That username is not available';
+					this.invalidCredentials = true;
+				} 
 			);
 	}
 
@@ -53,8 +58,22 @@ export class RegisterComponent {
 					this.currentUserService.setLoggedIn(true);
 					this.setUsername(username);
 				},
-				(error) => { this.invalidCredentials = true; }
+				(error) => { 
+					this.invalidMessage = 'That username is not available';
+					this.invalidCredentials = true;
+				}
 			);
+	}
+
+	validatePasswords(passwordOne: string, passwordTwo: string): void {
+		if (passwordOne !== passwordTwo) {
+			this.invalidMessage = 'The entered passwords do not match';
+			this.invalidCredentials = true;
+		} else {
+			this.invalidCredentials = false;
+			this.invalidMessage = '';
+
+		}
 	}
 
 	continueAsTempUser(username: string): void {

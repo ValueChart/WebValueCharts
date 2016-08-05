@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 14:27:32
+* @Last Modified time: 2016-08-05 10:47:21
 */
 
 /* Global Styles */
@@ -107,6 +107,12 @@ a.upload {
 .my-valuecharts-header {
     top: 10rem;
     position: relative;
+}
+
+.my-account-header {
+    top: 10rem;
+    position: relative;
+    height: 18rem;
 }
 
 /* Score Function Viewer Styles */
