@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 11:33:03
+* @Last Modified time: 2016-08-05 17:09:50
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -31,27 +31,35 @@ import { UserDomainElements, DomainElement }							from '../types/ScoreFunctionV
 
 
 @Directive({
-	selector: 'ScoreFunctionDirective',
-	inputs: ['objective'],
+	selector: 'ScoreFunction',
+	inputs: ['objective', 'height', 'width', 'orientation', 'services'],
 	providers: [ScoreFunctionViewerService]
 })
 export class ScoreFunctionDirective implements OnInit, DoCheck {
+	// Input fields:
+	private objectiveToDisplay: PrimitiveObjective;
+	private plotWidth: number;
+	private plotHeight: number;
+	private viewOrientation: string;
 
+	// Services:
+	private valueChartService: ValueChartService;
+	private scoreFunctionViewerService: ScoreFunctionViewerService;
+	private chartUndoRedoService: ChartUndoRedoService;
+
+	// Renderer Fields:
 	private scoreFunctionPlotContainer: d3.Selection<any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
 
-	private objectiveToDisplay: PrimitiveObjective;
+	// Change detection fields:
 	private previousObjectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunction: ScoreFunction;
 
 	private user: User;
 
-	constructor(
-		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService,
-		private scoreFunctionViewerService: ScoreFunctionViewerService,
-		private chartUndoRedoService: ChartUndoRedoService,
-		private ngZone: NgZone) { }
+
+
+	constructor(private ngZone: NgZone) { }
 
 	ngOnInit() {
 
@@ -61,8 +69,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 		this.initChangeDetection();
 		this.initScoreFunctionPlot();
-
-		this.configureDisplay();
 	}
 
 	initChangeDetection(): void {
@@ -81,11 +87,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		}
 
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
-		this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
-	}
-
-	configureDisplay(): void {
-		this.scoreFunctionPlotContainer.attr('display', 'block');
+		this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 	}
 
 	detectScoreFunctionChange(previousScoreFunction: ScoreFunction, currentScoreFunction: ScoreFunction): boolean {
@@ -114,7 +116,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
 
 			if (scoreFunctionChange) {
-				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
+				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 				this.previousScoreFunction = currentScoreFunction.getMemento();
 			}
 		}
@@ -122,5 +124,23 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	@Input() set objective(value: any) {
 		this.objectiveToDisplay = <PrimitiveObjective> value;
+	}
+
+	@Input() set width(value: any) {
+		this.plotWidth = <number> value;
+	}
+
+	@Input() set height(value: any) {
+		this.plotHeight = <number> value;
+	}
+
+	@Input() set orientation(value: any) {
+		this.viewOrientation = <string> value;
+	}
+
+	@Input() set services(value: any) {
+		this.valueChartService = value.valueChartService;
+		this.chartUndoRedoService = value.chartUndoRedoService;
+		this.scoreFunctionViewerService = value.scoreFunctionViewerService;
 	}
 }

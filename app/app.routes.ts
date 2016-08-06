@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 16:21:33
+* @Last Modified time: 2016-08-05 17:11:48
 */
 
 import { provideRouter, RouterConfig } 								from '@angular/router';
@@ -28,7 +28,7 @@ export const routes: RouterConfig = [
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
 	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent, canActivate: [AuthGuardService] },
 	{ path: 'view/:ValueChart', component: ValueChartViewerComponent, canActivate: [AuthGuardService] },
-	{ path: 'scoreFunction/:viewType', component: ScoreFunctionViewerComponent, canActivate: [AuthGuardService] },
+	{ path: 'scoreFunction/:viewType', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register:
 	{ path: '', redirectTo: '/register', pathMatch: 'prefix'}
 ];

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 14:32:17
+* @Last Modified time: 2016-08-05 17:19:23
 */
 
 import { Component }															from '@angular/core';
@@ -171,12 +171,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.resizeValueChart();
 		this.$ = $;
-
-		// Redirect back to Create page if the ValueChart is not initialized.
-		if (this.valueChart === undefined) {
-			this.router.navigate(['/create']);
-			return;
-		}
 
 		this.alternatives = this.valueChart.getAlternatives();
 

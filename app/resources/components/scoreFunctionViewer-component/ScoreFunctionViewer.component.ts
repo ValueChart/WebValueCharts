@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 11:37:32
+* @Last Modified time: 2016-08-05 17:25:01
 */
 
 import { Component }													from '@angular/core';
@@ -23,6 +23,7 @@ import { ValueChartService }											from '../../services/ValueChart.service';
 import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 
+import { ScoreFunctionDirective }										from '../../directives/ScoreFunction.directive';
 
 // Model Classes:
 import { ScoreFunction }												from '../../model/ScoreFunction';
@@ -34,15 +35,17 @@ import { UserDomainElements, DomainElement }							from '../../types/ScoreFuncti
 @Component({
 	selector: 'ScoreFunction',
 	templateUrl: 'app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
-	directives: []
+	directives: [ScoreFunctionDirective]
 })
-export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy {
+export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck {
 	private sub: any;
 	private opener: Window;
 
 	private valueChartService: ValueChartService;
 	private scoreFunctionViewerService: ScoreFunctionViewerService;
 	private chartUndoRedoService: ChartUndoRedoService;
+
+	private services: any = {};
 
 	private scoreFunctionPlotContainer: d3.Selection<any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
@@ -77,44 +80,21 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 			this.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
 		}
 
-
-		this.users = this.valueChartService.getUsers()
-
-		this.initChangeDetection();
-		this.initScoreFunctionPlot();
-		this.initDistributionPlot();
-
-		this.configureDisplay();
-	}
-
-	initChangeDetection(): void {
+		this.services.valueChartService = this.valueChartService;
+		this.services.chartUndoRedoService = this.chartUndoRedoService;
+		this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
 
 		this.previousViewType = this.viewType;
 
-		this.previousScoreFunctions = [];
-
-		this.users.forEach((user: User) => {
-			let currentScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
-			this.previousScoreFunctions.push(currentScoreFunction);
-		});
-	}
-
-	initScoreFunctionPlot(): void {
-
-		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
-		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
-		}
-
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
-		this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
+		this.users = this.valueChartService.getUsers()
+		this.initDistributionPlot();
+		this.configureDisplay();
 	}
 
 	initDistributionPlot(): void {
 		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.scoreFunctionViewerService);
 		this.scoreDistributionChartRenderer.createScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay);
-		this.scoreDistributionChartRenderer.renderScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, 300, 300, 'vertical');
+		this.scoreDistributionChartRenderer.renderScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, 375, 300, 'vertical');
 	}
 
 	configureDisplay(): void {
@@ -144,30 +124,13 @@ export class ScoreFunctionViewerComponent implements OnInit, DoCheck, OnDestroy 
 		return false;
 	}
 
+
 	ngDoCheck() {
 
 		if (this.viewType !== this.previousViewType) {
 			this.previousViewType = this.viewType;
 			this.configureDisplay();
 		}
-
-
-		this.users.forEach((user: User, index: number) => {
-			let currentScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
-			var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunctions[index], currentScoreFunction);
-
-			if (scoreFunctionChange) {
-				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, 300, 300, 'vertical');
-				// Trigger change detection in the main application:
-				if (window) {
-					(<any> window.opener).angularAppRef.tick();
-				} else {
-					this.ngOnDestroy();	// Remove the reference to this window from the parent window, seeing as this window has been destroyed.
-				}
-
-				this.previousScoreFunctions[index] = currentScoreFunction.getMemento();
-			}
-		})
 	}
 
 	ngOnDestroy() {

@@ -11,6 +11,8 @@ import { CurrentUserService }											from '../../services/CurrentUser.service
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../services/ValueChart.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
+import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
+
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
@@ -49,15 +51,23 @@ export class CreateValueChartComponent implements OnInit {
     selectedObjective: string;
     rankedObjectives: string[];
     isRanked: { [objName: string]: boolean; }; // really need to split this code up...
-	
+
+	private services: any = {};
+
+
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private creationStepsService: CreationStepsService,
-		private valueChartService: ValueChartService) { }
+		private valueChartService: ValueChartService,
+		private chartUndoRedoService: ChartUndoRedoService) { }
 
 	ngOnInit() {
+		this.services.valueChartService = this.valueChartService;
+		this.services.chartUndoRedoService = this.chartUndoRedoService;
+		this.services.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
+
 		// Initialize ValueChart properties
 		this.user = new User(this.currentUserService.getUsername());
 		this.valueChartName = "";
