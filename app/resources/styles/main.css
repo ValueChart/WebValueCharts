@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 10:47:21
+* @Last Modified by:   Emily Hindalong
+* @Last Modified time: 2016-08-05 15:21:45
 */
 
 /* Global Styles */
@@ -344,4 +344,35 @@ input {
     -webkit-border-radius:6px 0 6px 6px;
     -moz-border-radius:6px 0 6px 6px;
     border-radius:6px 0 6px 6px;
+}
+
+/* Objectives Tree styles */
+
+
+table
+{
+    border-collapse: collapse;
+    margin-bottom: 3em;
+    font-size: 70%;
+    line-height: 1.1;
+}
+
+th
+{
+    font-weight: normal;
+    text-align: left;
+    background: url(tabletree-arrow.gif) no-repeat 2px 50%;
+    padding-left: 15px;
+}
+
+tbody th.start
+{
+    background: url(tabletree-dots.gif) 18px 54% no-repeat;
+    padding-left: 26px;
+}
+
+tbody th.end
+{
+    background: url(tabletree-dots2.gif) 18px 54% no-repeat;
+    padding-left: 26px;
 }

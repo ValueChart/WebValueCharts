@@ -12,6 +12,29 @@
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
                         <h4>Add Objectives</h4>
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteObjective()" style="margin: 5px 10px;" />
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" (click)="addSubObjective()" style="margin: 5px 10px;" />
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Domain Type</th>
+                                    <th>Domain Info</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let obj of getFlattenedObjectives()" class="clickable-row" (click)="selectedWrapper=obj">
+                                    <th colspan="getColspan(obj)">{{obj.name}}</th>
+                                    <th>
+                                        <select class="form-control" #t [ngModel]="obj.type"  (ngModelChange)="changeType(obj)" [disabled]="obj.children.length > 0">
+                                            <option [value]="abstract">abstract</option>
+                                            <option [value]="primitive">primitive</option>
+                                        </select>
+                                    </th>
+                                
+                            </tbody>
+                        </table>
                     </div>
                     <div *ngIf="step === creationStepsService.ALTERNATIVES">
                         <h4>Add Alternatives</h4>

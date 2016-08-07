@@ -41,14 +41,26 @@ export class CreateValueChartComponent implements OnInit {
 	purpose: string; // "newChart" or "newUser"
 	step: string;
 	sub: any;
-	treeData: string[];
+
+	// Basics step
 	valueChartName: string;
 	valueChartDescription: string;
 	isGroupValueChart: boolean;
+
+	// Objectives steps
+	rootObjective: ObjectiveWrapper;
+    selectedWrapper: ObjectiveWrapper; // awful - need to refactor asap
+    objectivesCount : number;
+
+	// Alternatives step
     alternatives: { [altID: string]: Alternative; };
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
+  
+    // Preferences step
     selectedObjective: string;
+
+    // Priorities step
     rankedObjectives: string[];
     isRanked: { [objName: string]: boolean; }; // really need to split this code up...
 
@@ -73,10 +85,10 @@ export class CreateValueChartComponent implements OnInit {
 		this.valueChartName = "";
 		this.valueChartDescription = "";
 		this.isGroupValueChart = false;
-		this.treeData = ["item1","item2","item3"];
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;
+		this.objectivesCount = 0;
 		this.rankedObjectives = [];
 		this.isRanked = {};
 
@@ -95,53 +107,53 @@ export class CreateValueChartComponent implements OnInit {
 
 	    	// Create new ValueChart with a temporary name and description
 	    	this.valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
+
+	    	// Set root objective
+			this.rootObjective = new ObjectiveWrapper(String(this.objectivesCount),new AbstractObjective("root",""));
+			this.objectivesCount++;
 	  	
 	    	// Temporary: create some Objectives
-	    	let rate = new PrimitiveObjective("rate","");
-	    	let location = new PrimitiveObjective("location","");
-	    	let internet = new PrimitiveObjective("internet","");
-	    	let pool = new PrimitiveObjective("pool","");
-	    	let amenities = new AbstractObjective("amenities","");
-	    	let other = new AbstractObjective("other","");
+	    	// let rate = new PrimitiveObjective("rate","");
+	    	// let location = new PrimitiveObjective("location","");
+	    	// let internet = new PrimitiveObjective("internet","");
+	    	// let pool = new PrimitiveObjective("pool","");
+	    	// let amenities = new AbstractObjective("amenities","");
+	    	// let other = new AbstractObjective("other","");
 
-	    	rate.setColor("green")
-	    	location.setColor("red");
-	    	internet.setColor("purple");
-	    	pool.setColor("blue");
+	    	// rate.setColor("green")
+	    	// location.setColor("red");
+	    	// internet.setColor("purple");
+	    	// pool.setColor("blue");
 
-	    	amenities.addSubObjective(internet);
-	    	amenities.addSubObjective(pool);
-	    	other.addSubObjective(location);
-	    	other.addSubObjective(rate);
+	    	// amenities.addSubObjective(internet);
+	    	// amenities.addSubObjective(pool);
+	    	// other.addSubObjective(location);
+	    	// other.addSubObjective(rate);
 
-	    	let ratedom = new ContinuousDomain(30,300,"CAD");
-	    	let locdom = new CategoricalDomain(false);
-	    	locdom.addElement("downtown");
-	    	locdom.addElement("highway");
-	    	let intdom = new CategoricalDomain(false);
-	    	intdom.addElement("none");
-	    	intdom.addElement("low");
-	    	intdom.addElement("high");
-	    	let pooldom = new CategoricalDomain(false);
-	    	pooldom.addElement("no");
-	    	pooldom.addElement("yes");
+	    	// let ratedom = new ContinuousDomain(30,300,"CAD");
+	    	// let locdom = new CategoricalDomain(false);
+	    	// locdom.addElement("downtown");
+	    	// locdom.addElement("highway");
+	    	// let intdom = new CategoricalDomain(false);
+	    	// intdom.addElement("none");
+	    	// intdom.addElement("low");
+	    	// intdom.addElement("high");
+	    	// let pooldom = new CategoricalDomain(false);
+	    	// pooldom.addElement("no");
+	    	// pooldom.addElement("yes");
 
-	    	rate.setDomain(ratedom);
-	    	location.setDomain(locdom);
-	    	internet.setDomain(intdom);
-	    	pool.setDomain(pooldom);
+	    	// rate.setDomain(ratedom);
+	    	// location.setDomain(locdom);
+	    	// internet.setDomain(intdom);
+	    	// pool.setDomain(pooldom);
 
-	    	let hotel1 = new Alternative("Hotel 1","");
-	    	hotel1.setObjectiveValue("rate",140);
-	    	hotel1.setObjectiveValue("location","downtown");
-	    	hotel1.setObjectiveValue("internet","high");
-	    	hotel1.setObjectiveValue("pool","no");
+	    	// let hotel1 = new Alternative("Hotel 1","");
+	    	// hotel1.setObjectiveValue("rate",140);
+	    	// hotel1.setObjectiveValue("location","downtown");
+	    	// hotel1.setObjectiveValue("internet","high");
+	    	// hotel1.setObjectiveValue("pool","no");
 
-	    	this.valueChart.setRootObjectives([amenities,other]);
-	    	this.alternatives[this.alternativesCount] = hotel1;
-	    	this.isSelected[this.alternativesCount] = true;
-	    	this.alternativesCount++;
-	    	this.selectedObjective = "internet";
+	    	this.valueChart.setRootObjectives([this.rootObjective.obj]);
     	}
     	this.valueChart.addUser(this.user);
     	this.valueChartService.setValueChart(this.valueChart); // Needed for ScoreFunction plots
@@ -158,6 +170,7 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			this.initializeUser();
+			this.selectedObjective = this.rootObjective.obj.getName();
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
@@ -308,6 +321,51 @@ export class CreateValueChartComponent implements OnInit {
 		return sum;
 	}
 
+	// Objectives step
+
+
+	addSubObjective() {
+		let obj : AbstractObjective = <AbstractObjective>this.selectedWrapper;
+		(<AbstractObjective>this.selectedWrapper).addSubObjective("child + ")
+	}
+
+	deleteObjective() {
+
+	}
+
+	changeType(obj: ObjectiveWrapper) {
+		if (obj.type === 'abstract') {
+			obj.setObjective(new PrimitiveObjective(obj.name,obj.obj.getDescription()));
+		}
+		else {
+			obj.setObjective(new AbstractObjective(obj.name,obj.obj.getDescription()));
+		}
+	}
+
+	getObjColspan(obj: ObjectiveWrapper) : number {
+		if (obj.obj.objectiveType === 'abstract') {
+			return 4;
+		}
+		else {
+			return 1;
+		}
+	}
+
+	getFlattenedObjectives() : ObjectiveWrapper[] {
+		let flattened: ObjectiveWrapper[] = [];
+		this.flattenObjectives([this.rootObjective],flattened);
+		return flattened;
+	}
+
+	private flattenObjectives(objectives: ObjectiveWrapper[], flattened: ObjectiveWrapper[]) {
+  		for (let obj of objectives) {
+  			flattened.push(obj);
+  			if (obj.obj.objectiveType === 'abstract') {
+  				this.flattenObjectives(obj.children,flattened);
+  			}
+  		}
+  	}
+
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 	}
@@ -399,4 +457,24 @@ export class CreateValueChartComponent implements OnInit {
   		}
   		return scoreFunctionMap;
   	}
+}
+
+class ObjectiveWrapper {
+	objID : string;
+	obj: Objective;
+	name: string;
+	type: string;
+	children: ObjectiveWrapper[];
+
+	constructor(objID: string, obj: Objective, children?: ObjectiveWrapper[]) {
+		this.objID = objID;
+		this.children = children;
+		this.setObjective(obj);
+	}
+
+	setObjective(obj: Objective) {
+		this.obj = obj;
+		this.name = obj.getName();
+		this.type = obj.objectiveType;
+	}
 }
