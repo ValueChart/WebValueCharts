@@ -12,51 +12,67 @@
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
                         <h4>Add Objectives</h4>
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" [disabled]="selectedObjRow === rootObjRowID" (click)="deleteObjRow()" style="margin: 5px 10px;" />
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" [disabled]="objectiveRows[selectedObjRow].type === 'primitive'" (click)="addChildObjRow(selectedObjRow)" style="margin: 5px 10px;" />
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" [disabled]="disableDelete()" (click)="deleteObjRow(selectedObjRow)" style="margin: 5px 10px;" />
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" [disabled]="disableAddChild()" (click)="addChildObjRow(selectedObjRow)" style="margin: 5px 10px;" />
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Type</th>
+                                    <th>Color</th>
                                     <th>Domain Type</th>
                                     <th>Domain Info</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
-                                    <th style="padding-left: data-indent="objectiveRows[objID].depth">
+                                    <th>
+                                        <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
                                         <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].name"/>
+                                        </div>
                                     </th>
                                     <th>
                                         <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
                                     </th>
                                     <th>
-                                        <select class="form-control" #z [ngModel]="getType(objectiveRows[objID])" (ngModelChange)="setType(objectiveRows[objID],z.value)" [disabled]="objectiveRows[objID].children.length > 0">
-                                            <option [value]="abstract">abstract</option>
-                                            <option [value]="primitive">primitive</option>
+                                        <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0">
+                                            <option [value]="'abstract'">abstract</option>
+                                            <option [value]="'primitive'">primitive</option>
                                         </select>
                                     </th>
                                     <th>
                                         <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                                            <select class="form-control" #t [(ngModel)]="objectiveRows[objID].dom.type">
-                                                <option [value]="categorical">categorical</option>
-                                                <option [value]="continuous">continuous</option>
-                                                <option [value]="interval">interval</option>
+                                            <select class="form-control" [(ngModel)]="objectiveRows[objID].color">
+                                                <option [value]="'red'">red</option>
+                                                <option [value]="'blue'">blue</option>
+                                                <option [value]="'green'">green</option>
+                                                <option [value]="'purple'">purple</option>
+                                                <option [value]="'orange'">orange/option>
+                                                <option [value]="'yellow'">yellow</option>
+                                            </select>
+                                        </div>
+                                    </th> 
+                                    <th>
+                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
+                                        <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                                            <select class="form-control"[(ngModel)]="objectiveRows[objID].dom.type">
+                                                <option [value]="'categorical'">categorical</option>
+                                                <option [value]="'continuous'">continuous</option>
+                                                <option [value]="'interval'">interval</option>
                                             </select>
                                         </div>
                                     </th>
                                     <th>
                                         <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'categorical' ">cat</div>
+                                            && objectiveRows[objID].dom.type === 'categorical' ">categorical default</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'continuous' ">cont</div>
+                                            && objectiveRows[objID].dom.type === 'continuous' ">continuous default</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'interval' ">int</div>
-                                    </th>       
+                                            && objectiveRows[objID].dom.type === 'interval' ">interval default</div>
+                                    </th>         
                                 </tr>                             
                             </tbody>
                         </table>
@@ -86,7 +102,7 @@
                                     <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
                                 </th>
                                 <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
-                                    <div *ngIf="obj.getDomain().type === 'categorical'">
+                                    <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
                                         <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="{{obj.getName()}}" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
                                             <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
                                         </select>

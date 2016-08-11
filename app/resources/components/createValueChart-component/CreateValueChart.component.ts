@@ -23,8 +23,10 @@ import { ScoreFunctionMap }												from '../../model/ScoreFunctionMap';
 import { Objective }													from '../../model/Objective';
 import { AbstractObjective }											from '../../model/AbstractObjective';
 import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
+import { Domain }														from '../../model/Domain';
 import { CategoricalDomain }											from '../../model/CategoricalDomain';
 import { ContinuousDomain }												from '../../model/ContinuousDomain';
+import { IntervalDomain }												from '../../model/IntervalDomain';
 import { Alternative }													from '../../model/Alternative';
 import { ScoreFunction }												from '../../model/ScoreFunction';
 import { DiscreteScoreFunction }										from '../../model/DiscreteScoreFunction';
@@ -67,7 +69,6 @@ export class CreateValueChartComponent implements OnInit {
     isRanked: { [objName: string]: boolean; }; // really need to split this code up...
 
 	private services: any = {};
-
 
 	constructor(
 		private router: Router,
@@ -113,50 +114,9 @@ export class CreateValueChartComponent implements OnInit {
 	    	// Create new ValueChart with a temporary name and description
 	    	this.valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
 
-	    	// Set root objective
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow("","","",0);
+	    	// Create root objective
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName + " Root","","",0);
 			this.objectivesCount++;
-	  	
-	    	// Temporary: create some Objectives
-	    	// let rate = new PrimitiveObjective("rate","");
-	    	// let location = new PrimitiveObjective("location","");
-	    	// let internet = new PrimitiveObjective("internet","");
-	    	// let pool = new PrimitiveObjective("pool","");
-	    	// let amenities = new AbstractObjective("amenities","");
-	    	// let other = new AbstractObjective("other","");
-
-	    	// rate.setColor("green")
-	    	// location.setColor("red");
-	    	// internet.setColor("purple");
-	    	// pool.setColor("blue");
-
-	    	// amenities.addSubObjective(internet);
-	    	// amenities.addSubObjective(pool);
-	    	// other.addSubObjective(location);
-	    	// other.addSubObjective(rate);
-
-	    	// let ratedom = new ContinuousDomain(30,300,"CAD");
-	    	// let locdom = new CategoricalDomain(false);
-	    	// locdom.addElement("downtown");
-	    	// locdom.addElement("highway");
-	    	// let intdom = new CategoricalDomain(false);
-	    	// intdom.addElement("none");
-	    	// intdom.addElement("low");
-	    	// intdom.addElement("high");
-	    	// let pooldom = new CategoricalDomain(false);
-	    	// pooldom.addElement("no");
-	    	// pooldom.addElement("yes");
-
-	    	// rate.setDomain(ratedom);
-	    	// location.setDomain(locdom);
-	    	// internet.setDomain(intdom);
-	    	// pool.setDomain(pooldom);
-
-	    	// let hotel1 = new Alternative("Hotel 1","");
-	    	// hotel1.setObjectiveValue("rate",140);
-	    	// hotel1.setObjectiveValue("location","downtown");
-	    	// hotel1.setObjectiveValue("internet","high");
-	    	// hotel1.setObjectiveValue("pool","no");
     	}
     	this.valueChart.addUser(this.user);
     	this.valueChartService.setValueChart(this.valueChart); // Needed for ScoreFunction plots
@@ -172,8 +132,9 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChart.setDescription(this.valueChartDescription);
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
+			this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 			this.initializeUser();
-			this.selectedObjective = this.valueChart.getRootObjectives()[0].getName();
+			this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
@@ -253,6 +214,9 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	allSelected() : boolean {
+		if (this.altKeys().length === 0) {
+			return false;
+		}
 		for (let key of this.altKeys()) {
 			if (!this.isSelected[key]) {
 				return false;
@@ -344,6 +308,15 @@ export class CreateValueChartComponent implements OnInit {
 			this.deleteObjRow(child);
 		}
 		delete this.objectiveRows[objID];
+		this.selectedObjRow = "";
+	}
+
+	disableAddChild() {
+		return (this.selectedObjRow === "" || this.objectiveRows[this.selectedObjRow].type === 'primitive');
+	}
+
+	disableDelete() {
+		return (this.selectedObjRow === "" || this.selectedObjRow === this.rootObjRowID);
 	}
 
 	getFlattenedObjectiveRows() : string[] {
@@ -357,6 +330,37 @@ export class CreateValueChartComponent implements OnInit {
   			flattened.push(objID);
   			this.flattenObjectiveRows(this.objectiveRows[objID].children,flattened);
   		}
+  	}
+
+  	// Convert ObjectiveRows to Objectives
+  	// Using dummy domains for now...
+  	objRowToObjective(objrow: ObjectiveRow) : Objective {
+  		let obj: Objective;
+  		if (objrow.type === 'primitive') {
+  			obj = new PrimitiveObjective(objrow.name, objrow.desc);
+  			let dom : Domain;
+  			if (objrow.dom.type === 'categorical') {
+  				dom = new CategoricalDomain(true);
+  				(<CategoricalDomain>dom).addElement("1");
+  				(<CategoricalDomain>dom).addElement("2");
+  				(<CategoricalDomain>dom).addElement("3");
+  			}
+  			else if (objrow.dom.type === 'interval') {
+  				dom = new IntervalDomain(0,8,1);
+  			}
+  			else {
+  				dom = new ContinuousDomain(0,1,"cm");
+  			}
+  			(<PrimitiveObjective>obj).setDomain(dom);
+  			(<PrimitiveObjective>obj).setColor(objrow.color);
+  		}
+  		else {
+  			obj = new AbstractObjective(objrow.name, objrow.desc);
+  			for (let child of objrow.children) {
+  				(<AbstractObjective>obj).addSubObjective(this.objRowToObjective(this.objectiveRows[child]));
+  			}
+  		}
+  		return obj;
   	}
 
 	ngOnDestroy() {
@@ -423,7 +427,7 @@ export class CreateValueChartComponent implements OnInit {
   		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
   		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
   			let scoreFunction: ScoreFunction;
-  			if (obj.getDomainType() === 'categorical') {
+  			if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
   				scoreFunction = new DiscreteScoreFunction();
   				let dom = (<CategoricalDomain>obj.getDomain()).getElements();
   				let increment = 1.0 / (dom.length - 1);
@@ -451,16 +455,13 @@ export class CreateValueChartComponent implements OnInit {
   		return scoreFunctionMap;
   	}
 
-  	getType(obj: ObjectiveRow) {
-		obj.type;
-	}
-
-	setType(obj: ObjectiveRow, type: string) {
-		obj.type = type;
+	rangeList(start: number, end: number) {
+		let arr : number[] = [];
+		while(start < end){
+		   arr.push(end++);
+		}
 	}
 }
-
-
 
 class ObjectiveRow {
 	name: string;
@@ -468,6 +469,7 @@ class ObjectiveRow {
 	parent : string;
 	depth : number;
 	type: string;
+	color: string;
 	dom: DomainDetails;
 	children: string[];
 
@@ -477,6 +479,7 @@ class ObjectiveRow {
 		this.parent = parent;
 		this.depth = depth;
 		this.type = 'abstract';
+		this.color = 'red';
 		this.dom = new DomainDetails('categorical');
 		this.children = [];
 	}
