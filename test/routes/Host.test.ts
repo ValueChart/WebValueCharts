@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:45:50
+* @Last Modified time: 2016-08-10 20:31:29
 */
 
 // Require Node Libraries:
@@ -60,8 +60,6 @@ describe('WebSocket: /Host', () => {
 		it('should send a message to the client confirming successful connection with the correct chart ID', (done) => {
 			hostWebSocket = new WebSocket(hostUrl + chartId);
 			
-			hostWebSocket.onopen = (event: MessageEvent) => { hostWebSocket.send(JSON.stringify({ type: MessageType.ConnectionInit, chartId: chartId, data: 'opening-connection'})); }
-
 			hostWebSocket.onmessage = (msg: MessageEvent) => {
 				var hostMessage: HostMessage = JSON.parse(msg.data);
 

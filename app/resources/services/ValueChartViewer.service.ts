@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 14:43:13
+* @Last Modified time: 2016-08-10 21:04:48
 */
 
 import { Injectable } 										from '@angular/core';
@@ -59,6 +59,8 @@ export class ValueChartViewerService {
 	}
 
 	updateAllValueChartData(viewOrientation: string): void {
+		this.generateRowData();
+
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
 		

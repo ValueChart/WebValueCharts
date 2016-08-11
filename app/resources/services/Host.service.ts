@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 15:57:02
+* @Last Modified time: 2016-08-10 20:30:01
 */
 
 import { Injectable } 												from '@angular/core';
@@ -35,10 +35,6 @@ export class HostService {
 
 	hostGroupValueChart(chartId: string): WebSocket {
 		this.hostWebSocket = new WebSocket('ws://' + window.location.host + '/' + this.hostUrl + '/' + chartId);
-		// Send initialization message:
-		this.hostWebSocket.onopen = (event: MessageEvent) => { 
-			this.hostWebSocket.send(JSON.stringify({ type: MessageType.ConnectionInit, chartId: chartId, data: 'opening-connection'})); 
-		}
 
 		this.hostWebSocket.onmessage = this.hostMessageHandler;
 
@@ -61,7 +57,7 @@ export class HostService {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		switch (hostMessage.type) {
 			case MessageType.ConnectionInit:
-				
+				// Handle any responses to initialization here.
 				break;
 			
 			case MessageType.ChangePermissions:
@@ -71,6 +67,7 @@ export class HostService {
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				valueChart.addUser(newUser);
+				console.log('A user was added: ',newUser);
 				
 				break;
 
@@ -81,7 +78,7 @@ export class HostService {
 				});
 				// Delete the old version of the user and replace it with the new one.
 				valueChart.getUsers().splice(userIndex, 1, updatedUser);
-				
+				console.log('A user was changed: ', updatedUser);
 				break;
 
 			case MessageType.UserRemoved:

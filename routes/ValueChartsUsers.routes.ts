@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:09:40
+* @Last Modified time: 2016-08-10 20:34:20
 */
 
 // Import Libraries and Express Middleware:
@@ -94,6 +94,8 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 	var chartId: string = (<any> req).chartId;
 	var username: string = req.params.username;
 
+	var userExists: boolean;
+
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
@@ -104,9 +106,11 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 			});
 			if (userIndex === -1) {
 				// Add the user if it does not exist yet. 
+				userExists = false;
 				doc.users.push(req.body);
 			} else {
 				// Replace the old representation of the user.
+				userExists = true;
 				doc.users.splice(userIndex, 1, req.body);
 			}
 
@@ -117,8 +121,13 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 						.json({ data: err });
 
 				} else {
-					// Notify any clients hosting this ValueChart that a user has been changed.
-					hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
+					if (userExists) {
+						// Notify any clients hosting this ValueChart that a user has been changed.
+						hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
+					} else {
+						// Notify any clients hosting this ValueChart that a user has been added.
+						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
+					}
 
 					res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
 						.status(200)

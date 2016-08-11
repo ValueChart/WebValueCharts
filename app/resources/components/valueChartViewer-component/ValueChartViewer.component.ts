@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 17:17:28
+* @Last Modified time: 2016-08-10 19:54:00
 */
 
 import { Component }															from '@angular/core';
@@ -280,6 +280,7 @@ export class ValueChartViewerComponent implements OnInit {
 		} else {
 			this.hostService.hostGroupValueChart(this.valueChart._id);
 		}
+		console.log(this.hostService);
 	}
 
 	// ValueChart Member:

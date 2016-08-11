@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-26 19:11:13
+* @Last Modified time: 2016-08-10 21:06:05
 */
 
 
@@ -209,8 +209,22 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.updateRowOrder()
 		}
 
-		// Check the User Models for Changes:
+		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
+			// A user has been added to the ValueChart.
+			this.changeDetectionService.initDiffers(this.valueChart);
+			// Update data
+			this.valueChartViewerService.generateRowData();
+			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 
+			// Add new columns for the new user.
+			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
+			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
+
+			// Re-render everything.
+			this.updateValueChartDisplay()
+		}
+
+		// Check the User Models for Changes:
 		this.valueChartService.getUsers().forEach((user: User, i: number) => {
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
@@ -243,7 +257,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.changeDetectionService.colorsHaveChanged) {
 			// Objective colors have been changed
 			this.changeDetectionService.colorsHaveChanged = false;
-			this.updateValueChartDisplay();
+			this.updateRowOrder();
 		}
 	}
 

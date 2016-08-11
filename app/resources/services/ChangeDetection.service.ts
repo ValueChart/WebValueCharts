@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 15:21:24
+* @Last Modified time: 2016-08-10 20:39:26
 */
 
 import { Injectable } 															from '@angular/core';
@@ -34,6 +34,7 @@ export class ChangeDetectionService {
 	public previousHeight: number;
 
 	// Differs:
+	public previousNumUsers: number;
 	public userDiffers: KeyValueDiffer[];
 	public weightMapDiffers: KeyValueDiffer[];
 	public scoreFunctionMapDiffers: KeyValueDiffer[];
@@ -57,6 +58,9 @@ export class ChangeDetectionService {
 		this.weightMapDiffers = [];
 		this.scoreFunctionMapDiffers = [];
 		this.scoreFunctionDiffers = [];
+
+		this.previousNumUsers = users.length;
+
 		// Initialize Differs for 
 		users.forEach((user: User) => {
 			let userDiffer = this.objectDiffers.find({}).create(null);
