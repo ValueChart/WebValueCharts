@@ -12,27 +12,52 @@
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
                         <h4>Add Objectives</h4>
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteObjective()" style="margin: 5px 10px;" />
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" (click)="addSubObjective()" style="margin: 5px 10px;" />
-                        <table class="table table-bordered table-hover">
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" [disabled]="selectedObjRow === rootObjRowID" (click)="deleteObjRow()" style="margin: 5px 10px;" />
+                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" [disabled]="objectiveRows[selectedObjRow].type === 'primitive'" (click)="addChildObjRow(selectedObjRow)" style="margin: 5px 10px;" />
+                        <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>Description</th>
                                     <th>Type</th>
                                     <th>Domain Type</th>
                                     <th>Domain Info</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let obj of getFlattenedObjectives()" class="clickable-row" (click)="selectedWrapper=obj">
-                                    <th colspan="getColspan(obj)">{{obj.name}}</th>
+                                <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
+                                    <th style="padding-left: data-indent="objectiveRows[objID].depth">
+                                        <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].name"/>
+                                    </th>
                                     <th>
-                                        <select class="form-control" #t [ngModel]="obj.type"  (ngModelChange)="changeType(obj)" [disabled]="obj.children.length > 0">
+                                        <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
+                                    </th>
+                                    <th>
+                                        <select class="form-control" #z [ngModel]="getType(objectiveRows[objID])" (ngModelChange)="setType(objectiveRows[objID],z.value)" [disabled]="objectiveRows[objID].children.length > 0">
                                             <option [value]="abstract">abstract</option>
                                             <option [value]="primitive">primitive</option>
                                         </select>
                                     </th>
-                                
+                                    <th>
+                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
+                                        <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                                            <select class="form-control" #t [(ngModel)]="objectiveRows[objID].dom.type">
+                                                <option [value]="categorical">categorical</option>
+                                                <option [value]="continuous">continuous</option>
+                                                <option [value]="interval">interval</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
+                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
+                                            && objectiveRows[objID].dom.type === 'categorical' ">cat</div>
+                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
+                                            && objectiveRows[objID].dom.type === 'continuous' ">cont</div>
+                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
+                                            && objectiveRows[objID].dom.type === 'interval' ">int</div>
+                                    </th>       
+                                </tr>                             
                             </tbody>
                         </table>
                     </div>
@@ -55,10 +80,10 @@
                                     <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
                                 </th>
                                 <th>
-                                    <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" name="name" (ngModelChange)="alternatives[altID].setName(n.value)"/>
+                                    <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value)"/>
                                 </th>
                                 <th>
-                                    <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" name="description" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
+                                    <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
                                 </th>
                                 <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
                                     <div *ngIf="obj.getDomain().type === 'categorical'">

@@ -1,5 +1,6 @@
 import { Component }													from '@angular/core';
 import { OnInit }														from '@angular/core';
+import { NgClass } 														from '@angular/common';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 import * as d3 from 'd3';
@@ -32,7 +33,7 @@ import { ContinuousScoreFunction }										from '../../model/ContinuousScoreFun
 @Component({
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
-	directives: [ROUTER_DIRECTIVES, ScoreFunctionDirective],
+	directives: [ROUTER_DIRECTIVES, ScoreFunctionDirective, NgClass],
 	providers: [CreationStepsService, ValueChartService, ChartUndoRedoService]
 })
 export class CreateValueChartComponent implements OnInit {
@@ -48,8 +49,9 @@ export class CreateValueChartComponent implements OnInit {
 	isGroupValueChart: boolean;
 
 	// Objectives steps
-	rootObjective: ObjectiveWrapper;
-    selectedWrapper: ObjectiveWrapper; // awful - need to refactor asap
+	objectiveRows: { [objID: string]: ObjectiveRow; };
+	rootObjRowID : string;
+    selectedObjRow: string; // awful - need to refactor asap
     objectivesCount : number;
 
 	// Alternatives step
@@ -91,6 +93,9 @@ export class CreateValueChartComponent implements OnInit {
 		this.objectivesCount = 0;
 		this.rankedObjectives = [];
 		this.isRanked = {};
+		this.objectiveRows = {};
+		this.rootObjRowID = "0";
+		this.selectedObjRow = "0";
 
 		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
@@ -109,7 +114,7 @@ export class CreateValueChartComponent implements OnInit {
 	    	this.valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
 
 	    	// Set root objective
-			this.rootObjective = new ObjectiveWrapper(String(this.objectivesCount),new AbstractObjective("root",""));
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow("","","",0);
 			this.objectivesCount++;
 	  	
 	    	// Temporary: create some Objectives
@@ -152,8 +157,6 @@ export class CreateValueChartComponent implements OnInit {
 	    	// hotel1.setObjectiveValue("location","downtown");
 	    	// hotel1.setObjectiveValue("internet","high");
 	    	// hotel1.setObjectiveValue("pool","no");
-
-	    	this.valueChart.setRootObjectives([this.rootObjective.obj]);
     	}
     	this.valueChart.addUser(this.user);
     	this.valueChartService.setValueChart(this.valueChart); // Needed for ScoreFunction plots
@@ -170,7 +173,7 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			this.initializeUser();
-			this.selectedObjective = this.rootObjective.obj.getName();
+			this.selectedObjective = this.valueChart.getRootObjectives()[0].getName();
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
@@ -324,45 +327,35 @@ export class CreateValueChartComponent implements OnInit {
 	// Objectives step
 
 
-	addSubObjective() {
-		let obj : AbstractObjective = <AbstractObjective>this.selectedWrapper;
-		(<AbstractObjective>this.selectedWrapper).addSubObjective("child + ")
+	addChildObjRow(parentID: string) {
+		let child = new ObjectiveRow("","",parentID,this.objectiveRows[parentID].depth + 1);
+		let childID = String(this.objectivesCount);
+		this.objectiveRows[childID] = child;
+		this.objectivesCount++;
+		this.objectiveRows[parentID].addChild(childID);
 	}
 
-	deleteObjective() {
-
+	deleteObjRow(objID: string) {
+		let parentID = this.objectiveRows[objID].parent;
+		if (parentID !== "") {
+			this.objectiveRows[parentID].removeChild(objID);
+		}
+		for (let child of this.objectiveRows[objID].children) {
+			this.deleteObjRow(child);
+		}
+		delete this.objectiveRows[objID];
 	}
 
-	changeType(obj: ObjectiveWrapper) {
-		if (obj.type === 'abstract') {
-			obj.setObjective(new PrimitiveObjective(obj.name,obj.obj.getDescription()));
-		}
-		else {
-			obj.setObjective(new AbstractObjective(obj.name,obj.obj.getDescription()));
-		}
-	}
-
-	getObjColspan(obj: ObjectiveWrapper) : number {
-		if (obj.obj.objectiveType === 'abstract') {
-			return 4;
-		}
-		else {
-			return 1;
-		}
-	}
-
-	getFlattenedObjectives() : ObjectiveWrapper[] {
-		let flattened: ObjectiveWrapper[] = [];
-		this.flattenObjectives([this.rootObjective],flattened);
+	getFlattenedObjectiveRows() : string[] {
+		let flattened: string[] = [];
+		this.flattenObjectiveRows([this.rootObjRowID],flattened);
 		return flattened;
 	}
 
-	private flattenObjectives(objectives: ObjectiveWrapper[], flattened: ObjectiveWrapper[]) {
-  		for (let obj of objectives) {
-  			flattened.push(obj);
-  			if (obj.obj.objectiveType === 'abstract') {
-  				this.flattenObjectives(obj.children,flattened);
-  			}
+	private flattenObjectiveRows(ObjectiveRowIDs: string[], flattened: string[]) {
+  		for (let objID of ObjectiveRowIDs) {
+  			flattened.push(objID);
+  			this.flattenObjectiveRows(this.objectiveRows[objID].children,flattened);
   		}
   	}
 
@@ -457,24 +450,60 @@ export class CreateValueChartComponent implements OnInit {
   		}
   		return scoreFunctionMap;
   	}
+
+  	getType(obj: ObjectiveRow) {
+		obj.type;
+	}
+
+	setType(obj: ObjectiveRow, type: string) {
+		obj.type = type;
+	}
 }
 
-class ObjectiveWrapper {
-	objID : string;
-	obj: Objective;
+
+
+class ObjectiveRow {
 	name: string;
+	desc: string;
+	parent : string;
+	depth : number;
 	type: string;
-	children: ObjectiveWrapper[];
+	dom: DomainDetails;
+	children: string[];
 
-	constructor(objID: string, obj: Objective, children?: ObjectiveWrapper[]) {
-		this.objID = objID;
-		this.children = children;
-		this.setObjective(obj);
+	constructor(name: string, desc: string, parent: string, depth: number) {
+		this.name = name;
+		this.desc = desc;
+		this.parent = parent;
+		this.depth = depth;
+		this.type = 'abstract';
+		this.dom = new DomainDetails('categorical');
+		this.children = [];
 	}
 
-	setObjective(obj: Objective) {
-		this.obj = obj;
-		this.name = obj.getName();
-		this.type = obj.objectiveType;
+	addChild(child: string) {
+		this.children.push(child);
 	}
+
+	removeChild(child: string) {
+		let i = this.children.indexOf(child);
+        return i>-1 ? this.children.splice(i, 1) : [];
+	}
+}
+
+// Store details for all possible domain types
+// Making this a single class so that I don't have to make a new object every time the type is changed
+class DomainDetails {
+	type: string;
+	categories: string[];
+	min: number;
+	max: number;
+	interval: number;
+	unit: string;
+
+	constructor(type: string) {
+		this.type = type;
+		this.categories = [];
+	}
+
 }
