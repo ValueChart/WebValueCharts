@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 16:24:44
+* @Last Modified time: 2016-08-10 15:30:24
 */
 
 import { Component }									from '@angular/core';
@@ -44,7 +44,7 @@ export class CreateComponent {
 			.subscribe(
 				(valueChart: ValueChart) => { 
 					this.currentUserService.setValueChart(valueChart);
-					this.currentUserService.setHost(false);
+					this.currentUserService.setJoiningChart(true);
 					(<any> $('#close-chart-credentials-modal')).click();
 					this.router.navigate(['createValueChart', 'newUser']);
 				},
@@ -57,7 +57,7 @@ export class CreateComponent {
 
 	selectDemoValueChart(demoChart: any): void {
 		this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
-		this.currentUserService.setHost(true);
+		this.currentUserService.setJoiningChart(false);
 		var parameters = this.currentUserService.getValueChart().getName();
 		this.router.navigate(['/view/', parameters]);
 	}
@@ -74,7 +74,7 @@ export class CreateComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
 				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				this.currentUserService.setHost(true);
+				this.currentUserService.setJoiningChart(false);
 
 				if (route[1] === undefined) {
 					route[1] = this.currentUserService.getValueChart().getName();

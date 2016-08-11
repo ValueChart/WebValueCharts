@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 11:02:14
+* @Last Modified time: 2016-08-10 17:07:23
 */
 
 import { Component }										from '@angular/core';
@@ -31,8 +31,8 @@ export class RegisterComponent {
 	private invalidMessage: string;
 
 	constructor(
-		private router: Router, 
-		private currentUserService: CurrentUserService, 
+		private router: Router,
+		private currentUserService: CurrentUserService,
 		private userHttpService: UserHttpService) {
 		this.state = 'login';
 	}
@@ -40,28 +40,28 @@ export class RegisterComponent {
 	createNewUser(username: string, password: string, email: string): void {
 		this.userHttpService.createNewUser(username, password, email)
 			.subscribe(
-				(user) => { 
-					this.currentUserService.setLoggedIn(true);
-					this.setUsername(username);
-				},
-				(error) => { 
-					this.invalidMessage = 'That username is not available';
-					this.invalidCredentials = true;
-				} 
+			(user) => {
+				this.currentUserService.setLoggedIn(true);
+				this.setUsername(username);
+			},
+			(error) => {
+				this.invalidMessage = 'That username is not available';
+				this.invalidCredentials = true;
+			}
 			);
 	}
 
 	login(username: string, password: string): void {
 		this.userHttpService.login(username, password)
 			.subscribe(
-				(user) => {
-					this.currentUserService.setLoggedIn(true);
-					this.setUsername(username);
-				},
-				(error) => { 
-					this.invalidMessage = 'That username is not available';
-					this.invalidCredentials = true;
-				}
+			(user) => {
+				this.currentUserService.setLoggedIn(true);
+				this.setUsername(username);
+			},
+			(error) => {
+				this.invalidMessage = 'That username is not available';
+				this.invalidCredentials = true;
+			}
 			);
 	}
 
@@ -77,15 +77,31 @@ export class RegisterComponent {
 	}
 
 	continueAsTempUser(username: string): void {
-		(<any> $('#close-temporary-user-modal')).click();
+		(<any>$('#close-temporary-user-modal')).click();
 		this.currentUserService.setLoggedIn(false);
 		this.setUsername(username);
 	}
 
+	getRedirectRoute(): string[] {
+
+		// If the user is joining a chart, then navigate to createValueChart
+		if (this.currentUserService.isJoiningChart()) {
+			return ['createValueChart', 'newUser'];
+		} else {	// Else, navigate to the create page as normal
+			return ['create'];
+		}
+	}
+
 
 	setUsername(username: string): void {
+		let navigationExtras = {
+			preserveQueryParams: true,
+			preserveFragment: true
+		};
+
 		this.currentUserService.setUsername(username);
-		this.router.navigate(['create']);
+
+		this.router.navigate(this.getRedirectRoute(), navigationExtras);
 	}
 
 

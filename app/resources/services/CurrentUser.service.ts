@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 10:52:11
+* @Last Modified time: 2016-08-10 15:29:11
 */
 
 import { Injectable } 												from '@angular/core';
@@ -19,7 +19,7 @@ export class CurrentUserService {
 
 	private username: string; 				// The username of the current user.
 	private loggedIn: boolean;
-	private host: boolean;
+	private joiningChart: boolean;
 	private valueChart: ValueChart;
 	
 	constructor() { }
@@ -40,16 +40,16 @@ export class CurrentUserService {
 		this.valueChart = valueChart;
 	}
 
-	setHost(host: boolean): void {
-		this.host = host;
+	setJoiningChart(joiningChart: boolean): void {
+		this.joiningChart = joiningChart;
 	}
 
 	setLoggedIn(loggedIn: boolean): void {
 		this.loggedIn = loggedIn;
 	}
 
-	isHost(): boolean {
-		return this.host;
+	isJoiningChart(): boolean {
+		return this.joiningChart;
 	}
 
 	isLoggedIn(): boolean {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 17:19:23
+* @Last Modified time: 2016-08-10 17:17:28
 */
 
 import { Component }															from '@angular/core';
@@ -96,10 +96,14 @@ export class ValueChartViewerComponent implements OnInit {
 	private valueChartWidth: number;
 	private valueChartHeight: number;
 
+	// Attach the window variable to the component so that it is available in the template.
+	private window = window;
+
 	sub: any;
 
 	valueChart: ValueChart;
 	alternatives: Alternative[];
+
 
 	// ValueChart Display Configuration Options:
 	orientation: string;

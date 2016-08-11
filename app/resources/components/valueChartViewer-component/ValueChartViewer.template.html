@@ -12,14 +12,14 @@
 				Edit Preference Model
 				</button>
 			</div>
-			<div *ngIf="!currentUserService.isHost()">
+			<div *ngIf="currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" >
 					<button class="btn btn-success" (click)="submitPreferences()">
 					Submit Preferences
 					</button>
 				</div>
 			</div>
-			<div *ngIf="currentUserService.isHost()">
+			<div *ngIf="!currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!hostService.hostWebSocket">
 					<button class="btn btn-success" data-toggle="modal" data-target="#host-chart-modal">
 					Host ValueChart
@@ -309,16 +309,20 @@
 				</div>
 				<div class="modal-body">
 					<div class="row">
-						<label for="chart-name-input" class="col-sm-3 col-sm-offset-2 control-label">Set ValueChart Name</label>
+						<label for="chart-name-input" class="col-sm-4 col-sm-offset-1 control-label">Set ValueChart Name</label>
 						<div class="col-sm-6">
 							<input type="text" class="form-control" disabled="true" id="chart-name-input" placeholder="Name" [ngModel]="valueChart.getName()" name="name">
 						</div>
 					</div>
 					<div class="row">
-						<label for="chart-passsword-input" class="col-sm-3 col-sm-offset-2 control-label">Set ValueChart Password</label>
+						<label for="chart-passsword-input" class="col-sm-4 col-sm-offset-1 control-label">Set ValueChart Password</label>
 						<div class="col-sm-6">
 							<input type="text" class="form-control" id="chart-passsword-input" placeholder="Password" [(ngModel)]="valueChart.password" name="password">
 						</div>
+					</div>
+					<div class="row">
+						<label for="chart-passsword-input" class="col-sm-3 col-sm-offset-1 control-label">Invitation Link:</label>
+						<h5 class="col-sm-offset-4">{{ window.location.origin + '/join/ValueCharts/' + valueChart.getName() + '?password=' + valueChart.password }}</h5> 
 					</div>
 					<div class="row">
 						<div class="col-sm-offset-5 col-sm-7">

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 17:11:48
+* @Last Modified time: 2016-08-10 17:23:08
 */
 
 import { provideRouter, RouterConfig } 								from '@angular/router';
@@ -16,13 +16,15 @@ import { CreateValueChartComponent }								from './resources/components/createV
 import { ValueChartViewerComponent }								from './resources/components/valueChartViewer-component/ValueChartViewer.component';
 import { ScoreFunctionViewerComponent }								from './resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.component';
 
+import { GroupVcHttpService }										from './resources/services/GroupVcHttp.service';
 import { CurrentUserService }										from './resources/services/CurrentUser.service';
 import { AuthGuardService }											from './resources/services/AuthGuard.service';
-
+import { JoinGuardService }											from './resources/services/JoinGuard.service';
 
 
 export const routes: RouterConfig = [
 	{ path: 'register', component: RegisterComponent },
+	{ path: 'join/ValueCharts/:ValueChart', component: RegisterComponent, canActivate: [JoinGuardService] },
 	{ path: 'create', component: CreateComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
@@ -35,5 +37,5 @@ export const routes: RouterConfig = [
 
 export const APP_ROUTER_PROVIDERS = [
 	provideRouter(routes),
-	[AuthGuardService, CurrentUserService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, GroupVcHttpService]
 ];

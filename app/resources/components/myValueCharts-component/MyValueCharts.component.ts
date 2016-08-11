@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 15:58:58
+* @Last Modified time: 2016-08-10 15:31:08
 */
 
 import { Component }									from '@angular/core';
@@ -51,7 +51,7 @@ export class MyValueChartsComponent implements OnInit {
 		this.groupVcHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.currentUserService.setValueChart(valueChart);
-				this.currentUserService.setHost(true);
+				this.currentUserService.setJoiningChart(false);
 				this.router.navigate(['/view/', valueChart.getName()]);
 			});
 	}
