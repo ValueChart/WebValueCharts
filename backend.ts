@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 20:27:30
+* @Last Modified time: 2016-08-11 10:55:28
 */
 
 // Import Libraries and Middlware:
@@ -81,10 +81,8 @@ backend.use('/Users', usersRoutes);
 (<any>backend).ws('/host/:chart', function(ws: any, req: express.Request) {
 
 	var chartId: string = req.params.chart;
-	console.log('The connection is being opened');
 
 	// Initialize Connection:
-	console.log('initiating connection');
 	initEventListeners(chartId, ws);
 	hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', userChangesAccepted: true });
 	// Send message confirming successful connection:
@@ -92,7 +90,6 @@ backend.use('/Users', usersRoutes);
 
 	// This fires whenever the socket receives a message.
 	ws.on('message', (msg: string) => {
-		console.log('message recieved: ', msg);
 		var hostMessage: HostMessage = JSON.parse(msg);
 
 		switch (hostMessage.type) {
@@ -120,7 +117,6 @@ var initEventListeners = (chartId: string, ws: any): void => {
 	// Initialize event listeners:
 	hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, (user: any) => {
 		ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
-		console.log('User added');
 	});
 
 	hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, (username: string) => {
@@ -129,7 +125,6 @@ var initEventListeners = (chartId: string, ws: any): void => {
 
 	hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, (user: any) => {
 		ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
-		console.log('User changed');
 	});
 }
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 17:04:27
+* @Last Modified time: 2016-08-11 10:56:57
 */
 
 import { Injectable }     														from '@angular/core';
@@ -28,12 +28,10 @@ export class JoinGuardService implements CanActivate {
 		var name: string = route.params['ValueChart'];
 		// Retrieve the ValueChart password from the URL query parameters.
 		var password: string = state.queryParams['password'];
-		console.log(route, state);
 
 		this.groupVcHttpService.getValueChartStructure(name, password)
 			.subscribe( 
 				valueChart => {
-					console.log('we got here');
 					this.currentUserService.setJoiningChart(true);
 					this.currentUserService.setValueChart(valueChart);
 				},

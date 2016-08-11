@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 19:54:00
+* @Last Modified time: 2016-08-11 10:56:27
 */
 
 import { Component }															from '@angular/core';
@@ -275,12 +275,12 @@ export class ValueChartViewerComponent implements OnInit {
 					},
 					// Handle Server Errors
 					(error) => { 
-						console.log(error);
+
 					});
 		} else {
 			this.hostService.hostGroupValueChart(this.valueChart._id);
 		}
-		console.log(this.hostService);
+
 	}
 
 	// ValueChart Member:
@@ -294,12 +294,12 @@ export class ValueChartViewerComponent implements OnInit {
 			.subscribe(
 				// User Successfully Added!
 				(user: User) => { 
-					console.log(user);
+
 				},
 				// Handle Server Errors
 				(error) => { 
-					console.log(error);
 					// Add something to handle when the host has disabled user changes
+					
 				});
 	}
 

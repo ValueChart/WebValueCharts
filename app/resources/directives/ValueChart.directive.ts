@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 21:06:05
+* @Last Modified time: 2016-08-11 11:00:06
 */
 
 
@@ -121,7 +121,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.calculateDefaultComponentSize();
 
 		this.renderConfigService.viewOrientation = this.viewOrientation;
-		this.renderConfigService.initObjectiveColors();
+		this.renderConfigService.initUserColors();
 
 		// Initialize Change Detection:
 		this.initChangeDetection();
@@ -200,7 +200,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.initChangeDetection();
 			// Configure the Render Service:
 			this.renderConfigService.viewOrientation = this.viewOrientation;
-			this.renderConfigService.initObjectiveColors();
+			this.renderConfigService.initUserColors();
 
 
 			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
@@ -209,9 +209,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.updateRowOrder()
 		}
 
+		// Check for added or deleted users
 		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
 			// A user has been added to the ValueChart.
 			this.changeDetectionService.initDiffers(this.valueChart);
+			this.renderConfigService.initUserColors();
 			// Update data
 			this.valueChartViewerService.generateRowData();
 			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);

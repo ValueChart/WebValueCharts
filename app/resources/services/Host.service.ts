@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 20:30:01
+* @Last Modified time: 2016-08-11 10:56:47
 */
 
 import { Injectable } 												from '@angular/core';
@@ -67,7 +67,6 @@ export class HostService {
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				valueChart.addUser(newUser);
-				console.log('A user was added: ',newUser);
 				
 				break;
 
@@ -78,7 +77,6 @@ export class HostService {
 				});
 				// Delete the old version of the user and replace it with the new one.
 				valueChart.getUsers().splice(userIndex, 1, updatedUser);
-				console.log('A user was changed: ', updatedUser);
 				break;
 
 			case MessageType.UserRemoved:
