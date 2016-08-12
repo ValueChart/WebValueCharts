@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-11 11:01:44
+* @Last Modified time: 2016-08-12 10:44:08
 */
 
 import { Injectable } 												from '@angular/core';
@@ -72,11 +72,14 @@ export class RenderConfigService {
 	}
 
 	initUserColors(): void {
-		// Assign a color to each user in the ValueChart
-		var numKellyColorsUsed: number = 0;
+		if (this.valueChartService.isIndividual())
+			return;
+
+		// Assign a color to each user without one in the ValueChart
 		this.valueChartService.getUsers().forEach((user: User, index: number) => {
-			user.color = this.kellyColors[numKellyColorsUsed];
-			numKellyColorsUsed++;
+			if (!user.color) {
+				user.color = this.kellyColors[index];
+			}
 		});
 	}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 20:34:20
+* @Last Modified time: 2016-08-12 11:37:23
 */
 
 // Import Libraries and Express Middleware:
@@ -115,11 +115,10 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 			}
 
 
-			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+			groupVcCollection.update({ _id: chartId }, (doc), [], function(err: Error, savedDoc: any) {
 				if (err) {
 					res.status(400)
 						.json({ data: err });
-
 				} else {
 					if (userExists) {
 						// Notify any clients hosting this ValueChart that a user has been changed.

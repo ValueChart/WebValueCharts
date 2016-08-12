@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-11 11:00:06
+* @Last Modified time: 2016-08-12 10:42:35
 */
 
 
@@ -173,8 +173,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 	// This function is called by Angular whenever it detects that a change to this directive's inputs MAY have occurred. The method body is our implementation of change
-	// detection. We are implementing our own change detection Since Angular's change detection (ngOnChanges) is by reference. Note that when a a class implements 
-	// DoCheck, ngOnChanges is never called, even if the class also implements OnChanges. This means that changes must both be detected, and handled in ngDoCheck.
+	// detection. We are implementing our own change detection since Angular's change detection (ngOnChanges) is by reference. Note that when a a class implements 
+	// DoCheck, ngOnChanges is never called, even if the class also implements OnChanges. This means that changes must be both detected, and handled in ngDoCheck.
 	ngDoCheck() {
 		// DO NOT proceed with change detection if the directive has not yet been initialized.
 		if (this.isInitialized === undefined)
@@ -187,7 +187,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	// Methods for Detecting Changes:
-
 	detectValueChartChanges(): void {
 		// Check for changes to the ValueChart fields. This is NOT deep.
 		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
@@ -230,6 +229,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.valueChartService.getUsers().forEach((user: User, i: number) => {
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
+				this.renderConfigService.initUserColors(); 
 				this.updateValueChartDisplay();
 			}
 
