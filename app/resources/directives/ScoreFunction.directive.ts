@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 17:09:50
+* @Last Modified time: 2016-08-12 14:52:02
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -118,6 +118,11 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			if (scoreFunctionChange) {
 				this.scoreFunctionRenderer.renderScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 				this.previousScoreFunction = currentScoreFunction.getMemento();
+				
+				// If this is a sub window, update the parent window in response to the changes.
+				if (window.opener) {
+					(<any> window.opener).angularAppRef.tick();
+				}
 			}
 		}
 	}
