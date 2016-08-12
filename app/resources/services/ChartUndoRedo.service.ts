@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 14:42:34
+* @Last Modified time: 2016-08-12 14:11:41
 */
 
 
@@ -71,6 +71,11 @@ export class ChartUndoRedoService {
 	clearUndo(): void {
 		this.undoChangeTypes = [];
 		this.undoStateRecords = [];
+	}
+
+	resetUndoRedo() {
+		this.clearUndo();
+		this.clearRedo();
 	}
 
 	deleteNewestRecord(): void {

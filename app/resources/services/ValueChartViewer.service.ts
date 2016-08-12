@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 21:04:48
+* @Last Modified time: 2016-08-12 14:27:52
 */
 
 import { Injectable } 										from '@angular/core';
@@ -50,8 +50,6 @@ export class ValueChartViewerService {
 			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);	
 		}
 
-
-
 	initialize() {
 		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.getAlternatives());
 		this.generateLabelData();
@@ -59,8 +57,6 @@ export class ValueChartViewerService {
 	}
 
 	updateAllValueChartData(viewOrientation: string): void {
-		this.generateRowData();
-
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
 		

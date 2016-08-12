@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 10:42:35
+* @Last Modified time: 2016-08-12 14:34:44
 */
 
 
@@ -110,25 +110,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
 	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
 	ngOnInit() {
-
-		// Configure the ValueChartViewerService.
-		this.valueChartService.setValueChart(this.valueChart);
-		this.valueChartViewerService.initialize();
-		// Retrieve the formatted data from ValueChartViewerService.
-		this.valueChartViewerService.updateWeightOffsets();
-		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
-
+		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
 
-		this.renderConfigService.viewOrientation = this.viewOrientation;
-		this.renderConfigService.initUserColors();
+		// Configure the ValueChart for the data:
+		this.configureChartData();
 
 		// Initialize Change Detection:
 		this.initChangeDetection();
 
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
-
 		// ValueChart Setup is complete:
 		this.isInitialized = true;	
 	}
@@ -136,6 +128,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	calculateDefaultComponentSize() {
 		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
 		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
+	}
+
+	configureChartData() {
+		// Configure the ValueChartViewerService.
+		this.valueChartService.setValueChart(this.valueChart);
+		this.valueChartViewerService.initialize();
+		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
+		// Configure the render service.
+		this.renderConfigService.viewOrientation = this.viewOrientation;
+		this.renderConfigService.initUserColors();
 	}
 
 	createValueChart(): void {
@@ -147,8 +149,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 		// Render the ValueChart:
-		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.createLabels();
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
@@ -159,9 +160,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
+	createLabels() {
+		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+	}
+
 	initChangeDetection(): void {
+		// Data Models:
 		this.changeDetectionService.initDiffers(this.valueChart);
-		// View Configuration
+		
+		// View Configuration:
 		this.previousOrientation = this.viewOrientation;
 		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfiguration);
 		this.changeDetectionService.previousWidth = this.chartWidth;
@@ -180,68 +188,46 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		this.detectValueChartChanges();
+		// Check For Changes to the Data Model
+		this.detectDataModelChanges();
 		this.detectDataOrderChanges();
+
 		this.detectViewConfigChanges();
 		this.detectInteractionConfigChanges();
 	}
 
 	// Methods for Detecting Changes:
-	detectValueChartChanges(): void {
-		// Check for changes to the ValueChart fields. This is NOT deep.
+	detectDataModelChanges(): void {
+		// Check for changes to the ValueChart. This is by reference.
 		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
-			this.chartUndoRedoService.clearRedo();
-			this.chartUndoRedoService.clearUndo();			
-
-			this.valueChartService.setValueChart(this.valueChart);
-			this.valueChartViewerService.initialize();
-			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
-			this.initChangeDetection();
-			// Configure the Render Service:
-			this.renderConfigService.viewOrientation = this.viewOrientation;
-			this.renderConfigService.initUserColors();
-
-
-			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
-			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
-
-			this.updateRowOrder()
+			this.updateValueChart();
 		}
 
 		// Check for added or deleted users
 		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
-			// A user has been added to the ValueChart.
-			this.changeDetectionService.initDiffers(this.valueChart);
-			this.renderConfigService.initUserColors();
-			// Update data
-			this.valueChartViewerService.generateRowData();
-			this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
-
-			// Add new columns for the new user.
-			this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
-			this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
-
-			// Re-render everything.
-			this.updateValueChartDisplay()
+			this.updateUsers();
 		}
 
 		// Check the User Models for Changes:
 		this.valueChartService.getUsers().forEach((user: User, i: number) => {
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
-				this.renderConfigService.initUserColors(); 
+				this.renderConfigService.initUserColors();
+				this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 				this.updateValueChartDisplay();
 			}
 
 			let internalWeightMap = user.getWeightMap().getInternalWeightMap();
 			let weightMapChanges = this.changeDetectionService.weightMapDiffers[i].diff(internalWeightMap);
 			if (weightMapChanges) {
+				this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 				this.updateValueChartDisplay();
 			}
 
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			let scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffers[i].diff(scoreFunctionMap);
 			if (scoreFunctionMapChanges) {
+				this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 				this.updateValueChartDisplay();
 			}
 
@@ -250,6 +236,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				var functionIndex: number = j + (i * scoreFunctions.length)
 				var scoreFunctionChanges = this.changeDetectionService.scoreFunctionDiffers[functionIndex].diff(scoreFunction.getElementScoreMap());
 				if (scoreFunctionChanges) {
+					this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
 					this.updateValueChartDisplay();
 				}
 			});
@@ -259,20 +246,22 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.changeDetectionService.colorsHaveChanged) {
 			// Objective colors have been changed
 			this.changeDetectionService.colorsHaveChanged = false;
-			this.updateRowOrder();
+			this.updateObjectiveOrder();
+			this.updateValueChartDisplay();
 		}
 	}
 
 	detectDataOrderChanges(): void {
 		if (this.changeDetectionService.alternativeOrderChanged) {
 				this.changeDetectionService.alternativeOrderChanged = false;
-
 				this.updateAlternativeOrder();
+				this.updateValueChartDisplay();
 		} 
 		if (this.changeDetectionService.rowOrderChanged) {
 			this.changeDetectionService.rowOrderChanged = false;
 			this.changeDetectionService.alternativeOrderChanged = false;
-			this.updateRowOrder();
+			this.updateObjectiveOrder();
+			this.updateValueChartDisplay();
 		}
 	}
 
@@ -354,19 +343,34 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Methods for Handling Changes:
 
-	updateValueChartDisplay(): void {
-		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
-		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+	// This method updates the entire ValueChart.
+	updateValueChart(): void {
+		this.chartUndoRedoService.resetUndoRedo();	
+		this.configureChartData();
+		this.updateUserPreferenceColumns();
+		this.updateObjectiveOrder();
+		this.updateValueChartDisplay();
 	}
 
-	updateRowOrder(): void {
+	updateUsers(): void {
+		this.changeDetectionService.initDiffers(this.valueChart);
+		this.renderConfigService.initUserColors();
+		this.valueChartViewerService.generateRowData();
+		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
+		this.updateUserPreferenceColumns();
+		this.updateValueChartDisplay()
+	}
+
+	updateUserPreferenceColumns(): void {
+		this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
+		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
+	}
+
+	updateObjectiveOrder(): void {
 		// Destroy the previous label area.
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
-		this.labelRenderer.createLabelSpace(d3.select('.ValueChart'), this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.renderConfigService.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.createLabels();
 		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
@@ -376,9 +380,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	updateAlternativeOrder(): void {
 		this.valueChartViewerService.updateWeightOffsets();
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
-		
-		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
-		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
 	updateViewOrientation(): void {
@@ -391,6 +392,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	updateScoreFunctionDisplay(): void {
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+	}
+
+	updateValueChartDisplay(): void {
+		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
+		this.summaryChartRenderer.updateSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
 
