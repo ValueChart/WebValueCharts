@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 14:34:44
+* @Last Modified time: 2016-08-12 15:09:10
 */
 
 
@@ -371,9 +371,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
 		this.createLabels();
-		// Turn on objective sorting again. This was turned off because the label area was reconstructed.
+		
+		// Turn on any interactions that were removed when the labels were reconstructed. 
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
+		this.setColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
+
 		this.updateAlternativeOrder()
 	}
 
