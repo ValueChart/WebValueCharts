@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-11 10:56:27
+* @Last Modified time: 2016-08-12 12:36:45
 */
 
 import { Component }															from '@angular/core';
@@ -13,6 +13,8 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router
 import * as $																	from 'jquery';
 // d3
 import * as d3 																	from 'd3';
+// toastr
+import * as toastr 																from 'toastr';
 
 // Application classes
 import { CreateComponent }														from '../create-component/Create.component';
@@ -292,14 +294,14 @@ export class ValueChartViewerComponent implements OnInit {
 		// that has been retrieved from the server.
 		this.groupVcHttpService.updateUser(this.valueChart._id, currentUser)
 			.subscribe(
-				// User Successfully Added!
+				// User added/updated!
 				(user: User) => { 
-
+					toastr.success('Preferences successfully submitted');
 				},
 				// Handle Server Errors
 				(error) => { 
 					// Add something to handle when the host has disabled user changes
-					
+					toastr.warning('Preference submission failed. The Host has disabled new submissions');
 				});
 	}
 

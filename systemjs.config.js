@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 13:29:18
+* @Last Modified time: 2016-08-12 12:23:46
 */
 
 // =========================================================================================================================================
@@ -22,7 +22,8 @@
 		'@angular':                   'node_modules/@angular',
 		'd3': 						  'app/vendors/d3',
 		'jquery': 					  'app/vendors/jquery/dist',
-		'supertest': 				  'node_modules/supertest'
+		'supertest': 				  'node_modules/supertest',
+		'toastr':					  'app/vendors/toastr'
 	};
 
 	// Defines default extensions and files.
@@ -31,7 +32,8 @@
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
 		'd3':						  { main:'d3.js', defaultExtension: 'js' },
-		'jquery':					  { main:'jquery.js', defaultExtension: 'js'}
+		'jquery':					  { main:'jquery.js', defaultExtension: 'js'},
+		'toastr': 					  { main: 'toastr.js', defaultExtension: 'js' }
 	};
 
 

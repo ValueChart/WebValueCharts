@@ -2,10 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-11 10:56:47
+* @Last Modified time: 2016-08-12 12:27:29
 */
 
 import { Injectable } 												from '@angular/core';
+import * as toastr 													from 'toastr';
 
 // Application Classes:
 import { ValueChartService }										from './ValueChart.service';
@@ -49,6 +50,7 @@ export class HostService {
 	endCurrentHosting(): void {
 		this.hostWebSocket.close(1000);
 		this.hostWebSocket = null;
+		toastr.warning('ValueChart is no longer hosted');
 	}
 
 
@@ -57,17 +59,16 @@ export class HostService {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		switch (hostMessage.type) {
 			case MessageType.ConnectionInit:
-				// Handle any responses to initialization here.
+				toastr.success('ValueChart successfully hosted');
 				break;
 			
 			case MessageType.ChangePermissions:
-				
 				break;
 
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				valueChart.addUser(newUser);
-				
+				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
 
 			case MessageType.UserChanged:
@@ -77,6 +78,7 @@ export class HostService {
 				});
 				// Delete the old version of the user and replace it with the new one.
 				valueChart.getUsers().splice(userIndex, 1, updatedUser);
+				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 				break;
 
 			case MessageType.UserRemoved:
@@ -87,7 +89,7 @@ export class HostService {
 				});
 				// Delete the user from the ValueChart
 				valueChart.getUsers().splice(userIndex, 1);
-
+				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:
 				
