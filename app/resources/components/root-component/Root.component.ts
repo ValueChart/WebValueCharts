@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 15:20:55
+* @Last Modified time: 2016-08-12 17:16:41
 */
 
 import { Component } 												from '@angular/core';
@@ -64,6 +64,18 @@ export class RootComponent implements OnInit {
 				this.router.navigate(['/register']);
 			});
 
+	}
+
+	viewAverageChart(): void {
+		if (this.isGroupChart()) {
+			this.chartType = 'average';
+			this.router.navigate(['/view', this.currentUserService.getValueChart().getName() + '-average']);
+		}
+	}
+
+	viewGroupChart(): void {
+		this.chartType = 'normal';
+		this.router.navigate(['/view', this.currentUserService.getValueChart().getName()]); 
 	}
 
 	switchScoreFunctionView() {
