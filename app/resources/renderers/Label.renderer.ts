@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 22:04:31
+* @Last Modified time: 2016-08-12 17:06:45
 */
 
 import { Injectable } 												from '@angular/core';
@@ -115,10 +115,18 @@ export class LabelRenderer {
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-outline' });
 
 		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
-		newLabelContainers.append('text')
-			.classed('' + this.defs.SUBCONTAINER_TEXT, true)
+		var labelText = newLabelContainers.append('text')
+			.classed(this.defs.SUBCONTAINER_TEXT, true)
 			.classed('valuechart-label-text', true)
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-text' });
+
+		labelText.append('tspan')
+			.classed(this.defs.SUBCONTAINER_NAME, true)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-name' });
+
+		labelText.append('tspan')
+			.classed(this.defs.SUBCONTAINER_BEST_WORST, true)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-best-worst' });
 
 		newLabelContainers.append('line')
 			.classed(this.defs.SUBCONTAINER_DIVIDER, true)
@@ -265,8 +273,25 @@ export class LabelRenderer {
 					this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 2) + textOffset
 					:
 					this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 5) + textOffset;
+			});
+
+		labelTexts.select('.' + this.defs.SUBCONTAINER_NAME)
+			.text((d: LabelData) => { 
+				// Round the weight number to have 2 decimal places only.
+				return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
+			});	
+
+		labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+			.attr('x', (d: LabelData, i: number) => { return (viewOrientation === 'vertical') ? 10 : this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 5) + textOffset })
+			.attr('dy', '1.2em')
+			.text((d: LabelData) => {
+				var bestWorstText = '';
+				if (d.objective.objectiveType === 'primitive') {
+					var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
+				}
+				return bestWorstText;
 			})
-			.text((d: LabelData) => { return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)' });	// Round the weight number to have 2 decimal places only.
 
 	}
 

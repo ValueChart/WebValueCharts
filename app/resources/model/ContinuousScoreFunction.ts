@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 10:11:49
+* @Last Modified time: 2016-08-12 17:04:37
 */
 
 import { Memento }				from './Memento';
@@ -38,6 +38,8 @@ export class ContinuousScoreFunction extends ScoreFunction {
 			this.maxDomainValue = domainElement;
 		if (domainElement < this.minDomainValue || this.minDomainValue === undefined)
 			this.minDomainValue = domainElement;
+
+		this.updateBestAndWorstElements(domainElement, score);
 	}
 
 	getScore(domainElement: number): number {

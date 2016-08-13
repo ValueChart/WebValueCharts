@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-22 10:12:34
+* @Last Modified time: 2016-08-12 17:04:34
 */
 
 import { Memento }				from './Memento';
@@ -26,6 +26,8 @@ export class DiscreteScoreFunction extends ScoreFunction {
 
 	setElementScore(domainElement: string, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
+
+		this.updateBestAndWorstElements(domainElement, score);
 	}
 
 
