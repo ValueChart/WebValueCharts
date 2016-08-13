@@ -2,47 +2,47 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 15:09:10
+* @Last Modified time: 2016-08-13 15:25:52
 */
 
-
+// Import Angular Resources:
 import { Directive, Input } 													from '@angular/core';
 import { OnInit, DoCheck, SimpleChange }										from '@angular/core';
 import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 																	from 'd3';
 
-// Application classes
+// Import Application classes:
+	// Services:
 import { ValueChartService}														from '../services/ValueChart.service';
 import { ValueChartViewerService}												from '../services/ValueChartViewer.service';
 import { RenderConfigService }													from '../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
-
-
+	// Renderers:
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
-
+	// Interactions:
 import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetColorsInteraction }													from '../interactions/SetColors.interaction';
 import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
-
+	// Definitions:
 import { LabelDefinitions }														from '../services/LabelDefinitions.service';
 
-
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 															from '../model/ValueChart';
 import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 import { WeightMap }															from '../model/WeightMap';
 import { User }																	from '../model/User';
 import { ScoreFunction }														from '../model/ScoreFunction';
 
-import {RowData, CellData, LabelData}											from '../types/ValueChartViewer.types';
-
+// Import Types:
+import { RowData, CellData, LabelData }											from '../types/ValueChartViewer.types';
+import { InteractionConfig }													from '../types/Config.types';
 
 @Directive({
 	selector: 'ValueChart',
@@ -63,25 +63,37 @@ import {RowData, CellData, LabelData}											from '../types/ValueChartViewer.
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
-	private isInitialized: boolean;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	private valueChart: ValueChart;
+	// Chart Inputs:
+	private valueChart: ValueChart;								// The main data input to the directive.
+	private viewOrientation: string;							// View orientation. Either 'horizontal' or 'vertical'
+	private chartWidth: number;									// The width of the ValueChart.
+	private chartHeight: number;								// The Height of the ValueChart.
+	private interactionConfig: InteractionConfig = <any> {};	// Configuration options for user interactions.
 
-	private previousOrientation: string;
-	private viewOrientation: string;	// View orientation. Either 'horizontal' or 'vertical'
+	// d3 Selections:
+	private el: d3.Selection<any>; 								// The SVG base element for the ValueChart.
 
-	private chartWidth: number;
-	private chartHeight: number;
-
-	// Interaction Toggles
-	private interactionConfig: any = {};
-
-	// Fields for d3 collections that should be saved for later manipulation
-	private el: d3.Selection<any>; // The SVG base element for the ValueChart rendering.
-
+	// Default Size of ValueChart components. These components are the: labels, objective chart, summary chart. 
 	private defaultChartComponentWidth: number;
 	private defaultChartComponentHeight: number;
 
+	// Misc. Fields
+	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
+	
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						Any initialization that needs to be done should be placed in the ngOnInit method.
+						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
+	*/
 	constructor(
 		// Angular Resources:
 		private template: TemplateRef<any>,
@@ -103,17 +115,25 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private sortAlternativesInteraction: SortAlternativesInteraction,
 		private setColorsInteraction: SetColorsInteraction,
 		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction,
+		// Definitions:
+		private labelDefinitions: LabelDefinitions) { }
 
-		private labelDefinitions: LabelDefinitions) { 
-	}
-	// Initialization code for the ValueChart goes in this function. ngOnInit is called by Angular AFTER the first ngDoCheck()
-	// and after the input variables are initialized. This means that this.valueChart and this.viewOrientation are defined.
-	// ngOnInit is only called ONCE. This function should thus be used for one-time initialized only.
+
+	// ========================================================================================
+	//								Initialization Methods
+	// ========================================================================================
+
+	/* 	
+		@returns {void}
+		@description 	Initializes the ValueChartDirective. ngOnInit is called by Angular AFTER the first change detection cycle (i.e. ngDoCheck is called once)
+						and after the input variables are initialized. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
+						Calling ngOnInit should be left to Angular. Do not call it manually.
+	*/
 	ngOnInit() {
 		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
 
-		// Configure the ValueChart for the data:
+		// Configure the directive for the input data:
 		this.configureChartData();
 
 		// Initialize Change Detection:
@@ -121,95 +141,136 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
-		// ValueChart Setup is complete:
+
+		// Set initialization to be complete.
 		this.isInitialized = true;	
 	}
 
+	/*
+		@returns {void}
+		@description	Calculates the default size of ValueChart components (labels, summary chart, objective chart) depending on the input width 
+						and height of the ValueChart.
+	*/
 	calculateDefaultComponentSize() {
 		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
 		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
 	}
 
+	/*
+		@returns {void}
+		@description	Configures ValueChartViewerService and RenderConfigService using the directive's input data. This must be done before
+						constructing and/or rendering a ValueChart for the first time as these services are what provide data to the renderer classes.
+	*/
 	configureChartData() {
-		// Configure the ValueChartViewerService.
-		this.valueChartService.setValueChart(this.valueChart);
+		// Configure ValueChartViewerService.
+		this.valueChartService.setValueChart(this.valueChart);	// TODO: Is this call necessary? Investigate.
 		this.valueChartViewerService.initialize();
 		this.valueChartViewerService.updateAllValueChartData(this.viewOrientation);
-		// Configure the render service.
+		
+		// Configure RenderConfigService.
 		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.renderConfigService.initUserColors();
 	}
 
+	/*
+		@returns {void}
+		@description	Creates the ValueChart for the first time. It creates the SVG element that will contain the ValueChart, and then uses 
+						the renderer classes to create and render each component of the ValueChart.
+
+	*/
 	createValueChart(): void {
-		// Create the SVG base element, and set it to dynamically fit to the viewport:
+		// Create the SVG base element, and set it to fit to the input width and height:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed('ValueChart svg-content-valuechart', true)
 			.attr('viewBox', '0 -10' + ' ' + this.chartWidth + ' ' + this.chartHeight)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
 
-		// Render the ValueChart:
+		// Create the labels:
 		this.createLabels();
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 
+		// Create the objective chart:
 		this.objectiveChartRenderer.createObjectiveChart(this.el, this.valueChartViewerService.getRowData());
 		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.viewOrientation);
 
+		// Create the summary chart:
 		this.summaryChartRenderer.createSummaryChart(this.el, this.valueChartViewerService.getRowData());
 		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
+	/*
+		@returns {void}
+		@description	Creates and renders the labels using the LabelRenderer. This is used more frequently than the other component create + render calls so it
+						is encapsulated in its own method. 
+	*/
 	createLabels() {
 		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
 
+	/*
+		@returns {void}
+		@description	Initializes change detection for the directive using ChangeDetectionService. 
+	*/
 	initChangeDetection(): void {
-		// Data Models:
+		// Init change detection for the input data:
 		this.changeDetectionService.initDiffers(this.valueChart);
 		
-		// View Configuration:
-		this.previousOrientation = this.viewOrientation;
-		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfiguration);
+		// Init change detection for the view configuration:
+		this.changeDetectionService.previousOrientation = this.viewOrientation;
 		this.changeDetectionService.previousWidth = this.chartWidth;
 		this.changeDetectionService.previousHeight = this.chartHeight;
+		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfig);
 
-		// Interactions:
+		// Init change detection for the interaction configuration:
 		this.changeDetectionService.initPreviousInteractionConfig(this.interactionConfig)
 	}
 
+	// ========================================================================================
+	// 								Change Detection Methods:
+	// ========================================================================================
 
-	// This function is called by Angular whenever it detects that a change to this directive's inputs MAY have occurred. The method body is our implementation of change
-	// detection. We are implementing our own change detection since Angular's change detection (ngOnChanges) is by reference. Note that when a a class implements 
-	// DoCheck, ngOnChanges is never called, even if the class also implements OnChanges. This means that changes must be both detected, and handled in ngDoCheck.
+	/*
+		@returns {void}
+		@description	Detects and handles any changes to the directive's inputs (data, and view + interactions). This method is called by Angular whenever it detects that a change to this directive's inputs 
+						MAY have occurred. The method body is an implementation of change detection for the directive's various inputs. We are implementing our own change detection because 
+						Angular's change detection (provided by the ngOnChanges method) is by reference. Note that when a a class implements DoCheck, ngOnChanges is never called, even if
+						the class also implements OnChanges. This means that changes must be both detected, and handled in ngDoCheck.
+	*/
 	ngDoCheck() {
 		// DO NOT proceed with change detection if the directive has not yet been initialized.
 		if (this.isInitialized === undefined)
 			return;
 
-		// Check For Changes to the Data Model
-		this.detectDataModelChanges();
-		this.detectDataOrderChanges();
+		// Check for the Changes to the input data.
+		this.detectDataModelChanges();			// Check for and handle changes to the ValueChart.
+		this.detectDataOrderChanges();			// Check for and handle changes to the objective and alternative orderings. 
 
-		this.detectViewConfigChanges();
-		this.detectInteractionConfigChanges();
+		this.detectViewConfigChanges();			// Check for and handle changes to the view config.
+		this.detectInteractionConfigChanges();	// Check for and handle changes to the interaction config.
 	}
 
+	/*
+		@returns {void}
+		@description	Check for and handle changes to the ValueChart input to the directive.
+	*/
 	// Methods for Detecting Changes:
 	detectDataModelChanges(): void {
-		// Check for changes to the ValueChart. This is by reference.
+		// Check for and handle changes to the ValueChart. This is by reference.
 		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
 			this.updateValueChart();
 		}
 
-		// Check for added or deleted users
+		// Check to see if users have been added to deleted.
 		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
 			this.updateUsers();
 		}
 
-		// Check the User Models for Changes:
+		// Check for and handle changes to the users.
 		this.valueChartService.getUsers().forEach((user: User, i: number) => {
+			// Check for and handle changes to the user's fields.
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
 				this.renderConfigService.initUserColors();
@@ -217,6 +278,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				this.updateValueChartDisplay();
 			}
 
+			// Check for and handle changes to the user's WeightMap.
 			let internalWeightMap = user.getWeightMap().getInternalWeightMap();
 			let weightMapChanges = this.changeDetectionService.weightMapDiffers[i].diff(internalWeightMap);
 			if (weightMapChanges) {
@@ -224,6 +286,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				this.updateValueChartDisplay();
 			}
 
+			// Check for and handle changes to the user's ScoreFunctionMap.
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			let scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffers[i].diff(scoreFunctionMap);
 			if (scoreFunctionMapChanges) {
@@ -231,6 +294,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				this.updateValueChartDisplay();
 			}
 
+			// Check for and handle changes to the user's ScoreFunctions
 			var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
 			scoreFunctions.forEach((scoreFunction: ScoreFunction, j: number) => {
 				var functionIndex: number = j + (i * scoreFunctions.length)
@@ -243,6 +307,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		});
 
+		// Check for and handle changes to the objectives' colors.
 		if (this.changeDetectionService.colorsHaveChanged) {
 			// Objective colors have been changed
 			this.changeDetectionService.colorsHaveChanged = false;
@@ -251,26 +316,39 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 	}
 
+	/*
+		@returns {}
+		@description Check for and handle changes to the Alternative and Objective orderings.
+	*/
 	detectDataOrderChanges(): void {
+		// Check for and handle changes to the alternative ordering.
 		if (this.changeDetectionService.alternativeOrderChanged) {
 				this.changeDetectionService.alternativeOrderChanged = false;
 				this.updateAlternativeOrder();
 				this.updateValueChartDisplay();
 		} 
-		if (this.changeDetectionService.rowOrderChanged) {
-			this.changeDetectionService.rowOrderChanged = false;
+
+		// Check for and handle changes to the objective ordering.
+		if (this.changeDetectionService.objectiveOrderChanged) {
+			this.changeDetectionService.objectiveOrderChanged = false;
+			// Set alternative order changed to false as well since updating the objective order will update the alternative order.
 			this.changeDetectionService.alternativeOrderChanged = false;
 			this.updateObjectiveOrder();
 			this.updateValueChartDisplay();
 		}
 	}
 
+	/*
+		@returns {}
+		@description	Check for and handle changes to the ValueChart's orientation, size, and display options.
+	*/
 	detectViewConfigChanges(): void {
-		if (this.previousOrientation !== this.viewOrientation) {
-			this.previousOrientation = this.viewOrientation;
+		// Change for and handle changes to the orientation.
+		if (this.changeDetectionService.previousOrientation !== this.viewOrientation) {
+			this.changeDetectionService.previousOrientation = this.viewOrientation;
 			this.updateViewOrientation();
 		}
-
+		// Change for and handle changes to the width and height of the ValueChart.
 		if (this.changeDetectionService.previousWidth !== this.chartWidth || this.changeDetectionService.previousHeight !== this.chartHeight) {
 			this.changeDetectionService.previousWidth = this.chartWidth;
 			this.changeDetectionService.previousHeight = this.chartHeight;
@@ -279,37 +357,38 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.updateViewOrientation();
 		}
 
-		if (this.renderConfigService.viewConfiguration.displayScoreFunctions !== this.changeDetectionService.previousViewConfig.displayScoreFunctions) {
-			this.changeDetectionService.previousViewConfig.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
-			// Toggle Score Functions.
+		// Change for and handle changes to the display options:
+
+		if (this.renderConfigService.viewConfig.displayScoreFunctions !== this.changeDetectionService.previousViewConfig.displayScoreFunctions) {
+			this.changeDetectionService.previousViewConfig.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
 			this.updateScoreFunctionDisplay();
 		}
 
-		if (this.renderConfigService.viewConfiguration.displayDomainValues !== this.changeDetectionService.previousViewConfig.displayDomainValues) {
-			this.changeDetectionService.previousViewConfig.displayDomainValues = this.renderConfigService.viewConfiguration.displayDomainValues;
-			// Toggle Domain Labels.
+		if (this.renderConfigService.viewConfig.displayDomainValues !== this.changeDetectionService.previousViewConfig.displayDomainValues) {
+			this.changeDetectionService.previousViewConfig.displayDomainValues = this.renderConfigService.viewConfig.displayDomainValues;
 			this.objectiveChartRenderer.toggleDomainLabels();
 		}
 
-		if (this.renderConfigService.viewConfiguration.displayScales !== this.changeDetectionService.previousViewConfig.displayScales) {
-			this.changeDetectionService.previousViewConfig.displayScales = this.renderConfigService.viewConfiguration.displayScales;
-			// Toggle Utility Scale
+		if (this.renderConfigService.viewConfig.displayScales !== this.changeDetectionService.previousViewConfig.displayScales) {
+			this.changeDetectionService.previousViewConfig.displayScales = this.renderConfigService.viewConfig.displayScales;
 			this.summaryChartRenderer.toggleUtilityAxis();
 		}
 
-		if (this.renderConfigService.viewConfiguration.displayTotalScores !== this.changeDetectionService.previousViewConfig.displayTotalScores) {
-			this.changeDetectionService.previousViewConfig.displayTotalScores = this.renderConfigService.viewConfiguration.displayTotalScores;
-			// Toggle Total Scores
+		if (this.renderConfigService.viewConfig.displayTotalScores !== this.changeDetectionService.previousViewConfig.displayTotalScores) {
+			this.changeDetectionService.previousViewConfig.displayTotalScores = this.renderConfigService.viewConfig.displayTotalScores;
 			this.summaryChartRenderer.toggleScoreTotals();
 		}
 
-		if (this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels !== this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels) {
-			this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels = this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels;
-			// Toggle Score Function Value Labels.
+		if (this.renderConfigService.viewConfig.displayScoreFunctionValueLabels !== this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels) {
+			this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels = this.renderConfigService.viewConfig.displayScoreFunctionValueLabels;
 			this.labelRenderer.toggleScoreFunctionValueLabels();
 		}
 	}
 
+	/*
+		@returns {void}
+		@description	Check for and handle changes to the interaction options.
+	*/
 	detectInteractionConfigChanges(): void {
 		if (this.interactionConfig.weightResizeType !== this.changeDetectionService.previousInteractionConfig.weightResizeType) {
 			this.changeDetectionService.previousInteractionConfig.weightResizeType = this.interactionConfig.weightResizeType;
@@ -319,7 +398,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		if (this.interactionConfig.reorderObjectives !== this.changeDetectionService.previousInteractionConfig.reorderObjectives) {
 			this.changeDetectionService.previousInteractionConfig.reorderObjectives = this.interactionConfig.reorderObjectives;
-			// Toggle Dragging to sort objectives:
 			this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		}
 
@@ -330,20 +408,24 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		if (this.interactionConfig.pumpWeights !== this.changeDetectionService.previousInteractionConfig.pumpWeights) {
 			this.changeDetectionService.previousInteractionConfig.pumpWeights = this.interactionConfig.pumpWeights;
-			// Toggle the pump interaction:
 			this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
 		}
 
 		if (this.interactionConfig.setObjectiveColors !== this.changeDetectionService.previousInteractionConfig.setObjectiveColors) {
 			this.changeDetectionService.previousInteractionConfig.setObjectiveColors = this.interactionConfig.setObjectiveColors;
-			// Toggle setting objective colors:
 			this.setColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
 		}
 	}
 
-	// Methods for Handling Changes:
+	// ========================================================================================
+	// 								Change Handling Methods
+	// ========================================================================================
 
-	// This method updates the entire ValueChart.
+	/*
+		@returns {void}
+		@description	Update the entire ValueChart. This method should be used when the ValueChart input the directive changes to a different reference.
+						Re-renders the ValueChart.
+	*/
 	updateValueChart(): void {
 		this.chartUndoRedoService.resetUndoRedo();	
 		this.configureChartData();
@@ -352,6 +434,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.updateValueChartDisplay();
 	}
 
+	/*
+		@returns {void}
+		@description	Update the ValueChart's user columns in response to a new user, or a deleted user. Re-renders the ValueChart.
+	*/
 	updateUsers(): void {
 		this.changeDetectionService.initDiffers(this.valueChart);
 		this.renderConfigService.initUserColors();
@@ -361,11 +447,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.updateValueChartDisplay()
 	}
 
+	/*
+		@returns {}
+		@description	Create and delete user preference columns in response to new or deleted users. Does NOT re-render the ValueChart.
+	*/
 	updateUserPreferenceColumns(): void {
 		this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.valueChartViewerService.getRowData());
 		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.valueChartViewerService.getRowData());
 	}
 
+	/*
+		@returns {}
+		@description	Update ValueChart's objective order. Does NOT re-render the ValueChart.
+	*/
 	updateObjectiveOrder(): void {
 		// Destroy the previous label area.
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
@@ -380,11 +474,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.updateAlternativeOrder()
 	}
 
+	/*
+		@returns {void}
+		@description	Update the ValueChart's alternative order. Does NOT re-render the ValueChart.
+	*/
 	updateAlternativeOrder(): void {
 		this.valueChartViewerService.updateWeightOffsets();
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
 	}
 
+	/*
+		@returns {void}
+		@description	Update the orientation of the ValueChart. Re-renders the ValueChart.
+	*/
 	updateViewOrientation(): void {
 		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.valueChartViewerService.updateStackedBarOffsets(this.viewOrientation);
@@ -393,10 +495,20 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
 	}
 
+	/*
+		@returns {void}
+		@description	Remove or display the ScoreFunction plots.
+	*/
 	updateScoreFunctionDisplay(): void {
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
 
+	/*
+		@returns {void}
+		@description	Update the ValueChart's visual appearance. Does not do anything structural, like update objective/alternative ordering, add/delete new user columns, etc. 
+						It will update existing features like user column heights, objective widths, etc. This should be used as the last stage of handling change to update
+						the visual appearance of the ValueChart by re-rendering its components.
+	*/
 	updateValueChartDisplay(): void {
 		this.labelRenderer.updateLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.updateObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getRowData(), this.viewOrientation);
@@ -405,7 +517,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 
-	// Variable binding functions. These functions are called when the directive is initialized.
+	// ========================================================================================
+	// 								Input Variable Binding Methods
+	// ========================================================================================
 
 
 	// Binds to the directive attribute 'data', and is automatically called upon before ngOnInit. 
@@ -422,67 +536,80 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewOrientation = <string> value;
 	}
 
-	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives orientation attribute.
+	// Binds to the directive attribute 'width', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives width attribute.
 	@Input() set width(value: any) {
 		this.chartWidth = <number> value;
 	}
 
-	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives orientation attribute.
+	// Binds to the directive attribute 'height', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives height attribute.
 	@Input() set height(value: any) {
 		this.chartHeight = <number> value;
 	}
 
 
+	// View Options:
+
 	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.
 	@Input() set displayScoreFunctions(value: any) {
-		this.renderConfigService.viewConfiguration.displayScoreFunctions = <boolean> value;
+		this.renderConfigService.viewConfig.displayScoreFunctions = <boolean> value;
 	}
 
 	// Binds to the directive attribute 'displayDomainValues', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayDomainValues attribute.
 	@Input() set displayDomainValues(value: any) {
-	this.renderConfigService.viewConfiguration.displayDomainValues = <boolean>value;
+	this.renderConfigService.viewConfig.displayDomainValues = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'displayScales', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScales attribute.
 	@Input() set displayScales(value: any) {
-	this.renderConfigService.viewConfiguration.displayScales = <boolean>value;
+	this.renderConfigService.viewConfig.displayScales = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'displayTotalScores', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayTotalScores attribute.
 	@Input() set displayTotalScores(value: any) {
-		this.renderConfigService.viewConfiguration.displayTotalScores = <boolean>value;
+		this.renderConfigService.viewConfig.displayTotalScores = <boolean>value;
 	}
-
+	// Binds to the directive attribute 'displayScoreFunctionValueLabels', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives displayScoreFunctionValueLabels attribute.
 	@Input() set displayScoreFunctionValueLabels(value: any) {
-		this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels = <boolean>value;
+		this.renderConfigService.viewConfig.displayScoreFunctionValueLabels = <boolean>value;
 	}
 
-	// Interactions:
+	// Interaction Options:
 
+	// Binds to the directive attribute 'weightResizeType', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives weightResizeType attribute.
 	@Input() set weightResizeType(value: any) {
 		this.interactionConfig.weightResizeType = <string> value;
 	}
 
+	// Binds to the directive attribute 'reorderObjectives', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives reorderObjectives attribute.
 	@Input() set reorderObjectives(value: any) {
 		this.interactionConfig.reorderObjectives = <boolean> value;
 	}
 
+	// Binds to the directive attribute 'sortAlternatives', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives sortAlternatives attribute.
 	@Input() set sortAlternatives(value: any) {	
 		this.interactionConfig.sortAlternatives = <string> value;
 	}
 
+	// Binds to the directive attribute 'pumpWeights', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives pumpWeights attribute.
 	@Input() set pumpWeights(value: any) {
 		this.interactionConfig.pumpWeights = <string> value;
 	}
 
+	// Binds to the directive attribute 'setObjectiveColors', and is automatically called upon before ngOnInit. 
+	// The variable 'value' is whatever was input to the directives setObjectiveColors attribute.
 	@Input() set setObjectiveColors(value: any) {
-		this.interactionConfig.setObjectiveColors = <string>value;
+		this.interactionConfig.setObjectiveColors = <boolean> value;
 	}
 
 

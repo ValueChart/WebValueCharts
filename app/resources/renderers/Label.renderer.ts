@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 17:06:45
+* @Last Modified time: 2016-08-13 15:25:50
 */
 
 import { Injectable } 												from '@angular/core';
@@ -153,7 +153,7 @@ export class LabelRenderer {
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
 		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
@@ -173,7 +173,7 @@ export class LabelRenderer {
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.displayScoreFunctions = this.renderConfigService.viewConfiguration.displayScoreFunctions;
+		this.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
 		this.labelWidth = this.valueChartViewerService.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
@@ -371,7 +371,7 @@ export class LabelRenderer {
 			}
 
 			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(el, datum, width, height, viewOrientation);
-			this.scoreFunctionRenderers[datum.getId()].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
+			this.scoreFunctionRenderers[datum.getId()].toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
 
 			weightOffset += objectiveWeight;
 		});
@@ -379,7 +379,7 @@ export class LabelRenderer {
 
 	toggleScoreFunctionValueLabels(): void {
 		for(var field in this.scoreFunctionRenderers) {
-			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfiguration.displayScoreFunctionValueLabels);
+			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
 		}
 	}
 

@@ -2,41 +2,71 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 10:44:08
+* @Last Modified time: 2016-08-13 15:42:46
 */
 
+// Import Angular Classes:
 import { Injectable } 												from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 														from 'd3';
 
-// Application Classes
+// Import Application Classes
 import { ValueChartService }										from './ValueChart.service';
 
-// Model Classes:
+// Import Model Classes:
 import { User }														from '../model/User';
+
+// Import Types:
+import { ViewConfig }												from '../types/Config.types';
+
 
 @Injectable()
 export class RenderConfigService {
 
-	public CHART_COMPONENT_RATIO: number = 0.47;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	public viewOrientation: string;	// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
+	public CHART_COMPONENT_RATIO: number = 0.47;		// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
 
-	public viewConfiguration: any = {};
+	public viewOrientation: string;						// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
+
+	public viewConfig: ViewConfig = <any> {};			// Object with the current view configuration. The fields of this object are set by the ValueChartDirective input methods. 
 
 	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
 	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']
 
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
+	/*
+		@returns {void}
+		@description	Used for Angular's dependency injection.
+						This constructor should NOT be called manually. Angular will automatically handle the construction of this service when it is injected.
+	*/
 	constructor(private valueChartService: ValueChartService) { }
 
-	// This function configures the variables used for height, width, x, and y attributes of SVG elements.
-	// Whenever defining height and width attributes, the attributes should be set using dimensionOne, and dimensionTwo
-	// The same goes for x and y positions. This insures that when the orientation of the graph changes, the x and y,
-	// and height, and width attributes are switched. Note that the size of the graph -  width: 500, height: 300 - does not change,
-	// although the which variable represents that dimension does.
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	/*
+		@param viewConfig - The current viewConfig object for the ValueChartDirective.
+		@param viewOrientation - The current viewOrientation of the ValueChartDirective.
+		@param componentWidth - The width to that the ValueChartComponents are to be rendered with. Note that this currently does not support different widths for different components.
+		@param componentHeight - The height to that the ValueChartComponents are to be rendered with. Note that this currently does not support different heights for different components.
+		@returns {void}
+		@description	This function configures the variables used for height, width, x, and y attributes of SVG elements during the rendering of the ValueChart.
+						The height and width attributes of SVG elements should be set using dimensionOne, and dimensionTwo.
+						The x and y positions should be set using coordinateOne and coordinateTwo. 
+						This insures that when the orientation of the graph changes, the x and y, and height, and width attributes are switched. 
+						Note that the size of the graph is not changed during this process. 
+
+	*/
 	updateViewConfig(viewConfig: any, viewOrientation: string, componentWidth: number, componentHeight: number): void {
 		viewConfig.viewOrientation = viewOrientation;
 		viewConfig.chartComponentWidth = componentWidth;
@@ -71,6 +101,12 @@ export class RenderConfigService {
 		}
 	}
 
+	/*
+		@returns {void}
+		@description	Assigns a color to every user in the ValueChart that does not yet have a color. Note that users that join the ValueChart
+						do not have colors, so this method must be called whenever a new user joins.
+
+	*/
 	initUserColors(): void {
 		if (this.valueChartService.isIndividual())
 			return;
@@ -83,8 +119,15 @@ export class RenderConfigService {
 		});
 	}
 
-	// Generate the correct translation depending on the orientation. Translations are not performed individually for x and y,
-	// so this function is required to return the correct string.
+	/*
+		@param viewOrientation - the viewOrientation of the desired transform.
+		@param coordinateOneAmount - the amount of translation in the coordinateOne direction. Note what direction this is depends on the orientation.
+		@param coordinateTwoAmount - the amount of translation in the coordinateTwo direction. Note what direction this is depends on the orientation.
+		@returns a correctly formatted translate string for a transform attribute.
+		@description	Generate the correct translation for a transform attribute of an SVG element depending on the current ValueChart orientation.
+						This method allows transformations to be generated properly while using the coordinateOne and coordinateTwo fields instead of 
+						directly using x and y.
+	*/
 	generateTransformTranslation(viewOrientation: string, coordinateOneAmount: number, coordinateTwoAmount: number): string {
 		if (viewOrientation === 'vertical') {
 			return 'translate(' + coordinateOneAmount + ',' + coordinateTwoAmount + ')';
@@ -93,6 +136,14 @@ export class RenderConfigService {
 		}
 	}
 
+	/*
+		@param previousTransform - the transformation that is to be incremented by deltaCoordinateOne and deltaCoordinateTwo.
+		@param deltaCoordinateOne - the amount to increase the translation in the coordinateOne direction.
+		@param deltaCoordinateTwo - the amount to increase the translation in the coordinateTwo direction.
+		@returns a correctly formatted and incremented translate string for a transform attribute.
+		@description	Properly increment an existing transformation by deltaCoordinateOne and deltaCoordinateTwo while taking into account the current 
+						orientation of the ValueChart.
+	*/
 	incrementTransform(previousTransform: string, deltaCoordinateOne: number, deltaCoordinateTwo: number): string {
 		var commaIndex: number = previousTransform.indexOf(',');
 		// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 21:26:06
+* @Last Modified time: 2016-08-13 14:46:03
 */
 
 import { Injectable } 												from '@angular/core';
@@ -235,7 +235,7 @@ export class ReorderObjectivesInteraction {
 		this.valueChartViewerService.reorderRows(primitiveObjectives);
 		this.valueChartService.setPrimitivesObjectives(primitiveObjectives);
 
-		this.changeDetectionService.rowOrderChanged = true;
+		this.changeDetectionService.objectiveOrderChanged = true;
 	}
 
 	// This function extracts the ordering of objectives from the ordering of labels.

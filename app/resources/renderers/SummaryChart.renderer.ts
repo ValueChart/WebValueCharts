@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 22:05:02
+* @Last Modified time: 2016-08-13 15:25:49
 */
 
 import { Injectable } 												from '@angular/core';
@@ -356,7 +356,7 @@ export class SummaryChartRenderer {
 	}
 
 	toggleUtilityAxis(): void {
-		if (this.renderConfigService.viewConfiguration.displayScales) {
+		if (this.renderConfigService.viewConfig.displayScales) {
 			this.utilityAxisContainer.style('display', 'block');
 		} else {
 			this.utilityAxisContainer.style('display', 'none');
@@ -364,7 +364,7 @@ export class SummaryChartRenderer {
 	}
 
 	toggleScoreTotals(): void {
-		if (this.renderConfigService.viewConfiguration.displayTotalScores) {
+		if (this.renderConfigService.viewConfig.displayTotalScores) {
 			this.scoreTotalsContainer.style('display', 'block');
 		} else {
 			this.scoreTotalsContainer.style('display', 'none');
