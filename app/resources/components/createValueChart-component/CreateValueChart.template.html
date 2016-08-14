@@ -7,8 +7,7 @@
                         <label class="control-label">Chart name.</label>
                         <input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
                         <label class="control-label">Chart description.</label>
-                        <input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />
-                        
+                        <input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />  
                         <label><input type="checkbox" [(ngModel)]="isGroupValueChart" name="isGroupValueChart" style="margin: 5px 10px;">Group ValueChart</label>
                         <div *ngIf="isGroupValueChart">
                             <label class="control-label">Password.</label>
@@ -72,11 +71,35 @@
                                     <th>
                                         <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'categorical' ">categorical default</div>
+                                            && objectiveRows[objID].dom.type === 'categorical' ">
+                                            cat default
+                                        </div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'continuous' ">continuous default</div>
+                                            && objectiveRows[objID].dom.type === 'continuous' ">
+                                            <div style="display: table-row">
+                                                <div style="display: table-cell;"><label class="control-label">max:</label></div>
+                                                <div style="display: table-cell;"><label class="control-label">min:</label></div>
+                                                <div style="display: table-cell;"><label class="control-label">unit:</label></div>
+                                            </div>
+                                            <div style="display: table-row">
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.max" maxlength="100" /></div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.min" maxlength="100" /></div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" /></div>
+                                            </div>
+                                        </div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'interval' ">interval default</div>
+                                            && objectiveRows[objID].dom.type === 'interval' ">
+                                            <div style="display: table-row">
+                                                <div style="display: table-cell;"><label class="control-label">max:</label></div>
+                                                <div style="display: table-cell;"><label class="control-label">min:</label></div>
+                                                <div style="display: table-cell;"><label class="control-label">interval:</label></div>
+                                            </div>
+                                            <div style="display: table-row">
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.max" maxlength="100" /></div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.min" maxlength="100" /></div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.interval" maxlength="100" /></div>
+                                            </div>
+                                        </div>
                                     </th>         
                                 </tr>                             
                             </tbody>
@@ -108,7 +131,7 @@
                                 </th>
                                 <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
                                     <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
-                                        <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="{{obj.getName()}}" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
+                                        <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
                                             <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
                                         </select>
                                     </div>

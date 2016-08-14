@@ -118,10 +118,6 @@ export class CreateValueChartComponent implements OnInit {
 
 	    	// Create new ValueChart with a temporary name and description
 	    	this.valueChart = new ValueChart(this.valueChartName,this.valueChartDescription,this.user.getUsername());
-
-	    	// Create root objective
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName + " Root","","",0);
-			this.objectivesCount++;
     	}
     	this.valueChart.addUser(this.user);
     	this.valueChartService.setValueChart(this.valueChart); // Needed for ScoreFunction plots
@@ -136,10 +132,22 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChart.setName(this.valueChartName);
 			this.valueChart.setDescription(this.valueChartDescription);	
 	    	this.valueChart.password = this.valueChartPassword;
+
+	    	// Create root objective if needed
+	    	if (!this.objectiveRows[this.rootObjRowID]) {
+	    		this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName + " Root","","",0);
+				this.objectivesCount++;
+	    	}
+	    	else {
+	    		this.objectiveRows[this.rootObjRowID].name = this.valueChartName + " Root";
+	    	}	
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 			this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
+			if (this.altKeys().length === 0) {
+				this.addEmptyAlternative();
+			}
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
 			let alternatives: Alternative[] = [];
@@ -358,10 +366,10 @@ export class CreateValueChartComponent implements OnInit {
   				(<CategoricalDomain>dom).addElement("3");
   			}
   			else if (objrow.dom.type === 'interval') {
-  				dom = new IntervalDomain(0,8,1);
+  				dom = new IntervalDomain(objrow.dom.min,objrow.dom.max,objrow.dom.interval);
   			}
   			else {
-  				dom = new ContinuousDomain(0,1,"cm");
+  				dom = new ContinuousDomain(objrow.dom.min,objrow.dom.max,objrow.dom.unit);
   			}
   			(<PrimitiveObjective>obj).setDomain(dom);
   			(<PrimitiveObjective>obj).setColor(objrow.color);
