@@ -13,7 +13,7 @@ import { CreationStepsService }											from '../../services/CreationSteps.ser
 import { ValueChartService }											from '../../services/ValueChart.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
-
+import { GroupVcHttpService }											from '../../services/GroupVcHttp.service';
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
@@ -48,6 +48,7 @@ export class CreateValueChartComponent implements OnInit {
 	// Basics step
 	valueChartName: string;
 	valueChartDescription: string;
+	valueChartPassword: string;
 	isGroupValueChart: boolean;
 
 	// Objectives steps
@@ -69,11 +70,13 @@ export class CreateValueChartComponent implements OnInit {
     isRanked: { [objName: string]: boolean; }; // really need to split this code up...
 
 	private services: any = {};
+	saveSuccessful: boolean;
 
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
+		private groupVcHttpService: GroupVcHttpService,
 		private creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) { }
@@ -87,6 +90,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.user = new User(this.currentUserService.getUsername());
 		this.valueChartName = "";
 		this.valueChartDescription = "";
+		this.valueChartPassword = "";
 		this.isGroupValueChart = false;
 		this.alternatives = {};
 		this.isSelected = {};
@@ -97,6 +101,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.objectiveRows = {};
 		this.rootObjRowID = "0";
 		this.selectedObjRow = "0";
+		this.saveSuccessful = false;
 
 		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
@@ -112,7 +117,7 @@ export class CreateValueChartComponent implements OnInit {
     		this.step = this.creationStepsService.BASICS;
 
 	    	// Create new ValueChart with a temporary name and description
-	    	this.valueChart = new ValueChart(this.user.getUsername(),this.valueChartName,this.valueChartDescription);
+	    	this.valueChart = new ValueChart(this.valueChartName,this.valueChartDescription,this.user.getUsername());
 
 	    	// Create root objective
 			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName + " Root","","",0);
@@ -129,11 +134,11 @@ export class CreateValueChartComponent implements OnInit {
 	next() {
 		if (this.step === this.creationStepsService.BASICS) {
 			this.valueChart.setName(this.valueChartName);
-			this.valueChart.setDescription(this.valueChartDescription);
+			this.valueChart.setDescription(this.valueChartDescription);	
+	    	this.valueChart.password = this.valueChartPassword;
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
 			this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-			this.initializeUser();
 			this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
 		}
 		else if (this.step === this.creationStepsService.ALTERNATIVES) {
@@ -142,6 +147,7 @@ export class CreateValueChartComponent implements OnInit {
 				alternatives.push((this.alternatives[altID]));
 			}
 			this.valueChart.setAlternatives(alternatives);
+			this.initializeUser();
 		}
 		else if (this.step === this.creationStepsService.PREFERENCES) {
 			for (let obj of this.getPrimitiveObjectivesByName()) {
@@ -153,6 +159,7 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChart.addUser(this.user);
 			this.valueChartService.setValueChart(this.valueChart);
 			this.currentUserService.setValueChart(this.valueChart);
+			this.saveValueChartToDatabase();
 			this.router.navigate(['/view/ValueChart']);
 		}
 		this.step = this.creationStepsService.next(this.step);
@@ -166,19 +173,24 @@ export class CreateValueChartComponent implements OnInit {
 		this.user.setScoreFunctionMap(this.getInitialScoreFunctionMap());
 	}
 
-	save() {
-		// TODO: save to file using XML writer service
+	saveValueChartToDatabase() {
+		if (!this.valueChart._id) {
+			this.groupVcHttpService.createValueChart(this.valueChart)
+				.subscribe(
+					(valueChart: ValueChart) => { 
+						// Set the id of the ValueChart.
+						this.valueChart._id = valueChart._id;
+					},
+					// Handle Server Errors
+					(error) => { 
+
+					});
+		}
 	}
 
 	disableBackButton() : boolean {
 		return (this.step === this.creationStepsService.BASICS || 
 			(this.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser"));
-	}
-
-	disableSaveButton() : boolean {
-		let enabled = (this.step === this.creationStepsService.PRIORITIES ||
-					 this.step === this.creationStepsService.ALTERNATIVES && this.isGroupValueChart);
-		return !enabled;
 	}
 
 	disableNextButton() : boolean {

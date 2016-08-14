@@ -5,10 +5,15 @@
                 <div class="form-group">
                 	<div *ngIf="step === creationStepsService.BASICS">
                         <label class="control-label">Chart name.</label>
-                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" name="valueChartName" maxlength="100" />
+                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
                         <label class="control-label">Chart description.</label>
-                        <textarea  maxlength="100" class="form-control" [(ngModel)]="valueChartDescription" name="valueChartDescription"></textarea>
+                        <input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />
+                        
                         <label><input type="checkbox" [(ngModel)]="isGroupValueChart" name="isGroupValueChart" style="margin: 5px 10px;">Group ValueChart</label>
+                        <div *ngIf="isGroupValueChart">
+                            <label class="control-label">Password.</label>
+                            <input  class="form-control" type="text" [(ngModel)]="valueChartPassword" maxlength="100" />
+                        </div>
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
                         <h4>Add Objectives</h4>
@@ -173,11 +178,6 @@
                     <a class="btn btn-success btn-lg pull-left" [routerLink]="['/create']" style="margin: 5px 10px;">Home</a>
                     <input class="btn btn-success btn-lg pull-left" type="button" value="<< Back" [disabled]="disableBackButton()" (click)="back()" style="margin: 5px 10px;" />
                     <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" [disabled]="disableNextButton()" (click)="next()" style="margin: 5px 10px;"  />
-                    <input class="btn btn-success btn-lg pull-right" type="button" value="Save To File" [disabled]="disableSaveButton()" (click)="save()" style="margin: 5px 10px;" />
-                </div>
-
-                <div class="form-group">
-
                 </div>
             </div>
         </div>
