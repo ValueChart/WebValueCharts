@@ -136,24 +136,24 @@
 							</a>
 							<ul class="dropdown-menu " aria-labelledby="alternative-sort-dropdown">
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives('objective')">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_OBJECTIVE)">
 										Objective Score
-										<span *ngIf="sortAlternatives === 'objective'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="sortAlternatives === ALTERNATIVE_SORT_OBJECTIVE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives('alphabet')">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_ALPHABET)">
 										Alphabetically
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives('manual')">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_MANUAL)">
 										Manually
-										<span *ngIf="sortAlternatives === 'manual'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="sortAlternatives === ALTERNATIVE_SORT_MANUAL" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives('reset')">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_RESET)">
 										Reset Order
 									</a>
 								</li>
@@ -177,15 +177,15 @@
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="pump-dropdown">
 								<li>
-									<a href="javascript:void(0)" (click)="setPumpType('increase')">
+									<a href="javascript:void(0)" (click)="setPumpType(PUMP_INCREASE)">
 										Inflate
-										<span *ngIf="pumpWeights === 'increase'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="pumpWeights === PUMP_INCREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="setPumpType('decrease')">
+									<a href="javascript:void(0)" (click)="setPumpType(PUMP_DECREASE)">
 										Deflate
-										<span *ngIf="pumpWeights === 'decrease'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="pumpWeights === PUMP_DECREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 							</ul>

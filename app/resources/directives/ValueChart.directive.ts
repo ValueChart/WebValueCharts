@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-13 15:25:52
+* @Last Modified time: 2016-08-13 23:17:22
 */
 
 // Import Angular Resources:
@@ -45,21 +45,21 @@ import { RowData, CellData, LabelData }											from '../types/ValueChartViewe
 import { InteractionConfig }													from '../types/Config.types';
 
 @Directive({
-	selector: 'ValueChart',
-	inputs: ['data', 
-			'orientation',
-			'width',
-			'height',
-			'displayScoreFunctions',
-			'displayDomainValues',
-			'displayScales',
-			'displayTotalScores',
-			'displayScoreFunctionValueLabels',
-			'weightResizeType',
-			'reorderObjectives',
+	selector: 'ValueChart',							
+	inputs: ['data', 								// The data to be rendered. Must be an instance of the ValueChart class.
+			'orientation',							// The orientation of the rendered ValueChart. Must be the string "vertical" or "horizontal".
+			'width',								// The width of the area in which to render the ValueChart. Must be a number.
+			'height',								// The height of the area in which to render the ValueChart. Must be a number.
+			'displayScoreFunctions',				// Toggle for score function plots. Must be a boolean.
+			'displayDomainValues',					// Toggle for domain value labels in the objective chart. Must be a boolean.
+			'displayScales',						// Toggle for the utility scale next to the summary chart. Must be a boolean.
+			'displayTotalScores',					// Toggle for the total score labels in the summary chart. Must be a boolean.
+			'displayScoreFunctionValueLabels',		// Toggle for the score labels next to points/bars in the score function plots. Must be a boolean.
+			'weightResizeType',						// The type of objective weight resizing that is accomplished by dragging label dividers. Must be one of the strings: 'neighbor' or 'siblings', or 'none'. 'neighbor' sets dragging label dividers to change the weights of only objectives adjacent to the divider. 'siblings' sets dragging label dividers to change the weights of all the objectives at that level with the same parent (i.e. siblings). 'none' disables dragging to change objective weights.
+			'reorderObjectives',					// Toggle for dragging to reorder objectives. True enables objectives to be reordered by clicking and dragging. Must be a boolean.
 			'sortAlternatives',
 			'pumpWeights',
-			'setObjectiveColors',]
+			'setObjectiveColors']
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -151,7 +151,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Calculates the default size of ValueChart components (labels, summary chart, objective chart) depending on the input width 
 						and height of the ValueChart.
 	*/
-	calculateDefaultComponentSize() {
+	calculateDefaultComponentSize(): void {
 		this.defaultChartComponentWidth = (this.chartWidth * this.renderConfigService.CHART_COMPONENT_RATIO);
 		this.defaultChartComponentHeight = (this.chartHeight * this.renderConfigService.CHART_COMPONENT_RATIO);
 	}
@@ -161,7 +161,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Configures ValueChartViewerService and RenderConfigService using the directive's input data. This must be done before
 						constructing and/or rendering a ValueChart for the first time as these services are what provide data to the renderer classes.
 	*/
-	configureChartData() {
+	configureChartData(): void {
 		// Configure ValueChartViewerService.
 		this.valueChartService.setValueChart(this.valueChart);	// TODO: Is this call necessary? Investigate.
 		this.valueChartViewerService.initialize();
@@ -205,7 +205,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Creates and renders the labels using the LabelRenderer. This is used more frequently than the other component create + render calls so it
 						is encapsulated in its own method. 
 	*/
-	createLabels() {
+	createLabels(): void {
 		this.labelRenderer.createLabelSpace(this.el, this.valueChartViewerService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.valueChartViewerService.getLabelData(), this.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
@@ -256,7 +256,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@returns {void}
 		@description	Check for and handle changes to the ValueChart input to the directive.
 	*/
-	// Methods for Detecting Changes:
 	detectDataModelChanges(): void {
 		// Check for and handle changes to the ValueChart. This is by reference.
 		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
@@ -317,8 +316,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	/*
-		@returns {}
-		@description Check for and handle changes to the Alternative and Objective orderings.
+		@returns {void}
+		@description	Check for and handle changes to the Alternative and Objective orderings.
 	*/
 	detectDataOrderChanges(): void {
 		// Check for and handle changes to the alternative ordering.
@@ -339,7 +338,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	/*
-		@returns {}
+		@returns {void}
 		@description	Check for and handle changes to the ValueChart's orientation, size, and display options.
 	*/
 	detectViewConfigChanges(): void {
@@ -448,7 +447,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	/*
-		@returns {}
+		@returns {void}
 		@description	Create and delete user preference columns in response to new or deleted users. Does NOT re-render the ValueChart.
 	*/
 	updateUserPreferenceColumns(): void {
@@ -457,7 +456,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	}
 
 	/*
-		@returns {}
+		@returns {void}
 		@description	Update ValueChart's objective order. Does NOT re-render the ValueChart.
 	*/
 	updateObjectiveOrder(): void {

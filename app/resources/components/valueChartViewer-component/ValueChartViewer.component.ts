@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 12:36:45
+* @Last Modified time: 2016-08-13 22:45:38
 */
 
 import { Component }															from '@angular/core';
@@ -88,9 +88,19 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 })
 export class ValueChartViewerComponent implements OnInit {
 
+	// Pump Sorting Values:
 	private PUMP_OFF: string = 'none';
+	private PUMP_DECREASE: string = 'decrease';
+	private PUMP_INCREASE: string = 'increase';
+
+	// Alternative Sorting Values:
+	private ALTERNATIVE_SORT_MANUAL: string = 'manual';
+	private ALTERNATIVE_SORT_OBJECTIVE: string = 'objective';
+	private ALTERNATIVE_SORT_ALPHABET: string = 'alphabet';
+	private ALTERNATIVE_SORT_RESET: string = 'reset';
 	private ALTERNATIVE_SORT_OFF: string = 'none';
 
+	// Weight Resizing Values:
 	private RESIZE_NEIGHBOR: string = 'neighbor';
 	private RESIZE_SIBLINGS: string = 'siblings';
 	private NO_RESIZING: string = 'none';
@@ -388,22 +398,22 @@ export class ValueChartViewerComponent implements OnInit {
 
 		// Turn off all other interactions.
 		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.pumpWeights = 'none';
+		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
 	}
 
 	toggleSortAlternatives(sortType: string): void {
-		this.sortAlternatives = (this.sortAlternatives === sortType && (sortType === 'objective' || sortType === 'manual')) ? this.ALTERNATIVE_SORT_OFF : sortType;
+		this.sortAlternatives = (this.sortAlternatives === sortType && (sortType === this.ALTERNATIVE_SORT_OBJECTIVE || sortType === this.ALTERNATIVE_SORT_MANUAL)) ? this.ALTERNATIVE_SORT_OFF : sortType;
 
-		if (sortType === 'alphabet' || sortType === 'reset') {
+		if (sortType === this.ALTERNATIVE_SORT_ALPHABET || sortType === this.ALTERNATIVE_SORT_RESET) {
 			window.setTimeout(() => {
-				this.sortAlternatives = 'none';
+				this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 			}, 10);
 		}
 
 		// Turn off all other interactions.
 		this.reorderObjectives = false;
-		this.pumpWeights = 'none';
+		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
 	}
 
