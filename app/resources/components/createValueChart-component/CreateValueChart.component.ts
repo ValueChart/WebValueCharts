@@ -56,6 +56,7 @@ export class CreateValueChartComponent implements OnInit {
 	rootObjRowID : string;
     selectedObjRow: string; // awful - need to refactor asap
     objectivesCount : number;
+    categoriesToAdd: string[];
 
 	// Alternatives step
     alternatives: { [altID: string]: Alternative; };
@@ -70,7 +71,6 @@ export class CreateValueChartComponent implements OnInit {
     isRanked: { [objName: string]: boolean; }; // really need to split this code up...
 
 	private services: any = {};
-	saveSuccessful: boolean;
 
 	constructor(
 		private router: Router,
@@ -101,7 +101,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.objectiveRows = {};
 		this.rootObjRowID = "0";
 		this.selectedObjRow = "0";
-		this.saveSuccessful = false;
+		this.categoriesToAdd = [];
 
 		// Bind purpose to corresponding URL parameter
     	this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
@@ -135,11 +135,11 @@ export class CreateValueChartComponent implements OnInit {
 
 	    	// Create root objective if needed
 	    	if (!this.objectiveRows[this.rootObjRowID]) {
-	    		this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName + " Root","","",0);
+	    		this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.valueChartName,"","",0);
 				this.objectivesCount++;
 	    	}
 	    	else {
-	    		this.objectiveRows[this.rootObjRowID].name = this.valueChartName + " Root";
+	    		this.objectiveRows[this.rootObjRowID].name = this.valueChartName;
 	    	}	
 		}
 		else if (this.step === this.creationStepsService.OBJECTIVES) {
@@ -352,6 +352,53 @@ export class CreateValueChartComponent implements OnInit {
   		}
   	}
 
+  	private getSelectedValues(select: HTMLSelectElement) : string[] {
+		let result : string[] = [];
+		let options : HTMLCollection = select && select.options;
+		let opt : HTMLOptionElement;
+
+		for (let i=0, iLen=options.length; i<iLen; i++) {
+			opt = <HTMLOptionElement>options[i];
+			if (opt.selected) {
+				result.push(opt.value || opt.text);
+			}
+		}
+		return result;
+	}
+
+	addCategory(cat: string) {
+		this.categoriesToAdd.push(cat);
+		document.getElementsByName('newcat')[0].setAttribute("value","");
+	}
+
+	addCategories() {
+		for (let cat of this.categoriesToAdd) {
+			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
+		}
+		this.categoriesToAdd = [];
+	}
+
+	removeSelectedCategoriesMain() {
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmain")[0]);
+		for (let cat of selected) {
+			this.objectiveRows[this.selectedObjRow].dom.removeCategory(cat);
+		}
+	}
+
+	removeSelectedCategoriesModal() {
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
+		for (let cat of selected) {
+			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat),1);
+		}
+	}
+
+	getCategories(objrow: ObjectiveRow) : string[] {
+		if (objrow === undefined) {
+			return [];
+		}
+		return objrow.dom.categories;
+	}
+
   	// Convert ObjectiveRows to Objectives
   	// Using dummy domains for now...
   	objRowToObjective(objrow: ObjectiveRow) : Objective {
@@ -510,7 +557,7 @@ class ObjectiveRow {
 
 	removeChild(child: string) {
 		let i = this.children.indexOf(child);
-        return i>-1 ? this.children.splice(i, 1) : [];
+        this.children.splice(i, 1);
 	}
 }
 
@@ -529,4 +576,8 @@ class DomainDetails {
 		this.categories = [];
 	}
 
+	removeCategory(cat: string) {
+		let i = this.categories.indexOf(cat);
+        this.categories.splice(i, 1);
+	}
 }

@@ -72,7 +72,21 @@
                                         <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
                                             && objectiveRows[objID].dom.type === 'categorical' ">
-                                            cat default
+                                            <div style="display: table-row">
+                                                <div style="display: table-cell;">
+                                                    <SELECT class="form-control" name="catlistmain" size="3" style="width: 100px" MULTIPLE>
+                                                    <OPTION *ngFor="let opt of objectiveRows[objID].dom.categories">{{opt}}
+                                                    </SELECT>
+                                                </div>
+                                                <div style="display: table-cell;">
+                                                    <button class="btn btn-sm btn-default" style="margin: 5px" data-toggle="modal" data-target="#myCategoryModal">
+                                                        Add
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-default" style="margin: 5px" (click)="removeSelectedCategoriesMain()">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
                                             && objectiveRows[objID].dom.type === 'continuous' ">
@@ -204,5 +218,58 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="myCategoryModal" tabindex="-1" role="dialog" 
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal">
+                               <span aria-hidden="true">&times;</span>
+                               <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add Categories
+                        </h4>
+                    </div>      
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <form role="form">
+                          <div style="display: table-row">
+                            <div style="display: table-cell;">
+                                <input class="form-control" name="newcat" #cat placeholder="Category name" type="text"/>
+                            </div>
+                            <div style="display: table-cell;">
+                                <div>
+                                    <button type="button" class="btn btn-default" style="margin: 5px" (click)="addCategory(cat.value)">
+                                        >>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-default" style="margin: 5px" (click)="removeSelectedCategoriesModal(cat.value)">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="display: table-cell;">
+                                <SELECT SIZE="3" style="width: 100px" name="catlistmodal" MULTIPLE>
+                                <OPTION *ngFor="let cat of categoriesToAdd">{{cat}}
+                                </SELECT>
+                            </div>
+                          </div>
+                        </form>
+                    </div>           
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" (click)="addCategories() "data-dismiss="modal">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
