@@ -2,21 +2,23 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:59:31
+* @Last Modified time: 2016-08-16 11:29:46
 */
 
+// Import Angular Classes:
 import { Injectable } 									from '@angular/core';
 import { NgZone }										from '@angular/core';
-// d3
+
+// Import Libraries:
 import * as d3 											from 'd3';
 
-// Application Classes
+// Import Application Classes
 import { ValueChartService }							from '../services/ValueChart.service';
 import { ScoreFunctionViewerService }					from '../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
-// Model Classes
+// Import Model Classes
 import { ValueChart }									from '../model/ValueChart';
 import { Objective }									from '../model/Objective';
 import { PrimitiveObjective }							from '../model/PrimitiveObjective';
@@ -24,53 +26,94 @@ import { ScoreFunction }								from '../model/ScoreFunction';
 import { ContinuousScoreFunction }						from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }						from '../model/DiscreteScoreFunction';
 
+// Import Types:
 import { DomainElement, UserDomainElements } 			from '../types/ScoreFunctionViewer.types';
 
 
-// This class contains the logic for creating and rendering the a DiscreteScoreFunction for an Objective as a bar chart. 
+// This class contains the logic for creating and rendering multiple users' DiscreteScoreFunctions for a single objective with a discrete 
+// (either categorical or interval) domain. The score functions are rendered as bar charts. Each user has one bar indicating score per domain 
+// element in the objective. DiscreteScoreFunctionRenderer 
 
 @Injectable()
 export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
-	public barContainer: d3.Selection<any>;
-	public utilityBars: d3.Selection<any>;
-	public barTops: d3.Selection<any>;
-	public barLabelContainer: d3.Selection<any>;
-	public barLabels: d3.Selection<any>;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	private heightScale: d3.Linear<number, number>;
+	public barContainer: d3.Selection<any>;				// The 'g' element that contains the rectangles used as bars in the plot.
+	public utilityBars: d3.Selection<any>;				// The selection of 'rect' elements used as bars in the plot. There should be one per user per domain element. 
+	public barTops: d3.Selection<any>;					// The selection of 'rect' elements used as the filled tops of bars in the plot. These are for implementing clicking and dragging to change a score function.
+	public barLabelContainer: d3.Selection<any>;		// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
+	public barLabels: d3.Selection<any>;				// The selection of 'text' elements used as score labels for bars.
 
+	private heightScale: d3.Linear<number, number>;		// The linear scale used to translate from scores to pixel coordinates. This is used to determine the dimensions of the bars.
+
+	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
 		BARS_CONTAINER: 'scorefunction-bars-container',
 		BAR: 'scorefunction-bar',
 		BAR_TOP: 'scorefunction-bartop', 
 
-		POINT_LABELS_CONTAINER: 'scorefunction-point-labels-container',
-		POINT_LABEL: 'scorefunction-point-label',
+		BAR_LABELS_CONTAINER: 'scorefunction-bar-labels-container',
+		BAR_LABEL: 'scorefunction-bar-label',
 	}
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor ScoreFunctionRenderer, as 
+						all subclasses must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
+	*/
 	constructor(valueChartService: ValueChartService, scoreFunctionViewerService: ScoreFunctionViewerService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
 		super(valueChartService, scoreFunctionViewerService, chartUndoRedoService);
 	}
 
-	// This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
-	// like bars for the bar chart that is used to represent element scores.
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	/*
+		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. These are 'g' elements that will contain the parts of each users plot (bars/points).
+		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
+		@param objective - The objective for which the score function plot is going to be created.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@returns {void}
+		@description 	This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
+						like bars for the bar chart that is used to represent element scores. This method should NOT be called manually. Instead, 
+						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
+						doing the necessary construction of base containers and elements. 
+	*/
 	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
-		// Call the create plot method in ScoreFunctionRenderer.
+		// Call the create plot method in ScoreFunctionRenderer. This will create the user containers and create the domain labels.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
 
-		// Create the discrete score function specific elements (e.g. the bars for the bar graph)
+		// Create the bar container element.
 		this.barContainer = this.userContainers.append('g')
 			.classed(DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-bars-container');
 
+		// Create the bar label container element.
 		this.barLabelContainer = this.userContainers.append('g')
-			.classed(DiscreteScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER, true)
+			.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
 
+		// Create the bars, bar tops, and bar labels.
 		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective, usersDomainElements);
 	}
 
+	/*
+		@param barContainer - The 'g' element that is intended to contain the 'rect' elements that are bars in the plot.
+		@param labelContainer - The 'g' element that is intended to contain the labels for the bars. 
+		@param objective - The objective for which the score function plot is going to be created.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@returns {void}
+		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
+						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
+	*/
 	createDiscretePlotElements(barContainer: d3.Selection<any>, labelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
@@ -83,15 +126,15 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.utilityBars = barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR);
 
-		labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.POINT_LABEL)
+		labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL)
 			.data((d: UserDomainElements) => { return d.elements; })
 			.enter().append('text')
-				.classed(DiscreteScoreFunctionRenderer.defs.POINT_LABEL, true)
+				.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABEL, true)
 				.attr('id', (d: DomainElement) => {
 					return 'scorefunction-' + objective.getId() + '-' + d.element + '-label';
 				});
 
-		this.barLabels = labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.POINT_LABEL);
+		this.barLabels = labelContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL);
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
@@ -106,9 +149,20 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-	// This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction specific elements, 
-	// like bars for the bar chart that is used to represent element scores.
+	/*
+		@param domainLabels - The selection 'text' elements used to label the domain axis.
+		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
+		@param objective - The objective for which the score function plot is being rendered.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	Positions and styles the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
+						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
+						the entire score function plot. This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction specific elements (via renderDiscretePlot), 
+						like bars for the bar chart that is used to represent element scores.
+	*/
 	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+		// Use the super class' method to render position domain labels.
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
 		
 		var labelCoordinateOneOffset: number;
@@ -117,21 +171,33 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		} else {
 			labelCoordinateOneOffset = (1.5 * this.labelOffset) + 5;
 		}
-
+		// Fix domain labels positions specifically for the discrete plot.
 		domainLabels.attr(this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
-		
+			
+		// Render the discrete plot elements.
 		this.renderDiscretePlot(plotElementsContainer, objective, usersDomainElements, viewOrientation);
 	}
 
+	/*
+		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
+		@param objective - The objective for which the score function plot is being rendered.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	This method positions and styles the DiscreteScoreFunction specific elements of the score function plot. Specifically, it renders the bars, bar tops, and bar labels.
+						This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
+						the entire score function plot.
+	*/
 	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		var barWidth: number = ((this.viewConfig.dimensionOneSize / this.domainSize) / usersDomainElements.length) / 2;
 
+		// Position each users' container so theirs bars are properly offset from each other.
 		this.userContainers
 			.attr('transform', (d: UserDomainElements, i: number) => {
 				return 'translate(' + ((viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i)  + ')'))
 			});
 
-
+		// Configure the linear scale that translates scores into pixel units.
 		this.heightScale = d3.scaleLinear()
 			.domain([0, 1]);
 		if (viewOrientation === 'vertical') {
@@ -147,7 +213,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			return Math.max(this.heightScale(scoreFunction.getScore('' + d.element)), this.labelOffset); 
 		};
 
-
+		// Render the utility bars.
 		this.utilityBars
 			.attr(this.viewConfig.dimensionOne, barWidth)
 			.attr(this.viewConfig.dimensionTwo, calculateBarDimensionTwo)
@@ -157,6 +223,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('stroke', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
 
+		// Render the bar labels.
 		this.barLabels
 			.text((d: any, i: number) => { 
 				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
@@ -168,7 +235,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('font-size', 8);
 
-
+		// Render the bar tops.
 		this.barTops
 			.attr(this.viewConfig.dimensionOne, barWidth)
 			.attr(this.viewConfig.dimensionTwo, this.labelOffset)
@@ -181,6 +248,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.toggleDragToChangeScore(this.valueChartService.isIndividual(), objective, viewOrientation);
 	}
 
+	/*
+		@param enableDragging - Whether dragging to alter a user's score function should be enabled. 
+		@param objective - The objective for which the score function plot is being rendered.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	This method toggles the interaction that allows clicking and dragging on bar tops to alter a user's score function.
+	*/
 	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {
 		var dragToChangeScore = d3.drag();
 
@@ -210,8 +284,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			});
 		}
 
+		// Set the drag listeners on the bar top elements.
 		this.barTops.call(dragToChangeScore);
 
+		// Set the cursor style for the bar tops to indicate that they are drag-able.
 		this.barTops.style('cursor', () => {
 			if (!enableDragging) {
 				return 'auto';
@@ -221,6 +297,11 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		});
 	}
 
+	/*
+		@param enableDragging - A boolean value indicating whether or not to display the  score labels.
+		@returns {void}
+		@description	This method toggles the interaction that allows clicking and dragging on bar tops to alter a user's score function.
+	*/
 	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
 		if (displayScoreFunctionValueLabels) {
 			this.barLabelContainer.style('display', 'block');

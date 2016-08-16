@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:29:41
+* @Last Modified time: 2016-08-16 09:39:16
 */
 
 import { Injectable } 					from '@angular/core';
@@ -43,6 +43,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	private heightScale: d3.Linear<number, number>;
 
+	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
 		FITLINES_CONTAINER: 'scorefunction-fitlines-container',
 		FITLINE: 'scorefunction-fitline',

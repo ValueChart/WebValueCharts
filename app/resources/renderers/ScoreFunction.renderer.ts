@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:55:15
+* @Last Modified time: 2016-08-16 09:59:06
 */
 
 // Import Angular Classes:
@@ -91,9 +91,8 @@ export abstract class ScoreFunctionRenderer {
 
 	/*
 		@returns {void}
-		@description 	Used for Angular's dependency injection. Dependency injection and creation of the class via this constructor is only even 
-						manually done by the ScoreFunctionViewerComponent, and this is out of necessity. Try hard to avoid manually constructing instances of this class.
-						It should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
+		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. 
+						This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
 	constructor(
 			protected valueChartService: ValueChartService, 
@@ -176,7 +175,7 @@ export abstract class ScoreFunctionRenderer {
 
 
 	/*
-		@param plotElementsContainer - The 'g' element that is intended to contain the elements of the score function plot. Elements refers to bars/points, fit lines, labels, etc.
+		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. These are 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
 		@param objective - The objective for which the score function plot is going to be created.
 		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
@@ -186,7 +185,7 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId = objective.getId();
-
+		// Create the user containers. Each user should have one 'g' element that will hold the elements of its plot. Elements refers to bars, points, fit lines, etc.
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
 			.data(usersDomainElements)
 			.enter().append('g')
