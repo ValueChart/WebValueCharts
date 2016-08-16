@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 15:13:32
+* @Last Modified time: 2016-08-15 23:14:24
 */
 
 // Import Angular Classes"
@@ -84,10 +84,10 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 
 	/*
-		@param el - The element that is will be used as the parent of the objective chart.
+		@param el - The element that to be used as the parent of the objective chart.
 		@param rows - The data that the objective chart is going to represent. Must be of the type RowData.
 		@returns {void}
-		@description	Creates the base containers and elements for the objective Chart of a ValueChart. t should be called when
+		@description	Creates the base containers and elements for the objective Chart of a ValueChart. It should be called when
 						creating am objective chart for the first time, but not when updating as the basic framework of the chart never needs to be
 						constructed again. Instead, call the createObjectiveRows method to add or remove rows, and user columns from the 
 						objective chart.

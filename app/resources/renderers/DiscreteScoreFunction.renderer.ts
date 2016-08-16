@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 10:40:25
+* @Last Modified time: 2016-08-15 23:59:31
 */
 
 import { Injectable } 									from '@angular/core';
@@ -118,13 +118,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			labelCoordinateOneOffset = (1.5 * this.labelOffset) + 5;
 		}
 
-		domainLabels.attr(this.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+		domainLabels.attr(this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 		
 		this.renderDiscretePlot(plotElementsContainer, objective, usersDomainElements, viewOrientation);
 	}
 
 	renderDiscretePlot(plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
-		var barWidth: number = ((this.dimensionOneSize / this.domainSize) / usersDomainElements.length) / 2;
+		var barWidth: number = ((this.viewConfig.dimensionOneSize / this.domainSize) / usersDomainElements.length) / 2;
 
 		this.userContainers
 			.attr('transform', (d: UserDomainElements, i: number) => {
@@ -149,10 +149,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 
 		this.utilityBars
-			.attr(this.dimensionOne, barWidth)
-			.attr(this.dimensionTwo, calculateBarDimensionTwo)
-			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
-			.attr(this.coordinateTwo, (d: DomainElement) => {
+			.attr(this.viewConfig.dimensionOne, barWidth)
+			.attr(this.viewConfig.dimensionTwo, calculateBarDimensionTwo)
+			.attr(this.viewConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo;
 			})
 			.style('stroke', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
@@ -162,18 +162,18 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				return Math.round(100 * scoreFunction.getScore(d.element)) / 100; 
 			})
-			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
-			.attr(this.coordinateTwo, (d: DomainElement) => {
+			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
+			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			})
 			.style('font-size', 8);
 
 
 		this.barTops
-			.attr(this.dimensionOne, barWidth)
-			.attr(this.dimensionTwo, this.labelOffset)
-			.attr(this.coordinateOne, this.calculatePlotElementCoordinateOne)
-			.attr(this.coordinateTwo, (d: DomainElement) => {
+			.attr(this.viewConfig.dimensionOne, barWidth)
+			.attr(this.viewConfig.dimensionTwo, this.labelOffset)
+			.attr(this.viewConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
 				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
 			})
 			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } );
@@ -197,10 +197,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (viewOrientation === 'vertical') {
 					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.viewConfig.coordinateTwo]);
 				} else {
 					// No need to do anything with offsets here because x is already left to right.
-					score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+					score = this.heightScale.invert((<any>d3.event)[this.viewConfig.coordinateTwo]);
 				}
 				score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
 

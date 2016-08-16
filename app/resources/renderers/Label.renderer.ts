@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 17:14:55
+* @Last Modified time: 2016-08-15 23:29:29
 */
 
 // Import Angular Classes:
@@ -477,7 +477,7 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(el, datum, width, height, viewOrientation);
+			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(datum, width, height, viewOrientation);
 			this.scoreFunctionRenderers[datum.getId()].toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
 
 			weightOffset += objectiveWeight;
