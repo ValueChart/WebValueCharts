@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-19 10:32:05
+* @Last Modified time: 2016-08-15 23:29:41
 */
 
 import { Injectable } 					from '@angular/core';
@@ -125,7 +125,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.fitLines = linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE);
 	}
 
-	// This method overrides the rednerPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 
+	// This method overrides the renderPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction specific elements, 
 	// like points and connecting lines for the scatter plot that is used to represent element scores.
 	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
@@ -154,8 +154,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		};
 
 		this.plottedPoints
-			.attr('c' + this.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
-			.attr('c' + this.coordinateTwo, calculatePointCoordinateTwo)
+			.attr('c' + this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
+			.attr('c' + this.viewConfig.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
 			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
 			.style('fill-opacity', 0.5)
@@ -167,15 +167,15 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100; 
 			})
-			.attr(this.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
-			.attr(this.coordinateTwo, calculatePointCoordinateTwo)
+			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
+			.attr(this.viewConfig.coordinateTwo, calculatePointCoordinateTwo)
 			.style('font-size', 8);
 
 		this.fitLines
-			.attr(this.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
-			.attr(this.coordinateTwo + '1', calculatePointCoordinateTwo)
-			.attr(this.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
-			.attr(this.coordinateTwo + '2', (d: DomainElement, i: number) => { 
+			.attr(this.viewConfig.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
+			.attr(this.viewConfig.coordinateTwo + '1', calculatePointCoordinateTwo)
+			.attr(this.viewConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: DomainElement, i: number) => { 
 				var userElements = usersDomainElements.find((userElements: UserDomainElements) => {
 					return userElements.user.getUsername() === d.user.getUsername();
 				});
@@ -201,10 +201,10 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (viewOrientation === 'vertical') {
 					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.coordinateTwo]);
+					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.viewConfig.coordinateTwo]);
 				} else {
 					// No need to do anything with offsets here because x is already left to right.
-					score = this.heightScale.invert((<any>d3.event)[this.coordinateTwo]);
+					score = this.heightScale.invert((<any>d3.event)[this.viewConfig.coordinateTwo]);
 				}
 				score = Math.max(0, Math.min(score, 1)); // Normalize the score to be between 0 and 1.
 

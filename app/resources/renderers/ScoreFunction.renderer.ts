@@ -2,20 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-25 16:10:53
+* @Last Modified time: 2016-08-15 23:55:15
 */
 
+// Import Angular Classes:
 import { Injectable } 												from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 														from 'd3';
 
-// Application Classes
+// Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
-// Model Classes
+// Import Model Classes:
 import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { ScoreFunction }											from '../model/ScoreFunction';
@@ -25,45 +26,45 @@ import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 import { DomainElement, UserDomainElements } 						from '../types/ScoreFunctionViewer.types';
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
-// axis, labels, and base containers of a ScoreFunction.
+// axis, labels, and base containers of a ScoreFunction. It is an abstract class and should NOT be instantiated or used for any reason. This class has 
+// uses outside of rendering a ValueChart, and as such is decoupled as much as possible from the services associated with the ValueChartDirective.
 
 @Injectable()
 export abstract class ScoreFunctionRenderer {
 
-	protected domainSize: number;					// The number of domain elements the score function needs to plot.
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	// d3 Selections saved as fields to avoid parsing the DOM when unnecessary. 
+	protected domainSize: number;							// The number of domain elements the score function needs to plot.
+	protected objective: PrimitiveObjective;				// The primitive objective this renderer is creating a plot for.
+	protected usersDomainElements: UserDomainElements[];		// The data that this class is rendering. 
 
-	public rootContainer: d3.Selection<any>;						// The 'g' element that is the root container of the score function plot.
-	public plotOutline: d3.Selection<any>;						// The 'rect' element that is used to outline the score function plot
-	public plotContainer: d3.Selection<any>;						// The 'g' element that contains the plot itself.
-	public domainLabelContainer: d3.Selection<any>;				// The 'g' element that contains the labels for each domain element. 
-	public domainLabels: d3.Selection<any>;						// The collection of 'text' elements s.t. each element is a label for one domain element.
-	public plotElementsContainer: d3.Selection<any>;				// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
-	public axisContainer: d3.Selection<any>;						// The 'g' element that conntains the y and x axis.
-	public utilityLabelContainer: d3.Selection<any>;				// The 'g' element that contains the labels for utility axis.
-	public userContainers: d3.Selection<any>;
+	// d3 Selections:
+	public rootContainer: d3.Selection<any>;				// The 'g' element that is the root container of the score function plot.
+	public plotOutline: d3.Selection<any>;					// The 'rect' element that is used to outline the score function plot
+	public plotContainer: d3.Selection<any>;				// The 'g' element that contains the plot itself.
+	public domainLabelContainer: d3.Selection<any>;			// The 'g' element that contains the labels for each domain element. 
+	public domainLabels: d3.Selection<any>;					// The collection of 'text' elements s.t. each element is a label for one domain element.
+	public plotElementsContainer: d3.Selection<any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
+	public userContainers: d3.Selection<any>;				// The collection of 'g' elements s.t. each element is a container for the plot elements of one user.
+	public axisContainer: d3.Selection<any>;				// The 'g' element that conntains the y and x axis.
+	public utilityLabelContainer: d3.Selection<any>;		// The 'g' element that contains the labels for utility axis.
 
 
-
+	// View Configuration Fields:
+	protected viewConfig: any = {};							// The viewConfig object for this renderer. It is not configured using the renderConfigService because this class has
+															// intentionally been decoupled from that, and other, services.
 	protected utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
 	protected domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
 	protected utilityAxisMaxCoordinateTwo: number;			// The y coordinate of the top of the y-axis
 	protected domainAxisMaxCoordinateOne: number;			// The x coordinate of the rightmost end of the x-axis.
 
-	protected labelOffset: number = 15;	// Minimum offset of the x and y axis from the edge of the container in a score function plot.
-
-	protected dimensionOne: string;
-	protected dimensionTwo: string;
-	protected coordinateOne: string;
-	protected coordinateTwo: string;
-	protected dimensionOneSize: number;
-	protected dimensionTwoSize: number;
-
-	protected objective: PrimitiveObjective;
-	protected usersDomainElements: any;
+	// Constants for Rendering:
+	protected labelOffset: number = 15;						// Minimum offset of the x and y axis from the edge of the container in a score function plot.
 
 
+	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
 		OUTLINE_CONTAINER: 'scorefunction-outline-container',
 		PLOT_OUTLINE: 'scorefunction-plot-outline',
@@ -83,13 +84,35 @@ export abstract class ScoreFunctionRenderer {
 
 	};
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection. Dependency injection and creation of the class via this constructor is only even 
+						manually done by the ScoreFunctionViewerComponent, and this is out of necessity. Try hard to avoid manually constructing instances of this class.
+						It should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
+	*/
 	constructor(
 			protected valueChartService: ValueChartService, 
 			protected scoreFunctionViewerService: ScoreFunctionViewerService,
 			protected chartUndoRedoService: ChartUndoRedoService) { }
 
-	// This function creates the base containers and elements for a score function plot.s
+
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	/*
+		@param el - The element that to be used as the parent of the objective chart.
+		@param objective - The objective for which the score function plot is going to be created.
+		@returns {void}
+		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
+						sub classes of this class should call createScoreFunction before creating any of their specific elements.
+	*/
 	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective): void {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
@@ -127,8 +150,13 @@ export abstract class ScoreFunctionRenderer {
 		this.createPlot(this.plotElementsContainer, this.domainLabelContainer, objective, usersDomainElements);
 	}
 
-	// This function creates the axis of a score function plot, both x and y, and creates the utility axis labels.
-	// Note that the domain labels are created in createPlot, because they are data dependent.
+	/*
+		@param plotContainer - The 'g' element that is intended to contain the score function plot.
+		@param objectiveId - The id of the objective for which this score function plot is being created. This is for use in setting element IDs.
+		@returns {void}
+		@description 	Creates the axes of a score function plot, both x and y, and creates the utility axis labels. 
+						Note that the domain labels are created in createPlot because they are data dependent.
+	*/
 	createScoreFunctionAxis(plotContainer: d3.Selection<any>, objectiveId: string): void {
 		
 		this.axisContainer = plotContainer.append('g')
@@ -146,8 +174,16 @@ export abstract class ScoreFunctionRenderer {
 			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container'); 
 	}
 
-	// This function creates the domain labels for the domain element axis. DiscreteScoreFunction and ContinuousScoreFunction extend this method in order
-	// to create the specific elements they need.
+
+	/*
+		@param plotElementsContainer - The 'g' element that is intended to contain the elements of the score function plot. Elements refers to bars/points, fit lines, labels, etc.
+		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
+		@param objective - The objective for which the score function plot is going to be created.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@returns {void}
+		@description 	Creates the user containers, which will contain each users plot elements, and the domain labels for the domain element axis. 
+						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
+	*/
 	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId = objective.getId();
 
@@ -169,77 +205,99 @@ export abstract class ScoreFunctionRenderer {
 		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL);
 	}
 
-	// This function renders the elements created by createScoreFunction
-	renderScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, width: number, height: number, viewOrientation: string): void {
+	/*
+		@param objective - The objective for which the score function plot is going to be created.
+		@param width - The width of the area in which to render the score function plot.
+		@param height - The height of the area in which to render the score function plot.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	Initializes the view configuration for the score function plot, and then positions + styles its elements. This method should be used 
+						whenever the score function plot needs to be rendered for the first time, or when updated in response to changes to users' ScoreFunctions.
+						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
+						render plot method (which is overwritten by subclasses), and the renderScoreFunctionAxis to render the different parts of the score function plot.
+	*/
+	renderScoreFunction(objective: PrimitiveObjective, width: number, height: number, viewOrientation: string): void {
 		var objectiveId: string = objective.getId();
 
+		// Initialize the view configuration. This code is very similar to that in RenderConfigService, but is duplicated here to avoid a dependency on that class.
 		if (viewOrientation === 'vertical') {
-			this.dimensionOne = 'width';
-			this.dimensionTwo = 'height';
-			this.coordinateOne = 'x';
-			this.coordinateTwo = 'y';
+			this.viewConfig.dimensionOne = 'width';
+			this.viewConfig.dimensionTwo = 'height';
+			this.viewConfig.coordinateOne = 'x';
+			this.viewConfig.coordinateTwo = 'y';
 
-			this.dimensionOneSize = width;
-			this.dimensionTwoSize = height;
+			this.viewConfig.dimensionOneSize = width;
+			this.viewConfig.dimensionTwoSize = height;
 
-			this.domainAxisCoordinateTwo = Math.min((19 / 20) * this.dimensionTwoSize, this.dimensionTwoSize - this.labelOffset);
+			// Determine the positions of the two axis.
+			this.domainAxisCoordinateTwo = Math.min((19 / 20) * this.viewConfig.dimensionTwoSize, this.viewConfig.dimensionTwoSize - this.labelOffset);
 
-			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize / 20, 5);
+			this.utilityAxisMaxCoordinateTwo = Math.max(this.viewConfig.dimensionTwoSize / 20, 5);
 			this.utilityAxisCoordinateOne = this.labelOffset;
 			
 		} else {
-			this.dimensionOne = 'height';
-			this.dimensionTwo = 'width';
-			this.coordinateOne = 'y';
-			this.coordinateTwo = 'x';
+			this.viewConfig.dimensionOne = 'height';
+			this.viewConfig.dimensionTwo = 'width';
+			this.viewConfig.coordinateOne = 'y';
+			this.viewConfig.coordinateTwo = 'x';
 
-			this.dimensionOneSize = height;
-			this.dimensionTwoSize = width;
+			this.viewConfig.dimensionOneSize = height;
+			this.viewConfig.dimensionTwoSize = width;
 
-			this.domainAxisCoordinateTwo = Math.max((1 / 20) * this.dimensionTwoSize, this.labelOffset) + 10;
+			// Determine the positions of the two axis.
+			this.domainAxisCoordinateTwo = Math.max((1 / 20) * this.viewConfig.dimensionTwoSize, this.labelOffset) + 10;
 
-			this.utilityAxisMaxCoordinateTwo = Math.max(this.dimensionTwoSize * (19 / 20), 5);
+			this.utilityAxisMaxCoordinateTwo = Math.max(this.viewConfig.dimensionTwoSize * (19 / 20), 5);
 			this.utilityAxisCoordinateOne = this.labelOffset;
 		}
 
-		this.domainAxisMaxCoordinateOne = Math.min((19 / 20) * this.dimensionOneSize, this.dimensionOneSize - this.labelOffset);
+		this.domainAxisMaxCoordinateOne = Math.min((19 / 20) * this.viewConfig.dimensionOneSize, this.viewConfig.dimensionOneSize - this.labelOffset);
 
-
-
+		// Give the plot outline the correct dimensions.
 		this.plotOutline
-			.attr(this.dimensionOne, this.dimensionOneSize - 1)
-			.attr(this.dimensionTwo, this.dimensionTwoSize);
+			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize - 1)
+			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
 
 
-		this.renderScoreFunctionAxis(this.axisContainer, this.utilityLabelContainer, objectiveId, viewOrientation);
+		this.renderScoreFunctionAxis(this.axisContainer, objectiveId, viewOrientation);
 
 		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);			
 	}
 
-	// This function renders the elements created by createScoreFunctionAxis
-	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, utilityLabelContainer: d3.Selection<any>, objectiveId: string, viewOrientation: string): void {
+	/*
+		@param axisContainer - The 'g' element that the axes elements are in.
+		@param objectiveId - The Id of the objective this score function plot is for. Used for creating SVG element IDs.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
+						the axes elements should be done as part of a call to renderScoreFunction instead.
+	*/
+	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, objectiveId: string, viewOrientation: string): void {
 
+		// Position the domain axis.
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.DOMAIN_AXIS)
-			.attr(this.coordinateOne + '1', this.utilityAxisCoordinateOne)
-			.attr(this.coordinateTwo + '1', this.domainAxisCoordinateTwo)
-			.attr(this.coordinateOne + '2', this.domainAxisMaxCoordinateOne)
-			.attr(this.coordinateTwo + '2', this.domainAxisCoordinateTwo);
+			.attr(this.viewConfig.coordinateOne + '1', this.utilityAxisCoordinateOne)
+			.attr(this.viewConfig.coordinateTwo + '1', this.domainAxisCoordinateTwo)
+			.attr(this.viewConfig.coordinateOne + '2', this.domainAxisMaxCoordinateOne)
+			.attr(this.viewConfig.coordinateTwo + '2', this.domainAxisCoordinateTwo);
 
 
-		// Delete the elements of the previous scale:
+		// Delete the elements of the previous utility axis:
 		var elements: any = (<any> axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].remove();
 		}
 
-		// Create the new Scale:
+		// Create the new Scale for use creating the utility axis:
 		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
 			.domain([0, 1])
 
+		// Calculate the correct height of the utility axis.
 		var utilityScaleHeight: number = (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo - this.utilityAxisMaxCoordinateTwo) : (this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo);
 
 		var utilityAxis: any;
 
+		// The range of the scale must be inverted for the vertical axis because pixels coordinates set y to increase downwards, rather than upwards as normal.
 		if (viewOrientation === 'vertical') {
 			uilityScale.range([utilityScaleHeight, 0]);
 			utilityAxis = d3.axisLeft(uilityScale);
@@ -248,8 +306,10 @@ export abstract class ScoreFunctionRenderer {
 			utilityAxis = d3.axisTop(uilityScale);
 		}
 
+		// The utility axis should have two ticks. For some reason 1 is the way to do this...
 		utilityAxis.ticks(1);
 
+		// Position the axis by positioning the axis container and then create it.
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER)
 			.attr('transform', () => { 
 				return 'translate(' + ((viewOrientation === 'vertical') ? ((this.utilityAxisCoordinateOne + 4) + ',' + (this.utilityAxisMaxCoordinateTwo - .5) +')') : ((this.domainAxisCoordinateTwo - .5) + ', ' + (this.utilityAxisCoordinateOne + 4) + ')'));
@@ -258,8 +318,17 @@ export abstract class ScoreFunctionRenderer {
 			.style('font-size', 8);
 	}
 
-	// This function renders the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
-	// to render their specific elements.
+	/*
+		@param domainLabels - The selection 'text' elements used to label the domain axis.
+		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
+		@param objective - The objective for which the score function plot is being rendered.
+		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@returns {void}
+		@description	Positions and styles the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
+						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
+						the entire score function plot. Note that parameters not actively used in this method are used in the extended methods of the subclasses.
+	*/
 	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 
 		this.domainSize = usersDomainElements[0].elements.length;
@@ -275,9 +344,10 @@ export abstract class ScoreFunctionRenderer {
 			labelCoordinateTwo = this.domainAxisCoordinateTwo - (this.labelOffset);
 		}
 
+		// Position the domain labels along the domain (x) axis.
 		domainLabels
-			.attr(this.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
-			.attr(this.coordinateTwo, labelCoordinateTwo)
+			.attr(this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+			.attr(this.viewConfig.coordinateTwo, labelCoordinateTwo)
 			.text((d: DomainElement) => { return d.element; })
 			.style('font-size', '9px');
 	}
@@ -286,7 +356,9 @@ export abstract class ScoreFunctionRenderer {
 
 
 
-	// Anonymous functions that are used often enough to be made class fields:
+	// ========================================================================================
+	// 			Anonymous functions that are used often enough to be made class fields
+	// ========================================================================================
 
 	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + this.labelOffset * 1.5; }
 }
