@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 15:35:37
+* @Last Modified time: 2016-08-16 20:55:20
 */
 
 // Angular Resources:
 import { Injectable } 												from '@angular/core';
 
 // d3
-import * as d3 																	from 'd3';
+import * as d3 														from 'd3';
 
 // Application Classes: 
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
@@ -21,7 +21,7 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 import { ContinuousScoreFunction }									from '../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 
-import { ElementUserScoresSummary } 						from '../types/ScoreFunctionViewer.types';
+import { ElementUserScoresSummary } 								from '../types/ScoreFunctionViewer.types';
 
 
 
