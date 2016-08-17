@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:19:45
+* @Last Modified time: 2016-08-17 15:08:37
 */
 
 import { Component }									from '@angular/core';
@@ -12,7 +12,7 @@ import { OnInit }										from '@angular/core';
 // Application classes:
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { UserHttpService }								from '../../services/UserHttp.service';
-import { GroupVcHttpService }							from '../../services/GroupVcHttp.service';
+import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ExportValueChartComponent }					from '../exportValueChart-component/ExportValueChart.component';
 import { ValueChartXMLEncoder }							from '../../utilities/ValueChartXMLEncoder';
 
@@ -34,7 +34,7 @@ export class MyValueChartsComponent implements OnInit {
 		private valueChartXMLEncoder: ValueChartXMLEncoder,
 		private currentUserService: CurrentUserService,
 		private userHttpService: UserHttpService,
-		private groupVcHttpService: GroupVcHttpService) { }
+		private valueChartHttpService: ValueChartHttpService) { }
 
 
 	ngOnInit() {
@@ -48,7 +48,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	openValueChart(chartId: string, password: string): void {
-		this.groupVcHttpService.getValueChart(chartId, password)
+		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.currentUserService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
@@ -57,7 +57,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	deleteValueChart(chartId: string): void {
-		this.groupVcHttpService.deleteValueChart(chartId)
+		this.valueChartHttpService.deleteValueChart(chartId)
 			.subscribe(status => {
 				var index: number = this.valueChartSummaries.findIndex((valueChartSummary: any) => {
 					return valueChartSummary._id === chartId;
@@ -67,7 +67,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	openExportChartModal(chartId: string, password: string): void {
-		this.groupVcHttpService.getValueChart(chartId, password)
+		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.currentUserService.setValueChart(valueChart);
 			});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:23:33
+* @Last Modified time: 2016-08-17 15:20:01
 */
 
 import { Component }															from '@angular/core';
@@ -17,21 +17,21 @@ import * as $																	from 'jquery';
 import * as toastr 																from 'toastr';
 
 // Application classes
-import { CreateComponent }														from '../create-component/Create.component';
+import { HomeComponent }														from '../home-component/Home.component';
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
 
 import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 
 import { ValueChartService }													from '../../services/ValueChart.service';
-import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
+import { RendererDataService }													from '../../services/RendererData.service';
 import { ScoreFunctionViewerService }											from '../../services/ScoreFunctionViewer.service';
 import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 import { RenderEventsService }													from '../../services/RenderEvents.service';
 import { HostService }															from '../../services/Host.service';
-import { GroupVcHttpService }													from '../../services/GroupVcHttp.service';
+import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -40,7 +40,7 @@ import { LabelRenderer }														from '../../renderers/Label.renderer';
 import { ReorderObjectivesInteraction }											from '../../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
-import { SetColorsInteraction }													from '../../interactions/SetColors.interaction';
+import { SetObjectiveColorsInteraction }										from '../../interactions/SetObjectiveColors.interaction';
 import { ExpandScoreFunctionInteraction }										from '../../interactions/ExpandScoreFunction.interaction';
 
 
@@ -63,7 +63,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	providers: [
 	// Services:
 		ValueChartService,
-		ValueChartViewerService,
+		RendererDataService,
 		ScoreFunctionViewerService,
 		RenderConfigService,
 		ChartUndoRedoService,
@@ -78,7 +78,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ReorderObjectivesInteraction,
 		ResizeWeightsInteraction,
 		SortAlternativesInteraction,
-		SetColorsInteraction,
+		SetObjectiveColorsInteraction,
 		ExpandScoreFunctionInteraction,
 
 	// Definitions:
@@ -163,7 +163,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private summaryChartDefinitions: SummaryChartDefinitions,
 		private objectiveChartDefinitions: ObjectiveChartDefinitions,
 		private labelDefinitions: LabelDefinitions,
-		private groupVcHttpService: GroupVcHttpService,
+		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 
 	ngOnInit() {
@@ -277,7 +277,7 @@ export class ValueChartViewerComponent implements OnInit {
 		
 		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
 		if (!this.valueChart._id) {
-			this.groupVcHttpService.createValueChart(this.valueChart)
+			this.valueChartHttpService.createValueChart(this.valueChart)
 				.subscribe(
 					(valueChart: ValueChart) => { 
 						// Set the id of the ValueChart.
@@ -302,7 +302,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 		// that has been retrieved from the server.
-		this.groupVcHttpService.updateUser(this.valueChart._id, currentUser)
+		this.valueChartHttpService.updateUser(this.valueChart._id, currentUser)
 			.subscribe(
 				// User added/updated!
 				(user: User) => { 

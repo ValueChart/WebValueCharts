@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 15:11:11
+* @Last Modified time: 2016-08-17 15:19:40
 */
 
 import { Injectable } 															from '@angular/core';
@@ -21,7 +21,7 @@ import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 
 
 @Injectable()
-export class SetColorsInteraction {
+export class SetObjectiveColorsInteraction {
 
 	constructor(
 		private changeDetectionService: ChangeDetectionService, 

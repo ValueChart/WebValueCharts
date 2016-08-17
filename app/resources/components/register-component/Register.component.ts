@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:23:30
+* @Last Modified time: 2016-08-17 14:54:25
 */
 
 import { Component }										from '@angular/core';
@@ -90,7 +90,7 @@ export class RegisterComponent {
 		if (this.currentUserService.isJoiningChart()) {
 			return ['createValueChart', 'newUser'];
 		} else {	// Else, navigate to the create page as normal
-			return ['create'];
+			return ['home'];
 		}
 	}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 14:57:52
+* @Last Modified time: 2016-08-17 15:07:11
 */
 
 import '../../rxjs-operators';
@@ -23,7 +23,7 @@ import { JsonValueChartParser }										from '../utilities/JsonValueChartParser
 import { HostMessage, MessageType }									from '../types/HostMessage';
 
 @Injectable()
-export class GroupVcHttpService {
+export class ValueChartHttpService {
 
 	private valueChartsUrl: string = 'ValueCharts/';
 

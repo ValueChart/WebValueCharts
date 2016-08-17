@@ -2,19 +2,19 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:23:19
+* @Last Modified time: 2016-08-17 15:08:11
 */
 
 import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 
-import * as $															from 'jquery';	
+import * as $											from 'jquery';	
 
 // Application classes:
 import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
-import { GroupVcHttpService }							from '../../services/GroupVcHttp.service';
+import { ValueChartHttpService }							from '../../services/ValueChartHttp.service';
 
 // Model Classes:
 import { ValueChart }									from '../../model/ValueChart';
@@ -23,11 +23,11 @@ import { ValueChart }									from '../../model/ValueChart';
 import { singleHotel, groupHotel, waterManagement}		from '../../data/DemoValueCharts';
 
 @Component({
-	selector: 'create',
-	templateUrl: 'app/resources/components/create-component/Create.template.html',
+	selector: 'home',
+	templateUrl: 'app/resources/components/home-component/Home.template.html',
 	directives: [ROUTER_DIRECTIVES]
 })
-export class CreateComponent {
+export class HomeComponent {
 
 	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Wastewater Management', type: 'Individual' }]
 
@@ -39,10 +39,10 @@ export class CreateComponent {
 		private router: Router,
 		private valueChartParser: XMLValueChartParser, 
 		private currentUserService: CurrentUserService,
-		private groupVcHttpService: GroupVcHttpService) { }
+		private valueChartHttpService: ValueChartHttpService) { }
 
 	joinValueChart(chartName: string, chartPassword: string): void {
-		this.groupVcHttpService.getValueChartStructure(chartName, chartPassword)
+		this.valueChartHttpService.getValueChartStructure(chartName, chartPassword)
 			.subscribe(
 				(valueChart: ValueChart) => { 
 					this.currentUserService.setValueChart(valueChart);

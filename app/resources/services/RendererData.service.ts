@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 14:27:52
+* @Last Modified time: 2016-08-17 15:13:13
 */
 
 import { Injectable } 										from '@angular/core';
@@ -36,7 +36,7 @@ import { AlternativeOrderRecord }							from '../types/Record.types';
 // and for updating this data in response to user actions.
 
 @Injectable()
-export class ValueChartViewerService {
+export class RendererDataService {
 
 	private originalAlternativeOrder: AlternativeOrderRecord;
 	private rowData: RowData[];

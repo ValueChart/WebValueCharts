@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-13 14:46:03
+* @Last Modified time: 2016-08-17 15:14:04
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,7 +13,7 @@ import * as d3 														from 'd3';
 
 // Application Classes
 import { ValueChartService}											from '../services/ValueChart.service';
-import { ValueChartViewerService}									from '../services/ValueChartViewer.service';
+import { RendererDataService}									from '../services/RendererData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -61,7 +61,7 @@ export class ReorderObjectivesInteraction {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
+		private rendererDataService: RendererDataService,
 		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelRenderer: LabelRenderer,
@@ -232,7 +232,7 @@ export class ReorderObjectivesInteraction {
 
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
-		this.valueChartViewerService.reorderRows(primitiveObjectives);
+		this.rendererDataService.reorderRows(primitiveObjectives);
 		this.valueChartService.setPrimitivesObjectives(primitiveObjectives);
 
 		this.changeDetectionService.objectiveOrderChanged = true;

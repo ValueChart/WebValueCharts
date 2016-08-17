@@ -16,7 +16,7 @@ import { CreationStepsService }											from '../../services/CreationSteps.ser
 import { ValueChartService }											from '../../services/ValueChart.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
-import { GroupVcHttpService }											from '../../services/GroupVcHttp.service';
+import { ValueChartHttpService }											from '../../services/ValueChartHttp.service';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../model/ValueChart';
@@ -95,7 +95,7 @@ export class CreateValueChartComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
-		private groupVcHttpService: GroupVcHttpService,
+		private valueChartHttpService: ValueChartHttpService,
 		private creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) { }
@@ -229,7 +229,7 @@ export class CreateValueChartComponent implements OnInit, OnDestroy {
 
 	saveValueChartToDatabase() {
 		if (!this.valueChart._id) {
-			this.groupVcHttpService.createValueChart(this.valueChart)
+			this.valueChartHttpService.createValueChart(this.valueChart)
 				.subscribe(
 				(valueChart: ValueChart) => {
 					// Set the id of the ValueChart.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:14:05
+* @Last Modified time: 2016-08-17 15:14:02
 */
 
 // Import Angular Classes:
@@ -16,7 +16,7 @@ import * as $														from 'jquery';
 
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
-import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
+import { RendererDataService }										from '../services/RendererData.service';
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -82,7 +82,7 @@ export class LabelRenderer {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
+		private rendererDataService: RendererDataService,
 		private scoreFunctionViewerService: ScoreFunctionViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private defs: LabelDefinitions,
@@ -240,7 +240,7 @@ export class LabelRenderer {
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
-		this.labelWidth = this.valueChartViewerService.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
+		this.labelWidth = this.rendererDataService.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer

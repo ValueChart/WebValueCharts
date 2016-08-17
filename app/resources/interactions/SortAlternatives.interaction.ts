@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:14:12
+* @Last Modified time: 2016-08-17 15:14:03
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,7 +14,7 @@ import * as $														from 'jquery';
 
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
-import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
+import { RendererDataService }									from '../services/RendererData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
@@ -64,7 +64,7 @@ export class SortAlternativesInteraction {
 		private summaryChartRenderer: SummaryChartRenderer,
 		private renderConfigService: RenderConfigService,
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
+		private rendererDataService: RendererDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
 		private summaryChartDefinitions: SummaryChartDefinitions,
@@ -79,7 +79,7 @@ export class SortAlternativesInteraction {
 		} else if (sortingType === this.SORT_ALPHABETICALLY) {
 			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
-			this.valueChartViewerService.reorderAllCells(this.valueChartViewerService.generateCellOrderAlphabetically());
+			this.rendererDataService.reorderAllCells(this.rendererDataService.generateCellOrderAlphabetically());
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_MANUALLY) {
@@ -88,7 +88,7 @@ export class SortAlternativesInteraction {
 		} else if (sortingType === this.RESET_SORT) {
 			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
-			this.valueChartViewerService.resetCellOrder();
+			this.rendererDataService.resetCellOrder();
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_OFF) {
@@ -136,8 +136,8 @@ export class SortAlternativesInteraction {
 			} else {
 				objectivesToReorderBy = [<PrimitiveObjective> objective];
 			}
-			var cellIndices: number[] = this.valueChartViewerService.generateCellOrderByObjectiveScore(this.valueChartViewerService.getRowData(), objectivesToReorderBy)
-			this.valueChartViewerService.reorderAllCells(cellIndices);
+			var cellIndices: number[] = this.rendererDataService.generateCellOrderByObjectiveScore(this.rendererDataService.getRowData(), objectivesToReorderBy)
+			this.rendererDataService.reorderAllCells(cellIndices);
 			this.changeDetectionService.alternativeOrderChanged = true;
 		}
 
@@ -230,7 +230,7 @@ export class SortAlternativesInteraction {
 			alternatives.splice(this.newAlternativeIndex, 0, temp);
 
 
-			this.valueChartViewerService.getRowData().forEach((row: RowData) => {
+			this.rendererDataService.getRowData().forEach((row: RowData) => {
 				var temp: CellData = row.cells.splice(this.currentAlternativeIndex, 1)[0];
 				row.cells.splice(this.newAlternativeIndex, 0, temp);
 			});

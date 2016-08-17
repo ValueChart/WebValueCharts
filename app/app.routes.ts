@@ -2,21 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 17:23:08
+* @Last Modified time: 2016-08-17 15:36:42
 */
 
 import { provideRouter, RouterConfig } 								from '@angular/router';
 
 // Application Classes
 import { RegisterComponent }										from './resources/components/register-component/Register.component';
-import { CreateComponent }											from './resources/components/create-component/Create.component';
+import { HomeComponent }											from './resources/components/home-component/Home.component';
 import { MyValueChartsComponent }									from './resources/components/myValueCharts-component/MyValueCharts.component';
 import { AccountComponent }											from './resources/components/account-component/Account.component';
 import { CreateValueChartComponent }								from './resources/components/createValueChart-component/CreateValueChart.component';
 import { ValueChartViewerComponent }								from './resources/components/valueChartViewer-component/ValueChartViewer.component';
 import { ScoreFunctionViewerComponent }								from './resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.component';
 
-import { GroupVcHttpService }										from './resources/services/GroupVcHttp.service';
+import { ValueChartHttpService }									from './resources/services/ValueChartHttp.service';
 import { CurrentUserService }										from './resources/services/CurrentUser.service';
 import { AuthGuardService }											from './resources/services/AuthGuard.service';
 import { JoinGuardService }											from './resources/services/JoinGuard.service';
@@ -25,7 +25,7 @@ import { JoinGuardService }											from './resources/services/JoinGuard.servi
 export const routes: RouterConfig = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'join/ValueCharts/:ValueChart', component: RegisterComponent, canActivate: [JoinGuardService] },
-	{ path: 'create', component: CreateComponent, canActivate: [AuthGuardService] },
+	{ path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
 	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent, canActivate: [AuthGuardService] },
@@ -37,5 +37,5 @@ export const routes: RouterConfig = [
 
 export const APP_ROUTER_PROVIDERS = [
 	provideRouter(routes),
-	[AuthGuardService, JoinGuardService, CurrentUserService, GroupVcHttpService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService]
 ];

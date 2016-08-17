@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:14:21
+* @Last Modified time: 2016-08-17 15:14:04
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,7 +14,7 @@ import * as $														from 'jquery';
 
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
-import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
+import { RendererDataService }									from '../services/RendererData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -43,7 +43,7 @@ export class ResizeWeightsInteraction {
 		private renderConfigService: RenderConfigService,
 		private labelRenderer: LabelRenderer,
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
+		private rendererDataService: RendererDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { }
 
@@ -131,13 +131,13 @@ export class ResizeWeightsInteraction {
 				let currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
 
 				if (d.objective.objectiveType === 'abstract') {
-					this.valueChartViewerService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
 				} else {
 					weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
 				}
 
 				if (siblings[i - 1].objective.objectiveType === 'abstract') {
-					this.valueChartViewerService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
 				} else {
 					weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
 				}
@@ -151,15 +151,15 @@ export class ResizeWeightsInteraction {
 					siblingsToIncrease = siblings.slice(0, i);
 					siblingsToDecrease = siblings.slice(i);
 
-					this.valueChartViewerService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
-					this.valueChartViewerService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
 
 				} else {
 					siblingsToIncrease = siblings.slice(i);
 					siblingsToDecrease = siblings.slice(0, i);
 
-					this.valueChartViewerService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
-					this.valueChartViewerService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
+					this.rendererDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
 				}
 			}
 		});

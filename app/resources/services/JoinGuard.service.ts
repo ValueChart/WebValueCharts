@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-11 10:56:57
+* @Last Modified time: 2016-08-17 15:09:12
 */
 
 import { Injectable }     														from '@angular/core';
@@ -10,7 +10,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	
 
 // Application Classes:
 import { CurrentUserService }													from './CurrentUser.service';
-import { GroupVcHttpService }													from './GroupVcHttp.service';
+import { ValueChartHttpService }													from './ValueChartHttp.service';
 
 
 @Injectable()
@@ -19,7 +19,7 @@ export class JoinGuardService implements CanActivate {
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
-		private groupVcHttpService: GroupVcHttpService) { }
+		private valueChartHttpService: ValueChartHttpService) { }
 
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) : boolean {
@@ -29,7 +29,7 @@ export class JoinGuardService implements CanActivate {
 		// Retrieve the ValueChart password from the URL query parameters.
 		var password: string = state.queryParams['password'];
 
-		this.groupVcHttpService.getValueChartStructure(name, password)
+		this.valueChartHttpService.getValueChartStructure(name, password)
 			.subscribe( 
 				valueChart => {
 					this.currentUserService.setJoiningChart(true);
