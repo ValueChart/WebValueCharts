@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 15:14:54
+* @Last Modified time: 2016-08-16 23:11:44
 */
 
 import { Injectable } 												from '@angular/core';
@@ -49,15 +49,15 @@ export class SummaryChartRenderer {
 	public chart: d3.Selection<any>;						// The 'g' element that contains all the elements making up the summary chart.
 	public outline: d3.Selection<any>;						// The 'rect' element that outlines the summary chart.
 	public rowsContainer: d3.Selection<any>;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any>;							// The collection of all 'g' elements s.t. each element is a row container.
-	public cells: d3.Selection<any>;						// The collection of all 'g' elements s.t. each element is a cell container.
-	public userScores: d3.Selection<any>;					// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public rows: d3.Selection<any>;							// The selection of all 'g' elements s.t. each element is a row container.
+	public cells: d3.Selection<any>;						// The selection of all 'g' elements s.t. each element is a cell container.
+	public userScores: d3.Selection<any>;					// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	public scoreTotalsContainer: d3.Selection<any>;			// The 'g' element that holds the containers for user score text elements.
-	public scoreTotalsSubContainers: d3.Selection<any>;		// The collection of 'g' elements that hold the user score text elements. There is one container per cell.
-	public scoreTotals: d3.Selection<any>;					// The collection of 'text' elements used to display the total utility of each alternative for each user.
+	public scoreTotalsSubContainers: d3.Selection<any>;		// The selection of 'g' elements that hold the user score text elements. There is one container per cell.
+	public scoreTotals: d3.Selection<any>;					// The selection of 'text' elements used to display the total utility of each alternative for each user.
 	public utilityAxisContainer: d3.Selection<any>;			// The 'g' element that holds the optional utility (y) axis that can be displayed to the left of the summary chart. 
 	public alternativeBoxesContainer: d3.Selection<any>;	// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any>;				// The collection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
+	public alternativeBoxes: d3.Selection<any>;				// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
 
 	// Misc. Fields:
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
@@ -182,7 +182,7 @@ export class SummaryChartRenderer {
 		this.createSummaryChartCells(this.rows);
 	}
 	/*
-		@param stackedBarRows - The collection of summary chart rows. Each one is a 'g' element that contains, or will contain, row cells.
+		@param stackedBarRows - The selection of summary chart rows. Each one is a 'g' element that contains, or will contain, row cells.
 		@returns {void}
 		@description	Creates or updates the cells that compose each row of the summary chart, and the bars for each user score in that cell (ie, in that intersection of Alternative and PrimitiveObjective).
 						It updates existing cells by adding and removing cells to conform to the data assigned to each row. It updates user scores by adding and remove user scores to conform to the number 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 09:59:06
+* @Last Modified time: 2016-08-16 23:11:26
 */
 
 // Import Angular Classes:
@@ -45,9 +45,9 @@ export abstract class ScoreFunctionRenderer {
 	public plotOutline: d3.Selection<any>;					// The 'rect' element that is used to outline the score function plot
 	public plotContainer: d3.Selection<any>;				// The 'g' element that contains the plot itself.
 	public domainLabelContainer: d3.Selection<any>;			// The 'g' element that contains the labels for each domain element. 
-	public domainLabels: d3.Selection<any>;					// The collection of 'text' elements s.t. each element is a label for one domain element.
+	public domainLabels: d3.Selection<any>;					// The selection of 'text' elements s.t. each element is a label for one domain element.
 	public plotElementsContainer: d3.Selection<any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
-	public userContainers: d3.Selection<any>;				// The collection of 'g' elements s.t. each element is a container for the plot elements of one user.
+	public userContainers: d3.Selection<any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
 	public axisContainer: d3.Selection<any>;				// The 'g' element that conntains the y and x axis.
 	public utilityLabelContainer: d3.Selection<any>;		// The 'g' element that contains the labels for utility axis.
 
@@ -87,7 +87,6 @@ export abstract class ScoreFunctionRenderer {
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
-
 
 	/*
 		@returns {void}

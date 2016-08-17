@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:29:29
+* @Last Modified time: 2016-08-16 23:12:12
 */
 
 // Import Angular Classes:
@@ -57,9 +57,9 @@ export class LabelRenderer {
 	public viewConfig: ViewConfig = <ViewConfig> {};
 
 	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
-	public rootContainer: d3.Selection<any>;				// the 'g' element that is the root container of the Label area.
-	public labelSpaceOutline: d3.Selection<any>;			// the 'rect' element that is the outline of the label area.
-	public labelContainer: d3.Selection<any>;				// the 'g' element that contains the hierarchical label structure.
+	public rootContainer: d3.Selection<any>;				// The 'g' element that is the root container of the Label area.
+	public labelSpaceOutline: d3.Selection<any>;			// The 'rect' element that is the outline of the label area.
+	public labelContainer: d3.Selection<any>;				// The 'g' element that contains the hierarchical label structure.
 	public scoreFunctionContainer: d3.Selection<any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 

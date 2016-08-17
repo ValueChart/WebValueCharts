@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:14:24
+* @Last Modified time: 2016-08-16 23:11:36
 */
 
 // Import Angular Classes"
@@ -51,17 +51,17 @@ export class ObjectiveChartRenderer {
 	// d3 Selections:
 	public chart: d3.Selection<any>;							// The 'g' element that contains all the elements making up the objective chart.
 	public rowOutlinesContainer: d3.Selection<any>;				// The 'g' element that contains all the row outline elements
-	public rowOutlines: d3.Selection<any>;						// The collection of all 'rect' elements that are used outline each row.
+	public rowOutlines: d3.Selection<any>;						// The selection of all 'rect' elements that are used outline each row.
 	public rowsContainer: d3.Selection<any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any>;								// The collection of 'g' elements s.t. each element is a row container.
+	public rows: d3.Selection<any>;								// The selection of 'g' elements s.t. each element is a row container.
 	public alternativeLabelsContainer: d3.Selection<any>;		// The 'g' element that contains the alternative labels.
-	public alternativeLabels: d3.Selection<any>;				// The collection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
-	public cells: d3.Selection<any>;							// The collection of all 'g' elements s.t. each element is a cell container used to contain .
-	public userScores: d3.Selection<any>;						// The collection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public weightColumns: d3.Selection<any>;					// The collection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
-	public objectiveDomainLabels: d3.Selection<any>;			// The collection of 'text' elements used to label what domain element each cell represents.
+	public alternativeLabels: d3.Selection<any>;				// The selection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
+	public cells: d3.Selection<any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
+	public userScores: d3.Selection<any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public weightColumns: d3.Selection<any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
+	public objectiveDomainLabels: d3.Selection<any>;			// The selection of 'text' elements used to label what domain element each cell represents.
 	public alternativeBoxesContainer: d3.Selection<any>;		// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any>;					// The collection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
+	public alternativeBoxes: d3.Selection<any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
 
 
 	// ========================================================================================
@@ -88,7 +88,7 @@ export class ObjectiveChartRenderer {
 		@param rows - The data that the objective chart is going to represent. Must be of the type RowData.
 		@returns {void}
 		@description	Creates the base containers and elements for the objective Chart of a ValueChart. It should be called when
-						creating am objective chart for the first time, but not when updating as the basic framework of the chart never needs to be
+						creating an objective chart for the first time, but not when updating as the basic framework of the chart never needs to be
 						constructed again. Instead, call the createObjectiveRows method to add or remove rows, and user columns from the 
 						objective chart.
 	*/

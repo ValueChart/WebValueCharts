@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 17:25:01
+* @Last Modified time: 2016-08-16 22:50:53
 */
 
 import { Component }													from '@angular/core';
@@ -94,7 +94,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	initDistributionPlot(): void {
 		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.scoreFunctionViewerService);
 		this.scoreDistributionChartRenderer.createScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay);
-		this.scoreDistributionChartRenderer.renderScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, 375, 300, 'vertical');
+		this.scoreDistributionChartRenderer.renderScoreDistributionChart(375, 300, 'vertical');
 	}
 
 	configureDisplay(): void {
