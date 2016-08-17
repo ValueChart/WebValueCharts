@@ -2,18 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-13 22:45:38
+* @Last Modified time: 2016-08-17 13:23:33
 */
 
 import { Component }															from '@angular/core';
 import { OnInit, OnDestroy }													from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router';
 
-// JQuery
-import * as $																	from 'jquery';
 // d3
 import * as d3 																	from 'd3';
 // toastr
+import * as $																	from 'jquery';	
+
 import * as toastr 																from 'toastr';
 
 // Application classes

@@ -2,15 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 15:05:05
+* @Last Modified time: 2016-08-17 13:14:58
 */
 
 // Angular Classes:
 import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 
-// JQuery
-import * as $																	from 'jquery';
+import * as $														from 'jquery';	
+
 
 // Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';

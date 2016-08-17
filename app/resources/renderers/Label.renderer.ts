@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 23:12:12
+* @Last Modified time: 2016-08-17 13:14:05
 */
 
 // Import Angular Classes:
@@ -11,7 +11,8 @@ import { NgZone }													from '@angular/core';
 
 // Import libraries:
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
+import * as $														from 'jquery';	
+
 
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';

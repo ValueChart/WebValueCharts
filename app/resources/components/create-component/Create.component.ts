@@ -2,11 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 15:30:24
+* @Last Modified time: 2016-08-17 13:23:19
 */
 
 import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
+
+import * as $															from 'jquery';	
 
 // Application classes:
 import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';

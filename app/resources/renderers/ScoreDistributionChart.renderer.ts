@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 23:20:02
+* @Last Modified time: 2016-08-17 13:13:53
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import * as $														from 'jquery';	
 
 // Import Application Classes: 
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
@@ -25,10 +26,10 @@ import { DiscreteScoreFunction }									from '../model/DiscreteScoreFunction';
 import { ElementUserScoresSummary } 								from '../types/ScoreFunctionViewer.types';
 
 // This class renders multiple users' ScoreFunctions for the same PrimitiveObjective into a series of box plots. These box plots visualize the 
-// distribution of users scores for the domain elements of the PrimitiveObjective and facilitate identification of disagreements among a ValueCharts
-// users over an objective's ScoreFunction. This class should only be used to visualize MULTIPLE users' ScoreFunctions. Every box plot will appear as
-// a single black line (since the sample is of size one) if the ValueChart has only one user. Note that this class, similar to the ScoreFunctionRenderers,
-// is used outside of the ValueChartDirective's service environment, and has very few dependencies. This should be maintained as much as possible. 
+// distribution of users' scores for the domain elements of the PrimitiveObjective and facilitate identification of disagreements concerning score assignments.
+// This class should only be used to visualize MULTIPLE users' ScoreFunctions. Every box plot will appear as a single black line (since the sample 
+// is of size one) if the ValueChart has only one user. Note that this class, similar to the ScoreFunctionRenderers, is used outside 
+// of the ValueChartDirective's service environment and thus has very few dependencies. This should be maintained as much as possible. 
 
 @Injectable()
 export class ScoreDistributionChartRenderer {

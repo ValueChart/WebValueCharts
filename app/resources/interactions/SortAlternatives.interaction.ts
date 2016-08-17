@@ -2,14 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-21 21:33:16
+* @Last Modified time: 2016-08-17 13:14:12
 */
 
 import { Injectable } 												from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
+import * as $														from 'jquery';	
+
 
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 12:23:46
+* @Last Modified time: 2016-08-17 13:23:06
 */
 
 // =========================================================================================================================================
@@ -31,8 +31,8 @@
 		'app':                        { main: 'main.js',  defaultExtension: 'js' },
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
-		'd3':						  { main:'d3.js', defaultExtension: 'js' },
-		'jquery':					  { main:'jquery.js', defaultExtension: 'js'},
+		'd3':						  { main: 'd3.js', defaultExtension: 'js' },
+		'jquery':					  { main: 'jquery.js', defaultExtension: 'js'},
 		'toastr': 					  { main: 'toastr.js', defaultExtension: 'js' }
 	};
 

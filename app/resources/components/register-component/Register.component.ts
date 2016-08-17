@@ -2,11 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 17:07:23
+* @Last Modified time: 2016-08-17 13:23:30
 */
 
 import { Component }										from '@angular/core';
 import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
+
+import * as $															from 'jquery';	
 
 // Application Classes
 import { CurrentUserService }								from '../../services/CurrentUser.service';
