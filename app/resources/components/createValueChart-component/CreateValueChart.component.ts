@@ -214,6 +214,15 @@ export class CreateValueChartComponent implements OnInit {
 		return text;
 	}
 
+	ngOnDestroy() {
+		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
+	}
+
+	// There must be a better way...
+	toNumber(str: string) : number {
+		return Number(str);
+	}
+
 	altKeys() : Array<string> {
     	return Object.keys(this.alternatives);
   	}
@@ -408,9 +417,9 @@ export class CreateValueChartComponent implements OnInit {
   			let dom : Domain;
   			if (objrow.dom.type === 'categorical') {
   				dom = new CategoricalDomain(true);
-  				(<CategoricalDomain>dom).addElement("1");
-  				(<CategoricalDomain>dom).addElement("2");
-  				(<CategoricalDomain>dom).addElement("3");
+  				for (let cat of objrow.dom.categories) {
+  					(<CategoricalDomain>dom).addElement(cat);
+  				}
   			}
   			else if (objrow.dom.type === 'interval') {
   				dom = new IntervalDomain(objrow.dom.min,objrow.dom.max,objrow.dom.interval);
@@ -430,9 +439,7 @@ export class CreateValueChartComponent implements OnInit {
   		return obj;
   	}
 
-	ngOnDestroy() {
-		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
-	}
+
 
 	// ValueChart Utilities
 	getObjective(name: string): Objective {
@@ -505,8 +512,8 @@ export class CreateValueChartComponent implements OnInit {
   				}			
   			}
   			else {
-  				let min = (<ContinuousDomain>obj.getDomain()).getMinValue();
-  				let max = (<ContinuousDomain>obj.getDomain()).getMaxValue();
+  				let min : number = (<ContinuousDomain>obj.getDomain()).getMinValue();
+  				let max : number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
   				scoreFunction = new ContinuousScoreFunction(min,max);
   				// Add three evenly-space points between min and max
   				let increment = (max - min) / 4.0;

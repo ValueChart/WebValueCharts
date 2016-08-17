@@ -89,29 +89,27 @@
                                             </div>
                                         </div>
                                         <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'continuous' ">
+                                            && (objectiveRows[objID].dom.type === 'continuous' || objectiveRows[objID].dom.type === 'interval')">
                                             <div style="display: table-row">
-                                                <div style="display: table-cell;"><label class="control-label">max:</label></div>
                                                 <div style="display: table-cell;"><label class="control-label">min:</label></div>
-                                                <div style="display: table-cell;"><label class="control-label">unit:</label></div>
-                                            </div>
-                                            <div style="display: table-row">
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.max" maxlength="100" /></div>
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.min" maxlength="100" /></div>
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" /></div>
-                                            </div>
-                                        </div>
-                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'interval' ">
-                                            <div style="display: table-row">
                                                 <div style="display: table-cell;"><label class="control-label">max:</label></div>
-                                                <div style="display: table-cell;"><label class="control-label">min:</label></div>
-                                                <div style="display: table-cell;"><label class="control-label">interval:</label></div>
+                                                <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" style="display: table-cell;"><label class="control-label">unit:</label></div>
+                                                <div *ngIf="objectiveRows[objID].dom.type === 'interval'" style="display: table-cell;"><label class="control-label">interval:</label></div>
                                             </div>
                                             <div style="display: table-row">
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.max" maxlength="100" /></div>
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.min" maxlength="100" /></div>
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;"><input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.interval" maxlength="100" /></div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;">
+                                                    <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value)" maxlength="100" />
+                                                </div>
+                                                <div style="display: table-cell;width: 60px;padding-right: 5px;">
+                                                    <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value)" maxlength="100" />
+                                                </div>
+                                                <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" style="display: table-cell;width: 60px;padding-right: 5px;">
+                                                    <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />
+                                                    
+                                                </div>
+                                                <div *ngIf="objectiveRows[objID].dom.type === 'interval'" style="display: table-cell;width: 60px;padding-right: 5px;">
+                                                    <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value)" maxlength="100" />
+                                                </div>
                                             </div>
                                         </div>
                                     </th>         
@@ -150,7 +148,7 @@
                                         </select>
                                     </div>
                                     <div *ngIf="obj.getDomain().type === 'continuous'">
-                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" name="value" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),+m.value)"/>
+                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),toNumber(m.value))"/>
                                     </div>   
                                 </th>
                               </tr>
