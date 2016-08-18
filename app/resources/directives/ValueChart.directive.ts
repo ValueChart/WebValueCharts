@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:20:22
+* @Last Modified time: 2016-08-17 16:42:18
 */
 
 // Import Angular Resources:
@@ -57,9 +57,9 @@ import { InteractionConfig }													from '../types/Config.types';
 			'displayScoreFunctionValueLabels',		// Toggle for the score labels next to points/bars in the score function plots. Must be a boolean.
 			'weightResizeType',						// The type of objective weight resizing that is accomplished by dragging label dividers. Must be one of the strings: 'neighbor' or 'siblings', or 'none'. 'neighbor' sets dragging label dividers to change the weights of only objectives adjacent to the divider. 'siblings' sets dragging label dividers to change the weights of all the objectives at that level with the same parent (i.e. siblings). 'none' disables dragging to change objective weights.
 			'reorderObjectives',					// Toggle for dragging to reorder objectives. True enables objectives to be reordered by clicking and dragging. Must be a boolean.
-			'sortAlternatives',
-			'pumpWeights',
-			'setObjectiveColors']
+			'sortAlternatives',						// Type of sorting for alternatives. Must be one of the strings: 'manual', 'objective', 'alphabet', 'reset', or 'none'. 'manual' sets alternative sorting to be accomplished manually by clicking and dragging alternatives. 'objective' sets alternative sorting to be by objective score, which is accomplished by clicking on the objective to sort by. Note that clicking on the root objective sorts by total score. 'reset' resets the alternative order to be the original order, and can be used to undo user driven changes to the ordering.'none' turns off alternative sorting.
+			'pumpWeights',							// Toggle for the pump tool. Must be one of the strings: 'increase', 'decrease', or 'none'. 'increase' sets clicking on objectives to increase their weights, 'decrease' to 'decrease' their weights, and 'none' to do nothing.
+			'setObjectiveColors']					// Toggle clicking on objectives to open a color picker for changing their colors. Must be a boolean.
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 

@@ -2,15 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 14:54:25
+* @Last Modified time: 2016-08-17 17:08:38
 */
 
+// Import Angular Classes:
 import { Component }										from '@angular/core';
 import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
 
+// Import Libraries:
 import * as $															from 'jquery';	
 
-// Application Classes
+// Import Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
 
@@ -20,6 +22,10 @@ import { UserHttpService }									from '../../services/UserHttp.service';
 	directives: [ROUTER_DIRECTIVES]
 })
 export class RegisterComponent {
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
 	private username: string;
 	private password: string;
@@ -32,12 +38,21 @@ export class RegisterComponent {
 	private invalidCredentials: boolean;
 	private invalidMessage: string;
 
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
 		private userHttpService: UserHttpService) {
 		this.state = 'login';
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	createNewUser(username: string, password: string, email: string): void {
 		this.userHttpService.createNewUser(username, password, email)
