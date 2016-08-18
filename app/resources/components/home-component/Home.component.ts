@@ -14,7 +14,8 @@ import * as $											from 'jquery';
 import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
-import { ValueChartHttpService }							from '../../services/ValueChartHttp.service';
+import { ValueChartService }							from '../../services/ValueChart.service';
+import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 
 // Model Classes:
 import { ValueChart }									from '../../model/ValueChart';
@@ -39,13 +40,14 @@ export class HomeComponent {
 		private router: Router,
 		private valueChartParser: XMLValueChartParser,
 		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService) { }
 
 	joinValueChart(chartName: string, chartPassword: string): void {
 		this.valueChartHttpService.getValueChartStructure(chartName, chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
-				this.currentUserService.setValueChart(valueChart);
+				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(true);
 				(<any>$('#close-chart-credentials-modal')).click();
 				this.router.navigate(['createValueChart/newUser/BasicInfo']);
@@ -58,9 +60,9 @@ export class HomeComponent {
 	}
 
 	selectDemoValueChart(demoChart: any): void {
-		this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
+		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.currentUserService.getValueChart().getName();
+		var parameters = this.valueChartService.getValueChart().getName();
 		this.router.navigate(['/view/', parameters]);
 	}
 
@@ -75,11 +77,11 @@ export class HomeComponent {
 		reader.onload = (fileReaderEvent: ProgressEvent) => {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;
-				this.currentUserService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
+				this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
 				this.currentUserService.setJoiningChart(false);
 
 				if (route[1] === undefined) {
-					route[1] = this.currentUserService.getValueChart().getName();
+					route[1] = this.valueChartService.getValueChart().getName();
 				}
 				this.router.navigate(route);
 			}

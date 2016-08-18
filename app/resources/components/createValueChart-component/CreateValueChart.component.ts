@@ -22,7 +22,7 @@ import { User }															from '../../model/User';
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES, CreateBasicInfoComponent, CreateObjectivesComponent, CreateAlternativesComponent, CreateScoreFunctionsComponent, CreateWeightsComponent],
-	providers: [CreationStepsService, ValueChartService, ChartUndoRedoService]
+	providers: [CreationStepsService]
 })
 export class CreateValueChartComponent implements OnInit {
 	valueChart: ValueChart;
@@ -54,29 +54,30 @@ export class CreateValueChartComponent implements OnInit {
 		// Initialize according to purpose
 		if (this.purpose == "newChart") {
 			this.step = this.creationStepsService.BASICS;
-			this.user = new User(this.currentUserService.getUsername());
-			this.valueChart = new ValueChart("", "", this.user.getUsername()); // Create new ValueChart with a temporary name and description
-			this.valueChart.addUser(this.user);
-			this.valueChartService.setValueChart(this.valueChart);
-			this.currentUserService.setValueChart(this.valueChart);
+			let valueChart = new ValueChart("", "", this.user.getUsername()); // Create new ValueChart with a temporary name and description
+			valueChart.addUser(new User(this.currentUserService.getUsername())); // Add a new user to it
+			this.valueChartService.setValueChart(valueChart); // Set the chart
 			this.saveValueChartToDatabase();
 		}
 		else if (this.purpose == "newUser") {
 			this.step = this.creationStepsService.PREFERENCES;
-			this.user = new User(this.currentUserService.getUsername());
-			this.valueChart = this.currentUserService.getValueChart();
-			this.valueChart.addUser(this.user);
-			this.valueChartService.setValueChart(this.valueChart);
-			this.currentUserService.setValueChart(this.valueChart);
+			let valueChart = this.valueChartService.getValueChart(); // Get the existing chart
+			valueChart.addUser(new User(this.currentUserService.getUsername())); // Add a new user to it
 		}
 		else if (this.purpose === "editChart") {
 			this.step = this.creationStepsService.BASICS;
-			this.user = this.valueChartService.getCurrentUser();
-			this.valueChart = this.valueChartService.getValueChart();
+		}
+		else if (this.purpose === "editStructure") {
+			this.step = this.creationStepsService.OBJECTIVES;
+		}
+		else if (this.purpose === "editPreferences") {
+			this.step = this.creationStepsService.PREFERENCES;
 		}
 		else {
 			throw "Invalid route to CreateValueChart"; // TODO: handle this properly
 		}
+		this.valueChart = this.valueChartService.getValueChart();
+		this.user = this.valueChartService.getCurrentUser();
 		this.addNavigationWarning();
 	}
 
@@ -129,7 +130,8 @@ export class CreateValueChartComponent implements OnInit {
 
 	disableBackButton(): boolean {
 		return (this.step === this.creationStepsService.BASICS ||
-			(this.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser"));
+			(this.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser") ||
+			(this.step === this.creationStepsService.PREFERENCES && this.purpose === "editPreferences"));
 	}
 
 	disableNextButton(): boolean {

@@ -10,6 +10,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	
 
 // Application Classes:
 import { CurrentUserService }													from './CurrentUser.service';
+import { ValueChartService }													from './ValueChart.service';
 import { ValueChartHttpService }													from './ValueChartHttp.service';
 
 
@@ -19,8 +20,8 @@ export class JoinGuardService implements CanActivate {
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService) { }
-
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
@@ -33,7 +34,7 @@ export class JoinGuardService implements CanActivate {
 			.subscribe(
 			valueChart => {
 				this.currentUserService.setJoiningChart(true);
-				this.currentUserService.setValueChart(valueChart);
+				this.valueChartService.setValueChart(valueChart);
 			},
 			error => {
 				this.router.navigate(['/register']);

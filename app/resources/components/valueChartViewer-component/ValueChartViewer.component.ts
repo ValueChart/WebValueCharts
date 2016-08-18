@@ -62,11 +62,9 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 		// Services:
-		ValueChartService,
 		RendererDataService,
 		ScoreFunctionViewerService,
 		RenderConfigService,
-		ChartUndoRedoService,
 		ChangeDetectionService,
 		RenderEventsService,
 		HostService,
@@ -173,12 +171,12 @@ export class ValueChartViewerComponent implements OnInit {
 			this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 
 			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
-				this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
+				this.valueChart = this.valueChartService.getValueChart().getAverageValueChart();
 				this.chartType = 'average';
 				this.weightResizeType = this.RESIZE_NEIGHBOR;
 
 			} else {
-				this.valueChart = this.currentUserService.getValueChart();
+				this.valueChart = this.valueChartService.getValueChart();
 				this.chartType = 'normal';
 				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 			}
@@ -334,7 +332,6 @@ export class ValueChartViewerComponent implements OnInit {
 		this.resizeDetailBox();
 	}
 
-
 	// Undo and Redo:
 
 	undoChartChange(): void {
@@ -377,14 +374,13 @@ export class ValueChartViewerComponent implements OnInit {
 		this.displayScoreFunctionValueLabels = newVal;
 	}
 
-	editObjectiveModel(): void {
-		// TODO: Implement Editing of Objective Model
+	editStructure(): void {
+		this.router.navigate(['/createValueChart','editStructure']);
 	}
 
 	editPreferenceModel(): void {
-		// TODO: Implement Editing of Preference Model.
+		this.router.navigate(['/createValueChart','editPreferenceModel']);
 	}
-
 
 	// Interaction Toggles
 
