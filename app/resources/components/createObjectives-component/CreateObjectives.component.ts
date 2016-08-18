@@ -1,5 +1,9 @@
-import { Component, Input, OnInit }										from '@angular/core';
+import { Component, OnInit }										from '@angular/core';
 import { NgClass } 														from '@angular/common';
+
+// Import Application Classes:
+import { ValueChartService }												from '../../services/ValueChart.service';
+
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
@@ -14,7 +18,6 @@ import { IntervalDomain }												from '../../model/IntervalDomain';
 @Component({
 	selector: 'CreateObjectives',
 	templateUrl: 'app/resources/components/createObjectives-component/CreateObjectives.template.html',
-	inputs: ['vc'],
 	directives: [NgClass]
 })
 export class CreateObjectivesComponent implements OnInit {
@@ -29,7 +32,7 @@ export class CreateObjectivesComponent implements OnInit {
     categoryToAdd: string;
     categoriesToAdd: string[];
 
-	constructor() { }
+	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
 		this.objectiveRows = {};
@@ -39,17 +42,17 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoryToAdd = "";
 		this.categoriesToAdd = [];
 
-		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), "", "", 0);
+		if (this.valueChartService.getValueChart().getAllObjectives().length === 0) {
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChartService.getValueChart().getName(), "", "", 0);
 			this.objectivesCount++;
 		}
 		else {
-			this.objectiveToObjRow(this.valueChart.getRootObjectives()[0], "", 0);
+			this.objectiveToObjRow(this.valueChartService.getValueChart().getRootObjectives()[0], "", 0);
 		}
 	}
 
 	ngOnDestroy() {
-		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
+		this.valueChartService.getValueChart().setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 	}
 
 	addNewChildObjRow(parentID: string) {
@@ -213,10 +216,6 @@ export class CreateObjectivesComponent implements OnInit {
 
 	toNumber(str: string): number {
 		return Number(str);
-	}
-
-	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart>value;
 	}
 }
 

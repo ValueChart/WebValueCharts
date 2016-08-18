@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:08:11
+* @Last Modified time: 2016-08-18 14:03:04
 */
 
 import { Component }									from '@angular/core';
@@ -48,7 +48,7 @@ export class HomeComponent {
 				this.currentUserService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(true);
 				(<any>$('#close-chart-credentials-modal')).click();
-				this.router.navigate(['createValueChart', 'newUser']);
+				this.router.navigate(['createValueChart/newUser/BasicInfo']);
 			},
 			// Handle Server Errors (like not finding the ValueChart)
 			(error) => {

@@ -1,18 +1,19 @@
 import { Injectable } 							from '@angular/core';
+import { Router }								from '@angular/router';
 
 @Injectable()
 export class CreationStepsService {
 
-	BASICS: string = "basics";
-	OBJECTIVES: string = "objectives";
-	ALTERNATIVES: string = "alternatives";
-	PREFERENCES: string = "preferences";
-	PRIORITIES: string = "priorities";
+	BASICS: string = 'BasicInfo';
+	OBJECTIVES: string = 'Objectives';
+	ALTERNATIVES: string = 'Alternatives';
+	PREFERENCES: string = 'ScoreFunctions';
+	PRIORITIES: string = 'Weights';
 
 	nextStep: { [currentStep: string]: string; } = {};
 	previousStep: { [currentStep: string]: string; } = {};
 
-	constructor() {
+	constructor(private router: Router) {
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
 		this.nextStep[this.ALTERNATIVES] = this.PREFERENCES;
@@ -26,11 +27,15 @@ export class CreationStepsService {
 		this.previousStep[this.PRIORITIES] = this.PREFERENCES;
 	}
 
-	next(step: string): string {
+	next(step: string, purpose: string): string {
+		if (step !== this.PRIORITIES)
+			this.router.navigate(['createValueChart/' + purpose + '/' + this.nextStep[step]]);
+		
 		return this.nextStep[step];
 	}
 
-	previous(step: string): string {
+	previous(step: string, purpose: string): string {
+		this.router.navigate(['createValueChart/' + purpose + '/' + this.previousStep[step]]);
 		return this.previousStep[step];
 	}
 }

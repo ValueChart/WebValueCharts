@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 17:08:38
+* @Last Modified time: 2016-08-18 14:04:17
 */
 
 // Import Angular Classes:
@@ -103,7 +103,7 @@ export class RegisterComponent {
 
 		// If the user is joining a chart, then navigate to createValueChart
 		if (this.currentUserService.isJoiningChart()) {
-			return ['createValueChart', 'newUser'];
+			return ['createValueChart/newUser/BasicInfo'];
 		} else {	// Else, navigate to the create page as normal
 			return ['home'];
 		}

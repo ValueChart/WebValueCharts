@@ -3,31 +3,7 @@
 		<div class="flex-row column-container col-xs-12">
 			<div class="col-xs-10">
                 <div class="form-group">
-                	<div *ngIf="step === creationStepsService.BASICS">
-                        <CreateBasicInfo 
-                                [vc]="valueChart">
-                        </CreateBasicInfo>
-                    </div>
-                    <div *ngIf="step === creationStepsService.OBJECTIVES">
-                        <CreateObjectives 
-                                [vc]="valueChart">
-                        </CreateObjectives>
-                    </div>
-                    <div *ngIf="step === creationStepsService.ALTERNATIVES">
-                        <CreateAlternatives 
-                                [vc]="valueChart">
-                        </CreateAlternatives>
-                    </div>
-                    <div *ngIf="step === creationStepsService.PREFERENCES">
-                        <CreateScoreFunctions
-                                [vc]="valueChart">
-                        </CreateScoreFunctions>         
-                    </div>
-                    <div *ngIf="step === creationStepsService.PRIORITIES">
-                        <CreateWeights
-                                [vc]="valueChart">
-                        </CreateWeights>
-                    </div>
+                	<router-outlet></router-outlet>
                 </div>
                 <div class="form-group">
                     <a class="btn btn-success btn-lg pull-left" [routerLink]="['/home']" style="margin: 5px 10px;">Home</a>

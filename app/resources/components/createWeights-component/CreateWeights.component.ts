@@ -1,4 +1,4 @@
-import { Component, Input, OnInit }										from '@angular/core';
+import { Component, OnInit }										from '@angular/core';
 
 // Application classes:
 import { ValueChartService }											from '../../services/ValueChart.service';
@@ -15,10 +15,8 @@ import { ScoreFunction }												from '../../model/ScoreFunction';
 @Component({
 	selector: 'CreateWeights',
 	templateUrl: 'app/resources/components/createWeights-component/CreateWeights.template.html',
-	inputs: ['vc']
 })
 export class CreateWeightsComponent implements OnInit {
-	valueChart: ValueChart;
 	user: User;
 	rankedObjectives: string[];
     isRanked: { [objName: string]: boolean; };
@@ -35,13 +33,13 @@ export class CreateWeightsComponent implements OnInit {
 		this.user = this.valueChartService.getCurrentUser();
 		if (!this.user.getWeightMap()) {
 			this.user.setWeightMap(this.getInitialWeightMap());
-			for (let obj of this.valueChart.getAllPrimitiveObjectivesByName()) {
+			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
 		}
 		else {
-			let objectives: string[] = this.valueChart.getAllPrimitiveObjectivesByName();
-			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChart.getAllPrimitiveObjectives());
+			let objectives: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
+			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getValueChart().getAllPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
 			let sortedObjectives = sortedPairs.map(function(e, i) { return sortedPairs[i][0]; });
@@ -71,7 +69,7 @@ export class CreateWeightsComponent implements OnInit {
 		if (this.rankedObjectives.length === 0) {
 			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
 		}
-		else if (this.rankedObjectives.length < this.valueChart.getAllPrimitiveObjectives().length) {
+		else if (this.rankedObjectives.length < this.valueChartService.getValueChart().getAllPrimitiveObjectives().length) {
 			return "From the remaining objectives, which would you prefer to change next from the worst value to the best value?";
 		}
 		else {
@@ -81,7 +79,7 @@ export class CreateWeightsComponent implements OnInit {
 
 	getUnrankedObjectives(): string[] {
 		let unrankedObjectives: string[] = [];
-		for (let obj of this.valueChart.getAllPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 			if (!this.isRanked[obj]) {
 				unrankedObjectives.push(obj);
 			}
@@ -95,7 +93,7 @@ export class CreateWeightsComponent implements OnInit {
 	}
 
 	resetRanks() {
-		for (let obj of this.valueChart.getAllPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];
@@ -144,7 +142,7 @@ export class CreateWeightsComponent implements OnInit {
 	// Create initial weight map for the Objective hierarchy with evenly distributed weights
 	getInitialWeightMap(): WeightMap {
 		let weightMap: WeightMap = new WeightMap();
-		this.initializeWeightMap(this.valueChart.getRootObjectives(), weightMap, 1);
+		this.initializeWeightMap(this.valueChartService.getValueChart().getRootObjectives(), weightMap, 1);
 		return weightMap;
 	}
 
@@ -157,9 +155,5 @@ export class CreateWeightsComponent implements OnInit {
 				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
 			}
 		}
-	}
-
-	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart>value;
 	}
 }

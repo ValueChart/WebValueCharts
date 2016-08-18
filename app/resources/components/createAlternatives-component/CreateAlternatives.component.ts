@@ -1,4 +1,8 @@
-import { Component, Input, OnInit }										from '@angular/core';
+import { Component, OnInit }										from '@angular/core';
+
+// Import Application Classes:
+import { ValueChartService }												from '../../services/ValueChart.service';
+
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
@@ -9,26 +13,24 @@ import { ContinuousDomain }												from '../../model/ContinuousDomain';
 @Component({
 	selector: 'CreateAlternatives',
 	templateUrl: 'app/resources/components/createAlternatives-component/CreateAlternatives.template.html',
-	inputs: ['vc']
 })
 export class CreateAlternativesComponent implements OnInit {
-	valueChart: ValueChart;
     alternatives: { [altID: string]: Alternative; };
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
 
-	constructor() { }
+	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;
 
-		if (this.valueChart.getAlternatives().length === 0) {
+		if (this.valueChartService.getValueChart().getAlternatives().length === 0) {
 			this.addEmptyAlternative();
 		}
 		else {
-			for (let alt of this.valueChart.getAlternatives()) {
+			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;
 			}
@@ -40,7 +42,7 @@ export class CreateAlternativesComponent implements OnInit {
 		for (let altID of this.altKeys()) {
 			alternatives.push((this.alternatives[altID]));
 		}
-		this.valueChart.setAlternatives(alternatives);
+		this.valueChartService.getValueChart().setAlternatives(alternatives);
 	}
 
 	getColumnHeader(obj: PrimitiveObjective) : string {
@@ -92,9 +94,5 @@ export class CreateAlternativesComponent implements OnInit {
 
 	toNumber(str: string): number {
 		return Number(str);
-	}
-
-	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart>value;
 	}
 }

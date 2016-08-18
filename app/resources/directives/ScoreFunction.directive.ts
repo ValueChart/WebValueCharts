@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-15 23:29:19
+* @Last Modified time: 2016-08-18 11:13:54
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -16,7 +16,6 @@ import * as d3 															from 'd3';
 import { ScoreFunctionRenderer }										from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../renderers/ContinuousScoreFunction.renderer';
-import { ScoreDistributionChartRenderer }								from '../renderers/ScoreDistributionChart.renderer';
 
 import { CurrentUserService }											from '../services/CurrentUser.service';
 import { ValueChartService }											from '../services/ValueChart.service';
@@ -32,7 +31,6 @@ import { UserDomainElements, DomainElement }							from '../types/ScoreFunctionV
 
 @Directive({
 	selector: 'ScoreFunction',
-	inputs: ['objective', 'height', 'width', 'orientation', 'services'],
 	providers: [ScoreFunctionViewerService]
 })
 export class ScoreFunctionDirective implements OnInit, DoCheck {

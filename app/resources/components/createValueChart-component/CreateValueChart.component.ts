@@ -99,7 +99,7 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	back() {
-		this.step = this.creationStepsService.previous(this.step);
+		this.step = this.creationStepsService.previous(this.step, this.purpose);
 	}
 
 	next() {
@@ -108,7 +108,7 @@ export class CreateValueChartComponent implements OnInit {
 			window.onpopstate = () => { };
 			this.router.navigate(['/view/ValueChart']);
 		}
-		this.step = this.creationStepsService.next(this.step);
+		this.step = this.creationStepsService.next(this.step, this.purpose);
 	}
 
 	saveValueChartToDatabase() {

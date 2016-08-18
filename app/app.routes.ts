@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 16:21:37
+* @Last Modified time: 2016-08-18 11:47:30
 */
 
-import { provideRouter, RouterConfig } 								from '@angular/router';
+import { Routes, RouterModule } 									from '@angular/router';
 
 // Application Classes
 	// Components:
@@ -38,23 +38,22 @@ import { JoinGuardService }											from './resources/services/JoinGuard.servi
 	to send the index.html instead of an error. A user's request may not be a 404 at all; it may be intended for the front-end router.
 */
 
-export const routes: RouterConfig = [
+const routes: Routes = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'join/ValueCharts/:ValueChart', component: RegisterComponent, canActivate: [JoinGuardService] },
 	{ path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
-	{ path: 'createValueChart/:purpose', component: CreateValueChartComponent, canActivate: [AuthGuardService] },
 	{ path: 'view/:ValueChart', component: ValueChartViewerComponent, canActivate: [AuthGuardService] },
 	{ path: 'scoreFunction/:viewType', component: ScoreFunctionViewerComponent },
-	// Setup default URL as /register. This works because the empty string '' is technically considered a prefix for every other string,
-	// and we are using prefix matching for this url.
-	{ path: '', redirectTo: '/register', pathMatch: 'prefix'}
+	// Setup default URL as /register.
+	{ path: '**', redirectTo: '/register'}
 ];
 
 // Export the providers necessary for bootstrapping in main.ts. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	provideRouter(routes),
 	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService]
 ];
+
+export const ROUTER = RouterModule.forRoot(routes);

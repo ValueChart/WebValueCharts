@@ -1,4 +1,4 @@
-import { Component, Input, OnInit }										from '@angular/core';
+import { Component, OnInit }										from '@angular/core';
 
 // Application classes:
 import { ScoreFunctionDirective }										from '../../directives/ScoreFunction.directive';
@@ -22,12 +22,10 @@ import { ContinuousScoreFunction }										from '../../model/ContinuousScoreFun
 @Component({
   selector: 'CreateScoreFunctions',
   templateUrl: 'app/resources/components/createScoreFunctions-component/CreateScoreFunctions.template.html',
-  inputs: ['vc'],
   directives: [ScoreFunctionDirective]
 })
 export class CreateScoreFunctionsComponent implements OnInit {
-  valueChart: ValueChart;
-  user: User;
+    user: User;
     selectedObjective: string;
     private services: any = {};
 
@@ -45,11 +43,11 @@ export class CreateScoreFunctionsComponent implements OnInit {
       this.user.setScoreFunctionMap(this.getInitialScoreFunctionMap());
     }
 
-    this.selectedObjective = this.valueChart.getAllPrimitiveObjectives()[0].getName();
+    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
   }
 
   getObjective(name: string): Objective {
-    for (let obj of this.valueChart.getAllObjectives()) {
+    for (let obj of this.valueChartService.getValueChart().getAllObjectives()) {
       if (obj.getName() === name) {
         return obj;
       }
@@ -61,7 +59,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   // Scores for categorical variables are evenly space between 0 and 1
   getInitialScoreFunctionMap(): ScoreFunctionMap {
     let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
-    for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
+    for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
       let scoreFunction: ScoreFunction;
       if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
         scoreFunction = new DiscreteScoreFunction();
@@ -89,9 +87,5 @@ export class CreateScoreFunctionsComponent implements OnInit {
       scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
     }
     return scoreFunctionMap;
-  }
-
-  @Input() set vc(value: any) {
-    this.valueChart = <ValueChart>value;
   }
 }

@@ -1,34 +1,32 @@
-import { Component, Input, OnInit }											from '@angular/core';
+import { Component, OnInit }											from '@angular/core';
+
+// Import Application Classes:
+import { ValueChartService }												from '../../services/ValueChart.service';
 
 // Model Classes
-import { ValueChart } 													from '../../model/ValueChart';
+import { ValueChart } 														from '../../model/ValueChart';
 
 @Component({
 	selector: 'CreateBasicInfo',
 	templateUrl: 'app/resources/components/createBasicInfo-component/CreateBasicInfo.template.html',
-	inputs: ['vc']
 })
 export class CreateBasicInfoComponent implements OnInit {
-	valueChart: ValueChart;
+
 	valueChartName: string;
 	valueChartDescription: string;
 	valueChartPassword: string;
 
-	constructor() { }
+	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
-		this.valueChartName = this.valueChart.getName();
-		this.valueChartDescription = this.valueChart.getDescription();
-		this.valueChartPassword = this.valueChart.password ? this.valueChart.password : "";
+		this.valueChartName = this.valueChartService.getValueChart().getName();
+		this.valueChartDescription = this.valueChartService.getValueChart().getDescription();
+		this.valueChartPassword = this.valueChartService.getValueChart().password ? this.valueChartService.getValueChart().password : "";
 	}
 
 	ngOnDestroy() {
-		this.valueChart.setName(this.valueChartName);
-		this.valueChart.setDescription(this.valueChartDescription);
-		this.valueChart.password = this.valueChartPassword;
-	}
-
-	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart>value;
+		this.valueChartService.getValueChart().setName(this.valueChartName);
+		this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
+		this.valueChartService.getValueChart().password = this.valueChartPassword;
 	}
 }
