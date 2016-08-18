@@ -55,17 +55,17 @@
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive' 
                     && objectiveRows[objID].dom.type === 'categorical' ">
-                    <div style="display: table-row">
-                        <div style="display: table-cell;">
+                    <div class="form-group">
+                        <div class="form-group">
                             <SELECT class="form-control" name="catlistmain" size="3" style="width: 100px" MULTIPLE>
                             <OPTION *ngFor="let opt of objectiveRows[objID].dom.categories">{{opt}}
                             </SELECT>
                         </div>
-                        <div style="display: table-cell;">
-                            <button class="btn btn-sm btn-default" style="margin: 5px" data-toggle="modal" data-target="#myCategoryModal">
+                        <div class="form-group">
+                            <button class="btn btn-sm btn-default" style="margin: 5px, width: 50px" data-toggle="modal" data-target="#myCategoryModal">
                                 Add
                             </button>
-                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px" (click)="removeSelectedCategoriesMain()">
+                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px, width: 50px" (click)="removeSelectedCategoriesMain()">
                                 Delete
                             </button>
                         </div>
@@ -118,28 +118,22 @@
             <!-- Modal Body -->
             <div class="modal-body">
                 <form role="form">
-                  <div style="display: table-row">
-                    <div style="display: table-cell;">
-                        <input class="form-control" name="newcat" #cat placeholder="Category name" type="text"/>
-                    </div>
-                    <div style="display: table-cell;">
-                        <div>
-                            <button type="button" class="btn btn-default" style="margin: 5px" (click)="addCategory(cat.value)">
+                    <div class="input-group form-group">
+                        <input class="form-control" name="newcat" #cat placeholder="Category name" style="width: 200px; margin-right: 5px" type="text"/>
+                        <button type="button" class="btn btn-default" (click)="addCategory(cat.value)">
                                 >>
-                            </button>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-default" style="margin: 5px" (click)="removeSelectedCategoriesModal(cat.value)">
-                                Delete
-                            </button>
-                        </div>
+                        </button>
                     </div>
-                    <div style="display: table-cell;">
-                        <SELECT SIZE="3" style="width: 100px" name="catlistmodal" MULTIPLE>
+                    <div class="form-group">
+                        <SELECT SIZE="3" class="form-control" style="width: 250px" name="catlistmodal" MULTIPLE>
                         <OPTION *ngFor="let cat of categoriesToAdd">{{cat}}
                         </SELECT>
                     </div>
-                  </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default" (click)="removeSelectedCategoriesModal(cat.value)">
+                            Delete
+                        </button>
+                    </div>
                 </form>
             </div>           
             <!-- Modal Footer -->

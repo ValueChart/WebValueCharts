@@ -143,7 +143,6 @@ export class CreateObjectivesComponent implements OnInit {
 	}
 
 	// Convert ObjectiveRows to Objectives
-	// Using dummy domains for now...
 	objRowToObjective(objrow: ObjectiveRow): Objective {
 		let obj: Objective;
 		if (objrow.type === 'primitive') {
@@ -210,7 +209,6 @@ export class CreateObjectivesComponent implements OnInit {
 		return domDets;
 	}
 
-	// There must be a better way...
 	toNumber(str: string): number {
 		return Number(str);
 	}
