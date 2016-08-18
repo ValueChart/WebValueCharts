@@ -10,7 +10,7 @@ import { Component }										from '@angular/core';
 import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
 
 // Import Libraries:
-import * as $															from 'jquery';	
+import * as $															from 'jquery';
 
 // Import Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';

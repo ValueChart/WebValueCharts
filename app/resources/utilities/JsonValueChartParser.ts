@@ -12,7 +12,7 @@ import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
 import { PrimitiveObjective } 												from '../model/PrimitiveObjective';
 import { AbstractObjective } 												from '../model/AbstractObjective';
-import { Alternative } 														from '../model/Alternative'; 
+import { Alternative } 														from '../model/Alternative';
 import { ScoreFunctionMap }													from '../model/ScoreFunctionMap';
 import { ScoreFunction } 													from '../model/ScoreFunction';
 import { ContinuousScoreFunction } 											from '../model/ContinuousScoreFunction';
@@ -39,7 +39,7 @@ export class JsonValueChartParser {
 		} else {
 			jsonObject.users = [];
 		}
-		
+
 		// Parse Root Objectives
 		for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
 			jsonObject.rootObjectives[i] = this.parseObjective(jsonObject.rootObjectives[i]);
@@ -52,7 +52,7 @@ export class JsonValueChartParser {
 		Object.assign(valueChart, jsonObject);
 
 
-		return valueChart ;
+		return valueChart;
 	}
 
 	parseObjective(jsonObject: any): Objective {
@@ -95,7 +95,7 @@ export class JsonValueChartParser {
 		var alternative: Alternative = new Alternative(jsonObject.name, jsonObject.description);
 
 		for (var i = 0; i < jsonObject.objectiveValues.length; i++) {
-			alternative.setObjectiveValue(jsonObject.objectiveValues[i][0], jsonObject.objectiveValues[i][1]); 
+			alternative.setObjectiveValue(jsonObject.objectiveValues[i][0], jsonObject.objectiveValues[i][1]);
 		}
 
 		return alternative;
@@ -126,12 +126,12 @@ export class JsonValueChartParser {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
 		for (var i = 0; i < jsonObject.scoreFunctions.length; i++) {
-			scoreFunctionMap.setObjectiveScoreFunction(jsonObject.scoreFunctions[i][0], this.parseScoreFunction(jsonObject.scoreFunctions[i][1])); 
+			scoreFunctionMap.setObjectiveScoreFunction(jsonObject.scoreFunctions[i][0], this.parseScoreFunction(jsonObject.scoreFunctions[i][1]));
 		}
 		return scoreFunctionMap;
 	}
 
-	parseScoreFunction(jsonObject: any): ScoreFunction {	
+	parseScoreFunction(jsonObject: any): ScoreFunction {
 		var scoreFunction: ScoreFunction;
 
 		if (jsonObject.type === 'continuous') {

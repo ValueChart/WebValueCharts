@@ -54,7 +54,7 @@ export abstract class ScoreFunctionRenderer {
 
 	// View Configuration Fields:
 	protected viewConfig: any = {};							// The viewConfig object for this renderer. It is not configured using the renderConfigService because this class has
-															// intentionally been decoupled from that, and other, services.
+	// intentionally been decoupled from that, and other, services.
 	protected utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
 	protected domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
 	protected utilityAxisMaxCoordinateTwo: number;			// The y coordinate of the top of the y-axis
@@ -94,9 +94,9 @@ export abstract class ScoreFunctionRenderer {
 						This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
 	constructor(
-			protected valueChartService: ValueChartService, 
-			protected scoreFunctionViewerService: ScoreFunctionViewerService,
-			protected chartUndoRedoService: ChartUndoRedoService) { }
+		protected valueChartService: ValueChartService,
+		protected scoreFunctionViewerService: ScoreFunctionViewerService,
+		protected chartUndoRedoService: ChartUndoRedoService) { }
 
 
 
@@ -123,9 +123,9 @@ export abstract class ScoreFunctionRenderer {
 			.classed(ScoreFunctionRenderer.defs.OUTLINE_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-outline-container')
 			.append('rect')
-				.classed(ScoreFunctionRenderer.defs.PLOT_OUTLINE, true)
-				.attr('id', 'scorefunction-' + objectiveId + '-outline')
-				.classed('valuechart-outline', true);
+			.classed(ScoreFunctionRenderer.defs.PLOT_OUTLINE, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-outline')
+			.classed('valuechart-outline', true);
 
 		// Create a container to hold all the elements of the plot.
 		this.plotContainer = el.append('g')
@@ -156,7 +156,7 @@ export abstract class ScoreFunctionRenderer {
 						Note that the domain labels are created in createPlot because they are data dependent.
 	*/
 	createScoreFunctionAxis(plotContainer: d3.Selection<any>, objectiveId: string): void {
-		
+
 		this.axisContainer = plotContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.AXES_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-axes-container');
@@ -169,7 +169,7 @@ export abstract class ScoreFunctionRenderer {
 
 		this.axisContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER, true)
-			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container'); 
+			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container');
 	}
 
 
@@ -188,17 +188,17 @@ export abstract class ScoreFunctionRenderer {
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
 			.data(usersDomainElements)
 			.enter().append('g')
-				.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
-				.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.user.getUsername().replace(/\s+/g, '') + '-container'; });
+			.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
+			.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.user.getUsername().replace(/\s+/g, '') + '-container'; });
 
 		// Create one label for each element of the PrimitiveObjective's domain.
 		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
 			.data(usersDomainElements[0].elements)
 			.enter().append('text')
-				.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
-				.attr('id', (d: DomainElement) => {
-					return 'scorefunction-' + objectiveId + '-' + d.element + '-label';
-				});
+			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
+			.attr('id', (d: DomainElement) => {
+				return 'scorefunction-' + objectiveId + '-' + d.element + '-label';
+			});
 
 		this.domainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL);
 	}
@@ -232,7 +232,7 @@ export abstract class ScoreFunctionRenderer {
 
 			this.utilityAxisMaxCoordinateTwo = Math.max(this.viewConfig.dimensionTwoSize / 20, 5);
 			this.utilityAxisCoordinateOne = this.labelOffset;
-			
+
 		} else {
 			this.viewConfig.dimensionOne = 'height';
 			this.viewConfig.dimensionTwo = 'width';
@@ -259,7 +259,7 @@ export abstract class ScoreFunctionRenderer {
 
 		this.renderScoreFunctionAxis(this.axisContainer, objectiveId, viewOrientation);
 
-		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);			
+		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);
 	}
 
 	/*
@@ -281,7 +281,7 @@ export abstract class ScoreFunctionRenderer {
 
 
 		// Delete the elements of the previous utility axis:
-		var elements: any = (<any> axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
+		var elements: any = (<any>axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].remove();
 		}
@@ -309,8 +309,8 @@ export abstract class ScoreFunctionRenderer {
 
 		// Position the axis by positioning the axis container and then create it.
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER)
-			.attr('transform', () => { 
-				return 'translate(' + ((viewOrientation === 'vertical') ? ((this.utilityAxisCoordinateOne + 4) + ',' + (this.utilityAxisMaxCoordinateTwo - .5) +')') : ((this.domainAxisCoordinateTwo - .5) + ', ' + (this.utilityAxisCoordinateOne + 4) + ')'));
+			.attr('transform', () => {
+				return 'translate(' + ((viewOrientation === 'vertical') ? ((this.utilityAxisCoordinateOne + 4) + ',' + (this.utilityAxisMaxCoordinateTwo - .5) + ')') : ((this.domainAxisCoordinateTwo - .5) + ', ' + (this.utilityAxisCoordinateOne + 4) + ')'));
 			})
 			.call(utilityAxis)
 			.style('font-size', 8);

@@ -12,7 +12,7 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // d3
 import * as d3 															from 'd3';
-	
+
 // Application classes:
 import { ScoreFunctionRenderer }										from '../../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteScoreFunction.renderer';
@@ -60,7 +60,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	private previousViewType: string;
 
 	constructor(
-		private ngZone: NgZone, 
+		private ngZone: NgZone,
 		private router: Router,
 		private route: ActivatedRoute) { }
 
@@ -73,9 +73,9 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 		if (window) {
 			this.opener = window.opener;
 
-			this.objectiveToDisplay = (<any> window.opener).objectiveToPlot;
-			this.valueChartService = (<any> window.opener).valueChartService;
-			this.chartUndoRedoService = (<any> window.opener).chartUndoRedoService;
+			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
+			this.valueChartService = (<any>window.opener).valueChartService;
+			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
 
 			this.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
 		}
@@ -135,7 +135,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 	ngOnDestroy() {
 		// Remove the ScoreFunction viewer form the parent window's list of children.
-		(<any> this.opener).childWindows.scoreFunctionViewer = null;
+		(<any>this.opener).childWindows.scoreFunctionViewer = null;
 		this.sub.unsubscribe();											// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 	}
 }

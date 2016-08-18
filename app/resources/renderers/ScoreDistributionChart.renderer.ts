@@ -10,7 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 // Import Application Classes: 
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
@@ -67,7 +67,7 @@ export class ScoreDistributionChartRenderer {
 	private coordinateTwoOffset: number = 15;
 
 	// class name definitions for SVG elements that are created by this renderer.
-	public static defs: any = { 
+	public static defs: any = {
 		OUTLINE_CONTAINER: 'distribution-outline-container',
 		OUTLINE: 'distribution-outline',
 
@@ -126,9 +126,9 @@ export class ScoreDistributionChartRenderer {
 			.classed(ScoreDistributionChartRenderer.defs.OUTLINE_CONTAINER, true)
 			.attr('id', 'distribution-' + objectiveId + '-outline-container')
 			.append('rect')
-				.classed(ScoreDistributionChartRenderer.defs.OUTLINE, true)
-				.attr('id', 'distribution-' + objectiveId + '-outline')
-				.classed('valuechart-outline', true);
+			.classed(ScoreDistributionChartRenderer.defs.OUTLINE, true)
+			.attr('id', 'distribution-' + objectiveId + '-outline')
+			.classed('valuechart-outline', true);
 
 		// Create a container to hold all the elements of the chart.
 		this.chartContainer = el.append('g')
@@ -182,8 +182,8 @@ export class ScoreDistributionChartRenderer {
 		this.domainLabelsContainer.selectAll('.' + ScoreDistributionChartRenderer.defs.DOMAIN_LABEL)
 			.data(elementUserScoresSummaries)
 			.enter().append('text')
-				.classed(ScoreDistributionChartRenderer.defs.DOMAIN_LABEL, true)
-				.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-domain-label'; });
+			.classed(ScoreDistributionChartRenderer.defs.DOMAIN_LABEL, true)
+			.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-domain-label'; });
 
 		// Save the domain labels as a field.
 		this.domainLabels = this.domainLabelsContainer.selectAll('.' + ScoreDistributionChartRenderer.defs.DOMAIN_LABEL);
@@ -202,10 +202,10 @@ export class ScoreDistributionChartRenderer {
 			.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINERS_CONTAINER, true)
 			.attr('id', 'distribution-' + objective.getId() + '-boxplot-containers-container')
 			.selectAll('.' + ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER)
-				.data(elementUserScoresSummaries)
-				.enter().append('g')
-					.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER, true)
-					.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-boxplot-container'; });
+			.data(elementUserScoresSummaries)
+			.enter().append('g')
+			.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER, true)
+			.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-boxplot-container'; });
 
 		this.boxplotContainers = chartContainer.selectAll('.' + ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER);
 
@@ -272,7 +272,7 @@ export class ScoreDistributionChartRenderer {
 
 			this.viewConfig.dimensionOneSize = width;
 			this.viewConfig.dimensionTwoSize = height;
-			
+
 		} else {
 			this.viewConfig.dimensionOne = 'height';
 			this.viewConfig.dimensionTwo = 'width';
@@ -317,10 +317,10 @@ export class ScoreDistributionChartRenderer {
 	renderDomainAxis(domainAxis: d3.Selection<any>, domainLabels: d3.Selection<any>, viewOrientation: string): void {
 
 		// This function is used to determine the coordinate two position of the domain axis.
-		var calculateDomainAxisCoordinateTwo = () => { 
-			return (viewOrientation === 'vertical') ? 
+		var calculateDomainAxisCoordinateTwo = () => {
+			return (viewOrientation === 'vertical') ?
 				(this.viewConfig.dimensionTwoSize - this.coordinateTwoOffset) + 0.5
-			:
+				:
 				this.coordinateTwoOffset;
 		};
 
@@ -340,7 +340,7 @@ export class ScoreDistributionChartRenderer {
 		domainLabels
 			.text((d: ElementUserScoresSummary) => { return d.element })
 			.attr(this.viewConfig.coordinateOne, (d: ElementUserScoresSummary, i: number) => { return this.calculateBoxPlotCoordinateOne(i) + labelOffset; })
-			.attr(this.viewConfig.coordinateTwo, () => { return  calculateDomainAxisCoordinateTwo() + ((viewOrientation === 'vertical') ? (this.coordinateTwoOffset / 2) : -(this.coordinateTwoOffset / 2)); })
+			.attr(this.viewConfig.coordinateTwo, () => { return calculateDomainAxisCoordinateTwo() + ((viewOrientation === 'vertical') ? (this.coordinateTwoOffset / 2) : -(this.coordinateTwoOffset / 2)); })
 			.style('font-size', 8);
 
 	}
@@ -352,9 +352,9 @@ export class ScoreDistributionChartRenderer {
 		@description	Positions and styles the score axis of the chart. This method should NOT be called manually.
 	*/
 	renderScoreAxis(scoreAxisContainer: d3.Selection<any>, viewOrientation: string): void {
-		
+
 		// Delete elements from a previous rendering of the score axis. This must be done because we are using d3's axis generating methods.
-		var elements: any = (<any> scoreAxisContainer.node()).children;
+		var elements: any = (<any>scoreAxisContainer.node()).children;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].remove();
 		}
@@ -372,7 +372,7 @@ export class ScoreDistributionChartRenderer {
 		if (viewOrientation === 'vertical') {
 			scoreAxisScale.range([scoreAxisHeight, 0]);
 			scoreAxis = d3.axisLeft(scoreAxisScale);
-			scoreAxisContainer.attr('transform', 'translate(' + this.coordinateOneOffset + ',' + (this.coordinateTwoOffset / 2) +')');
+			scoreAxisContainer.attr('transform', 'translate(' + this.coordinateOneOffset + ',' + (this.coordinateTwoOffset / 2) + ')');
 		} else {
 			scoreAxisScale.range([0, scoreAxisHeight]);
 			scoreAxis = d3.axisTop(scoreAxisScale);

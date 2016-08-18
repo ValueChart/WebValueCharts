@@ -30,8 +30,8 @@ export class HostService {
 
 	private valueChartParser: JsonValueChartParser;
 
-	constructor(private valueChartService: ValueChartService) { 
-			this.valueChartParser = new JsonValueChartParser();
+	constructor(private valueChartService: ValueChartService) {
+		this.valueChartParser = new JsonValueChartParser();
 	}
 
 	hostGroupValueChart(chartId: string): WebSocket {
@@ -40,7 +40,7 @@ export class HostService {
 		this.hostWebSocket.onmessage = this.hostMessageHandler;
 
 		return this.hostWebSocket;
-	}	
+	}
 
 	setUserChangesAccepted(userChangesAccepted: boolean, chartId: string): void {
 		this.userChangesAccepted = userChangesAccepted;
@@ -61,7 +61,7 @@ export class HostService {
 			case MessageType.ConnectionInit:
 				toastr.success('ValueChart successfully hosted');
 				break;
-			
+
 			case MessageType.ChangePermissions:
 				break;
 
@@ -92,7 +92,7 @@ export class HostService {
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:
-				
+
 				break;
 		}
 	}

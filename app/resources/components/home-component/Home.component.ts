@@ -8,7 +8,7 @@
 import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 
-import * as $											from 'jquery';	
+import * as $											from 'jquery';
 
 // Application classes:
 import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';
@@ -37,24 +37,24 @@ export class HomeComponent {
 
 	constructor(
 		private router: Router,
-		private valueChartParser: XMLValueChartParser, 
+		private valueChartParser: XMLValueChartParser,
 		private currentUserService: CurrentUserService,
 		private valueChartHttpService: ValueChartHttpService) { }
 
 	joinValueChart(chartName: string, chartPassword: string): void {
 		this.valueChartHttpService.getValueChartStructure(chartName, chartPassword)
 			.subscribe(
-				(valueChart: ValueChart) => { 
-					this.currentUserService.setValueChart(valueChart);
-					this.currentUserService.setJoiningChart(true);
-					(<any> $('#close-chart-credentials-modal')).click();
-					this.router.navigate(['createValueChart', 'newUser']);
-				},
-				// Handle Server Errors (like not finding the ValueChart)
-				(error) => { 
-					if (error === '404 - Not Found')
-						this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
-				});
+			(valueChart: ValueChart) => {
+				this.currentUserService.setValueChart(valueChart);
+				this.currentUserService.setJoiningChart(true);
+				(<any>$('#close-chart-credentials-modal')).click();
+				this.router.navigate(['createValueChart', 'newUser']);
+			},
+			// Handle Server Errors (like not finding the ValueChart)
+			(error) => {
+				if (error === '404 - Not Found')
+					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
+			});
 	}
 
 	selectDemoValueChart(demoChart: any): void {
@@ -65,11 +65,11 @@ export class HomeComponent {
 	}
 
 	goToValueChart(event: Event): void {
-		this.uploadValueChart(event,['/view/']);
+		this.uploadValueChart(event, ['/view/']);
 	}
 
 	uploadValueChart(event: Event, route: String[]) {
-		var xmlFile: File = (<HTMLInputElement> event.target).files[0];
+		var xmlFile: File = (<HTMLInputElement>event.target).files[0];
 
 		var reader: FileReader = new FileReader();
 		reader.onload = (fileReaderEvent: ProgressEvent) => {

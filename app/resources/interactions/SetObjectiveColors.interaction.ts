@@ -24,8 +24,8 @@ import { PrimitiveObjective }													from '../model/PrimitiveObjective';
 export class SetObjectiveColorsInteraction {
 
 	constructor(
-		private changeDetectionService: ChangeDetectionService, 
-		private labelDefinitions: LabelDefinitions) { } 
+		private changeDetectionService: ChangeDetectionService,
+		private labelDefinitions: LabelDefinitions) { }
 
 	toggleSettingObjectiveColors(setObjectiveColors: boolean): void {
 		var primitiveObjectiveLabels: JQuery = $('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
@@ -35,9 +35,9 @@ export class SetObjectiveColorsInteraction {
 				var targetObjective: PrimitiveObjective = d3.select(eventObject.target).datum().objective;
 				var colorPicker = $('#primitiveObjective-color-picker');
 				colorPicker.off('change');
-				
+
 				colorPicker.change((e: Event) => {
-					var color: string = (<any> e.target).value;
+					var color: string = (<any>e.target).value;
 					targetObjective.setColor(color);
 					this.changeDetectionService.colorsHaveChanged = true;
 				});

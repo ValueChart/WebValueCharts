@@ -9,7 +9,7 @@ import { Injectable } 												from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 
 // Application Classes
@@ -49,7 +49,7 @@ export class SortAlternativesInteraction {
 	private alternativeBox: d3.Selection<any>;
 	private alternativeLabelToMove: d3.Selection<any>;
 	private totalScoreLabelToMove: d3.Selection<any>;
-	
+
 	private alternativeDimensionOneSize: number;
 	private minCoordOne: number;
 	private maxCoordOne: number;
@@ -121,25 +121,25 @@ export class SortAlternativesInteraction {
 				.on('start', this.startSortAlternatives)
 				.on('drag', this.sortAlternatives)
 				.on('end', this.endSortAlternatives);
-		} 
-		
+		}
+
 		alternativeBoxes.call(dragToSort);
 	}
 
 	sortByObjective = (eventObject: Event) => {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
+		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
-			var objective: Objective = (<any>eventObject.target).__data__.objective;
-			var objectivesToReorderBy: PrimitiveObjective[];
-			if (objective.objectiveType === 'abstract') {
-				objectivesToReorderBy = (<AbstractObjective> objective).getAllPrimitiveSubObjectives();
-			} else {
-				objectivesToReorderBy = [<PrimitiveObjective> objective];
-			}
-			var cellIndices: number[] = this.rendererDataService.generateCellOrderByObjectiveScore(this.rendererDataService.getRowData(), objectivesToReorderBy)
-			this.rendererDataService.reorderAllCells(cellIndices);
-			this.changeDetectionService.alternativeOrderChanged = true;
+		var objective: Objective = (<any>eventObject.target).__data__.objective;
+		var objectivesToReorderBy: PrimitiveObjective[];
+		if (objective.objectiveType === 'abstract') {
+			objectivesToReorderBy = (<AbstractObjective>objective).getAllPrimitiveSubObjectives();
+		} else {
+			objectivesToReorderBy = [<PrimitiveObjective>objective];
 		}
+		var cellIndices: number[] = this.rendererDataService.generateCellOrderByObjectiveScore(this.rendererDataService.getRowData(), objectivesToReorderBy)
+		this.rendererDataService.reorderAllCells(cellIndices);
+		this.changeDetectionService.alternativeOrderChanged = true;
+	}
 
 	startSortAlternatives = (d: Alternative, i: number) => {
 		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
@@ -148,13 +148,13 @@ export class SortAlternativesInteraction {
 		this.maxCoordOne = this.summaryChartRenderer.viewConfig.dimensionOneSize;
 		this.totalCoordOneChange = 0;
 
-		this.alternativeBox = d3.select((<any> d3.event).sourceEvent.target)
+		this.alternativeBox = d3.select((<any>d3.event).sourceEvent.target)
 		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.dimensionOne);
 
 		this.siblingBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
 
 		this.cellsToMove = d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getName() + '"]');
-		this.alternativeLabelToMove = d3.select('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getName() + '"]'); 
+		this.alternativeLabelToMove = d3.select('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getName() + '"]');
 		this.totalScoreLabelToMove = d3.select('.' + this.summaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getName() + '"]');
 
 		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
@@ -168,7 +168,7 @@ export class SortAlternativesInteraction {
 		}
 
 		this.newAlternativeIndex = this.currentAlternativeIndex;
-		this.jumpPoints = [0];	
+		this.jumpPoints = [0];
 
 		this.siblingBoxes.nodes().forEach((alternativeBox: Element) => {
 			if (alternativeBox !== undefined) {
@@ -184,7 +184,7 @@ export class SortAlternativesInteraction {
 	sortAlternatives = (d: Alternative, i: number) => {
 		var deltaCoordOne: number = (<any>d3.event)['d' + this.summaryChartRenderer.viewConfig.coordinateOne];
 		var currentCoordOne: number = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
-		
+
 		if (currentCoordOne + deltaCoordOne < 0) {
 			deltaCoordOne = 0 - currentCoordOne;
 		} else if (currentCoordOne + this.alternativeDimensionOneSize + deltaCoordOne > this.maxCoordOne) {
@@ -206,18 +206,18 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE +  '[alternative="' + d.getName() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getName() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
 			var previousTransform: string = cellSelection.attr('transform');
-			cellSelection.attr('transform', this.renderConfigService.incrementTransform(previousTransform, deltaCoordOne,0));
+			cellSelection.attr('transform', this.renderConfigService.incrementTransform(previousTransform, deltaCoordOne, 0));
 		});
 
 		if (this.alternativeLabelToMove)
 			this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne, +this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne) + deltaCoordOne);
 
-		if (this.totalScoreLabelToMove) 
+		if (this.totalScoreLabelToMove)
 			this.totalScoreLabelToMove.attr('transform', this.renderConfigService.incrementTransform(this.totalScoreLabelToMove.attr('transform'), deltaCoordOne, 0));
 
 	}

@@ -19,7 +19,7 @@ import { ValueChart }										from '../model/ValueChart';
 import { Objective }										from '../model/Objective';
 import { PrimitiveObjective }								from '../model/PrimitiveObjective';
 import { AbstractObjective }								from '../model/AbstractObjective';
-import { User }												from '../model/User';	
+import { User }												from '../model/User';
 import { Alternative }										from '../model/Alternative';
 import { WeightMap }										from '../model/WeightMap';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
@@ -31,7 +31,7 @@ import { RowData, CellData, UserScoreData, LabelData}		from '../types/ValueChart
 import { ObjectivesRecord }									from '../types/Record.types';
 import { AlternativeOrderRecord }							from '../types/Record.types';
 
-	
+
 // This class contains methods for converting a ValueChartDirective's ValueChart into a format suitable for d3, 
 // and for updating this data in response to user actions.
 
@@ -45,10 +45,10 @@ export class RendererDataService {
 	constructor(
 		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) {
-			
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);	
-		}
+
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);
+	}
 
 	initialize() {
 		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.getAlternatives());
@@ -59,7 +59,7 @@ export class RendererDataService {
 	updateAllValueChartData(viewOrientation: string): void {
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
-		
+
 		this.getLabelData().forEach((labelDatum: LabelData) => {
 			this.updateLabelDataWeights(labelDatum);
 		});
@@ -73,7 +73,7 @@ export class RendererDataService {
 			var children: LabelData[] = [];
 			var maxDepthOfChildren: number = 0;
 
-			(<AbstractObjective> objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
+			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
 				let labelDatum: LabelData = this.getLabelDatum(subObjective, depth + 1);
 				weight += labelDatum.weight;
 				if (labelDatum.depthOfChildren > maxDepthOfChildren)
@@ -81,9 +81,9 @@ export class RendererDataService {
 				children.push(labelDatum);
 			});
 
-			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1};
+			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
 		} else if (objective.objectiveType === 'primitive') {
-			labelData =  { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0};
+			labelData = { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0 };
 		}
 
 		return labelData;
@@ -94,7 +94,7 @@ export class RendererDataService {
 			return this.labelData;
 		}
 		this.generateLabelData();
-		return this.labelData; 
+		return this.labelData;
 	}
 
 	generateLabelData(): void {
@@ -142,7 +142,7 @@ export class RendererDataService {
 
 				objectiveValue.userScores.push(userScore);
 			}
-		});	
+		});
 
 		return objectiveValues;
 	}
@@ -204,7 +204,7 @@ export class RendererDataService {
 						previousOffset = 0;
 						previousWeightedScore = 0;
 					} else {
-						let previousUserScore = rowDataCopy[i-1].cells[j].userScores[k];
+						let previousUserScore = rowDataCopy[i - 1].cells[j].userScores[k];
 						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getId());
 						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getId());
 						previousOffset = previousUserScore.offset;
@@ -272,7 +272,7 @@ export class RendererDataService {
 				});
 			}
 		}
-		
+
 		cellIndices.sort((a: number, b: number) => {
 			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
 			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
@@ -285,7 +285,7 @@ export class RendererDataService {
 				return 1;						// b should come before a in the ordering.
 			}
 		});
-		
+
 		return cellIndices;
 	}
 
@@ -307,7 +307,7 @@ export class RendererDataService {
 			}
 		});
 
-		return cellIndices; 
+		return cellIndices;
 	}
 
 	calculateMinLabelWidth(labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
@@ -327,7 +327,7 @@ export class RendererDataService {
 		var weightTotal: number = 0;
 		var nonZeroWeights: number = 0;
 
-		labelData.forEach((child:LabelData) => {
+		labelData.forEach((child: LabelData) => {
 			if (child.weight !== 0) {
 				weightTotal += child.weight;
 				nonZeroWeights++;

@@ -15,13 +15,13 @@ import { ValueChartService }													from './ValueChart.service';
 
 // Model Classes
 import { PrimitiveObjective }													from '../model/PrimitiveObjective';
-import { User }																	from '../model/User';	
+import { User }																	from '../model/User';
 import { CategoricalDomain }													from '../model/CategoricalDomain';
 import { IntervalDomain }														from '../model/IntervalDomain';
 import { ScoreFunction }														from '../model/ScoreFunction';
 
 import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '../types/ScoreFunctionViewer.types.ts';
-	
+
 // This class stores the state of a ValueChart and exposes this state to the renderer classes. Renderer classes are allowed to modify 
 // this state as a way of initiating change detection. 
 
@@ -35,9 +35,9 @@ export class ScoreFunctionViewerService {
 		var domainElements: (string | number)[] = [];
 
 		if (objective.getDomainType() === 'categorical') {
-			domainElements = (<CategoricalDomain> objective.getDomain()).getElements();
+			domainElements = (<CategoricalDomain>objective.getDomain()).getElements();
 		} else if (objective.getDomainType() === 'interval') {
-			domainElements = (<IntervalDomain> objective.getDomain()).getElements();
+			domainElements = (<IntervalDomain>objective.getDomain()).getElements();
 		} else {
 			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 		}
@@ -64,27 +64,27 @@ export class ScoreFunctionViewerService {
 		});
 
 		userScores.sort((a: number, b: number) => {
-			if (a < b) 
+			if (a < b)
 				return -1;
-			else 
+			else
 				return 1;
 		});
 
 		var elementScoresSummary: ElementUserScoresSummary = {
-				element: element,
+			element: element,
 
-				min: d3.min(userScores),
-				firstQuartile: d3.quantile(userScores, 0.25),
-				median: d3.median(userScores),
-				thirdQuartile: d3.quantile(userScores, 0.75),
-				max: d3.max(userScores),
+			min: d3.min(userScores),
+			firstQuartile: d3.quantile(userScores, 0.25),
+			median: d3.median(userScores),
+			thirdQuartile: d3.quantile(userScores, 0.75),
+			max: d3.max(userScores),
 		};
 
 		return elementScoresSummary;
 	}
 
-	getAllElementUserScoresSummaries(objective: PrimitiveObjective): ElementUserScoresSummary[] { 
-		var elementUserScoresSummaries: ElementUserScoresSummary[] = []; 
+	getAllElementUserScoresSummaries(objective: PrimitiveObjective): ElementUserScoresSummary[] {
+		var elementUserScoresSummaries: ElementUserScoresSummary[] = [];
 
 		var scoreFunction: ScoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 		scoreFunction.getAllElements().forEach((element: (number | string)) => {

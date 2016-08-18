@@ -12,7 +12,7 @@ import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
 import { PrimitiveObjective } 												from '../model/PrimitiveObjective';
 import { AbstractObjective } 												from '../model/AbstractObjective';
-import { Alternative } 														from '../model/Alternative'; 
+import { Alternative } 														from '../model/Alternative';
 import { ScoreFunctionMap }													from '../model/ScoreFunctionMap';
 import { ScoreFunction } 													from '../model/ScoreFunction';
 import { ContinuousScoreFunction } 											from '../model/ContinuousScoreFunction';
@@ -27,17 +27,17 @@ export class ValueChartsPlusParser {
 
 	parseValueChart(xmlDocument: Document): ValueChart {
 
-		var objectivesParentElement: Element = xmlDocument.querySelector('Criteria');	
+		var objectivesParentElement: Element = xmlDocument.querySelector('Criteria');
 		var alternativesParentElement: Element = xmlDocument.querySelector('Alternatives');
 		var valueChartName: string = xmlDocument.querySelector('ValueCharts').getAttribute('problem');
 
-		var valueChart: ValueChart = new ValueChart(valueChartName, '', '');	
+		var valueChart: ValueChart = new ValueChart(valueChartName, '', '');
 
-		valueChart.setRootObjectives(this.parseObjectives(<Element[]> (<any> objectivesParentElement).children));
+		valueChart.setRootObjectives(this.parseObjectives(<Element[]>(<any>objectivesParentElement).children));
 
 		var primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
 
-		valueChart.setAlternatives(this.parseAlternatives((<any> alternativesParentElement).children, primitiveObjectives));
+		valueChart.setAlternatives(this.parseAlternatives((<any>alternativesParentElement).children, primitiveObjectives));
 
 		valueChart.setUsers([this.parseUser(xmlDocument, primitiveObjectives)]);
 
@@ -45,7 +45,7 @@ export class ValueChartsPlusParser {
 
 		return valueChart;
 	}
-	
+
 	parseObjectives(objectiveElements: Element[]): Objective[] {
 		var parsedObjectives: Objective[] = [];
 
@@ -64,8 +64,8 @@ export class ValueChartsPlusParser {
 		var name: string = abstractObjectiveElement.getAttribute('name');
 		// The data files have no description for abstract objectives at the moment.
 		var abstractObjective: AbstractObjective = new AbstractObjective(name, '');
-		abstractObjective.setDirectSubObjectives(this.parseObjectives((<any> abstractObjectiveElement).children));
-		
+		abstractObjective.setDirectSubObjectives(this.parseObjectives((<any>abstractObjectiveElement).children));
+
 		return abstractObjective;
 	}
 
@@ -79,17 +79,17 @@ export class ValueChartsPlusParser {
 		var domainElements = primitiveObjectiveElement.querySelector('Domain');
 
 		if (domainElements.getAttribute('type') === 'continuous') {
-			primitiveObjective.setDomain(this.parseContinuousDomain(domainElements));			
+			primitiveObjective.setDomain(this.parseContinuousDomain(domainElements));
 		} else {
-			primitiveObjective.setDomain(this.parseCategoricalDomain(domainElements));	
+			primitiveObjective.setDomain(this.parseCategoricalDomain(domainElements));
 		}
 
 		return primitiveObjective;
 	}
 
 	parseContinuousDomain(domainElement: Element): ContinuousDomain {
-		var minValue = +(<any> domainElement).children[0].getAttribute('x');
-		var maxValue = +(<any>domainElement).children[(<any> domainElement).children.length - 1].getAttribute('x');
+		var minValue = +(<any>domainElement).children[0].getAttribute('x');
+		var maxValue = +(<any>domainElement).children[(<any>domainElement).children.length - 1].getAttribute('x');
 
 		return new ContinuousDomain(minValue, maxValue);
 	}
@@ -97,8 +97,8 @@ export class ValueChartsPlusParser {
 	parseCategoricalDomain(domainElement: Element): CategoricalDomain {
 		var categoricalDomain: CategoricalDomain = new CategoricalDomain(false);
 
-		for (var i: number = 0; i < (<any> domainElement).children.length; i++) {
-			categoricalDomain.addElement((<any> domainElement).children[i].getAttribute('x'));
+		for (var i: number = 0; i < (<any>domainElement).children.length; i++) {
+			categoricalDomain.addElement((<any>domainElement).children[i].getAttribute('x'));
 		}
 
 		return categoricalDomain;

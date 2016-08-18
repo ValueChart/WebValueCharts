@@ -22,7 +22,7 @@ export class PrimitiveObjective implements Objective {
 
 	constructor(name: string, description: string, id?: string) {
 		this.name = name;
-		this.description = description; 
+		this.description = description;
 		this.objectiveType = 'primitive';
 		this.id = id;
 
@@ -58,7 +58,7 @@ export class PrimitiveObjective implements Objective {
 		return this.color;
 	}
 
-	setColor(color: string):void {
+	setColor(color: string): void {
 		this.color = color;
 	}
 
@@ -70,7 +70,7 @@ export class PrimitiveObjective implements Objective {
 		return this.domain;
 	}
 
-	setDomain(domain: Domain):void {
+	setDomain(domain: Domain): void {
 		this.domain = domain;
 	}
 

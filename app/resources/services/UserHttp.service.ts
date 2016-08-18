@@ -68,13 +68,13 @@ export class UserHttpService {
 			.catch(this.handleError);
 	}
 
-		// This method extracts the data from the response object and returns it as an observable.l
-	extractData = (res: Response): {username: string, password: string, loginResult: boolean } => {
+	// This method extracts the data from the response object and returns it as an observable.l
+	extractData = (res: Response): { username: string, password: string, loginResult: boolean } => {
 		let body = res.json();
 		return body.data || {}; // Return the body of the response, or an empty object if it is undefined.
 	}
 
-		// This method handles any errors from the request.
+	// This method handles any errors from the request.
 	handleError = (error: any, caught: Observable<any>): Observable<any> => {
 		let errMsg = (error.message) ? error.message :
 			error.status ? `${error.status} - ${error.statusText}` : 'Server error';

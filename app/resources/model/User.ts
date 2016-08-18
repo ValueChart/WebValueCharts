@@ -13,8 +13,8 @@ export class User {
 
 	private username: string;
 	public color: string;
-	private weightMap: WeightMap; 
-	private scoreFunctionMap: ScoreFunctionMap; 
+	private weightMap: WeightMap;
+	private scoreFunctionMap: ScoreFunctionMap;
 
 	constructor(username: string) {
 		if (username !== undefined) {

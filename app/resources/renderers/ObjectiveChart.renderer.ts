@@ -41,12 +41,12 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
-	
+
 	// Constants for use in rendering the summary chart.
 	private USER_SCORE_SPACING: number = 10; // The spacing between user score bars, in pixels.
 
 	// The viewConfig object for this renderer. It is configured using the renderConfigService.
-	public viewConfig: ViewConfig = <ViewConfig> {};
+	public viewConfig: ViewConfig = <ViewConfig>{};
 
 	// d3 Selections:
 	public chart: d3.Selection<any>;							// The 'g' element that contains all the elements making up the objective chart.
@@ -142,7 +142,7 @@ export class ObjectiveChartRenderer {
 		this.rowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE);	// Update the row outlines field.
 
 
-		
+
 		var updateRowContainers = rowsContainer.selectAll('.' + this.defs.ROW)
 			.data(rows);
 
@@ -227,9 +227,9 @@ export class ObjectiveChartRenderer {
 			.data((d: CellData) => { return [d]; });
 
 		// Update domain labels to conform to the data.
-		updateDomainLabels.exit().remove();	
+		updateDomainLabels.exit().remove();
 		updateDomainLabels.enter().append('text')
-				.classed(this.defs.DOMAIN_LABEL, true);
+			.classed(this.defs.DOMAIN_LABEL, true);
 
 		this.objectiveDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL);
 	}
@@ -324,7 +324,7 @@ export class ObjectiveChartRenderer {
 		rowOutlines
 			.attr('transform', (d: RowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.viewConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
-			})		
+			})
 			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
 			.attr(this.viewConfig.dimensionTwo, (d: RowData) => {
 				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getId());
@@ -354,7 +354,7 @@ export class ObjectiveChartRenderer {
 			.attr(this.viewConfig.coordinateOne, this.calculateCellCoordinateOne)
 			.attr(this.viewConfig.coordinateTwo, 0)
 			.attr('alternative', (d: Alternative) => { return d.getName(); })
-			.attr('id', (d: Alternative) => { return 'objective-' + d.getName() + '-box'});
+			.attr('id', (d: Alternative) => { return 'objective-' + d.getName() + '-box' });
 
 
 		this.renderObjectiveChartCells(cells, userScores, weightColumns, viewOrientation);
@@ -375,25 +375,25 @@ export class ObjectiveChartRenderer {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i);
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, coordinateOne, 0);
 			})
-			.attr('alternative', (d: CellData) => { return d.alternative.getName();});
+			.attr('alternative', (d: CellData) => { return d.alternative.getName(); });
 
 		var domainLabelCoord: number = 5;
 
 		cells.selectAll('.' + this.defs.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; })
-				.text((d: CellData, i: number) => { return d.value })
-				.attr(this.viewConfig.coordinateOne, (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / 3)
-				.attr(this.viewConfig.coordinateTwo, (d: CellData, i: number) => {
-					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getId());
-					return (viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
-				});
+			.text((d: CellData, i: number) => { return d.value })
+			.attr(this.viewConfig.coordinateOne, (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / 3)
+			.attr(this.viewConfig.coordinateTwo, (d: CellData, i: number) => {
+				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getId());
+				return (viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
+			});
 
 		this.toggleDomainLabels();
 
 		this.renderUserScores(userScores, viewOrientation);
 		this.renderWeightColumns(weightColumns, viewOrientation);
 
-		(<any> this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
+		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
 	}
 
 	/*
@@ -405,10 +405,10 @@ export class ObjectiveChartRenderer {
 	*/
 	renderUserScores(userScores: d3.Selection<any>, viewOrientation: string): void {
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => { 
+			.style('fill', (d: UserScoreData, i: number) => {
 				if (this.valueChartService.isIndividual())
-					return d.objective.getColor(); 
-				else 
+					return d.objective.getColor();
+				else
 					return d.user.color;
 			})
 			.attr(this.viewConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
@@ -446,16 +446,16 @@ export class ObjectiveChartRenderer {
 
 		weightColumns
 			.attr(this.viewConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - (this.USER_SCORE_SPACING + 1), 0); })
-			.attr(this.viewConfig.dimensionTwo, (d: UserScoreData, i: number) => { return calculateWeightColumnDimensionTwo(d,i); })
+			.attr(this.viewConfig.dimensionTwo, (d: UserScoreData, i: number) => { return calculateWeightColumnDimensionTwo(d, i); })
 			.attr(this.viewConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + ((this.USER_SCORE_SPACING + 1) / 2); })
-			.style('stroke-dasharray', (d: UserScoreData, i: number) => { 
+			.style('stroke-dasharray', (d: UserScoreData, i: number) => {
 				let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i) - (this.USER_SCORE_SPACING + 1));
 				let dimensionTwo: number = calculateWeightColumnDimensionTwo(d, i);
-				
+
 				return (viewOrientation === 'vertical') ?
-					(dimensionOne + dimensionTwo) + ', ' + dimensionOne 
-				:
-					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;  
+					(dimensionOne + dimensionTwo) + ', ' + dimensionOne
+					:
+					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
 			});
 
 		if (viewOrientation === 'vertical') {
@@ -479,7 +479,7 @@ export class ObjectiveChartRenderer {
 		if (this.valueChartService.isIndividual()) {
 			this.weightColumns.style('display', 'none');
 		} else {
-			this.weightColumns.style('display', 'block');			
+			this.weightColumns.style('display', 'block');
 		}
 	}
 
@@ -500,7 +500,7 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
-	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()); }; 
+	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()); };
 	// Calculate the CoordinateOne of a userScore given the userScore object and its index. userScores are just further subdivisions of cells based on the number of userScores in each cell.
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / this.valueChartService.getNumUsers(); };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).

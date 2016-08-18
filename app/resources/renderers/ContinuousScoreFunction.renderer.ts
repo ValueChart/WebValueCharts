@@ -96,9 +96,9 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
-		
+
 		// Create the continuous score function specific element containers:
-		
+
 		// Create the fitline container.
 		this.linesContainer = this.userContainers.append('g')
 			.classed(ContinuousScoreFunctionRenderer.defs.FITLINES_CONTAINER, true)
@@ -107,7 +107,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Create the points container.
 		this.pointsContainer = this.userContainers.append('g')
 			.classed(ContinuousScoreFunctionRenderer.defs.POINTS_CONTAINER, true)
-			.attr('id','scorefunction-' + objective.getId() + '-points-container');
+			.attr('id', 'scorefunction-' + objective.getId() + '-points-container');
 
 		// Create the point labels container.
 		this.pointLabelContainer = this.userContainers.append('g')
@@ -132,20 +132,20 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
 			.data((d: UserDomainElements) => { return d.elements; })
 			.enter().append('circle')
-				.classed(ContinuousScoreFunctionRenderer.defs.POINT, true)
-				.attr('id', (d: DomainElement) => {
-					return 'scorefunction-' + objective.getId() + '-' + d.element + '-point';
-				});
+			.classed(ContinuousScoreFunctionRenderer.defs.POINT, true)
+			.attr('id', (d: DomainElement) => {
+				return 'scorefunction-' + objective.getId() + '-' + d.element + '-point';
+			});
 
 		this.plottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT);
 
 		labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL)
 			.data((d: UserDomainElements) => { return d.elements; })
 			.enter().append('text')
-				.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABEL, true)
-				.attr('id', (d: DomainElement) => {
-					return 'scorefunction-' + objective.getId() + '-' + d.element + 'point-label';
-				});
+			.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABEL, true)
+			.attr('id', (d: DomainElement) => {
+				return 'scorefunction-' + objective.getId() + '-' + d.element + 'point-label';
+			});
 
 		this.pointLabels = labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL);
 
@@ -157,13 +157,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				var temp = d.elements.pop();	// Remove the last domain element.
 				var data = d.elements.slice();	// Copy the array.
 				d.elements.push(temp);			// Add the domain element back.
-				return data; 
+				return data;
 			})
 			.enter().append('line')
-				.classed(ContinuousScoreFunctionRenderer.defs.FITLINE, true)
-				.attr('id', (d: DomainElement) => {
-					return 'scorefunction-' + objective.getId() + '-' + d.element + '-fitline';
-				});
+			.classed(ContinuousScoreFunctionRenderer.defs.FITLINE, true)
+			.attr('id', (d: DomainElement) => {
+				return 'scorefunction-' + objective.getId() + '-' + d.element + '-fitline';
+			});
 
 		this.fitLines = linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE);
 	}
@@ -210,26 +210,26 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
-		var calculatePointCoordinateTwo = (d: DomainElement) => { 
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d.element)) : this.heightScale(scoreFunction.getScore(+d.element)); 
+		var calculatePointCoordinateTwo = (d: DomainElement) => {
+			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d.element)) : this.heightScale(scoreFunction.getScore(+d.element));
 		};
 
 		// Render the scatter plot points for each user.
 		this.plottedPoints
-			.attr('c' + this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
+			.attr('c' + this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
 			.attr('c' + this.viewConfig.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
-			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); } )
+			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); })
 			.style('fill-opacity', 0.5)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
 
 		// Render the point labels for each user.
 		this.pointLabels
-			.text((d: any, i: number) => { 
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100; 
+			.text((d: any, i: number) => {
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100;
 			})
 			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
 			.attr(this.viewConfig.coordinateTwo, calculatePointCoordinateTwo)
@@ -237,14 +237,14 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Render the fitlines for each user.
 		this.fitLines
-			.attr(this.viewConfig.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d,i) - pointOffset })
+			.attr(this.viewConfig.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
 			.attr(this.viewConfig.coordinateTwo + '1', calculatePointCoordinateTwo)
 			.attr(this.viewConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
-			.attr(this.viewConfig.coordinateTwo + '2', (d: DomainElement, i: number) => { 
+			.attr(this.viewConfig.coordinateTwo + '2', (d: DomainElement, i: number) => {
 				var userElements = usersDomainElements.find((userElements: UserDomainElements) => {
 					return userElements.user.getUsername() === d.user.getUsername();
 				});
-				return calculatePointCoordinateTwo(userElements.elements[i + 1]); 
+				return calculatePointCoordinateTwo(userElements.elements[i + 1]);
 			});
 
 		// Enable or disable dragging to change user score functions depending on whether the ValueChart is has multiple users (should be disabled) or has one user (should be enabled).
@@ -263,13 +263,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		if (enableDragging) {
 			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				// Save the current state of the ScoreFunction.
 				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 			});
 
 			dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (viewOrientation === 'vertical') {
@@ -283,7 +283,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 				// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
 				// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
-				this.ngZone.run(() => { scoreFunction.setElementScore(<number> d.element, score) });
+				this.ngZone.run(() => { scoreFunction.setElementScore(<number>d.element, score) });
 			});
 		}
 

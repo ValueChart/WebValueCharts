@@ -25,7 +25,7 @@ import { ScoreFunction }									from '../model/ScoreFunction';
 // Type Definitions:
 import { ValueChartStateContainer }							from '../types/StateContainer.types';
 import { ScoreFunctionRecord }								from '../types/Record.types';
-	
+
 // This class stores the state of a ValueChart and exposes this state to the renderer classes. Renderer classes are allowed to modify 
 // this state as a way of initiating change detection. 
 
@@ -77,8 +77,8 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getRootObjectives();
 	}
 
-	getAbstractObjectives() : AbstractObjective[] {
-		let abstractObjs : AbstractObjective[] = [];
+	getAbstractObjectives(): AbstractObjective[] {
+		let abstractObjs: AbstractObjective[] = [];
 		for (let obj of this.valueChart.getAllObjectives()) {
 			if (obj.objectiveType === "abstract") {
 				abstractObjs.push(<AbstractObjective>obj);
@@ -104,7 +104,7 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getMaximumWeightMap();
 	}
 
-	getAlternativeValuesforObjective(obj: PrimitiveObjective) : { value: (string | number), alternative: Alternative }[] {
+	getAlternativeValuesforObjective(obj: PrimitiveObjective): { value: (string | number), alternative: Alternative }[] {
 		return this.valueChart.getAlternativeValuesforObjective(obj);
 	}
 

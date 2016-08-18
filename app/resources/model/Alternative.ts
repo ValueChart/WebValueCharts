@@ -37,8 +37,8 @@ export class Alternative {
 		return this.objectiveValues.get(objectiveName);
 	}
 
-	getAllObjectiveValuePairs(): {objectiveName: string, value: string | number}[] {
-		var objectiveValuePairs: {objectiveName: string, value: string | number}[] = [];
+	getAllObjectiveValuePairs(): { objectiveName: string, value: string | number }[] {
+		var objectiveValuePairs: { objectiveName: string, value: string | number }[] = [];
 
 		var mapIterator: Iterator<string> = this.objectiveValues.keys();
 		var iteratorElement: IteratorResult<string> = mapIterator.next();

@@ -11,7 +11,7 @@ import { NgZone }													from '@angular/core';
 
 // Import libraries:
 import * as d3 														from 'd3';
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 
 // Import Application Classes:
@@ -55,7 +55,7 @@ export class LabelRenderer {
 	// ========================================================================================
 
 	// The viewConfig object for this renderer. It is configured using the renderConfigService.
-	public viewConfig: ViewConfig = <ViewConfig> {};
+	public viewConfig: ViewConfig = <ViewConfig>{};
 
 	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
 	public rootContainer: d3.Selection<any>;				// The 'g' element that is the root container of the Label area.
@@ -64,11 +64,11 @@ export class LabelRenderer {
 	public scoreFunctionContainer: d3.Selection<any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
-															// space that the label area is rendered in.
+	// space that the label area is rendered in.
 	private displayScoreFunctions: boolean;					// Should score function plots be displayed? 
 
 	public scoreFunctionRenderers: any;						// A JS object literal used as a map to store instances of score function renderers.  Its field names are the names of primitive objectives,
-															// and the values are score function renderers.
+	// and the values are score function renderers.
 
 	// ========================================================================================
 	// 									Constructor
@@ -86,7 +86,7 @@ export class LabelRenderer {
 		private scoreFunctionViewerService: ScoreFunctionViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private defs: LabelDefinitions,
-		private ngZone: NgZone) { 
+		private ngZone: NgZone) {
 	}
 
 	// ========================================================================================
@@ -112,8 +112,8 @@ export class LabelRenderer {
 		this.labelSpaceOutline = this.rootContainer.append('g')
 			.classed(this.defs.OUTLINE_CONTAINER, true)
 			.append('rect')
-				.classed(this.defs.OUTLINE, true)
-				.classed('valuechart-outline', true);
+			.classed(this.defs.OUTLINE, true)
+			.classed('valuechart-outline', true);
 
 		// Create the container which will hold all labels.
 		this.labelContainer = this.rootContainer.append('g')
@@ -146,9 +146,9 @@ export class LabelRenderer {
 		var newLabelContainers: d3.Selection<any> = labelContainer.selectAll('g[parent=' + parentName + ']')
 			.data(labelData)
 			.enter().append('g')
-				.classed(this.defs.LABEL_SUBCONTAINER, true)
-				.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-container' })
-				.attr('parent', parentName);	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
+			.classed(this.defs.LABEL_SUBCONTAINER, true)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-container' })
+			.attr('parent', parentName);	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
 
 		// Append an outline rectangle for label container that was just created.
 		newLabelContainers.append('rect')
@@ -187,7 +187,7 @@ export class LabelRenderer {
 
 				el.select('#label-' + labelDatum.objective.getId() + '-text')
 					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
-				return;	
+				return;
 			}
 
 			this.createLabels(el, el.select('#label-' + labelDatum.objective.getId() + '-container'), labelDatum.subLabelData, labelDatum.objective.getId());
@@ -246,7 +246,7 @@ export class LabelRenderer {
 		this.rootContainer
 			.attr('transform', () => {
 				if (viewOrientation === 'vertical')
-					return 'translate(0,' + (this.viewConfig.dimensionTwoSize + 10) + ')';	
+					return 'translate(0,' + (this.viewConfig.dimensionTwoSize + 10) + ')';
 				else
 					return 'translate(0,0)';
 			});
@@ -260,7 +260,7 @@ export class LabelRenderer {
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + this.defs.ROOT_CONTAINER_NAME + '"]');
 		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
 
-		var scoreFunctionContainer: d3.Selection<any>  = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
+		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
 		// Render or hide the score function pots depending on the value of the displayScoreFunctions attribute on the ValueChartDirective.
 		if (this.displayScoreFunctions) {
@@ -303,7 +303,7 @@ export class LabelRenderer {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
 			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
-			
+
 			let scaledWeightOffset: number = this.viewConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
@@ -354,8 +354,8 @@ export class LabelRenderer {
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
 		labelTexts.attr(this.viewConfig.coordinateOne, () => {
-				return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2); 
-			})
+			return (viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2);
+		})
 			.attr(this.viewConfig.coordinateTwo, (d: LabelData, i: number) => {
 				return (viewOrientation === "vertical") ?
 					this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 2) + textOffset
@@ -364,10 +364,10 @@ export class LabelRenderer {
 			});
 
 		labelTexts.select('.' + this.defs.SUBCONTAINER_NAME)
-			.text((d: LabelData) => { 
+			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
 				return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
-			});	
+			});
 
 		labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
 			.attr('x', (d: LabelData, i: number) => { return (viewOrientation === 'vertical') ? 10 : this.viewConfig.dimensionTwoScale(weightOffsets[i]) + (this.viewConfig.dimensionTwoScale(d.weight) / 5) + textOffset })
@@ -413,14 +413,14 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
-	createScoreFunctions(scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {	
+	createScoreFunctions(scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {
 		this.scoreFunctionRenderers = {}
 
 		var newScoreFunctionPlots: d3.Selection<any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(data)
 			.enter().append('g')
-				.classed(this.defs.SCORE_FUNCTION, true)
-				.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; })
+			.classed(this.defs.SCORE_FUNCTION, true)
+			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; })
 
 		// Use the ScoreFunctionRenderer to create each score function.
 		newScoreFunctionPlots.nodes().forEach((scoreFunctionPlot: Element) => {
@@ -429,10 +429,10 @@ export class LabelRenderer {
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
 				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
-			else 
+			else
 				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 
-			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum);	
+			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum);
 		});
 	}
 	/*
@@ -491,7 +491,7 @@ export class LabelRenderer {
 		@description	Display or hide the utility labels on the score function plot's points/bars depending on the value of the displayTotalScores attribute on the ValueChartDirective.
 	*/
 	toggleScoreFunctionValueLabels(): void {
-		for(var field in this.scoreFunctionRenderers) {
+		for (var field in this.scoreFunctionRenderers) {
 			this.scoreFunctionRenderers[field].toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
 		}
 	}

@@ -39,7 +39,7 @@ export abstract class ScoreFunction implements Memento {
 		var bestElementSoFar = iteratorElement.value;
 		while (iteratorElement.done === false) {
 			let currentElementScore: number = this.elementScoreMap.get(iteratorElement.value);
-			
+
 			if (this.elementScoreMap.get(bestElementSoFar) < currentElementScore) {
 				bestElementSoFar = iteratorElement.value;
 			}
@@ -55,7 +55,7 @@ export abstract class ScoreFunction implements Memento {
 		var worstElementSoFar = iteratorElement.value;
 		while (iteratorElement.done === false) {
 			let currentElementScore: number = this.elementScoreMap.get(iteratorElement.value);
-			
+
 			if (this.elementScoreMap.get(worstElementSoFar) > currentElementScore) {
 				worstElementSoFar = iteratorElement.value;
 			}
@@ -69,8 +69,8 @@ export abstract class ScoreFunction implements Memento {
 			this.findBestElement();
 		else if (updatedDomainElement === this.worstElement)
 			this.findWorstElement();
-		
-		if (this.bestElement === undefined || updatedScore > this.elementScoreMap.get(this.bestElement)) 
+
+		if (this.bestElement === undefined || updatedScore > this.elementScoreMap.get(this.bestElement))
 			this.bestElement = updatedDomainElement;
 		else if (this.worstElement === undefined || updatedScore < this.elementScoreMap.get(this.worstElement))
 			this.worstElement = updatedDomainElement;
@@ -82,14 +82,14 @@ export abstract class ScoreFunction implements Memento {
 
 	setElementScoreMap(newMap: Map<number | string, number>): void {
 		this.elementScoreMap = newMap;
-	} 
+	}
 
 	removeElement(domainElement: number | string): void {
 		this.elementScoreMap.delete(domainElement);
 
-		if (domainElement === this.worstElement) 
+		if (domainElement === this.worstElement)
 			this.findWorstElement();
-		
+
 		if (domainElement === this.bestElement)
 			this.findBestElement();
 	}

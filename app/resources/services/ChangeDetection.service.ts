@@ -21,7 +21,7 @@ import { User }																	from '../model/User';
 import { InteractionConfig, ViewConfig }										from '../types/Config.types';
 
 @Injectable()
-export class ChangeDetectionService { 
+export class ChangeDetectionService {
 
 	// ========================================================================================
 	// 									Fields
@@ -35,8 +35,8 @@ export class ChangeDetectionService {
 	public colorsHaveChanged: boolean;							// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
 
 	// Old input values to the ValueChartDirective. Used for comparison purposes.
-	public previousViewConfig: ViewConfig = <any> {};				// Old values of the view config. Its fields should equal those of the viewConfig object in RenderConfigService unless a change has taken place.
-	public previousInteractionConfig: InteractionConfig = <any> {};	// Old values of the interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
+	public previousViewConfig: ViewConfig = <any>{};				// Old values of the view config. Its fields should equal those of the viewConfig object in RenderConfigService unless a change has taken place.
+	public previousInteractionConfig: InteractionConfig = <any>{};	// Old values of the interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
 	public previousWidth: number;									// The old width. Its should equal the width in ValueChartDirective unless a change has taken place.
 	public previousHeight: number;									// The old height. Its should equal the height in ValueChartDirective unless a change has taken place.
 	public previousOrientation: string;								// The old view orientation. Its should equal the orientation in ValueChartDirective unless a change has taken place.
@@ -60,11 +60,11 @@ export class ChangeDetectionService {
 	constructor(
 		private objectDiffers: KeyValueDiffers,
 		private chartUndoRedoService: ChartUndoRedoService) {
-			// Listen to undo-redo events notifying of changes to the alternative ordering.
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_ALTERNATIVE_ORDER_CHANGED, () => { this.alternativeOrderChanged = true; });
-			// Listen to undo-redo events notifying of changes to the objective ordering.
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_OBJECTIVES_CHANGED, 		() => { this.objectiveOrderChanged = true; });
-		}
+		// Listen to undo-redo events notifying of changes to the alternative ordering.
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_ALTERNATIVE_ORDER_CHANGED, () => { this.alternativeOrderChanged = true; });
+		// Listen to undo-redo events notifying of changes to the objective ordering.
+		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SET_OBJECTIVES_CHANGED, () => { this.objectiveOrderChanged = true; });
+	}
 
 	// ========================================================================================
 	// 									Methods
@@ -111,10 +111,10 @@ export class ChangeDetectionService {
 		@description	Initialize the previousViewConfig object.
 	*/
 	initPreviousViewConfig(viewConfig: any): void {
-		this.previousViewConfig.displayScoreFunctions			= viewConfig.displayScoreFunctions;
-		this.previousViewConfig.displayDomainValues 			= viewConfig.displayDomainValues;
-		this.previousViewConfig.displayScales 					= viewConfig.displayScales;
-		this.previousViewConfig.displayTotalScores 				= viewConfig.displayTotalScores;
+		this.previousViewConfig.displayScoreFunctions = viewConfig.displayScoreFunctions;
+		this.previousViewConfig.displayDomainValues = viewConfig.displayDomainValues;
+		this.previousViewConfig.displayScales = viewConfig.displayScales;
+		this.previousViewConfig.displayTotalScores = viewConfig.displayTotalScores;
 		this.previousViewConfig.displayScoreFunctionValueLabels = viewConfig.displayScoreFunctionValueLabels
 	}
 
@@ -124,11 +124,11 @@ export class ChangeDetectionService {
 		@description	Initialize the previousInteractionConfig object.
 	*/
 	initPreviousInteractionConfig(interactionConfig: any) {
-		this.previousInteractionConfig.weightResizeType 		= interactionConfig.weightResizeType;
-		this.previousInteractionConfig.reorderObjectives 		= interactionConfig.reorderObjectives;
-		this.previousInteractionConfig.sortAlternatives 		= interactionConfig.sortAlternatives;
-		this.previousInteractionConfig.pumpWeights 				= interactionConfig.pumpWeights; 
-		this.previousInteractionConfig.setObjectiveColors		 = interactionConfig.setObjectiveColors;
+		this.previousInteractionConfig.weightResizeType = interactionConfig.weightResizeType;
+		this.previousInteractionConfig.reorderObjectives = interactionConfig.reorderObjectives;
+		this.previousInteractionConfig.sortAlternatives = interactionConfig.sortAlternatives;
+		this.previousInteractionConfig.pumpWeights = interactionConfig.pumpWeights;
+		this.previousInteractionConfig.setObjectiveColors = interactionConfig.setObjectiveColors;
 	}
 
 }

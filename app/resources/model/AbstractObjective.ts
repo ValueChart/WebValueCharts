@@ -75,11 +75,11 @@ export class AbstractObjective implements Objective {
 	}
 
 	getAllSubObjectives(): Objective[] {
-		var subObjectives: Objective[]  = [];
+		var subObjectives: Objective[] = [];
 		this.subObjectives.forEach((objective: Objective) => {
 			subObjectives.push(objective);
 			if (objective.objectiveType === 'abstract') {
-				Array.prototype.push.apply(subObjectives, (<AbstractObjective> objective).getAllSubObjectives());
+				Array.prototype.push.apply(subObjectives, (<AbstractObjective>objective).getAllSubObjectives());
 			}
 		});
 		return subObjectives;
@@ -98,7 +98,7 @@ export class AbstractObjective implements Objective {
 			return objective.objectiveType === 'primitive';
 		});
 
-		return <PrimitiveObjective[]> subObjectives;
+		return <PrimitiveObjective[]>subObjectives;
 	}
 
 	getMemento(): Memento {
@@ -110,7 +110,7 @@ export class AbstractObjective implements Objective {
 
 		// Create copies of each of the child objectives.
 		for (var i = 0; i < this.subObjectives.length; i++) {
-			subObjectives[i] = <Objective> this.subObjectives[i].getMemento();
+			subObjectives[i] = <Objective>this.subObjectives[i].getMemento();
 		}
 
 		abstractObjectiveCopy.setDirectSubObjectives(subObjectives);

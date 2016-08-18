@@ -10,7 +10,7 @@ import { Domain } 		from './Domain';
 
 
 export class ContinuousDomain implements Domain {
-	
+
 	type: string;
 	private minValue: number;
 	private maxValue: number;
@@ -24,7 +24,7 @@ export class ContinuousDomain implements Domain {
 
 		if (unit)
 			this.unit = unit;
-		
+
 		this.type = 'continuous';
 	}
 

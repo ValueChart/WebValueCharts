@@ -21,7 +21,7 @@ export class CurrentUserService {
 	private loggedIn: boolean;
 	private joiningChart: boolean;
 	private valueChart: ValueChart;
-	
+
 	constructor() { }
 
 	getUsername(): string {

@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-07-20 10:11:33
 */
 
-import { User }							from '../model/User';	
+import { User }							from '../model/User';
 
 export interface DomainElement {
 	element: (string | number);

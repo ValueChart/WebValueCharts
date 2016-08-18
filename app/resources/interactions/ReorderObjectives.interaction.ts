@@ -79,7 +79,7 @@ export class ReorderObjectivesInteraction {
 				.on('start', this.startReorderObjectives)
 				.on('drag', this.reorderObjectives)
 				.on('end', this.endReorderObjectives);
-		} 
+		}
 
 		labelOutlines.call(dragToReorder);
 		labelTexts.call(dragToReorder);
@@ -106,7 +106,7 @@ export class ReorderObjectivesInteraction {
 
 		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');						// The container that holds the container for the label we are reordering.
 		this.siblingContainers = this.parentContainer.selectAll('g[parent="' + this.parentObjectiveName + '"]');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
-																													// Note: siblingsConatiners includes containerToReorder.
+		// Note: siblingsConatiners includes containerToReorder.
 		// Set all the siblings that are NOT being moved to be partially transparent.
 		this.siblingContainers.style('opacity', 0.5);
 		this.containerToReorder.style('opacity', 1);
@@ -120,7 +120,7 @@ export class ReorderObjectivesInteraction {
 		this.objectiveDimensionTwo = +currentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo);							// Determine the Dimension Two (height if vertical, width of horizontal) of the label we are moving.
 		this.maxCoordinateTwo = +parentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label we are reordering.
 		this.objectiveCoordTwoOffset = +currentOutline.attr(this.labelRenderer.viewConfig.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label we are reordering.
-		
+
 		this.currentObjectiveIndex = this.siblingContainers.nodes().indexOf(this.containerToReorder.node());						// Determine the position of the label we are reordering in the list of siblings.
 		this.newObjectiveIndex = this.currentObjectiveIndex;
 		this.jumpPoints = [0];																								// Initialize the list of points which define what position the label we are reordering has been moved to.
@@ -158,8 +158,8 @@ export class ReorderObjectivesInteraction {
 
 		// Calculate the current Coordinate Two position of the label that is being reordered. 
 		// This is the recent change (deltaCoordinateTwo) + the totalChange so far (this.totalCoordTwoChange) + the offset of the label before dragging began (this.objectiveCoordTwoOffset)
-		var currentCoordTwoPosition: number = deltaCoordinateTwo + this.totalCoordTwoChange + this.objectiveCoordTwoOffset; 
-		
+		var currentCoordTwoPosition: number = deltaCoordinateTwo + this.totalCoordTwoChange + this.objectiveCoordTwoOffset;
+
 		// Make sure that the label does not exit the bounds of the label area.
 		if (currentCoordTwoPosition < 0) {
 			deltaCoordinateTwo = 0 - this.totalCoordTwoChange - this.objectiveCoordTwoOffset;
@@ -216,7 +216,7 @@ export class ReorderObjectivesInteraction {
 			parentData.subLabelData.splice(this.newObjectiveIndex, 0, temp);
 
 			// Reorder the Objectives
-			let siblingObjectives: Objective[] = (<AbstractObjective> parentData.objective).getDirectSubObjectives()
+			let siblingObjectives: Objective[] = (<AbstractObjective>parentData.objective).getDirectSubObjectives()
 			let tempObjective: Objective = siblingObjectives.splice(this.currentObjectiveIndex, 1)[0];
 			siblingObjectives.splice(this.newObjectiveIndex, 0, tempObjective);
 		} else {

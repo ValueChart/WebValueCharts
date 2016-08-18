@@ -29,7 +29,7 @@ export class AlternativeOrderRecord implements Memento {
 	getMemento(): Memento {
 		return this;
 	}
-} 
+}
 
 export class ObjectivesRecord implements Memento {
 
@@ -39,7 +39,7 @@ export class ObjectivesRecord implements Memento {
 		this.rootObjectives = [];
 
 		rootObjectives.forEach((objective: Objective) => {
-			this.rootObjectives.push(<Objective> objective.getMemento());
+			this.rootObjectives.push(<Objective>objective.getMemento());
 		});
 	}
 

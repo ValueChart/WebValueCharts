@@ -32,7 +32,7 @@ export class RenderConfigService {
 
 	public viewOrientation: string;						// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
 
-	public viewConfig: ViewConfig = <any> {};			// Object with the current view configuration. The fields of this object are set by the ValueChartDirective input methods. 
+	public viewConfig: ViewConfig = <any>{};			// Object with the current view configuration. The fields of this object are set by the ValueChartDirective input methods. 
 
 	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
 	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']

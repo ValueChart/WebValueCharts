@@ -19,7 +19,7 @@ export class AuthGuardService implements CanActivate {
 		private currentUserService: CurrentUserService) { }
 
 
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) : boolean {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 		if (this.currentUserService.getUsername() !== undefined && this.currentUserService.getUsername() !== null && this.currentUserService.getUsername() !== '') {
 			return true;
 		} else {

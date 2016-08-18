@@ -9,7 +9,7 @@ import { Injectable } 												from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 // Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
@@ -41,7 +41,7 @@ export class ExpandScoreFunctionInteraction {
 
 	toggleExpandScoreFunction(enableExpanding: boolean) {
 		var ScoreFunctionPlots: JQuery = $('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE);
-		
+
 		ScoreFunctionPlots.off('dblclick');
 
 		if (enableExpanding) {
@@ -55,16 +55,16 @@ export class ExpandScoreFunctionInteraction {
 		// correctly unless the navigation to them is initiated by Angular.
 
 		// Pass relevant data to the pop-up by attaching it to the window object.
-		(<any> window).objectiveToPlot = objective;
-		(<any> window).valueChartService = this.valueChartService;
-		(<any> window).chartUndoRedoService = this.chartUndoRedoService;
+		(<any>window).objectiveToPlot = objective;
+		(<any>window).valueChartService = this.valueChartService;
+		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
-					'Expanded' + objective.getName() + 'ScoreFunction',
-					this.WINDOW_OPTIONS);
+			'Expanded' + objective.getName() + 'ScoreFunction',
+			this.WINDOW_OPTIONS);
 
-		(<any> window).childWindows = (<any> window).childWindows || { };
-		(<any> window).childWindows.scoreFunctionViewer = this.popUpRef;
+		(<any>window).childWindows = (<any>window).childWindows || {};
+		(<any>window).childWindows.scoreFunctionViewer = this.popUpRef;
 
 	}
 

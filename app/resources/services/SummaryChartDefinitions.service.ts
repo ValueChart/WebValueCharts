@@ -11,7 +11,7 @@ import { Injectable } 												from '@angular/core';
 
 @Injectable()
 export class SummaryChartDefinitions {
-	
+
 	CHART: string = 'summary-chart';
 
 	OUTLINE_CONTAINER: string = 'summary-outline-container';
@@ -37,6 +37,6 @@ export class SummaryChartDefinitions {
 	CHART_ALTERNATIVE: string = 'alternative-box';
 
 
-	constructor() {}
+	constructor() { }
 
 }

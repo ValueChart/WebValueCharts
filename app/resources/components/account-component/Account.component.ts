@@ -38,7 +38,7 @@ export class AccountComponent implements OnInit {
 
 	ngOnInit() {
 		this.userHttpService.getUser(this.username)
-			.subscribe( user => {
+			.subscribe(user => {
 				this.password = user.password;
 				this.rePassword = user.password;
 				this.email = user.email;

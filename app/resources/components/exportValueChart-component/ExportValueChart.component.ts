@@ -9,7 +9,7 @@
 import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 
 // Application Classes:
@@ -19,10 +19,10 @@ import { ValueChartXMLEncoder }								from '../../utilities/ValueChartXMLEncode
 // Model Classes:
 import { ValueChart }										from '../../model/ValueChart';
 
- 
+
 @Component({
 	selector: 'ExportValueChart',
-	template: 	`
+	template: `
 				<div class="export-value-chart">
 					<a class="btn btn-default" id="download-value-chart"
 						[class.disabled]="!currentUserService.getValueChart()" 
@@ -34,14 +34,14 @@ import { ValueChart }										from '../../model/ValueChart';
 				</div>
 				`
 })
-export class ExportValueChartComponent implements OnInit{
+export class ExportValueChartComponent implements OnInit {
 
 	private valueChartXMLEncoder: ValueChartXMLEncoder;
 	private valueChartStringURL: string;
 
 	private downloadLink: JQuery;
 
-	constructor(private currentUserService: CurrentUserService) { } 
+	constructor(private currentUserService: CurrentUserService) { }
 
 	ngOnInit() {
 		this.valueChartXMLEncoder = new ValueChartXMLEncoder();
@@ -58,7 +58,7 @@ export class ExportValueChartComponent implements OnInit{
 		}
 
 	}
-	
+
 	downloadValueChart(): void {
 		var valueChart: ValueChart = this.currentUserService.getValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
@@ -68,14 +68,14 @@ export class ExportValueChartComponent implements OnInit{
 	}
 
 	convertValueChartIntoObjectURL(valueChart: ValueChart): string {
-		if (valueChart === undefined) 
+		if (valueChart === undefined)
 			return;
 
 		var valueChartString: string = this.valueChartXMLEncoder.encodeValueChart(valueChart);
-		var valueChartBlob: Blob = new Blob([valueChartString], {type: 'text/xml'});
+		var valueChartBlob: Blob = new Blob([valueChartString], { type: 'text/xml' });
 
 		return URL.createObjectURL(valueChartBlob);
-	}	
+	}
 
 
 }

@@ -8,7 +8,7 @@
 import { Objective }					from '../model/Objective';
 import { PrimitiveObjective }			from '../model/PrimitiveObjective';
 import { Alternative }					from '../model/Alternative';
-import { User }							from '../model/User';	
+import { User }							from '../model/User';
 
 
 export interface RowData {

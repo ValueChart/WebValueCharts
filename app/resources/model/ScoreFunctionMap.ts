@@ -9,7 +9,7 @@ import { ScoreFunction } 			from './ScoreFunction';
 
 
 export class ScoreFunctionMap {
-	
+
 	private scoreFunctions: Map<string, ScoreFunction>;
 
 	constructor() {
@@ -25,15 +25,15 @@ export class ScoreFunctionMap {
 		while (iteratorElement.done === false) {
 
 			scoreFunctions.push(iteratorElement.value);
-			
+
 			iteratorElement = scoreFunctionIterator.next();
 		}
 
 		return scoreFunctions;
 	}
 
-	getAllKeyScoreFunctionPairs(): {key: string, scoreFunction: ScoreFunction}[] {
-		var scoreFunctionKeyPairs: {key: string, scoreFunction: ScoreFunction}[] = [];
+	getAllKeyScoreFunctionPairs(): { key: string, scoreFunction: ScoreFunction }[] {
+		var scoreFunctionKeyPairs: { key: string, scoreFunction: ScoreFunction }[] = [];
 
 		var scoreFunctionIterator: Iterator<string> = this.scoreFunctions.keys();
 		var iteratorElement: IteratorResult<string> = scoreFunctionIterator.next();

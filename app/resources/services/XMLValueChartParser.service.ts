@@ -20,12 +20,12 @@ export class XMLValueChartParser {
 
 	xmlDocParser: DOMParser;
 	valueChartPlusParser: ValueChartsPlusParser;
-	webValueChartsParser: WebValueChartsParser; 
+	webValueChartsParser: WebValueChartsParser;
 
 	constructor() {
 		this.xmlDocParser = new DOMParser();
 		this.valueChartPlusParser = new ValueChartsPlusParser();
-		this.webValueChartsParser = new WebValueChartsParser();	
+		this.webValueChartsParser = new WebValueChartsParser();
 	}
 
 	parseValueChart(xmlString: string): ValueChart {
@@ -37,14 +37,14 @@ export class XMLValueChartParser {
 		// The ValueChart XML representation is version 1.0, or the version is not defined.
 		if (!valueChartElement.getAttribute('version') || valueChartElement.getAttribute('version') === '1.0') {
 			try {
-				valueChart = this.valueChartPlusParser.parseValueChart(xmlDocument); 
-			} catch(e) {
+				valueChart = this.valueChartPlusParser.parseValueChart(xmlDocument);
+			} catch (e) {
 				console.log(e);
 			}
 		} else {
 			try {
-				valueChart = this.webValueChartsParser.parseValueChart(xmlDocument); 
-			} catch(e) {
+				valueChart = this.webValueChartsParser.parseValueChart(xmlDocument);
+			} catch (e) {
 				console.log(e);
 			}
 		}

@@ -55,11 +55,11 @@ export class ChartUndoRedoService {
 
 		// Create a custom event dispatcher, with one event for each kind of change.
 		this.undoRedoDispatcher = d3.dispatch(
-			this.SCORE_FUNCTION_CHANGE, 
-			this.WEIGHT_MAP_CHANGE, 
-			this.ALTERNATIVE_ORDER_CHANGE, 
+			this.SCORE_FUNCTION_CHANGE,
+			this.WEIGHT_MAP_CHANGE,
+			this.ALTERNATIVE_ORDER_CHANGE,
 			this.OBJECTIVES_CHANGE,
-			this.SET_ALTERNATIVE_ORDER_CHANGED, 
+			this.SET_ALTERNATIVE_ORDER_CHANGED,
 			this.SET_OBJECTIVES_CHANGED);
 	}
 
@@ -144,21 +144,21 @@ export class ChartUndoRedoService {
 		var changeType: string = this.undoChangeTypes.pop();
 		this.redoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.undoStateRecords.pop();
-		(<any> this)[changeType](stateRecord, currentStateContainer, this.redoStateRecords);
-		if ((<any> window).childWindows.scoreFunctionViewer)
-			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
+		(<any>this)[changeType](stateRecord, currentStateContainer, this.redoStateRecords);
+		if ((<any>window).childWindows.scoreFunctionViewer)
+			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
 	redo(currentStateContainer: ValueChartStateContainer): void {
-		if (!this.canRedo()) 
+		if (!this.canRedo())
 			return;
 
 		var changeType = this.redoChangeTypes.pop();
 		this.undoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.redoStateRecords.pop();
-		(<any> this)[changeType](stateRecord, currentStateContainer, this.undoStateRecords);
-		if ((<any> window).childWindows.scoreFunctionViewer)
-			(<any> window).childWindows.scoreFunctionViewer.angularAppRef.tick();
+		(<any>this)[changeType](stateRecord, currentStateContainer, this.undoStateRecords);
+		if ((<any>window).childWindows.scoreFunctionViewer)
+			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
 	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
@@ -169,7 +169,7 @@ export class ChartUndoRedoService {
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
 		// Dispatch the ScoreFunctionChange event, notifying any listeners and passing the scoreFunctionRecord as a parameter.
-		(<any> this.undoRedoDispatcher).call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
+		(<any>this.undoRedoDispatcher).call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
 	}
 
 	weightMapChange(weightMapRecord: WeightMap, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
@@ -178,8 +178,8 @@ export class ChartUndoRedoService {
 
 		var currentWeightMap: WeightMap = currentStateContainer.getCurrentUserWeightMap();
 		stateRecords.push(currentWeightMap);
-		
-		(<any> this.undoRedoDispatcher).call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
+
+		(<any>this.undoRedoDispatcher).call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
 	}
 
 	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
@@ -192,8 +192,8 @@ export class ChartUndoRedoService {
 			cellIndices[alternativeOrderRecord.alternativeIndexMap[alternative.getName()]] = index;
 		});
 
-		(<any> this.undoRedoDispatcher).call(this.ALTERNATIVE_ORDER_CHANGE, {}, cellIndices);
-		(<any> this.undoRedoDispatcher).call(this.SET_ALTERNATIVE_ORDER_CHANGED);
+		(<any>this.undoRedoDispatcher).call(this.ALTERNATIVE_ORDER_CHANGE, {}, cellIndices);
+		(<any>this.undoRedoDispatcher).call(this.SET_ALTERNATIVE_ORDER_CHANGED);
 	}
 
 	objectivesChange(objectivesRecord: ObjectivesRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
@@ -201,8 +201,8 @@ export class ChartUndoRedoService {
 
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 
-		(<any> this.undoRedoDispatcher).call(this.OBJECTIVES_CHANGE, {}, objectivesRecord);
-		(<any> this.undoRedoDispatcher).call(this.SET_OBJECTIVES_CHANGED);
+		(<any>this.undoRedoDispatcher).call(this.OBJECTIVES_CHANGE, {}, objectivesRecord);
+		(<any>this.undoRedoDispatcher).call(this.SET_OBJECTIVES_CHANGED);
 	}
 
 }

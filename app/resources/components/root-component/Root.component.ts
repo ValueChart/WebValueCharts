@@ -39,11 +39,11 @@ import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEnco
 	selector: 'root',
 	templateUrl: 'app/resources/components/root-component/Root.template.html',
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
-	providers: [TemplateRef, 
-				ViewContainerRef,
-				XMLValueChartParser,
-				ValueChartXMLEncoder,
-				UserHttpService]
+	providers: [TemplateRef,
+		ViewContainerRef,
+		XMLValueChartParser,
+		ValueChartXMLEncoder,
+		UserHttpService]
 })
 export class RootComponent implements OnInit {
 
@@ -75,11 +75,11 @@ export class RootComponent implements OnInit {
 						initialized. Angular will automatically handle the construction of this class whenever it's selector is used.
 	*/
 	constructor(
-		private router: Router, 
+		private router: Router,
 		private userHttpService: UserHttpService,
-		private currentUserService: CurrentUserService, 
-		private applicationRef: ApplicationRef) {}
-	
+		private currentUserService: CurrentUserService,
+		private applicationRef: ApplicationRef) { }
+
 
 	// ========================================================================================
 	// 									Methods
@@ -93,21 +93,21 @@ export class RootComponent implements OnInit {
 						ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. Calling ngOnInit should be left 
 						to Angular. Do NOT call it manually. 
 	*/
-	ngOnInit() { 
+	ngOnInit() {
 		// Attach this Angular application reference to the window object.
 		// This is to make it accessible to any additional windows that are created
 		// by this window. This is specifically used by the ScoreFunctionViewerComponent.
-		(<any> window).angularAppRef = this.applicationRef;				
-		(<any> window).childWindows = {};					// Initialize a map to used as storage for references to an windows created by this window.
+		(<any>window).angularAppRef = this.applicationRef;
+		(<any>window).childWindows = {};					// Initialize a map to used as storage for references to an windows created by this window.
 	}
 
 	/* 	
 		@returns {boolean} - True if ValueChart is a group ValueChart. False otherwise.
 		@description 	Determines if the current ValueChart is a group ValueChart (i.e. has more than one user) or an individual ValueChart (i.e. has exactly one user).
 	*/
-	isGroupChart(): boolean {																						
+	isGroupChart(): boolean {
 		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
-				(window.opener && !(<any> window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
+			(window.opener && !(<any>window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
 	}
 
 	/* 	
@@ -120,7 +120,7 @@ export class RootComponent implements OnInit {
 	*/
 	logout(): void {
 		this.userHttpService.logout()
-			.subscribe(logoutResult => { 
+			.subscribe(logoutResult => {
 				this.currentUserService.setLoggedIn(false);
 				this.router.navigate(['/register']);
 			});
@@ -149,7 +149,7 @@ export class RootComponent implements OnInit {
 	*/
 	viewGroupChart(): void {
 		this.chartType = 'normal';
-		this.router.navigate(['/view', this.currentUserService.getValueChart().getName()]); 
+		this.router.navigate(['/view', this.currentUserService.getValueChart().getName()]);
 	}
 
 	/* 	
@@ -163,10 +163,10 @@ export class RootComponent implements OnInit {
 	switchScoreFunctionView() {
 
 		if (this.router.url.indexOf('distribution') === -1) {
-			this.router.navigate(['scoreFunction', 'distribution']);		
+			this.router.navigate(['scoreFunction', 'distribution']);
 			this.switchScoreFunctionViewText = 'User Scores';
 		} else {
-			this.router.navigate(['scoreFunction', 'plot']);	
+			this.router.navigate(['scoreFunction', 'plot']);
 			this.switchScoreFunctionViewText = 'Score Distributions';
 		}
 

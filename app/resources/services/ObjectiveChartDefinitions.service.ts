@@ -19,7 +19,7 @@ export class ObjectiveChartDefinitions {
 
 	ROWS_CONTAINER: string = 'objective-rows-container';
 	ROW: string = 'objective-row';
-	
+
 	CELL: string = 'objective-cell';
 
 	USER_SCORES_CONTAINER: string = 'objective-scores-container';
@@ -43,4 +43,3 @@ export class ObjectiveChartDefinitions {
 	constructor() { }
 
 }
-	

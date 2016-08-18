@@ -10,7 +10,7 @@ import { NgZone }													from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';	
+import * as $														from 'jquery';
 
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
@@ -91,8 +91,8 @@ export class ResizeWeightsInteraction {
 		var labelDividers: d3.Selection<any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-				return (resizeType !== 'none') ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
-			});
+			return (resizeType !== 'none') ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+		});
 
 		labelDividers.call(dragToResizeWeights);
 
@@ -102,7 +102,7 @@ export class ResizeWeightsInteraction {
 
 			let subLabelSpaces: d3.Selection<any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
 				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
-			
+
 			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, resizeType);	// Toggle dragging for the sub labels.
 		});
 	}
@@ -120,7 +120,7 @@ export class ResizeWeightsInteraction {
 		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
 		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
-		var siblings: LabelData[] = (<LabelData> parentContainer.datum()).subLabelData;
+		var siblings: LabelData[] = (<LabelData>parentContainer.datum()).subLabelData;
 
 		// Run inside the angular zone so that change detection is triggered.
 		this.ngZone.run(() => {
@@ -142,7 +142,7 @@ export class ResizeWeightsInteraction {
 					weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
 				}
 			} else {
-				let combinedWeight: number = (<LabelData> parentContainer.datum()).weight;
+				let combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
 				let siblingsToIncrease: LabelData[] = [];
 				let siblingsToDecrease: LabelData[] = [];
 

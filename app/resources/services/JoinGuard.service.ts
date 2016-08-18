@@ -22,22 +22,22 @@ export class JoinGuardService implements CanActivate {
 		private valueChartHttpService: ValueChartHttpService) { }
 
 
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) : boolean {
-		
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+
 		// Retrieve the ValueChart ID from the URL router parameters.
 		var name: string = route.params['ValueChart'];
 		// Retrieve the ValueChart password from the URL query parameters.
 		var password: string = state.queryParams['password'];
 
 		this.valueChartHttpService.getValueChartStructure(name, password)
-			.subscribe( 
-				valueChart => {
-					this.currentUserService.setJoiningChart(true);
-					this.currentUserService.setValueChart(valueChart);
-				},
-				error => { 
-					this.router.navigate(['/register']);
-				});
+			.subscribe(
+			valueChart => {
+				this.currentUserService.setJoiningChart(true);
+				this.currentUserService.setValueChart(valueChart);
+			},
+			error => {
+				this.router.navigate(['/register']);
+			});
 
 		return true;
 	}

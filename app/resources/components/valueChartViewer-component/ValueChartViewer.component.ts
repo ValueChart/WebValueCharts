@@ -12,7 +12,7 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router
 // d3
 import * as d3 																	from 'd3';
 // toastr
-import * as $																	from 'jquery';	
+import * as $																	from 'jquery';
 
 import * as toastr 																from 'toastr';
 
@@ -61,7 +61,7 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 	templateUrl: 'app/resources/components/valueChartViewer-component/ValueChartViewer.template.html',
 	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
-	// Services:
+		// Services:
 		ValueChartService,
 		RendererDataService,
 		ScoreFunctionViewerService,
@@ -70,18 +70,18 @@ import { PrimitiveObjective } 													from '../../model/PrimitiveObjective'
 		ChangeDetectionService,
 		RenderEventsService,
 		HostService,
-	// Renderers:
+		// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
 		LabelRenderer,
-	// Interactions:
+		// Interactions:
 		ReorderObjectivesInteraction,
 		ResizeWeightsInteraction,
 		SortAlternativesInteraction,
 		SetObjectiveColorsInteraction,
 		ExpandScoreFunctionInteraction,
 
-	// Definitions:
+		// Definitions:
 		SummaryChartDefinitions,
 		ObjectiveChartDefinitions,
 		LabelDefinitions]
@@ -145,12 +145,12 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	DETAIL_BOX_USERS_TAB: string = 'users';
 
-	chartType: string;	
+	chartType: string;
 
 
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
-	
+
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
@@ -169,15 +169,15 @@ export class ValueChartViewerComponent implements OnInit {
 	ngOnInit() {
 
 		this.sub = this.route.params.subscribe(params => {
-		    let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
-		    this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+			let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
+			this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 
-		    if (valueChartName.toLowerCase().indexOf('average') !== -1) {
-		     	this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
-		     	this.chartType = 'average';
-		     	this.weightResizeType = this.RESIZE_NEIGHBOR;
+			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
+				this.valueChart = this.currentUserService.getValueChart().getAverageValueChart();
+				this.chartType = 'average';
+				this.weightResizeType = this.RESIZE_NEIGHBOR;
 
-		    } else {
+			} else {
 				this.valueChart = this.currentUserService.getValueChart();
 				this.chartType = 'normal';
 				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
@@ -224,10 +224,10 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	ngOnDestroy() {
- 		this.sub.unsubscribe();
+		this.sub.unsubscribe();
 
- 		// Destroy the ValueChart
- 		$('ValueChart').remove();
+		// Destroy the ValueChart
+		$('ValueChart').remove();
 	}
 
 	setUserColor(user: User, color: string): void {
@@ -273,22 +273,22 @@ export class ValueChartViewerComponent implements OnInit {
 
 	hostValueChart(chartName: string): void {
 		// Close the Modal
-		(<any> $('#close-host-chart-modal')).click();
-		
+		(<any>$('#close-host-chart-modal')).click();
+
 		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
 		if (!this.valueChart._id) {
 			this.valueChartHttpService.createValueChart(this.valueChart)
 				.subscribe(
-					(valueChart: ValueChart) => { 
-						// Set the id of the ValueChart.
-						this.valueChart._id = valueChart._id;
-						// Host the ValueChart.
-						this.hostService.hostGroupValueChart(valueChart._id);
-					},
-					// Handle Server Errors
-					(error) => { 
+				(valueChart: ValueChart) => {
+					// Set the id of the ValueChart.
+					this.valueChart._id = valueChart._id;
+					// Host the ValueChart.
+					this.hostService.hostGroupValueChart(valueChart._id);
+				},
+				// Handle Server Errors
+				(error) => {
 
-					});
+				});
 		} else {
 			this.hostService.hostGroupValueChart(this.valueChart._id);
 		}
@@ -304,15 +304,15 @@ export class ValueChartViewerComponent implements OnInit {
 		// that has been retrieved from the server.
 		this.valueChartHttpService.updateUser(this.valueChart._id, currentUser)
 			.subscribe(
-				// User added/updated!
-				(user: User) => { 
-					toastr.success('Preferences successfully submitted');
-				},
-				// Handle Server Errors
-				(error) => { 
-					// Add something to handle when the host has disabled user changes
-					toastr.warning('Preference submission failed. The Host has disabled new submissions');
-				});
+			// User added/updated!
+			(user: User) => {
+				toastr.success('Preferences successfully submitted');
+			},
+			// Handle Server Errors
+			(error) => {
+				// Add something to handle when the host has disabled user changes
+				toastr.warning('Preference submission failed. The Host has disabled new submissions');
+			});
 	}
 
 
@@ -360,19 +360,19 @@ export class ValueChartViewerComponent implements OnInit {
 
 	setDisplayScoreFunctions(newVal: boolean): void {
 		this.displayScoreFunctions = newVal;
-	}	
+	}
 
 	setDisplayDomainValues(newVal: boolean): void {
 		this.displayDomainValues = newVal;
-	}	
+	}
 
 	setDisplayScales(newVal: boolean): void {
 		this.displayScales = newVal;
-	}	
+	}
 
 	setDisplayTotalScores(newVal: boolean): void {
 		this.displayTotalScores = newVal;
-	}	
+	}
 	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
 		this.displayScoreFunctionValueLabels = newVal;
 	}
@@ -418,7 +418,7 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	setPumpType(pumpType: string): void {
-		this.pumpWeights = (this.pumpWeights === pumpType) ? this.PUMP_OFF : pumpType; 
+		this.pumpWeights = (this.pumpWeights === pumpType) ? this.PUMP_OFF : pumpType;
 
 		// Turn off all other interactions.
 		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;

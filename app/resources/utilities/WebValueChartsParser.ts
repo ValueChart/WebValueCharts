@@ -12,7 +12,7 @@ import { WeightMap }														from '../model/WeightMap';
 import { Objective } 														from '../model/Objective';
 import { PrimitiveObjective } 												from '../model/PrimitiveObjective';
 import { AbstractObjective } 												from '../model/AbstractObjective';
-import { Alternative } 														from '../model/Alternative'; 
+import { Alternative } 														from '../model/Alternative';
 import { ScoreFunctionMap }													from '../model/ScoreFunctionMap';
 import { ScoreFunction } 													from '../model/ScoreFunction';
 import { ContinuousScoreFunction } 											from '../model/ContinuousScoreFunction';
@@ -23,7 +23,7 @@ import { ContinuousDomain } 												from '../model/ContinuousDomain';
 import { CategoricalDomain } 												from '../model/CategoricalDomain';
 
 export class WebValueChartsParser {
-	
+
 	constructor() { }
 
 	parseValueChart(xmlDocument: Document): ValueChart {
@@ -57,7 +57,7 @@ export class WebValueChartsParser {
 	parseObjectives(objectivesParentElement: Element): Objective[] {
 		var objectives: Objective[] = [];
 
-		var objectiveElements: Element[] = (<any> objectivesParentElement).children;
+		var objectiveElements: Element[] = (<any>objectivesParentElement).children;
 
 		for (var i = 0; i < objectiveElements.length; i++) {
 			let objectiveElement: Element = objectiveElements[i];
@@ -70,15 +70,15 @@ export class WebValueChartsParser {
 
 			if (type === 'abstract') {
 				objective = new AbstractObjective(name, description, id);
-				(<AbstractObjective> objective).setDirectSubObjectives(this.parseObjectives(objectiveElement));
+				(<AbstractObjective>objective).setDirectSubObjectives(this.parseObjectives(objectiveElement));
 			} else {
 				let color: string = objectiveElement.getAttribute('color');
 				objective = new PrimitiveObjective(name, description, id);
-				(<PrimitiveObjective> objective).setColor(color);
+				(<PrimitiveObjective>objective).setColor(color);
 
 				let domainElement: Element = objectiveElement.querySelector('Domain');
 
-				(<PrimitiveObjective> objective).setDomain(this.parseDomain(domainElement));
+				(<PrimitiveObjective>objective).setDomain(this.parseDomain(domainElement));
 			}
 			objectives.push(objective);
 		}
@@ -136,7 +136,7 @@ export class WebValueChartsParser {
 				});
 
 				if (correspondingObjective.getDomainType() === 'categorical') {
-					(<CategoricalDomain> correspondingObjective.getDomain()).addElement(<string> domainValue);
+					(<CategoricalDomain>correspondingObjective.getDomain()).addElement(<string>domainValue);
 				} else if (correspondingObjective.getDomainType() === 'continuous') {
 					domainValue = +domainValue;											// Convert the domain value to a number
 				}
@@ -162,7 +162,7 @@ export class WebValueChartsParser {
 			let name: string = userElement.getAttribute('name');
 			let user: User = new User(name);
 			user.color = userElement.getAttribute('color');
-			
+
 			let weightsParentElement = userElement.querySelector('Weights');
 			user.setWeightMap(this.parseWeightMap((weightsParentElement)))
 
@@ -188,7 +188,7 @@ export class WebValueChartsParser {
 			weightMap.setObjectiveWeight(objectiveName, weight);
 		}
 
-	return weightMap;
+		return weightMap;
 	}
 
 	parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
@@ -200,7 +200,7 @@ export class WebValueChartsParser {
 			let scoreFunctionElement: Element = scoreFunctionElements[i];
 
 			let objectiveName: string = scoreFunctionElement.getAttribute('objective');
-			let scoreFunction: ScoreFunction = this.parseScoreFunction(scoreFunctionElement); 
+			let scoreFunction: ScoreFunction = this.parseScoreFunction(scoreFunctionElement);
 
 			scoreFunctionMap.setObjectiveScoreFunction(objectiveName, scoreFunction);
 		}

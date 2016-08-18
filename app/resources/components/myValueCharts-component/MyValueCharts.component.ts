@@ -40,9 +40,9 @@ export class MyValueChartsComponent implements OnInit {
 	ngOnInit() {
 		this.userHttpService.getUserValueCharts(this.currentUserService.getUsername())
 			.subscribe(
-				valueChartSummaries => { 
-					this.valueChartSummaries = valueChartSummaries;
-				});
+			valueChartSummaries => {
+				this.valueChartSummaries = valueChartSummaries;
+			});
 
 		this.downloadLink = $('#download-user-weights');
 	}
@@ -92,11 +92,11 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	convertValueChartIntoObjectURL(valueChart: ValueChart): string {
-		if (valueChart === undefined) 
+		if (valueChart === undefined)
 			return;
 
 		var weightString: string = this.valueChartXMLEncoder.encodeUserWeights(valueChart);
-		var weightsBlob: Blob = new Blob([weightString], {type: 'text/xml'});
+		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
 
 		return URL.createObjectURL(weightsBlob);
 	}

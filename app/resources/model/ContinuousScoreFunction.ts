@@ -25,13 +25,13 @@ export class ContinuousScoreFunction extends ScoreFunction {
 		super();
 
 		this.type = 'continuous';
-		
+
 		this.minDomainValue = minDomainValue;
 		this.maxDomainValue = maxDomainValue;
 
 		this.interpolationStrategy = ContinuousScoreFunction.linearInterpolation;
 	}
-	
+
 	setElementScore(domainElement: number, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
 		if (domainElement > this.maxDomainValue || this.maxDomainValue === undefined)
@@ -43,11 +43,11 @@ export class ContinuousScoreFunction extends ScoreFunction {
 	}
 
 	getScore(domainElement: number): number {
-		var score = this.elementScoreMap.get(domainElement); 
+		var score = this.elementScoreMap.get(domainElement);
 
 		if (score !== undefined) {
 			return score;	// The value was in the mapping of domain elements to scores.
-		} 
+		}
 		var aboveElement: number = this.maxDomainValue;
 		var belowElement: number = this.minDomainValue;
 
@@ -56,14 +56,14 @@ export class ContinuousScoreFunction extends ScoreFunction {
 
 		while (iteratorElement.done === false) {
 
-		// Locate the nearest elements on either side of the current element that are defined. Because these have been inserted 
-		// into the value function it is assumed that there is a specific function defined between them. Is this assumption wrong?
-		// I believe that this works well for Linear Functions, but maybe not for more complex functions?
+			// Locate the nearest elements on either side of the current element that are defined. Because these have been inserted 
+			// into the value function it is assumed that there is a specific function defined between them. Is this assumption wrong?
+			// I believe that this works well for Linear Functions, but maybe not for more complex functions?
 			if (iteratorElement.value > belowElement && iteratorElement.value < domainElement) {
-				belowElement = <number> +iteratorElement.value;
+				belowElement = <number>+iteratorElement.value;
 			}
 			if (iteratorElement.value < aboveElement && iteratorElement.value > domainElement) {
-				aboveElement = <number> +iteratorElement.value;
+				aboveElement = <number>+iteratorElement.value;
 			}
 			iteratorElement = elementIterator.next();
 		}

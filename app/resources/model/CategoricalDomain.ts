@@ -14,8 +14,8 @@ export class CategoricalDomain implements Domain {
 	public ordered: boolean;
 	private elements: string[];
 
-	constructor(ordered: boolean) {	
-		this.type = "categorical"; 
+	constructor(ordered: boolean) {
+		this.type = "categorical";
 		this.ordered = ordered;
 		this.elements = [];
 	}
@@ -23,14 +23,14 @@ export class CategoricalDomain implements Domain {
 	// Should not allow you to add duplicate elements to the domain.
 	addElement(element: string): void {
 		var elementIndex: number = this.elements.indexOf(element);
-		if (elementIndex  == -1) {
+		if (elementIndex == -1) {
 			this.elements.push(element);
 		}
 	}
 
 	removeElement(element: string): void {
 		var elementIndex: number = this.elements.indexOf(element);
-		if (elementIndex  !== -1) {
+		if (elementIndex !== -1) {
 			this.elements.splice(elementIndex, 1);
 		}
 	}

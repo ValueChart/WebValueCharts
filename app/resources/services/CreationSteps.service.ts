@@ -18,7 +18,7 @@ export class CreationStepsService {
 		this.nextStep[this.ALTERNATIVES] = this.PREFERENCES;
 		this.nextStep[this.PREFERENCES] = this.PRIORITIES;
 		this.nextStep[this.PRIORITIES] = this.PRIORITIES;
-		
+
 		this.previousStep[this.BASICS] = this.BASICS;
 		this.previousStep[this.OBJECTIVES] = this.BASICS;
 		this.previousStep[this.ALTERNATIVES] = this.OBJECTIVES;
@@ -26,11 +26,11 @@ export class CreationStepsService {
 		this.previousStep[this.PRIORITIES] = this.PREFERENCES;
 	}
 
-	next(step: string) : string {
+	next(step: string): string {
 		return this.nextStep[step];
 	}
 
-	previous(step: string) : string {
+	previous(step: string): string {
 		return this.previousStep[step];
 	}
 }

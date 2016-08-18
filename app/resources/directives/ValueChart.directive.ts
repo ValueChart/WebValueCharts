@@ -14,23 +14,23 @@ import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
 import * as d3 																	from 'd3';
 
 // Import Application classes:
-	// Services:
+// Services:
 import { ValueChartService}														from '../services/ValueChart.service';
 import { RendererDataService}													from '../services/RendererData.service';
 import { RenderConfigService }													from '../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
-	// Renderers:
+// Renderers:
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
-	// Interactions:
+// Interactions:
 import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetObjectiveColorsInteraction }										from '../interactions/SetObjectiveColors.interaction';
 import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
-	// Definitions:
+// Definitions:
 import { LabelDefinitions }														from '../services/LabelDefinitions.service';
 
 // Import Model Classes:
@@ -45,21 +45,21 @@ import { RowData, CellData, LabelData }											from '../types/ValueChartViewe
 import { InteractionConfig }													from '../types/Config.types';
 
 @Directive({
-	selector: 'ValueChart',							
+	selector: 'ValueChart',
 	inputs: ['data', 								// The data to be rendered. Must be an instance of the ValueChart class.
-			'orientation',							// The orientation of the rendered ValueChart. Must be the string "vertical" or "horizontal".
-			'width',								// The width of the area in which to render the ValueChart. Must be a number.
-			'height',								// The height of the area in which to render the ValueChart. Must be a number.
-			'displayScoreFunctions',				// Toggle for score function plots. Must be a boolean.
-			'displayDomainValues',					// Toggle for domain value labels in the objective chart. Must be a boolean.
-			'displayScales',						// Toggle for the utility scale next to the summary chart. Must be a boolean.
-			'displayTotalScores',					// Toggle for the total score labels in the summary chart. Must be a boolean.
-			'displayScoreFunctionValueLabels',		// Toggle for the score labels next to points/bars in the score function plots. Must be a boolean.
-			'weightResizeType',						// The type of objective weight resizing that is accomplished by dragging label dividers. Must be one of the strings: 'neighbor' or 'siblings', or 'none'. 'neighbor' sets dragging label dividers to change the weights of only objectives adjacent to the divider. 'siblings' sets dragging label dividers to change the weights of all the objectives at that level with the same parent (i.e. siblings). 'none' disables dragging to change objective weights.
-			'reorderObjectives',					// Toggle for dragging to reorder objectives. True enables objectives to be reordered by clicking and dragging. Must be a boolean.
-			'sortAlternatives',						// Type of sorting for alternatives. Must be one of the strings: 'manual', 'objective', 'alphabet', 'reset', or 'none'. 'manual' sets alternative sorting to be accomplished manually by clicking and dragging alternatives. 'objective' sets alternative sorting to be by objective score, which is accomplished by clicking on the objective to sort by. Note that clicking on the root objective sorts by total score. 'reset' resets the alternative order to be the original order, and can be used to undo user driven changes to the ordering.'none' turns off alternative sorting.
-			'pumpWeights',							// Toggle for the pump tool. Must be one of the strings: 'increase', 'decrease', or 'none'. 'increase' sets clicking on objectives to increase their weights, 'decrease' to 'decrease' their weights, and 'none' to do nothing.
-			'setObjectiveColors']					// Toggle clicking on objectives to open a color picker for changing their colors. Must be a boolean.
+		'orientation',							// The orientation of the rendered ValueChart. Must be the string "vertical" or "horizontal".
+		'width',								// The width of the area in which to render the ValueChart. Must be a number.
+		'height',								// The height of the area in which to render the ValueChart. Must be a number.
+		'displayScoreFunctions',				// Toggle for score function plots. Must be a boolean.
+		'displayDomainValues',					// Toggle for domain value labels in the objective chart. Must be a boolean.
+		'displayScales',						// Toggle for the utility scale next to the summary chart. Must be a boolean.
+		'displayTotalScores',					// Toggle for the total score labels in the summary chart. Must be a boolean.
+		'displayScoreFunctionValueLabels',		// Toggle for the score labels next to points/bars in the score function plots. Must be a boolean.
+		'weightResizeType',						// The type of objective weight resizing that is accomplished by dragging label dividers. Must be one of the strings: 'neighbor' or 'siblings', or 'none'. 'neighbor' sets dragging label dividers to change the weights of only objectives adjacent to the divider. 'siblings' sets dragging label dividers to change the weights of all the objectives at that level with the same parent (i.e. siblings). 'none' disables dragging to change objective weights.
+		'reorderObjectives',					// Toggle for dragging to reorder objectives. True enables objectives to be reordered by clicking and dragging. Must be a boolean.
+		'sortAlternatives',						// Type of sorting for alternatives. Must be one of the strings: 'manual', 'objective', 'alphabet', 'reset', or 'none'. 'manual' sets alternative sorting to be accomplished manually by clicking and dragging alternatives. 'objective' sets alternative sorting to be by objective score, which is accomplished by clicking on the objective to sort by. Note that clicking on the root objective sorts by total score. 'reset' resets the alternative order to be the original order, and can be used to undo user driven changes to the ordering.'none' turns off alternative sorting.
+		'pumpWeights',							// Toggle for the pump tool. Must be one of the strings: 'increase', 'decrease', or 'none'. 'increase' sets clicking on objectives to increase their weights, 'decrease' to 'decrease' their weights, and 'none' to do nothing.
+		'setObjectiveColors']					// Toggle clicking on objectives to open a color picker for changing their colors. Must be a boolean.
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -72,7 +72,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private viewOrientation: string;							// View orientation. Either 'horizontal' or 'vertical'
 	private chartWidth: number;									// The width of the ValueChart.
 	private chartHeight: number;								// The Height of the ValueChart.
-	private interactionConfig: InteractionConfig = <any> {};	// Configuration options for user interactions.
+	private interactionConfig: InteractionConfig = <any>{};	// Configuration options for user interactions.
 
 	// d3 Selections:
 	private el: d3.Selection<any>; 								// The SVG base element for the ValueChart.
@@ -83,7 +83,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
-	
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -143,7 +143,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.createValueChart();
 
 		// Set initialization to be complete.
-		this.isInitialized = true;	
+		this.isInitialized = true;
 	}
 
 	/*
@@ -166,7 +166,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.valueChartService.setValueChart(this.valueChart);	// TODO: Is this call necessary? Investigate.
 		this.rendererDataService.initialize();
 		this.rendererDataService.updateAllValueChartData(this.viewOrientation);
-		
+
 		// Configure RenderConfigService.
 		this.renderConfigService.viewOrientation = this.viewOrientation;
 		this.renderConfigService.initUserColors();
@@ -217,7 +217,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	initChangeDetection(): void {
 		// Init change detection for the input data:
 		this.changeDetectionService.initDiffers(this.valueChart);
-		
+
 		// Init change detection for the view configuration:
 		this.changeDetectionService.previousOrientation = this.viewOrientation;
 		this.changeDetectionService.previousWidth = this.chartWidth;
@@ -322,10 +322,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	detectDataOrderChanges(): void {
 		// Check for and handle changes to the alternative ordering.
 		if (this.changeDetectionService.alternativeOrderChanged) {
-				this.changeDetectionService.alternativeOrderChanged = false;
-				this.updateAlternativeOrder();
-				this.updateValueChartDisplay();
-		} 
+			this.changeDetectionService.alternativeOrderChanged = false;
+			this.updateAlternativeOrder();
+			this.updateValueChartDisplay();
+		}
 
 		// Check for and handle changes to the objective ordering.
 		if (this.changeDetectionService.objectiveOrderChanged) {
@@ -426,7 +426,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						Re-renders the ValueChart.
 	*/
 	updateValueChart(): void {
-		this.chartUndoRedoService.resetUndoRedo();	
+		this.chartUndoRedoService.resetUndoRedo();
 		this.configureChartData();
 		this.updateUserPreferenceColumns();
 		this.updateObjectiveOrder();
@@ -464,7 +464,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
 		// Rebuild and re-render the label area.
 		this.createLabels();
-		
+
 		// Turn on any interactions that were removed when the labels were reconstructed. 
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
@@ -524,7 +524,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Binds to the directive attribute 'data', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives data attribute.
 	@Input() set data(value: any) {
-		this.valueChart = <ValueChart> value;
+		this.valueChart = <ValueChart>value;
 	}
 
 	// View Configuration
@@ -532,19 +532,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Binds to the directive attribute 'orientation', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives orientation attribute.
 	@Input() set orientation(value: any) {
-		this.viewOrientation = <string> value;
+		this.viewOrientation = <string>value;
 	}
 
 	// Binds to the directive attribute 'width', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives width attribute.
 	@Input() set width(value: any) {
-		this.chartWidth = <number> value;
+		this.chartWidth = <number>value;
 	}
 
 	// Binds to the directive attribute 'height', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives height attribute.
 	@Input() set height(value: any) {
-		this.chartHeight = <number> value;
+		this.chartHeight = <number>value;
 	}
 
 
@@ -553,19 +553,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.
 	@Input() set displayScoreFunctions(value: any) {
-		this.renderConfigService.viewConfig.displayScoreFunctions = <boolean> value;
+		this.renderConfigService.viewConfig.displayScoreFunctions = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'displayDomainValues', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayDomainValues attribute.
 	@Input() set displayDomainValues(value: any) {
-	this.renderConfigService.viewConfig.displayDomainValues = <boolean>value;
+		this.renderConfigService.viewConfig.displayDomainValues = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'displayScales', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives displayScales attribute.
 	@Input() set displayScales(value: any) {
-	this.renderConfigService.viewConfig.displayScales = <boolean>value;
+		this.renderConfigService.viewConfig.displayScales = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'displayTotalScores', and is automatically called upon before ngOnInit. 
@@ -584,31 +584,31 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Binds to the directive attribute 'weightResizeType', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives weightResizeType attribute.
 	@Input() set weightResizeType(value: any) {
-		this.interactionConfig.weightResizeType = <string> value;
+		this.interactionConfig.weightResizeType = <string>value;
 	}
 
 	// Binds to the directive attribute 'reorderObjectives', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives reorderObjectives attribute.
 	@Input() set reorderObjectives(value: any) {
-		this.interactionConfig.reorderObjectives = <boolean> value;
+		this.interactionConfig.reorderObjectives = <boolean>value;
 	}
 
 	// Binds to the directive attribute 'sortAlternatives', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives sortAlternatives attribute.
-	@Input() set sortAlternatives(value: any) {	
-		this.interactionConfig.sortAlternatives = <string> value;
+	@Input() set sortAlternatives(value: any) {
+		this.interactionConfig.sortAlternatives = <string>value;
 	}
 
 	// Binds to the directive attribute 'pumpWeights', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives pumpWeights attribute.
 	@Input() set pumpWeights(value: any) {
-		this.interactionConfig.pumpWeights = <string> value;
+		this.interactionConfig.pumpWeights = <string>value;
 	}
 
 	// Binds to the directive attribute 'setObjectiveColors', and is automatically called upon before ngOnInit. 
 	// The variable 'value' is whatever was input to the directives setObjectiveColors attribute.
 	@Input() set setObjectiveColors(value: any) {
-		this.interactionConfig.setObjectiveColors = <boolean> value;
+		this.interactionConfig.setObjectiveColors = <boolean>value;
 	}
 
 
