@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // Import Application Classes:
-import { CreateBasicInfoComponent }										from '../CreateBasicInfo-component/CreateBasicInfo.component';
-import { CreateObjectivesComponent }									from '../CreateObjectives-component/CreateObjectives.component';
-import { CreateAlternativesComponent }									from '../CreateAlternatives-component/CreateAlternatives.component';
-import { CreateScoreFunctionsComponent }								from '../CreateScoreFunctions-component/CreateScoreFunctions.component';
-import { CreateWeightsComponent }										from '../CreateWeights-component/CreateWeights.component';
+import { CreateBasicInfoComponent }										from '../createBasicInfo-component/CreateBasicInfo.component';
+import { CreateObjectivesComponent }									from '../createObjectives-component/CreateObjectives.component';
+import { CreateAlternativesComponent }									from '../createAlternatives-component/CreateAlternatives.component';
+import { CreateScoreFunctionsComponent }								from '../createScoreFunctions-component/CreateScoreFunctions.component';
+import { CreateWeightsComponent }										from '../createWeights-component/CreateWeights.component';
 import { CurrentUserService }											from '../../services/CurrentUser.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../services/ValueChart.service';
