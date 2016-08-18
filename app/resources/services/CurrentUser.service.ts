@@ -20,7 +20,6 @@ export class CurrentUserService {
 	private username: string; 				// The username of the current user.
 	private loggedIn: boolean;
 	private joiningChart: boolean;
-	private valueChart: ValueChart;
 
 	constructor() { }
 
@@ -30,14 +29,6 @@ export class CurrentUserService {
 
 	setUsername(username: string): void {
 		this.username = username;
-	}
-
-	getValueChart(): ValueChart {
-		return this.valueChart;
-	}
-
-	setValueChart(valueChart: ValueChart): void {
-		this.valueChart = valueChart;
 	}
 
 	setJoiningChart(joiningChart: boolean): void {
@@ -55,5 +46,4 @@ export class CurrentUserService {
 	isLoggedIn(): boolean {
 		return this.loggedIn;
 	}
-
 }

@@ -11,6 +11,7 @@ import { OnInit }										from '@angular/core';
 
 // Application classes:
 import { CurrentUserService }							from '../../services/CurrentUser.service';
+import { ValueChartService }							from '../../services/ValueChart.service';
 import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ExportValueChartComponent }					from '../exportValueChart-component/ExportValueChart.component';
@@ -33,6 +34,7 @@ export class MyValueChartsComponent implements OnInit {
 		private router: Router,
 		private valueChartXMLEncoder: ValueChartXMLEncoder,
 		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
 		private valueChartHttpService: ValueChartHttpService) { }
 
@@ -50,9 +52,18 @@ export class MyValueChartsComponent implements OnInit {
 	openValueChart(chartId: string, password: string): void {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.currentUserService.setValueChart(valueChart);
+				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				this.router.navigate(['/view/', valueChart.getName()]);
+			});
+	}
+
+	editValueChart(chartId: string, password: string): void {
+		this.valueChartHttpService.getValueChart(chartId, password)
+			.subscribe(valueChart => {
+				this.valueChartService.setValueChart(valueChart);
+				this.currentUserService.setJoiningChart(false);
+				this.router.navigate(['/createValueChart/','editChart']);
 			});
 	}
 
@@ -69,12 +80,12 @@ export class MyValueChartsComponent implements OnInit {
 	openExportChartModal(chartId: string, password: string): void {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.currentUserService.setValueChart(valueChart);
+				this.valueChartService.setValueChart(valueChart);
 			});
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.currentUserService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
 			return valueChart.getName() + 'UserWeights.csv';
@@ -84,7 +95,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	exportUserWeights() {
-		var valueChart: ValueChart = this.currentUserService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var weightsObjectUrl: string = this.convertValueChartIntoObjectURL(valueChart);
 
 		this.downloadLink.attr('href', weightsObjectUrl);

@@ -9,11 +9,11 @@
 import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 
-import * as $														from 'jquery';
+import * as $												from 'jquery';
 
 
 // Application Classes:
-import { CurrentUserService }								from '../../services/CurrentUser.service';
+import { ValueChartService }								from '../../services/ValueChart.service';
 import { ValueChartXMLEncoder }								from '../../utilities/ValueChartXMLEncoder';
 
 // Model Classes:
@@ -41,7 +41,7 @@ export class ExportValueChartComponent implements OnInit {
 
 	private downloadLink: JQuery;
 
-	constructor(private currentUserService: CurrentUserService) { }
+	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
 		this.valueChartXMLEncoder = new ValueChartXMLEncoder();
@@ -49,7 +49,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.currentUserService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
 			return valueChart.getName() + '.xml';
@@ -60,7 +60,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	downloadValueChart(): void {
-		var valueChart: ValueChart = this.currentUserService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
 
 		this.downloadLink.attr('href', valueChartObjectURL);

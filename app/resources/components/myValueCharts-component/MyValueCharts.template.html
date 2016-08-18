@@ -17,6 +17,7 @@
 							<td>{{chartSummary.password}}</td>
 							<td>{{chartSummary.numUsers}}</td>
 							<td><button class="btn btn-sm btn-default" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
+							<td><button class="btn btn-sm btn-default" (click)="editValueChart(chartSummary._id, chartSummary.password)">Edit</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="openExportChartModal(chartSummary._id, chartSummary.password)" type="button" data-toggle="modal" data-target="#export-modal">Export</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="deleteValueChart(chartSummary._id)">Delete</button></td>
 						</tr>

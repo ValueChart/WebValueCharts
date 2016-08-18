@@ -16,6 +16,8 @@ import { ApplicationRef } 											from '@angular/core';
 // Import Application classes
 import { XMLValueChartParser } 										from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
+import { ValueChartService }										from '../../services/ValueChart.service';
+import { ChartUndoRedoService }										from '../../services/ChartUndoRedo.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
 import { ExportValueChartComponent }								from '../exportValueChart-component/ExportValueChart.component';
 import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEncoder';
@@ -43,7 +45,10 @@ import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEnco
 		ViewContainerRef,
 		XMLValueChartParser,
 		ValueChartXMLEncoder,
-		UserHttpService]
+		UserHttpService,
+		CurrentUserService,
+		ValueChartService,
+		ChartUndoRedoService]
 })
 export class RootComponent implements OnInit {
 
@@ -78,6 +83,7 @@ export class RootComponent implements OnInit {
 		private router: Router,
 		private userHttpService: UserHttpService,
 		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService,
 		private applicationRef: ApplicationRef) { }
 
 
@@ -106,7 +112,7 @@ export class RootComponent implements OnInit {
 		@description 	Determines if the current ValueChart is a group ValueChart (i.e. has more than one user) or an individual ValueChart (i.e. has exactly one user).
 	*/
 	isGroupChart(): boolean {
-		return (this.currentUserService.getValueChart() && !this.currentUserService.getValueChart().isIndividual()) || 		// Check the currentUserService
+		return (this.valueChartService.getValueChart() && !this.valueChartService.getValueChart().isIndividual()) || 		// Check the currentUserService
 			(window.opener && !(<any>window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
 	}
 
@@ -137,7 +143,7 @@ export class RootComponent implements OnInit {
 	viewAverageChart(): void {
 		if (this.isGroupChart()) {
 			this.chartType = 'average';
-			this.router.navigate(['/view', this.currentUserService.getValueChart().getName() + '-average']);
+			this.router.navigate(['/view', this.valueChartService.getValueChart().getName() + '-average']);
 		}
 	}
 
@@ -149,7 +155,7 @@ export class RootComponent implements OnInit {
 	*/
 	viewGroupChart(): void {
 		this.chartType = 'normal';
-		this.router.navigate(['/view', this.currentUserService.getValueChart().getName()]);
+		this.router.navigate(['/view', this.valueChartService.getValueChart().getName()]);
 	}
 
 	/* 	
