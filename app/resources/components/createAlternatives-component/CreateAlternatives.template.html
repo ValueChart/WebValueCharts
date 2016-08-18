@@ -7,7 +7,7 @@
         <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
         <th>Name</th>
         <th>Description</th>
-        <th *ngFor="let objName of valueChart.getAllPrimitiveObjectivesByName()">{{objName}}</th>
+        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">{{getColumnHeader(obj)}}</th>
       </tr>
     </thead>
     <tbody>

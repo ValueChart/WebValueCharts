@@ -3,6 +3,8 @@ import { Component, Input, OnInit }										from '@angular/core';
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
 import { Alternative }													from '../../model/Alternative';
+import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
+import { ContinuousDomain }												from '../../model/ContinuousDomain';
 
 @Component({
 	selector: 'CreateAlternatives',
@@ -39,6 +41,15 @@ export class CreateAlternativesComponent implements OnInit {
 			alternatives.push((this.alternatives[altID]));
 		}
 		this.valueChart.setAlternatives(alternatives);
+	}
+
+	getColumnHeader(obj: PrimitiveObjective) : string {
+		if (obj.getDomainType() === 'continuous') {
+			return obj.getName() + " (min: " + (<ContinuousDomain>obj.getDomain()).getMinValue() + ", max: " +  (<ContinuousDomain>obj.getDomain()).getMaxValue() + ")"; 
+		}
+		else {
+			return obj.getName();
+		}
 	}
 
 	altKeys(): Array<string> {
