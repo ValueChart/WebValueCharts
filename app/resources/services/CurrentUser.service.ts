@@ -7,11 +7,6 @@
 
 import { Injectable } 												from '@angular/core';
 
-// Model Classes
-import { ValueChart }												from '../model/ValueChart';
-import { User }														from '../model/User';
-
-
 // This class is used to expose application-wide state to components that require it. This includes the current user's username, and the current ValueChart.
 
 @Injectable()

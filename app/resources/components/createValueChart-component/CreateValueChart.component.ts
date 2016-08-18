@@ -22,7 +22,7 @@ import { User }															from '../../model/User';
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES, CreateBasicInfoComponent, CreateObjectivesComponent, CreateAlternativesComponent, CreateScoreFunctionsComponent, CreateWeightsComponent],
-	providers: [CreationStepsService, ValueChartService]
+	providers: [CreationStepsService]
 })
 export class CreateValueChartComponent implements OnInit {
 	valueChart: ValueChart;
