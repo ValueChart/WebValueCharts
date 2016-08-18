@@ -51,6 +51,18 @@ export class ValueChartHttpService {
 			.catch(this.handleError);
 	}
 
+	updateValueChart(valueChart: ValueChart): Observable<ValueChart> {
+
+		let body = JSON.stringify(valueChart);
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.put(this.valueChartsUrl + valueChart._id, body, options)
+			.map(this.extractValueChartData)
+			.catch(this.handleError);
+	}
+
+
 	getValueChart(chartId: string, password: string): Observable<ValueChart> {
 		return this.http.get(this.valueChartsUrl + chartId + '?password=' + password)
 			.map(this.extractValueChartData)

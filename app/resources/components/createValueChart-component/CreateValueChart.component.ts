@@ -53,12 +53,13 @@ export class CreateValueChartComponent implements OnInit {
 
 		// Initialize according to purpose
 		if (this.purpose == "newChart") {
-			this.step = this.creationStepsService.BASICS; 3
+			this.step = this.creationStepsService.BASICS;
 			this.user = new User(this.currentUserService.getUsername());
 			this.valueChart = new ValueChart("", "", this.user.getUsername()); // Create new ValueChart with a temporary name and description
 			this.valueChart.addUser(this.user);
 			this.valueChartService.setValueChart(this.valueChart);
 			this.currentUserService.setValueChart(this.valueChart);
+			this.saveValueChartToDatabase();
 		}
 		else if (this.purpose == "newUser") {
 			this.step = this.creationStepsService.PREFERENCES;
@@ -104,10 +105,10 @@ export class CreateValueChartComponent implements OnInit {
 
 	next() {
 		if (this.step === this.creationStepsService.PRIORITIES) {
-			this.saveValueChartToDatabase();
 			window.onpopstate = () => { };
 			this.router.navigate(['/view/ValueChart']);
 		}
+		this.valueChartHttpService.updateValueChart(this.valueChart);
 		this.step = this.creationStepsService.next(this.step, this.purpose);
 	}
 
