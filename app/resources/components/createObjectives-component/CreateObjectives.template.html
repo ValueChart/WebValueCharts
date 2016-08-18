@@ -24,7 +24,7 @@
             </th>
             <th>
                 <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0">
-                    <option [value]="'abstract'">objective group</option>
+                    <option [value]="'abstract'">parent objective</option>
                     <option [value]="'primitive'">base objective</option>
                 </select>
             </th>
@@ -65,7 +65,7 @@
                             <button class="btn btn-sm btn-default" style="margin: 5px, width: 50px" data-toggle="modal" data-target="#myCategoryModal">
                                 Add
                             </button>
-                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px, width: 50px" (click)="removeSelectedCategoriesMain()">
+                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px, width: 50px" (click)="removeSelectedCategoriesMain(objectiveRows[objID])">
                                 Delete
                             </button>
                         </div>
@@ -119,18 +119,18 @@
             <div class="modal-body">
                 <form role="form">
                     <div class="input-group form-group">
-                        <input class="form-control" name="newcat" #cat placeholder="Category name" style="width: 200px; margin-right: 5px" type="text"/>
-                        <button type="button" class="btn btn-default" (click)="addCategory(cat.value)">
+                        <input class="form-control" [(ngModel)]="categoryToAdd" name="newcat" style="width: 200px; margin-right: 5px" type="text"/>
+                        <button type="button" class="btn btn-default" (click)="addCategory()">
                                 >>
                         </button>
                     </div>
                     <div class="form-group">
-                        <SELECT SIZE="3" class="form-control" style="width: 250px" name="catlistmodal" MULTIPLE>
+                        <SELECT SIZE="8" class="form-control" style="width: 250px" name="catlistmodal" MULTIPLE>
                         <OPTION *ngFor="let cat of categoriesToAdd">{{cat}}
                         </SELECT>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-default" (click)="removeSelectedCategoriesModal(cat.value)">
+                        <button type="button" class="btn btn-default" (click)="removeSelectedCategoriesModal()">
                             Delete
                         </button>
                     </div>

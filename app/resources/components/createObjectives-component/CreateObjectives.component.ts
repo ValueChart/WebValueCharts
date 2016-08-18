@@ -26,6 +26,7 @@ export class CreateObjectivesComponent implements OnInit {
 	rootObjRowID: string;
     selectedObjRow: string; // awful - need to refactor asap
     objectivesCount: number;
+    categoryToAdd: string;
     categoriesToAdd: string[];
 
 	constructor() { }
@@ -35,6 +36,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.rootObjRowID = "0";
 		this.selectedObjRow = "0";
 		this.objectivesCount = 0;
+		this.categoryToAdd = "";
 		this.categoriesToAdd = [];
 
 		if (this.valueChart.getAllObjectives().length === 0) {
@@ -109,9 +111,9 @@ export class CreateObjectivesComponent implements OnInit {
 		return result;
 	}
 
-	addCategory(cat: string) {
-		this.categoriesToAdd.push(cat);
-		document.getElementsByName('newcat')[0].setAttribute("value", "");
+	addCategory() {
+		this.categoriesToAdd.push(this.categoryToAdd);
+		this.categoryToAdd = "";
 	}
 
 	addCategories() {
@@ -121,10 +123,10 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoriesToAdd = [];
 	}
 
-	removeSelectedCategoriesMain() {
+	removeSelectedCategoriesMain(objrow: ObjectiveRow) {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmain")[0]);
 		for (let cat of selected) {
-			this.objectiveRows[this.selectedObjRow].dom.removeCategory(cat);
+			objrow.dom.removeCategory(cat);
 		}
 	}
 
