@@ -11,7 +11,7 @@ import { NgZone }														from '@angular/core';
 
 // d3
 import * as d3 															from 'd3';
-	
+
 // Application classes:
 import { ScoreFunctionRenderer }										from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../renderers/DiscreteScoreFunction.renderer';
@@ -118,29 +118,29 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			if (scoreFunctionChange) {
 				this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 				this.previousScoreFunction = currentScoreFunction.getMemento();
-				
+
 				// If this is a sub window, update the parent window in response to the changes.
 				if (window.opener) {
-					(<any> window.opener).angularAppRef.tick();
+					(<any>window.opener).angularAppRef.tick();
 				}
 			}
 		}
 	}
 
 	@Input() set objective(value: any) {
-		this.objectiveToDisplay = <PrimitiveObjective> value;
+		this.objectiveToDisplay = <PrimitiveObjective>value;
 	}
 
 	@Input() set width(value: any) {
-		this.plotWidth = <number> value;
+		this.plotWidth = <number>value;
 	}
 
 	@Input() set height(value: any) {
-		this.plotHeight = <number> value;
+		this.plotHeight = <number>value;
 	}
 
 	@Input() set orientation(value: any) {
-		this.viewOrientation = <string> value;
+		this.viewOrientation = <string>value;
 	}
 
 	@Input() set services(value: any) {

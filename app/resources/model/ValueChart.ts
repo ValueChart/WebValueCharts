@@ -117,9 +117,9 @@ export class ValueChart {
 				});
 
 				primitiveObjectives = primitiveObjectives.concat(<PrimitiveObjective[]>objectives);
-			
+
 			} else {
-				primitiveObjectives.push(<PrimitiveObjective> this.rootObjectives[i]);
+				primitiveObjectives.push(<PrimitiveObjective>this.rootObjectives[i]);
 			}
 		}
 		return primitiveObjectives;
@@ -128,7 +128,7 @@ export class ValueChart {
 	getAllPrimitiveObjectivesByName(): string[] {
 		var primObj: string[] = [];
 		for (var obj of this.getAllPrimitiveObjectives()) {
-			primObj.push(obj.getName());	
+			primObj.push(obj.getName());
 		}
 		return primObj;
 	}
@@ -209,7 +209,7 @@ export class ValueChart {
 		for (var i = 0; i < primitiveObjectives.length; i++) {
 			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getId(), combinedWeights[i]);
 		}
-		
+
 		return maximumWeightMap;
 	}
 
@@ -231,7 +231,7 @@ export class ValueChart {
 		}
 
 		averageUser = new User("AverageUser");
-		averageUser.setWeightMap(this.calculateAverageWeightMap()); 
+		averageUser.setWeightMap(this.calculateAverageWeightMap());
 		averageUser.setScoreFunctionMap(this.calculateAverageScoreFunctionMap());
 
 		return averageUser;
@@ -280,7 +280,7 @@ export class ValueChart {
 		} else {
 			averageScoreFunction = new DiscreteScoreFunction();
 		}
-		
+
 		var elements: (string | number)[] = scoreFunctions[0].getAllElements();
 
 		elements.forEach((element: string | number) => {

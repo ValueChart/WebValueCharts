@@ -23,9 +23,9 @@ export class CreateObjectivesComponent implements OnInit {
 	valueChart: ValueChart;
 
 	objectiveRows: { [objID: string]: ObjectiveRow; };
-	rootObjRowID : string;
+	rootObjRowID: string;
     selectedObjRow: string; // awful - need to refactor asap
-    objectivesCount : number;
+    objectivesCount: number;
     categoriesToAdd: string[];
 
 	constructor() { }
@@ -38,27 +38,27 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoriesToAdd = [];
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID,this.valueChart.getName(),"","",0);
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), "", "", 0);
 			this.objectivesCount++;
 		}
 		else {
-			this.objectiveToObjRow(this.valueChart.getRootObjectives()[0],"",0);
-		}	
-  	}
+			this.objectiveToObjRow(this.valueChart.getRootObjectives()[0], "", 0);
+		}
+	}
 
-  	ngOnDestroy() {
+	ngOnDestroy() {
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-  	}
+	}
 
-  	addNewChildObjRow(parentID: string) {
-  		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount),"","",parentID,this.objectiveRows[parentID].depth + 1));
-  	}
+	addNewChildObjRow(parentID: string) {
+		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), "", "", parentID, this.objectiveRows[parentID].depth + 1));
+	}
 
 	addObjRow(parentID: string, objrow: ObjectiveRow) {
 		this.objectiveRows[objrow.id] = objrow;
 		this.objectivesCount++;
 		if (this.objectiveRows[parentID]) {
-			this.objectiveRows[parentID].addChild(objrow.id);	
+			this.objectiveRows[parentID].addChild(objrow.id);
 		}
 	}
 
@@ -82,25 +82,25 @@ export class CreateObjectivesComponent implements OnInit {
 		return (this.selectedObjRow === "" || this.selectedObjRow === this.rootObjRowID);
 	}
 
-	getFlattenedObjectiveRows() : string[] {
+	getFlattenedObjectiveRows(): string[] {
 		let flattened: string[] = [];
-		this.flattenObjectiveRows([this.rootObjRowID],flattened);
+		this.flattenObjectiveRows([this.rootObjRowID], flattened);
 		return flattened;
 	}
 
 	flattenObjectiveRows(ObjectiveRowIDs: string[], flattened: string[]) {
-  		for (let objID of ObjectiveRowIDs) {
-  			flattened.push(objID);
-  			this.flattenObjectiveRows(this.objectiveRows[objID].children,flattened);
-  		}
-  	}
+		for (let objID of ObjectiveRowIDs) {
+			flattened.push(objID);
+			this.flattenObjectiveRows(this.objectiveRows[objID].children, flattened);
+		}
+	}
 
-  	getSelectedValues(select: HTMLSelectElement) : string[] {
-		let result : string[] = [];
-		let options : HTMLCollection = select && select.options;
-		let opt : HTMLOptionElement;
+	getSelectedValues(select: HTMLSelectElement): string[] {
+		let result: string[] = [];
+		let options: HTMLCollection = select && select.options;
+		let opt: HTMLOptionElement;
 
-		for (let i=0, iLen=options.length; i<iLen; i++) {
+		for (let i = 0, iLen = options.length; i < iLen; i++) {
 			opt = <HTMLOptionElement>options[i];
 			if (opt.selected) {
 				result.push(opt.value || opt.text);
@@ -111,7 +111,7 @@ export class CreateObjectivesComponent implements OnInit {
 
 	addCategory(cat: string) {
 		this.categoriesToAdd.push(cat);
-		document.getElementsByName('newcat')[0].setAttribute("value","");
+		document.getElementsByName('newcat')[0].setAttribute("value", "");
 	}
 
 	addCategories() {
@@ -131,92 +131,92 @@ export class CreateObjectivesComponent implements OnInit {
 	removeSelectedCategoriesModal() {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
 		for (let cat of selected) {
-			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat),1);
+			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat), 1);
 		}
 	}
 
-	getCategories(objrow: ObjectiveRow) : string[] {
+	getCategories(objrow: ObjectiveRow): string[] {
 		if (objrow === undefined) {
 			return [];
 		}
 		return objrow.dom.categories;
 	}
 
-  	// Convert ObjectiveRows to Objectives
-  	// Using dummy domains for now...
-  	objRowToObjective(objrow: ObjectiveRow) : Objective {
-  		let obj: Objective;
-  		if (objrow.type === 'primitive') {
-  			obj = new PrimitiveObjective(objrow.name, objrow.desc);
-  			let dom : Domain;
-  			if (objrow.dom.type === 'categorical') {
-  				dom = new CategoricalDomain(true);
-  				for (let cat of objrow.dom.categories) {
-  					(<CategoricalDomain>dom).addElement(cat);
-  				}
-  			}
-  			else if (objrow.dom.type === 'interval') {
-  				dom = new IntervalDomain(objrow.dom.min,objrow.dom.max,objrow.dom.interval);
-  			}
-  			else {
-  				dom = new ContinuousDomain(objrow.dom.min,objrow.dom.max,objrow.dom.unit);
-  			}
-  			(<PrimitiveObjective>obj).setDomain(dom);
-  			(<PrimitiveObjective>obj).setColor(objrow.color);
-  		}
-  		else {
-  			obj = new AbstractObjective(objrow.name, objrow.desc);
-  			for (let child of objrow.children) {
-  				(<AbstractObjective>obj).addSubObjective(this.objRowToObjective(this.objectiveRows[child]));
-  			}
-  		}
-  		return obj;
-  	}
+	// Convert ObjectiveRows to Objectives
+	// Using dummy domains for now...
+	objRowToObjective(objrow: ObjectiveRow): Objective {
+		let obj: Objective;
+		if (objrow.type === 'primitive') {
+			obj = new PrimitiveObjective(objrow.name, objrow.desc);
+			let dom: Domain;
+			if (objrow.dom.type === 'categorical') {
+				dom = new CategoricalDomain(true);
+				for (let cat of objrow.dom.categories) {
+					(<CategoricalDomain>dom).addElement(cat);
+				}
+			}
+			else if (objrow.dom.type === 'interval') {
+				dom = new IntervalDomain(objrow.dom.min, objrow.dom.max, objrow.dom.interval);
+			}
+			else {
+				dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max, objrow.dom.unit);
+			}
+			(<PrimitiveObjective>obj).setDomain(dom);
+			(<PrimitiveObjective>obj).setColor(objrow.color);
+		}
+		else {
+			obj = new AbstractObjective(objrow.name, objrow.desc);
+			for (let child of objrow.children) {
+				(<AbstractObjective>obj).addSubObjective(this.objRowToObjective(this.objectiveRows[child]));
+			}
+		}
+		return obj;
+	}
 
-  	// Recursively convert Objectives into ObjectiveRows
-  	objectiveToObjRow(obj: Objective, parentID: string, depth: number) {
-  		let objrow : ObjectiveRow;
-  		if (obj.objectiveType === 'abstract') {
-  			objrow = new ObjectiveRow(String(this.objectivesCount),obj.getName(),obj.getDescription(),parentID,depth,'abstract');
-  			this.addObjRow(parentID,objrow);
-  			for (let child of (<AbstractObjective>obj).getDirectSubObjectives()) {
-  				this.objectiveToObjRow(child,objrow.id,objrow.depth + 1);
-  			}
-  		}
-  		else {
-  			objrow = new ObjectiveRow(String(this.objectivesCount),obj.getName(),obj.getDescription(),parentID,depth,'primitive',(<PrimitiveObjective>obj).getColor(),
-  				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()));
-  			this.addObjRow(parentID,objrow);
-  		}
-  	}
+	// Recursively convert Objectives into ObjectiveRows
+	objectiveToObjRow(obj: Objective, parentID: string, depth: number) {
+		let objrow: ObjectiveRow;
+		if (obj.objectiveType === 'abstract') {
+			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getName(), obj.getDescription(), parentID, depth, 'abstract');
+			this.addObjRow(parentID, objrow);
+			for (let child of (<AbstractObjective>obj).getDirectSubObjectives()) {
+				this.objectiveToObjRow(child, objrow.id, objrow.depth + 1);
+			}
+		}
+		else {
+			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getName(), obj.getDescription(), parentID, depth, 'primitive', (<PrimitiveObjective>obj).getColor(),
+				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()));
+			this.addObjRow(parentID, objrow);
+		}
+	}
 
-  	domainToDomainDetails(dom: Domain) : DomainDetails {
-  		let domDets : DomainDetails = new DomainDetails(dom.type);
-  		if (dom.type === 'categorical') {
-  			for (let cat of (<CategoricalDomain>dom).getElements()) {
-  				domDets.categories.push(cat);
-  			}
-  		}
-  		else if (dom.type === 'continuous') {
-  			domDets.min = (<ContinuousDomain>dom).getMinValue();
-  			domDets.max = (<ContinuousDomain>dom).getMaxValue();
-  			domDets.unit = (<ContinuousDomain>dom).unit;
-  		}
-  		else {
-  			domDets.min = (<IntervalDomain>dom).getMinValue();
-  			domDets.max = (<IntervalDomain>dom).getMaxValue();
+	domainToDomainDetails(dom: Domain): DomainDetails {
+		let domDets: DomainDetails = new DomainDetails(dom.type);
+		if (dom.type === 'categorical') {
+			for (let cat of (<CategoricalDomain>dom).getElements()) {
+				domDets.categories.push(cat);
+			}
+		}
+		else if (dom.type === 'continuous') {
+			domDets.min = (<ContinuousDomain>dom).getMinValue();
+			domDets.max = (<ContinuousDomain>dom).getMaxValue();
+			domDets.unit = (<ContinuousDomain>dom).unit;
+		}
+		else {
+			domDets.min = (<IntervalDomain>dom).getMinValue();
+			domDets.max = (<IntervalDomain>dom).getMaxValue();
 			domDets.interval = (<IntervalDomain>dom).getInterval();
-  		}
-  		return domDets;
-  	}
+		}
+		return domDets;
+	}
 
-  	// There must be a better way...
-	toNumber(str: string) : number {
+	// There must be a better way...
+	toNumber(str: string): number {
 		return Number(str);
 	}
 
 	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart> value;
+		this.valueChart = <ValueChart>value;
 	}
 }
 
@@ -224,8 +224,8 @@ class ObjectiveRow {
 	id: string;
 	name: string;
 	desc: string;
-	parent : string;
-	depth : number;
+	parent: string;
+	depth: number;
 	type: string;
 	color: string;
 	dom: DomainDetails;

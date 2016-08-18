@@ -31,22 +31,22 @@ export class CreateAlternativesComponent implements OnInit {
 				this.alternativesCount++;
 			}
 		}
-  	}
+	}
 
-  	ngOnDestroy() {
-  		let alternatives: Alternative[] = [];
+	ngOnDestroy() {
+		let alternatives: Alternative[] = [];
 		for (let altID of this.altKeys()) {
 			alternatives.push((this.alternatives[altID]));
 		}
 		this.valueChart.setAlternatives(alternatives);
-  	}
-	
-	altKeys() : Array<string> {
-    	return Object.keys(this.alternatives);
-  	}
+	}
+
+	altKeys(): Array<string> {
+		return Object.keys(this.alternatives);
+	}
 
 	addEmptyAlternative() {
-		this.alternatives[this.alternativesCount] = new Alternative("","");
+		this.alternatives[this.alternativesCount] = new Alternative("", "");
 		this.isSelected[this.alternativesCount] = false;
 		this.alternativesCount++;
 	}
@@ -60,7 +60,7 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
-	allSelected() : boolean {
+	allSelected(): boolean {
 		if (this.altKeys().length === 0) {
 			return false;
 		}
@@ -79,11 +79,11 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
-	toNumber(str: string) : number {
+	toNumber(str: string): number {
 		return Number(str);
 	}
 
 	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart> value;
+		this.valueChart = <ValueChart>value;
 	}
 }

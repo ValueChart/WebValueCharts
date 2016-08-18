@@ -40,34 +40,34 @@ export class CreateWeightsComponent implements OnInit {
 			}
 		}
 		else {
-			let objectives : string[] = this.valueChart.getAllPrimitiveObjectivesByName();
-			let weights : number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChart.getAllPrimitiveObjectives());
-			let pairs = objectives.map(function (e, i) {return [objectives[i], weights[i]];});
+			let objectives: string[] = this.valueChart.getAllPrimitiveObjectivesByName();
+			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChart.getAllPrimitiveObjectives());
+			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
-			let sortedObjectives = sortedPairs.map(function (e, i) {return sortedPairs[i][0];});
+			let sortedObjectives = sortedPairs.map(function(e, i) { return sortedPairs[i][0]; });
 			for (let obj of sortedObjectives) {
 				this.rankObjective(<string>obj);
 			}
-		}	
-  	}
+		}
+	}
 
-  	ngOnDestroy() {
+	ngOnDestroy() {
 		this.user.setWeightMap(this.getWeightMapFromRanks());
 	}
 
-  	compareObjectivesByWeight(pair1: [string,number], pair2: [string,number]) {
-  		if (pair1[1] < pair2[1]) {
-  			return 1;
-  		}
-  		else if (pair1[1] === pair2[1]) {
-  			return 0;
-  		}
-  		else {
-  			return -1;
-  		}
-  	}
+	compareObjectivesByWeight(pair1: [string, number], pair2: [string, number]) {
+		if (pair1[1] < pair2[1]) {
+			return 1;
+		}
+		else if (pair1[1] === pair2[1]) {
+			return 0;
+		}
+		else {
+			return -1;
+		}
+	}
 
-	getPrioritiesText() : string {
+	getPrioritiesText(): string {
 		if (this.rankedObjectives.length === 0) {
 			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
 		}
@@ -79,8 +79,8 @@ export class CreateWeightsComponent implements OnInit {
 		}
 	}
 
-	getUnrankedObjectives() : string[] {
-		let unrankedObjectives : string[] = [];
+	getUnrankedObjectives(): string[] {
+		let unrankedObjectives: string[] = [];
 		for (let obj of this.valueChart.getAllPrimitiveObjectivesByName()) {
 			if (!this.isRanked[obj]) {
 				unrankedObjectives.push(obj);
@@ -101,13 +101,13 @@ export class CreateWeightsComponent implements OnInit {
 		this.rankedObjectives = [];
 	}
 
-	getWeightMapFromRanks() : WeightMap {
+	getWeightMapFromRanks(): WeightMap {
 		let weights = new WeightMap();
 		let rank = 1;
 		let numObjectives = this.rankedObjectives.length;
 		for (let obj of this.rankedObjectives) {
-			let weight = this.computeSum(rank,numObjectives) / numObjectives;
-			weights.setObjectiveWeight(obj,weight);
+			let weight = this.computeSum(rank, numObjectives) / numObjectives;
+			weights.setObjectiveWeight(obj, weight);
 			rank++;
 		}
 		return weights;
@@ -117,14 +117,14 @@ export class CreateWeightsComponent implements OnInit {
 		let sum = 0.0;
 		let i = k;
 		while (i <= K) {
-			sum += 1/i;
+			sum += 1 / i;
 			i++;
 		}
 		return sum;
 	}
 
-	getBestOutcome(objName: string) : string | number {
-		let scoreFunction : ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+	getBestOutcome(objName: string): string | number {
+		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
 		for (let outcome of scoreFunction.getAllElements()) {
 			if (scoreFunction.getScore(outcome) === 1) {
 				return outcome;
@@ -132,8 +132,8 @@ export class CreateWeightsComponent implements OnInit {
 		}
 	}
 
-	getWorstOutcome(objName: string) : string | number {
-		let scoreFunction : ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+	getWorstOutcome(objName: string): string | number {
+		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
 		for (let outcome of scoreFunction.getAllElements()) {
 			if (scoreFunction.getScore(outcome) === 0) {
 				return outcome;
@@ -144,22 +144,22 @@ export class CreateWeightsComponent implements OnInit {
 	// Create initial weight map for the Objective hierarchy with evenly distributed weights
 	getInitialWeightMap(): WeightMap {
 		let weightMap: WeightMap = new WeightMap();
-    	this.initializeWeightMap(this.valueChart.getRootObjectives(),weightMap,1);
-    	return weightMap;
+		this.initializeWeightMap(this.valueChart.getRootObjectives(), weightMap, 1);
+		return weightMap;
 	}
 
 	// Recursively add entries to weight map
-  	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
-  		let weight = parentWeight * 1.0 / objectives.length;
-  		for (let obj of objectives) {
-  			weightMap.setObjectiveWeight(obj.getName(),weight);
-  			if (obj.objectiveType === 'abstract') {
-  				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(),weightMap,weight);
-  			}	
-  		}
-  	}
+	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
+		let weight = parentWeight * 1.0 / objectives.length;
+		for (let obj of objectives) {
+			weightMap.setObjectiveWeight(obj.getName(), weight);
+			if (obj.objectiveType === 'abstract') {
+				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
+			}
+		}
+	}
 
-  	@Input() set vc(value: any) {
-		this.valueChart = <ValueChart> value;
+	@Input() set vc(value: any) {
+		this.valueChart = <ValueChart>value;
 	}
 }

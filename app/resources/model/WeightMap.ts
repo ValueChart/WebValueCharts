@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-06-22 10:17:02
 */
 
-import { Memento }						from './Memento'; 
+import { Memento }						from './Memento';
 import { PrimitiveObjective } 			from './PrimitiveObjective';
 
 
