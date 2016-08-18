@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:14:02
+* @Last Modified time: 2016-08-17 23:38:22
 */
 
 // Import Angular Classes:
@@ -18,6 +18,7 @@ import * as $														from 'jquery';
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RendererDataService }										from '../services/RendererData.service';
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
+import { RenderEventsService }										from '../services/RenderEvents.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
@@ -38,7 +39,7 @@ import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';
 
 // Import Types:
-import {RowData, CellData, LabelData, ViewConfig}					from '../types/ValueChartViewer.types';
+import {RowData, CellData, LabelData, ViewConfig}					from '../types/RendererData.types';
 
 
 
@@ -81,6 +82,7 @@ export class LabelRenderer {
 	*/
 	constructor(
 		private renderConfigService: RenderConfigService,
+		private renderEventsService: RenderEventsService,
 		private valueChartService: ValueChartService,
 		private rendererDataService: RendererDataService,
 		private scoreFunctionViewerService: ScoreFunctionViewerService,
@@ -128,6 +130,9 @@ export class LabelRenderer {
 
 		// Create the score Functions.
 		this.createScoreFunctions(this.scoreFunctionContainer, objectiveData);
+	
+		// Fire the Construction Over event on completion of construction.
+		(<any>this.renderEventsService.labelsDispatcher).call('Construction-Over');
 	}
 
 
@@ -223,6 +228,9 @@ export class LabelRenderer {
 		} else {
 			scoreFunctionContainer.style('display', 'none');
 		}
+
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.labelsDispatcher).call('Rendering-Over');
 	}
 
 	/*
@@ -270,6 +278,9 @@ export class LabelRenderer {
 		} else {
 			scoreFunctionContainer.style('display', 'none');
 		}
+
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.labelsDispatcher).call('Rendering-Over');
 	}
 
 	/*

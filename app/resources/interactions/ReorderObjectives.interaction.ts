@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:14:04
+* @Last Modified time: 2016-08-17 23:26:13
 */
 
 import { Injectable } 												from '@angular/core';
@@ -27,7 +27,7 @@ import { Objective }												from '../model/Objective';
 import { PrimitiveObjective }										from '../model/PrimitiveObjective';
 import { AbstractObjective }										from '../model/AbstractObjective';
 
-import {RowData, CellData, LabelData}								from '../types/ValueChartViewer.types';
+import {RowData, CellData, LabelData}								from '../types/RendererData.types';
 
 
 

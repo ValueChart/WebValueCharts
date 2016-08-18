@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:13:13
+* @Last Modified time: 2016-08-17 23:26:06
 */
 
 import { Injectable } 										from '@angular/core';
@@ -25,7 +25,7 @@ import { WeightMap }										from '../model/WeightMap';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
 
-import { RowData, CellData, UserScoreData, LabelData}		from '../types/ValueChartViewer.types.ts';
+import { RowData, CellData, UserScoreData, LabelData}		from '../types/RendererData.types.ts';
 
 // Types:
 import { ObjectivesRecord }									from '../types/Record.types';

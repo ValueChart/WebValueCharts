@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 23:11:44
+* @Last Modified time: 2016-08-17 23:39:19
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,6 +13,7 @@ import * as d3 														from 'd3';
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RenderEventsService }										from '../services/RenderEvents.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 
 // Model Classes
@@ -21,7 +22,7 @@ import { Alternative }												from '../model/Alternative';
 import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 
-import {RowData, CellData, UserScoreData, ViewConfig}				from '../types/ValueChartViewer.types';
+import {RowData, CellData, UserScoreData, ViewConfig}				from '../types/RendererData.types';
 
 
 // This class renders a ValueChart's Alternatives into a stacked bar chart that summarizes the utilities users 
@@ -73,6 +74,7 @@ export class SummaryChartRenderer {
 	*/
 	constructor(
 		private renderConfigService: RenderConfigService,
+		private renderEventsService: RenderEventsService,
 		private valueChartService: ValueChartService,
 		private defs: SummaryChartDefinitions) { }
 
@@ -116,6 +118,9 @@ export class SummaryChartRenderer {
 			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, rows);
+	
+		// Fire the Construction Over event on completion of construction.
+		(<any>this.renderEventsService.summaryChartDispatcher).call('Construction-Over');
 	}
 
 	/*
@@ -251,6 +256,9 @@ export class SummaryChartRenderer {
 
 		// Render the summary chart using the selections with updated data.
 		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, viewOrientation);
+	
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
 	}
 
 	/*
@@ -298,6 +306,9 @@ export class SummaryChartRenderer {
 		this.toggleUtilityAxis();
 
 		this.renderSummaryChartRows(this.alternativeBoxes, this.scoreTotals, this.cells, this.userScores, viewOrientation);
+	
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
 	}
 
 	/*
