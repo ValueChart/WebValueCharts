@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-23 10:56:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:14:54
+* @Last Modified time: 2016-08-17 23:26:05
 */
 
 // Application Classes:
@@ -16,7 +16,7 @@ import { ValueChart }												from '../../app/resources/model/ValueChart';
 import { WeightMap }												from '../../app/resources/model/WeightMap';
 import { PrimitiveObjective }										from '../../app/resources/model/PrimitiveObjective'; 
 
-import {RowData, CellData, LabelData}								from '../../app/resources/types/ValueChartViewer.types';
+import {RowData, CellData, LabelData}								from '../../app/resources/types/RendererData.types';
 
 
 

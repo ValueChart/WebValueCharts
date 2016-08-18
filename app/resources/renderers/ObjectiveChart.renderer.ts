@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 23:11:36
+* @Last Modified time: 2016-08-17 23:35:44
 */
 
 // Import Angular Classes"
@@ -25,7 +25,7 @@ import { ScoreFunctionMap }											from '../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../model/ScoreFunction';
 
 // Import Types:
-import {RowData, CellData, UserScoreData, ViewConfig}				from '../types/ValueChartViewer.types';
+import {RowData, CellData, UserScoreData, ViewConfig}				from '../types/RendererData.types';
 
 
 // This class renders a ValueChart's Alternatives into a series of bar charts, one for each primitive objective in the ValueChart. 
@@ -110,6 +110,9 @@ export class ObjectiveChartRenderer {
 			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer, rows);
+
+		// Fire the Construction Over event on completion of construction.
+		(<any>this.renderEventsService.objectiveChartDispatcher).call('Construction-Over');
 	}
 
 	/*
@@ -277,6 +280,9 @@ export class ObjectiveChartRenderer {
 
 
 		this.renderObjectiveChartRows(rowOutlinesToUpdate, rowsToUpdate, alternativeLabelsToUpdate, alternativeBoxesToUpdate, cellsToUpdate, userScoresToUpdate, weightColumnsToUpdate, viewOrientation);
+	
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.objectiveChartDispatcher).call('Rendering-Over');
 	}
 
 
@@ -303,6 +309,8 @@ export class ObjectiveChartRenderer {
 			});
 
 		this.renderObjectiveChartRows(this.rowOutlines, this.rows, this.alternativeLabels, this.alternativeBoxes, this.cells, this.userScores, this.weightColumns, viewOrientation);
+		// Fire the Rendering Over event on completion of rendering.
+		(<any>this.renderEventsService.objectiveChartDispatcher).call('Rendering-Over');
 	}
 
 
@@ -392,8 +400,6 @@ export class ObjectiveChartRenderer {
 
 		this.renderUserScores(userScores, viewOrientation);
 		this.renderWeightColumns(weightColumns, viewOrientation);
-
-		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
 	}
 
 	/*

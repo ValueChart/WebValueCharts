@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:56:26
+* @Last Modified time: 2016-08-17 22:59:04
 */
 
 // Require Node Libraries:
@@ -20,7 +20,7 @@ import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMa
 
 
 // Import Test Data:
-import { JsonGroupHotel }						from '../TestData/ValueChartsData';
+import { JsonGroupHotel }						from '../testData/ValueChartsData';
 
 
 describe('ValueCharts Routes', () => {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:20:01
+* @Last Modified time: 2016-08-17 23:31:48
 */
 
 import { Component }															from '@angular/core';
@@ -218,7 +218,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.resizeValueChart()
 		});
 
-		this.renderEventsService.summaryChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
+		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
 
 	ngOnDestroy() {

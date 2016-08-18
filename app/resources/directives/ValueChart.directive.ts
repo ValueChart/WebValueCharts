@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 16:42:18
+* @Last Modified time: 2016-08-17 23:26:14
 */
 
 // Import Angular Resources:
@@ -41,7 +41,7 @@ import { User }																	from '../model/User';
 import { ScoreFunction }														from '../model/ScoreFunction';
 
 // Import Types:
-import { RowData, CellData, LabelData }											from '../types/ValueChartViewer.types';
+import { RowData, CellData, LabelData }											from '../types/RendererData.types';
 import { InteractionConfig }													from '../types/Config.types';
 
 @Directive({

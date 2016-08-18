@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-10 20:31:29
+* @Last Modified time: 2016-08-17 22:54:24
 */
 
 // Require Node Libraries:
@@ -26,7 +26,7 @@ import { HostMessage,  MessageType}				from '../../app/resources/types/HostMessa
 
 
 // Import Test Data:
-import { JsonGroupHotel }						from '../TestData/ValueChartsData';
+import { JsonGroupHotel }						from '../testData/ValueChartsData';
 
 describe('WebSocket: /Host', () => {
 	var hostUrl: string  = 'ws://localhost:3000/host/';
