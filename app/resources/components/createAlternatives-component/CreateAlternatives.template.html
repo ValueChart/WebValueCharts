@@ -1,0 +1,36 @@
+<h4>Add Alternatives</h4>
+<input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteAlternatives()" style="margin: 5px 10px;" />
+<input class="btn btn-default btn-lg pull-right" type="button" value="Add Alternative" (click)="addEmptyAlternative()" style="margin: 5px 10px;" />
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
+        <th>Name</th>
+        <th>Description</th>
+        <th *ngFor="let objName of valueChart.getAllPrimitiveObjectivesByName()">{{objName}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let altID of altKeys()">
+        <th>
+            <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
+        </th>
+        <th>
+            <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value)"/>
+        </th>
+        <th>
+            <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
+        </th>
+        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
+            <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
+                <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
+                    <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
+                </select>
+            </div>
+            <div *ngIf="obj.getDomain().type === 'continuous'">
+                <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),toNumber(m.value))"/>
+            </div>   
+        </th>
+      </tr>
+    </tbody>
+</table>

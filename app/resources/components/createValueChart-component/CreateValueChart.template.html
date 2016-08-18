@@ -1,212 +1,32 @@
 <div class="">
-    <div class="flex-column creation-page">
-        <div class="flex-row column-container col-xs-12">
-            <div class="col-xs-10">
+	<div class="flex-column creation-page">
+		<div class="flex-row column-container col-xs-12">
+			<div class="col-xs-10">
                 <div class="form-group">
-                    <div *ngIf="step === creationStepsService.BASICS">
-                        <label class="control-label">Chart name.</label>
-                        <input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
-                        <label class="control-label">Chart description.</label>
-                        <input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />  
-                        <label><input type="checkbox" [(ngModel)]="isGroupValueChart" name="isGroupValueChart" style="margin: 5px 10px;">Group ValueChart</label>
-                        <div *ngIf="isGroupValueChart">
-                            <label class="control-label">Password.</label>
-                            <input  class="form-control" type="text" [(ngModel)]="valueChartPassword" maxlength="100" />
-                        </div>
+                	<div *ngIf="step === creationStepsService.BASICS">
+                        <CreateBasicInfo 
+                                [vc]="valueChart">
+                        </CreateBasicInfo>
                     </div>
                     <div *ngIf="step === creationStepsService.OBJECTIVES">
-                        <h4>Add Objectives</h4>
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" [disabled]="disableDelete()" (click)="deleteObjRow(selectedObjRow)" style="margin: 5px 10px;" />
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" [disabled]="disableAddChild()" (click)="addChildObjRow(selectedObjRow)" style="margin: 5px 10px;" />
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Type</th>
-                                    <th>Color</th>
-                                    <th>Domain Type</th>
-                                    <th>Domain Info</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
-                                    <th>
-                                        <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                                        <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].name"/>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
-                                    </th>
-                                    <th>
-                                        <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0">
-                                            <option [value]="'abstract'">abstract</option>
-                                            <option [value]="'primitive'">primitive</option>
-                                        </select>
-                                    </th>
-                                    <th>
-                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
-                                        <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                                            <select class="form-control" [(ngModel)]="objectiveRows[objID].color">
-                                                <option [value]="'red'">red</option>
-                                                <option [value]="'blue'">blue</option>
-                                                <option [value]="'green'">green</option>
-                                                <option [value]="'purple'">purple</option>
-                                                <option [value]="'orange'">orange/option>
-                                                <option [value]="'yellow'">yellow</option>
-                                            </select>
-                                        </div>
-                                    </th> 
-                                    <th>
-                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
-                                        <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                                            <select class="form-control"[(ngModel)]="objectiveRows[objID].dom.type">
-                                                <option [value]="'categorical'">categorical</option>
-                                                <option [value]="'continuous'">continuous</option>
-                                                <option [value]="'interval'">interval</option>
-                                            </select>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
-                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && objectiveRows[objID].dom.type === 'categorical' ">
-                                            <div style="display: table-row">
-                                                <div style="display: table-cell;">
-                                                    <SELECT class="form-control" name="catlistmain" size="3" style="width: 100px" MULTIPLE>
-                                                    <OPTION *ngFor="let opt of objectiveRows[objID].dom.categories">{{opt}}
-                                                    </SELECT>
-                                                </div>
-                                                <div style="display: table-cell;">
-                                                    <button class="btn btn-sm btn-default" style="margin: 5px" data-toggle="modal" data-target="#myCategoryModal">
-                                                        Add
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-default" style="margin: 5px" (click)="removeSelectedCategoriesMain()">
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div *ngIf="objectiveRows[objID].type === 'primitive' 
-                                            && (objectiveRows[objID].dom.type === 'continuous' || objectiveRows[objID].dom.type === 'interval')">
-                                            <div style="display: table-row">
-                                                <div style="display: table-cell;"><label class="control-label">min:</label></div>
-                                                <div style="display: table-cell;"><label class="control-label">max:</label></div>
-                                                <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" style="display: table-cell;"><label class="control-label">unit:</label></div>
-                                                <div *ngIf="objectiveRows[objID].dom.type === 'interval'" style="display: table-cell;"><label class="control-label">interval:</label></div>
-                                            </div>
-                                            <div style="display: table-row">
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;">
-                                                    <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value)" maxlength="100" />
-                                                </div>
-                                                <div style="display: table-cell;width: 60px;padding-right: 5px;">
-                                                    <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value)" maxlength="100" />
-                                                </div>
-                                                <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" style="display: table-cell;width: 60px;padding-right: 5px;">
-                                                    <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />
-                                                    
-                                                </div>
-                                                <div *ngIf="objectiveRows[objID].dom.type === 'interval'" style="display: table-cell;width: 60px;padding-right: 5px;">
-                                                    <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value)" maxlength="100" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </th>         
-                                </tr>                             
-                            </tbody>
-                        </table>
+                        <CreateObjectives 
+                                [vc]="valueChart">
+                        </CreateObjectives>
                     </div>
                     <div *ngIf="step === creationStepsService.ALTERNATIVES">
-                        <h4>Add Alternatives</h4>
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteAlternatives()" style="margin: 5px 10px;" />
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Add Alternative" (click)="addEmptyAlternative()" style="margin: 5px 10px;" />
-                        <table class="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th *ngFor="let objName of getPrimitiveObjectivesByName()">{{objName}}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let altID of altKeys()">
-                                <th>
-                                    <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
-                                </th>
-                                <th>
-                                    <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value)"/>
-                                </th>
-                                <th>
-                                    <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
-                                </th>
-                                <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
-                                    <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
-                                        <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
-                                            <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
-                                        </select>
-                                    </div>
-                                    <div *ngIf="obj.getDomain().type === 'continuous'">
-                                        <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),toNumber(m.value))"/>
-                                    </div>   
-                                </th>
-                              </tr>
-                            </tbody>
-                          </table>
+                        <CreateAlternatives 
+                                [vc]="valueChart">
+                        </CreateAlternatives>
                     </div>
                     <div *ngIf="step === creationStepsService.PREFERENCES">
-                         <label class="control-label">Select Objective:</label>
-                        <select class="form-control" [(ngModel)]="selectedObjective" name="selectedObjective">
-                            <option *ngFor="let obj of getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
-                        </select>
-                        <div>
-                            <ScoreFunction 
-                                [objective]="getObjective(selectedObjective)"
-                                [width]="300"
-                                [height]="300"
-                                [orientation]="'vertical'"
-                                [services]="services">
-                                <svg class="svg-content-createvaluechart" viewBox="0 0, 300, 300" preserveAspectRatio="xMinYMin meet">
-                                    <g class="expanded-score-function"></g>
-                                </svg>
-                            </ScoreFunction>  
-                        </div>           
+                        <CreateScoreFunctions
+                                [vc]="valueChart">
+                        </CreateScoreFunctions>         
                     </div>
                     <div *ngIf="step === creationStepsService.PRIORITIES">
-                        <h4>Set Priorities</h4>
-                        <label class="control-label">{{getPrioritiesText()}}</label>
-                        <input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks()" style="margin: 5px 10px;" />
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                              <tr>
-                                <th>Objective</th>
-                                <th>Worst Outcome</th>
-                                <th>Best Outcome</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName)">
-                                    <th>{{objName}}</th>
-                                    <th style="background-color: #ff8080">{{getWorstOutcome(objName)}}</th>
-                                    <th style="background-color: #70db70">{{getBestOutcome(objName)}}</th>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table">
-                            <thead>
-                              <tr>
-                                <th>Ranking</th>
-                                <th>Objective</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let objName of rankedObjectives; let rank = index">
-                                    <th>{{rank + 1}}</th>
-                                    <th>{{objName}}</th>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <CreateWeights
+                                [vc]="valueChart">
+                        </CreateWeights>
                     </div>
                 </div>
                 <div class="form-group">
@@ -216,58 +36,5 @@
                 </div>
             </div>
         </div>
-        <!-- Modal -->
-        <div class="modal fade" id="myCategoryModal" tabindex="-1" role="dialog" 
-             aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <button type="button" class="close" 
-                           data-dismiss="modal">
-                               <span aria-hidden="true">&times;</span>
-                               <span class="sr-only">Close</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">
-                            Add Categories
-                        </h4>
-                    </div>      
-                    <!-- Modal Body -->
-                    <div class="modal-body">
-                        <form role="form">
-                          <div style="display: table-row">
-                            <div style="display: table-cell;">
-                                <input class="form-control" name="newcat" #cat placeholder="Category name" type="text"/>
-                            </div>
-                            <div style="display: table-cell;">
-                                <div>
-                                    <button type="button" class="btn btn-default" style="margin: 5px" (click)="addCategory(cat.value)">
-                                        >>
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-default" style="margin: 5px" (click)="removeSelectedCategoriesModal(cat.value)">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                            <div style="display: table-cell;">
-                                <SELECT SIZE="3" style="width: 100px" name="catlistmodal" MULTIPLE>
-                                <OPTION *ngFor="let cat of categoriesToAdd">{{cat}}
-                                </SELECT>
-                            </div>
-                          </div>
-                        </form>
-                    </div>           
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" (click)="addCategories() "data-dismiss="modal">
-                            OK
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>

@@ -125,6 +125,14 @@ export class ValueChart {
 		return primitiveObjectives;
 	}
 
+	getAllPrimitiveObjectivesByName(): string[] {
+		var primObj: string[] = [];
+		for (var obj of this.getAllPrimitiveObjectives()) {
+			primObj.push(obj.getName());	
+		}
+		return primObj;
+	}
+
 	// Alternative Related Methods:
 
 	getAlternatives(): Alternative[] {

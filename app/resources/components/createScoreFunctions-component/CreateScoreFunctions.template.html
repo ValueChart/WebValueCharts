@@ -1,0 +1,17 @@
+<h4>Define Score Functions</h4>
+<label class="control-label">Select Objective:</label>
+<select class="form-control" [(ngModel)]="selectedObjective" name="selectedObjective">
+    <option *ngFor="let obj of valueChart.getAllPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+</select>
+<div>
+    <ScoreFunction 
+        [objective]="getObjective(selectedObjective)"
+        [width]="300"
+        [height]="300"
+        [orientation]="'vertical'"
+        [services]="services">
+        <svg class="svg-content-createvaluechart" viewBox="0 0, 300, 300" preserveAspectRatio="xMinYMin meet">
+            <g class="expanded-score-function"></g>
+        </svg>
+    </ScoreFunction>  
+</div> 
