@@ -16,16 +16,16 @@
         <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
             <th>
                 <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].name"/>
+                <input class="form-control" type="text" style="width: 200px" [(ngModel)]="objectiveRows[objID].name"/>
                 </div>
             </th>
             <th>
-                <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
+                <input class="form-control" type="text" style="width: 200px" [(ngModel)]="objectiveRows[objID].desc"/>
             </th>
             <th>
                 <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0">
-                    <option [value]="'abstract'">abstract</option>
-                    <option [value]="'primitive'">primitive</option>
+                    <option [value]="'abstract'">objective group</option>
+                    <option [value]="'primitive'">base objective</option>
                 </select>
             </th>
             <th>
@@ -36,7 +36,7 @@
                         <option [value]="'blue'">blue</option>
                         <option [value]="'green'">green</option>
                         <option [value]="'purple'">purple</option>
-                        <option [value]="'orange'">orange/option>
+                        <option [value]="'orange'">orange</option>
                         <option [value]="'yellow'">yellow</option>
                     </select>
                 </div>
