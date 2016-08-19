@@ -10,7 +10,7 @@ import { ScoreFunctionViewerService }									from '../../services/ScoreFunction
 import { ValueChart } 													from '../../model/ValueChart';
 import { User }															from '../../model/User';
 import { ScoreFunctionMap }												from '../../model/ScoreFunctionMap';
-import { Objective }													from '../../model/Objective';
+import { Objective }													from '../../model/Objective';      
 import { Domain }														from '../../model/Domain';
 import { CategoricalDomain }											from '../../model/CategoricalDomain';
 import { ContinuousDomain }												from '../../model/ContinuousDomain';
@@ -44,6 +44,16 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
 
     this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
+  }
+
+  advanceSelectedObjective() {
+    let primObjs: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
+    let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
+    let nextIndex: number = selectedIndex + 1;
+    if (nextIndex >= primObjs.length) {
+      nextIndex = 0;
+    }
+    this.selectedObjective = primObjs[nextIndex];
   }
 
   getObjective(name: string): Objective {

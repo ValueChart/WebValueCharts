@@ -1,8 +1,13 @@
 <h4>Define Score Functions</h4>
 <label class="control-label">Select Objective:</label>
-<select class="form-control" [(ngModel)]="selectedObjective" name="selectedObjective">
-    <option *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
-</select>
+<div class="input-group">
+    <select class="form-control" style="width: 245px; margin-right: 5px" [(ngModel)]="selectedObjective" name="selectedObjective">
+        <option *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+    </select>
+    <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
+        Next
+    </button>
+</div>
 <div>
     <ScoreFunction 
         [objective]="getObjective(selectedObjective)"
