@@ -377,7 +377,7 @@ export class LabelRenderer {
 		labelTexts.select('.' + this.defs.SUBCONTAINER_NAME)
 			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
-				return d.objective.getId() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
+				return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
 			});
 
 		labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)

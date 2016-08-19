@@ -22,6 +22,8 @@ import { IntervalDomain }													from '../model/IntervalDomain';
 import { ContinuousDomain } 												from '../model/ContinuousDomain';
 import { CategoricalDomain } 												from '../model/CategoricalDomain';
 
+import * as Formatter														from '../Formatter';
+
 export class WebValueChartsParser {
 
 	constructor() { }
@@ -126,7 +128,7 @@ export class WebValueChartsParser {
 			for (var j = 0; j < alternativeValueElements.length; j++) {
 				let alternativeValueElement: Element = alternativeValueElements[j];
 
-				let objectiveId: string = alternativeValueElement.getAttribute('objective');
+				let objectiveId: string = Formatter.nameToID(alternativeValueElement.getAttribute('objective'));
 				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
 
@@ -181,10 +183,10 @@ export class WebValueChartsParser {
 
 		for (var i = 0; i < weightElements.length; i++) {
 			let weightElement: Element = weightElements[i];
-			let objectiveName: string = weightElement.getAttribute('objective');
+			let objectiveId: string = Formatter.nametoDI(weightElement.getAttribute('objective'));
 			let weight: number = +weightElement.getAttribute('value');
 
-			weightMap.setObjectiveWeight(objectiveName, weight);
+			weightMap.setObjectiveWeight(objectiveId, weight);
 		}
 
 		return weightMap;
@@ -198,10 +200,10 @@ export class WebValueChartsParser {
 		for (var i = 0; i < scoreFunctionElements.length; i++) {
 			let scoreFunctionElement: Element = scoreFunctionElements[i];
 
-			let objectiveName: string = scoreFunctionElement.getAttribute('objective');
+			let objectiveId: string = Formatter.nameToID(scoreFunctionElement.getAttribute('objective'));
 			let scoreFunction: ScoreFunction = this.parseScoreFunction(scoreFunctionElement);
 
-			scoreFunctionMap.setObjectiveScoreFunction(objectiveName, scoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(objectiveId, scoreFunction);
 		}
 
 		return scoreFunctionMap;

@@ -211,7 +211,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d.element)) : this.heightScale(scoreFunction.getScore(+d.element));
 		};
 
@@ -228,7 +228,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Render the point labels for each user.
 		this.pointLabels
 			.text((d: any, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100;
 			})
 			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
@@ -263,13 +263,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		if (enableDragging) {
 			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				// Save the current state of the ScoreFunction.
 				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 			});
 
 			dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (viewOrientation === 'vertical') {
