@@ -54,10 +54,10 @@ export class CreateValueChartComponent implements OnInit {
 		// Initialize according to purpose
 		if (this.purpose == "newChart") {
 			this.step = this.creationStepsService.BASICS;
-			let valueChart = new ValueChart("", "", this.user.getUsername()); // Create new ValueChart with a temporary name and description
+			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			valueChart.addUser(new User(this.currentUserService.getUsername())); // Add a new user to it
 			this.valueChartService.setValueChart(valueChart); // Set the chart
-			this.saveValueChartToDatabase();
+			this.valueChartHttpService.createValueChart(valueChart);
 		}
 		else if (this.purpose == "newUser") {
 			this.step = this.creationStepsService.PREFERENCES;
