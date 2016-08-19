@@ -22,12 +22,9 @@ import { IntervalDomain }												from '../../model/IntervalDomain';
 })
 export class CreateObjectivesComponent implements OnInit {
 
-	// Input properties
-	valueChart: ValueChart;
-
 	objectiveRows: { [objID: string]: ObjectiveRow; };
 	rootObjRowID: string;
-    selectedObjRow: string; // awful - need to refactor asap
+    selectedObjRow: string;
     objectivesCount: number;
     categoryToAdd: string;
     categoriesToAdd: string[];
@@ -47,7 +44,9 @@ export class CreateObjectivesComponent implements OnInit {
 			this.objectivesCount++;
 		}
 		else {
-			this.objectiveToObjRow(this.valueChartService.getValueChart().getRootObjectives()[0], "", 0);
+			let rootObjective : Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
+			rootObjective.setName(this.valueChartService.getValueChart().getName());
+			this.objectiveToObjRow(rootObjective, "", 0);
 		}
 	}
 

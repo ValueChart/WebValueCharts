@@ -11,7 +11,6 @@ import { ValueChart } 														from '../../model/ValueChart';
 	templateUrl: 'app/resources/components/createBasicInfo-component/CreateBasicInfo.template.html',
 })
 export class CreateBasicInfoComponent implements OnInit {
-
 	valueChartName: string;
 	valueChartDescription: string;
 	valueChartPassword: string;
