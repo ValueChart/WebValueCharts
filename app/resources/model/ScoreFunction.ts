@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:07:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 17:04:31
+* @Last Modified time: 2016-08-19 11:02:16
 */
 
 import { Memento }										from './Memento';
@@ -67,12 +67,12 @@ export abstract class ScoreFunction implements Memento {
 	updateBestAndWorstElements(updatedDomainElement: string | number, updatedScore: number) {
 		if (updatedDomainElement === this.bestElement)
 			this.findBestElement();
-		else if (updatedDomainElement === this.worstElement)
+		if (updatedDomainElement === this.worstElement)
 			this.findWorstElement();
 
 		if (this.bestElement === undefined || updatedScore > this.elementScoreMap.get(this.bestElement))
 			this.bestElement = updatedDomainElement;
-		else if (this.worstElement === undefined || updatedScore < this.elementScoreMap.get(this.worstElement))
+		if (this.worstElement === undefined || updatedScore < this.elementScoreMap.get(this.worstElement))
 			this.worstElement = updatedDomainElement;
 	}
 

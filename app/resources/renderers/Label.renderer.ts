@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:38:22
+* @Last Modified time: 2016-08-19 11:00:59
 */
 
 // Import Angular Classes:
@@ -390,7 +390,15 @@ export class LabelRenderer {
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
 				return bestWorstText;
-			})
+			});
+
+		if (this.valueChartService.isIndividual()) {
+			labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+				.style('display', 'block');
+		} else {
+			labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+				.style('display', 'none');
+		}
 
 	}
 
