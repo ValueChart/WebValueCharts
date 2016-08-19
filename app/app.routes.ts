@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-18 11:47:30
+* @Last Modified time: 2016-08-19 11:43:01
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -19,6 +19,8 @@ import { ScoreFunctionViewerComponent }								from './resources/components/scor
 	// Services:
 import { ValueChartHttpService }									from './resources/services/ValueChartHttp.service';
 import { CurrentUserService }										from './resources/services/CurrentUser.service';
+import { ChartUndoRedoService }										from './resources/services/ChartUndoRedo.service';
+import { ValueChartService }										from './resources/services/ValueChart.service';
 import { AuthGuardService }											from './resources/services/AuthGuard.service';
 import { JoinGuardService }											from './resources/services/JoinGuard.service';
 
@@ -53,7 +55,7 @@ const routes: Routes = [
 // Export the providers necessary for bootstrapping in main.ts. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService, ValueChartService, ChartUndoRedoService]
 ];
 
 export const ROUTER = RouterModule.forRoot(routes);

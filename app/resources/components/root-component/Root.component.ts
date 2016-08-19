@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 17:08:19
+* @Last Modified time: 2016-08-19 11:41:44
 */
 
 // Import Angular Classes:
@@ -17,7 +17,6 @@ import { ApplicationRef } 											from '@angular/core';
 import { XMLValueChartParser } 										from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { ValueChartService }										from '../../services/ValueChart.service';
-import { ChartUndoRedoService }										from '../../services/ChartUndoRedo.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
 import { ExportValueChartComponent }								from '../exportValueChart-component/ExportValueChart.component';
 import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEncoder';
@@ -45,9 +44,7 @@ import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEnco
 		ViewContainerRef,
 		XMLValueChartParser,
 		ValueChartXMLEncoder,
-		UserHttpService,
-		ValueChartService,
-		ChartUndoRedoService]
+		UserHttpService]
 })
 export class RootComponent implements OnInit {
 
