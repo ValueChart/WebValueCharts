@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:26:06
+* @Last Modified time: 2016-08-19 13:12:36
 */
 
 import { Injectable } 										from '@angular/core';
@@ -57,6 +57,7 @@ export class RendererDataService {
 	}
 
 	updateAllValueChartData(viewOrientation: string): void {
+		this.valueChartService.updateMaximumWeightMap();
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(viewOrientation);
 

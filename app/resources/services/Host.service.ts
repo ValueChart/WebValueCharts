@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 12:27:29
+* @Last Modified time: 2016-08-19 14:40:44
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,7 +14,7 @@ import { ValueChartService }										from './ValueChart.service';
 // Model Classes:
 import { ValueChart }												from '../model/ValueChart';
 import { User }														from '../model/User';
-
+import { ScoreFunction }											from '../model/ScoreFunction';
 // Utility Classes: 
 import { JsonValueChartParser }										from '../utilities/JsonValueChartParser';
 
@@ -73,11 +73,19 @@ export class HostService {
 
 			case MessageType.UserChanged:
 				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
+				console.log('user changed: ', updatedUser);
 				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
 					return user.getUsername() === updatedUser.getUsername();
 				});
-				// Delete the old version of the user and replace it with the new one.
-				valueChart.getUsers().splice(userIndex, 1, updatedUser);
+
+				// Update the user's preferences.
+				var oldUser: User = valueChart.getUsers()[userIndex];
+				oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
+				oldUser.getScoreFunctionMap().getAllKeyScoreFunctionPairs().forEach((pair: { key: string, scoreFunction: ScoreFunction}) => {
+					let newScores = updatedUser.getScoreFunctionMap().getObjectiveScoreFunction(pair.key).getElementScoreMap();
+					pair.scoreFunction.setElementScoreMap(newScores);
+				});
+
 				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 				break;
 
@@ -95,5 +103,12 @@ export class HostService {
 
 				break;
 		}
+	}
+
+	updateUser(newVersion: User, oldVersion: User) {
+		// This should change, but updated it anyway.
+		oldVersion.setUsername(newVersion.getUsername());
+		oldVersion.setWeightMap(newVersion.getWeightMap());
+		oldVersion.setScoreFunctionMap(newVersion.getScoreFunctionMap());
 	}
 }

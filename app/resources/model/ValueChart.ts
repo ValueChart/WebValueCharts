@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:16:55
+* @Last Modified time: 2016-08-19 13:01:37
 */
 
 import { Objective } 															from './Objective';
@@ -198,10 +198,10 @@ export class ValueChart {
 		var maximumWeightMap = new WeightMap();
 
 		this.users.forEach((user: User) => {
-			let normalizedUserWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-			for (var i = 0; i < normalizedUserWeights.length; i++) {
-				if (combinedWeights[i] < normalizedUserWeights[i]) {
-					combinedWeights[i] = normalizedUserWeights[i];
+			let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
+			for (var i = 0; i < objectiveWeights.length; i++) {
+				if (combinedWeights[i] < objectiveWeights[i]) {
+					combinedWeights[i] = objectiveWeights[i];
 				}
 			}
 		});

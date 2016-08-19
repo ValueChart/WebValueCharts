@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-18 10:35:01
+* @Last Modified time: 2016-08-19 14:11:30
 */
 
 // Import Angular Resources:
@@ -258,7 +258,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			// Check for and handle changes to the user's fields.
 			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
 			if (userChanges) {
-				this.renderConfigService.initUserColors();
 				this.rendererDataService.updateAllValueChartData(this.viewOrientation);
 				this.updateValueChartDisplay();
 			}
@@ -289,7 +288,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 					this.updateValueChartDisplay();
 				}
 			});
-
 		});
 
 		// Check for and handle changes to the objectives' colors.
