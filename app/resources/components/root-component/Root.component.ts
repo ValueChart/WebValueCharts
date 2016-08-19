@@ -46,7 +46,6 @@ import { ValueChartXMLEncoder }										from '../../utilities/ValueChartXMLEnco
 		XMLValueChartParser,
 		ValueChartXMLEncoder,
 		UserHttpService,
-		CurrentUserService,
 		ValueChartService,
 		ChartUndoRedoService]
 })
