@@ -60,7 +60,7 @@ app/app.routes.js
 test/**/*.js
 routes/*.js
 utilities/*.js
-backend.js
+WebValueCharts.js
 
 ### Apache Server ###
 .htaccess
