@@ -4,6 +4,8 @@
 * @Last Modified by:   aaronpmishkin
 * @Last Modified time: 2016-08-19 13:01:37
 */
+	
+import *	as Formatter																	from '../utilities/Formatter';
 
 import { Objective } 															from './Objective';
 import { PrimitiveObjective } 													from './PrimitiveObjective';
@@ -19,6 +21,7 @@ import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 
 export class ValueChart {
 
+	private id: string;
 	private name: string;
 	private description: string;
 	private creator: string;
@@ -36,10 +39,19 @@ export class ValueChart {
 		this.rootObjectives = [];
 		this.alternatives = [];
 		this.users = [];
+		this.id = Formatter.nameToID(this.name);
 
 		if (users) {
 			this.users = users;
 		}
+	}
+
+	getId(): string {
+		return this.id;
+	}
+
+	setId(id: string) {
+		this.id = id;
 	}
 
 	getName(): string {
@@ -48,6 +60,7 @@ export class ValueChart {
 
 	setName(name: string): void {
 		this.name = name;
+		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

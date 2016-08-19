@@ -58,14 +58,14 @@ export class JsonValueChartParser {
 	parseObjective(jsonObject: any): Objective {
 		var objective: Objective;
 		if (jsonObject.objectiveType === 'abstract') {
-			objective = new AbstractObjective(jsonObject.name, jsonObject.description, jsonObject.id);
+			objective = new AbstractObjective(jsonObject.name, jsonObject.description);
 			for (var i = 0; i < jsonObject.subObjectives.length; i++) {
 				jsonObject.subObjectives[i] = this.parseObjective(jsonObject.subObjectives[i]);
 			}
 
 			Object.assign(objective, jsonObject);
 		} else {
-			objective = new PrimitiveObjective(jsonObject.name, jsonObject.description, jsonObject.id);
+			objective = new PrimitiveObjective(jsonObject.name, jsonObject.description);
 
 			jsonObject.domain = this.parseDomain(jsonObject.domain);
 

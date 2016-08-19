@@ -5,8 +5,11 @@
 * @Last Modified time: 2016-07-27 12:19:08
 */
 
+import *	as Formatter																	from '../utilities/Formatter';
+
 export class Alternative {
 
+	private id: string;
 	private name: string;
 	private description: string;
 	private objectiveValues: Map<string, string | number>;
@@ -15,6 +18,11 @@ export class Alternative {
 		this.name = name;
 		this.description = description;
 		this.objectiveValues = new Map<string, string | number>();
+		this.id = Formatter.nameToID(this.name);
+	}
+
+	getID(): string {
+		return this.id;
 	}
 
 	getName(): string {
@@ -23,6 +31,7 @@ export class Alternative {
 
 	setName(name: string): void {
 		this.name = name;
+		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

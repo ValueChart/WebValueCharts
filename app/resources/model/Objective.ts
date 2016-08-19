@@ -19,8 +19,6 @@ export interface Objective extends Memento {
 
 	getId(): string;
 
-	setId(name: string): void;
-
 	getDescription(): string;
 
 	setDescription(description: string): void;

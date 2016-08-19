@@ -73,7 +73,6 @@ export class ValueChartXMLEncoder {
 		var objectiveElement = xmlDocument.createElement('Objective');
 		objectiveElement.setAttribute('name', objective.getName());
 		objectiveElement.setAttribute('type', objective.objectiveType);
-		objectiveElement.setAttribute('id', objective.getId());
 
 		if (objective.objectiveType === 'abstract') {
 			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {

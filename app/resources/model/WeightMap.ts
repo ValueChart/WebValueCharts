@@ -75,7 +75,7 @@ export class WeightMap implements Memento {
 	getObjectiveWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var orderedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i].getName());
+			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i].getId());
 		}
 
 		return orderedWeights
@@ -84,7 +84,7 @@ export class WeightMap implements Memento {
 	getNormalizedWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var normalizedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			normalizedWeights[i] = this.weights.get(orderedObjectives[i].getName()) / this.weightTotal;
+			normalizedWeights[i] = this.weights.get(orderedObjectives[i].getId()) / this.weightTotal;
 		}
 
 		return normalizedWeights;

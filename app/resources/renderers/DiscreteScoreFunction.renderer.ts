@@ -209,7 +209,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
-			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 			return Math.max(this.heightScale(scoreFunction.getScore('' + d.element)), this.labelOffset);
 		};
 
@@ -226,7 +226,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Render the bar labels.
 		this.barLabels
 			.text((d: any, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 				return Math.round(100 * scoreFunction.getScore(d.element)) / 100;
 			})
 			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
@@ -261,13 +261,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		if (enableDragging) {
 			dragToChangeScore.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 				// Save the current state of the ScoreFunction.
 				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
 			});
 
 			dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (viewOrientation === 'vertical') {

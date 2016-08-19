@@ -65,15 +65,14 @@ export class WebValueChartsParser {
 
 			let type: string = objectiveElement.getAttribute('type');
 			let name: string = objectiveElement.getAttribute('name');
-			let id: string = objectiveElement.getAttribute('id') || name;
 			let description: string = objectiveElement.querySelector('Description').innerHTML;
 
 			if (type === 'abstract') {
-				objective = new AbstractObjective(name, description, id);
+				objective = new AbstractObjective(name, description);
 				(<AbstractObjective>objective).setDirectSubObjectives(this.parseObjectives(objectiveElement));
 			} else {
 				let color: string = objectiveElement.getAttribute('color');
-				objective = new PrimitiveObjective(name, description, id);
+				objective = new PrimitiveObjective(name, description);
 				(<PrimitiveObjective>objective).setColor(color);
 
 				let domainElement: Element = objectiveElement.querySelector('Domain');

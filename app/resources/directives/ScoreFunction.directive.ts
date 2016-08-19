@@ -71,7 +71,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initChangeDetection(): void {
 
-		let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
+		let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getId()).getMemento();
 		this.previousScoreFunction = currentScoreFunction;
 		this.previousObjectiveToDisplay = this.objectiveToDisplay;
 	}

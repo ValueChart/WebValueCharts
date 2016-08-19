@@ -9,6 +9,7 @@ import { Objective } 	from './Objective';
 import { Domain } 		from './Domain';
 
 import { Memento }				from './Memento';
+import *	as Formatter																	from '../utilities/Formatter';
 
 
 export class PrimitiveObjective implements Objective {
@@ -20,14 +21,15 @@ export class PrimitiveObjective implements Objective {
 	private color: string;
 	private domain: Domain;
 
-	constructor(name: string, description: string, id?: string) {
+	constructor(name: string, description: string) {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'primitive';
-		this.id = id;
+		this.id = Formatter.nameToID(this.name);
+	}
 
-		if (id === undefined)
-			this.id = name;
+	getId(): string {
+		return this.id;
 	}
 
 	getName(): string {
@@ -36,14 +38,7 @@ export class PrimitiveObjective implements Objective {
 
 	setName(name: string): void {
 		this.name = name;
-	}
-
-	getId(): string {
-		return this.id;
-	}
-
-	setId(id: string): void {
-		this.id = id;
+		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {
@@ -76,7 +71,7 @@ export class PrimitiveObjective implements Objective {
 
 	getMemento(): Memento {
 		// Create a new PrimitiveObjective object.
-		var primitiveObjectiveCopy: PrimitiveObjective = new PrimitiveObjective(this.name, this.description, this.id);
+		var primitiveObjectiveCopy: PrimitiveObjective = new PrimitiveObjective(this.name, this.description);
 		// Copy over all the properties from the PrimitiveObjective that is being copied. Note that this does NOT create a new domain Objective, it merely preservers the reference.
 		Object.assign(primitiveObjectiveCopy, this);
 

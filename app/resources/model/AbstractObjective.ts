@@ -10,6 +10,7 @@ import { PrimitiveObjective }	from './PrimitiveObjective';
 import { Domain } 				from './Domain';
 
 import { Memento }				from './Memento';
+import *	as Formatter																	from '../utilities/Formatter';
 
 
 export class AbstractObjective implements Objective {
@@ -20,15 +21,16 @@ export class AbstractObjective implements Objective {
 	private description: string;
 	private subObjectives: Objective[];
 
-	constructor(name: string, description: string, id?: string) {
+	constructor(name: string, description: string) {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'abstract';
 		this.subObjectives = [];
-		this.id = id;
+		this.id = Formatter.nameToID(this.name);
+	}
 
-		if (id === undefined)
-			this.id = name;
+	getId(): string {
+		return this.id;
 	}
 
 	getName(): string {
@@ -37,14 +39,7 @@ export class AbstractObjective implements Objective {
 
 	setName(name: string): void {
 		this.name = name;
-	}
-
-	getId(): string {
-		return this.id;
-	}
-
-	setId(id: string) {
-		this.id = id;
+		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {
@@ -103,7 +98,7 @@ export class AbstractObjective implements Objective {
 
 	getMemento(): Memento {
 		// Create a new AbstractObjective object.
-		var abstractObjectiveCopy: AbstractObjective = new AbstractObjective(this.name, this.description, this.id);
+		var abstractObjectiveCopy: AbstractObjective = new AbstractObjective(this.name, this.description);
 		// Copy over all the properties from the AbstractObjective that is being copied. Note that this does NOT create a new domain Objective, it merely preservers the reference.
 		Object.assign(abstractObjectiveCopy, this);
 		var subObjectives: Objective[] = []

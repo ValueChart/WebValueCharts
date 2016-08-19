@@ -60,7 +60,7 @@ export class ExpandScoreFunctionInteraction {
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
-			'Expanded' + objective.getName() + 'ScoreFunction',
+			'Expanded' + objective.getId() + 'ScoreFunction',
 			this.WINDOW_OPTIONS);
 
 		(<any>window).childWindows = (<any>window).childWindows || {};
