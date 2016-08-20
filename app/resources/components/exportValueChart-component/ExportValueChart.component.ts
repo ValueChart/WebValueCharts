@@ -2,21 +2,19 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:14:58
+* @Last Modified time: 2016-08-20 12:33:17
 */
 
-// Angular Classes:
+// Import Angular Classes:
 import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 
-import * as $												from 'jquery';
 
-
-// Application Classes:
+// Import Application Classes:
 import { ValueChartService }								from '../../services/ValueChart.service';
 import { ValueChartXMLEncoder }								from '../../utilities/ValueChartXMLEncoder';
 
-// Model Classes:
+// Import Model Classes:
 import { ValueChart }										from '../../model/ValueChart';
 
 

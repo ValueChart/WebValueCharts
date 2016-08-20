@@ -2,11 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 21:24:45
+* @Last Modified time: 2016-08-20 12:31:50
 */
 
 import { Injectable } 												from '@angular/core';
-import * as toastr 													from 'toastr';
 
 // Application Classes:
 import { ValueChartService }										from './ValueChart.service';

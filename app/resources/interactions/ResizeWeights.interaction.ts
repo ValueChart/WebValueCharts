@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:26:11
+* @Last Modified time: 2016-08-20 12:32:43
 */
 
 import { Injectable } 												from '@angular/core';
@@ -10,7 +10,6 @@ import { NgZone }													from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
 
 // Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';

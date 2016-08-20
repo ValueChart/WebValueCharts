@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 23:31:17
+* @Last Modified time: 2016-08-20 12:32:38
 */
 
 // Import Angular Classes:
@@ -11,7 +11,6 @@ import { NgZone }													from '@angular/core';
 
 // Import libraries:
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
 
 
 // Import Application Classes:

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 23:09:23
+* @Last Modified time: 2016-08-20 12:31:44
 */
 
 import { Component }															from '@angular/core';
@@ -11,10 +11,6 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router
 
 // d3
 import * as d3 																	from 'd3';
-// toastr
-import * as $																	from 'jquery';
-
-import * as toastr 																from 'toastr';
 
 // Application classes
 import { HomeComponent }														from '../home-component/Home.component';

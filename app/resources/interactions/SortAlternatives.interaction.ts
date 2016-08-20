@@ -2,14 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:26:11
+* @Last Modified time: 2016-08-20 12:32:41
 */
 
 import { Injectable } 												from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
 
 
 // Application Classes

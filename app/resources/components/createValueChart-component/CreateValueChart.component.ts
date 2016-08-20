@@ -2,9 +2,6 @@
 import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
-// Import Libraries:
-import * as toastr 														from 'toastr';
-
 // Import Application Classes:
 import { CreateBasicInfoComponent }										from '../createBasicInfo-component/CreateBasicInfo.component';
 import { CreateObjectivesComponent }									from '../createObjectives-component/CreateObjectives.component';

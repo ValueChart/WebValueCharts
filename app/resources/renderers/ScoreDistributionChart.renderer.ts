@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 13:13:53
+* @Last Modified time: 2016-08-20 12:32:36
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
-import * as $														from 'jquery';
 
 // Import Application Classes: 
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
