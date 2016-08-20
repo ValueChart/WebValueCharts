@@ -23,7 +23,7 @@ export class CreateBasicInfoComponent implements OnInit {
 		this.valueChartPassword = this.valueChartService.getValueChart().password ? this.valueChartService.getValueChart().password : "";
 	}
 
-	ngOnDestroy() {
+	updateValueChart():void {
 		this.valueChartService.getValueChart().setName(this.valueChartName);
 		this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
 		this.valueChartService.getValueChart().password = this.valueChartPassword;

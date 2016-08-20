@@ -6,7 +6,7 @@
                 	<router-outlet></router-outlet>
                 </div>
                 <div class="form-group">
-                    <a class="btn btn-success btn-lg pull-left" [routerLink]="['/home']" style="margin: 5px 10px;">Home</a>
+                    <a class="btn btn-success btn-lg pull-left" (click)="deleteValueChart(valueChart)" [routerLink]="['/home']" style="margin: 5px 10px;">Home</a>
                     <input class="btn btn-success btn-lg pull-left" type="button" value="<< Back" [disabled]="disableBackButton()" (click)="back()" style="margin: 5px 10px;" />
                     <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" [disabled]="disableNextButton()" (click)="next()" style="margin: 5px 10px;"  />
                 </div>

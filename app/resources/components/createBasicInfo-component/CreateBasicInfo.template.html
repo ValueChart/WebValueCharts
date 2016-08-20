@@ -1,6 +1,6 @@
 <label class="control-label">Chart name.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartName" maxlength="100" />
+<input  class="form-control" type="text" [(ngModel)]="valueChartName" (change)="updateValueChart()" maxlength="100" />
 <label class="control-label">Chart description.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />
+<input  class="form-control" type="text" [(ngModel)]="valueChartDescription" (change)="updateValueChart()" maxlength="100" />
 <label class="control-label">Password.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartPassword" maxlength="100" />
+<input  class="form-control" type="text" [(ngModel)]="valueChartPassword" (change)="updateValueChart()" maxlength="100" />

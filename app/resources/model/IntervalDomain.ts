@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-01 11:59:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 16:19:21
+* @Last Modified time: 2016-08-19 15:35:30
 */
 
 import { Domain } 			from './Domain';
@@ -46,14 +46,14 @@ export class IntervalDomain implements Domain {
 		return this.max;
 	}
 
-	getElements(): number[] {
-		var elements: number[] = [];
+	getElements(): string[] {
+		var elements: string[] = [];
 		var currentElement: number = this.min;
 		while (currentElement < this.max) {
-			elements.push(currentElement);
+			elements.push('' + currentElement);
 			currentElement += this.interval;
 		}
-		elements.push(this.max);
+		elements.push('' + this.max);
 
 		return elements;
 	}

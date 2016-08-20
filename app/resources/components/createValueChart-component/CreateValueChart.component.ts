@@ -1,6 +1,10 @@
 import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
+// Import Libraries:
+import * as toastr 														from 'toastr';
+
+
 // Import Application Classes:
 import { CreateBasicInfoComponent }										from '../createBasicInfo-component/CreateBasicInfo.component';
 import { CreateObjectivesComponent }									from '../createObjectives-component/CreateObjectives.component';
@@ -55,9 +59,9 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.purpose == "newChart") {
 			this.step = this.creationStepsService.BASICS;
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
+			(<any>valueChart).incomplete = true;
 			valueChart.addUser(new User(this.currentUserService.getUsername())); // Add a new user to it
 			this.valueChartService.setValueChart(valueChart); // Set the chart
-			this.valueChartHttpService.createValueChart(valueChart);
 		}
 		else if (this.purpose == "newUser") {
 			this.step = this.creationStepsService.PREFERENCES;
@@ -101,30 +105,58 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	back() {
+		this.updateValueChartInDatabase(this.valueChart);
 		this.step = this.creationStepsService.previous(this.step, this.purpose);
 	}
 
 	next() {
 		if (this.step === this.creationStepsService.PRIORITIES) {
 			window.onpopstate = () => { };
+
+			(<any>this.valueChart).incomplete = undefined;
+
 			this.router.navigate(['/view/ValueChart']);
-		}
-		this.valueChartHttpService.updateValueChart(this.valueChart);
+		} else if (this.step === this.creationStepsService.BASICS) {
+			this.saveValueChartToDatabase(this.valueChart);
+		} 
+		console.log(this.valueChart._id);
+		this.updateValueChartInDatabase(this.valueChart);
+
 		this.step = this.creationStepsService.next(this.step, this.purpose);
 	}
 
-	saveValueChartToDatabase() {
-		if (!this.valueChart._id) {
-			this.valueChartHttpService.createValueChart(this.valueChart)
+	updateValueChartInDatabase(valueChart: ValueChart): void {
+		if (this.valueChart._id) {
+			console.log('Updating valuechart');
+			this.valueChartHttpService.updateValueChart(this.valueChart)
+				.subscribe(
+					(valuechart) => { toastr.success('ValueChart auto-saved'); },
+					(error) => {
+						// Handle any errors here.
+					});
+		}
+	}
+
+	saveValueChartToDatabase(valueChart: ValueChart): void {
+		if (!valueChart._id) {
+			this.valueChartHttpService.createValueChart(valueChart)
 				.subscribe(
 				(valueChart: ValueChart) => {
 					// Set the id of the ValueChart.
 					this.valueChart._id = valueChart._id;
+					toastr.success('ValueChart auto-saved');
 				},
 				// Handle Server Errors
 				(error) => {
-
+				
 				});
+		}
+	}
+
+	deleteValueChart(valueChart: ValueChart): void {
+		if (valueChart._id) {
+			this.valueChartHttpService.deleteValueChart(valueChart._id)
+				.subscribe(status => { toastr.error('ValueChart deleted');  });
 		}
 	}
 

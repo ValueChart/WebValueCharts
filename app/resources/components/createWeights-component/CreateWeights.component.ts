@@ -123,20 +123,12 @@ export class CreateWeightsComponent implements OnInit {
 
 	getBestOutcome(objName: string): string | number {
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let outcome of scoreFunction.getAllElements()) {
-			if (scoreFunction.getScore(outcome) === 1) {
-				return outcome;
-			}
-		}
+		return scoreFunction.bestElement;
 	}
 
 	getWorstOutcome(objName: string): string | number {
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let outcome of scoreFunction.getAllElements()) {
-			if (scoreFunction.getScore(outcome) === 0) {
-				return outcome;
-			}
-		}
+		return scoreFunction.worstElement;
 	}
 
 	// Create initial weight map for the Objective hierarchy with evenly distributed weights

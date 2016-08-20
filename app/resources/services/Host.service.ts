@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 14:40:44
+* @Last Modified time: 2016-08-19 14:56:49
 */
 
 import { Injectable } 												from '@angular/core';
@@ -106,7 +106,7 @@ export class HostService {
 	}
 
 	updateUser(newVersion: User, oldVersion: User) {
-		// This should change, but updated it anyway.
+		// This shouldn't change, but update it anyway.
 		oldVersion.setUsername(newVersion.getUsername());
 		oldVersion.setWeightMap(newVersion.getWeightMap());
 		oldVersion.setScoreFunctionMap(newVersion.getScoreFunctionMap());
