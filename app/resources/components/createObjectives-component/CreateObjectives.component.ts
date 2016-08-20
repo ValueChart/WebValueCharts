@@ -14,6 +14,7 @@ import { Domain }														from '../../model/Domain';
 import { CategoricalDomain }											from '../../model/CategoricalDomain';
 import { ContinuousDomain }												from '../../model/ContinuousDomain';
 import { IntervalDomain }												from '../../model/IntervalDomain';
+import { Alternative }													from '../../model/Alternative';
 
 @Component({
 	selector: 'CreateObjectives',
@@ -21,6 +22,10 @@ import { IntervalDomain }												from '../../model/IntervalDomain';
 	directives: [NgClass]
 })
 export class CreateObjectivesComponent implements OnInit {
+
+	// Map objective row IDs to original PrimitiveObjective name and current name in input field
+	// This allows us to update references in other parts of the ValueChart when component is destroyed
+	namesMap: { [objID: string]: [string,string] }; 
 
 	objectiveRows: { [objID: string]: ObjectiveRow; };
 	rootObjRowID: string;
@@ -32,6 +37,7 @@ export class CreateObjectivesComponent implements OnInit {
 	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
+		this.namesMap = {};
 		this.objectiveRows = {};
 		this.rootObjRowID = "0";
 		this.selectedObjRow = "0";
@@ -47,11 +53,67 @@ export class CreateObjectivesComponent implements OnInit {
 			let rootObjective : Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
 			rootObjective.setName(this.valueChartService.getValueChart().getName());
 			this.objectiveToObjRow(rootObjective, "", 0);
+
+			// Initialize names map
+			for (let objID of Object.keys(this.objectiveRows)) {
+				let objrow: ObjectiveRow = this.objectiveRows[objID];
+				if (objrow.type === 'primitive') {
+					this.namesMap[objID] = [objrow.name,objrow.name];
+				}
+			}
 		}
 	}
 
 	ngOnDestroy() {
 		this.valueChartService.getValueChart().setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
+		this.updateObjectiveNames();
+	}
+
+	updateObjectiveNames() {
+		for (let objID of Object.keys(this.namesMap)) {
+			let oldName: string = this.namesMap[objID][0];
+			let newName: string = this.namesMap[objID][1];
+			
+			// Update references if name has changed
+			if (oldName !== newName) {
+				
+				for (let alt of this.valueChartService.getAlternatives()) {
+					let objVal = alt.getObjectiveValue(oldName);
+					if (objVal) {
+						alt.removeObjective(oldName);
+						alt.setObjectiveValue(newName,objVal);
+					}
+				}
+
+				for (let user of this.valueChartService.getUsers()) {
+					let scoreFunctionMap = user.getScoreFunctionMap();
+					if (scoreFunctionMap) {
+						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(oldName);
+						if (scoreFunction) {
+							scoreFunctionMap.removeObjectiveScoreFunction(oldName);
+							scoreFunctionMap.setObjectiveScoreFunction(newName,scoreFunction);
+						}
+					}				
+					let weightMap = user.getWeightMap();
+					if (weightMap) {
+						let weight = weightMap.getObjectiveWeight(oldName);
+						if (weight) {
+							weightMap.removeObjectiveWeight(oldName);
+							weightMap.setObjectiveWeight(newName,weight);
+						}
+					}		
+				}
+			}
+		}
+	}
+
+	setObjectiveName(objID: string, name: string) {	
+		this.objectiveRows[objID].name = name;
+
+		// Update name in name map if entry exists
+		if (this.namesMap[objID]) {
+			this.namesMap[objID] = [this.namesMap[objID][0],name];
+		}
 	}
 
 	addNewChildObjRow(parentID: string) {
