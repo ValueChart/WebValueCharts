@@ -16,7 +16,7 @@
         <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
             <th>
                 <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control" type="text" style="width: 200px" #name [ngModel]="objectiveRows[objID].name" (ngModelChange)="setObjectiveName(objID,name.value)"/>
+                <input class="form-control" type="text" style="width: 200px" [disabled]="objID === rootObjRowID" #name [ngModel]="objectiveRows[objID].name" (ngModelChange)="setObjectiveName(objID,name.value)"/>
                 </div>
             </th>
             <th>
@@ -57,7 +57,7 @@
                     && objectiveRows[objID].dom.type === 'categorical' ">
                     <div class="form-group">
                         <div class="form-group">
-                            <SELECT class="form-control" name="catlistmain" size="3" style="width: 100px" MULTIPLE>
+                            <SELECT class="form-control" [name]="'catlist' + objID" size="3" style="width: 100px" MULTIPLE>
                             <OPTION *ngFor="let opt of objectiveRows[objID].dom.categories">{{opt}}
                             </SELECT>
                         </div>
@@ -65,7 +65,7 @@
                             <button class="btn btn-sm btn-default" style="margin: 5px, width: 50px" data-toggle="modal" data-target="#myCategoryModal">
                                 Add
                             </button>
-                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px, width: 50px" (click)="removeSelectedCategoriesMain(objectiveRows[objID])">
+                            <button type="button" class="btn btn-sm btn-default" style="margin: 5px, width: 50px" (click)="removeSelectedCategoriesMain(objID)">
                                 Delete
                             </button>
                         </div>

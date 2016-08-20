@@ -187,10 +187,10 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoriesToAdd = [];
 	}
 
-	removeSelectedCategoriesMain(objrow: ObjectiveRow) {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmain")[0]);
+	removeSelectedCategoriesMain(objID: string) {
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlist" + objID)[0]);
 		for (let cat of selected) {
-			objrow.dom.removeCategory(cat);
+			this.objectiveRows[objID].dom.removeCategory(cat);
 		}
 	}
 
