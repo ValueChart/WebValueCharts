@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:35:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 16:30:17
+* @Last Modified time: 2016-08-20 13:51:47
 */
 
 /* 
@@ -19,7 +19,7 @@ import 'rxjs/add/observable/throw';
 
 // Operators
 import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 11:41:44
+* @Last Modified time: 2016-08-20 15:56:36
 */
 
 // Import Angular Classes:
@@ -60,6 +60,8 @@ export class RootComponent implements OnInit {
 	// that the ScoreFuntionViewer is currently displaying. 'normal' is the default value.
 	private switchScoreFunctionViewText: string = 'Score Distributions';
 
+
+	private window = window;
 
 
 	// ========================================================================================
@@ -126,7 +128,6 @@ export class RootComponent implements OnInit {
 				this.currentUserService.setLoggedIn(false);
 				this.router.navigate(['/register']);
 			});
-
 	}
 
 	/* 	

@@ -6,9 +6,33 @@
                     <router-outlet></router-outlet>
                 </div>
                 <div class="form-group">
-                    <a class="btn btn-success btn-lg pull-left" (click)="deleteValueChart(valueChart)" [routerLink]="['/home']" style="margin: 5px 10px;">Home</a>
+                    <a class="btn btn-success btn-lg pull-left" (click)="window.destination='/home'" [routerLink]="['/home']" style="margin: 5px 10px;">Home</a>
                     <input class="btn btn-success btn-lg pull-left" type="button" value="<< Back" [disabled]="disableBackButton()" (click)="back()" style="margin: 5px 10px;" />
                     <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" [disabled]="disableNextButton()" (click)="next()" style="margin: 5px 10px;"  />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="navigation-warning-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" id="close-navigation-warning-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-header">Navigation Warning</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <h3>Do you want to keep this ValueChart?</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn btn-lg btn-success" (click)="handleNavigationReponse(true, true)">Keep</button>
+                            <button type="submit" class="btn btn-lg btn-danger" (click)="handleNavigationReponse(false, true)">Discard</button>
+                            <button type="submit" class="btn btn-lg btn-primary col-sm-offset-1" (click)="handleNavigationReponse(true, false)">Cancel Navigation</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

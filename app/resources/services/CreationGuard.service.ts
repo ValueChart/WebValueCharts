@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:32:33
+* @Last Modified time: 2016-08-20 16:08:35
 */
 
 // Import Angular Classes:
@@ -16,14 +16,25 @@ import { CreateValueChartComponent } 							from '../components/createValueChart
 
 @Injectable()
 export class CreationGuardService implements CanDeactivate<CreateValueChartComponent> {
-	
-	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
-		// In progress		
-		return window.confirm('Are you sure that you want leave this page? All of your unsaved changes will be lost.');
+	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
+		if (component.allowedToNavigate || (<any> window).destination && (<any> window).destination.indexOf('/view/') !== -1) {
+			return true;
+		} else {
+			var observable = component.openNavigationModal();
+			observable.subscribe((navigate: boolean) => {
+				if (navigate) {
+					component.allowedToNavigate = true;
+					var destination = (((<any> window).destination) ? (<any> window).destination : window.location.pathname);
+					component.router.navigate([destination]);
+				} else {
+					history.forward();
+				}
+			(<any> window).destination = undefined;
+			});
+			return false;
+		}
 	}
-
-
 
 }

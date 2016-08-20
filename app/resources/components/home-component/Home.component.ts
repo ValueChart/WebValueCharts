@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:33:01
+* @Last Modified time: 2016-08-20 12:47:23
 */
 
 // Import Angular Classes:
@@ -48,7 +48,7 @@ export class HomeComponent {
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(true);
-				(<any>$('#close-chart-credentials-modal')).click();
+				$('#chart-credentials-modal').modal('hide');
 				this.router.navigate(['createValueChart/newUser/ScoreFunctions']);
 			},
 			// Handle Server Errors (like not finding the ValueChart)

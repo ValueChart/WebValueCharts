@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:31:44
+* @Last Modified time: 2016-08-20 12:47:22
 */
 
 import { Component }															from '@angular/core';
@@ -267,7 +267,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	hostValueChart(chartName: string): void {
 		// Close the Modal
-		(<any>$('#close-host-chart-modal')).click();
+		$('#host-chart-modal').modal('hide');
 
 		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
 		if (!this.valueChart._id) {

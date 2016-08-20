@@ -1,6 +1,9 @@
 // Import Angular Classes:
 import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
+import { Observable }     												from 'rxjs/Observable';
+import { Subject }														from 'rxjs/Subject';	
+import '../../../rxjs-operators';
 
 // Import Application Classes:
 import { CreateBasicInfoComponent }										from '../createBasicInfo-component/CreateBasicInfo.component';
@@ -33,8 +36,14 @@ export class CreateValueChartComponent implements OnInit {
 	sub: any;
 	private services: any = {};
 
+
+	// Navigation Control:
+	private window = window;
+	public allowedToNavigate: boolean = false;
+	public navigationResponse: Subject<boolean> = new Subject<boolean>();
+
 	constructor(
-		private router: Router,
+		public router: Router,
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private valueChartHttpService: ValueChartHttpService,
@@ -93,7 +102,7 @@ export class CreateValueChartComponent implements OnInit {
 			window.onpopstate = () => { };
 
 			(<any>this.valueChart).incomplete = undefined;
-
+			(<any> window).destination = '/view/ValueChart';
 			this.router.navigate(['/view/ValueChart']);
 		} else if (this.step === this.creationStepsService.BASICS) {
 			this.saveValueChartToDatabase(this.valueChart);
@@ -155,5 +164,26 @@ export class CreateValueChartComponent implements OnInit {
 			text = "View Chart >>";
 		}
 		return text;
+	}
+
+	// Navigation Control:
+	openNavigationModal(): Observable<boolean> {
+		$('#navigation-warning-modal').modal('show');	
+		
+		return this.navigationResponse.asObservable();
+	}
+
+	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
+		if (navigate) {
+			if (keepValueChart) {
+				(this.valueChart._id) ? this.updateValueChartInDatabase(this.valueChart) : this.saveValueChartToDatabase(this.valueChart);
+			} else if (this.valueChart._id) {
+				this.deleteValueChart(this.valueChart);
+			}
+		}
+
+		this.navigationResponse.next(navigate);
+
+		$('#navigation-warning-modal').modal('hide');
 	}
 }

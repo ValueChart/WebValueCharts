@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:32:51
+* @Last Modified time: 2016-08-20 12:47:23
 */
 
 // Import Angular Classes:
@@ -91,7 +91,7 @@ export class RegisterComponent {
 	}
 
 	continueAsTempUser(username: string): void {
-		(<any>$('#close-temporary-user-modal')).click();
+		$('#temporary-user-modal').modal('hide');
 		this.currentUserService.setLoggedIn(false);
 		this.setUsername(username);
 	}

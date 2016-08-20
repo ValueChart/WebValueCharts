@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:51:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 22:33:23
+* @Last Modified time: 2016-08-20 12:45:11
 */
 
 
@@ -38,6 +38,7 @@ import { CreationGuardService }					from '../services/CreationGuard.service';
 		UtilitiesModule 
 	],
 	declarations: [
+		CreateValueChartComponent,
 		CreateAlternativesComponent,
 		CreateBasicInfoComponent,
 		CreateObjectivesComponent,

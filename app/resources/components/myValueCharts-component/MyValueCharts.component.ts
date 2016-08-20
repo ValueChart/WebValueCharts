@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 21:32:02
+* @Last Modified time: 2016-08-20 16:12:12
 */
 
 import { Component }									from '@angular/core';
@@ -50,6 +50,8 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	openValueChart(chartId: string, password: string): void {
+		password = password || '';
+		
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
@@ -59,6 +61,8 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	editValueChart(chartId: string, password: string): void {
+		password = password || '';
+
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
