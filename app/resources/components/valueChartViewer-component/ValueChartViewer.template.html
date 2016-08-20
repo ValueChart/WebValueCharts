@@ -3,14 +3,14 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-default" (click)="editStructure()">
+				<a class="btn btn-default" *ngIf="this.valueChart.isIndividual()" [routerLink]="['/createValueChart/editStructure/Objectives']">
 				Edit Structure
-				</button>
+				</a>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-default" (click)="editPreferenceModel()">
+				<a class="btn btn-default" [routerLink]="['/createValueChart/editPreferences/ScoreFunctions']">
 				Edit Preference Model
-				</button>
+				</a>
 			</div>
 			<div *ngIf="currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" >

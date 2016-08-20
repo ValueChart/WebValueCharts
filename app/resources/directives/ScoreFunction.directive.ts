@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-18 11:13:54
+* @Last Modified time: 2016-08-19 23:30:32
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -39,6 +39,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private plotWidth: number;
 	private plotHeight: number;
 	private viewOrientation: string;
+	private individual: boolean;
 
 	// Services:
 	private valueChartService: ValueChartService;
@@ -54,7 +55,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private previousScoreFunction: ScoreFunction;
 
 	private user: User;
-
 
 
 	constructor(private ngZone: NgZone) { }
@@ -84,7 +84,18 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 		}
 
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay);
+		this.valueChartService.getCurrentUser()
+
+		var usersDomainElements: UserDomainElements[]
+
+		if (this.individual) {
+			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, [this.valueChartService.getCurrentUser()]);
+		} else {
+			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
+		}
+
+
+		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements);
 		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 	}
 
@@ -145,5 +156,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		this.valueChartService = value.valueChartService;
 		this.chartUndoRedoService = value.chartUndoRedoService;
 		this.scoreFunctionViewerService = value.scoreFunctionViewerService;
+	}
+
+	@Input() set individualOnly(value: any) {
+		this.individual = <boolean> value;
 	}
 }

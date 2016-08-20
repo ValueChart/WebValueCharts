@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-03 12:27:53
+* @Last Modified time: 2016-08-19 21:19:29
 */
 
 // Model Classes
@@ -31,8 +31,8 @@ export class JsonValueChartParser {
 		var valueChart: ValueChart = new ValueChart(jsonObject.name, jsonObject.description, jsonObject.creator);
 		// Copy over all the properties from the WeightMap that is being saved.
 		valueChart._id = jsonObject._id;
-		// Parse Users
-		if (jsonObject.users) {
+		// Parse Users if they are defined.
+		if (jsonObject.users !== undefined) {
 			for (var i = 0; i < jsonObject.users.length; i++) {
 				jsonObject.users[i] = this.parseUser(jsonObject.users[i]);
 			}
@@ -40,15 +40,21 @@ export class JsonValueChartParser {
 			jsonObject.users = [];
 		}
 
-		// Parse Root Objectives
-		for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
-			jsonObject.rootObjectives[i] = this.parseObjective(jsonObject.rootObjectives[i]);
+		if (jsonObject.rootObjectives !== undefined) {
+			// Parse Root Objectives
+			for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
+				jsonObject.rootObjectives[i] = this.parseObjective(jsonObject.rootObjectives[i]);
+			}
 		}
-		// Parse Alternatives
-		for (var i = 0; i < jsonObject.alternatives.length; i++) {
-			jsonObject.alternatives[i] = this.parseAlternative(jsonObject.alternatives[i]);
+		if (jsonObject.alternatives !== undefined) {
+			// Parse Alternatives
+			for (var i = 0; i < jsonObject.alternatives.length; i++) {
+				jsonObject.alternatives[i] = this.parseAlternative(jsonObject.alternatives[i]);
+			}	
 		}
 
+		// Copy over all properties from the json object the new ValueChart. This includes all the 
+		// users, objectives, and alternatives that are parsed above.
 		Object.assign(valueChart, jsonObject);
 
 
@@ -104,8 +110,15 @@ export class JsonValueChartParser {
 	parseUser(jsonObject: any): User {
 		var user: User = new User(jsonObject.username);
 
-		jsonObject.weightMap = this.parseWeightMap(jsonObject.weightMap);
-		jsonObject.scoreFunctionMap = this.parseScoreFunctionMap(jsonObject.scoreFunctionMap);
+		// Parse the weight map if it is defined.
+		if (jsonObject.weightMap !== undefined) {
+			jsonObject.weightMap = this.parseWeightMap(jsonObject.weightMap);
+		}
+
+		// Parse the score function map if it is defined.
+		if (jsonObject.scoreFunctionMap !== undefined) {
+			jsonObject.scoreFunctionMap = this.parseScoreFunctionMap(jsonObject.scoreFunctionMap);
+		}
 
 		Object.assign(user, jsonObject);
 

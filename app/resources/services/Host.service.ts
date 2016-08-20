@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 14:56:49
+* @Last Modified time: 2016-08-19 21:24:45
 */
 
 import { Injectable } 												from '@angular/core';
@@ -73,7 +73,6 @@ export class HostService {
 
 			case MessageType.UserChanged:
 				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				console.log('user changed: ', updatedUser);
 				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
 					return user.getUsername() === updatedUser.getUsername();
 				});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:51:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-18 11:12:28
+* @Last Modified time: 2016-08-19 22:33:23
 */
 
 
@@ -26,6 +26,8 @@ import { CreateWeightsComponent }				from './createWeights-component/CreateWeigh
 
 import { UtilitiesModule }						from './utilities.module';
 
+import { CreationGuardService }					from '../services/CreationGuard.service';
+
 
 @NgModule({
 	imports: [ 
@@ -43,6 +45,7 @@ import { UtilitiesModule }						from './utilities.module';
 		CreateWeightsComponent,
 	],
 	providers: [
+		CreationGuardService
 	],
 })
 export class CreateModule { }

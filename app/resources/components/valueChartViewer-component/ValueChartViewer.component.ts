@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:31:48
+* @Last Modified time: 2016-08-19 23:09:23
 */
 
 import { Component }															from '@angular/core';
@@ -372,14 +372,6 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
 		this.displayScoreFunctionValueLabels = newVal;
-	}
-
-	editStructure(): void {
-		this.router.navigate(['/createValueChart','editStructure']);
-	}
-
-	editPreferenceModel(): void {
-		this.router.navigate(['/createValueChart','editPreferenceModel']);
 	}
 
 	// Interaction Toggles

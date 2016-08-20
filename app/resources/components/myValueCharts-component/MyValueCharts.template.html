@@ -9,6 +9,7 @@
 						<th>Name</th>
 						<th>Password</th>
 						<th>Number of Users</th>
+						<th>Creation</th>
 					</thead>
 					<tbody>
 						<tr *ngFor="let chartSummary of valueChartSummaries; let i = index ">
@@ -16,9 +17,10 @@
 							<td>{{chartSummary.name}}</td>
 							<td>{{chartSummary.password}}</td>
 							<td>{{chartSummary.numUsers}}</td>
-							<td><button class="btn btn-sm btn-default" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
+							<td>{{getStatusText(chartSummary)}}</td>
+							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="editValueChart(chartSummary._id, chartSummary.password)">Edit</button></td>
-							<td><button class="btn btn-sm btn-default" (click)="openExportChartModal(chartSummary._id, chartSummary.password)" type="button" data-toggle="modal" data-target="#export-modal">Export</button></td>
+							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="openExportChartModal(chartSummary._id, chartSummary.password)" type="button" data-toggle="modal" data-target="#export-modal">Export</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="deleteValueChart(chartSummary._id)">Delete</button></td>
 						</tr>
 					</tbody>

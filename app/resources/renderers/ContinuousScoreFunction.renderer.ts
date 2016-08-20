@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 21:30:33
+* @Last Modified time: 2016-08-19 23:34:02
 */
 
 // Import Angular classes:
@@ -248,7 +248,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			});
 
 		// Enable or disable dragging to change user score functions depending on whether the ValueChart is has multiple users (should be disabled) or has one user (should be enabled).
-		this.toggleDragToChangeScore(this.valueChartService.isIndividual(), objective, viewOrientation);
+		this.toggleDragToChangeScore((this.usersDomainElements.length === 1), objective, viewOrientation);
 	}
 
 	/*

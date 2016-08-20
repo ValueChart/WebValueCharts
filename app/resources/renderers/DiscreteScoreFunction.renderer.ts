@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 15:34:04
+* @Last Modified time: 2016-08-19 23:33:48
 */
 
 // Import Angular Classes:
@@ -246,7 +246,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); });
 
 		// Enable or disable dragging to change user score functions depending on whether the ValueChart is has multiple users (should be disabled) or has one user (should be enabled).
-		this.toggleDragToChangeScore(this.valueChartService.isIndividual(), objective, viewOrientation);
+		this.toggleDragToChangeScore((this.usersDomainElements.length === 1), objective, viewOrientation);
 	}
 
 	/*

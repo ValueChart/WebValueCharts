@@ -1,9 +1,9 @@
+// Import Angular Classes:
 import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // Import Libraries:
 import * as toastr 														from 'toastr';
-
 
 // Import Application Classes:
 import { CreateBasicInfoComponent }										from '../createBasicInfo-component/CreateBasicInfo.component';
@@ -35,7 +35,6 @@ export class CreateValueChartComponent implements OnInit {
 	step: string;
 	sub: any;
 	private services: any = {};
-	private location: string;
 
 	constructor(
 		private router: Router,
@@ -47,7 +46,6 @@ export class CreateValueChartComponent implements OnInit {
 		private chartUndoRedoService: ChartUndoRedoService) { }
 
 	ngOnInit() {
-		this.location = window.location.pathname;
 		this.services.valueChartService = this.valueChartService;
 		this.services.chartUndoRedoService = this.chartUndoRedoService;
 		this.services.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
@@ -82,26 +80,10 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		this.valueChart = this.valueChartService.getValueChart();
 		this.user = this.valueChartService.getCurrentUser();
-		this.addNavigationWarning();
 	}
 
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
-	}
-
-	addNavigationWarning(): void {
-		history.pushState(null, document.title, window.location.pathname);
-
-		window.onpopstate = (eventObject: Event) => {
-			var navigate = window.confirm('Do you really want to navigate away from this page? All of your creation progress will be lost.');
-
-			if (navigate) {
-				window.onpopstate = () => { };
-				history.back();
-			} else {
-				history.pushState("", document.title, window.location.pathname);
-			}
-		}
 	}
 
 	back() {
@@ -119,7 +101,6 @@ export class CreateValueChartComponent implements OnInit {
 		} else if (this.step === this.creationStepsService.BASICS) {
 			this.saveValueChartToDatabase(this.valueChart);
 		} 
-		console.log(this.valueChart._id);
 		this.updateValueChartInDatabase(this.valueChart);
 
 		this.step = this.creationStepsService.next(this.step, this.purpose);
@@ -127,12 +108,12 @@ export class CreateValueChartComponent implements OnInit {
 
 	updateValueChartInDatabase(valueChart: ValueChart): void {
 		if (this.valueChart._id) {
-			console.log('Updating valuechart');
 			this.valueChartHttpService.updateValueChart(this.valueChart)
 				.subscribe(
 					(valuechart) => { toastr.success('ValueChart auto-saved'); },
 					(error) => {
 						// Handle any errors here.
+						toastr.warning('Auto-saving failed');
 					});
 		}
 	}
@@ -148,7 +129,7 @@ export class CreateValueChartComponent implements OnInit {
 				},
 				// Handle Server Errors
 				(error) => {
-				
+					toastr.warning('Auto-saving failed');
 				});
 		}
 	}

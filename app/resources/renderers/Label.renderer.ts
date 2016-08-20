@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 11:00:59
+* @Last Modified time: 2016-08-19 23:31:17
 */
 
 // Import Angular Classes:
@@ -40,6 +40,7 @@ import { WeightMap }												from '../model/WeightMap';
 
 // Import Types:
 import {RowData, CellData, LabelData, ViewConfig}					from '../types/RendererData.types';
+import { DomainElement, UserDomainElements } 						from '../types/ScoreFunctionViewer.types';
 
 
 
@@ -451,7 +452,9 @@ export class LabelRenderer {
 			else
 				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 
-			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum);
+			var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
+
+			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum, usersDomainElements);
 		});
 	}
 	/*

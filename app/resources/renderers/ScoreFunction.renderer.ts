@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 23:11:26
+* @Last Modified time: 2016-08-19 23:29:21
 */
 
 // Import Angular Classes:
@@ -111,9 +111,11 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
 						sub classes of this class should call createScoreFunction before creating any of their specific elements.
 	*/
-	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective): void {
+	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
+		this.usersDomainElements = usersDomainElements.slice();
+
 
 		// The root container is passed in.
 		this.rootContainer = el;
@@ -133,9 +135,6 @@ export abstract class ScoreFunctionRenderer {
 			.attr('id', 'scorefunction-' + objectiveId + '-plot-container');
 
 		this.createScoreFunctionAxis(this.plotContainer, objectiveId);
-
-		var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(objective);
-		this.usersDomainElements = usersDomainElements.slice();
 
 		this.domainLabelContainer = this.plotContainer.append('g')								// Create a container to hold the domain axis labels.
 			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABELS_CONTAINER, true)

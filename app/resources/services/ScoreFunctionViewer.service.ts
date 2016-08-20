@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-20 14:10:35
+* @Last Modified time: 2016-08-19 23:23:00
 */
 
 import { Injectable } 															from '@angular/core';
@@ -30,7 +30,7 @@ export class ScoreFunctionViewerService {
 
 	constructor(private valueChartService: ValueChartService) { }
 
-	getAllUsersDomainElements(objective: PrimitiveObjective): UserDomainElements[] {
+	getAllUsersDomainElements(objective: PrimitiveObjective, users: User[]): UserDomainElements[] {
 		var allUsersDomainElements: UserDomainElements[] = [];
 		var domainElements: (string | number)[] = [];
 
@@ -42,7 +42,7 @@ export class ScoreFunctionViewerService {
 			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 		}
 
-		this.valueChartService.getUsers().forEach((user: User) => {
+		users.forEach((user: User) => {
 			var userDomainElements: UserDomainElements = { user: user, elements: [] };
 
 			domainElements.forEach((domainElement: string | number) => {

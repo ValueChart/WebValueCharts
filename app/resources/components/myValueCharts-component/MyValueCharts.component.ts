@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 15:08:37
+* @Last Modified time: 2016-08-19 21:32:02
 */
 
 import { Component }									from '@angular/core';
@@ -63,7 +63,7 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
-				this.router.navigate(['/createValueChart/','editChart']);
+				this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 			});
 	}
 
@@ -110,6 +110,14 @@ export class MyValueChartsComponent implements OnInit {
 		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
 
 		return URL.createObjectURL(weightsBlob);
+	}
+
+	getStatusText(valueChartSummary: any): string {
+		if (valueChartSummary.incomplete === undefined) {
+			return 'Complete';
+		} else {
+			return 'Incomplete';
+		}
 	}
 
 }

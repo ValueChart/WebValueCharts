@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:57:00
+* @Last Modified time: 2016-08-19 21:26:58
 */
 
 // Import Libraries and Express Middleware:
@@ -117,7 +117,7 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 			} else if (docs) {
 				var vcSummaries: any[] = [];
 				docs.forEach((doc: any) => {
-					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password });
+					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
 				});
 
 				res.status(200)

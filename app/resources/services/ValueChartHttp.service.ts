@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 16:59:58
+* @Last Modified time: 2016-08-19 21:09:15
 */
 
 import '../../rxjs-operators';
@@ -135,11 +135,7 @@ export class ValueChartHttpService {
 
 	extractValueChartData = (res: Response): ValueChart => {
 		let body = res.json();
-		if (body.data.incomplete) {
-			return body.data;
-		} else {
-			return this.valueChartParser.parseValueChart(body.data);
-		}
+		return this.valueChartParser.parseValueChart(body.data);
 	}
 
 	extractUserData = (res: Response): User => {

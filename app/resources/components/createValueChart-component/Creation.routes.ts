@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:02:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-18 14:34:15
+* @Last Modified time: 2016-08-19 22:17:20
 */
 
 // Import Angular Classes:
@@ -17,12 +17,15 @@ import { CreateScoreFunctionsComponent }		from '../createScoreFunctions-componen
 import { CreateWeightsComponent }				from '../createWeights-component/CreateWeights.component';
 
 import { AuthGuardService }						from '../../services/AuthGuard.service';
+import { CreationGuardService }					from '../../services/CreationGuard.service';
+
 
 const creationRoutes: Routes = [
 	{
 		path: 'createValueChart/:purpose',
 		component: CreateValueChartComponent,
 		canActivate: [AuthGuardService],
+		canDeactivate: [CreationGuardService],
 		children: [
 			{ path: 'BasicInfo', component: CreateBasicInfoComponent },
 			{ path: 'Objectives', component: CreateObjectivesComponent },

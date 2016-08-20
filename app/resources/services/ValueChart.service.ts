@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 13:40:36
+* @Last Modified time: 2016-08-19 21:24:50
 */
 
 import { Injectable } 										from '@angular/core';
@@ -109,7 +109,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	updateMaximumWeightMap(): WeightMap {
-		console.log(this.valueChart.getMaximumWeightMap());
 		return this.maximumWeightMap = this.valueChart.getMaximumWeightMap();
 	}
 
