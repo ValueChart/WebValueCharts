@@ -15,8 +15,8 @@ import { CurrentUserService }											from '../../services/CurrentUser.service
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../services/ValueChart.service';
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
-import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
 import { ValueChartHttpService }										from '../../services/ValueChartHttp.service';
+import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../model/ValueChart';
@@ -26,7 +26,7 @@ import { User }															from '../../model/User';
 	selector: 'createValueChart',
 	templateUrl: 'app/resources/components/createValueChart-component/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES, CreateBasicInfoComponent, CreateObjectivesComponent, CreateAlternativesComponent, CreateScoreFunctionsComponent, CreateWeightsComponent],
-	providers: [CreationStepsService]
+	providers: [CreationStepsService,UpdateObjectiveReferencesService]
 })
 export class CreateValueChartComponent implements OnInit {
 	valueChart: ValueChart;
@@ -34,8 +34,6 @@ export class CreateValueChartComponent implements OnInit {
 	purpose: string; // "newChart" or "newUser" or "editChart"
 	step: string;
 	sub: any;
-	private services: any = {};
-
 
 	// Navigation Control:
 	private window = window;
@@ -49,12 +47,10 @@ export class CreateValueChartComponent implements OnInit {
 		private valueChartHttpService: ValueChartHttpService,
 		private creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
-		private chartUndoRedoService: ChartUndoRedoService) { }
+		private chartUndoRedoService: ChartUndoRedoService,
+		private updateObjectiveReferencesService: UpdateObjectiveReferencesService) { }
 
 	ngOnInit() {
-		this.services.valueChartService = this.valueChartService;
-		this.services.chartUndoRedoService = this.chartUndoRedoService;
-		this.services.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
 
 		// Bind purpose to corresponding URL parameter
 		this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);

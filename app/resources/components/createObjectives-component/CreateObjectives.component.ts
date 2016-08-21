@@ -3,7 +3,7 @@ import { NgClass } 														from '@angular/common';
 
 // Import Application Classes:
 import { ValueChartService }												from '../../services/ValueChart.service';
-
+import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 
 // Model Classes
 import { ValueChart } 													from '../../model/ValueChart';
@@ -32,7 +32,9 @@ export class CreateObjectivesComponent implements OnInit {
     categoriesToAdd: string[];
     editing: boolean;
 
-	constructor(private valueChartService: ValueChartService) { }
+	constructor(
+		private valueChartService: ValueChartService,
+		private updateObjRefService: UpdateObjectiveReferencesService) { }
 
 	ngOnInit() {
 		this.initialPrimObjRows = {};
@@ -87,77 +89,10 @@ export class CreateObjectivesComponent implements OnInit {
 		if (removed.length > 0 || added.length > 0) {
 			this.valueChartService.resetAllWeightMaps();
 		}
-		this.addScoreFunctions(added);
-		this.removeReferences(removed);
-		this.updateObjectiveNames(kept);
+		this.updateObjRefService.addScoreFunctions(added.map(x => this.objectiveRows[x].name));
+		this.updateObjRefService.removeReferences(removed.map(x => this.initialPrimObjRows[x].name));
+		this.updateObjRefService.updateObjectiveNames(kept.map(x => this.initialPrimObjRows[x].name), kept.map(x => this.objectiveRows[x].name));
 		this.updateDomains(kept);
-	}
-
-	// Initialize ScoreFunctions for new PrimitiveObjectives
-	addScoreFunctions(objIDs: string[]) {
-		for (let objID of objIDs) {
-			let objname = this.objectiveRows[objID].name;
-			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
-			let scoreFunction = this.valueChartService.getInitialScoreFunction(obj);
-			for (let user of this.valueChartService.getUsers()) {
-				let scoreFunctionMap = user.getScoreFunctionMap();
-				if (scoreFunctionMap) {
-					scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
-				}
-			}
-		}
-	}
-
-	removeReferences(objIDs: string[]) {
-		for (let objID of objIDs) {
-			let objname = this.initialPrimObjRows[objID].name;
-			for (let alt of this.valueChartService.getAlternatives()) {
-				alt.removeObjective(name);
-			}
-			for (let user of this.valueChartService.getUsers()) {
-				let scoreFunctionMap = user.getScoreFunctionMap();
-				if (scoreFunctionMap) {
-					scoreFunctionMap.removeObjectiveScoreFunction(name);			
-				}
-
-			}
-		}
-	}
-
-	updateObjectiveNames(objIDs: string[]) {
-		for (let objID of objIDs) {
-			let oldName: string = this.initialPrimObjRows[objID].name;
-			let newName: string = this.objectiveRows[objID].name;
-
-			// Update references if name has changed
-			if (oldName !== newName) {
-				for (let alt of this.valueChartService.getAlternatives()) {
-					let objVal = alt.getObjectiveValue(oldName);
-					if (objVal) {
-						alt.removeObjective(oldName);
-						alt.setObjectiveValue(newName, objVal);
-					}
-				}
-				for (let user of this.valueChartService.getUsers()) {
-					let scoreFunctionMap = user.getScoreFunctionMap();
-					if (scoreFunctionMap) {
-						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(oldName);
-						if (scoreFunction) {
-							scoreFunctionMap.removeObjectiveScoreFunction(oldName);
-							scoreFunctionMap.setObjectiveScoreFunction(newName, scoreFunction);
-						}
-					}
-					let weightMap = user.getWeightMap();
-					if (weightMap) {
-						let weight = weightMap.getObjectiveWeight(oldName);
-						if (weight) {
-							weightMap.removeObjectiveWeight(oldName);
-							weightMap.setObjectiveWeight(newName, weight);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	updateDomains(objIDs: string[]) {

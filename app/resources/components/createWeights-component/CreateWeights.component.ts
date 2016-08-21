@@ -20,13 +20,11 @@ export class CreateWeightsComponent implements OnInit {
 	user: User;
 	rankedObjectives: string[];
     isRanked: { [objName: string]: boolean; };
-	private services: any = {};
 
 	constructor(
 		private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
-		this.services.valueChartService = this.valueChartService;
 		this.rankedObjectives = [];
 		this.isRanked = {};
 		this.user = this.valueChartService.getCurrentUser();
