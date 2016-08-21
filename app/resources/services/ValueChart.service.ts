@@ -21,6 +21,10 @@ import { Alternative }										from '../model/Alternative';
 import { WeightMap }										from '../model/WeightMap';
 import { ScoreFunctionMap }									from '../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../model/ScoreFunction';
+import { DiscreteScoreFunction }							from '../model/DiscreteScoreFunction';
+import { ContinuousScoreFunction }							from '../model/ContinuousScoreFunction';
+import { CategoricalDomain }								from '../model/CategoricalDomain';
+import { ContinuousDomain }									from '../model/ContinuousDomain';
 
 // Type Definitions:
 import { ValueChartStateContainer }							from '../types/StateContainer.types';
@@ -37,12 +41,17 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	private maximumWeightMap: WeightMap;
 
+	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
+	// has been reset since they last did SMARTER
+
 	constructor(
 		private currentUserService: CurrentUserService,
 		private chartUndoRedoService: ChartUndoRedoService) {
 
 		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
 		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
+
+		this.weightMapReset = {};
 	}
 
 	// Initialize Service fields based on the passed-in ValueChart.
@@ -53,6 +62,11 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	getValueChart(): ValueChart {
 		return this.valueChart;
+	}
+
+	addUser(user: User) {
+		this.valueChart.addUser(user);
+		this.weightMapReset[user.getUsername()] = false;
 	}
 
 	getUsers(): User[] {
@@ -99,6 +113,15 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	resetPrimitiveObjectives() {
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
+	}
+
+	getObjectiveByName(name: string): Objective {
+		for (let obj of this.getValueChart().getAllObjectives()) {
+			if (obj.getName() === name) {
+				return obj;
+			}
+		}
+		throw "Objective not found";
 	}
 
 	// This is either: a - the current user's WeightMap if the ValueChart has one user; b - a WeightMap where each objective weight is the maximum weight assigned to the objective by a user.
@@ -152,5 +175,80 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
 		this.getCurrentUser().setWeightMap(weightMapRecord);
+	}
+
+	setWeightMap(user: User, weightMap: WeightMap) {
+		user.setWeightMap(weightMap);
+		this.weightMapReset[user.getUsername()] = false;
+	}
+
+	isWeightMapReset(user: User) {
+		return this.weightMapReset[user.getUsername()];
+	}
+
+	// Set all Users' WeightMaps to default
+	resetAllWeightMaps() {
+		let weightMap: WeightMap = this.getInitialWeightMap();
+		for (let user of this.getUsers()) {
+			user.setWeightMap(weightMap);
+			this.weightMapReset[user.getUsername()] = true;
+		}
+	}
+
+	// Create initial weight map for the Objective hierarchy with evenly distributed weights
+	private getInitialWeightMap(): WeightMap {
+		let weightMap: WeightMap = new WeightMap();
+		this.initializeWeightMap(this.getRootObjectives(), weightMap, 1);
+		return weightMap;
+	}
+
+	// Recursively add entries to weight map
+	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
+		let weight = parentWeight * 1.0 / objectives.length;
+		for (let obj of objectives) {
+			weightMap.setObjectiveWeight(obj.getName(), weight);
+			if (obj.objectiveType === 'abstract') {
+				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
+			}
+		}
+	}
+
+	// Set up initial ScoreFunctions
+	// Scores for categorical variables are evenly space between 0 and 1
+	getInitialScoreFunctionMap(): ScoreFunctionMap {
+		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
+		for (let obj of this.getPrimitiveObjectives()) {
+			let scoreFunction = this.getInitialScoreFunction(obj);
+			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
+		}
+		return scoreFunctionMap;
+	}
+
+	getInitialScoreFunction(obj: PrimitiveObjective): ScoreFunction {
+		let scoreFunction: ScoreFunction;
+		if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+			scoreFunction = new DiscreteScoreFunction();
+			let dom = (<CategoricalDomain>obj.getDomain()).getElements();
+			let increment = 1.0 / (dom.length - 1);
+			let currentScore = 0;
+			for (let item of dom) {
+				scoreFunction.setElementScore(item, currentScore);
+				currentScore += increment;
+			}
+		}
+		else {
+			let min: number = (<ContinuousDomain>obj.getDomain()).getMinValue();
+			let max: number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
+			scoreFunction = new ContinuousScoreFunction(min, max);
+			// Add three evenly-space points between min and max
+			let increment = (max - min) / 4.0;
+			let slope = 1.0 / (max - min);
+			scoreFunction.setElementScore(min, 0);
+			scoreFunction.setElementScore(min + increment, slope * increment);
+			scoreFunction.setElementScore(min + 2 * increment, slope * 2 * increment);
+			scoreFunction.setElementScore(min + 3 * increment, slope * 3 * increment);
+			scoreFunction.setElementScore(max, 1);
+		}
+		return scoreFunction;
 	}
 }

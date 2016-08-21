@@ -16,7 +16,7 @@
         <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objrowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
             <th>
                 <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control" type="text" style="width: 200px" [disabled]="objID === rootObjRowID" #name [ngModel]="objectiveRows[objID].name" (ngModelChange)="setObjectiveName(objID,name.value)"/>
+                <input class="form-control" type="text" style="width: 200px" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name"/>
                 </div>
             </th>
             <th>

@@ -66,7 +66,7 @@ export class HostService {
 
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				valueChart.addUser(newUser);
+				this.valueChartService.addUser(newUser);
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
 

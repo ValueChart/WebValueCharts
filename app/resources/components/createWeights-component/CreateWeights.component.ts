@@ -29,13 +29,13 @@ export class CreateWeightsComponent implements OnInit {
 		this.services.valueChartService = this.valueChartService;
 		this.rankedObjectives = [];
 		this.isRanked = {};
-
 		this.user = this.valueChartService.getCurrentUser();
-		if (!this.user.getWeightMap()) {
-			this.user.setWeightMap(this.getInitialWeightMap());
+
+		// If weight map is uninitialized or has been reset, set all Objectives to unranked
+		if (!this.user.getWeightMap() || this.valueChartService.isWeightMapReset(this.user)) {
 			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
-			}
+			}		
 		}
 		else {
 			let objectives: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
@@ -50,7 +50,7 @@ export class CreateWeightsComponent implements OnInit {
 	}
 
 	ngOnDestroy() {
-		this.user.setWeightMap(this.getWeightMapFromRanks());
+		this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
 	}
 
 	compareObjectivesByWeight(pair1: [string, number], pair2: [string, number]) {
@@ -129,23 +129,5 @@ export class CreateWeightsComponent implements OnInit {
 	getWorstOutcome(objName: string): string | number {
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
 		return scoreFunction.worstElement;
-	}
-
-	// Create initial weight map for the Objective hierarchy with evenly distributed weights
-	getInitialWeightMap(): WeightMap {
-		let weightMap: WeightMap = new WeightMap();
-		this.initializeWeightMap(this.valueChartService.getValueChart().getRootObjectives(), weightMap, 1);
-		return weightMap;
-	}
-
-	// Recursively add entries to weight map
-	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
-		let weight = parentWeight * 1.0 / objectives.length;
-		for (let obj of objectives) {
-			weightMap.setObjectiveWeight(obj.getName(), weight);
-			if (obj.objectiveType === 'abstract') {
-				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
-			}
-		}
 	}
 }

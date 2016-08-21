@@ -10,7 +10,7 @@
 </div>
 <div>
     <ScoreFunction 
-        [objective]="getObjective(selectedObjective)"
+        [objective]="valueChartService.getObjectiveByName(selectedObjective)"
         [width]="300"
         [height]="300"
         [orientation]="'vertical'"

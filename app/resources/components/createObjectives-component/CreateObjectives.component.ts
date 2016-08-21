@@ -23,42 +23,43 @@ import { Alternative }													from '../../model/Alternative';
 })
 export class CreateObjectivesComponent implements OnInit {
 
-	// Map objective row IDs to original PrimitiveObjective name and current name in input field
-	// This allows us to update references in other parts of the ValueChart when component is destroyed
-	namesMap: { [objID: string]: [string,string] }; 
-
+	initialPrimObjRows: { [objID: string]: ObjectiveRow };
 	objectiveRows: { [objID: string]: ObjectiveRow; };
 	rootObjRowID: string;
     selectedObjRow: string;
     objectivesCount: number;
     categoryToAdd: string;
     categoriesToAdd: string[];
+    editing: boolean;
 
 	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
-		this.namesMap = {};
+		this.initialPrimObjRows = {};
 		this.objectiveRows = {};
 		this.rootObjRowID = "0";
 		this.selectedObjRow = "0";
 		this.objectivesCount = 0;
 		this.categoryToAdd = "";
 		this.categoriesToAdd = [];
+		this.editing = false;
 
 		if (this.valueChartService.getValueChart().getAllObjectives().length === 0) {
 			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChartService.getValueChart().getName(), "", "", 0);
 			this.objectivesCount++;
 		}
 		else {
-			let rootObjective : Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
+			this.editing = true;
+			let rootObjective: Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
 			rootObjective.setName(this.valueChartService.getValueChart().getName());
 			this.objectiveToObjRow(rootObjective, "", 0);
 
-			// Initialize names map
-			for (let objID of Object.keys(this.objectiveRows)) {
+			// Store record of each ObjectiveRow of type 'primitive'
+			// This allows us to update references in other parts of the ValueChart when component is destroyed
+			for (let objID of this.objKeys()) {
 				let objrow: ObjectiveRow = this.objectiveRows[objID];
 				if (objrow.type === 'primitive') {
-					this.namesMap[objID] = [objrow.name,objrow.name];
+					this.initialPrimObjRows[objID] = objrow.copy();
 				}
 			}
 		}
@@ -66,54 +67,109 @@ export class CreateObjectivesComponent implements OnInit {
 
 	ngOnDestroy() {
 		this.valueChartService.getValueChart().setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-		this.updateObjectiveNames();
+		this.valueChartService.resetPrimitiveObjectives();
+		if (this.editing) {
+			this.updateReferences();
+		}
 	}
 
-	updateObjectiveNames() {
-		for (let objID of Object.keys(this.namesMap)) {
-			let oldName: string = this.namesMap[objID][0];
-			let newName: string = this.namesMap[objID][1];
-			
+	// Update PrimitiveObjective references throughout ValueChart
+	updateReferences() {
+		let initialPrimObjKeys = this.initialObjKeys();
+		let finalPrimObjKeys = this.objKeys().filter(x => this.objectiveRows[x].type === 'primitive');
+		let added = finalPrimObjKeys.filter(x => initialPrimObjKeys.indexOf(x) === -1);
+		let removed = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) === -1);
+		let kept = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) > -1);
+
+		// If any Objectives were added or removed, we must reset all the WeightMaps
+		// For now, reset to evenly-distributed weights instead of deleting WeightMap altogether so that Group ValueCharts doesn't break
+		// TODO: alert all Users that their WeightMap has been reset and they must do SMARTER again
+		if (removed.length > 0 || added.length > 0) {
+			this.valueChartService.resetAllWeightMaps();
+		}
+		this.addScoreFunctions(added);
+		this.removeReferences(removed);
+		this.updateObjectiveNames(kept);
+		this.updateDomains(kept);
+	}
+
+	// Initialize ScoreFunctions for new PrimitiveObjectives
+	addScoreFunctions(objIDs: string[]) {
+		for (let objID of objIDs) {
+			let objname = this.objectiveRows[objID].name;
+			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
+			let scoreFunction = this.valueChartService.getInitialScoreFunction(obj);
+			for (let user of this.valueChartService.getUsers()) {
+				let scoreFunctionMap = user.getScoreFunctionMap();
+				if (scoreFunctionMap) {
+					scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
+				}
+			}
+		}
+	}
+
+	removeReferences(objIDs: string[]) {
+		for (let objID of objIDs) {
+			let objname = this.initialPrimObjRows[objID].name;
+			for (let alt of this.valueChartService.getAlternatives()) {
+				alt.removeObjective(name);
+			}
+			for (let user of this.valueChartService.getUsers()) {
+				let scoreFunctionMap = user.getScoreFunctionMap();
+				if (scoreFunctionMap) {
+					scoreFunctionMap.removeObjectiveScoreFunction(name);			
+				}
+
+			}
+		}
+	}
+
+	updateObjectiveNames(objIDs: string[]) {
+		for (let objID of objIDs) {
+			let oldName: string = this.initialPrimObjRows[objID].name;
+			let newName: string = this.objectiveRows[objID].name;
+
 			// Update references if name has changed
 			if (oldName !== newName) {
-				
 				for (let alt of this.valueChartService.getAlternatives()) {
 					let objVal = alt.getObjectiveValue(oldName);
 					if (objVal) {
 						alt.removeObjective(oldName);
-						alt.setObjectiveValue(newName,objVal);
+						alt.setObjectiveValue(newName, objVal);
 					}
 				}
-
 				for (let user of this.valueChartService.getUsers()) {
 					let scoreFunctionMap = user.getScoreFunctionMap();
 					if (scoreFunctionMap) {
 						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(oldName);
 						if (scoreFunction) {
 							scoreFunctionMap.removeObjectiveScoreFunction(oldName);
-							scoreFunctionMap.setObjectiveScoreFunction(newName,scoreFunction);
+							scoreFunctionMap.setObjectiveScoreFunction(newName, scoreFunction);
 						}
-					}				
+					}
 					let weightMap = user.getWeightMap();
 					if (weightMap) {
 						let weight = weightMap.getObjectiveWeight(oldName);
 						if (weight) {
 							weightMap.removeObjectiveWeight(oldName);
-							weightMap.setObjectiveWeight(newName,weight);
+							weightMap.setObjectiveWeight(newName, weight);
 						}
-					}		
+					}
 				}
 			}
 		}
 	}
 
-	setObjectiveName(objID: string, name: string) {	
-		this.objectiveRows[objID].name = name;
+	updateDomains(objIDs: string[]) {
 
-		// Update name in name map if entry exists
-		if (this.namesMap[objID]) {
-			this.namesMap[objID] = [this.namesMap[objID][0],name];
-		}
+	}
+
+	objKeys(): Array<string> {
+		return Object.keys(this.objectiveRows);
+	}
+
+	initialObjKeys(): Array<string> {
+		return Object.keys(this.initialPrimObjRows);
 	}
 
 	addNewChildObjRow(parentID: string) {
@@ -311,6 +367,11 @@ class ObjectiveRow {
 		let i = this.children.indexOf(child);
         this.children.splice(i, 1);
 	}
+
+	copy(): ObjectiveRow {
+		let domCopy = this.dom.copy();
+		return new ObjectiveRow(this.id, this.name, this.desc, this.parent, this.depth, this.type, this.color, domCopy);
+	}
 }
 
 // Store details for all possible domain types
@@ -331,5 +392,15 @@ class DomainDetails {
 	removeCategory(cat: string) {
 		let i = this.categories.indexOf(cat);
         this.categories.splice(i, 1);
+	}
+
+	copy(): DomainDetails {
+		let domCopy = new DomainDetails(this.type);
+		domCopy.categories = this.categories.slice();
+		domCopy.min = this.min;
+		domCopy.max = this.max;
+		domCopy.interval = this.interval;
+		domCopy.unit = this.unit;
+		return domCopy;
 	}
 }
