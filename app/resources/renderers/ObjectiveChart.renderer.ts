@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 23:35:44
+* @Last Modified time: 2016-08-21 15:41:02
 */
 
 // Import Angular Classes"
@@ -335,7 +335,7 @@ export class ObjectiveChartRenderer {
 			})
 			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
 			.attr(this.viewConfig.dimensionTwo, (d: RowData) => {
-				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getId());
+				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
 				return this.viewConfig.dimensionTwoScale(maxObjectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
@@ -353,7 +353,7 @@ export class ObjectiveChartRenderer {
 			.attr(this.viewConfig.coordinateTwo, () => {
 				return (viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoSize + alternativeLabelCoordTwoOffset : alternativeLabelCoordTwoOffset;
 			})
-			.attr('alternative', (d: Alternative) => { return d.getName(); })
+			.attr('alternative', (d: Alternative) => { return d.getId(); })
 			.style('font-size', '20px');
 
 		alternativeBoxes
@@ -361,8 +361,8 @@ export class ObjectiveChartRenderer {
 			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize)
 			.attr(this.viewConfig.coordinateOne, this.calculateCellCoordinateOne)
 			.attr(this.viewConfig.coordinateTwo, 0)
-			.attr('alternative', (d: Alternative) => { return d.getName(); })
-			.attr('id', (d: Alternative) => { return 'objective-' + d.getName() + '-box' });
+			.attr('alternative', (d: Alternative) => { return d.getId(); })
+			.attr('id', (d: Alternative) => { return 'objective-' + d.getId() + '-box' });
 
 
 		this.renderObjectiveChartCells(cells, userScores, weightColumns, viewOrientation);
@@ -383,7 +383,7 @@ export class ObjectiveChartRenderer {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i);
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, coordinateOne, 0);
 			})
-			.attr('alternative', (d: CellData) => { return d.alternative.getName(); });
+			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 
 		var domainLabelCoord: number = 5;
 
@@ -392,7 +392,7 @@ export class ObjectiveChartRenderer {
 			.text((d: CellData, i: number) => { return d.value })
 			.attr(this.viewConfig.coordinateOne, (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / 3)
 			.attr(this.viewConfig.coordinateTwo, (d: CellData, i: number) => {
-				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getId());
+				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());
 				return (viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
 
@@ -425,9 +425,9 @@ export class ObjectiveChartRenderer {
 		if (viewOrientation === 'vertical') {
 			userScores
 				.attr(this.viewConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getId());
-					let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
-					let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
+					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+					let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - this.viewConfig.dimensionTwoScale(score * userObjectiveWeight);
 				});
 		} else {
@@ -446,7 +446,7 @@ export class ObjectiveChartRenderer {
 	renderWeightColumns(weightColumns: d3.Selection<any>, viewOrientation: string): void {
 		var calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
 			let weightDimensionTwoOffset: number = 2;
-			let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
+			let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 			return Math.max(this.viewConfig.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);
 		}
 
@@ -467,7 +467,7 @@ export class ObjectiveChartRenderer {
 		if (viewOrientation === 'vertical') {
 			weightColumns
 				.attr(this.viewConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getId());
+					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
 					return this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - calculateWeightColumnDimensionTwo(d, i);
 				});
 		} else {
@@ -511,8 +511,8 @@ export class ObjectiveChartRenderer {
 	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / this.valueChartService.getNumUsers(); };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
-		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getId());
-		let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId()).getScore(d.value);
+		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+		let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		return this.viewConfig.dimensionTwoScale(score * userObjectiveWeight);
 	};
 }

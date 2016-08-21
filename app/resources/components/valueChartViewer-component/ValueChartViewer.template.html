@@ -322,11 +322,11 @@
 					</div>
 					<div class="row">
 						<label for="chart-passsword-input" class="col-sm-3 col-sm-offset-1 control-label">Invitation Link:</label>
-						<h5 class="col-sm-offset-4">{{ window.location.origin + '/join/ValueCharts/' + valueChart.getName() + '?password=' + valueChart.password }}</h5> 
+						<h5 class="col-sm-offset-4">{{ window.location.origin + '/join/ValueCharts/' + valueChart.getId() + '?password=' + valueChart.password }}</h5> 
 					</div>
 					<div class="row">
 						<div class="col-sm-offset-5 col-sm-7">
-							<button type="submit" class="btn btn-success" (click)="hostValueChart(valueChart.getName(), valueChart.password)">Host ValueChart</button>
+							<button type="submit" class="btn btn-success" (click)="hostValueChart()">Host ValueChart</button>
 						</div>
 					</div>
 				</div>

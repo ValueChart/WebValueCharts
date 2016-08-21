@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:32:38
+* @Last Modified time: 2016-08-21 15:17:23
 */
 
 // Import Angular Classes:
@@ -386,7 +386,7 @@ export class LabelRenderer {
 			.text((d: LabelData) => {
 				var bestWorstText = '';
 				if (d.objective.objectiveType === 'primitive') {
-					var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId());
+					var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
 				return bestWorstText;
@@ -484,7 +484,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(datum.getId());
+			objectiveWeight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(datum.getName());
 			dimensionOneTransform = (this.viewConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.viewConfig.dimensionTwoScale(weightOffset);				// ^^
 

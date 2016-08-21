@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 23:29:21
+* @Last Modified time: 2016-08-21 15:22:24
 */
 
 // Import Angular Classes:
@@ -256,7 +256,7 @@ export abstract class ScoreFunctionRenderer {
 			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
 
 
-		this.renderScoreFunctionAxis(this.axisContainer, objectiveId, viewOrientation);
+		this.renderScoreFunctionAxis(this.axisContainer, viewOrientation);
 
 		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);
 	}
@@ -269,7 +269,7 @@ export abstract class ScoreFunctionRenderer {
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
 						the axes elements should be done as part of a call to renderScoreFunction instead.
 	*/
-	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, objectiveId: string, viewOrientation: string): void {
+	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, viewOrientation: string): void {
 
 		// Position the domain axis.
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.DOMAIN_AXIS)

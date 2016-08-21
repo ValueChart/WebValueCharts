@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 13:12:36
+* @Last Modified time: 2016-08-21 15:25:20
 */
 
 import { Injectable } 										from '@angular/core';
@@ -84,7 +84,7 @@ export class RendererDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
 		} else if (objective.objectiveType === 'primitive') {
-			labelData = { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0 };
+			labelData = { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
 		}
 
 		return labelData;
@@ -114,7 +114,7 @@ export class RendererDataService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getId());
+			labelDatum.weight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 		}
 	}
 
@@ -174,7 +174,7 @@ export class RendererDataService {
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.valueChartService.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getId());
+			weightOffset += this.valueChartService.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
 		}
 	}
 
@@ -206,8 +206,8 @@ export class RendererDataService {
 						previousWeightedScore = 0;
 					} else {
 						let previousUserScore = rowDataCopy[i - 1].cells[j].userScores[k];
-						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getId());
-						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getId());
+						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getName());
 						previousOffset = previousUserScore.offset;
 					}
 
@@ -221,11 +221,11 @@ export class RendererDataService {
 		var desiredIndices: any = {};
 
 		this.rowData.sort((a: RowData, b: RowData) => {
-			let aIndex = desiredIndices[a.objective.getId()] || primitiveObjectives.indexOf(a.objective);
-			let bIndex = desiredIndices[b.objective.getId()] || primitiveObjectives.indexOf(b.objective);
+			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
+			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
 
-			desiredIndices[a.objective.getId()] = aIndex;
-			desiredIndices[b.objective.getId()] = bIndex;
+			desiredIndices[a.objective.getName()] = aIndex;
+			desiredIndices[b.objective.getName()] = bIndex;
 
 			if (aIndex < bIndex)
 				return -1;
@@ -266,8 +266,8 @@ export class RendererDataService {
 
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getId());
-				var weight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getId());
+				var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
+				var weight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getName());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});
@@ -349,7 +349,7 @@ export class RendererDataService {
 
 			if (labelDatum.subLabelData === undefined) {
 				var newWeight = Math.max(Math.min(labelDatum.weight + weightIncrement, labelDatumMax), 0);
-				weightMap.setObjectiveWeight(labelDatum.objective.getId(), newWeight);
+				weightMap.setObjectiveWeight(labelDatum.objective.getName(), newWeight);
 			} else {
 				this.incrementObjectivesWeights(labelDatum.subLabelData, weightMap, weightIncrement, labelDatumMax);
 			}

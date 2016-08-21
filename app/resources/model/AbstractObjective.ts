@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:21:06
+* @Last Modified time: 2016-08-21 15:40:11
 */
 
 import { Objective } 			from './Objective';
@@ -10,7 +10,7 @@ import { PrimitiveObjective }	from './PrimitiveObjective';
 import { Domain } 				from './Domain';
 
 import { Memento }				from './Memento';
-import *	as Formatter																	from '../utilities/Formatter';
+import *	as Formatter		from '../utilities/Formatter';
 
 
 export class AbstractObjective implements Objective {

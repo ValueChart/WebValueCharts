@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-27 12:19:08
+* @Last Modified time: 2016-08-21 15:15:04
 */
 
 import *	as Formatter																	from '../utilities/Formatter';
@@ -21,7 +21,7 @@ export class Alternative {
 		this.id = Formatter.nameToID(this.name);
 	}
 
-	getID(): string {
+	getId(): string {
 		return this.id;
 	}
 

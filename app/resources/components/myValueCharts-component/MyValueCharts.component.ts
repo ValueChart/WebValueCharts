@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 16:12:12
+* @Last Modified time: 2016-08-21 15:35:59
 */
 
 import { Component }									from '@angular/core';
@@ -92,7 +92,7 @@ export class MyValueChartsComponent implements OnInit {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
-			return valueChart.getName() + 'UserWeights.csv';
+			return valueChart.getId() + 'UserWeights.csv';
 		} else {
 			return '';
 		}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 23:23:00
+* @Last Modified time: 2016-08-21 15:26:30
 */
 
 import { Injectable } 															from '@angular/core';
@@ -39,7 +39,7 @@ export class ScoreFunctionViewerService {
 		} else if (objective.getDomainType() === 'interval') {
 			domainElements = (<IntervalDomain>objective.getDomain()).getElements();
 		} else {
-			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
+			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
 		}
 
 		users.forEach((user: User) => {
@@ -55,11 +55,11 @@ export class ScoreFunctionViewerService {
 		return allUsersDomainElements;
 	}
 
-	getElementUserScoresSummary(objectiveId: string, element: (number | string)): ElementUserScoresSummary {
+	getElementUserScoresSummary(objectiveName: string, element: (number | string)): ElementUserScoresSummary {
 		var userScores: number[] = [];
 
 		this.valueChartService.getUsers().forEach((user: User) => {
-			let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objectiveId);
+			let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objectiveName);
 			userScores.push(scoreFunction.getScore(element));
 		});
 
@@ -86,9 +86,9 @@ export class ScoreFunctionViewerService {
 	getAllElementUserScoresSummaries(objective: PrimitiveObjective): ElementUserScoresSummary[] {
 		var elementUserScoresSummaries: ElementUserScoresSummary[] = [];
 
-		var scoreFunction: ScoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+		var scoreFunction: ScoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 		scoreFunction.getAllElements().forEach((element: (number | string)) => {
-			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getId(), element));
+			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getName(), element));
 		});
 
 		return elementUserScoresSummaries;

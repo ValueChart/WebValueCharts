@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-02 16:19:12
+* @Last Modified time: 2016-08-21 15:28:00
 */
 
 // Model Classes
@@ -126,12 +126,12 @@ export class WebValueChartsParser {
 			for (var j = 0; j < alternativeValueElements.length; j++) {
 				let alternativeValueElement: Element = alternativeValueElements[j];
 
-				let objectiveId: string = alternativeValueElement.getAttribute('objective');
+				let objectiveName: string = alternativeValueElement.getAttribute('objective');
 				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
 
 				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
-					return objective.getId() === objectiveId;
+					return objective.getName() === objectiveName;
 				});
 
 				if (correspondingObjective.getDomainType() === 'categorical') {
@@ -139,7 +139,7 @@ export class WebValueChartsParser {
 				} else if (correspondingObjective.getDomainType() === 'continuous') {
 					domainValue = +domainValue;											// Convert the domain value to a number
 				}
-				alternative.setObjectiveValue(objectiveId, domainValue);
+				alternative.setObjectiveValue(objectiveName, domainValue);
 			}
 
 			alternatives.push(alternative);

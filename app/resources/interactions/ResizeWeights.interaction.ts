@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:32:43
+* @Last Modified time: 2016-08-21 15:16:09
 */
 
 import { Injectable } 												from '@angular/core';
@@ -57,7 +57,7 @@ export class ResizeWeightsInteraction {
 				// Calculate the correct weight increment.
 				var totalWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getWeightTotal();
 				var labelDatum: LabelData = d3.select(eventObject.target).datum();
-				var previousWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
+				var previousWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -65,7 +65,7 @@ export class ResizeWeightsInteraction {
 					pumpAmount = 0 - previousWeight;
 				}
 
-				this.valueChartService.getCurrentUser().getWeightMap().setObjectiveWeight(labelDatum.objective.getId(), previousWeight + pumpAmount);
+				this.valueChartService.getCurrentUser().getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
 		}
 	}
@@ -132,13 +132,13 @@ export class ResizeWeightsInteraction {
 				if (d.objective.objectiveType === 'abstract') {
 					this.rendererDataService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
 				} else {
-					weightMap.setObjectiveWeight(d.objective.getId(), currentElementWeight);
+					weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
 				}
 
 				if (siblings[i - 1].objective.objectiveType === 'abstract') {
 					this.rendererDataService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
 				} else {
-					weightMap.setObjectiveWeight(siblings[i - 1].objective.getId(), siblingElementWeight);
+					weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
 				}
 			} else {
 				let combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
