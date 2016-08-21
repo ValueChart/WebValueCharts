@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 15:56:38
+* @Last Modified time: 2016-08-21 00:16:15
 */
 
 
@@ -37,7 +37,7 @@ valueChartRoutes.all('/:chart/*', function(req: express.Request, res: express.Re
 
 
 valueChartRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	
 	groupVcCollection.count({ name: req.body.name }, function(err: Error, count: number) {
 		if (count !== 0) {
@@ -62,7 +62,7 @@ valueChartRoutes.post('/', function(req: express.Request, res: express.Response,
 });
 
 valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 	
 	var password: string = req.query.password;
@@ -83,7 +83,7 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 });
 
 valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 
 	groupVcCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
@@ -103,7 +103,7 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 });
 
 valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 
 	(<any> groupVcCollection).findOneAndDelete({ _id: chartId }, function(err: Error, doc: any) {
@@ -117,7 +117,7 @@ valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.R
 });
 
 valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 
 	var password: string = req.query.password;
@@ -141,7 +141,7 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 });
 
 valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartName: string = (<any> req).chartId;
 
 	groupVcCollection.findOne({ name: chartName }, function (err: Error, foundDocument: any) {

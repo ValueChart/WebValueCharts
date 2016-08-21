@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 11:37:23
+* @Last Modified time: 2016-08-21 00:16:14
 */
 
 // Import Libraries and Express Middleware:
@@ -31,7 +31,7 @@ valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Respo
 });
 
 valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 
 	groupVcCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
@@ -61,7 +61,7 @@ valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Resp
 	});
 });
 valueChartUsersRoutes.get('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 	var username: string = req.params.username;
 
@@ -90,7 +90,7 @@ valueChartUsersRoutes.get('/:username', function(req: express.Request, res: expr
 	});
 });
 valueChartUsersRoutes.put('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 	var username: string = req.params.username;
 
@@ -139,7 +139,7 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 	});
 });
 valueChartUsersRoutes.delete('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 	var username: string = req.params.username;
 

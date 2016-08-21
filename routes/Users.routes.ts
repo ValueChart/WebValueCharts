@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 21:26:58
+* @Last Modified time: 2016-08-21 00:16:17
 */
 
 // Import Libraries and Express Middleware:
@@ -104,7 +104,7 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 
 
 usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var groupVcCollection: Monk.Collection = (<any> req).db.get('GroupValueCharts');
+	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var username = req.params.user;
 
 	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
