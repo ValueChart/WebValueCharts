@@ -87,16 +87,45 @@ export class CreateObjectivesComponent implements OnInit {
 		// For now, reset to evenly-distributed weights instead of deleting WeightMap altogether so that Group ValueCharts doesn't break
 		// TODO: alert all Users that their WeightMap has been reset and they must do SMARTER again
 		if (removed.length > 0 || added.length > 0) {
-			this.valueChartService.resetAllWeightMaps();
+			this.updateObjRefService.resetWeightMaps();
 		}
 		this.updateObjRefService.addScoreFunctions(added.map(x => this.objectiveRows[x].name));
 		this.updateObjRefService.removeReferences(removed.map(x => this.initialPrimObjRows[x].name));
 		this.updateObjRefService.updateObjectiveNames(kept.map(x => this.initialPrimObjRows[x].name), kept.map(x => this.objectiveRows[x].name));
-		this.updateDomains(kept);
+		this.handleDomainChanges(kept);
 	}
 
-	updateDomains(objIDs: string[]) {
+	handleDomainChanges(objIDs: string[]) {
+		for (let objID of objIDs) {
+			let oldDom = this.initialPrimObjRows[objID].dom;
+			let newDom = this.objectiveRows[objID].dom;
+			let objName = this.objectiveRows[objID].name;
+			
+			// Reset all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
+			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
+			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
+				let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objName);
+				this.updateObjRefService.resetScoreFunctions(obj);
+				this.updateObjRefService.resetWeightMaps(); // must be done because best/worst outcomes may have changed
+			}
 
+			// Check for changes to categorical domain options
+			// In this case, we can keep the previous ScoreFunction elements since there is no inherent scale
+			// However, if the best/worst outcomes were deleted for any users, we need to make adjustments accordingly
+			else if (newDom.type === 'categorical') {
+				let addedCats = newDom.categories.filter(x => oldDom.categories.indexOf(x) === -1);
+				let removedCats = oldDom.categories.filter(x => newDom.categories.indexOf(x) === -1);	
+				for (let cat of removedCats) {
+					this.updateObjRefService.removeElementFromScoreFunctions(objName, cat);
+				}
+				if (removedCats.length > 0) {
+					this.updateObjRefService.rescaleScoreFunctions(objName);
+				}
+				for (let cat of addedCats) {
+					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
+				}
+			}
+		}
 	}
 
 	objKeys(): Array<string> {

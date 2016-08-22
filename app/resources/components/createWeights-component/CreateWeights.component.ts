@@ -30,7 +30,7 @@ export class CreateWeightsComponent implements OnInit {
 		this.user = this.valueChartService.getCurrentUser();
 
 		// If weight map is uninitialized or has been reset, set all Objectives to unranked
-		if (!this.user.getWeightMap() || this.valueChartService.isWeightMapReset(this.user)) {
+		if (!this.user.getWeightMap() || this.valueChartService.wasWeightMapReset(this.user)) {
 			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}		

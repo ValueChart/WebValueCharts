@@ -94,6 +94,25 @@ export abstract class ScoreFunction implements Memento {
 			this.findBestElement();
 	}
 
+	// Rescale ScoreFunction so that the best outcome has score of 1 and worst outcome has score of 0
+	// Returns true if rescaling was needed, false otherwise
+	rescale(): boolean {
+		var bestOutcomeScore = this.getScore(this.bestElement);
+		var worstOutcomeScore = this.getScore(this.worstElement);
+		if (bestOutcomeScore !== 1 || worstOutcomeScore !== 0) {
+			var range = bestOutcomeScore - worstOutcomeScore;
+			if (range === 0) {
+				throw "Objective outcome scores are all the same. (This should not be allowed.)";
+			}
+			for (var element of this.getAllElements()) {
+				var newScore = (this.getScore(element) - worstOutcomeScore) / range;
+				this.setElementScore(element, newScore);
+			}
+			return true;
+		}
+		return false;
+	}
+
 	abstract setElementScore(domainElement: number | string, score: number): void;
 	abstract getScore(domainElement: number | string): number;
 	abstract getMemento(): ScoreFunction;

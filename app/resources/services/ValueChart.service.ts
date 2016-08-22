@@ -182,39 +182,36 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
-	isWeightMapReset(user: User) {
+	wasWeightMapReset(user: User) {
 		return this.weightMapReset[user.getUsername()];
 	}
 
-	// Set all Users' WeightMaps to default
-	resetAllWeightMaps() {
-		let weightMap: WeightMap = this.getInitialWeightMap();
-		for (let user of this.getUsers()) {
-			user.setWeightMap(weightMap);
-			this.weightMapReset[user.getUsername()] = true;
-		}
+	// Set User's WeightMaps to default
+	resetWeightMap(user: User, weightMap: WeightMap) {
+		user.setWeightMap(weightMap);
+		this.weightMapReset[user.getUsername()] = true;
 	}
 
 	// Create initial weight map for the Objective hierarchy with evenly distributed weights
-	private getInitialWeightMap(): WeightMap {
+	getDefaultWeightMap(): WeightMap {
 		let weightMap: WeightMap = new WeightMap();
-		this.initializeWeightMap(this.getRootObjectives(), weightMap, 1);
+		this.initializeDefaultWeightMap(this.getRootObjectives(), weightMap, 1);
 		return weightMap;
 	}
 
 	// Recursively add entries to weight map
-	private initializeWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
+	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
 		let weight = parentWeight * 1.0 / objectives.length;
 		for (let obj of objectives) {
 			weightMap.setObjectiveWeight(obj.getName(), weight);
 			if (obj.objectiveType === 'abstract') {
-				this.initializeWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
+				this.initializeDefaultWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
 			}
 		}
 	}
 
 	// Set up initial ScoreFunctions
-	// Scores for categorical variables are evenly space between 0 and 1
+	// Scores for categorical variables are evenly spaced between 0 and 1
 	getInitialScoreFunctionMap(): ScoreFunctionMap {
 		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 		for (let obj of this.getPrimitiveObjectives()) {
@@ -240,7 +237,7 @@ export class ValueChartService implements ValueChartStateContainer {
 			let min: number = (<ContinuousDomain>obj.getDomain()).getMinValue();
 			let max: number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
 			scoreFunction = new ContinuousScoreFunction(min, max);
-			// Add three evenly-space points between min and max
+			// Add three evenly-spaced points between min and max
 			let increment = (max - min) / 4.0;
 			let slope = 1.0 / (max - min);
 			scoreFunction.setElementScore(min, 0);
