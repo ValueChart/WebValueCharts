@@ -2,11 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 15:28:47
+* @Last Modified time: 2016-08-21 17:45:28
 */
 	
-import * as Formatter															from '../utilities/Formatter';
-
+// Import Model Classes:
 import { Objective } 															from './Objective';
 import { PrimitiveObjective } 													from './PrimitiveObjective';
 import { AbstractObjective } 													from './AbstractObjective';
@@ -18,20 +17,50 @@ import { ScoreFunction }														from './ScoreFunction';
 import { ContinuousScoreFunction }												from './ContinuousScoreFunction';
 import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 
+// Import Utility Classes:
+import * as Formatter															from '../utilities/Formatter';
+
+/*
+	This class is the data representation of a ValueChart. It uses the Alternative class to represent the 
+	decision options in a ValueChart, a hierarchical structure of of Objectives to represent criteria for the
+	decision, and an array of Users to represent preferences for multiple users. A ValueChart with one user
+	is referred to as a "individual" ValueChart, while a ValueChart with multiple users is referred to as a 
+	"group" ValueChart. These ValueCharts sub-types are rendered differently by the ValueChartDirective, 
+	but data-wise differ only in the number of users.
+*/
+
 
 export class ValueChart {
 
-	private id: string;
-	private name: string;
-	private description: string;
-	private creator: string;
-	private rootObjectives: Objective[];
-	private alternatives: Alternative[];
-	private users: User[];
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	public _id: string;
-	public password: string;
+	private name: string;					// The name of the ValueChart.
+	private id: string;						// The name of the ValueChart formatted for use as a HTML id.
+	private description: string;			// The description of the ValueChart.
+	private creator: string;				// The username of the creator of the ValueChart.
+	private rootObjectives: Objective[];	// The collection of root objectives for the ValueChart. This should almost always be a single abstract objective.
+	private alternatives: Alternative[];	// The collection of alternatives for the ValueChart
+	private users: User[];					// The collection of users in this ValueChart. One user means the ValueChart is an "individual" chart. More than ones means it is a "group" chart.
 
+	public _id: string;						// The id of the ValueChart in the database. This field should ONLY be set if the ValueChart has been added to the database. 
+	public password: string;				// The password to access this ValueChart.
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@param name - The name of the ValueChart.
+		@param description - The description of the ValueChart.
+		@param creator - The username of the user who created the ValueChart.
+		@param users - The collections of users in the ValueChart.
+		@returns {void}	
+		@description	Constructs a new ValueChart. This constructor only initializes the basic fields of the ValueChart.
+						Alternatives, objectives, and possibly users must be set manually before the ValueChart is complete,
+						and can be used. 
+	*/
 	constructor(name: string, description: string, creator: string, users?: User[]) {
 		this.name = name;
 		this.description = description;
@@ -45,6 +74,12 @@ export class ValueChart {
 			this.users = users;
 		}
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	// Note that methods that are simple getters/setters, or modifiers are not commented as they are self-explanatory.
 
 	getId(): string {
 		return this.id;
@@ -83,8 +118,6 @@ export class ValueChart {
 		return this.users.length === 1;
 	}
 
-	// Objective Related Methods:
-
 	getRootObjectives(): Objective[] {
 		return this.rootObjectives;
 	}
@@ -106,6 +139,11 @@ export class ValueChart {
 		}
 	}
 
+
+	/*
+		@returns {Objective[]} - An array of all objectives in the ValueChart. This array is NOT ordered.	
+		@description	Parses the ValueChart's hierarchical objective structure to find every objective (both primitive and abstract).
+	*/
 	getAllObjectives(): Objective[] {
 		var objectives: Objective[] = this.rootObjectives.slice();	// Slice clones the array and returns a reference to this clone.		
 		for (var i: number = 0; i < this.rootObjectives.length; i++) {
@@ -116,6 +154,10 @@ export class ValueChart {
 		return objectives;
 	}
 
+	/*
+		@returns {Objective[]} - An array of all primitive objectives in the ValueChart. This array is NOT ordered.	
+		@description	Parses the ValueChart's hierarchical objective structure to find every primitive objective.
+	*/
 	getAllPrimitiveObjectives(): PrimitiveObjective[] {
 		var primitiveObjectives: PrimitiveObjective[] = [];
 		var objectives: Objective[];
@@ -138,6 +180,12 @@ export class ValueChart {
 		return primitiveObjectives;
 	}
 
+	/*
+		@returns {string[]} - An array of the names of all primitive objectives in the ValueChart. This array is NOT ordered.	
+		@description	Parses the ValueChart's hierarchical objective structure to find every primitive objective's name.
+						This method is used surprisingly useful considering WeightMaps, ScoreFunctionMaps, and alternatives use
+						objective names as keys.
+	*/
 	getAllPrimitiveObjectivesByName(): string[] {
 		var primObj: string[] = [];
 		for (var obj of this.getAllPrimitiveObjectives()) {
@@ -169,6 +217,12 @@ export class ValueChart {
 		}
 	}
 
+	/*
+		@returns {(string | number, alternative)[]} - An array of the given objective's domains values that are the consequences of Alternatives paired with the alternative.
+		@description	Iterates over the ValueChart's collection of alternatives to retrieve the array of all alternative consequences for a
+						give objective. The alternative is paired with its consequence in the array so that the connection between
+						domain value and alternative is not lost.
+	*/
 	getAlternativeValuesforObjective(objective: PrimitiveObjective): { value: (string | number), alternative: Alternative }[] {
 		var alternativeValues: { value: (string | number), alternative: Alternative }[] = [];
 
@@ -202,6 +256,13 @@ export class ValueChart {
 		}
 	}
 
+	/*
+		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
+		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
+						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
+						one user the in ValueChart, that user's weight map is simply returned. The maximum weight map is to determine label heights
+						by the LabelRenderer, and row heights by the objective chart renderer.
+	*/
 	getMaximumWeightMap(): WeightMap {
 		if (this.users.length === 1)
 			return this.users[0].getWeightMap();
@@ -226,6 +287,12 @@ export class ValueChart {
 		return maximumWeightMap;
 	}
 
+	/*
+		@returns {ValueChart} - A ValueChart with one user, whose ScoreFunctions and WeightMap are averages of the users in the current ValueChart. 
+		@description	Computes the average user of the current ValueChart by averaging their weights and scores separately. The name of the average 
+						ValueChart is the name of the current ValueChart, but with ' Average' added to it. This method is most often used to determine the 
+						average of a group ValueChart for rendering by the ValueChartDirective.
+	*/
 	getAverageValueChart(): ValueChart {
 		var averageValueChart: ValueChart = new ValueChart(this.name + ' Average', this.description, this.creator, [this.getAverageUser()]);
 		averageValueChart.setRootObjectives(this.rootObjectives);
@@ -233,6 +300,11 @@ export class ValueChart {
 		return averageValueChart;
 	}
 
+	/*
+		@returns {User} - A user whose ScoreFunctions and WeightMap are averages of the users in the current ValueChart. 
+		@description	Computes the average user of the current ValueChart by averaging their weights and scores separately. The name of the average 
+						user is 'AverageUser'. This method is most often used to determine the average of a user for averaging a group ValueChart.
+	*/
 	getAverageUser(): User {
 		var averageUser: User = new User('Average User');
 
@@ -250,6 +322,10 @@ export class ValueChart {
 		return averageUser;
 	}
 
+	/*
+		@returns {WeightMap} - A WeightMap that is an average of the WeightMaps of the users in the current ValueChart. 
+		@description	Computes the average weight of each objective in the ValueChart by iterating over each user's WeightMap.
+	*/
 	calculateAverageWeightMap(): WeightMap {
 		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
 		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
@@ -269,6 +345,11 @@ export class ValueChart {
 		return averageWeightMap;
 	}
 
+	/*
+		@returns {ScoreFunctionMap} - A ScoreFunctionMap whose ScoreFunctions are averages of the ScoreFunctions of the users in the current ValueChart. 
+		@description	Computes the average ScoreFunction for each objective in the ValueChart by iterating over each user's ScoreFunction for that objective.
+						These ScoreFunctions are then assigned to a new ScoreFuntionMap that is returned.
+	*/
 	calculateAverageScoreFunctionMap(): ScoreFunctionMap {
 		var averageScoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
@@ -286,6 +367,12 @@ export class ValueChart {
 		return averageScoreFunctionMap;
 	}
 
+	/*
+		@param scoreFunctions - An array of ScoreFunctions that are to be averaged into a new ScoreFunction. These score functions must be for the given objective.
+		@param objective - A PrimitiveObjective whose ScoreFunctions are to be averaged. 
+		@returns {ScoreFunctionMap} - A ScoreFunction that is an average of the given ScoreFunction
+		@description	Computes the average ScoreFunction for the given objective in the ValueChart by iterating over the given ScoreFunction, which must be for that objective.
+	*/
 	calculateAverageScoreFunction(scoreFunctions: ScoreFunction[], objective: PrimitiveObjective): ScoreFunction {
 		var averageScoreFunction: ScoreFunction;
 		if (objective.getDomainType() === 'continuous') {

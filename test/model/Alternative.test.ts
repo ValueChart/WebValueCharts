@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:15:11
+* @Last Modified time: 2016-08-21 17:38:24
 */
 
 
@@ -11,9 +11,6 @@ import { PrimitiveObjective }	from '../../app/resources/model/PrimitiveObjective
 
 
 import { expect }				from 'chai';
-
-
-
 
 describe('Alternative', () => {
 	var alternative: Alternative;
@@ -108,6 +105,33 @@ describe('Alternative', () => {
 				expect(alternative.getObjectiveValue(weather.getName())).to.equal("Sunny");
 				expect(alternative.getObjectiveValue(distance.getName())).to.be.undefined;
 			});
+		});
+	});
+
+	describe('#getAllObjectiveValuePairs()', () => {
+		var altitude: PrimitiveObjective;
+
+		beforeEach(function() {
+			altitude = new PrimitiveObjective('altitude', 'This is also for testing');
+			alternative = new Alternative('TestAlternative', 'This alternative is for testing');
+			alternative.setObjectiveValue(weather.getName(), "Sunny");
+			alternative.setObjectiveValue(distance.getName(), 100);
+			alternative.setObjectiveValue(altitude.getName(), 10000);
+		})
+
+		it('should return the all the Alternative\'s consquences paired with the name of the objectives they are for', () => {
+			var pairs: any[] = alternative.getAllObjectiveValuePairs();
+
+			expect(pairs).to.have.length(3);
+
+			expect(pairs[0].objectiveName).to.equal('weather');
+			expect(pairs[0].value).to.equal('Sunny');
+
+			expect(pairs[1].objectiveName).to.equal('distance');
+			expect(pairs[1].value).to.equal(100);
+
+			expect(pairs[2].objectiveName).to.equal('altitude');
+			expect(pairs[2].value).to.equal(10000);
 		});
 	});
 });

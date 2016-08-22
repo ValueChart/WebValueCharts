@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 16:41:21
+* @Last Modified time: 2016-08-21 16:36:06
 */
 
 
@@ -47,11 +47,13 @@ describe('ValueChart', () => {
 		describe('#constructor(name: string, description: string, creator: string)', () => {
 
 			context('when constructor is used', () => {
-				it('should have a name, description and creator', () => {
-					valueChart = new ValueChart('TestChart', 'This is a test chart', 'Aaron');
-					expect(valueChart.getName()).to.equal('TestChart');
+				it('should have a name, description, creator and id', () => {
+					valueChart = new ValueChart('Test Chart', 'This is a test chart', 'Aaron');
+					expect(valueChart.getName()).to.equal('Test Chart');
 					expect(valueChart.getDescription()).to.equal('This is a test chart');
 					expect(valueChart.getCreator()).to.equal('Aaron');
+
+					expect(valueChart.getId()).to.equal('TestChart');
 				});
 			});
 
