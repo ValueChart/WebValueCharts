@@ -2,12 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 17:14:55
+* @Last Modified time: 2016-08-22 12:57:32
 */
 
 import { WeightMap } 			from './WeightMap';
 import { ScoreFunctionMap }		from './ScoreFunctionMap';
 
+/*
+
+*/
 
 export class User {
 

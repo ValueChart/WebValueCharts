@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 21:24:50
+* @Last Modified time: 2016-08-22 13:06:11
 */
 
 import { Injectable } 										from '@angular/core';
@@ -42,7 +42,9 @@ export class ValueChartService implements ValueChartStateContainer {
 	private maximumWeightMap: WeightMap;
 
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
-	// has been reset since they last did SMARTER
+															 // has been reset since they last did SMARTER
+
+	public inactiveValueCharts: ValueChart[] = [];
 
 	constructor(
 		private currentUserService: CurrentUserService,

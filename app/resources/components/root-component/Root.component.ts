@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 15:56:36
+* @Last Modified time: 2016-08-22 13:05:10
 */
 
 // Import Angular Classes:
@@ -152,6 +152,7 @@ export class RootComponent implements OnInit {
 	*/
 	viewGroupChart(): void {
 		this.chartType = 'normal';
+		this.valueChartService.setValueChart(this.valueChartService.inactiveValueCharts.pop());
 		this.router.navigate(['/view', this.valueChartService.getValueChartName()]);
 	}
 

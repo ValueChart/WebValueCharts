@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-16 22:50:53
+* @Last Modified time: 2016-08-22 12:55:25
 */
 
 import { Component }													from '@angular/core';
@@ -33,7 +33,7 @@ import { UserDomainElements, DomainElement }							from '../../types/ScoreFuncti
 
 
 @Component({
-	selector: 'ScoreFunction',
+	selector: 'ScoreFunctionViewer',
 	templateUrl: 'app/resources/components/scoreFunctionViewer-component/ScoreFunctionViewer.template.html',
 	directives: [ScoreFunctionDirective]
 })
@@ -76,7 +76,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
 			this.valueChartService = (<any>window.opener).valueChartService;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
-			this.scoreFunctionViewerService = (<any>window.opener).scoreFunctionViewerService;
+			this.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
 		}
 
 		this.services.valueChartService = this.valueChartService;

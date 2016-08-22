@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 14:11:30
+* @Last Modified time: 2016-08-22 13:00:27
 */
 
 // Import Angular Resources:
@@ -149,7 +149,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	configureChartData(): void {
 		// Configure ValueChartViewerService.
-		this.valueChartService.setValueChart(this.valueChart);	// TODO: Is this call necessary? Investigate.
 		this.rendererDataService.initialize();
 		this.rendererDataService.updateAllValueChartData(this.viewOrientation);
 
