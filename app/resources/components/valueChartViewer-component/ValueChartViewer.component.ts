@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 15:38:08
+* @Last Modified time: 2016-08-22 10:54:42
 */
 
 import { Component }															from '@angular/core';
@@ -287,6 +287,26 @@ export class ValueChartViewerComponent implements OnInit {
 			this.hostService.hostGroupValueChart(this.valueChart._id);
 		}
 
+	}
+
+	removeUser(user: User): void {
+		this.valueChartHttpService.deleteUser(this.valueChart._id, user.getUsername())
+			.subscribe(username => {
+				if (!this.hostService.hostWebSocket) { 	// Handle the deleted user manually.
+
+					var userIndex: number = this.valueChart.getUsers().findIndex((user: User) => {
+						return user.getUsername() === user.getUsername();
+					});
+					// Delete the user from the ValueChart
+					this.valueChart.getUsers().splice(userIndex, 1);
+					toastr.warning(user.getUsername() + ' has left the ValueChart');
+				}
+
+				// The Host connection is active, so let it handle the deleted user.
+			},
+			err => {
+				toastr.error(user.getUsername() + ' could not be deleted');
+			});
 	}
 
 	// ValueChart Member:

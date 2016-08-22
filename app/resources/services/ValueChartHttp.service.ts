@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-19 21:09:15
+* @Last Modified time: 2016-08-22 10:59:56
 */
 
 import '../../rxjs-operators';
@@ -117,7 +117,7 @@ export class ValueChartHttpService {
 
 	deleteUser(chartId: string, username: string): Observable<User> {
 		return this.http.delete(this.valueChartsUrl + chartId + '/users/' + username)
-			.map(this.extractData)
+			.map(this.extractBody)
 			.catch(this.handleError);
 	}
 

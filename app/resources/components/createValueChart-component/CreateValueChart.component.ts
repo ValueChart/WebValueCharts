@@ -92,7 +92,9 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	back() {
-		this.updateValueChartInDatabase(this.valueChart);
+		if (!this.currentUserService.isJoiningChart())
+			this.updateValueChartInDatabase(this.valueChart);
+
 		this.step = this.creationStepsService.previous(this.step, this.purpose);
 	}
 
