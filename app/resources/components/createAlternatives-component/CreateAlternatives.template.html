@@ -7,7 +7,7 @@
         <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
         <th>Name</th>
         <th>Description</th>
-        <th *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectives()">{{getColumnHeader(obj)}}</th>
+        <th *ngFor="let obj of valueChartService.getPrimitiveObjectives()">{{getColumnHeader(obj)}}</th>
       </tr>
     </thead>
     <tbody>
@@ -21,7 +21,7 @@
         <th>
             <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
         </th>
-        <th *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectives()">
+        <th *ngFor="let obj of valueChartService.getPrimitiveObjectives()">
             <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
                 <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value)">
                     <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>

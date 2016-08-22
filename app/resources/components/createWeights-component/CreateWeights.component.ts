@@ -31,13 +31,13 @@ export class CreateWeightsComponent implements OnInit {
 
 		// If weight map is uninitialized or has been reset, set all Objectives to unranked
 		if (!this.user.getWeightMap() || this.valueChartService.wasWeightMapReset(this.user)) {
-			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
+			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}		
 		}
 		else {
-			let objectives: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
-			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getValueChart().getAllPrimitiveObjectives());
+			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
+			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
 			let sortedObjectives = sortedPairs.map(function(e, i) { return sortedPairs[i][0]; });
@@ -67,7 +67,7 @@ export class CreateWeightsComponent implements OnInit {
 		if (this.rankedObjectives.length === 0) {
 			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
 		}
-		else if (this.rankedObjectives.length < this.valueChartService.getValueChart().getAllPrimitiveObjectives().length) {
+		else if (this.rankedObjectives.length < this.valueChartService.getPrimitiveObjectives().length) {
 			return "From the remaining objectives, which would you prefer to change next from the worst value to the best value?";
 		}
 		else {
@@ -77,7 +77,7 @@ export class CreateWeightsComponent implements OnInit {
 
 	getUnrankedObjectives(): string[] {
 		let unrankedObjectives: string[] = [];
-		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 			if (!this.isRanked[obj]) {
 				unrankedObjectives.push(obj);
 			}
@@ -91,7 +91,7 @@ export class CreateWeightsComponent implements OnInit {
 	}
 
 	resetRanks() {
-		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];

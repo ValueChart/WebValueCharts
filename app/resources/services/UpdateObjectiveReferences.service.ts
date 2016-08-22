@@ -52,7 +52,7 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Insert a new element into users' DiscreteScoreFunction for specified Objective
+	// Insert a new element into users' DiscreteScoreFunctions for specified Objective
 	// Initialize score to 0 for now
 	addElementToScoreFunctions(objName: string, element: string) {
 		for (let user of this.valueChartService.getUsers()) {
@@ -66,7 +66,7 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Remove element fron users' DiscreteScoreFunction for specified Objective
+	// Remove element fron users' DiscreteScoreFunctions for specified Objective
 	removeElementFromScoreFunctions(objName: string, element: string) {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();

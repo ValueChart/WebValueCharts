@@ -140,7 +140,7 @@ export class RootComponent implements OnInit {
 	viewAverageChart(): void {
 		if (this.isGroupChart()) {
 			this.chartType = 'average';
-			this.router.navigate(['/view', this.valueChartService.getValueChart().getName() + '-average']);
+			this.router.navigate(['/view', this.valueChartService.getValueChartName() + '-average']);
 		}
 	}
 
@@ -152,7 +152,7 @@ export class RootComponent implements OnInit {
 	*/
 	viewGroupChart(): void {
 		this.chartType = 'normal';
-		this.router.navigate(['/view', this.valueChartService.getValueChart().getName()]);
+		this.router.navigate(['/view', this.valueChartService.getValueChartName()]);
 	}
 
 	/* 	

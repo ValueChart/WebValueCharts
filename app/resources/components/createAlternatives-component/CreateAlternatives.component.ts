@@ -26,11 +26,11 @@ export class CreateAlternativesComponent implements OnInit {
 		this.isSelected = {};
 		this.alternativesCount = 0;
 
-		if (this.valueChartService.getValueChart().getAlternatives().length === 0) {
+		if (this.valueChartService.getAlternatives().length === 0) {
 			this.addEmptyAlternative();
 		}
 		else {
-			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
+			for (let alt of this.valueChartService.getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;
 			}
@@ -42,7 +42,7 @@ export class CreateAlternativesComponent implements OnInit {
 		for (let altID of this.altKeys()) {
 			alternatives.push((this.alternatives[altID]));
 		}
-		this.valueChartService.getValueChart().setAlternatives(alternatives);
+		this.valueChartService.setAlternatives(alternatives);
 	}
 
 	getColumnHeader(obj: PrimitiveObjective) : string {

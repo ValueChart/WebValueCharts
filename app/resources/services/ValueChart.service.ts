@@ -69,6 +69,10 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
+	getValueChartName() {
+		return this.valueChart.getName();
+	}
+
 	getUsers(): User[] {
 		return this.valueChart.getUsers();
 	}
@@ -105,6 +109,10 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	getPrimitiveObjectives(): PrimitiveObjective[] {
 		return this.primitiveObjectives;
+	}
+
+	getPrimitiveObjectivesByName(): string[] {
+		return this.valueChart.getAllPrimitiveObjectivesByName();
 	}
 
 	setPrimitivesObjectives(objs: PrimitiveObjective[]) {
@@ -186,7 +194,7 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.weightMapReset[user.getUsername()];
 	}
 
-	// Set User's WeightMaps to default
+	// Set User's WeightMap to default
 	resetWeightMap(user: User, weightMap: WeightMap) {
 		user.setWeightMap(weightMap);
 		this.weightMapReset[user.getUsername()] = true;

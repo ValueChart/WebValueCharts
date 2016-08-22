@@ -43,11 +43,11 @@ export class CreateScoreFunctionsComponent implements OnInit {
       this.user.setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
     }
 
-    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
+    this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
   }
 
   advanceSelectedObjective() {
-    let primObjs: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
+    let primObjs: string[] = this.valueChartService.getPrimitiveObjectivesByName();
     let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
     let nextIndex: number = selectedIndex + 1;
     if (nextIndex >= primObjs.length) {

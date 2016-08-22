@@ -61,7 +61,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.valueChartService.getValueChart().getName();
+		var parameters = this.valueChartService.getValueChartName();
 		this.router.navigate(['/view/', parameters]);
 	}
 
@@ -80,7 +80,7 @@ export class HomeComponent {
 				this.currentUserService.setJoiningChart(false);
 
 				if (route[1] === undefined) {
-					route[1] = this.valueChartService.getValueChart().getName();
+					route[1] = this.valueChartService.getValueChartName();
 				}
 				this.router.navigate(route);
 			}

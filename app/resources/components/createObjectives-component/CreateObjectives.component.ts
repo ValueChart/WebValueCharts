@@ -47,13 +47,13 @@ export class CreateObjectivesComponent implements OnInit {
 		this.editing = false;
 
 		if (this.valueChartService.getValueChart().getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChartService.getValueChart().getName(), "", "", 0);
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChartService.getValueChartName(), "", "", 0);
 			this.objectivesCount++;
 		}
 		else {
 			this.editing = true;
-			let rootObjective: Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
-			rootObjective.setName(this.valueChartService.getValueChart().getName());
+			let rootObjective: Objective = this.valueChartService.getRootObjectives()[0];
+			rootObjective.setName(this.valueChartService.getValueChartName());
 			this.objectiveToObjRow(rootObjective, "", 0);
 
 			// Store record of each ObjectiveRow of type 'primitive'

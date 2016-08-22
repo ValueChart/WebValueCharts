@@ -18,7 +18,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	constructor(private valueChartService: ValueChartService) { }
 
 	ngOnInit() {
-		this.valueChartName = this.valueChartService.getValueChart().getName();
+		this.valueChartName = this.valueChartService.getValueChartName();
 		this.valueChartDescription = this.valueChartService.getValueChart().getDescription();
 		this.valueChartPassword = this.valueChartService.getValueChart().password ? this.valueChartService.getValueChart().password : "";
 	}
