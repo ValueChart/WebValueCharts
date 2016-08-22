@@ -76,8 +76,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
 			this.valueChartService = (<any>window.opener).valueChartService;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
-
-			this.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
+			this.scoreFunctionViewerService = (<any>window.opener).scoreFunctionViewerService;
 		}
 
 		this.services.valueChartService = this.valueChartService;

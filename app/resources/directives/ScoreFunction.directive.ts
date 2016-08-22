@@ -30,8 +30,7 @@ import { UserDomainElements, DomainElement }							from '../types/ScoreFunctionV
 
 
 @Directive({
-	selector: 'ScoreFunction',
-	providers: [ScoreFunctionViewerService]
+	selector: 'ScoreFunction'
 })
 export class ScoreFunctionDirective implements OnInit, DoCheck {
 	// Input fields:
