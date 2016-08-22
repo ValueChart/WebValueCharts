@@ -37,6 +37,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	// Navigation Control:
 	private window = window;
+	private saveOnDestroy: boolean = false;
 	public allowedToNavigate: boolean = false;
 	public navigationResponse: Subject<boolean> = new Subject<boolean>();
 
@@ -85,6 +86,9 @@ export class CreateValueChartComponent implements OnInit {
 
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
+		if (this.saveOnDestroy) {
+			(this.valueChart._id) ? this.updateValueChartInDatabase(this.valueChart) : this.saveValueChartToDatabase(this.valueChart);
+		}
 	}
 
 	back() {
@@ -171,7 +175,7 @@ export class CreateValueChartComponent implements OnInit {
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate) {
 			if (keepValueChart) {
-				(this.valueChart._id) ? this.updateValueChartInDatabase(this.valueChart) : this.saveValueChartToDatabase(this.valueChart);
+				this.saveOnDestroy = true;
 			} else if (this.valueChart._id) {
 				this.deleteValueChart(this.valueChart);
 			}
