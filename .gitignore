@@ -40,7 +40,6 @@ jspm_packages
 
 ### Bower ###
 bower_components
-app/vendors
 .bower-cache
 .bower-registry
 .bower-tmp
@@ -53,13 +52,13 @@ typings
 
 ### Generated JS Files ###
 
-app/resources/**/*.js
-app/main.js
-app/rxjs-operators.js
-app/app.routes.js
+client/resources/**/*.js
+client/main.js
+client/rxjs-operators.js
+client/app.routes.js
+client/vendors
 test/**/*.js
-routes/*.js
-utilities/*.js
+server/**/*.js
 WebValueCharts.js
 
 ### Apache Server ###

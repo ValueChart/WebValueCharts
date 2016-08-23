@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 12:32:00
+* @Last Modified time: 2016-08-23 11:43:04
 */
 
 // =========================================================================================================================================
@@ -17,16 +17,16 @@
 
 	// This is a map of package names to their locations in our project structure. This is necessary for SystemJS to know how to load packages.
 	var map = {
-		'app':                        'app', // 'dist',
+		'client':                     'client',
 		'rxjs':                       'node_modules/rxjs',
 		'@angular':                   'node_modules/@angular',
-		'd3': 						  'app/vendors/d3',
+		'd3': 						  'client/vendors/d3',
 		'supertest': 				  'node_modules/supertest'
 	};
 
 	// Defines default extensions and files.
 	var packages = {
-		'app':                        { main: 'main.js',  defaultExtension: 'js' },
+		'client':                     { main: 'main.js',  defaultExtension: 'js' },
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
 		'd3':						  { main: 'd3.js', defaultExtension: 'js' }

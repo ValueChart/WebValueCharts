@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 09:05:58
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:14:39
+* @Last Modified time: 2016-08-23 12:16:04
 */
 
-import { AbstractObjective } 	from '../../app/resources/model/AbstractObjective';
-import { PrimitiveObjective } 	from '../../app/resources/model/PrimitiveObjective';
-import { Objective } 			from '../../app/resources/model/Objective';
+import { AbstractObjective } 	from '../../client/resources/model/AbstractObjective';
+import { PrimitiveObjective } 	from '../../client/resources/model/PrimitiveObjective';
+import { Objective } 			from '../../client/resources/model/Objective';
 
 import { expect }				from 'chai';
 

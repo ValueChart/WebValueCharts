@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:15:15
+* @Last Modified time: 2016-08-23 12:16:01
 */
 
 // Import CategoricalDomain, the class to be tested.
-import { CategoricalDomain } from '../../app/resources/model/CategoricalDomain';
+import { CategoricalDomain } from '../../client/resources/model/CategoricalDomain';
 
 // Chai (and therefore the function 'expect') is injected by Karma AFTER the typescript code is compiled. This means that TypeScript looks 
 // for a declarations for expect before there is one. This statement declares expect as a variable in the namespace, but still allows it to 

@@ -2,21 +2,21 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 22:59:04
+* @Last Modified time: 2016-08-23 12:17:31
 */
 
 // Require Node Libraries:
 import { expect } 								from 'chai';
 import * as request								from 'supertest';
 // Utility Classes:
-import { JsonValueChartParser }					from '../../app/resources/utilities/JsonValueChartParser';
+import { JsonValueChartParser }					from '../../client/resources/modules/utilities/classes/JsonValueChartParser';
 
 // Model Classes
-import { ValueChart }							from '../../app/resources/model/ValueChart';
-import { Alternative }							from '../../app/resources/model/Alternative';
-import { User }									from '../../app/resources/model/User';
-import { WeightMap }							from '../../app/resources/model/WeightMap';
-import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMap';
+import { ValueChart }							from '../../client/resources/model/ValueChart';
+import { Alternative }							from '../../client/resources/model/Alternative';
+import { User }									from '../../client/resources/model/User';
+import { WeightMap }							from '../../client/resources/model/WeightMap';
+import { ScoreFunctionMap }						from '../../client/resources/model/ScoreFunctionMap';
 
 
 // Import Test Data:

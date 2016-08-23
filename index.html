@@ -10,9 +10,9 @@
 			 Needed for Angular Routing to work in HTML5 mode. -->
 		<base href="http://localhost:3000">
 		<!-- Load Style Sheets -->
-		<link rel="stylesheet" href="app/resources/styles/main.css">
-		<link rel="stylesheet" href="app/vendors/bootstrap/dist/css/bootstrap.css">
-		<link rel="stylesheet" href="app/vendors/toastr/toastr.css">
+		<link rel="stylesheet" href="client/resources/styles/main.css">
+		<link rel="stylesheet" href="client/vendors/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="client/vendors/toastr/toastr.css">
 
 		<!--  Load JavaScript libraries -->
 		<!-- Polyfill(s) for browsers that do not meet ES6 -->
@@ -20,13 +20,13 @@
   		<script src="node_modules/zone.js/dist/zone.js"></script>
     	<script src="node_modules/reflect-metadata/Reflect.js"></script>
     	<script src="node_modules/systemjs/dist/system.src.js"></script>
-    	<script src="app/vendors/jquery/dist/jquery.min.js"></script>
-		<script src="app/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="app/vendors/toastr/toastr.js"></script>
+    	<script src="client/vendors/jquery/dist/jquery.min.js"></script>
+		<script src="client/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="client/vendors/toastr/toastr.js"></script>
 		<!--  Configure SystemJS -->
 		<script src="systemjs.config.js"></script>
 		<script>
-			System.import('app').catch(function(err){ console.error(err); });
+			System.import('client').catch(function(err){ console.error(err); });
 		</script>
 	</head>
 	<!-- 3. Display the application -->

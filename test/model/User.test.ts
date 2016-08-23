@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 15:22:14
+* @Last Modified time: 2016-08-23 12:15:46
 */
 
 
-import { User } 				from '../../app/resources/model/User';
-import { WeightMap } 			from '../../app/resources/model/WeightMap';
-import { ScoreFunctionMap } 	from '../../app/resources/model/ScoreFunctionMap';
+import { User } 				from '../../client/resources/model/User';
+import { WeightMap } 			from '../../client/resources/model/WeightMap';
+import { ScoreFunctionMap } 	from '../../client/resources/model/ScoreFunctionMap';
 
 // import { expect }				from 'chai';
 

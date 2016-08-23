@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 22:02:30
+* @Last Modified time: 2016-08-23 12:12:50
 */
 
 // Import Libraries and Middleware:
@@ -17,13 +17,13 @@ import * as bodyParser 								from 'body-parser';
 import * as expressSession							from 'express-session';
 
 //  Import Routers and Route Handlers:
-import { indexRoutes } 								from './routes/Index.routes';
-import { valueChartRoutes } 						from './routes/ValueCharts.routes';
-import { usersRoutes }								from './routes/Users.routes';
-import { hostWebSocket }							from './routes/Host.routes';
+import { indexRoutes } 								from './server/routes/Index.routes';
+import { valueChartRoutes } 						from './server/routes/ValueCharts.routes';
+import { usersRoutes }								from './server/routes/Users.routes';
+import { hostWebSocket }							from './server/routes/Host.routes';
 
 // Import Utilities:
-import { passport }									from './utilities/auth';
+import { passport }									from './server/utilities/auth';
 
 
 // Create the express application.

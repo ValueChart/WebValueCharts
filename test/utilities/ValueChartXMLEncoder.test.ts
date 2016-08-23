@@ -2,30 +2,30 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 16:27:55
+* @Last Modified time: 2016-08-23 12:26:25
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
 
 
 // Utilities:
-import { ValueChartXMLEncoder }									from '../../app/resources/utilities/ValueChartXMLEncoder';
-import { WebValueChartsParser }									from '../../app/resources/utilities/WebValueChartsParser';
+import { ValueChartXMLEncoder }									from '../../client/resources/modules/utilities/classes/ValueChartXMLEncoder';
+import { WebValueChartsParser }									from '../../client/resources/modules/utilities/classes/WebValueChartsParser';
 
 // Model Classes:
-import { ValueChart }											from '../../app/resources/model/ValueChart';
-import { Alternative }											from '../../app/resources/model/Alternative';
-import { User } 												from '../../app/resources/model/User';
-import { Objective } 											from '../../app/resources/model/Objective';
-import { PrimitiveObjective } 									from '../../app/resources/model/PrimitiveObjective';
-import { AbstractObjective } 									from '../../app/resources/model/AbstractObjective';
-import { CategoricalDomain }									from '../../app/resources/model/CategoricalDomain';
-import { ContinuousDomain }										from '../../app/resources/model/ContinuousDomain';
-import { WeightMap } 											from '../../app/resources/model/WeightMap';
-import { ScoreFunctionMap } 									from '../../app/resources/model/ScoreFunctionMap';
-import { ScoreFunction } 										from '../../app/resources/model/ScoreFunction';
-import { ContinuousScoreFunction } 								from '../../app/resources/model/ContinuousScoreFunction';
-import { DiscreteScoreFunction } 								from '../../app/resources/model/DiscreteScoreFunction';
+import { ValueChart }											from '../../client/resources/model/ValueChart';
+import { Alternative }											from '../../client/resources/model/Alternative';
+import { User } 												from '../../client/resources/model/User';
+import { Objective } 											from '../../client/resources/model/Objective';
+import { PrimitiveObjective } 									from '../../client/resources/model/PrimitiveObjective';
+import { AbstractObjective } 									from '../../client/resources/model/AbstractObjective';
+import { CategoricalDomain }									from '../../client/resources/model/CategoricalDomain';
+import { ContinuousDomain }										from '../../client/resources/model/ContinuousDomain';
+import { WeightMap } 											from '../../client/resources/model/WeightMap';
+import { ScoreFunctionMap } 									from '../../client/resources/model/ScoreFunctionMap';
+import { ScoreFunction } 										from '../../client/resources/model/ScoreFunction';
+import { ContinuousScoreFunction } 								from '../../client/resources/model/ContinuousScoreFunction';
+import { DiscreteScoreFunction } 								from '../../client/resources/model/DiscreteScoreFunction';
 
 
 /*

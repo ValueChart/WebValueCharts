@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:14:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 16:19:30
+* @Last Modified time: 2016-08-23 12:15:48
 */
 
-import { ScoreFunctionMap } 			from '../../app/resources/model/ScoreFunctionMap';
-import { ScoreFunction } 				from '../../app/resources/model/ScoreFunction';
-import { PrimitiveObjective } 			from '../../app/resources/model/PrimitiveObjective';
-import { DiscreteScoreFunction } 		from '../../app/resources/model/DiscreteScoreFunction';
-import { ContinuousScoreFunction } 		from '../../app/resources/model/ContinuousScoreFunction';
+import { ScoreFunctionMap } 			from '../../client/resources/model/ScoreFunctionMap';
+import { ScoreFunction } 				from '../../client/resources/model/ScoreFunction';
+import { PrimitiveObjective } 			from '../../client/resources/model/PrimitiveObjective';
+import { DiscreteScoreFunction } 		from '../../client/resources/model/DiscreteScoreFunction';
+import { ContinuousScoreFunction } 		from '../../client/resources/model/ContinuousScoreFunction';
 	
 import { expect }						from 'chai';
 

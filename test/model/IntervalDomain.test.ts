@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-01 11:59:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 17:29:55
+* @Last Modified time: 2016-08-23 12:15:51
 */
 
-import { IntervalDomain } 		from '../../app/resources/model/IntervalDomain';
+import { IntervalDomain } 		from '../../client/resources/model/IntervalDomain';
 
 import { expect }				from 'chai';
 

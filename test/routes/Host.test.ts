@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-17 22:54:24
+* @Last Modified time: 2016-08-23 12:16:48
 */
 
 // Require Node Libraries:
@@ -12,17 +12,17 @@ var WebSocket = require('websocket').w3cwebsocket;
 import { expect } 								from 'chai';
 import * as request								from 'supertest';
 // Utility Classes:
-import { JsonValueChartParser }					from '../../app/resources/utilities/JsonValueChartParser';
+import { JsonValueChartParser }					from '../../client/resources/modules/utilities/classes/JsonValueChartParser';
 
 // Model Classes
-import { ValueChart }							from '../../app/resources/model/ValueChart';
-import { Alternative }							from '../../app/resources/model/Alternative';
-import { User }									from '../../app/resources/model/User';
-import { WeightMap }							from '../../app/resources/model/WeightMap';
-import { ScoreFunctionMap }						from '../../app/resources/model/ScoreFunctionMap';
+import { ValueChart }							from '../../client/resources/model/ValueChart';
+import { Alternative }							from '../../client/resources/model/Alternative';
+import { User }									from '../../client/resources/model/User';
+import { WeightMap }							from '../../client/resources/model/WeightMap';
+import { ScoreFunctionMap }						from '../../client/resources/model/ScoreFunctionMap';
 
 // Import Types:
-import { HostMessage,  MessageType}				from '../../app/resources/types/HostMessage';
+import { HostMessage,  MessageType}				from '../../client/resources/types/HostMessage';
 
 
 // Import Test Data:
