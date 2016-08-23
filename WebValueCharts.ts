@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 11:30:58
+* @Last Modified time: 2016-08-22 21:45:45
 */
 
 // Import Libraries and Middlware:
@@ -16,56 +16,64 @@ import * as cookieParser 							from 'cookie-parser';
 import * as bodyParser 								from 'body-parser';
 import * as expressSession							from 'express-session';
 
-//  Routers:
+//  Import Routers and Route Handlers:
 import { indexRoutes } 								from './routes/Index.routes';
 import { valueChartRoutes } 						from './routes/ValueCharts.routes';
 import { usersRoutes }								from './routes/Users.routes';
+import { hostWebSocket }							from './routes/Host.routes';
 
 // Types and Utilities
-import { HostEventEmitter, hostEventEmitter } 		from './utilities/HostEventEmitters';
-import { HostConnectionStatus, hostConnections }	from './utilities/HostConnections';
 import { passport }									from './utilities/auth';
-import { HostMessage, MessageType}					from './app/resources/types/HostMessage';
 
 
-var backend: express.Application = express();
-// Retrieve the database via the connection url. development is the username and BackEndConstruction is the password.
+// Create the express application.
+var webValueCharts: express.Application = express();
+
+// Retrieve the database via the connection url. "development" is the username and "BackEndConstruction" is the password.
 var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
 
-var expressWs = require('express-ws')(backend);
+// Require express websocket (an express implementation of the WebSocket protocol) and call its initialization function.
+// This function attaches the WebScoket methods (ws for example) to the express instance we are using.
+var expressWs = require('express-ws')(webValueCharts);
 
-// uncomment after placing your favicon in /public
-// backend.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// This is where we would setup our favicon, the image displayed by web browsers in the corner of tabs.
+// webValueCharts.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-backend.use(logger('dev'));
-backend.use(bodyParser.json());
-backend.use(bodyParser.urlencoded({ extended: false }));
-// Note that the secrete for cookie parser and expressSession MUST be the same.
-backend.use(cookieParser('ThisIsOurSecret'));
-// Initialize ExpressSession:
-backend.use(expressSession({
+// Setup a logger. We are using morgan for this purpose. Note that no serious logging has been setup yet.
+webValueCharts.use(logger('dev'));
+// Set our application to use the bodyParser middleware. This middleware is what allows the backend to parse json http requests it receives.
+webValueCharts.use(bodyParser.json());			
+webValueCharts.use(bodyParser.urlencoded({ extended: false }));
+// Setup our application to use the cookieParser middlware for parsing cookies. Note that the secret for cookie parser and expressSession MUST be the same.
+webValueCharts.use(cookieParser('ThisIsOurSecret'));
+// Initialize ExpressSession, the middleware we are using for implementing user sessions:
+webValueCharts.use(expressSession({
 	secret: 'ThisIsOurSecret',
 	cookie: {
-		maxAge: null,
-		secure: false,
+		maxAge: null,		// User cookies don't expire.
+		secure: false,		// User cookies are not secure.
 	},
 	resave: false,
 	saveUninitialized: true
 }));
-// Initialize Passport:
-backend.use(passport.initialize());
-backend.use(passport.session());
-backend.use(express.static(__dirname));
 
+// Initialize Passport. Passport is the middleware that our backend uses for user Authentication. 
+webValueCharts.use(passport.initialize());		// Initialize passport.
+webValueCharts.use(passport.session());			// Initialize user sessions.
 
-// Attach the database to the request object
-backend.use(function(req, res, next) {
+// Set express to allow static serving of files from the current directory. This is what allows our backend to 
+// send HTML, JS, etc files to the client.
+webValueCharts.use(express.static(__dirname));
+
+// Attach the database to all request objects. Middleware functions are evaluated by Express in a stack, and this function
+// is at the very top. This means means that the db object will be attached to every request before any other middleware can be called.
+webValueCharts.use(function(req, res, next) {
     (<any>req).db = db;
     next();
 });
 
-// Set the proper Access-Control headers for all responses.
-backend.all('*', function(req, res, next) {
+// Set the proper Access-Control headers for all responses. This is necessary for user Auth cookies to be sent and received correctly.
+webValueCharts.all('*', function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header('Access-Control-Allow-Credentials', (<any>true));
@@ -73,78 +81,19 @@ backend.all('*', function(req, res, next) {
 });
 
 // Attach routers to manage specific URIs
-backend.use('/', indexRoutes);
-backend.use('/ValueCharts', valueChartRoutes);
-backend.use('/Users', usersRoutes);
+webValueCharts.use('/', indexRoutes);					// The index.html page.
+webValueCharts.use('/ValueCharts', valueChartRoutes);	// ValueCharts resource endpoints.
+webValueCharts.use('/Users', usersRoutes);				// User resource endpoints.
 
+// Setup the host WebScoket on the route '/host/:chart' where :chart is a chartId. See the Host.routes.ts file for more information.
+(<any>webValueCharts).ws('/host/:chart', hostWebSocket);
 
-(<any>backend).ws('/host/:chart', function(ws: any, req: express.Request) {
-
-	var chartId: string = req.params.chart;
-
-	// Initialize Connection:
-	var eventListeners: any[] = initEventListeners(chartId, ws);
-	hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', userChangesAccepted: true });
-	// Send message confirming successful connection:
-	ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
-
-	// This fires whenever the socket receives a message.
-	ws.on('message', (msg: string) => {
-		var hostMessage: HostMessage = JSON.parse(msg);
-
-		switch (hostMessage.type) {
-			case MessageType.ConnectionInit:
-
-				break;
-			case MessageType.ChangePermissions:
-				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
-				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: MessageType.ChangePermissions }));
-
-				break;
-			default:
-
-				break;
-		}
-	});
-
-	// This fires when the socket is closed.
-	ws.on('close', () => {
-		// Cleanup the event listeners.
-		eventListeners.forEach((listener: any) => {
-			hostEventEmitter.removeListener(listener.eventName, listener.listener);
-		});
-	});
-});
-
-var initEventListeners = (chartId: string, ws: any): any[] => {
-	
-	var addedListener = (user: any) => {
-		ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
-	};
-
-	var removedListener = (username: string) => {
-		ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
-	};
-
-	var changedListener = (user: any) => {
-		ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
-	};
-
-	// Initialize event listeners:
-	hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, addedListener);
-
-	hostEventEmitter.on(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, removedListener);
-
-	hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, changedListener);
-
-	return [{ listener: addedListener, eventName: HostEventEmitter.USER_ADDED_EVENT + '-' + chartId }, 
-			{ listener: removedListener, eventName: HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId }, 
-			{ listener: changedListener, eventName: HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId }];
-}
-
-
-// catch 404 errors and redirect the request to the index.html file.
-backend.use(function(req: express.Request, res: express.Response, next: express.NextFunction) {
+// Catch 404 errors and redirect the request to the index.html file.
+// This middleware is the last one in the stack, so it will only be called when no other middle 
+// successfully handles a request. This is the essence of a 404 request in the context of express.
+// It is very important that we redirect 404 statuses to the index.html file. This is because the request
+// may only be a 404 error 
+webValueCharts.use(function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var options = {
 		root: __dirname,  // base directory should be /built/public
 		headers: {
@@ -152,7 +101,7 @@ backend.use(function(req: express.Request, res: express.Response, next: express.
 			'x-sent': true
 		}
 	};
-
+// Return the index.html file so that Angular's front-end routing can handle the request.
 	res.sendFile('index.html', options);
 });
 
@@ -161,8 +110,8 @@ backend.use(function(req: express.Request, res: express.Response, next: express.
 
 // development error handler
 // will print stacktrace
-if (backend.get('env') === 'development') {
-	backend.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
+if (webValueCharts.get('env') === 'development') {
+	webValueCharts.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
 		res.status(err.status || 500);
 		res.json({
 			message: err.message,
@@ -173,7 +122,7 @@ if (backend.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-backend.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
+webValueCharts.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
 	res.status(err.status || 500);
 	res.json({
 		message: err.message,
@@ -181,7 +130,8 @@ backend.use(function(err: any, req: express.Request, res: express.Response, next
 	});
 });
 
-module.exports = backend;
+// Export the web application to any other files that might require it.
+module.exports = webValueCharts;
 
-
-backend.listen(3000);
+// Start the server and set it to listen on port 3000.
+webValueCharts.listen(3000);
