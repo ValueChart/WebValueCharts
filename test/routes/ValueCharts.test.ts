@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:17:31
+* @Last Modified time: 2016-08-23 16:46:44
 */
 
 // Require Node Libraries:
@@ -81,6 +81,51 @@ describe('ValueCharts Routes', () => {
 					        if (err) return done(err);
 					        done();
 					    });
+				});
+			});
+		});
+	});
+
+	describe('Route: /ValueCharts/name/:Chart', () => {
+
+		describe('Method: Get', () => {
+
+			context('when the ValueChart name is taken', () => {
+
+				it('should return false to indicate that the name is taken, along with status code 200', (done) => {
+					user.get('ValueCharts/' + JsonGroupHotel.name + '/available')
+							.set('Accept', 'application/json')
+							.expect('Content-Type', /json/)
+							.expect(200)
+						    .expect((res: request.Response) => {
+
+						    	console.log(res.body.data);
+								var valueChartResponse = res.body.data;
+
+								expect(valueChartResponse).to.be.false;
+
+							}).end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+			context('when the ValueChart name is not taken', () => {
+				it('shold return true to indicate that the name is free, along with status code 200', (done) => {
+					user.get('ValueCharts/AFreeName/available')
+							.set('Accept', 'application/json')
+							.expect('Content-Type', /json/)
+							.expect(200)
+						    .expect((res: request.Response) => {
+								var valueChartResponse = res.body.data;
+
+								expect(valueChartResponse).to.be.true;
+
+							}).end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
 				});
 			});
 		});
