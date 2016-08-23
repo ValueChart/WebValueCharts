@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 21:45:45
+* @Last Modified time: 2016-08-22 22:02:30
 */
 
-// Import Libraries and Middlware:
+// Import Libraries and Middleware:
 import * as express 								from 'express';
 import * as mongo 									from 'mongodb';
 import * as monk									from 'monk';
@@ -22,7 +22,7 @@ import { valueChartRoutes } 						from './routes/ValueCharts.routes';
 import { usersRoutes }								from './routes/Users.routes';
 import { hostWebSocket }							from './routes/Host.routes';
 
-// Types and Utilities
+// Import Utilities:
 import { passport }									from './utilities/auth';
 
 
@@ -80,7 +80,7 @@ webValueCharts.all('*', function(req, res, next) {
 	next();
 });
 
-// Attach routers to manage specific URIs
+// Attach routers to manage specific URIs. 
 webValueCharts.use('/', indexRoutes);					// The index.html page.
 webValueCharts.use('/ValueCharts', valueChartRoutes);	// ValueCharts resource endpoints.
 webValueCharts.use('/Users', usersRoutes);				// User resource endpoints.
