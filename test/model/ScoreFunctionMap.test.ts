@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:14:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:16:21
+* @Last Modified time: 2016-08-22 16:19:30
 */
 
 import { ScoreFunctionMap } 			from '../../app/resources/model/ScoreFunctionMap';
@@ -10,12 +10,8 @@ import { ScoreFunction } 				from '../../app/resources/model/ScoreFunction';
 import { PrimitiveObjective } 			from '../../app/resources/model/PrimitiveObjective';
 import { DiscreteScoreFunction } 		from '../../app/resources/model/DiscreteScoreFunction';
 import { ContinuousScoreFunction } 		from '../../app/resources/model/ContinuousScoreFunction';
-
-
 	
 import { expect }						from 'chai';
-
-
 
 
 describe('ScoreFunctionMap', () => {
@@ -140,6 +136,47 @@ describe('ScoreFunctionMap', () => {
 				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
 				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.be.undefined;
 			});
+		});
+	});
+
+	describe('#getAllScoreFunctions()', () => {
+
+		beforeEach(function() {
+			scoreFunctionMap = new ScoreFunctionMap();
+			scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(elevation.getName(), continuousScoreFunction);
+		});
+
+		it('should retrieve an array of all the ScoreFunctions stored within the ScoreFunctionMap', () => {
+			var scoreFunctions = scoreFunctionMap.getAllScoreFunctions();
+
+			expect(scoreFunctions).to.have.length(3);
+
+			expect(scoreFunctions[0]).to.deep.equal(discreteScoreFunction);
+			expect(scoreFunctions[1]).to.deep.equal(continuousScoreFunction);
+			expect(scoreFunctions[2]).to.deep.equal(continuousScoreFunction);
+
+		});
+	});
+
+	describe('#getAllKeyScoreFunctionPairs()', () => {
+
+		beforeEach(function() {
+			scoreFunctionMap = new ScoreFunctionMap();
+			scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(elevation.getName(), continuousScoreFunction);
+		});
+
+		it('should retrieve an array of all the ScoreFunctions along with their corresponding objective names stored within the ScoreFunctionMap', () => {
+			var scoreFunctions = scoreFunctionMap.getAllKeyScoreFunctionPairs();
+
+			expect(scoreFunctions).to.have.length(3);
+
+			expect(scoreFunctions[0]).to.deep.equal({key: weather.getName(), scoreFunction: discreteScoreFunction });
+			expect(scoreFunctions[1]).to.deep.equal({key: distance.getName(), scoreFunction: continuousScoreFunction });
+			expect(scoreFunctions[2]).to.deep.equal({key: elevation.getName(), scoreFunction: continuousScoreFunction });
 		});
 	});
 

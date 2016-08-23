@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 17:47:42
+* @Last Modified time: 2016-08-22 16:01:41
 */
 
 // Import Utility Classes:
@@ -22,7 +22,7 @@ export class Alternative {
 	private name: string;									// The name of the Alternative
 	private id: string;										// The name of the Alternative formatted for use as a HTML id.
 	private description: string;							// The description of the alternative.
-	private objectiveValues: Map<string, string | number>;	// The map of the Alternative's consequences to the associated Primitive Objective
+	private objectiveValues: Map<string, string | number>;	// The internal Map objective used to match consequences to the name of the associated PrimitiveObjective.
 
 	// ========================================================================================
 	// 									Constructor

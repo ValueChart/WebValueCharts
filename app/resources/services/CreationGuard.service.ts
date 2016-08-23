@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-20 16:08:35
+* @Last Modified time: 2016-08-22 13:56:02
 */
 
 // Import Angular Classes:
@@ -36,5 +36,4 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 			return false;
 		}
 	}
-
 }

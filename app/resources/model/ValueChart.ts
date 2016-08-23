@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 17:45:28
+* @Last Modified time: 2016-08-22 15:27:42
 */
 	
 // Import Model Classes:
@@ -21,9 +21,9 @@ import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 import * as Formatter															from '../utilities/Formatter';
 
 /*
-	This class is the data representation of a ValueChart. It uses the Alternative class to represent the 
+	This class is the representation of a ValueChart's internal data. It uses the Alternative class to represent the 
 	decision options in a ValueChart, a hierarchical structure of of Objectives to represent criteria for the
-	decision, and an array of Users to represent preferences for multiple users. A ValueChart with one user
+	decision, and an array of Users to represent user preferences. A ValueChart with one user
 	is referred to as a "individual" ValueChart, while a ValueChart with multiple users is referred to as a 
 	"group" ValueChart. These ValueCharts sub-types are rendered differently by the ValueChartDirective, 
 	but data-wise differ only in the number of users.

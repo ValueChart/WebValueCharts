@@ -2,23 +2,38 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 15:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-12 17:04:34
+* @Last Modified time: 2016-08-22 20:34:24
 */
 
 import { Memento }				from './Memento';
 import { ScoreFunction } 		from './ScoreFunction';
 
 
+/*
+	This class extends ScoreFunction to implement score functions for objectives with discrete (interval and categorical) domains.
+	The class is wrapper around a Map object that is used to map user scores to specific domain elements.
+*/
 
 export class DiscreteScoreFunction extends ScoreFunction {
 
-	public type: string;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
+
+	public type: string;	// The type of the ScoreFunction. Should always be 'discrete'.
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
 	constructor() {
 		super();
-		this.elementScoreMap = new Map<string, number>();
 		this.type = 'discrete';
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	getScore(domainElement: string): number {
 		return this.elementScoreMap.get(domainElement);
@@ -26,11 +41,15 @@ export class DiscreteScoreFunction extends ScoreFunction {
 
 	setElementScore(domainElement: string, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
-
 		this.updateBestAndWorstElements(domainElement, score);
 	}
 
 
+	/*
+		@returns {DiscreteScoreFunction} - A DiscreteScoreFunction that is an exact copy of this DiscreteScoreFunction.
+		@description	Returns a copy (AKA a memento) of the DiscreteScoreFunction. This copy is stored in a different memory location and will not be changed if the original
+						object is changed. This method should be used to create copies of DiscreteScoreFunctions when user scores needs to be preserved and stored.
+	*/
 	getMemento(): DiscreteScoreFunction {
 		var scoreFunctionCopy: DiscreteScoreFunction;
 

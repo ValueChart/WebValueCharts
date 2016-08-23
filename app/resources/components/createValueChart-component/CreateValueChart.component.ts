@@ -169,6 +169,7 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.step === this.creationStepsService.PRIORITIES) {
 			text = "View Chart >>";
 		}
+
 		return text;
 	}
 

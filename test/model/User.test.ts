@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:15:04
+* @Last Modified time: 2016-08-22 15:22:14
 */
 
 
@@ -28,5 +28,5 @@ describe('User', () => {
 		});
 	});
 
-	// Current the rest of the methods in User are simple getters and setters that don't warrant testings.
+	// The rest of the methods in User are simple getters and setters that don't warrant testings.
 });

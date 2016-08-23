@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 13:14:58
+* @Last Modified time: 2016-08-22 15:56:12
 */
 
 import { WeightMap } 			from '../../app/resources/model/WeightMap';
@@ -47,7 +47,7 @@ describe('WeightMap', () => {
 		});
 
 		context('when there are Objective-weights pairs in the WeightMap', () => {
-			
+
 			before(function() {
 				weightMap.setObjectiveWeight(weather.getName(), 2);
 				weightMap.setObjectiveWeight(humidity.getName(), 1);
@@ -149,6 +149,82 @@ describe('WeightMap', () => {
 		});
 	});
 
+	describe('#getWeightTotal()', () => {
+
+		before(function() {
+			weightMap = new WeightMap();
+			weightMap.setObjectiveWeight(weather.getName(), 3);
+		});
+
+		context('when there is only one objective weight in the WeightMap', () => {
+			it('should return the correct weight total', () => {
+				expect(weightMap.getWeightTotal()).to.equal(3);
+			});
+		});
+
+		context('when more objective weights are added to the WeightMap', () => {
+
+			before(function() {
+				weightMap.setObjectiveWeight(distance.getName(), 10);
+				weightMap.setObjectiveWeight(elevation.getName(), 5)
+				weightMap.setObjectiveWeight(temperature.getName(), 1)
+				weightMap.setObjectiveWeight(humidity.getName(), 10);
+			});
+
+			it('should return the correct weight total', () => {
+				expect(weightMap.getWeightTotal()).to.equal(3 + 10 + 5 + 1 + 10);
+			});
+
+		});
+
+		context('when objective weights are changed', () => {
+
+			before(function() {
+				weightMap.setObjectiveWeight(temperature.getName(), 6)
+				weightMap.setObjectiveWeight(humidity.getName(), 0.5);
+			});
+
+			it('should return the correct weight total', () => {
+				expect(weightMap.getWeightTotal()).to.equal(3 + 10 + 5 + 6 + 0.5);
+			});
+		});
+
+		context('when objective weights are removed', () => {
+
+			before(function() {
+				weightMap.removeObjectiveWeight(temperature.getName());
+			});
+
+			it('should return the correct weight total', () => {
+				expect(weightMap.getWeightTotal()).to.equal(3 + 10 + 5 + 0.5);
+			});
+		});
+
+	});
+
+	describe('#recalculateWeightTotal()', () => {
+		var weightTotal: number;
+
+		before(function() {
+			weightMap = new WeightMap();
+			weightMap.setObjectiveWeight(weather.getName(), 3);
+			weightMap.setObjectiveWeight(distance.getName(), 5);
+			weightMap.setObjectiveWeight(elevation.getName(), 2);
+			weightMap.setObjectiveWeight(temperature.getName(), 1);
+			weightMap.setObjectiveWeight(humidity.getName(), 2);
+
+			weightTotal = 3 + 5 + 2 + 1 + 2;
+		});
+
+
+		it('should return the correct weight total', () => {
+			expect(weightMap.recalculateWeightTotal()).to.equal(weightTotal);
+		});
+
+	});
+
+
+
 	describe('#getNormalizedObjectiveWeight(objective: PrimitiveObjective)', () => {
 		var weightTotal: number;
 
@@ -223,7 +299,7 @@ describe('WeightMap', () => {
 
 
 	describe('#getNormalizedWeights(orderedObjectives: PrimitiveObjective[])', () => {
-		var weightTotal: number; 
+		var weightTotal: number;
 		var normalizedWeights: number[];
 
 		context('when the sum of the weights is greater than 1', () => {
@@ -296,7 +372,7 @@ describe('WeightMap', () => {
 				normalizedWeights = weightMap.getNormalizedWeights(objectiveOrder);
 
 				expect(normalizedWeights).to.have.length(5);
-				
+
 				// Use within to account for floating point rounding errors.
 				expect(normalizedWeights[0]).to.be.closeTo(.1 / weightTotal, roundingError); // This should be the weight for distance.
 				expect(normalizedWeights[1]).to.be.closeTo(.3 / weightTotal, roundingError); // This should be the weight for temperature.

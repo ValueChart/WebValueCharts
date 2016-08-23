@@ -2,31 +2,64 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-11 12:21:13
+* @Last Modified time: 2016-08-22 20:40:33
 */
 
-import { Objective } 	from './Objective';
-import { Domain } 		from './Domain';
+// Import Model Classes:
+import { Objective } 			from './Objective';
+import { Domain } 				from './Domain';
 
 import { Memento }				from './Memento';
-import *	as Formatter																	from '../utilities/Formatter';
 
+// Import Utilities:
+import *	as Formatter		from '../utilities/Formatter';
+
+
+/*
+	A primitive objective is a criteria used to evaluate alternatives in a decision that cannot be broken down into further criteria.
+	This is why it is called primitive. Primitive objectives are a key component of a ValueChart. They are assigned weights by users to rank
+	their importance relative to other PrimitiveObjectives, and given user defined score functions, which assign scores to every element in the 
+	objectives domain. An objectives domain is the range of values that an alternative may assign to that objective.
+*/
 
 export class PrimitiveObjective implements Objective {
 
-	public objectiveType: string;
-	private name: string;
-	private id: string;
-	private description: string;
-	private color: string;
-	private domain: Domain;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
+
+	public objectiveType: string;			// The type of objective. This must always be 'primitive';
+	private name: string;					// The name of the objective. This field is ALWAYS used as the key for Alternatives, WeightMaps, and ScoreFunctionMaps. NEVER use id.
+	private id: string;						// The id of the objective. This is for use as an HTML id ONLY, and is formatted from the name field specifically for this purpose. 
+	private description: string;			// The description of the objective.
+	private color: string;					// The color of the objective in a ValueChart.
+	private domain: Domain;					// The domain of the objective. 
+
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+
+	/*
+		@param name - The name of the PrimitiveObjective.
+		@param description - The description of the PrimitiveObjective.
+		@returns {void}	
+		@description	Constructs a new PrimitiveObjective. This constructor only initializes the basic fields of the PrimitiveObjective.
+						A domain must be assigned separately using the getDomain method. The same goes for a color.
+	*/
 	constructor(name: string, description: string) {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'primitive';
 		this.id = Formatter.nameToID(this.name);
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
 
 	getId(): string {
 		return this.id;
@@ -69,6 +102,12 @@ export class PrimitiveObjective implements Objective {
 		this.domain = domain;
 	}
 
+
+	/*
+		@returns {PrimitiveObjective} - A PrimitiveObjective that is an exact copy of this PrimitiveObjective.
+		@description	Returns a copy (AKA a memento) of the PrimitiveObjective. This copy is stored in a different memory location and will not be changed if the original
+						PrimitiveObjective is changed. This method should be used to create copies of a PrimitiveObjective when it needs to be preserved and stored.
+	*/
 	getMemento(): Memento {
 		// Create a new PrimitiveObjective object.
 		var primitiveObjectiveCopy: PrimitiveObjective = new PrimitiveObjective(this.name, this.description);

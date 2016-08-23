@@ -2,19 +2,33 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:27:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-01 16:14:12
+* @Last Modified time: 2016-08-22 21:05:58
 */
 
-
+// Import Model Classes:
 import { Domain } 		from './Domain';
 
 
+/*
+	This class represents a continuous domain. An continuous domain is a domain that is densely includes every value between a minimum and maximum value.
+	For example, a continuous domain [0,10] is a domain that includes 0, 10 and all possible values between them.
+	Continuous domains are assigned scores by the ContinuousScoreFunction.
+*/
+
 export class ContinuousDomain implements Domain {
 
-	type: string;
-	private minValue: number;
-	private maxValue: number;
-	unit: string;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
+
+	public type: string;			// The type of the domain. Should always be 'continuous'.
+	private minValue: number;		// The minimum value of the domain. Inclusive.
+	private maxValue: number;		// The maximum value of the domain. Inclusive.
+	public unit: string;			// The unit of the domain. For example: dollars, meters, etc.
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
 	constructor(minValue?: number, maxValue?: number, unit?: string) {
 		if (minValue !== undefined)
@@ -27,6 +41,10 @@ export class ContinuousDomain implements Domain {
 
 		this.type = 'continuous';
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	setRange(minValue: number, maxValue: number): void {
 		this.minValue = minValue;
