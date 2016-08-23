@@ -2,19 +2,19 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:02:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:47:16
+* @Last Modified time: 2016-08-23 12:49:05
 */
 
 // Import Angular Classes:
 import { Routes, RouterModule }  from '@angular/router';
 
 // Import Application Classes: 
-import { CreateValueChartComponent }			from './Components/CreateValueChart/CreateValueChart.component';
-import { CreateAlternativesComponent }			from './Components/CreateAlternatives/CreateAlternatives.component';
-import { CreateBasicInfoComponent }				from './Components/CreateBasicInfo/CreateBasicInfo.component';
-import { CreateObjectivesComponent }			from './Components/CreateObjectives/CreateObjectives.component';
-import { CreateScoreFunctionsComponent }		from './Components/CreateScoreFunctions/CreateScoreFunctions.component';
-import { CreateWeightsComponent }				from './Components/CreateWeights/CreateWeights.component';
+import { CreateValueChartComponent }			from './components/CreateValueChart/CreateValueChart.component';
+import { CreateAlternativesComponent }			from './components/CreateAlternatives/CreateAlternatives.component';
+import { CreateBasicInfoComponent }				from './components/CreateBasicInfo/CreateBasicInfo.component';
+import { CreateObjectivesComponent }			from './components/CreateObjectives/CreateObjectives.component';
+import { CreateScoreFunctionsComponent }		from './components/CreateScoreFunctions/CreateScoreFunctions.component';
+import { CreateWeightsComponent }				from './components/CreateWeights/CreateWeights.component';
 
 import { AuthGuardService }						from '../app/services/AuthGuard.service';
 import { CreationGuardService }					from './services/CreationGuard.service';
