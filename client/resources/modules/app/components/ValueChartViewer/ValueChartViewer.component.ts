@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 15:17:34
+* @Last Modified time: 2016-08-23 16:09:29
 */
 
 import { Component }															from '@angular/core';
@@ -288,24 +288,23 @@ export class ValueChartViewerComponent implements OnInit {
 
 	}
 
-	removeUser(user: User): void {
-		this.valueChartHttpService.deleteUser(this.valueChart._id, user.getUsername())
+	removeUser(userToDelete: User): void {
+		this.valueChartHttpService.deleteUser(this.valueChart._id, userToDelete.getUsername())
 			.subscribe(username => {
-				console.log(user);
 				if (!this.hostService.hostWebSocket) { 	// Handle the deleted user manually.
 
 					var userIndex: number = this.valueChart.getUsers().findIndex((user: User) => {
-						return user.getUsername() === user.getUsername();
+						return user.getUsername() === userToDelete.getUsername();
 					});
 					// Delete the user from the ValueChart
 					this.valueChart.getUsers().splice(userIndex, 1);
-					toastr.warning(user.getUsername() + ' has left the ValueChart');
+					toastr.warning(userToDelete.getUsername() + ' has left the ValueChart');
 				}
 
 				// The Host connection is active, so let it handle the deleted user.
 			},
 			err => {
-				toastr.error(user.getUsername() + ' could not be deleted');
+				toastr.error(userToDelete.getUsername() + ' could not be deleted');
 			});
 	}
 

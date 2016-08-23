@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 15:31:02
+* @Last Modified time: 2016-08-23 16:10:23
 */
 
 // Import Libraries and Middleware:
@@ -65,7 +65,6 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 	// Register an event handler to handle the WebSocket close event. This event is fired when the client closes the WebSocket connection
 	// with the back-end.
 	ws.on('close', () => {
-		console.log('the event emitters were cleanup up');
 		timers.clearInterval(connectionTimer);
 		// Cleanup the event listeners. They need to be removed so that the back-end does not try to send messages to the client via a closed WebSocket.
 		eventListeners.forEach((listener: any) => {
