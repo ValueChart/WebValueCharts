@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:13:32
+* @Last Modified time: 2016-08-23 15:31:02
 */
 
 // Import Libraries and Middleware:
 import * as express 								from 'express';
-
+var timers = require('timers');
 // Import Utilities:
 import { HostEventEmitter, hostEventEmitter } 		from '../utilities/HostEventEmitters';
 import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
@@ -32,6 +32,10 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 	// Send message confirming successful connection:
 	ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
 
+	var connectionTimer = timers.setInterval(() => {
+		ws.send(JSON.stringify({ type: MessageType.KeepConnection, chartId: chartId, data: 'Keep connection Open' }));
+	}, 5000);
+
 	// Register an event handler to handle message events. This handler will be called whenever the client sends a message to 
 	// the WebSocket.
 	ws.on('message', (msg: string) => {
@@ -51,12 +55,18 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 			default:
 				// Do nothing. The message is not of a known type.
 				break;
+
+			case MessageType.KeepConnection:
+				// Do nothing.
+				break;
 		}
 	});
 
 	// Register an event handler to handle the WebSocket close event. This event is fired when the client closes the WebSocket connection
 	// with the back-end.
 	ws.on('close', () => {
+		console.log('the event emitters were cleanup up');
+		timers.clearInterval(connectionTimer);
 		// Cleanup the event listeners. They need to be removed so that the back-end does not try to send messages to the client via a closed WebSocket.
 		eventListeners.forEach((listener: any) => {
 			hostEventEmitter.removeListener(listener.eventName, listener.listener);
@@ -71,16 +81,19 @@ var initEventListeners = (chartId: string, ws: any): any[] => {
 	
 	// Send a message to the client whenever a user is added to the hosted ValueChart. The new user object is included in the message.
 	var addedListener = (user: any) => {
+		console.log('User added event detected');
 		ws.send(JSON.stringify({ type: MessageType.UserAdded, data: user, chartId: chartId }));
 	};
 
 	// Send a message to the client whenever a user is removed from the hosted ValueChart. The name of the removed user is included in the message.
 	var removedListener = (username: string) => {
+		console.log('User removed event detected');
 		ws.send(JSON.stringify({ type: MessageType.UserRemoved, data: username, chartId: chartId }));
 	};
 
 	// Send a message to the client whenever a user in the hosted ValueChart is changed. The changed user object is included in the message. 
 	var changedListener = (user: any) => {
+		console.log('User changed event detected');
 		ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
 	};
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:03:52
+* @Last Modified time: 2016-08-23 15:28:13
 */
 
 import { Injectable } 												from '@angular/core';
@@ -66,6 +66,9 @@ export class HostService {
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				this.valueChartService.addUser(newUser);
+
+				console.log('User joined: ', newUser);
+
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
 
@@ -75,6 +78,12 @@ export class HostService {
 					return user.getUsername() === updatedUser.getUsername();
 				});
 
+				if (userIndex === -1 ) {
+					this.valueChartService.addUser(updatedUser);
+					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
+					break;
+				}
+
 				// Update the user's preferences.
 				var oldUser: User = valueChart.getUsers()[userIndex];
 				oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
@@ -83,6 +92,7 @@ export class HostService {
 					pair.scoreFunction.setElementScoreMap(newScores);
 				});
 
+				console.log('User changed: ', updatedUser);
 				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 				break;
 
@@ -93,11 +103,15 @@ export class HostService {
 					return user.getUsername() === userToDelete;
 				});
 				// Delete the user from the ValueChart
+				console.log('User deleted: ', updatedUser);
 				valueChart.getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:
 
+			case MessageType.KeepConnection:
+				console.log(hostMessage);
+				this.hostWebSocket.send(JSON.stringify( { type: MessageType.KeepConnection, data: 'Keep connection Open' } ));
 				break;
 		}
 	}

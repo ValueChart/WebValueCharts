@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:59:43
+* @Last Modified time: 2016-08-23 15:17:34
 */
 
 import { Component }															from '@angular/core';
@@ -291,6 +291,7 @@ export class ValueChartViewerComponent implements OnInit {
 	removeUser(user: User): void {
 		this.valueChartHttpService.deleteUser(this.valueChart._id, user.getUsername())
 			.subscribe(username => {
+				console.log(user);
 				if (!this.hostService.hostWebSocket) { 	// Handle the deleted user manually.
 
 					var userIndex: number = this.valueChart.getUsers().findIndex((user: User) => {
