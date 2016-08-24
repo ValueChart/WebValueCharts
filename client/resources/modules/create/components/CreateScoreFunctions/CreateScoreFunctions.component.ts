@@ -43,7 +43,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     private scoreFunctionViewerService: ScoreFunctionViewerService) { }
 
   ngOnInit() {
-    this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+    this.creationStepsService.observables[this.creationStepsService.PREFERENCES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
             subscriber.next(this.validate());
             subscriber.complete();
         });

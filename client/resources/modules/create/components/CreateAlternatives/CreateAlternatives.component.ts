@@ -22,10 +22,13 @@ export class CreateAlternativesComponent implements OnInit {
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
 
+    // Validation fields:
+    validationTriggered: boolean = false;
+
 	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
 	ngOnInit() {
-		this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+		this.creationStepsService.observables[this.creationStepsService.ALTERNATIVES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
             subscriber.next(this.validate());
             subscriber.complete();
         });
@@ -52,10 +55,6 @@ export class CreateAlternativesComponent implements OnInit {
 		this.valueChartService.setAlternatives(alternatives);
 	}
 
-	validate(): boolean {
-		return true;
-	}
-
 	getColumnHeader(obj: PrimitiveObjective) : string {
 		if (obj.getDomainType() === 'continuous') {
 			return obj.getName() + " (min: " + (<ContinuousDomain>obj.getDomain()).getMinValue() + ", max: " +  (<ContinuousDomain>obj.getDomain()).getMaxValue() + ")"; 
@@ -67,6 +66,14 @@ export class CreateAlternativesComponent implements OnInit {
 
 	altKeys(): Array<string> {
 		return Object.keys(this.alternatives);
+	}
+
+	getNames(): string[] {
+		let names: string[] = [];
+		for (let altID of this.altKeys()) {
+			names.push(this.alternatives[altID].getName());
+		}
+		return names;
 	}
 
 	addEmptyAlternative() {
@@ -105,5 +112,61 @@ export class CreateAlternativesComponent implements OnInit {
 
 	toNumber(str: string): number {
 		return Number(str);
+	}
+
+	// Validation methods:
+
+	validate(): boolean {
+		this.validationTriggered = true;
+		return this.hasAlternatives() && this.allHaveNames() && this.allNamesValid()
+			&& this.allNamesUnique() && this.allObjectivesHaveValues() && this.allValuesWithinRange();
+	}
+
+	hasAlternatives(): boolean {
+		return this.altKeys().length > 0;
+	}
+
+	allHaveNames(): boolean {
+		return this.getNames().indexOf("") === -1;
+	}
+
+	allNamesValid(): boolean {
+		let regex = new RegExp("^[\\s\\w-]+$");
+		for (let name of this.getNames()) {
+			if (name.search(regex) === -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	allNamesUnique(): boolean {
+		return this.getNames().length === (new Set(this.getNames())).size;
+	}
+
+	allObjectivesHaveValues(): boolean {
+		for (let altID of this.altKeys()) {
+			for (let objname of this.valueChartService.getPrimitiveObjectivesByName()) {
+				if (!this.alternatives[altID].getObjectiveValue(objname)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	allValuesWithinRange(): boolean {
+		for (let altID of this.altKeys()) {
+			for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+				if (obj.getDomainType() === 'continuous') {
+					let dom: ContinuousDomain = <ContinuousDomain>obj.getDomain();
+					let objValue = this.alternatives[altID].getObjectiveValue(obj.getName());
+					if (objValue > dom.getMaxValue() || objValue < dom.getMinValue()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 }

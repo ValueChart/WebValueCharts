@@ -103,7 +103,7 @@
              class="alert alert-danger">
           Every Objective must have a name.
 </div>
-<div *ngIf="validationTriggered && allHaveNames() && !objectiveNamesValid()" 
+<div *ngIf="validationTriggered && allHaveNames() && !allNamesValid()" 
              class="alert alert-danger">
           Names may only contain alphanumeric characters, hyphens, underscores, and spaces.
 </div>

@@ -29,7 +29,7 @@ export class CreateWeightsComponent implements OnInit {
 		private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
 	ngOnInit() {
-		this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+		this.creationStepsService.observables[this.creationStepsService.PRIORITIES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
             subscriber.next(this.validate());
             subscriber.complete();
         });

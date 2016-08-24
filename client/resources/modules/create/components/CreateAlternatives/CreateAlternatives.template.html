@@ -34,3 +34,27 @@
       </tr>
     </tbody>
 </table>
+<div *ngIf="validationTriggered && !hasAlternatives()" 
+             class="alert alert-danger">
+          There must be at least one Alternative.
+</div>
+<div *ngIf="validationTriggered && !allHaveNames()" 
+             class="alert alert-danger">
+          Every Alternative must have a name.
+</div>
+<div *ngIf="validationTriggered && allHaveNames() && !allNamesValid()" 
+             class="alert alert-danger">
+          Names may only contain alphanumeric characters, hyphens, underscores, and spaces.
+</div>
+<div *ngIf="validationTriggered && allHaveNames() && !allNamesUnique()" 
+             class="alert alert-danger">
+          All Alternative names must be unique.
+</div>
+<div *ngIf="validationTriggered && !allObjectivesHaveValues()" 
+             class="alert alert-danger">
+          You must select an outcome for every Objective on every Alternative.
+</div>
+<div *ngIf="validationTriggered && !allValuesWithinRange()" 
+             class="alert alert-danger">
+          Objective outcomes must fall within the specified range.
+</div>

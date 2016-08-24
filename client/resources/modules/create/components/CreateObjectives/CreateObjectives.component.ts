@@ -324,17 +324,16 @@ export class CreateObjectivesComponent implements OnInit {
 
 	validate(): boolean {
 		this.validationTriggered = true;
-		let valid =  this.allHaveNames() && this.objectiveNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
+		return  this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
 			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.atLeastTwoCategories() 
 			&& this.continuousComplete() && this.intervalComplete() && this.minLessThanMax() && this.intervalOk();
-		return valid;
 	}
 
 	allHaveNames(): boolean {
 		return this.getNames().indexOf("") === -1;
 	}
 
-	objectiveNamesValid() {
+	allNamesValid() {
 		let regex = new RegExp("^[\\s\\w-]+$");
 		for (let name of this.getNames()) {
 			if (name.search(regex) === -1) {
