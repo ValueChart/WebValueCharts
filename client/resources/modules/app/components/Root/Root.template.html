@@ -7,7 +7,7 @@
 				</div>
 				<ul class="nav pull-right col-xs-10">
 					<form class="form-inline center-form pull-right">
-						<div class="form-group navbar-group" *ngIf="chartType === 'normal' && router.url.indexOf('view/') !== -1">
+						<div class="form-group navbar-group" *ngIf="chartType === 'normal' && router.url.indexOf('view/') !== -1 && !valueChartService.isIndividual()">
 							<a class="btn btn-default" (click)="viewAverageChart()" id="view-average-chart">
 								View Average Chart
 							</a>

@@ -149,8 +149,11 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getAlternativeValuesforObjective(obj);
 	}
 
-	isIndividual() {
-		return this.valueChart.isIndividual();
+	isIndividual(): boolean {
+		if (this.valueChart) {
+			return this.valueChart.isIndividual();
+		}
+		return false;
 	}
 
 	currentUserIsDefined(): boolean {
