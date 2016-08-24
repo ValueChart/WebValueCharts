@@ -8,6 +8,7 @@ import '../../../utilities/rxjs-operators';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
+import *	as Formatter												from '../../../utilities/classes/Formatter';
 
 // Model Classes
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -151,6 +152,10 @@ export class CreateObjectivesComponent implements OnInit {
 			names.push(this.objectiveRows[key].name);
 		}
 		return names;
+	}
+
+	getFormattedNames(): string[] {
+		return this.getNames().map(x => Formatter.nameToID(x));
 	}
 
 	initialObjKeys(): Array<string> {
@@ -345,7 +350,7 @@ export class CreateObjectivesComponent implements OnInit {
 	}
 
 	allNamesUnique(): boolean {
-		return this.getNames().length === (new Set(this.getNames())).size;
+		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
 	}
 
 	hasPrimitive(): boolean {

@@ -6,6 +6,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
+import *	as Formatter												from '../../../utilities/classes/Formatter';
 
 // Model Classes
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -76,6 +77,10 @@ export class CreateAlternativesComponent implements OnInit {
 		return names;
 	}
 
+	getFormattedNames(): string[] {
+		return this.getNames().map(x => Formatter.nameToID(x));
+	}
+
 	addEmptyAlternative() {
 		this.alternatives[this.alternativesCount] = new Alternative("", "");
 		this.isSelected[this.alternativesCount] = false;
@@ -141,7 +146,7 @@ export class CreateAlternativesComponent implements OnInit {
 	}
 
 	allNamesUnique(): boolean {
-		return this.getNames().length === (new Set(this.getNames())).size;
+		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
 	}
 
 	allObjectivesHaveValues(): boolean {
