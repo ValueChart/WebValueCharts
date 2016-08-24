@@ -1,5 +1,7 @@
 import { Injectable } 							from '@angular/core';
 import { Router }								from '@angular/router';
+import { Observable }     						from 'rxjs/Observable';
+import '../../utilities/rxjs-operators';
 
 @Injectable()
 export class CreationStepsService {
@@ -12,8 +14,10 @@ export class CreationStepsService {
 
 	nextStep: { [currentStep: string]: string; } = {};
 	previousStep: { [currentStep: string]: string; } = {};
+	observables: { [step: string]: Observable<boolean>; } = {};
 
 	constructor(private router: Router) {
+
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
 		this.nextStep[this.ALTERNATIVES] = this.PREFERENCES;
@@ -37,5 +41,13 @@ export class CreationStepsService {
 	previous(step: string, purpose: string): string {
 		this.router.navigate(['createValueChart/' + purpose + '/' + this.previousStep[step]]);
 		return this.previousStep[step];
+	}
+
+	validate(step: string): boolean {
+		let valid: boolean;
+		this.observables[step].subscribe(isValid => {
+			valid = isValid;
+		});
+        return valid;
 	}
 }

@@ -1,8 +1,12 @@
 import { Component, OnInit }											from '@angular/core';
 import { NgClass } 														from '@angular/common';
+import { Observable }     													from 'rxjs/Observable';
+import { Subscriber }     													from 'rxjs/Subscriber';
+import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 
 // Model Classes
@@ -34,9 +38,15 @@ export class CreateObjectivesComponent implements OnInit {
 
 	constructor(
 		private valueChartService: ValueChartService,
+		private creationStepsService: CreationStepsService,
 		private updateObjRefService: UpdateObjectiveReferencesService) { }
 
 	ngOnInit() {
+		this.creationStepsService.observables[this.creationStepsService.OBJECTIVES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+            subscriber.next(this.validate());
+            subscriber.complete();
+        });
+
 		this.initialPrimObjRows = {};
 		this.objectiveRows = {};
 		this.rootObjRowID = "0";
@@ -73,6 +83,10 @@ export class CreateObjectivesComponent implements OnInit {
 		if (this.editing) {
 			this.updateReferences();
 		}
+	}
+
+	validate(): boolean {
+		return true;
 	}
 
 	// Update PrimitiveObjective references throughout ValueChart

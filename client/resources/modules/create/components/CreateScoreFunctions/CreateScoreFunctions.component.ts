@@ -1,8 +1,12 @@
 import { Component, OnInit }										    from '@angular/core';
+import { Observable }                               from 'rxjs/Observable';
+import { Subscriber }                               from 'rxjs/Subscriber';
+import '../../../utilities/rxjs-operators';
 
 // Application classes:
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
+import { CreationStepsService }                      from '../../services/CreationSteps.service';
 import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }								from '../../../app/services/ScoreFunctionViewer.service';
 
@@ -34,10 +38,15 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   constructor(
     private valueChartService: ValueChartService,
+    private creationStepsService: CreationStepsService,
     private chartUndoRedoService: ChartUndoRedoService,
     private scoreFunctionViewerService: ScoreFunctionViewerService) { }
 
   ngOnInit() {
+    this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+            subscriber.next(this.validate());
+            subscriber.complete();
+        });
     this.services.valueChartService = this.valueChartService;
     this.services.chartUndoRedoService = this.chartUndoRedoService;
     this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
@@ -65,6 +74,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
         this.valueChartService.resetWeightMap(this.user, this.valueChartService.getDefaultWeightMap());
       }
     }
+  }
+
+  validate(): boolean {
+    return true;
   }
 
   advanceSelectedObjective() {

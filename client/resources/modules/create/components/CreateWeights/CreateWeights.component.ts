@@ -1,7 +1,11 @@
 import { Component, OnInit }											from '@angular/core';
+import { Observable }     													from 'rxjs/Observable';
+import { Subscriber }     													from 'rxjs/Subscriber';
+import '../../../utilities/rxjs-operators';
 
 // Application classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { CreationStepsService }											from '../../services/CreationSteps.service';
 
 // Model Classes
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -22,9 +26,13 @@ export class CreateWeightsComponent implements OnInit {
     isRanked: { [objName: string]: boolean; };
 
 	constructor(
-		private valueChartService: ValueChartService) { }
+		private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
 	ngOnInit() {
+		this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+            subscriber.next(this.validate());
+            subscriber.complete();
+        });
 		this.rankedObjectives = [];
 		this.isRanked = {};
 		this.user = this.valueChartService.getCurrentUser();
@@ -49,6 +57,10 @@ export class CreateWeightsComponent implements OnInit {
 
 	ngOnDestroy() {
 		this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
+	}
+
+	validate(): boolean {
+		return true;
 	}
 
 	compareObjectivesByWeight(pair1: [string, number], pair2: [string, number]) {

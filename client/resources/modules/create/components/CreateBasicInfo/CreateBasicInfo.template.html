@@ -1,6 +1,27 @@
 <label class="control-label">Chart name.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartName" (change)="updateValueChart()" maxlength="100" />
+<input class="form-control required" type="text" [(ngModel)]="valueChartName" (change)="updateValueChart()" maxlength="100" required #name="ngModel"/>
 <label class="control-label">Chart description.</label>
 <input  class="form-control" type="text" [(ngModel)]="valueChartDescription" (change)="updateValueChart()" maxlength="100" />
 <label class="control-label">Password.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartPassword" (change)="updateValueChart()" maxlength="100" />
+<input class="form-control required" type="text" [(ngModel)]="valueChartPassword" (change)="updateValueChart()" maxlength="100" required #password="ngModel"/>
+<div *ngIf="(validationTriggered || name.dirty) && !name.valid" 
+             class="alert alert-danger">
+          You must provide a name.
+</div>
+<div *ngIf="(validationTriggered || name.dirty) && name.valid && !nameValid()" 
+             class="alert alert-danger">
+          Name must not contain special characters.
+</div>
+<div *ngIf="(validationTriggered || name.dirty) && name.valid && nameValid() && !nameAvailable" 
+             class="alert alert-danger">
+          Name is already taken.
+</div>
+
+<div *ngIf="(validationTriggered || password.dirty) && !password.valid" 
+             class="alert alert-danger">
+          You must provide a password.
+</div>
+<div *ngIf="(validationTriggered || password.dirty) && password.valid && !passwordValid()"
+             class="alert alert-danger">
+          Password must not contain spaces.
+</div>

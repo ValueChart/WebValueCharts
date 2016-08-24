@@ -1,8 +1,11 @@
 import { Component, OnInit }											from '@angular/core';
+import { Observable }     													from 'rxjs/Observable';
+import { Subscriber }     													from 'rxjs/Subscriber';
+import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
-
+import { CreationStepsService }											from '../../services/CreationSteps.service';
 
 // Model Classes
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -19,9 +22,13 @@ export class CreateAlternativesComponent implements OnInit {
     isSelected: { [altID: string]: boolean; };
     alternativesCount: number;
 
-	constructor(private valueChartService: ValueChartService) { }
+	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
 	ngOnInit() {
+		this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+            subscriber.next(this.validate());
+            subscriber.complete();
+        });
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;
@@ -43,6 +50,10 @@ export class CreateAlternativesComponent implements OnInit {
 			alternatives.push((this.alternatives[altID]));
 		}
 		this.valueChartService.setAlternatives(alternatives);
+	}
+
+	validate(): boolean {
+		return true;
 	}
 
 	getColumnHeader(obj: PrimitiveObjective) : string {

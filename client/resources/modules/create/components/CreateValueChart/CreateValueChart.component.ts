@@ -25,7 +25,7 @@ import { User }															from '../../../../model/User';
 @Component({
 	selector: 'createValueChart',
 	templateUrl: 'client/resources/modules/create/components/CreateValueChart/CreateValueChart.template.html',
-	directives: [ROUTER_DIRECTIVES, CreateBasicInfoComponent, CreateObjectivesComponent, CreateAlternativesComponent, CreateScoreFunctionsComponent, CreateWeightsComponent],
+	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService,UpdateObjectiveReferencesService]
 })
 export class CreateValueChartComponent implements OnInit {
@@ -92,30 +92,40 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	back() {
-		if (!this.currentUserService.isJoiningChart())
-			this.updateValueChartInDatabase(this.valueChart);
-
-		this.step = this.creationStepsService.previous(this.step, this.purpose);
+		if (this.creationStepsService.validate(this.step)) {
+			if (!this.currentUserService.isJoiningChart()) {
+				this.updateValueChartInDatabase(this.valueChart);
+			}
+			this.step = this.creationStepsService.previous(this.step, this.purpose);
+		}
+		else {
+			toastr.error('There were problems with your submission.');
+		}
 	}
 
 	next() {
-		if (this.step === this.creationStepsService.PRIORITIES) {
-			window.onpopstate = () => { };
-			(<any>this.valueChart).incomplete = undefined;
-			(<any> window).destination = '/view/ValueChart';
-			this.router.navigate(['/view/ValueChart']);
-		} 
+		if (this.creationStepsService.validate(this.step)) {
+			if (this.step === this.creationStepsService.PRIORITIES) {
+				window.onpopstate = () => { };
+				(<any>this.valueChart).incomplete = undefined;
+				(<any> window).destination = '/view/ValueChart';
+				this.router.navigate(['/view/ValueChart']);
+			} 
 
-		// If the user is creating a new chart, auto-save it.
-		if (!this.currentUserService.isJoiningChart()) {
-			if (this.step === this.creationStepsService.BASICS) {
-				this.saveValueChartToDatabase(this.valueChart);
-			} else {
-				this.updateValueChartInDatabase(this.valueChart);
+			// If the user is creating a new chart, auto-save it.
+			if (!this.currentUserService.isJoiningChart()) {
+				if (this.step === this.creationStepsService.BASICS) {
+					this.saveValueChartToDatabase(this.valueChart);
+				} else {
+					this.updateValueChartInDatabase(this.valueChart);
+				}
 			}
-		}
 
-		this.step = this.creationStepsService.next(this.step, this.purpose);
+			this.step = this.creationStepsService.next(this.step, this.purpose);			
+		}
+		else {
+			toastr.error('There were problems with your submission.');
+		}
 	}
 
 	updateValueChartInDatabase(valueChart: ValueChart): void {
@@ -160,7 +170,6 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	disableNextButton(): boolean {
-		// Add validation
 		return false;
 	}
 
@@ -169,7 +178,6 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.step === this.creationStepsService.PRIORITIES) {
 			text = "View Chart >>";
 		}
-
 		return text;
 	}
 
@@ -181,15 +189,23 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
+		let cancelNavigation = false;
 		if (navigate) {
 			if (keepValueChart) {
-				this.saveOnDestroy = true;
+				if (this.creationStepsService.validate(this.step)) {
+					this.saveOnDestroy = true;
+				}
+				else {
+					cancelNavigation = true;
+					toastr.error("There were problems with your submission. Please fix them if you'd like to save the chart.");
+				}
 			} else if (this.valueChart._id) {
 				this.deleteValueChart(this.valueChart);
 			}
 		}
-
-		this.navigationResponse.next(navigate);
+		if (!cancelNavigation) {
+			this.navigationResponse.next(navigate);
+		}		
 
 		$('#navigation-warning-modal').modal('hide');
 	}
