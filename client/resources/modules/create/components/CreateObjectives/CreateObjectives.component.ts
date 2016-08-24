@@ -36,6 +36,9 @@ export class CreateObjectivesComponent implements OnInit {
     categoriesToAdd: string[];
     editing: boolean;
 
+    // Validation fields:
+    validationTriggered: boolean = false;
+
 	constructor(
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
@@ -83,10 +86,6 @@ export class CreateObjectivesComponent implements OnInit {
 		if (this.editing) {
 			this.updateReferences();
 		}
-	}
-
-	validate(): boolean {
-		return true;
 	}
 
 	// Update PrimitiveObjective references throughout ValueChart
@@ -144,6 +143,14 @@ export class CreateObjectivesComponent implements OnInit {
 
 	objKeys(): Array<string> {
 		return Object.keys(this.objectiveRows);
+	}
+
+	getNames(): string[] {
+		let names: string[] = [];
+		for (let key of this.objKeys()) {
+			names.push(this.objectiveRows[key].name);
+		}
+		return names;
 	}
 
 	initialObjKeys(): Array<string> {
@@ -311,6 +318,124 @@ export class CreateObjectivesComponent implements OnInit {
 
 	toNumber(str: string): number {
 		return Number(str);
+	}
+
+	// Validation methods:
+
+	validate(): boolean {
+		this.validationTriggered = true;
+		let valid =  this.allHaveNames() && this.objectiveNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
+			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.atLeastTwoCategories() 
+			&& this.continuousComplete() && this.intervalComplete() && this.minLessThanMax() && this.intervalOk();
+		return valid;
+	}
+
+	allHaveNames(): boolean {
+		return this.getNames().indexOf("") === -1;
+	}
+
+	objectiveNamesValid() {
+		let regex = new RegExp("^[\\s\\w-]+$");
+		for (let name of this.getNames()) {
+			if (name.search(regex) === -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	allNamesUnique(): boolean {
+		return this.getNames().length === (new Set(this.getNames())).size;
+	}
+
+	hasPrimitive(): boolean {
+		for (let key of this.objKeys()) {
+			if (this.objectiveRows[key].type === 'primitive') {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	allAbstractHaveChildren(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'abstract' && objrow.children.length === 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	categoryNamesValid(): boolean {
+		let regex = new RegExp("^[\\w]+$");
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {
+				for (let category of objrow.dom.categories) {
+					if (category.search(regex) === -1) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	atLeastTwoCategories(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical' 
+				&& objrow.dom.categories.length < 2) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	continuousComplete(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'continuous' 
+				&& (objrow.dom.min === undefined || objrow.dom.max === undefined
+					|| isNaN(objrow.dom.min)|| isNaN(objrow.dom.max))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	intervalComplete(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'interval' 
+				&& (objrow.dom.min === undefined || objrow.dom.max === undefined || objrow.dom.interval === undefined
+					|| isNaN(objrow.dom.min)|| isNaN(objrow.dom.max) || isNaN(objrow.dom.interval))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	minLessThanMax(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && (objrow.dom.type === 'continuous' || objrow.dom.type === 'interval') 
+				&& (objrow.dom.min >= objrow.dom.max)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	intervalOk(): boolean {for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'interval' 
+				&& (objrow.dom.interval >= (objrow.dom.max - objrow.dom.min) || (objrow.dom.interval <= 0))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
 

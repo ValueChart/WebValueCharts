@@ -99,7 +99,7 @@ export class CreateValueChartComponent implements OnInit {
 			this.step = this.creationStepsService.previous(this.step, this.purpose);
 		}
 		else {
-			toastr.error('There were problems with your submission.');
+			toastr.error('There were problems with your submission. Please fix them to proceed.');
 		}
 	}
 
@@ -124,7 +124,7 @@ export class CreateValueChartComponent implements OnInit {
 			this.step = this.creationStepsService.next(this.step, this.purpose);			
 		}
 		else {
-			toastr.error('There were problems with your submission.');
+			toastr.error('There were problems with your submission. Please fix them to proceed.');
 		}
 	}
 

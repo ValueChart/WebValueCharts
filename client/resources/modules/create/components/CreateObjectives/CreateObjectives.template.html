@@ -99,6 +99,50 @@
         </tr>                             
     </tbody>
 </table>
+<div *ngIf="validationTriggered && !allHaveNames()" 
+             class="alert alert-danger">
+          Every Objective must have a name.
+</div>
+<div *ngIf="validationTriggered && allHaveNames() && !objectiveNamesValid()" 
+             class="alert alert-danger">
+          Names may only contain alphanumeric characters, hyphens, underscores, and spaces.
+</div>
+<div *ngIf="validationTriggered && allHaveNames() && !allNamesUnique()" 
+             class="alert alert-danger">
+          All Objective names must be unique.
+</div>
+<div *ngIf="validationTriggered && !hasPrimitive()" 
+             class="alert alert-danger">
+          There must be at least one base Objective.
+</div>
+<div *ngIf="validationTriggered && hasPrimitive && !allAbstractHaveChildren()" 
+             class="alert alert-danger">
+          Every parent Objective must have at least one child.
+</div>
+<div *ngIf="validationTriggered && !categoryNamesValid()" 
+             class="alert alert-danger">
+          Category names may only contain alphanumeric characters.
+</div>
+<div *ngIf="validationTriggered && !atLeastTwoCategories()" 
+             class="alert alert-danger">
+          Categorical domains must have at least two categories.
+</div>
+<div *ngIf="validationTriggered && !continuousComplete()" 
+             class="alert alert-danger">
+          Continuous domains must have a min and a max.
+</div>
+<div *ngIf="validationTriggered && !intervalComplete()" 
+             class="alert alert-danger">
+          Interval domains must have a min, max, and interval.
+</div>
+<div *ngIf="validationTriggered && !minLessThanMax()" 
+             class="alert alert-danger">
+          Min must be less than max.
+</div>
+<div *ngIf="validationTriggered && intervalComplete() && !intervalOk()" 
+             class="alert alert-danger">
+          Interval must be greater than 0 and less than max - min.
+</div>
 <!-- Modal -->
 <div class="modal fade" id="myCategoryModal" tabindex="-1" role="dialog" 
      aria-labelledby="myModalLabel" aria-hidden="true">
