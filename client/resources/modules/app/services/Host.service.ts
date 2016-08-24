@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:03:52
+* @Last Modified time: 2016-08-23 16:10:10
 */
 
 import { Injectable } 												from '@angular/core';
@@ -66,6 +66,7 @@ export class HostService {
 			case MessageType.UserAdded:
 				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				this.valueChartService.addUser(newUser);
+
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
 
@@ -75,15 +76,21 @@ export class HostService {
 					return user.getUsername() === updatedUser.getUsername();
 				});
 
-				// Update the user's preferences.
-				var oldUser: User = valueChart.getUsers()[userIndex];
-				oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
-				oldUser.getScoreFunctionMap().getAllKeyScoreFunctionPairs().forEach((pair: { key: string, scoreFunction: ScoreFunction}) => {
-					let newScores = updatedUser.getScoreFunctionMap().getObjectiveScoreFunction(pair.key).getElementScoreMap();
-					pair.scoreFunction.setElementScoreMap(newScores);
-				});
+				if (userIndex === -1 ) {
+					this.valueChartService.addUser(updatedUser);
+					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
+				} else {
+					// Update the user's preferences.
+					var oldUser: User = valueChart.getUsers()[userIndex];
+					oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
+					oldUser.getScoreFunctionMap().getAllKeyScoreFunctionPairs().forEach((pair: { key: string, scoreFunction: ScoreFunction}) => {
+						let newScores = updatedUser.getScoreFunctionMap().getObjectiveScoreFunction(pair.key).getElementScoreMap();
+						pair.scoreFunction.setElementScoreMap(newScores);
+					});
 
-				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
+					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
+				}
+
 				break;
 
 			case MessageType.UserRemoved:
@@ -98,6 +105,8 @@ export class HostService {
 				break;
 			default:
 
+			case MessageType.KeepConnection:
+				this.hostWebSocket.send(JSON.stringify( { type: MessageType.KeepConnection, data: 'Keep connection Open' } ));
 				break;
 		}
 	}

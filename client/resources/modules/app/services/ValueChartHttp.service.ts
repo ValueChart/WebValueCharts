@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:04:50
+* @Last Modified time: 2016-08-23 16:48:14
 */
 
 import '../../utilities/rxjs-operators';
@@ -62,6 +62,11 @@ export class ValueChartHttpService {
 			.catch(this.handleError);
 	}
 
+	isNameAvailable(chartName: string): Observable<boolean> {
+		return this.http.get(this.valueChartsUrl + chartName + '/available')
+			.map(this.extractData)
+			.catch(this.handleError);
+	}		
 
 	getValueChart(chartId: string, password: string): Observable<ValueChart> {
 		return this.http.get(this.valueChartsUrl + chartId + '?password=' + password)
