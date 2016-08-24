@@ -37,7 +37,6 @@
                         <option [value]="'green'">green</option>
                         <option [value]="'purple'">purple</option>
                         <option [value]="'orange'">orange</option>
-                        <option [value]="'yellow'">yellow</option>
                     </select>
                 </div>
             </th> 
@@ -122,6 +121,10 @@
 <div *ngIf="validationTriggered && !categoryNamesValid()" 
              class="alert alert-danger">
           Category names may only contain alphanumeric characters.
+</div>
+<div *ngIf="validationTriggered && !categoryNamesUnique()" 
+             class="alert alert-danger">
+          Categorical domain elements must be unique.
 </div>
 <div *ngIf="validationTriggered && !atLeastTwoCategories()" 
              class="alert alert-danger">

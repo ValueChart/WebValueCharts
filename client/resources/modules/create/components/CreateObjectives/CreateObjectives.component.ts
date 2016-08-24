@@ -325,8 +325,9 @@ export class CreateObjectivesComponent implements OnInit {
 	validate(): boolean {
 		this.validationTriggered = true;
 		return  this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
-			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.atLeastTwoCategories() 
-			&& this.continuousComplete() && this.intervalComplete() && this.minLessThanMax() && this.intervalOk();
+			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.categoryNamesUnique()
+			&& this.atLeastTwoCategories() && this.continuousComplete() && this.intervalComplete() 
+			&& this.minLessThanMax() && this.intervalOk();
 	}
 
 	allHaveNames(): boolean {
@@ -375,6 +376,18 @@ export class CreateObjectivesComponent implements OnInit {
 					if (category.search(regex) === -1) {
 						return false;
 					}
+				}
+			}
+		}
+		return true;
+	}
+
+	categoryNamesUnique(): boolean {
+		for (let key of this.objKeys()) {
+			let objrow: ObjectiveRow = this.objectiveRows[key];
+			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {
+				if (objrow.dom.categories.length  !== (new Set(objrow.dom.categories)).size) {
+					return false;
 				}
 			}
 		}
