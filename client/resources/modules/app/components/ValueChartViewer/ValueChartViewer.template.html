@@ -275,7 +275,7 @@
 				<div *ngFor="let user of valueChart.getUsers(); let i = index ">
 					<h5>
 					{{user.getUsername()}}
-					<span class="pull-right"><input type="color" value="{{renderConfigService.kellyColors[i]}}" (change)="setUserColor(user, $event.target.value)"></span>
+					<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
 					<button class="pull-right btn btn-danger btn-xs" *ngIf="user.getUsername() !== currentUserService.getUsername()" (click)="removeUser(user)">Remove</button>
 					</h5>
 				</div>

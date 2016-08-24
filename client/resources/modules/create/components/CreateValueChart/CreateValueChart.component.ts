@@ -117,7 +117,7 @@ export class CreateValueChartComponent implements OnInit {
 
 			if (this.step === this.creationStepsService.PRIORITIES) {
 				window.onpopstate = () => { };
-				(<any>this.valueChart).incomplete = undefined;
+				(<any>this.valueChart).incomplete = false;
 				(<any> window).destination = '/view/ValueChart';
 				this.router.navigate(['/view/ValueChart']);
 			} 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:48:13
+* @Last Modified time: 2016-08-24 10:41:34
 */
 
 // Import Angular Classes:
@@ -19,7 +19,8 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 
 	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
-		if (component.allowedToNavigate || (<any> window).destination && (<any> window).destination.indexOf('/view/') !== -1) {
+		if (component.allowedToNavigate || (<any> window).destination && ((<any> window).destination.indexOf('/view/') !== -1 ||
+																			(<any> window).destination === '/register')) {
 			return true;
 		} else {
 			var observable = component.openNavigationModal();

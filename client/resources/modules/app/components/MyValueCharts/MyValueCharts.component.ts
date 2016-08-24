@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:58:04
+* @Last Modified time: 2016-08-24 10:36:37
 */
 
 import { Component }									from '@angular/core';
@@ -117,10 +117,10 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	getStatusText(valueChartSummary: any): string {
-		if (valueChartSummary.incomplete === undefined) {
-			return 'Complete';
-		} else {
+		if (valueChartSummary.incomplete) {
 			return 'Incomplete';
+		} else {
+			return 'Complete';
 		}
 	}
 
