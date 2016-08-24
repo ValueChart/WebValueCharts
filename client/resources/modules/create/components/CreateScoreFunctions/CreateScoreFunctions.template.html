@@ -21,3 +21,7 @@
         </svg>
     </ScoreFunction>  
 </div> 
+<div *ngIf="validationTriggered && badScoreFunctions.length > 0" 
+             class="alert alert-danger">
+          {{badScoreFunctionsText()}}
+</div>

@@ -36,6 +36,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
   initialWorstOutcomes: { [objName: string]: string | number };
   private services: any = {};
 
+  // Validation fields:
+  validationTriggered: boolean = false;
+  badScoreFunctions: string[] = [];
+
   constructor(
     private valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
@@ -76,10 +80,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
   }
 
-  validate(): boolean {
-    return true;
-  }
-
   advanceSelectedObjective() {
     let primObjs: string[] = this.valueChartService.getPrimitiveObjectivesByName();
     let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
@@ -88,5 +88,49 @@ export class CreateScoreFunctionsComponent implements OnInit {
       nextIndex = 0;
     }
     this.selectedObjective = primObjs[nextIndex];
+  }
+
+  // Validation methods:
+
+  validate(): boolean {
+    this.validationTriggered = true;
+    this.setBadScoreFunctions();
+    if (this.badScoreFunctions.length === 0) {
+      this.rescaleScoreFunctions();
+      return true;
+    }
+    return false;
+  }
+
+  setBadScoreFunctions(): void {
+    let badScoreFunctions: string[] = [];
+    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      let bestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
+      let worstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
+      let bestOutcomeScore = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).getScore(bestOutcome);
+      let worstOutcomeScore = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).getScore(worstOutcome);
+      if (bestOutcomeScore === worstOutcomeScore) {
+        badScoreFunctions.push(objName);
+      }
+      this.badScoreFunctions = badScoreFunctions;
+    }
+  }
+
+  rescaleScoreFunctions(): void {
+    let rescaled: boolean = false;
+    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+      if (scoreFunction.rescale()) {
+        rescaled = true;
+      }
+    }
+    if (rescaled) {
+      toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
+    }    
+  }
+
+  badScoreFunctionsText(): string {
+    return "An Objective's outcomes can't all have the same score. Please adjust the score functions for: " + 
+              this.badScoreFunctions.map(objname => objname).join(', ');
   }
 }

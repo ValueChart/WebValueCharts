@@ -60,7 +60,7 @@ export class UpdateObjectiveReferencesService {
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
 				if (scoreFunction) {
-					scoreFunction.setElementScore(element, 0);
+					scoreFunction.setElementScore(element, 0.5);
 				}
 			}
 		}
