@@ -6,6 +6,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { ValueChartService }												from '../../../app/services/ValueChart.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
+import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
 
 // Model Classes
 import { ValueChart } 														from '../../../../model/ValueChart';
@@ -23,7 +24,9 @@ export class CreateBasicInfoComponent implements OnInit {
 	validationTriggered: boolean = false;
 	nameAvailable: boolean = true;
 
-	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
+	constructor(private valueChartService: ValueChartService, 
+		private creationStepsService: CreationStepsService,
+		private valueChartHttpService: ValueChartHttpService) { }
 
 	ngOnInit() {
 		this.creationStepsService.observables[this.creationStepsService.BASICS] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
@@ -45,18 +48,21 @@ export class CreateBasicInfoComponent implements OnInit {
 
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.nameValid() && this.passwordValid();
+		return this.nameValid() && this.nameUnique() && this.passwordValid();
 	}	
 
 	nameValid(): boolean {
 		let regex = new RegExp("^[\\s\\w-]+$");
-		return (this.valueChartName.search(regex) !== -1) && this.nameUnique();
+		return (this.valueChartName.search(regex) !== -1);
 	}
 
+	// Because the HTTP call is asynchronous, this function returns before nameAvailable has been correctly set
+	// Need to find a way around this (promises?)
 	nameUnique(): boolean {
-		this.nameAvailable = true; 
-		// TODO: Look up chart names in database
-		return this.nameAvailable;
+		this.valueChartHttpService.isNameAvailable(this.valueChartName).subscribe(isUnique => {
+			this.nameAvailable = isUnique;
+		});
+     	return this.nameAvailable;
 	}	
 
 	passwordValid() {
