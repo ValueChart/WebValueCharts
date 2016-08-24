@@ -105,13 +105,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	next() {
 		if (this.creationStepsService.validate(this.step)) {
-			if (this.step === this.creationStepsService.PRIORITIES) {
-				window.onpopstate = () => { };
-				(<any>this.valueChart).incomplete = undefined;
-				(<any> window).destination = '/view/ValueChart';
-				this.router.navigate(['/view/ValueChart']);
-			} 
-
+			
 			// If the user is creating a new chart, auto-save it.
 			if (!this.currentUserService.isJoiningChart()) {
 				if (this.step === this.creationStepsService.BASICS) {
@@ -120,6 +114,13 @@ export class CreateValueChartComponent implements OnInit {
 					this.updateValueChartInDatabase(this.valueChart);
 				}
 			}
+
+			if (this.step === this.creationStepsService.PRIORITIES) {
+				window.onpopstate = () => { };
+				(<any>this.valueChart).incomplete = undefined;
+				(<any> window).destination = '/view/ValueChart';
+				this.router.navigate(['/view/ValueChart']);
+			} 
 
 			this.step = this.creationStepsService.next(this.step, this.purpose);			
 		}
