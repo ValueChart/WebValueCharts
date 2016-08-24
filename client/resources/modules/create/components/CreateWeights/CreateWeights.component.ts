@@ -25,6 +25,9 @@ export class CreateWeightsComponent implements OnInit {
 	rankedObjectives: string[];
     isRanked: { [objName: string]: boolean; };
 
+    // Validation fields:
+    validationTriggered: boolean = false;
+
 	constructor(
 		private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
@@ -57,10 +60,6 @@ export class CreateWeightsComponent implements OnInit {
 
 	ngOnDestroy() {
 		this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
-	}
-
-	validate(): boolean {
-		return true;
 	}
 
 	compareObjectivesByWeight(pair1: [string, number], pair2: [string, number]) {
@@ -139,5 +138,21 @@ export class CreateWeightsComponent implements OnInit {
 	getWorstOutcome(objName: string): string | number {
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
 		return scoreFunction.worstElement;
+	}
+
+	// Validation methods:
+
+	validate(): boolean {
+		this.validationTriggered = true;
+		return this.allRanked();
+	}
+
+	allRanked(): boolean {
+		for (let objName of Object.keys(this.isRanked)) {
+			if (!this.isRanked[objName]) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

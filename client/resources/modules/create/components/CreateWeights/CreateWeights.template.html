@@ -31,3 +31,7 @@
         </tr>
     </tbody>
 </table>
+<div *ngIf="validationTriggered && !allRanked()" 
+             class="alert alert-danger">
+          You must rank all the Objectives.
+</div>
