@@ -221,6 +221,12 @@ export class CreateObjectivesComponent implements OnInit {
 		return result;
 	}
 
+	handleKeyPress(key: string) {
+		if (key === "Enter") {
+			this.addCategory();
+		}
+	}
+
 	addCategory() {
 		this.categoriesToAdd.push(this.categoryToAdd);
 		this.categoryToAdd = "";

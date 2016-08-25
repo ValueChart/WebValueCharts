@@ -166,7 +166,7 @@
             <div class="modal-body">
                 <form role="form">
                     <div class="input-group form-group">
-                        <input class="form-control" [(ngModel)]="categoryToAdd" name="newcat" style="width: 200px; margin-right: 5px" type="text"/>
+                        <input class="form-control" [(ngModel)]="categoryToAdd" name="newcat" style="width: 200px; margin-right: 5px" type="text" (keypress)="handleKeyPress($event.key)"/>
                         <button type="button" class="btn btn-default" (click)="addCategory()">
                                 >>
                         </button>
