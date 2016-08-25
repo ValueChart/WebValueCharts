@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 10:24:17
+* @Last Modified time: 2016-08-24 16:49:43
 */
 
 // Import Angular Classes:
@@ -53,8 +53,7 @@ export class ValueChartHttpService {
 	/*
 		@returns {void}
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
-						Any initialization that needs to be done should be placed in an ngOnInit method.
-						This constructor should NOT be called manually. Angular will automatically handle the construction of this class when it is used.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(private http: Http) {
 		this.valueChartParser = new JsonValueChartParser();
@@ -65,7 +64,7 @@ export class ValueChartHttpService {
 	// ========================================================================================
 
 	/*
-		@param valueChart - The ValueChart to be created as a resource on the server.
+		@param valueChart - The ValueChart to be created on the server.
 		@returns {Observable<ValueChart>} - An observable of the ValueChart that was created.
 		@description 	Creates a new ValueChart resource on the server. The created resource is 
 						is a JSON version of the supplied ValueChart, and can be accessed using 
@@ -87,9 +86,9 @@ export class ValueChartHttpService {
 	}
 
 	/*
-		@param valueChart - The ValueChart whose resource on the server is to be updated.
+		@param valueChart - The ValueChart on the server that is to be updated.
 		@returns {Observable<ValueChart>} - An observable of the ValueChart that was updated.
-		@description 	Updates an existing ValueChart resource on the serverThe updated resource is is a JSON version 
+		@description 	Updates an existing ValueChart resource on the server. The updated resource is is a JSON version 
 						of the supplied ValueChart, and can be accessed using the getValueChart method of this class 
 						and the resource's id. The id can be obtained from the _id field of the observable 
 						ValueChart that is returned by this method. This method should NOT be used to create a 
@@ -110,7 +109,7 @@ export class ValueChartHttpService {
 		@param chartName - The ValueChart name whose availability is to be checked.
 		@returns {Observable<boolean>} - An observable of a boolean value. If the boolean is true, the name is available; 
 		@description 	Determines whether or not the give ValueChart name is available by querying the server to see
-						if a ValueChart with that name already exists. Note that duplicate names are not permitted for ValueCharts.
+						if a ValueChart resource with that name already exists. Note that duplicate names are not permitted for ValueCharts.
 	*/
 	isNameAvailable(chartName: string): Observable<boolean> {
 		return this.http.get(this.valueChartsUrl + chartName + '/available')

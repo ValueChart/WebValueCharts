@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 16:10:23
+* @Last Modified time: 2016-08-24 18:01:44
 */
 
 // Import Libraries and Middleware:
@@ -32,6 +32,8 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 	// Send message confirming successful connection:
 	ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
 
+	// Register a timer to send a KeepConnection message to the client every five seconds. These messages a are hack used to keep 
+	// the websocket open. It seems that the websocket will silently close if messages are continuously being exchanged between the server and client.
 	var connectionTimer = timers.setInterval(() => {
 		ws.send(JSON.stringify({ type: MessageType.KeepConnection, chartId: chartId, data: 'Keep connection Open' }));
 	}, 5000);
@@ -55,7 +57,8 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 			default:
 				// Do nothing. The message is not of a known type.
 				break;
-
+			// The client has replied to the KeepConnection message sent by the server. Nothing needs to be done about this.
+			// The client will reply to every KeepConnection message.
 			case MessageType.KeepConnection:
 				// Do nothing.
 				break;
