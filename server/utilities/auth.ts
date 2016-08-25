@@ -2,15 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 22:13:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-04 13:40:49
+* @Last Modified time: 2016-08-24 18:18:16
 */
+
+// Import Libraries and Express Middleware:
 import * as express 								from 'express';
 import * as Passport 								from 'passport';
 import { Strategy }									from 'passport-local';
 import * as monk									from 'monk';
 
+// Load the database.
 var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
-
 
 var localRegistration = (username: string, password: string, req: express.Request) => {
 

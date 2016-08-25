@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-21 00:16:14
+* @Last Modified time: 2016-08-24 18:39:18
 */
 
 // Import Libraries and Express Middleware:
@@ -138,6 +138,8 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 		}
 	});
 });
+
+
 valueChartUsersRoutes.delete('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var groupVcCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
