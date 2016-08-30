@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:22:16
+* @Last Modified time: 2016-08-30 13:05:31
 */
 
 // Import Node Libraries: 
 import { expect }												from 'chai';
 
 // Application Classes:
-import { WebValueChartsParser } 								from '../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XMLValueChartParser';
 
 // Model Classes:
 import { ValueChart }											from '../../client/resources/model/ValueChart';
@@ -28,13 +28,13 @@ import { DiscreteScoreFunction } 								from '../../client/resources/model/Disc
 
 /*
 
-describe('WebValueChartsParser', () => {
-	var valueChartParser: WebValueChartsParser;
+describe('XmlValueChartParser', () => {
+	var valueChartParser: XmlValueChartParser;
 	var xmlDocParser: DOMParser;
 	var xmlDocument: Document;
 
 	before(function() {
-		valueChartParser = new WebValueChartsParser();
+		valueChartParser = new XmlValueChartParser();
 		xmlDocParser = new DOMParser();
 		xmlDocument = xmlDocParser.parseFromString(XMLTestString, 'application/xml');
 	});

@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:11:39
+* @Last Modified time: 2016-08-30 14:02:21
 */
 
-// Model Classes
+// Import Model Classes
 import { ValueChart } 														from '../../../model/ValueChart';
 import { User }																from '../../../model/User';
 import { WeightMap }														from '../../../model/WeightMap';
@@ -22,13 +22,39 @@ import { IntervalDomain }													from '../../../model/IntervalDomain';
 import { ContinuousDomain } 												from '../../../model/ContinuousDomain';
 import { CategoricalDomain } 												from '../../../model/CategoricalDomain';
 
-export class WebValueChartsParser {
+/*
+	This class parses ValueCharts that have been formatted as XML documents into ValueChart class instances. It parses the ValueChart's alternatives,
+	objectives (both abstract and primitive), and users into the proper class instances as a part of this process. This class is inflexible; it 
+	expects all XML documents to be complete ValueCharts. It should be expanded to parse XML ValueCharts robustly and will completeness
+	checking in the future.
+
+	Note that XmlValueChartParser parses the WebValueCharts XML schema for a ValueChart ONLY. It cannot parse the ValueChartsPlus XML schema
+	This is what the XmlValueChartLegacyParser class is for. Because the ValueChartsPlus XML schema is no longer in use, XmlValueChartParser
+	is almost always the correct parser to use when handling XML ValueCharts. See the github wiki for more information about 
+	the two different XML schemas, or the ValueChartPrototype.xml file for an example of the WebValueCharts XML schema.
+*/
+
+export class XmlValueChartParser {
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
 	constructor() { }
 
-	parseValueChart(xmlDocument: Document): ValueChart {
-		var valueChart: ValueChart;
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
+	/*
+		@param xmlDocument - A document object created by parsing an XML string using the DOMParser.parseFromString() method. Note that this
+							must be a complete ValueChart xml document that satisfies the WebValueCharts XML schema.
+		@returns {ValueChart}	- A ValueChart object parsed from the xmlDocument parameter. 
+		@description	Parses a ValueChart from an XML document and into the proper classes instances so that it can be used by the 
+						application. ONLY this method should be called manually when parsing an XML ValueChart; the other methods in the file
+						are private helpers.
+	*/
+	parseValueChart(xmlDocument: Document): ValueChart {
 		var valueChartElement: Element = xmlDocument.querySelector('ValueCharts');
 
 		var valueChartName: string = valueChartElement.getAttribute('name');
@@ -38,7 +64,7 @@ export class WebValueChartsParser {
 		var usersParentElement: Element = valueChartElement.querySelector('Users');
 		var users: User[] = this.parseUsers(usersParentElement);
 
-		valueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
+		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
 		valueChart._id = valueChartElement.getAttribute('id');
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
@@ -48,13 +74,17 @@ export class WebValueChartsParser {
 		valueChart.setRootObjectives(this.parseObjectives(objectivesParentElement));
 		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement, valueChart.getAllPrimitiveObjectives()));
 
-
 		return valueChart;
 	}
 
-	// ValueChart Structure Parsing Functions:
 
-	parseObjectives(objectivesParentElement: Element): Objective[] {
+	/*
+		@param objectivesParentElement - The <Objectives> element from the XML document, or a <Objective> element with type="abstract".
+		@returns {Objective[]}	- The root objectives of the ValueChart 
+		@description	Parses the hierarchical structure of objectives from an XML document representing a ValueChart.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseObjectives(objectivesParentElement: Element): Objective[] {
 		var objectives: Objective[] = [];
 
 		var objectiveElements: Element[] = (<any>objectivesParentElement).children;
@@ -85,7 +115,13 @@ export class WebValueChartsParser {
 		return objectives;
 	}
 
-	parseDomain(domainElement: Element): Domain {
+	/*
+		@param domainElement - The <Domain> element for one PrimitiveObjective in a ValueChart's XML document. This element contains the domain information for a single Objective.
+		@returns {Domain}	- A domain object constructed from the information stored in the given <Domain> element.
+		@description	Parses a <Domain> element to construct a Domain object of the right type for a Primitive Objective. 
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseDomain(domainElement: Element): Domain {
 		var domain: Domain;
 
 		var type: string = domainElement.getAttribute('type');
@@ -108,7 +144,17 @@ export class WebValueChartsParser {
 		return domain;
 	}
 
-	parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
+	/*
+		@param alternativesParentElement - The <Alternatives> element from the ValueChart's XML document. This element contains all of the ValueChart's alternatives as children.
+		@param primitiveObjectives - The array of primitiveObjective objects belonging to the ValueChart that is being parsed. These MUST correlate properly
+									with the objective names in the <Alternative> elements being parsed.
+		@returns {Alternative[]}	- An array of Alternative objects constructed from the children of The <Alternatives> element.
+		@description	Parses an <Alternatives> element from a ValueChart's XML document to obtain the array of Alternatives belonging to the ValueChart.
+						This method will also update the domains of the objectives in array of PrimitiveObjectives given as a parameter as it parses the
+						alternatives. This updating is done in-place.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
 		var alternatives: Alternative[] = [];
 
 		var alternativeElements: NodeListOf<Element> = alternativesParentElement.querySelectorAll('Alternative');
@@ -148,9 +194,15 @@ export class WebValueChartsParser {
 		return alternatives;
 	}
 
-	// Preference Model Parsing Functions:
-
-	parseUsers(usersParentElement: Element): User[] {
+	/*
+		@param usersParentElement - The <Users> element from the ValueChart's XML document. This element contains all of the ValueChart's users as children.
+		@returns {User[]}	- An array of User objects constructed from the children of The <Users> element.
+		@description	Parses a <Users> element from a ValueChart's XML document to obtain the array of Users belonging to the ValueChart.
+						This method will parse the ScoreFunctionMap, WeightMap, and ScoreFunctions of each <User> element that is a 
+						child of the provided <Users> element to produce complete user objects.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseUsers(usersParentElement: Element): User[] {
 		var users: User[] = [];
 
 		var userElements: NodeListOf<Element> = usersParentElement.querySelectorAll('User');
@@ -174,7 +226,13 @@ export class WebValueChartsParser {
 		return users;
 	}
 
-	parseWeightMap(weightsParentElement: Element): WeightMap {
+	/*
+		@param weightsParentElement - The <Weights> element for one user in a ValueChart's XML document. This element contains all of a user's weights as child elements.
+		@returns {WeightMap}	- A WeightMap object created from the <Weight> elements that are children of the provided weightsParentElement.
+		@description	Parses a <Weights> element from a ValueChart's XML document to obtain a WeightMap.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseWeightMap(weightsParentElement: Element): WeightMap {
 		var weightMap: WeightMap = new WeightMap();
 
 		var weightElements: NodeListOf<Element> = weightsParentElement.querySelectorAll('Weight');
@@ -190,7 +248,14 @@ export class WebValueChartsParser {
 		return weightMap;
 	}
 
-	parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
+	/*
+		@param scoreFunctionsParentElement - The <ScoreFunctions> element for one user in a ValueChart's XML document. This element contains all of a user's score functions as child elements.
+		@returns {ScoreFunctionMap}	- A ScoreFunctionMap object created by parsing the provided scoreFunctionsParentElement.
+		@description	Parses a <ScoreFunctions> element from a ValueChart's XML document to obtain a ScoreFunctionMap. Note that the ScoreFunctions within
+						the map are parsed as a part of this methods execution.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
 		var scoreFunctionElements: NodeListOf<Element> = scoreFunctionsParentElement.querySelectorAll('ScoreFunction');
@@ -207,7 +272,13 @@ export class WebValueChartsParser {
 		return scoreFunctionMap;
 	}
 
-	parseScoreFunction(scoreFunctionElement: Element): ScoreFunction {
+	/*
+		@param scoreFunctionsParentElement - A <ScoreFunction> element from the ValueChart's XML document. 
+		@returns {ScoreFunction}	- A ScoreFunctionMap object created by parsing the provided scoreFunctionsParentElement.
+		@description	Parses a <ScoreFunction> element from a ValueChart's XML document to obtain a ScoreFunction.
+						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
+	*/
+	private parseScoreFunction(scoreFunctionElement: Element): ScoreFunction {
 		var scoreFunction: ScoreFunction;
 
 		var type: string = scoreFunctionElement.getAttribute('type');

@@ -2,15 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:26:25
+* @Last Modified time: 2016-08-30 13:04:49
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
 
 
 // Utilities:
-import { ValueChartXMLEncoder }									from '../../client/resources/modules/utilities/classes/ValueChartXMLEncoder';
-import { WebValueChartsParser }									from '../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { ValueChartLegacyParser }								from '../../client/resources/modules/utilities/classes/XmlValueChartLegacyParser';
+import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XMLValueChartParser';
 
 // Model Classes:
 import { ValueChart }											from '../../client/resources/model/ValueChart';
@@ -31,7 +31,7 @@ import { DiscreteScoreFunction } 								from '../../client/resources/model/Disc
 /*
 describe('ValueChartXMlEncoder', () => {
 
-	var valueChartParser: WebValueChartsParser;
+	var valueChartParser: XmlValueChartParser;
 	var xmlDocParser: DOMParser;
 	var xmlSerializer: XMLSerializer;
 
@@ -41,7 +41,7 @@ describe('ValueChartXMlEncoder', () => {
 	var valueChartXMLEncoder: ValueChartXMLEncoder;
 
 	before(function() {
-		valueChartParser = new WebValueChartsParser();
+		valueChartParser = new XmlValueChartParser();
 		xmlDocParser = new DOMParser();
 		xmlSerializer = new XMLSerializer();
 

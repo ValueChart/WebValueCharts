@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:05:20
+* @Last Modified time: 2016-08-30 13:02:59
 */
 // Library Classes
 import { Injectable } 															from '@angular/core';
 
 // Utility Classes
-import { ValueChartsPlusParser }												from '../../utilities/classes/ValueChartsPlusParser';
-import { WebValueChartsParser }													from '../../utilities/classes/WebValueChartsParser';
+import { ValueChartLegacyParser }												from '../../utilities/classes/XmlValueChartLegacyParser';
+import { XmlValueChartParser }													from '../../utilities/classes/XMLValueChartParser';
 
 // Model Classes
 import { ValueChart }															from '../../../model/ValueChart';
@@ -19,13 +19,13 @@ import { ValueChart }															from '../../../model/ValueChart';
 export class XMLValueChartParser {
 
 	xmlDocParser: DOMParser;
-	valueChartPlusParser: ValueChartsPlusParser;
-	webValueChartsParser: WebValueChartsParser;
+	valueChartPlusParser: ValueChartLegacyParser;
+	webValueChartsParser: XmlValueChartParser;
 
 	constructor() {
 		this.xmlDocParser = new DOMParser();
-		this.valueChartPlusParser = new ValueChartsPlusParser();
-		this.webValueChartsParser = new WebValueChartsParser();
+		this.valueChartPlusParser = new ValueChartLegacyParser();
+		this.webValueChartsParser = new XmlValueChartParser();
 	}
 
 	parseValueChart(xmlString: string): ValueChart {
