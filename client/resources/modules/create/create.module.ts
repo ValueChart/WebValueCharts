@@ -2,10 +2,8 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:51:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:38:03
+* @Last Modified time: 2016-08-30 16:23:51
 */
-
-
 
 // Import Angular Classes:
 import { NgModule }    						  	from '@angular/core';
@@ -29,7 +27,17 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 import { CreationGuardService }					from './services/CreationGuard.service';
 
 
+/*
+	This is the CreateModule's declaration. It creates the CreateModule, imports whatever modules it depends on, registers
+	the components that belong to it, registers required providers. The CreateModule does not defined a Bootstrap component because
+	it is a submodule of the AppModule.
+	The CreateModule is responsible for ValueChart creation. It uses the CREATION_ROUTER exported by Create.routes.ts to manage
+	the creation workflow's routes, and the CreationGuardService to prevent users from accidentally navigating away from
+	those routes during ValueChart creation.
+*/
+
 @NgModule({
+	// Import all required modules.
 	imports: [ 
 		FormsModule,
 		HttpModule,
@@ -37,6 +45,8 @@ import { CreationGuardService }					from './services/CreationGuard.service';
 		CREATION_ROUTER,
 		UtilitiesModule 
 	],
+	// All Components and Directives that belong to this module MUST be declared here. Any modules that are shared between CreateModule and another module (ie. AppModule)
+	// must be declared in the UtilitiesModule instead and imported via that module.
 	declarations: [
 		CreateValueChartComponent,
 		CreateAlternativesComponent,
@@ -45,6 +55,7 @@ import { CreationGuardService }					from './services/CreationGuard.service';
 		CreateScoreFunctionsComponent,
 		CreateWeightsComponent
 	],
+	// Register any required providers. This is just the Router providers.
 	providers: [
 		CreationGuardService
 	],

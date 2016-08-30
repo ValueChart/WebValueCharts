@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:44:56
+* @Last Modified time: 2016-08-30 16:15:19
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -25,14 +25,17 @@ import { JoinGuardService }											from './services/JoinGuard.service';
 
 
 /*
-	This is the route configuration for the application. This is where components are assigned to url paths. 
+	This is the route configuration for the main application router. This is where components are assigned to url paths. 
 	Angular will use these assignments to determine what component to display when the application is loaded, 
 	or when it detects a change the client's url. The canActivate field on each path allows us to register a 
 	class that will be responsible for determining if the application is allowed to navigate to the path.
-	The AuthGuardService class is used to prevent users from navigating away from the register path without
+	The AuthGuardService class is used to prevent users from navigating away from the 'register' path without
 	signing in (i.e authenticating themselves). The JoinGuardService is used to load a ValueChart for a user that
 	is joining an existing ValueChart via a url. It will only block navigation if the invitation url used is not valid.
-	Note that the path '/register' is the default path that the client will redirect users to if no path match is found.
+	Note that the path '/register' is the default path that the client will redirect users to if no path match is found. This is
+	accomplished via the '**' (wildcard) path.
+
+	Note that all Creation related routes are declared and handled in Create.routes.ts, which is the router for the CreateModule.
 
 	It is important to realize that Angular's routing is font-end only, and is begins after a client has been sent
 	the application's index.html file. This is why the back-end is set up to redirect all requests resulting in a 404 status
@@ -51,10 +54,11 @@ const routes: Routes = [
 	{ path: '**', redirectTo: '/register'}
 ];
 
-// Export the providers necessary for bootstrapping in main.ts. Any class that must be provided for the routes to work should 
+// Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
 	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService, ValueChartService, ChartUndoRedoService]
 ];
 
+// Export the router itself. This is registered as the applications router in the AppModule.
 export const ROUTER = RouterModule.forRoot(routes);

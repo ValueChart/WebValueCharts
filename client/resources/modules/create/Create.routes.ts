@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:02:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:49:05
+* @Last Modified time: 2016-08-30 16:30:53
 */
 
 // Import Angular Classes:
@@ -19,6 +19,13 @@ import { CreateWeightsComponent }				from './components/CreateWeights/CreateWeig
 import { AuthGuardService }						from '../app/services/AuthGuard.service';
 import { CreationGuardService }					from './services/CreationGuard.service';
 
+/*
+	This is the route configuration for the CreateModule. It defines the base route for the creation pages, 'createValueChart/:purpose',
+	and associates it with CreateValueChartComponent, which is the base component of the CreateModule. It also creates five sub-routes
+	that allow the CreateValueChartComponent to display a different creation component (used to implement one state of ValeuChart creation)
+	depending on the current URI. The 'createValueChart/:purpose' route uses the CreationGuardService to prevent users from accidentally navigating
+	during ValueChart creation.
+*/
 
 const creationRoutes: Routes = [
 	{

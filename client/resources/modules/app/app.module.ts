@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:15:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:53:47
+* @Last Modified time: 2016-08-30 16:23:47
 */
 
 
@@ -36,29 +36,26 @@ import { ScoreFunctionDirective }				from '../utilities/directives/ScoreFunction
 import { CreateModule }							from '../create/create.module';
 import { UtilitiesModule }						from '../utilities/utilities.module';
 
-/*
-	This is where the application is bootstrapped. Bootstrapping is when the initial components of the application are connected
-	together by Angular. This should only ever be done once for an application, and it should be the first thing is that is done
-	when the application is delivered to the client. 
 
-	Only classes that are absolute needed before any component is instantiated should be registered in the bootstrap method call.
-	For us, this is the RootComponent, which is the only component that is always displayed regardless of the url path, 
-	APP_ROUTER_PROVIDERS, which contains the classes required for our application's routing to function properly,
-	and HTTP_PROVIDERS, the providers required for HTTP methods to work properly across the application. Refrain from adding
-	more classes to this list if possible. Having many classes bootstrap slows down the application's initial loading time 
-	and is bad style.
+/*
+	This is the AppModule declaration. It creates the AppModule, imports whatever modules it depends on, registers
+	the components that belong to it, registers required providers, and defines the component that should be bootstrapped.
+	The AppModule is the base module of WebValueCharts. It has the main application router (ROUTER), and is responsible for all
+	application functionality with the exception of ValueChart creation, which the delegates to the CreateModule.
 */
 
-
 @NgModule({
-	imports: [ 
+	// Import all required modules.
+	imports: [ 	
 		BrowserModule,
 		FormsModule,
 		HttpModule,
-		ROUTER,
-		CreateModule,
+		ROUTER,			// Import the main application router defined in app.routes.ts
+		CreateModule,	// Import the create 
 		UtilitiesModule
 	],
+	// All Components and Directives that belong to this module MUST be declared here. Any modules that are shared between AppModule and another module
+	// must be declared in the UtilitiesModule instead and imported via that module.
 	declarations: [
 		RootComponent,
 		RegisterComponent,
@@ -70,9 +67,11 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 		ExportValueChartComponent,
 		ValueChartDirective
 	],
+	// Register any required providers. This is just the Router providers.
 	providers: [
 		APP_ROUTER_PROVIDERS
 	],
+	// Set the RootComponent to be the AppModules' base component.
 	bootstrap: [ 
 		RootComponent 
 	]	
