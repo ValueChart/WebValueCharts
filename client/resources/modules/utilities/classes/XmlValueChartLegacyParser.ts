@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 14:11:12
+* @Last Modified time: 2016-08-30 15:48:46
 */
 
 // Model Classes
@@ -27,14 +27,14 @@ import { CategoricalDomain } 												from '../../../model/CategoricalDomain'
 	expects all XML documents to be complete ValueCharts. It should be expanded to parse XML ValueCharts robustly and will completeness
 	checking in the future.
 
-	ValueChartLegacyParser parses the ValueChartsPlus XML schema for a ValueChart ONLY. It cannot parse the WebValueCharts XML schema
+	XmlValueChartLegacyParser parses the ValueChartsPlus XML schema for a ValueChart ONLY. It cannot parse the WebValueCharts XML schema
 	This is what the XmlValueChartParser class is for. The ValueChartsPlus XML schema for ValueCharts is no longer in use, and this class only
 	exists to allow for "legacy" support of the old format. New ValueCharts should NOT be created in this format, and ValueChartParser should
 	almost always be used instead of ValueChartLegacyParser.See the github wiki for more information about 
 	the two different XML schemas, or the hotel.xml file for an example of the ValueChartsPlus XML schema.
 */
 
-export class ValueChartLegacyParser {
+export class XmlValueChartLegacyParser {
 
 	// ========================================================================================
 	// 									Constructor
@@ -50,11 +50,11 @@ export class ValueChartLegacyParser {
 		@param xmlDocument - A document object created by parsing an XML string using the DOMParser.parseFromString() method. Note that this
 							must be a complete ValueChart xml document that satisfies the ValueChartsPlus XML schema.
 		@returns {ValueChart}	- A ValueChart object parsed from the xmlDocument parameter. 
-		@description	Parses a ValueChart from an XML document and into the proper classes instances so that it can be used by the 
+		@description	Parses a ValueChart from an XML document and into the proper class instances so that it can be used by the 
 						application. ONLY this method should be called manually when parsing an XML ValueChart; the other methods in the file
 						are private helpers.
 	*/
-	parseValueChart(xmlDocument: Document): ValueChart {
+	public parseValueChart(xmlDocument: Document): ValueChart {
 
 		var objectivesParentElement: Element = xmlDocument.querySelector('Criteria');
 		var alternativesParentElement: Element = xmlDocument.querySelector('Alternatives');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 14:02:21
+* @Last Modified time: 2016-08-30 15:34:07
 */
 
 // Import Model Classes
@@ -50,11 +50,11 @@ export class XmlValueChartParser {
 		@param xmlDocument - A document object created by parsing an XML string using the DOMParser.parseFromString() method. Note that this
 							must be a complete ValueChart xml document that satisfies the WebValueCharts XML schema.
 		@returns {ValueChart}	- A ValueChart object parsed from the xmlDocument parameter. 
-		@description	Parses a ValueChart from an XML document and into the proper classes instances so that it can be used by the 
+		@description	Parses a ValueChart from an XML document and into the proper class instances so that it can be used by the 
 						application. ONLY this method should be called manually when parsing an XML ValueChart; the other methods in the file
 						are private helpers.
 	*/
-	parseValueChart(xmlDocument: Document): ValueChart {
+	public parseValueChart(xmlDocument: Document): ValueChart {
 		var valueChartElement: Element = xmlDocument.querySelector('ValueCharts');
 
 		var valueChartName: string = valueChartElement.getAttribute('name');

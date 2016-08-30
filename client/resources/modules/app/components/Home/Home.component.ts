@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:35:51
+* @Last Modified time: 2016-08-30 15:53:36
 */
 
 // Import Angular Classes:
@@ -10,7 +10,7 @@ import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 
 // Application classes:
-import { XMLValueChartParser } 							from '../../services/XMLValueChartParser.service';
+import { XMLValueChartParserService } 							from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
@@ -37,7 +37,7 @@ export class HomeComponent {
 
 	constructor(
 		private router: Router,
-		private valueChartParser: XMLValueChartParser,
+		private valueChartParser: XMLValueChartParserService,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService) { }

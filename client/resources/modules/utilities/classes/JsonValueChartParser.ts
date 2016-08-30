@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:11:09
+* @Last Modified time: 2016-08-30 15:37:50
 */
 
-// Model Classes
+// Import Model Classes
 import { ValueChart } 														from '../../../model/ValueChart';
 import { User }																from '../../../model/User';
 import { WeightMap }														from '../../../model/WeightMap';
@@ -22,139 +22,173 @@ import { IntervalDomain }													from '../../../model/IntervalDomain';
 import { ContinuousDomain } 												from '../../../model/ContinuousDomain';
 import { CategoricalDomain } 												from '../../../model/CategoricalDomain';
 
+/*
+	This class parses ValueChart's that have been formatted as JSON objects into ValueChart objects. JSON ValueCharts are ValueCharts that have been formatted
+	into JavaScript object literals, and are no longer proper instances of the ValueChart class. They have all of the data of a ValueChart
+	object, but lack the class' methods, (because the prototype is no longer correct). Additionally, all the objects that are a part of a ValueChart
+	(Objectives, Alternatives, Users, etc) are also object literals and not proper class instances in a JSON ValueChart. This converts these 
+	object literals into proper class instances so that they can be used by the application.
+
+	JSON is markup language that is used by WebValueCharts to communicate between the client and server. This means that JsonValueChartParser is 
+	required to convert ValueChart and User literals sent by the server into ValueChart and user Objects that can be used by the client. Because
+	the resources communicated between the client and server may not be complete, this class is capable of parsing incomplete ValueCharts and Users.
+*/
+
+
 export class JsonValueChartParser {
+
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
 	constructor() { }
 
-	parseValueChart(jsonObject: any): ValueChart {
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
-		var valueChart: ValueChart = new ValueChart(jsonObject.name, jsonObject.description, jsonObject.creator);
+
+	/*
+		@param JsonValueChart - A JSON representation of a ValueChart. This representation does not have to be complete. This means it can be missing fields like users, alternatives, etc. Missing fields will be parsed.
+		@returns {ValueChart}	- A ValueChart object parsed from the JSON representation provided. 
+		@description	Parses a ValueChart from a JSON representation and into the proper class instances so that it can be used by the 
+						application.
+	*/
+	public parseValueChart(JsonValueChart: any): ValueChart {
+
+		var valueChart: ValueChart = new ValueChart(JsonValueChart.name, JsonValueChart.description, JsonValueChart.creator);
 		// Copy over all the properties from the WeightMap that is being saved.
-		valueChart._id = jsonObject._id;
+		valueChart._id = JsonValueChart._id;
 		// Parse Users if they are defined.
-		if (jsonObject.users !== undefined) {
-			for (var i = 0; i < jsonObject.users.length; i++) {
-				jsonObject.users[i] = this.parseUser(jsonObject.users[i]);
+		if (JsonValueChart.users !== undefined) {
+			for (var i = 0; i < JsonValueChart.users.length; i++) {
+				JsonValueChart.users[i] = this.parseUser(JsonValueChart.users[i]);
 			}
 		} else {
-			jsonObject.users = [];
+			JsonValueChart.users = [];
 		}
 
-		if (jsonObject.rootObjectives !== undefined) {
+		if (JsonValueChart.rootObjectives !== undefined) {
 			// Parse Root Objectives
-			for (var i = 0; i < jsonObject.rootObjectives.length; i++) {
-				jsonObject.rootObjectives[i] = this.parseObjective(jsonObject.rootObjectives[i]);
+			for (var i = 0; i < JsonValueChart.rootObjectives.length; i++) {
+				JsonValueChart.rootObjectives[i] = this.parseObjective(JsonValueChart.rootObjectives[i]);
 			}
 		}
-		if (jsonObject.alternatives !== undefined) {
+		if (JsonValueChart.alternatives !== undefined) {
 			// Parse Alternatives
-			for (var i = 0; i < jsonObject.alternatives.length; i++) {
-				jsonObject.alternatives[i] = this.parseAlternative(jsonObject.alternatives[i]);
+			for (var i = 0; i < JsonValueChart.alternatives.length; i++) {
+				JsonValueChart.alternatives[i] = this.parseAlternative(JsonValueChart.alternatives[i]);
 			}	
 		}
 
 		// Copy over all properties from the json object the new ValueChart. This includes all the 
 		// users, objectives, and alternatives that are parsed above.
-		Object.assign(valueChart, jsonObject);
+		Object.assign(valueChart, JsonValueChart);
 
 
 		return valueChart;
 	}
 
-	parseObjective(jsonObject: any): Objective {
+	private parseObjective(jsonObjective: any): Objective {
 		var objective: Objective;
-		if (jsonObject.objectiveType === 'abstract') {
-			objective = new AbstractObjective(jsonObject.name, jsonObject.description);
-			for (var i = 0; i < jsonObject.subObjectives.length; i++) {
-				jsonObject.subObjectives[i] = this.parseObjective(jsonObject.subObjectives[i]);
+		if (jsonObjective.objectiveType === 'abstract') {
+			objective = new AbstractObjective(jsonObjective.name, jsonObjective.description);
+			for (var i = 0; i < jsonObjective.subObjectives.length; i++) {
+				jsonObjective.subObjectives[i] = this.parseObjective(jsonObjective.subObjectives[i]);
 			}
 
-			Object.assign(objective, jsonObject);
+			Object.assign(objective, jsonObjective);
 		} else {
-			objective = new PrimitiveObjective(jsonObject.name, jsonObject.description);
+			objective = new PrimitiveObjective(jsonObjective.name, jsonObjective.description);
 
-			jsonObject.domain = this.parseDomain(jsonObject.domain);
+			jsonObjective.domain = this.parseDomain(jsonObjective.domain);
 
-			Object.assign(objective, jsonObject);
+			Object.assign(objective, jsonObjective);
 		}
 
 		return objective;
 	}
 
-	parseDomain(jsonObject: any): Domain {
+	private parseDomain(jsonDomain: any): Domain {
 		var domain: Domain;
 
-		if (jsonObject.type === 'continuous') {
+		if (jsonDomain.type === 'continuous') {
 			domain = new ContinuousDomain();
-		} else if (jsonObject.type === 'categorical') {
-			domain = new CategoricalDomain(jsonObject.ordered);
+		} else if (jsonDomain.type === 'categorical') {
+			domain = new CategoricalDomain(jsonDomain.ordered);
 		} else {
-			domain = new IntervalDomain(jsonObject.min, jsonObject.max, jsonObject.interval);
+			domain = new IntervalDomain(jsonDomain.min, jsonDomain.max, jsonDomain.interval);
 		}
 
-		Object.assign(domain, jsonObject);
+		Object.assign(domain, jsonDomain);
 
 		return domain;
 	}
 
-	parseAlternative(jsonObject: any): Alternative {
-		var alternative: Alternative = new Alternative(jsonObject.name, jsonObject.description);
+	private parseAlternative(jsonAlternative: any): Alternative {
+		var alternative: Alternative = new Alternative(jsonAlternative.name, jsonAlternative.description);
 
-		for (var i = 0; i < jsonObject.objectiveValues.length; i++) {
-			alternative.setObjectiveValue(jsonObject.objectiveValues[i][0], jsonObject.objectiveValues[i][1]);
+		for (var i = 0; i < jsonAlternative.objectiveValues.length; i++) {
+			alternative.setObjectiveValue(jsonAlternative.objectiveValues[i][0], jsonAlternative.objectiveValues[i][1]);
 		}
 
 		return alternative;
 	}
 
-	parseUser(jsonObject: any): User {
-		var user: User = new User(jsonObject.username);
+	/*
+		@param jsonUser - A JSON representation of a ValueChart User. 
+		@returns {User}	- A User object parsed from the JSON representation provided. 
+		@description	Parses a User from a JSON representation and into the proper class instances so that it can be used by the 
+						application. This method can be used to parse Users sent in responses from the WebValueCharts server.
+	*/
+	public parseUser(jsonUser: any): User {
+		var user: User = new User(jsonUser.username);
 
 		// Parse the weight map if it is defined.
-		if (jsonObject.weightMap !== undefined) {
-			jsonObject.weightMap = this.parseWeightMap(jsonObject.weightMap);
+		if (jsonUser.weightMap !== undefined) {
+			jsonUser.weightMap = this.parseWeightMap(jsonUser.weightMap);
 		}
 
 		// Parse the score function map if it is defined.
-		if (jsonObject.scoreFunctionMap !== undefined) {
-			jsonObject.scoreFunctionMap = this.parseScoreFunctionMap(jsonObject.scoreFunctionMap);
+		if (jsonUser.scoreFunctionMap !== undefined) {
+			jsonUser.scoreFunctionMap = this.parseScoreFunctionMap(jsonUser.scoreFunctionMap);
 		}
 
-		Object.assign(user, jsonObject);
+		Object.assign(user, jsonUser);
 
 		return user;
 	}
 
-	parseWeightMap(jsonObject: any): WeightMap {
+	private parseWeightMap(jsonWeightMap: any): WeightMap {
 		var weightMap: WeightMap = new WeightMap();
 
-		for (var i = 0; i < jsonObject.weights.length; i++) {
-			weightMap.setObjectiveWeight(jsonObject.weights[i][0], jsonObject.weights[i][1]);
+		for (var i = 0; i < jsonWeightMap.weights.length; i++) {
+			weightMap.setObjectiveWeight(jsonWeightMap.weights[i][0], jsonWeightMap.weights[i][1]);
 		}
 
 		return weightMap;
 	}
 
-	parseScoreFunctionMap(jsonObject: any): ScoreFunctionMap {
+	private parseScoreFunctionMap(jsonScoreFunctionMap: any): ScoreFunctionMap {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
-		for (var i = 0; i < jsonObject.scoreFunctions.length; i++) {
-			scoreFunctionMap.setObjectiveScoreFunction(jsonObject.scoreFunctions[i][0], this.parseScoreFunction(jsonObject.scoreFunctions[i][1]));
+		for (var i = 0; i < jsonScoreFunctionMap.scoreFunctions.length; i++) {
+			scoreFunctionMap.setObjectiveScoreFunction(jsonScoreFunctionMap.scoreFunctions[i][0], this.parseScoreFunction(jsonScoreFunctionMap.scoreFunctions[i][1]));
 		}
 		return scoreFunctionMap;
 	}
 
-	parseScoreFunction(jsonObject: any): ScoreFunction {
+	private parseScoreFunction(jsonScoreFunction: any): ScoreFunction {
 		var scoreFunction: ScoreFunction;
 
-		if (jsonObject.type === 'continuous') {
-			scoreFunction = new ContinuousScoreFunction(jsonObject.minDomainValue, jsonObject.maxDomainValue);
+		if (jsonScoreFunction.type === 'continuous') {
+			scoreFunction = new ContinuousScoreFunction(jsonScoreFunction.minDomainValue, jsonScoreFunction.maxDomainValue);
 		} else {
 			scoreFunction = new DiscreteScoreFunction();
 		}
 
-		for (var i = 0; i < jsonObject.elementScoreMap.length; i++) {
-			scoreFunction.setElementScore(jsonObject.elementScoreMap[i][0], jsonObject.elementScoreMap[i][1]);
+		for (var i = 0; i < jsonScoreFunction.elementScoreMap.length; i++) {
+			scoreFunction.setElementScore(jsonScoreFunction.elementScoreMap[i][0], jsonScoreFunction.elementScoreMap[i][1]);
 		}
 
 		return scoreFunction;

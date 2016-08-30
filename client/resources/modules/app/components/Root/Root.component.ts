@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 10:40:22
+* @Last Modified time: 2016-08-30 15:53:35
 */
 
 // Import Angular Classes:
@@ -14,7 +14,7 @@ import { ApplicationRef } 											from '@angular/core';
 
 
 // Import Application classes
-import { XMLValueChartParser } 										from '../../services/XMLValueChartParser.service';
+import { XMLValueChartParserService } 										from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { ValueChartService }										from '../../services/ValueChart.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
@@ -42,7 +42,7 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
 	providers: [TemplateRef,
 		ViewContainerRef,
-		XMLValueChartParser,
+		XMLValueChartParserService,
 		ValueChartXMLEncoder,
 		UserHttpService]
 })

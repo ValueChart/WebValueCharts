@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 13:06:06
+* @Last Modified time: 2016-08-30 15:42:50
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
 
 // Application Classes:
-import { ValueChartLegacyParser }								from '../../client/resources/modules/utilities/classes/XmlValueChartLegacyParser';
+import { XmlValueChartLegacyParser }								from '../../client/resources/modules/utilities/classes/XmlValueChartLegacyParser';
 
 
 // Model Classes:
