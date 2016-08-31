@@ -2,16 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:00:46
+* @Last Modified time: 2016-08-30 20:38:59
 */
 
+// Import Angular Classes:
 import { Injectable } 												from '@angular/core';
 import { NgZone }													from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 														from 'd3';
 
-// Application Classes
+// Import Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RendererDataService }										from '../services/RendererData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
@@ -20,7 +21,7 @@ import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service
 
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
-// Model Classes
+// Import Model Classes
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';
@@ -29,7 +30,6 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { WeightMap }												from '../../../model/WeightMap';
 
 import {RowData, CellData, LabelData}								from '../../../types/RendererData.types';
-
 
 
 @Injectable()
