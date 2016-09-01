@@ -2,16 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:04:28
+* @Last Modified time: 2016-09-01 12:09:00
 */
 
+// Import Angular Classes:
 import { Injectable } 										from '@angular/core';
 
 // Application Classes:
 import { CurrentUserService }								from './CurrentUser.service';
 import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
 import { Objective }										from '../../../model/Objective';
 import { AbstractObjective }								from '../../../model/AbstractObjective';
@@ -26,35 +27,64 @@ import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFun
 import { CategoricalDomain }								from '../../../model/CategoricalDomain';
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 
-// Type Definitions:
+// Import Type Definitions:
 import { ValueChartStateContainer }							from '../../../types/StateContainer.types';
 import { ScoreFunctionRecord }								from '../../../types/Record.types';
 
-// This class stores the state of a ValueChart and exposes this state to the renderer classes. Renderer classes are allowed to modify 
-// this state as a way of initiating change detection. 
+/*
+	This class stores the state of the active ValueChart and exposes this state to any component, directive, or service in the application
+	that requires it. It also provides utility methods for retrieving specific data from a ValueChart object.
+*/
 
 @Injectable()
 export class ValueChartService implements ValueChartStateContainer {
 
-	private valueChart: ValueChart;
-	private primitiveObjectives: PrimitiveObjective[];
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
-	private maximumWeightMap: WeightMap;
+	private valueChart: ValueChart;
+	public inactiveValueCharts: ValueChart[] = [];		// The ValueCharts not currently being used by the application. This should have a 
+														// maximum on ONE element, and ONLY when the average of the current ValueChart is being
+														// displayed by the ValueChartViewerComponent. 
+
+	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
+														// re-traversing the objective hierarchy, which is costly.
+
+	private maximumWeightMap: WeightMap;				// The WeightMap composed of maximum user assigned weights. This means that each
+														// objective weight is the largest weight assigned by any user in the active ValueChart
+														// to that objective. If ValueChart has only one user, the maximum WeightMap is equal to 
+														// that user's WeightMap. The main use of this WeightMap is to determine label heights in the 
+														// ValueChart visualization for group charts.
 
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
 															 // has been reset since they last did SMARTER
 
-	public inactiveValueCharts: ValueChart[] = [];
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. Unfortunately we are forced to assign handlers to the Undo/Redo services event emitters in this
+						method.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(
 		private currentUserService: CurrentUserService,
 		private chartUndoRedoService: ChartUndoRedoService) {
 
+		// Assign handlers to update the active ValueChart when the ChartUndoRedoService fires undo/redo events.
 		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
 		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
 
 		this.weightMapReset = {};
 	}
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {

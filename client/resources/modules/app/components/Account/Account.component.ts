@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 16:30:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-31 22:16:00
+* @Last Modified time: 2016-09-01 10:39:00
 */
 
 import { Component } 												from '@angular/core';
@@ -14,8 +14,9 @@ import { CurrentUserService }										from '../../services/CurrentUser.service'
 import { UserHttpService }											from '../../services/UserHttp.service';
 
 /*
-	This component is the My Account page. It allows authenticated (i.e. signed in) users to modify their 
-	account's email and password. Users are NOT allowed to modify their username. 
+	This component implements the My Account page. It allows authenticated (i.e. signed in) users to modify their 
+	account's email and password. Users are NOT allowed to modify their username. It uses the the userHttpService to
+	communicate with the server and change user account details.
 */
 
 @Component({

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-31 18:53:46
+* @Last Modified time: 2016-09-01 10:59:25
 */
 
 // Import Angular Classes:
@@ -199,6 +199,27 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
+		// Display either the current ValueChart, or the average of the current ValueChart depending on the route parameters:
+		this.sub = this.route.params.subscribe(params => {
+			let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
+			this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+
+			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
+				this.valueChartService.inactiveValueCharts.push(this.valueChartService.getValueChart());
+				this.valueChartService.setValueChart(this.valueChartService.getValueChart().getAverageValueChart());
+				this.valueChart = this.valueChartService.getValueChart();
+				this.chartType = 'average';
+				this.weightResizeType = this.RESIZE_NEIGHBOR;
+
+			} else {
+				this.valueChart = this.valueChartService.getValueChart();
+				this.chartType = 'normal';
+				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
+			}
+
+		});
+
+
 		this.$ = $;
 		this.alternatives = this.valueChart.getAlternatives();
 
@@ -235,27 +256,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 		// Set Alternative labels to link to the Alternative detail box. 
 		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
-
-
-		// Display either the current ValueChart, or the average of the current ValueChart depending on the route parameters:
-		this.sub = this.route.params.subscribe(params => {
-			let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
-			this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
-
-			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
-				this.valueChartService.inactiveValueCharts.push(this.valueChartService.getValueChart());
-				this.valueChartService.setValueChart(this.valueChartService.getValueChart().getAverageValueChart());
-				this.valueChart = this.valueChartService.getValueChart();
-				this.chartType = 'average';
-				this.weightResizeType = this.RESIZE_NEIGHBOR;
-
-			} else {
-				this.valueChart = this.valueChartService.getValueChart();
-				this.chartType = 'normal';
-				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
-			}
-
-		});
 	}
 
 	/* 	

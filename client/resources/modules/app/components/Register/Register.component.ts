@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-31 22:07:48
+* @Last Modified time: 2016-09-01 10:37:48
 */
 
 // Import Angular Classes:
@@ -14,7 +14,7 @@ import { CurrentUserService }								from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
 
 /*
-	This component is the user login and account creation page. It allows users to login to the ValueCharts application
+	This component implements the user login and account creation page. It allows users to login to the ValueCharts application
 	as using an account that they have created previously, or as temporary users with no account. Temporary users do 
 	not have access to account related aspects of the application like the My Account, and My ValueCharts pages, but they do allow
 	users to create, host and join ValueCharts. The register component also allows users to create a new account whenever they want.

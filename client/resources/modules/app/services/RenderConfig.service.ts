@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:04:05
+* @Last Modified time: 2016-09-01 13:28:47
 */
 
 // Import Angular Classes:
@@ -145,10 +145,19 @@ export class RenderConfigService {
 						orientation of the ValueChart.
 	*/
 	incrementTransform(previousTransform: string, deltaCoordinateOne: number, deltaCoordinateTwo: number): string {
-		var commaIndex: number = previousTransform.indexOf(',');
-		// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.
-		var xTransform: number = +previousTransform.substring(previousTransform.indexOf('(') + 1, commaIndex);
-		var yTransform: number = +previousTransform.substring(commaIndex + 1, previousTransform.indexOf(')'));
+		var xTransform: number
+		var yTransform: number
+
+		if (previousTransform) {
+			var commaIndex: number = previousTransform.indexOf(',');
+			// Pull the current transform coordinates form the string. + is a quick operation that converts them into numbers.
+			xTransform = +previousTransform.substring(previousTransform.indexOf('(') + 1, commaIndex);
+			yTransform = +previousTransform.substring(commaIndex + 1, previousTransform.indexOf(')'));
+		} else {
+			xTransform = 0;
+			yTransform = 0;
+		}
+
 
 		if (this.viewOrientation === 'vertical') {
 			return 'translate(' + (xTransform + deltaCoordinateOne) + ',' + (yTransform + deltaCoordinateTwo) + ')';

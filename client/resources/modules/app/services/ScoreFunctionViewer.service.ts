@@ -2,33 +2,53 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:04:20
+* @Last Modified time: 2016-09-01 12:55:30
 */
 
+// Import Angular Classes:
 import { Injectable } 															from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 																	from 'd3';
 
 // Application Classes:
 import { ValueChartService }													from './ValueChart.service';
 
-// Model Classes
+// Import Model Classes
 import { PrimitiveObjective }													from '../../../model/PrimitiveObjective';
 import { User }																	from '../../../model/User';
 import { CategoricalDomain }													from '../../../model/CategoricalDomain';
 import { IntervalDomain }														from '../../../model/IntervalDomain';
 import { ScoreFunction }														from '../../../model/ScoreFunction';
 
+// Import Type Definitions:
 import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '../../../types/ScoreFunctionViewer.types.ts';
 
-// This class stores the state of a ValueChart and exposes this state to the renderer classes. Renderer classes are allowed to modify 
-// this state as a way of initiating change detection. 
+
+/*
+	This class contains methods for formatting data from the active ValueChart object in the ValueChartService
+	to be suitable for the ScoreFunctionRenderer classes and the ScoreDistributionChartRenderer class.
+*/
 
 @Injectable()
 export class ScoreFunctionViewerService {
+	
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+	
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. Unfortunately we are forced to assign handlers to the Undo/Redo services event emitters in this
+						method.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(private valueChartService: ValueChartService) { }
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	getAllUsersDomainElements(objective: PrimitiveObjective, users: User[]): UserDomainElements[] {
 		var allUsersDomainElements: UserDomainElements[] = [];

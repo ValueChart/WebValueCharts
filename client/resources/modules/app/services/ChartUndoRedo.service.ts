@@ -2,16 +2,16 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:03:21
+* @Last Modified time: 2016-09-01 13:19:34
 */
 
-
+// Import Application Classes:
 import { Injectable } 														from '@angular/core';
 
-// d3
-import * as d3 																	from 'd3';
+// Import Libraries:
+import * as d3 																from 'd3';
 
-// Model Classes
+// Import Model Classes
 import { ValueChart }														from '../../../model/ValueChart';
 import { Alternative }														from '../../../model/Alternative';
 import { Objective }														from '../../../model/Objective';
@@ -21,15 +21,33 @@ import { ScoreFunction }													from '../../../model/ScoreFunction';
 
 import { Memento }															from '../../../model/Memento';
 
-// Types:
+// Import Type Definitions:
 import { ValueChartStateContainer }											from '../../../types/StateContainer.types';
 import { AlternativeOrderRecord }											from '../../../types/Record.types';
 import { ScoreFunctionRecord }												from '../../../types/Record.types';
 import { ObjectivesRecord }													from '../../../types/Record.types';
 
+/*
+	This class implements change tracking for implementing undo/redo functionality for individual ValueCharts. ChartUndoRedoService
+	does NOT handle the changes caused by undoing or redoing. Instead, it tracks the changes in state caused by these actions, and informs
+	any subscribing classes of these state changes through d3 event emitters. It is the responsibility of these subscribing classes
+	to properly update the ValueChart's state. Similarly, it is the responsibility of any classes that are going to change the ValueChart's
+	state to inform this class of those changes BEFORE they happen.
+	
+	ChartUndoRedoService utilizes four different stacks to keep track of user driven changes. Two of the stacks, undoChangeTypes and 
+	undoStateRecords, are used to track changes in the undo "direction" and the other two, redoChangeTypes and redoStateRecords 
+	are used to track changes in the redo "direction". The ___ChangeType stacks record the type of change that the user made, while
+	the ___StateRecords stacks provide storage for whatever state preceded the changes. Values popped off the ___ChangeType stacks 
+	determine what type of event is emitted by the class when undo/redo actions occur, and values popped off the ___StateRecords
+	stacks are passed to subscribing classes as event data.
+*/
 
 @Injectable()
 export class ChartUndoRedoService {
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
 	public SCORE_FUNCTION_CHANGE: string = 'scoreFunctionChange';
 	public WEIGHT_MAP_CHANGE: string = 'weightMapChange';
@@ -47,6 +65,15 @@ export class ChartUndoRedoService {
 
 	public undoRedoDispatcher: d3.Dispatch;
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. Unfortunately we are forced to setup the Undo/Redo event emitters here.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor() {
 		this.undoChangeTypes = [];
 		this.redoChangeTypes = [];
@@ -63,27 +90,31 @@ export class ChartUndoRedoService {
 			this.SET_OBJECTIVES_CHANGED);
 	}
 
-	clearRedo(): void {
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	public clearRedo(): void {
 		this.redoChangeTypes = [];
 		this.redoStateRecords = [];
 	}
 
-	clearUndo(): void {
+	public clearUndo(): void {
 		this.undoChangeTypes = [];
 		this.undoStateRecords = [];
 	}
 
-	resetUndoRedo() {
+	public resetUndoRedo() {
 		this.clearUndo();
 		this.clearRedo();
 	}
 
-	deleteNewestRecord(): void {
+	public deleteNewestRecord(): void {
 		this.undoChangeTypes.pop();
 		this.undoStateRecords.pop();
 	}
 
-	saveScoreFunctionRecord(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
+	public saveScoreFunctionRecord(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 		// Record the type of change has been made.
@@ -95,7 +126,7 @@ export class ChartUndoRedoService {
 		this.undoStateRecords.push(scoreFunctionRecord);
 	}
 
-	saveWeightMapRecord(weightMap: WeightMap): void {
+	public saveWeightMapRecord(weightMap: WeightMap): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 		// Record the type of change that has been made.
@@ -107,7 +138,7 @@ export class ChartUndoRedoService {
 		this.undoStateRecords.push(weightMapRecord);
 	}
 
-	saveAlternativeOrderRecord(alternatives: Alternative[]): void {
+	public saveAlternativeOrderRecord(alternatives: Alternative[]): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 
@@ -118,7 +149,7 @@ export class ChartUndoRedoService {
 		this.undoStateRecords.push(alternativeOrderRecord);
 	}
 
-	saveObjectivesRecord(objectives: Objective[]): void {
+	public saveObjectivesRecord(objectives: Objective[]): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
 
@@ -129,15 +160,15 @@ export class ChartUndoRedoService {
 		this.undoStateRecords.push(objectivesRecord);
 	}
 
-	canUndo(): boolean {
+	public canUndo(): boolean {
 		return this.undoChangeTypes.length !== 0;
 	}
 
-	canRedo(): boolean {
+	public canRedo(): boolean {
 		return this.redoChangeTypes.length !== 0;
 	}
 
-	undo(currentStateContainer: ValueChartStateContainer): void {
+	public undo(currentStateContainer: ValueChartStateContainer): void {
 		if (!this.canUndo())
 			return;
 
@@ -149,7 +180,7 @@ export class ChartUndoRedoService {
 			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	redo(currentStateContainer: ValueChartStateContainer): void {
+	public redo(currentStateContainer: ValueChartStateContainer): void {
 		if (!this.canRedo())
 			return;
 
@@ -161,7 +192,7 @@ export class ChartUndoRedoService {
 			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+	private scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
 		if (!currentStateContainer.currentUserIsDefined())
 			return;
 
@@ -172,7 +203,7 @@ export class ChartUndoRedoService {
 		(<any>this.undoRedoDispatcher).call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
 	}
 
-	weightMapChange(weightMapRecord: WeightMap, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+	private weightMapChange(weightMapRecord: WeightMap, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
 		if (!currentStateContainer.currentUserIsDefined())
 			return;
 
@@ -182,7 +213,7 @@ export class ChartUndoRedoService {
 		(<any>this.undoRedoDispatcher).call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
 	}
 
-	alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+	private alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
 		var alternatives: Alternative[] = currentStateContainer.getAlternatives();
 		stateRecords.push(new AlternativeOrderRecord(alternatives));
 
@@ -196,7 +227,7 @@ export class ChartUndoRedoService {
 		(<any>this.undoRedoDispatcher).call(this.SET_ALTERNATIVE_ORDER_CHANGED);
 	}
 
-	objectivesChange(objectivesRecord: ObjectivesRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
+	private objectivesChange(objectivesRecord: ObjectivesRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
 		var currentObjectives: Objective[] = currentStateContainer.getRootObjectives();
 
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
