@@ -132,7 +132,6 @@ a.upload {
     stroke-width: 1px;
 }
 
-
 /* SVG */
 
 .svg-content-valuechart {
@@ -221,7 +220,6 @@ a.upload {
     top: 16rem;
 }
 
-
 /* ValueChart SVG Styles */
 
 .valuechart-outline {
@@ -267,8 +265,6 @@ a.upload {
     stroke-width: 3px;
 }
 
-
-
 /* Override bootstrap default styles*/
 
 input[type=color] {
@@ -282,12 +278,15 @@ body {
 
 input {
 	border-radius: 3px !important;
+}
+
+.btn {
+    margin: 5px 5px !important;
 }	
 
 .btn-success {
 	background-color: #2A692A !important;
 	border-color: #2A692A !important;
-
 }
 
 .valuechart-toolbar-group {
@@ -307,6 +306,7 @@ input {
 .dropdown-submenu {
     position:relative;
 }
+
 .dropdown-submenu>.dropdown-menu {
     top:0;
     left:100%;
@@ -316,9 +316,11 @@ input {
     -moz-border-radius:0 6px 6px 6px;
     border-radius:0 6px 6px 6px;
 }
+
 .dropdown-submenu:hover>.dropdown-menu {
     display:block;
 }
+
 .dropdown-submenu>a:after {
     display:block;
     content:" ";
@@ -332,12 +334,15 @@ input {
     margin-top:5px;
     margin-right:-10px;
 }
+
 .dropdown-submenu:hover>a:after {
     border-left-color:#ffffff;
 }
+
 .dropdown-submenu.pull-left {
     float:none;
 }
+
 .dropdown-submenu.pull-left>.dropdown-menu {
     left:-100%;
     margin-left:10px;
@@ -346,9 +351,41 @@ input {
     border-radius:6px 0 6px 6px;
 }
 
-/* Objectives Tree styles */
+/* Creation workflow styles */
 
-.objrowselected
-{
+.objectives-table-row {
+    display: table-row;
+}
+
+.objectives-table-cell {
+    display: table-cell;
+    width: 60px;
+    padding-right: 5px;
+}
+
+.objectives-table-input {
+    width: 200px !important;
+}
+
+.tablerowselected {
     background-color: #D4E7F2;
 }
+
+#add-category-input {
+    width: 200px !important; 
+    margin: 5px !important;
+}
+
+#score-function-dropdown {
+    width: 245px; 
+    margin-right: 5px;
+}
+
+.worst-outcome {
+    background-color: #ffcccc;
+}
+
+.best-outcome {
+    background-color: #ccffcc;
+}
+

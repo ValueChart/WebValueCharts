@@ -1,6 +1,6 @@
 <h4>Set Priorities</h4>
 <label class="control-label">{{getPrioritiesText()}}</label>
-<input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks()" style="margin: 5px 10px;" />
+<input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks()" />
 <table class="table table-bordered table-hover">
     <thead>
       <tr>
@@ -12,8 +12,8 @@
     <tbody>
         <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName)">
             <th>{{objName}}</th>
-            <th style="background-color: #ffcccc">{{getWorstOutcome(objName)}}</th>
-            <th style="background-color: #ccffcc">{{getBestOutcome(objName)}}</th>
+            <th class="worst-outcome">{{getWorstOutcome(objName)}}</th>
+            <th class="best-outcome">{{getBestOutcome(objName)}}</th>
         </tr>
     </tbody>
 </table>
