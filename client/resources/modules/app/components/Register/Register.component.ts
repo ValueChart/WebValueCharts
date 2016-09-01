@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 11:56:56
+* @Last Modified time: 2016-08-31 22:07:48
 */
 
 // Import Angular Classes:
@@ -12,6 +12,18 @@ import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
 // Import Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
+
+/*
+	This component is the user login and account creation page. It allows users to login to the ValueCharts application
+	as using an account that they have created previously, or as temporary users with no account. Temporary users do 
+	not have access to account related aspects of the application like the My Account, and My ValueCharts pages, but they do allow
+	users to create, host and join ValueCharts. The register component also allows users to create a new account whenever they want.
+
+	The register component is also the landing page for the application. This means that users who navigate to the base URL of the 
+	app are directed to this component. Additionally, it is the only component that the router will display to users who are not
+	authenticated. See app.routes.ts for more information about the authentication wall.
+*/
+
 
 @Component({
 	selector: 'register',
@@ -24,7 +36,7 @@ export class RegisterComponent {
 	// 									Fields
 	// ========================================================================================
 
-	private username: string;
+	private username: string;		
 	private password: string;
 	private rePassword: string;
 	private email: string;
@@ -40,6 +52,11 @@ export class RegisterComponent {
 	// 									Constructor
 	// ========================================================================================
 
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(
 		private router: Router,
 		private currentUserService: CurrentUserService,
@@ -105,7 +122,6 @@ export class RegisterComponent {
 			return ['home'];
 		}
 	}
-
 
 	setUsername(username: string): void {
 		let navigationExtras = {

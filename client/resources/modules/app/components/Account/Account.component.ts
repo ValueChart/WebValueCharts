@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 16:30:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:38:52
+* @Last Modified time: 2016-08-31 22:16:00
 */
 
 import { Component } 												from '@angular/core';
@@ -13,6 +13,10 @@ import { Router, ROUTER_DIRECTIVES }								from '@angular/router';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
 
+/*
+	This component is the My Account page. It allows authenticated (i.e. signed in) users to modify their 
+	account's email and password. Users are NOT allowed to modify their username. 
+*/
 
 @Component({
 	selector: 'account',
@@ -20,6 +24,10 @@ import { UserHttpService }											from '../../services/UserHttp.service';
 	directives: [ROUTER_DIRECTIVES],
 })
 export class AccountComponent implements OnInit {
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
 
 	private username: string = this.currentUserService.getUsername();
 	private password: string;
@@ -31,11 +39,29 @@ export class AccountComponent implements OnInit {
 	private invalidMessage: string;
 	private credentialsUpdated: boolean;
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(
 		private currentUserService: CurrentUserService,
 		private userHttpService: UserHttpService) { }
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
+	/* 	
+		@returns {void}
+		@description 	Initializes the ValueChartViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
+						Calling ngOnInit should be left to Angular. Do not call it manually. All initialization logic for this component should be put in this
+						method rather than in the constructor.
+	*/
 	ngOnInit() {
 		this.userHttpService.getUser(this.username)
 			.subscribe(user => {
