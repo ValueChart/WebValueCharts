@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 13:05:31
+* @Last Modified time: 2016-09-03 19:04:40
 */
 
 // Import Node Libraries: 
 import { expect }												from 'chai';
 
 // Application Classes:
-import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XMLValueChartParser';
+import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XmlValueChartParser';
 
 // Model Classes:
 import { ValueChart }											from '../../client/resources/model/ValueChart';

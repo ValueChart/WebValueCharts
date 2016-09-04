@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:53:37
+* @Last Modified time: 2016-09-03 19:00:14
 */
 // Import Angular Classes
 import { Injectable } 															from '@angular/core';
 
 // Import Utility Classes
 import { XmlValueChartLegacyParser }											from '../../utilities/classes/XmlValueChartLegacyParser';
-import { XmlValueChartParser }													from '../../utilities/classes/XMLValueChartParser';
+import { XmlValueChartParser }													from '../../utilities/classes/XmlValueChartParser';
 
 // Import Model Classes
 import { ValueChart }															from '../../../model/ValueChart';
