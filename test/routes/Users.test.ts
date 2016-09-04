@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:25:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-05 14:52:10
+* @Last Modified time: 2016-09-03 18:41:18
 */
 
 // Require Node Libraries:
-import { expect } 								from 'chai';
-import * as request								from 'supertest';
+import { expect } 								from 'chai';			// Import Chai's assertions.
+import * as request								from 'supertest';		// Import supertest.
 
 
 describe('Users Routes', () => {
@@ -17,7 +17,8 @@ describe('Users Routes', () => {
 	var testUser: any = { username: 'TestUser', password: 'TestingUserRoutes', 'email': 'testing@testing.com' };
 
 	before(function() {
-		user = request.agent('http://localhost:3000/');
+		user = request.agent('http://localhost:3000/');	// Create a new supertest agent. This is what will be used to make http requests to the server endpoints.
+														// Notice that the base URL of the server is passed as a parameter and NEVER used again.
 	});
 
 	describe('Route: /Users', () => {
@@ -27,20 +28,22 @@ describe('Users Routes', () => {
 			context('when the username in question is not taken', () => {
 
 				it('should return a status object with the new user\'s username, password, and login status as well as status code 201', (done) => {
+					// Send a post request to the server.
 					user.post('Users').send(testUser)
-						.set('Accept', 'application/json')
-						.expect('Content-Type', /json/)
-						.expect(201)
-						.expect((res: request.Response) => {
+						.set('Accept', 'application/json')	// We will accept JSON as a valid type of response.
+						.expect('Content-Type', /json/)		// Assert that the response type is JSON.
+						.expect(201)						// Assert that the status set on the response's header is 201: Created
+						.expect((res: request.Response) => {	// This is where assertions about the response body are placed.
 							var response = res.body.data;
 
 							expect(response.username).to.equal(testUser.username);
 							expect(response.password).to.equal(testUser.password);
 							expect(response.loginResult).to.be.true;
 
-						}).end(function(err, res) {
-							if (err) return done(err);
-							done();
+						}).end(function(err, res) {			
+							if (err) return done(err);	// We must return any errors to the Mocha test framework via the done promise because the
+														// test is executing asynchronously.
+							done();						// Signal to Mocha that the asynchronous test is complete by fulfilling the promise.
 						});
 				});
 			});
