@@ -1,29 +1,20 @@
 # Web ValueCharts
 
-Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of visualizations and interactive techniques intended to support decision-makers in preferential choice. More information about ValueCharts can be found [here](http://www.cs.ubc.ca/group/iui/VALUECHARTS/)
+Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of visualizations and interactive techniques intended to support decision-makers in preferential choice. More information about ValueCharts can be found at the [project website] (http://www.cs.ubc.ca/group/iui/VALUECHARTS/).
 
-An up-to-date version of ValueCharts can be found [here](https://www.cs.ubc.ca/~amishkin/ValueCharts/). The XML files in app/resources/data can be uploaded and used as dummy models to explore the application's current functionality.
+### Live Version
 
-### Checking Out the Project
+An up-to-date version of Web ValueCharts can be found [here](http://valuecharts.cs.ubc.ca/). Users that want to create a permanent account instead of continuing as a temporary user should not use any real credentials until the project is updated to use HTTPS. There are several demonstration ValueCharts that can be viewed by users in interested in evaluating the project.
 
-You must have git installed to checkout the project. Once you have git:
+### Setting up a Local Instance of the Application
 
-cd to the desired parent directory. Then:
+Please see the [Quick Start Guide] (https://github.com/ValueChart/WebValueCharts/wiki/Quick-Start) for information on how to quickly obtain the project and setup a local host.
 
-git clone https://github.com/ValueChart/WebValueCharts.git
+### Documentation and Development Guide
 
-### Updating the Project
+Please view the project [wiki] (https://github.com/ValueChart/WebValueCharts/wiki) for detailed documentation and a thorough development guide. For specific issues please see the heavily commented source files.
 
-To retrieve changes from the repository and update a local clone of the project:
+### Issues
 
-cd to the home directory of your local. Then:
+Please report any issues or bugs using the [Issues Page] (https://github.com/ValueChart/WebValueCharts/issues). Detailed bug reports are greatly appreciated. 
 
-git pull
-
-Git will automatically merge simple changes, but you may be required to merge some things manually. 
-
-Further information about using Git can be found [here](https://www.atlassian.com/git/).
-
-### Installing Dependencies, Building, and Running the Project:
-
-Please see the [Wiki](https://github.com/ValueChart/WebValueCharts/wiki)
