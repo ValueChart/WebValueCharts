@@ -4,7 +4,7 @@ Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of 
 
 ### Live Version
 
-An up-to-date version of Web ValueCharts can be found [here](http://valuecharts.cs.ubc.ca/). Users that want to create a permanent account instead of continuing as a temporary user should not use any real credentials until the project is updated to use HTTPS. There are several demonstration ValueCharts that can be viewed by users in interested in evaluating the project.
+An up-to-date version of Web ValueCharts can be found [here](http://valuecharts.cs.ubc.ca/). Users that want to create a permanent account instead of continuing as a temporary user should not use any real credentials until the project is updated to use HTTPS. There are several demonstration ValueCharts that can be viewed by users interested in evaluating the project.
 
 ### Setting up a Local Instance of the Application
 
