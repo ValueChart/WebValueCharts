@@ -1,3 +1,4 @@
+// Import Angular Classes:
 import { Component, OnInit }											from '@angular/core';
 import { NgClass } 														from '@angular/common';
 import { Observable }     													from 'rxjs/Observable';
@@ -21,6 +22,12 @@ import { ContinuousDomain }												from '../../../../model/ContinuousDomain'
 import { IntervalDomain }												from '../../../../model/IntervalDomain';
 import { Alternative }													from '../../../../model/Alternative';
 
+/*
+	This component defines the UI controls for creating and editing the Objective structure of a ValueChart.
+	It consists of an Angular table where each row is bound to an ObjectiveRow object (described at end of this file).
+	Objectives are converted to/from ObjectiveRows when the component is created/destroyed.
+*/
+
 @Component({
 	selector: 'CreateObjectives',
 	templateUrl: 'client/resources/modules/create/components/CreateObjectives/CreateObjectives.template.html',
@@ -28,23 +35,54 @@ import { Alternative }													from '../../../../model/Alternative';
 })
 export class CreateObjectivesComponent implements OnInit {
 
-	initialPrimObjRows: { [objID: string]: ObjectiveRow };
-	objectiveRows: { [objID: string]: ObjectiveRow; };
-	rootObjRowID: string;
-    selectedObjRow: string;
-    objectivesCount: number;
-    categoryToAdd: string;
-    categoriesToAdd: string[];
-    editing: boolean;
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
+
+	// Component state fields:
+    editing: boolean; // true if the user is editing a pre-existing Objective structure, 
+    				  // false if this is the first time they are defining Objectives for the ValueChart
+
+	// Objective row fields:
+	objectiveRows: { [objID: string]: ObjectiveRow; }; // It is necessary to track ObjectiveRows by ID since their names may not be unique
+    objectivesCount: number; // Incremented every time an ObjectiveRow is added, but never decremented; used to generate unique IDs for ObjectiveRows
+	selectedObjRow: string; // The ID of the row currently selected in the table
+	rootObjRowID: string; // The ID of the root ObjectiveRow
+	initialPrimObjRows: { [objID: string]: ObjectiveRow }; // Store the initial state at the beginning so that we can update 
+														   // Objective references throughout the model with any changes that were made.
+
+    // Add Category modal fields:
+    categoryToAdd: string; // Category in input field of modal
+    categoriesToAdd: string[]; // Categories in modal list
 
     // Validation fields:
     validationTriggered: boolean = false;
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private updateObjRefService: UpdateObjectiveReferencesService) { }
 
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	// ================================ Life-cycle Methods ====================================
+
+	/* 	
+		@returns {void}
+		@description 	Initializes CreateObjectives. ngOnInit is only called ONCE by Angular.
+						Calling ngOnInit should be left to Angular. Do not call it manually.
+	*/
 	ngOnInit() {
 		this.creationStepsService.observables[this.creationStepsService.OBJECTIVES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
             subscriber.next(this.validate());
@@ -81,6 +119,11 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Destroys CreateObjectives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+						requires that a different component is displayed in the router-outlet.
+	*/
 	ngOnDestroy() {
 		this.valueChartService.getValueChart().setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 		this.valueChartService.resetPrimitiveObjectives();
@@ -89,7 +132,13 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
-	// Update PrimitiveObjective references throughout ValueChart
+	// ================================ Model Update Methods ====================================
+
+	/* 	
+		@returns {void}
+		@description 	Updates references to PrimitiveObjectives throughout the ValueChart.
+						Handles any other changes to the model that need to be made when the Objectives change.
+	*/
 	updateReferences() {
 		let initialPrimObjKeys = this.initialObjKeys();
 		let finalPrimObjKeys = this.objKeys().filter(x => this.objectiveRows[x].type === 'primitive');
@@ -109,6 +158,10 @@ export class CreateObjectivesComponent implements OnInit {
 		this.handleDomainChanges(kept);
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Updates ScoreFunctions and Weights in response to changes to Objective domains.
+	*/
 	handleDomainChanges(objIDs: string[]) {
 		for (let objID of objIDs) {
 			let oldDom = this.initialPrimObjRows[objID].dom;
@@ -142,10 +195,20 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
+	// ================================ Objective Row Methods ====================================
+
+	/* 	
+		@returns {Array<string>}
+		@description 	Gets all ObjectiveRow IDs.
+	*/
 	objKeys(): Array<string> {
 		return Object.keys(this.objectiveRows);
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Gets all ObjectiveRow names.
+	*/
 	getNames(): string[] {
 		let names: string[] = [];
 		for (let key of this.objKeys()) {
@@ -154,19 +217,35 @@ export class CreateObjectivesComponent implements OnInit {
 		return names;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Gets all ObjectiveRow names in ID format. (Right now, it just removes whitespace.)
+	*/
 	getFormattedNames(): string[] {
 		return this.getNames().map(x => Formatter.nameToID(x));
 	}
 
+	/* 	
+		@returns {Array<string>}
+		@description 	Gets all initial primitive ObjectiveRow IDs.
+	*/
 	initialObjKeys(): Array<string> {
 		return Object.keys(this.initialPrimObjRows);
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Creates a new, blank ObjectiveRow under an existing ObjectiveRow.
+	*/
 	addNewChildObjRow(parentID: string) {
 		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), "", "", parentID, this.objectiveRows[parentID].depth + 1));
 	}
 
-	addObjRow(parentID: string, objrow: ObjectiveRow) {
+	/* 	
+		@returns {void}
+		@description 	Inserts an ObjectiveRow under another ObjectiveRow.
+	*/
+	private addObjRow(parentID: string, objrow: ObjectiveRow) {
 		this.objectiveRows[objrow.id] = objrow;
 		this.objectivesCount++;
 		if (this.objectiveRows[parentID]) {
@@ -174,6 +253,10 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Deletes the ObjectiveRow with the given ID along with its children.
+	*/
 	deleteObjRow(objID: string) {
 		let parentID = this.objectiveRows[objID].parent;
 		if (parentID !== "") {
@@ -186,20 +269,36 @@ export class CreateObjectivesComponent implements OnInit {
 		this.selectedObjRow = "";
 	}
 
-	disableAddChild() {
+	/* 	
+		@returns {boolean}
+		@description 	Used by "Add Child" button. Returns true if no row is selected or a primitive objective row is selected.
+	*/
+	disableAddChild(): boolean {
 		return (this.selectedObjRow === "" || this.objectiveRows[this.selectedObjRow].type === 'primitive');
 	}
 
-	disableDelete() {
+	/* 	
+		@returns {boolean}
+		@description 	Used by "Delete" button. Returns true if no row is selected or the root is selected.
+	*/
+	disableDelete(): boolean {
 		return (this.selectedObjRow === "" || this.selectedObjRow === this.rootObjRowID);
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Gets the ObjectiveRow IDs as a list in the order that they will be displayed.
+	*/
 	getFlattenedObjectiveRows(): string[] {
 		let flattened: string[] = [];
 		this.flattenObjectiveRows([this.rootObjRowID], flattened);
 		return flattened;
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Recursively converts the implicit tree-structure of ObjectiveRows into a list in the order that the rows will be displayed.
+	*/
 	flattenObjectiveRows(ObjectiveRowIDs: string[], flattened: string[]) {
 		for (let objID of ObjectiveRowIDs) {
 			flattened.push(objID);
@@ -207,60 +306,10 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
-	getSelectedValues(select: HTMLSelectElement): string[] {
-		let result: string[] = [];
-		let options: HTMLCollection = select && select.options;
-		let opt: HTMLOptionElement;
-
-		for (let i = 0, iLen = options.length; i < iLen; i++) {
-			opt = <HTMLOptionElement>options[i];
-			if (opt.selected) {
-				result.push(opt.value || opt.text);
-			}
-		}
-		return result;
-	}
-
-	handleKeyPress(key: string) {
-		if (key === "Enter") {
-			this.addCategory();
-		}
-	}
-
-	addCategory() {
-		this.categoriesToAdd.push(this.categoryToAdd);
-		this.categoryToAdd = "";
-	}
-
-	addCategories() {
-		for (let cat of this.categoriesToAdd) {
-			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
-		}
-		this.categoriesToAdd = [];
-	}
-
-	removeSelectedCategoriesMain(objID: string) {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlist" + objID)[0]);
-		for (let cat of selected) {
-			this.objectiveRows[objID].dom.removeCategory(cat);
-		}
-	}
-
-	removeSelectedCategoriesModal() {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
-		for (let cat of selected) {
-			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat), 1);
-		}
-	}
-
-	getCategories(objrow: ObjectiveRow): string[] {
-		if (objrow === undefined) {
-			return [];
-		}
-		return objrow.dom.categories;
-	}
-
-	// Convert ObjectiveRows to Objectives
+	/* 	
+		@returns {Objective}
+		@description 	Converts an ObjectiveRow into an Objective.
+	*/
 	objRowToObjective(objrow: ObjectiveRow): Objective {
 		let obj: Objective;
 		if (objrow.type === 'primitive') {
@@ -290,7 +339,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return obj;
 	}
 
-	// Recursively convert Objectives into ObjectiveRows
+	/* 	
+		@returns {void}
+		@description 	Recursively converts an Objective and all its descendants into ObjectiveRows.
+	*/
 	objectiveToObjRow(obj: Objective, parentID: string, depth: number) {
 		let objrow: ObjectiveRow;
 		if (obj.objectiveType === 'abstract') {
@@ -307,6 +359,10 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {DomainDetails}
+		@description 	Convert an Objective's Domain into DomainDetails (internal representation).
+	*/
 	domainToDomainDetails(dom: Domain): DomainDetails {
 		let domDets: DomainDetails = new DomainDetails(dom.type);
 		if (dom.type === 'categorical') {
@@ -327,12 +383,105 @@ export class CreateObjectivesComponent implements OnInit {
 		return domDets;
 	}
 
+	// ================================ Categorical Domain Methods ====================================
+
+	/* 	
+		@returns {void}
+		@description 	Moves category from modal input field to modal list.
+	*/
+	addCategory() {
+		this.categoriesToAdd.push(this.categoryToAdd);
+		this.categoryToAdd = "";
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Moves categories from modal list to ObjectiveRow domain.
+	*/
+	addCategories() {
+		for (let cat of this.categoriesToAdd) {
+			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
+		}
+		this.categoriesToAdd = [];
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Calls addCategory() when Enter is pressed.
+						This makes it easier for the user to add many categories to modal list in sequence.
+	*/
+	handleKeyPress(key: string) {
+		if (key === "Enter") {
+			this.addCategory();
+		}
+	}
+
+		/* 	
+		@returns {void}
+		@description 	Removes selected categories from modal list.
+	*/
+	removeSelectedCategoriesModal() {
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
+		for (let cat of selected) {
+			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat), 1);
+		}
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Removes selected categories in main view from ObjectiveRow domain.
+	*/
+	removeSelectedCategoriesMain(objID: string) {
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlist" + objID)[0]);
+		for (let cat of selected) {
+			this.objectiveRows[objID].dom.removeCategory(cat);
+		}
+	}
+
+	/* 	
+		@returns {string[]}
+		@description 	Gets domain categories for an ObjectiveRow.
+	*/
+	getCategories(objrow: ObjectiveRow): string[] {
+		if (objrow === undefined) {
+			return [];
+		}
+		return objrow.dom.categories;
+	}
+
+	/* 	
+		@returns {string[]}
+		@description 	Gets selected elements of a given HTMLSelectElement.
+	*/
+	getSelectedValues(select: HTMLSelectElement): string[] {
+		let result: string[] = [];
+		let options: HTMLCollection = select && select.options;
+		let opt: HTMLOptionElement;
+
+		for (let i = 0, iLen = options.length; i < iLen; i++) {
+			opt = <HTMLOptionElement>options[i];
+			if (opt.selected) {
+				result.push(opt.value || opt.text);
+			}
+		}
+		return result;
+	}
+	
+	/* 	
+		@returns {number}
+		@description 	Converts a string to a Number. This was needed because TypeScript failed to do so implicitly.
+	*/
 	toNumber(str: string): number {
 		return Number(str);
 	}
 
-	// Validation methods:
+	// ================================ Validation Methods ====================================
 
+	/* 	
+		@returns {boolean}
+		@description 	Validate ObjectiveRow structure.
+						This should be done prior to updating the ValueChart model and saving to the database.
+	*/
 	validate(): boolean {
 		this.validationTriggered = true;
 		return  this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
@@ -341,11 +490,19 @@ export class CreateObjectivesComponent implements OnInit {
 			&& this.minLessThanMax() && this.intervalOk();
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every ObjectiveRow has a name that isn't the empty string.
+	*/
 	allHaveNames(): boolean {
 		return this.getNames().indexOf("") === -1;
 	}
 
-	allNamesValid() {
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every ObjectiveRow has a name that contains only alphanumeric characters, spaces, hyphens, and underscores.
+	*/
+	allNamesValid(): boolean {
 		let regex = new RegExp("^[\\s\\w-]+$");
 		for (let name of this.getNames()) {
 			if (name.search(regex) === -1) {
@@ -355,10 +512,18 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every ObjectiveRow names are unique after converting to ID format.
+	*/
 	allNamesUnique(): boolean {
 		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff there is at least one primitive Objective.
+	*/
 	hasPrimitive(): boolean {
 		for (let key of this.objKeys()) {
 			if (this.objectiveRows[key].type === 'primitive') {
@@ -368,6 +533,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return false;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every abstract Objective has at least one child.
+	*/
 	allAbstractHaveChildren(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -378,6 +547,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every category name is valid (i.e., contains only alphanumeric characters).
+	*/
 	categoryNamesValid(): boolean {
 		let regex = new RegExp("^[\\w]+$");
 		for (let key of this.objKeys()) {
@@ -393,6 +566,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every category name within each categorical domain is unique.
+	*/
 	categoryNamesUnique(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -405,6 +582,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff each categorical domain has at least two categories.
+	*/
 	atLeastTwoCategories(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -416,6 +597,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff each continuous domain has a min and max value.
+	*/
 	continuousComplete(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -428,6 +613,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff each interval domain has a min, max, and interval value.
+	*/
 	intervalComplete(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -440,6 +629,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff for each continuous and interval domain, the min is less than the max.
+	*/
 	minLessThanMax(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
@@ -451,6 +644,10 @@ export class CreateObjectivesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff for each interval domain, the interval is less than the range (max - min).
+	*/
 	intervalOk(): boolean {for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
 			if (objrow.type === 'primitive' && objrow.dom.type === 'interval' 
@@ -462,6 +659,12 @@ export class CreateObjectivesComponent implements OnInit {
 	}
 }
 
+/*
+	This is an internal structure that is used to store the details of each Objective in the html table.
+	Objectives are converted to/from ObjectiveRows when the component is created/destroyed.
+	This is done so that ObjectiveRows can be converted between types while keeping the same object.
+	It also allows us to store other useful properties (e.g. parent, depth) and makes Angular field binding simpler.
+*/
 class ObjectiveRow {
 	id: string;
 	name: string;
@@ -500,8 +703,10 @@ class ObjectiveRow {
 	}
 }
 
-// Store details for all possible domain types
-// Making this a single class so that I don't have to make a new object every time the type is changed
+/*
+	This class stores the details of an ObjectiveRow's domain.
+	A single class covers all possible types so that ObjectiveRows can be converted between types while keeping the same object.
+*/
 class DomainDetails {
 	type: string;
 	categories: string[];

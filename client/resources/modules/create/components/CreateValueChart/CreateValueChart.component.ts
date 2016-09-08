@@ -27,7 +27,7 @@ import { User }															from '../../../../model/User';
 	It supplies navigation buttons that allow the user to progress through the stages.
 
 	Each substep of the create workflow is handled by a separate child component. Clicking navigation buttons triggers 
-	validation in the current substep component.
+	validation in the current substep's component.
 
 */
 
@@ -83,8 +83,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {void}
-		@description 	Initializes CreateValueChart. ngOnInit is only called ONCE by Angular. 
-						This function is thus used for one-time initialized only. 
+		@description 	Initializes CreateValueChart. ngOnInit is only called ONCE by Angular.
 						Calling ngOnInit should be left to Angular. Do not call it manually.
 	*/
 	ngOnInit() {
