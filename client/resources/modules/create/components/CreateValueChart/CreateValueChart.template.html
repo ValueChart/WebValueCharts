@@ -8,7 +8,7 @@
                 <div class="form-group">
                     <a class="btn btn-success btn-lg pull-left" (click)="window.destination='/home'" [routerLink]="['/home']">Home</a>
                     <input class="btn btn-success btn-lg pull-left" type="button" value="<< Back" [disabled]="disableBackButton()" (click)="back()" />
-                    <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" [disabled]="disableNextButton()" (click)="next()" />
+                    <input class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" (click)="next()" />
                 </div>
             </div>
         </div>
