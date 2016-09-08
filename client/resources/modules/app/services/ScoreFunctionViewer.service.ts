@@ -11,7 +11,7 @@ import { Injectable } 															from '@angular/core';
 // Import Libraries:
 import * as d3 																	from 'd3';
 
-// Application Classes:
+// Import Application Classes:
 import { ValueChartService }													from './ValueChart.service';
 
 // Import Model Classes:

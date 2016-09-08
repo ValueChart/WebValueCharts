@@ -3,7 +3,7 @@ import { Observable }     													from 'rxjs/Observable';
 import { Subscriber }     													from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
-// Application classes:
+// Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 

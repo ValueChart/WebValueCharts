@@ -8,7 +8,8 @@
 // Require Node Libraries:
 import { expect } 								from 'chai';
 import * as request								from 'supertest';
-// Utility Classes:
+
+// Import Utility Classes:
 import { JsonValueChartParser }					from '../../client/resources/modules/utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:

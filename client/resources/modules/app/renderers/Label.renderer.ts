@@ -12,7 +12,6 @@ import { NgZone }													from '@angular/core';
 // Import libraries:
 import * as d3 														from 'd3';
 
-
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RendererDataService }										from '../services/RendererData.service';
@@ -20,14 +19,11 @@ import { ScoreFunctionViewerService }								from '../services/ScoreFunctionView
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
-
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
 import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
-
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
-
 
 // Import Model Classes:
 import { Objective }												from '../../../model/Objective';

@@ -7,7 +7,7 @@
 
 import { Injectable } 												from '@angular/core';
 
-// Application Classes:
+// Import Application Classes:
 import { ValueChartService }										from './ValueChart.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
@@ -16,7 +16,7 @@ import { ValueChart }												from '../../../model/ValueChart';
 import { User }														from '../../../model/User';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 
-// Types: 
+// Import Types: 
 import { HostMessage, MessageType }									from '../../../types/HostMessage';
 
 /*

@@ -9,7 +9,6 @@
 import { Component } 										from '@angular/core';
 import { OnInit } 											from '@angular/core';
 
-
 // Import Application Classes:
 import { ValueChartService }								from '../../services/ValueChart.service';
 import { ValueChartXMLEncoder }								from '../../../utilities/classes/ValueChartXMLEncoder';

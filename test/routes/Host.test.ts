@@ -11,7 +11,8 @@ var WebSocket = require('websocket').w3cwebsocket;
 
 import { expect } 								from 'chai';
 import * as request								from 'supertest';
-// Utility Classes:
+
+// Import Utility Classes:
 import { JsonValueChartParser }					from '../../client/resources/modules/utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:
@@ -23,7 +24,6 @@ import { ScoreFunctionMap }						from '../../client/resources/model/ScoreFunctio
 
 // Import Types:
 import { HostMessage,  MessageType}				from '../../client/resources/types/HostMessage';
-
 
 // Import Test Data:
 import { JsonGroupHotel }						from '../testData/ValueChartsData';

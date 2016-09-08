@@ -12,7 +12,7 @@ import { NgZone }														from '@angular/core';
 // d3
 import * as d3 															from 'd3';
 
-// Application classes:
+// Import Application Classes:
 import { ScoreFunctionRenderer }										from '../../app/renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../app/renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../../app/renderers/ContinuousScoreFunction.renderer';

@@ -8,7 +8,7 @@
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core';
 
-// Application Classes:
+// Import Application Classes:
 import { CurrentUserService }								from './CurrentUser.service';
 import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 

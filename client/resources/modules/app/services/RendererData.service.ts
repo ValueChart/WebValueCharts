@@ -26,7 +26,6 @@ import { WeightMap }										from '../../../model/WeightMap';
 import { ScoreFunctionMap }									from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../../../model/ScoreFunction';
 
-
 // Import Type Definitions:
 import { RowData, CellData, UserScoreData, LabelData}		from '../../../types/RendererData.types';
 import { ObjectivesRecord }									from '../../../types/Record.types';

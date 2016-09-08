@@ -5,10 +5,9 @@
 * @Last Modified time: 2016-08-23 12:02:00
 */
 
-// Import Angular classes:
+// Import Angular Classes:
 import { Injectable } 									from '@angular/core';
 import { NgZone }										from '@angular/core';
-
 
 // Import Libraries:
 import * as d3 											from 'd3';
@@ -18,7 +17,6 @@ import { ValueChartService }							from '../services/ValueChart.service';
 import { ScoreFunctionViewerService }					from '../services/ScoreFunctionViewer.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
-
 
 // Import Model Classes:
 import { Objective }									from '../../../model/Objective';

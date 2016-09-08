@@ -16,8 +16,7 @@ import { HTTP_PROVIDERS } 						from '@angular/http';
 // Import Application Classes:
 import { APP_ROUTER_PROVIDERS, ROUTER }			from './app.routes';
 import { CREATION_ROUTER }						from '../create/Create.routes';
-	// Components List:
-
+// Components:
 import { RootComponent }						from './components/Root/Root.component';
 import { RegisterComponent }					from './components/Register/Register.component';
 import { HomeComponent }						from './components/Home/Home.component';
@@ -26,13 +25,10 @@ import { AccountComponent }						from './components/Account/Account.component';
 import { MyValueChartsComponent }				from './components/MyValueCharts/MyValueCharts.component';
 import { ScoreFunctionViewerComponent }			from './components/ScoreFunctionViewer/ScoreFunctionViewer.component';
 import { ExportValueChartComponent }			from './components/ExportValueChart/ExportValueChart.component';
-
-	// Directives List:
+// Directives:
 import { ValueChartDirective }					from './directives/ValueChart.directive';
 import { ScoreFunctionDirective }				from '../utilities/directives/ScoreFunction.directive';
-
-
-	// Modules:
+// Modules:
 import { CreateModule }							from '../create/create.module';
 import { UtilitiesModule }						from '../utilities/utilities.module';
 

@@ -7,7 +7,7 @@
 
 import { Injectable } 										from '@angular/core';
 
-// Application Classes:
+// Import Application Classes:
 import { ValueChartService }								from '../../app/services/ValueChart.service';
 
 // Import Model Classes:

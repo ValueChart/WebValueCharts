@@ -10,7 +10,7 @@ import { Injectable } 												from '@angular/core';
 // d3
 import * as d3 														from 'd3';
 
-// Application Classes
+// Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';

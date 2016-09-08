@@ -7,7 +7,7 @@
 
 import { Routes, RouterModule } 									from '@angular/router';
 
-// Application Classes
+// Import Application Classes:
 	// Components:
 import { RegisterComponent }										from './components/Register/Register.component';
 import { HomeComponent }											from './components/Home/Home.component';

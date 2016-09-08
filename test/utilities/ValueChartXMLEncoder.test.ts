@@ -7,8 +7,7 @@
 // Import Node Libraries:
 import { expect }												from 'chai';
 
-
-// Utilities:
+// Import Utilities:
 import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XmlValueChartParser';
 
 // Import Model Classes:
@@ -242,7 +241,7 @@ describe('ValueChartXMlEncoder', () => {
 
 
 
-// Test Resources:
+// Import Test Resources:
 var XMLTestString: string = 
 `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0">
