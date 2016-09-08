@@ -11,7 +11,7 @@ import { Injectable } 														from '@angular/core';
 // Import Libraries:
 import * as d3 																from 'd3';
 
-// Import Model Classes
+// Import Model Classes:
 import { ValueChart }														from '../../../model/ValueChart';
 import { Alternative }														from '../../../model/Alternative';
 import { Objective }														from '../../../model/Objective';

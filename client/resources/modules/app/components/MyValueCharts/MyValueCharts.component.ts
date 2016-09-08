@@ -10,7 +10,7 @@ import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 import { OnInit }										from '@angular/core';
 
-// Import Application classes:
+// Import Application Classes:
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { UserHttpService }								from '../../services/UserHttp.service';

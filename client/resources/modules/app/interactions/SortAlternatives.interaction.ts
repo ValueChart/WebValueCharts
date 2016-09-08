@@ -25,7 +25,7 @@ import { SummaryChartDefinitions }									from '../services/SummaryChartDefinit
 import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
-// Import Model Classes
+// Import Model Classes:
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';

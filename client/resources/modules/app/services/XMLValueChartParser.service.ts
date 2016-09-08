@@ -11,7 +11,7 @@ import { Injectable } 															from '@angular/core';
 import { XmlValueChartLegacyParser }											from '../../utilities/classes/XmlValueChartLegacyParser';
 import { XmlValueChartParser }													from '../../utilities/classes/XmlValueChartParser';
 
-// Import Model Classes
+// Import Model Classes:
 import { ValueChart }															from '../../../model/ValueChart';
 
 

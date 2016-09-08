@@ -21,7 +21,7 @@ import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service
 
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
-// Import Model Classes
+// Import Model Classes:
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';

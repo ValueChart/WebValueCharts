@@ -14,7 +14,7 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 // Import Libraries:
 import * as d3 															from 'd3';
 
-// Import Application classes:
+// Import Application Classes:
 import { ScoreFunctionRenderer }										from '../../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../../renderers/ContinuousScoreFunction.renderer';

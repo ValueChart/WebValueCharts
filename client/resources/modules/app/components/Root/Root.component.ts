@@ -13,7 +13,7 @@ import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
 import { ApplicationRef } 											from '@angular/core';
 
 
-// Import Application classes
+// Import Application Classes:
 import { XMLValueChartParserService } 										from '../../services/XMLValueChartParser.service';
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { ValueChartService }										from '../../services/ValueChart.service';

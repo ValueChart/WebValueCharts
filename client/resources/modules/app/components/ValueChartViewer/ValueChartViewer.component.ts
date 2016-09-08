@@ -10,10 +10,10 @@ import { Component }															from '@angular/core';
 import { OnInit, OnDestroy }													from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router';
 
-// Import Libraries
+// Import Libraries:
 import * as d3 																	from 'd3';
 
-// Import Application classes
+// Import Application Classes:
 import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
@@ -41,7 +41,7 @@ import { SummaryChartDefinitions }												from '../../services/SummaryChartD
 import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
 import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
 
-// Import Model Classes
+// Import Model Classes:
 import { User }																	from '../../../../model/User';
 import { ValueChart } 															from '../../../../model/ValueChart';
 import { Alternative } 															from '../../../../model/Alternative';

@@ -18,7 +18,7 @@ import { ScoreFunctionViewerService }					from '../services/ScoreFunctionViewer.
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
-// Import Model Classes
+// Import Model Classes:
 import { ValueChart }									from '../../../model/ValueChart';
 import { Objective }									from '../../../model/Objective';
 import { PrimitiveObjective }							from '../../../model/PrimitiveObjective';

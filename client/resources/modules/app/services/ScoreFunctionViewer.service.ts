@@ -14,7 +14,7 @@ import * as d3 																	from 'd3';
 // Application Classes:
 import { ValueChartService }													from './ValueChart.service';
 
-// Import Model Classes
+// Import Model Classes:
 import { PrimitiveObjective }													from '../../../model/PrimitiveObjective';
 import { User }																	from '../../../model/User';
 import { CategoricalDomain }													from '../../../model/CategoricalDomain';

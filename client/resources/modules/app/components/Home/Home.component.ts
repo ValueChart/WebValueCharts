@@ -9,7 +9,7 @@
 import { Component }									from '@angular/core';
 import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
 
-// Import Application classes:
+// Import Application Classes:
 import { XMLValueChartParserService } 							from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';

@@ -13,7 +13,7 @@ import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
 // Import Libraries:
 import * as d3 																	from 'd3';
 
-// Import Application classes:
+// Import Application Classes:
 // Services:
 import { ValueChartService}														from '../services/ValueChart.service';
 import { RendererDataService}													from '../services/RendererData.service';
