@@ -8,7 +8,7 @@ import { ValueChartService }												from '../../../app/services/ValueChart.s
 import { CreationStepsService }												from '../../services/CreationSteps.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 														from '../../../../model/ValueChart';
 
 @Component({

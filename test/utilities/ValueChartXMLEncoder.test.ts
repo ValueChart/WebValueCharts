@@ -11,7 +11,7 @@ import { expect }												from 'chai';
 // Utilities:
 import { XmlValueChartParser }									from '../../client/resources/modules/utilities/classes/XmlValueChartParser';
 
-// Model Classes:
+// Import Model Classes:
 import { ValueChart }											from '../../client/resources/model/ValueChart';
 import { Alternative }											from '../../client/resources/model/Alternative';
 import { User } 												from '../../client/resources/model/User';

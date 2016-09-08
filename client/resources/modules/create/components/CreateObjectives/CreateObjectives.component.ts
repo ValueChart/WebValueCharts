@@ -10,7 +10,7 @@ import { CreationStepsService }											from '../../services/CreationSteps.ser
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
 import { Objective }													from '../../../../model/Objective';
 import { AbstractObjective }											from '../../../../model/AbstractObjective';

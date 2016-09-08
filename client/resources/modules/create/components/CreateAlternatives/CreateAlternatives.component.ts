@@ -8,7 +8,7 @@ import { ValueChartService }											from '../../../app/services/ValueChart.se
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
 import { Alternative }													from '../../../../model/Alternative';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';

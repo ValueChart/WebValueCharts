@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-07-25 14:26:44
 */
 
-// Model Classes:
+// Import Model Classes:
 import { User }														from '../model/User';
 import { ScoreFunction }											from '../model/ScoreFunction';
 import { WeightMap }												from '../model/WeightMap';

@@ -10,7 +10,7 @@ import { Injectable } 										from '@angular/core';
 // Application Classes:
 import { ValueChartService }								from '../../app/services/ValueChart.service';
 
-// Model Classes
+// Import Model Classes:
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
 import { User }												from '../../../model/User';
 

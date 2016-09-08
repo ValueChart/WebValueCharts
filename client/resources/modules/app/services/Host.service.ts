@@ -11,7 +11,7 @@ import { Injectable } 												from '@angular/core';
 import { ValueChartService }										from './ValueChart.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
-// Model Classes:
+// Import Model Classes:
 import { ValueChart }												from '../../../model/ValueChart';
 import { User }														from '../../../model/User';
 import { ScoreFunction }											from '../../../model/ScoreFunction';

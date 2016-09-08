@@ -16,7 +16,7 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 
-// Model Classes
+// Import Model Classes:
 import { User }														from '../../../model/User';
 import { Alternative }												from '../../../model/Alternative';
 import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';

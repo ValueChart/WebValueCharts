@@ -22,7 +22,7 @@ import { ValueChartService }											from '../../app/services/ValueChart.servi
 import { ChartUndoRedoService }											from '../../app/services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }									from '../../app/services/ScoreFunctionViewer.service';
 
-// Model Classes:
+// Import Model Classes:
 import { ScoreFunction }												from '../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../model/PrimitiveObjective';
 import { User }															from '../../../model/User';

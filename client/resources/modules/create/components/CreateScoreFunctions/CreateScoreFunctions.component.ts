@@ -10,7 +10,7 @@ import { CreationStepsService }                      from '../../services/Creati
 import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }								from '../../../app/services/ScoreFunctionViewer.service';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 													    from '../../../../model/ValueChart';
 import { User }														      	  from '../../../../model/User';
 import { ScoreFunctionMap }												  from '../../../../model/ScoreFunctionMap';

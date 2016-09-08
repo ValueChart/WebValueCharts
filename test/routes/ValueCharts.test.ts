@@ -11,7 +11,7 @@ import * as request								from 'supertest';
 // Utility Classes:
 import { JsonValueChartParser }					from '../../client/resources/modules/utilities/classes/JsonValueChartParser';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart }							from '../../client/resources/model/ValueChart';
 import { Alternative }							from '../../client/resources/model/Alternative';
 import { User }									from '../../client/resources/model/User';

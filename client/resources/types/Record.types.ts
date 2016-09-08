@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-06-28 14:28:39
 */
 
-// Model Classes
+// Import Model Classes:
 import { Alternative }					from '../model/Alternative';
 import { Objective }					from '../model/Objective';
 import { AbstractObjective }			from '../model/AbstractObjective';

@@ -7,7 +7,7 @@ import '../../../utilities/rxjs-operators';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
 import { User }															from '../../../../model/User';
 import { WeightMap }													from '../../../../model/WeightMap';

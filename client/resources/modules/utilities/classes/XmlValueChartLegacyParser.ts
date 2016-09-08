@@ -5,7 +5,7 @@
 * @Last Modified time: 2016-08-30 15:48:46
 */
 
-// Model Classes
+// Import Model Classes:
 import { ValueChart }														from '../../../model/ValueChart';
 import { User }																from '../../../model/User';
 import { WeightMap }														from '../../../model/WeightMap';
