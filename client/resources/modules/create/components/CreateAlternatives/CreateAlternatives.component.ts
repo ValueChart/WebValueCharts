@@ -14,20 +14,51 @@ import { Alternative }													from '../../../../model/Alternative';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
 
+/*
+	This component defines the UI controls for creating and editing the Alternatives of a ValueChart.
+	It consists of an Angular table where each row is bound to an Alternative object in the ValueChart.
+*/
+
 @Component({
 	selector: 'CreateAlternatives',
 	templateUrl: 'client/resources/modules/create/components/CreateAlternatives/CreateAlternatives.template.html',
 })
 export class CreateAlternativesComponent implements OnInit {
-    alternatives: { [altID: string]: Alternative; };
-    isSelected: { [altID: string]: boolean; };
-    alternativesCount: number;
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
+
+    alternatives: { [altID: string]: Alternative; }; // It is necessary to track Alternatives by ID since their names may not be unique
+    isSelected: { [altID: string]: boolean; }; // Specifies whether the row corresponding to each Alternative is currently selected
+    alternativesCount: number; // Incremented every time an Alternative is added, but never decremented; used to generate unique IDs for Alternatives
 
     // Validation fields:
-    validationTriggered: boolean = false;
+    validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
+    									  // If true, validation messages will be shown whenever conditions fail
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	// ================================ Life-cycle Methods ====================================
+
+	/* 	
+		@returns {void}
+		@description 	Initializes CreateAlternatives. ngOnInit is only called ONCE by Angular.
+						Calling ngOnInit should be left to Angular. Do not call it manually.
+	*/
 	ngOnInit() {
 		this.creationStepsService.observables[this.creationStepsService.ALTERNATIVES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
             subscriber.next(this.validate());
@@ -48,6 +79,11 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Destroys CreateAlternatives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+						requires that a different component is displayed in the router-outlet.
+	*/
 	ngOnDestroy() {
 		let alternatives: Alternative[] = [];
 		for (let altID of this.altKeys()) {

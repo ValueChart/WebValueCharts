@@ -56,7 +56,8 @@ export class CreateObjectivesComponent implements OnInit {
     categoriesToAdd: string[]; // Categories in modal list
 
     // Validation fields:
-    validationTriggered: boolean = false;
+    validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
+    									  // If true, validation messages will be shown whenever conditions fail
 
 	// ========================================================================================
 	// 									Constructor
