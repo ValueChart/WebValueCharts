@@ -501,7 +501,8 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff every ObjectiveRow has a name that contains only alphanumeric characters, spaces, hyphens, and underscores.
+		@description 	Returns true iff every ObjectiveRow has a name that contains at least one character
+						and only alphanumeric characters, spaces, hyphens, and underscores.
 	*/
 	allNamesValid(): boolean {
 		let regex = new RegExp("^[\\s\\w-]+$");
