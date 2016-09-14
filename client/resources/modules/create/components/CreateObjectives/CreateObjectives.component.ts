@@ -516,7 +516,7 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff every ObjectiveRow names are unique after converting to ID format.
+		@description 	Returns true iff all ObjectiveRow names are unique after converting to ID format.
 	*/
 	allNamesUnique(): boolean {
 		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;

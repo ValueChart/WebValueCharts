@@ -92,6 +92,13 @@ export class CreateAlternativesComponent implements OnInit {
 		this.valueChartService.setAlternatives(alternatives);
 	}
 
+	// ================================ Alternatives Table Methods ====================================
+
+	/* 	
+		@returns {string}
+		@description 	Returns text for Objective column header.
+						(Includes the range for continuous domain Objectives.)
+	*/	
 	getColumnHeader(obj: PrimitiveObjective) : string {
 		if (obj.getDomainType() === 'continuous') {
 			return obj.getName() + " (min: " + (<ContinuousDomain>obj.getDomain()).getMinValue() + ", max: " +  (<ContinuousDomain>obj.getDomain()).getMaxValue() + ")"; 
@@ -101,10 +108,18 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {Array<string{}}
+		@description 	Gets all Alternative IDs.
+	*/	
 	altKeys(): Array<string> {
 		return Object.keys(this.alternatives);
 	}
 
+	/* 	
+		@returns {Array<string{}}
+		@description 	Gets all Alternative names.
+	*/	
 	getNames(): string[] {
 		let names: string[] = [];
 		for (let altID of this.altKeys()) {
@@ -113,16 +128,29 @@ export class CreateAlternativesComponent implements OnInit {
 		return names;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Gets all Alternative names in ID format. (Right now, it just removes whitespace.)
+	*/
 	getFormattedNames(): string[] {
 		return this.getNames().map(x => Formatter.nameToID(x));
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Adds a new, blank Alternative to alternatives.
+						(This has the effect of inserting a new row.)
+	*/
 	addEmptyAlternative() {
 		this.alternatives[this.alternativesCount] = new Alternative("", "");
 		this.isSelected[this.alternativesCount] = false;
 		this.alternativesCount++;
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Delete all selected Alternatives
+	*/
 	deleteAlternatives() {
 		for (let key of this.altKeys()) {
 			if (this.isSelected[key]) {
@@ -132,6 +160,10 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true if all Alternatives are selected, false otherwise.
+	*/
 	allSelected(): boolean {
 		if (this.altKeys().length === 0) {
 			return false;
@@ -144,6 +176,10 @@ export class CreateAlternativesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {void}
+		@description 	Deselects all Alternatives if all are selected, selects all otherwise.
+	*/
 	toggleSelectAll() {
 		let allSelected = this.allSelected();
 		for (let key of this.altKeys()) {
@@ -151,26 +187,48 @@ export class CreateAlternativesComponent implements OnInit {
 		}
 	}
 
+	/* 	
+		@returns {number}
+		@description 	Converts str to a number.
+	*/
 	toNumber(str: string): number {
 		return Number(str);
 	}
 
-	// Validation methods:
+	// ================================ Validation Methods ====================================
 
+	/* 	
+		@returns {boolean}
+		@description 	Validate Alternatives.
+						This should be done prior to updating the ValueChart model and saving to the database.
+	*/
 	validate(): boolean {
 		this.validationTriggered = true;
 		return this.hasAlternatives() && this.allHaveNames() && this.allNamesValid()
 			&& this.allNamesUnique() && this.allObjectivesHaveValues() && this.allValuesWithinRange();
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff there is at least one Alternative.
+	*/
 	hasAlternatives(): boolean {
 		return this.altKeys().length > 0;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every Alternative has a name that isn't the empty string.
+	*/
 	allHaveNames(): boolean {
 		return this.getNames().indexOf("") === -1;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff every Altenrativehas a name that contains at least one character
+						and only alphanumeric characters, spaces, hyphens, and underscores.
+	*/
 	allNamesValid(): boolean {
 		let regex = new RegExp("^[\\s\\w-]+$");
 		for (let name of this.getNames()) {
@@ -181,10 +239,18 @@ export class CreateAlternativesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff all Alternatives names are unique after converting to ID format.
+	*/
 	allNamesUnique(): boolean {
 		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff a value has been set/selected in evern Objective column for every Alternative.
+	*/
 	allObjectivesHaveValues(): boolean {
 		for (let altID of this.altKeys()) {
 			for (let objname of this.valueChartService.getPrimitiveObjectivesByName()) {
@@ -196,6 +262,10 @@ export class CreateAlternativesComponent implements OnInit {
 		return true;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff the values entered for every continuous Objective for every Alternative are within the set range.
+	*/
 	allValuesWithinRange(): boolean {
 		for (let altID of this.altKeys()) {
 			for (let obj of this.valueChartService.getPrimitiveObjectives()) {
