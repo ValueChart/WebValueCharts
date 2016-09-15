@@ -36,6 +36,10 @@ export class CreateWeightsComponent implements OnInit {
 	user: User;
 	rankedObjectives: string[]; // Objectives that have already been ranked
     isRanked: { [objName: string]: boolean; }; // Indicates whether each Objective has been ranked
+    updateOnDestroy: boolean; // Indicates whether or not the weights should be computed and set on destroy.
+    						  // True if the weights have not yet been set by the user or if the user has clicked "Reset Weights".
+    						  // This is to ensure that previosly-made adjutments to weights are preserved.
+
 
     // Validation fields:
     validationTriggered: boolean = false;
@@ -77,7 +81,9 @@ export class CreateWeightsComponent implements OnInit {
 			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
+			this.updateOnDestroy = true;
 		}
+		// Weights have already been set by the user
 		else {
 			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
 			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
@@ -87,6 +93,7 @@ export class CreateWeightsComponent implements OnInit {
 			for (let obj of sortedObjectives) {
 				this.rankObjective(<string>obj);
 			}
+			this.updateOnDestroy = false;
 		}
 	}
 
@@ -96,11 +103,12 @@ export class CreateWeightsComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-		this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
+		if (this.updateOnDestroy) {	
+			this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
+		}
 	}
 
 	// ================================ SMARTER Methods ====================================
-
 
 	/* 	
 		@returns {string}
@@ -187,6 +195,7 @@ export class CreateWeightsComponent implements OnInit {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];
+		this.updateOnDestroy = true;
 	}
 
 	// ================================ Ranks-to-Weights Methods ====================================

@@ -255,7 +255,7 @@ export class CreateAlternativesComponent implements OnInit {
 	allObjectivesHaveValues(): boolean {
 		for (let altID of this.altKeys()) {
 			for (let objname of this.valueChartService.getPrimitiveObjectivesByName()) {
-				if (this.alternatives[altID].getObjectiveValue(objname) !== undefined) {
+				if (this.alternatives[altID].getObjectiveValue(objname) === undefined) {
 					return false;
 				}
 			}
