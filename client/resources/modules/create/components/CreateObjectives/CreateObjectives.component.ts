@@ -21,6 +21,7 @@ import { CategoricalDomain }											from '../../../../model/CategoricalDomain
 import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
 import { IntervalDomain }												from '../../../../model/IntervalDomain';
 import { Alternative }													from '../../../../model/Alternative';
+import { RescaleError }													from '../../../../model/ScoreFunction';
 
 /*
 	This component defines the UI controls for creating and editing the Objective structure of a ValueChart.
@@ -168,11 +169,11 @@ export class CreateObjectivesComponent implements OnInit {
 			let oldDom = this.initialPrimObjRows[objID].dom;
 			let newDom = this.objectiveRows[objID].dom;
 			let objName = this.objectiveRows[objID].name;
+			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objName);
 
 			// Reset all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
 			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
 			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
-				let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objName);
 				this.updateObjRefService.resetScoreFunctions(obj);
 				this.updateObjRefService.resetWeightMaps(); // must be done because best/worst outcomes may have changed
 			}
@@ -186,12 +187,21 @@ export class CreateObjectivesComponent implements OnInit {
 				for (let cat of removedCats) {
 					this.updateObjRefService.removeElementFromScoreFunctions(objName, cat);
 				}
-				if (removedCats.length > 0) {
-					this.updateObjRefService.rescaleScoreFunctions(objName);
-				}
 				for (let cat of addedCats) {
 					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
 				}
+				try {
+					this.updateObjRefService.rescaleScoreFunctions(objName);
+				}
+				// If all scores are the same, simply reinitialize the ScoreFunctions
+				catch (e) {
+					if (e instanceof RescaleError) {
+						this.updateObjRefService.resetScoreFunctions(obj);
+					}
+					else {
+						throw e;
+					}
+				}		
 			}
 		}
 	}
