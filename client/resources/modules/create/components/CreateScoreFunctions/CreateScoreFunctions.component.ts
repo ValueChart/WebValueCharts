@@ -1,3 +1,4 @@
+// Import Angular Classes:
 import { Component, OnInit }										    from '@angular/core';
 import { Observable }                               from 'rxjs/Observable';
 import { Subscriber }                               from 'rxjs/Subscriber';
@@ -39,7 +40,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   // ========================================================================================
   //                   Fields
   // ========================================================================================
-  
+
   user: User;
   selectedObjective: string; // Objective selected in the dropdown menu
   initialBestOutcomes: { [objName: string]: string | number }; // Track initial best outcomes for each Objective
@@ -80,9 +81,9 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   ngOnInit() {
     this.creationStepsService.observables[this.creationStepsService.PREFERENCES] = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
-            subscriber.next(this.validate());
-            subscriber.complete();
-        });
+      subscriber.next(this.validate());
+      subscriber.complete();
+    });
     this.services.valueChartService = this.valueChartService;
     this.services.chartUndoRedoService = this.chartUndoRedoService;
     this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
@@ -103,7 +104,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   /*   
     @returns {void}
-    @description   Destroys CreateBasicInfo. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+    @description   Destroys CreateScoreFunctions. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
             requires that a different component is displayed in the router-outlet.
   */
   ngOnDestroy() {
@@ -138,7 +139,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   /*   
     @returns {boolean}
-    @description   Validate ScoreFunctions.
+    @description   Validates ScoreFunctions.
                    This should be done prior to updating the ValueChart model and saving to the database.
   */
   validate(): boolean {
@@ -151,11 +152,11 @@ export class CreateScoreFunctionsComponent implements OnInit {
     return false;
   }
 
-   /*   
-    @returns {void}
-    @description   Sets badScoreFunctions to contain names of all Objective whoses ScoreFunctions are invalid.
-                   Currently, it simply checks where each ScoreFunctions has distinct best and worst outcome scores.
-  */
+  /*   
+   @returns {void}
+   @description   Sets badScoreFunctions to contain names of all Objective whoses ScoreFunctions are invalid.
+                  Currently, it simply checks where each ScoreFunctions has distinct best and worst outcome scores.
+ */
   setBadScoreFunctions(): void {
     let badScoreFunctions: string[] = [];
     for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
@@ -184,7 +185,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
     if (rescaled) {
       toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
-    }    
+    }
   }
 
   /*   
@@ -192,7 +193,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     @description   Returns text for bad score function validation message.
   */
   badScoreFunctionsText(): string {
-    return "An Objective's outcomes can't all have the same score. Please adjust the score functions for: " + 
-              this.badScoreFunctions.map(objname => objname).join(', ');
+    return "An Objective's outcomes can't all have the same score. Please adjust the score functions for: " +
+      this.badScoreFunctions.map(objname => objname).join(', ');
   }
 }

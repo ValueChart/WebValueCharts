@@ -1,3 +1,4 @@
+// Import Angular Classes:
 import { Component, OnInit }											from '@angular/core';
 import { Observable }     													from 'rxjs/Observable';
 import { Subscriber }     													from 'rxjs/Subscriber';
@@ -35,7 +36,7 @@ export class CreateAlternativesComponent implements OnInit {
 
     // Validation fields:
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
-    									  // If true, validation messages will be shown whenever conditions fail
+										  // If true, validation messages will be shown whenever conditions fail
 
 	// ========================================================================================
 	// 									Constructor
@@ -98,10 +99,10 @@ export class CreateAlternativesComponent implements OnInit {
 		@returns {string}
 		@description 	Returns text for Objective column header.
 						(Includes the range for continuous domain Objectives.)
-	*/	
-	getColumnHeader(obj: PrimitiveObjective) : string {
+	*/
+	getColumnHeader(obj: PrimitiveObjective): string {
 		if (obj.getDomainType() === 'continuous') {
-			return obj.getName() + " (min: " + (<ContinuousDomain>obj.getDomain()).getMinValue() + ", max: " +  (<ContinuousDomain>obj.getDomain()).getMaxValue() + ")"; 
+			return obj.getName() + " (min: " + (<ContinuousDomain>obj.getDomain()).getMinValue() + ", max: " + (<ContinuousDomain>obj.getDomain()).getMaxValue() + ")";
 		}
 		else {
 			return obj.getName();
@@ -111,7 +112,7 @@ export class CreateAlternativesComponent implements OnInit {
 	/* 	
 		@returns {Array<string{}}
 		@description 	Gets all Alternative IDs.
-	*/	
+	*/
 	altKeys(): Array<string> {
 		return Object.keys(this.alternatives);
 	}
@@ -119,7 +120,7 @@ export class CreateAlternativesComponent implements OnInit {
 	/* 	
 		@returns {Array<string{}}
 		@description 	Gets all Alternative names.
-	*/	
+	*/
 	getNames(): string[] {
 		let names: string[] = [];
 		for (let altID of this.altKeys()) {
@@ -149,7 +150,7 @@ export class CreateAlternativesComponent implements OnInit {
 
 	/* 	
 		@returns {void}
-		@description 	Delete all selected Alternatives
+		@description 	Deletes all selected Alternatives
 	*/
 	deleteAlternatives() {
 		for (let key of this.altKeys()) {
@@ -162,7 +163,7 @@ export class CreateAlternativesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true if all Alternatives are selected, false otherwise.
+		@description 	Returns true iff all Alternatives are selected.
 	*/
 	allSelected(): boolean {
 		if (this.altKeys().length === 0) {
@@ -199,7 +200,7 @@ export class CreateAlternativesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Validate Alternatives.
+		@description 	Validates Alternatives.
 						This should be done prior to updating the ValueChart model and saving to the database.
 	*/
 	validate(): boolean {

@@ -1,3 +1,4 @@
+// Import Angular Classes:
 import { Injectable } 							from '@angular/core';
 import { Router }								from '@angular/router';
 import { Observable }     						from 'rxjs/Observable';
@@ -10,10 +11,10 @@ import '../../utilities/rxjs-operators';
 @Injectable()
 export class CreationStepsService {
 
-  // ========================================================================================
-  //                   Fields
-  // ========================================================================================
-  
+	// ========================================================================================
+	//                   Fields
+	// ========================================================================================
+
 	BASICS: string = 'BasicInfo';
 	OBJECTIVES: string = 'Objectives';
 	ALTERNATIVES: string = 'Alternatives';
@@ -26,7 +27,7 @@ export class CreationStepsService {
 																// These are set by each step's component during ngInit.
 																// This enables the parent component (CreateValueChart)
 																// to trigger validation in its children and observe the result.
-	
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -50,9 +51,9 @@ export class CreationStepsService {
 		this.previousStep[this.PRIORITIES] = this.PREFERENCES;
 	}
 
-  // ========================================================================================
-  //                   Methods
-  // ========================================================================================
+	// ========================================================================================
+	//                   Methods
+	// ========================================================================================
 
 	/* 	
 		@returns {string}
@@ -61,7 +62,7 @@ export class CreationStepsService {
 	next(step: string, purpose: string): string {
 		if (step !== this.PRIORITIES)
 			this.router.navigate(['createValueChart/' + purpose + '/' + this.nextStep[step]]);
-		
+
 		return this.nextStep[step];
 	}
 
@@ -76,8 +77,7 @@ export class CreationStepsService {
 
 	/* 	
 		@returns {boolean}
-		@description 	Subscribes to the Observable for step's component,
-						which triggers validation in that component.
+		@description 	Subscribes to the Observable for step's component, which triggers validation in that component.
 						Returns true iff validation passes.
 	*/
 	validate(step: string): boolean {

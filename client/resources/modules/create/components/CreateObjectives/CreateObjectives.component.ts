@@ -41,7 +41,7 @@ export class CreateObjectivesComponent implements OnInit {
 
 	// Component state fields:
     editing: boolean; // true if the user is editing a pre-existing Objective structure, 
-    				  // false if this is the first time they are defining Objectives for the ValueChart
+					  // false if this is the first time they are defining Objectives for the ValueChart
 
 	// Objective row fields:
 	objectiveRows: { [objID: string]: ObjectiveRow; }; // It is necessary to track ObjectiveRows by ID since their names may not be unique
@@ -57,7 +57,7 @@ export class CreateObjectivesComponent implements OnInit {
 
     // Validation fields:
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
-    									  // If true, validation messages will be shown whenever conditions fail
+										  // If true, validation messages will be shown whenever conditions fail
 
 	// ========================================================================================
 	// 									Constructor
@@ -168,7 +168,7 @@ export class CreateObjectivesComponent implements OnInit {
 			let oldDom = this.initialPrimObjRows[objID].dom;
 			let newDom = this.objectiveRows[objID].dom;
 			let objName = this.objectiveRows[objID].name;
-			
+
 			// Reset all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
 			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
 			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
@@ -182,7 +182,7 @@ export class CreateObjectivesComponent implements OnInit {
 			// However, if the best/worst outcomes were deleted for any users, we need to make adjustments accordingly
 			else if (newDom.type === 'categorical') {
 				let addedCats = newDom.categories.filter(x => oldDom.categories.indexOf(x) === -1);
-				let removedCats = oldDom.categories.filter(x => newDom.categories.indexOf(x) === -1);	
+				let removedCats = oldDom.categories.filter(x => newDom.categories.indexOf(x) === -1);
 				for (let cat of removedCats) {
 					this.updateObjRefService.removeElementFromScoreFunctions(objName, cat);
 				}
@@ -362,7 +362,7 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {DomainDetails}
-		@description 	Convert an Objective's Domain into DomainDetails (internal representation).
+		@description 	Converts an Objective's Domain into DomainDetails (internal representation).
 	*/
 	domainToDomainDetails(dom: Domain): DomainDetails {
 		let domDets: DomainDetails = new DomainDetails(dom.type);
@@ -417,10 +417,10 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 	}
 
-		/* 	
-		@returns {void}
-		@description 	Removes selected categories from modal list.
-	*/
+	/* 	
+	@returns {void}
+	@description 	Removes selected categories from modal list.
+*/
 	removeSelectedCategoriesModal() {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
 		for (let cat of selected) {
@@ -467,7 +467,7 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 		return result;
 	}
-	
+
 	/* 	
 		@returns {number}
 		@description 	Converts a string to a Number. This was needed because TypeScript failed to do so implicitly.
@@ -480,14 +480,14 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Validate ObjectiveRow structure.
+		@description 	Validates ObjectiveRow structure.
 						This should be done prior to updating the ValueChart model and saving to the database.
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return  this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive() 
+		return this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive()
 			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.categoryNamesUnique()
-			&& this.atLeastTwoCategories() && this.continuousComplete() && this.intervalComplete() 
+			&& this.atLeastTwoCategories() && this.continuousComplete() && this.intervalComplete()
 			&& this.minLessThanMax() && this.intervalOk();
 	}
 
@@ -576,7 +576,7 @@ export class CreateObjectivesComponent implements OnInit {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
 			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {
-				if (objrow.dom.categories.length  !== (new Set(objrow.dom.categories)).size) {
+				if (objrow.dom.categories.length !== (new Set(objrow.dom.categories)).size) {
 					return false;
 				}
 			}
@@ -591,7 +591,7 @@ export class CreateObjectivesComponent implements OnInit {
 	atLeastTwoCategories(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical' 
+			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical'
 				&& objrow.dom.categories.length < 2) {
 				return false;
 			}
@@ -606,9 +606,9 @@ export class CreateObjectivesComponent implements OnInit {
 	continuousComplete(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'continuous' 
+			if (objrow.type === 'primitive' && objrow.dom.type === 'continuous'
 				&& (objrow.dom.min === undefined || objrow.dom.max === undefined
-					|| isNaN(objrow.dom.min)|| isNaN(objrow.dom.max))) {
+					|| isNaN(objrow.dom.min) || isNaN(objrow.dom.max))) {
 				return false;
 			}
 		}
@@ -622,9 +622,9 @@ export class CreateObjectivesComponent implements OnInit {
 	intervalComplete(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'interval' 
+			if (objrow.type === 'primitive' && objrow.dom.type === 'interval'
 				&& (objrow.dom.min === undefined || objrow.dom.max === undefined || objrow.dom.interval === undefined
-					|| isNaN(objrow.dom.min)|| isNaN(objrow.dom.max) || isNaN(objrow.dom.interval))) {
+					|| isNaN(objrow.dom.min) || isNaN(objrow.dom.max) || isNaN(objrow.dom.interval))) {
 				return false;
 			}
 		}
@@ -638,7 +638,7 @@ export class CreateObjectivesComponent implements OnInit {
 	minLessThanMax(): boolean {
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && (objrow.dom.type === 'continuous' || objrow.dom.type === 'interval') 
+			if (objrow.type === 'primitive' && (objrow.dom.type === 'continuous' || objrow.dom.type === 'interval')
 				&& (objrow.dom.min >= objrow.dom.max)) {
 				return false;
 			}
@@ -650,9 +650,10 @@ export class CreateObjectivesComponent implements OnInit {
 		@returns {boolean}
 		@description 	Returns true iff for each interval domain, the interval is less than the range (max - min).
 	*/
-	intervalOk(): boolean {for (let key of this.objKeys()) {
+	intervalOk(): boolean {
+		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'interval' 
+			if (objrow.type === 'primitive' && objrow.dom.type === 'interval'
 				&& (objrow.dom.interval >= (objrow.dom.max - objrow.dom.min) || (objrow.dom.interval <= 0))) {
 				return false;
 			}

@@ -1,3 +1,4 @@
+// Import Angular Classes:
 import { Component, OnInit }											from '@angular/core';
 import { Observable }     													from 'rxjs/Observable';
 import { Subscriber }     													from 'rxjs/Subscriber';
@@ -27,10 +28,10 @@ import { ScoreFunction }												from '../../../../model/ScoreFunction';
 	templateUrl: 'client/resources/modules/create/components/CreateWeights/CreateWeights.template.html',
 })
 export class CreateWeightsComponent implements OnInit {
-	
+
 	// ========================================================================================
-  	//                   Fields
-  	// ========================================================================================
+	//                   Fields
+	// ========================================================================================
 
 	user: User;
 	rankedObjectives: string[]; // Objectives that have already been ranked
@@ -75,7 +76,7 @@ export class CreateWeightsComponent implements OnInit {
 		if (!this.user.getWeightMap() || this.valueChartService.wasWeightMapReset(this.user)) {
 			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
-			}		
+			}
 		}
 		else {
 			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
@@ -226,7 +227,7 @@ export class CreateWeightsComponent implements OnInit {
 		@returns {boolean}
 		@description 	Validate Weights.
 						This should be done prior to updating the ValueChart model and saving to the database.
-	*/	
+	*/
 	validate(): boolean {
 		this.validationTriggered = true;
 		return this.allRanked();

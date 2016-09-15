@@ -2,7 +2,7 @@
 import { Component, OnInit, OnDestroy }									from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
 import { Observable }     												from 'rxjs/Observable';
-import { Subject }														from 'rxjs/Subject';	
+import { Subject }														from 'rxjs/Subject';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
@@ -35,7 +35,7 @@ import { User }															from '../../../../model/User';
 	selector: 'createValueChart',
 	templateUrl: 'client/resources/modules/create/components/CreateValueChart/CreateValueChart.template.html',
 	directives: [ROUTER_DIRECTIVES],
-	providers: [CreationStepsService,UpdateObjectiveReferencesService]
+	providers: [CreationStepsService, UpdateObjectiveReferencesService]
 })
 export class CreateValueChartComponent implements OnInit {
 
@@ -43,11 +43,10 @@ export class CreateValueChartComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	// Basic:
 	valueChart: ValueChart;
 	user: User;
 	purpose: string; // "newChart" or "newUser" or "editChart"
-	
+
 	// Navigation Control:
 	sub: any;
 	step: string;
@@ -166,16 +165,16 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.creationStepsService.validate(this.step)) {
 			if (this.purpose === "newChart" && this.step === this.creationStepsService.BASICS) {
 				this.saveValueChartToDatabase(this.valueChart);
-			} else if (!this.currentUserService.isJoiningChart()){
+			} else if (!this.currentUserService.isJoiningChart()) {
 				this.updateValueChartInDatabase(this.valueChart);
 			}
 			if (this.step === this.creationStepsService.PRIORITIES) {
 				window.onpopstate = () => { };
 				(<any>this.valueChart).incomplete = false;
-				(<any> window).destination = '/view/ValueChart';
+				(<any>window).destination = '/view/ValueChart';
 				this.router.navigate(['/view/ValueChart']);
-			} 
-			this.step = this.creationStepsService.next(this.step, this.purpose);			
+			}
+			this.step = this.creationStepsService.next(this.step, this.purpose);
 		}
 		else {
 			toastr.error('There were problems with your submission. Please fix them to proceed.');
@@ -215,8 +214,8 @@ export class CreateValueChartComponent implements OnInit {
 						The response is returned as an observable boolean.
 	*/
 	openNavigationModal(): Observable<boolean> {
-		$('#navigation-warning-modal').modal('show');	
-		
+		$('#navigation-warning-modal').modal('show');
+
 		return this.navigationResponse.asObservable();
 	}
 
@@ -243,7 +242,7 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		if (!cancelNavigation) {
 			this.navigationResponse.next(navigate);
-		}		
+		}
 
 		$('#navigation-warning-modal').modal('hide');
 	}
@@ -258,11 +257,11 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.valueChart._id) {
 			this.valueChartHttpService.updateValueChart(this.valueChart)
 				.subscribe(
-					(valuechart) => { toastr.success('ValueChart auto-saved'); },
-					(error) => {
-						// Handle any errors here.
-						toastr.warning('Auto-saving failed');
-					});
+				(valuechart) => { toastr.success('ValueChart auto-saved'); },
+				(error) => {
+					// Handle any errors here.
+					toastr.warning('Auto-saving failed');
+				});
 		}
 	}
 
@@ -293,7 +292,7 @@ export class CreateValueChartComponent implements OnInit {
 	deleteValueChart(valueChart: ValueChart): void {
 		if (valueChart._id) {
 			this.valueChartHttpService.deleteValueChart(valueChart._id)
-				.subscribe(status => { toastr.error('ValueChart deleted');  });
+				.subscribe(status => { toastr.error('ValueChart deleted'); });
 		}
 	}
 }

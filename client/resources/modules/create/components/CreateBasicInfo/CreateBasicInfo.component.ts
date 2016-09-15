@@ -43,7 +43,7 @@ export class CreateBasicInfoComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService, 
+	constructor(private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private valueChartHttpService: ValueChartHttpService) { }
 
@@ -89,7 +89,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	validate(): boolean {
 		this.validationTriggered = true;
 		return this.nameValid() && this.nameUnique() && this.passwordValid();
-	}	
+	}
 
 	/* 	
 		@returns {boolean}
@@ -101,7 +101,7 @@ export class CreateBasicInfoComponent implements OnInit {
 		return (this.valueChartName.search(regex) !== -1);
 	}
 
-	
+
 	/* 	
 		@returns {boolean}
 		@description 	Returns true iff the name is not already taken by another ValueChart in the database.
@@ -112,8 +112,8 @@ export class CreateBasicInfoComponent implements OnInit {
 		this.valueChartHttpService.isNameAvailable(this.valueChartName).subscribe(isUnique => {
 			this.nameAvailable = isUnique;
 		});
-     	return this.nameAvailable;
-	}	
+		return this.nameAvailable;
+	}
 
 	/* 	
 		@returns {boolean}

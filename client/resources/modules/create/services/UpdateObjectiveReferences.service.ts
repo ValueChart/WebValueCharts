@@ -1,10 +1,4 @@
-/*
-* @Author: aaronpmishkin
-* @Date:   2016-06-03 10:09:41
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:11:00
-*/
-
+// Import Angular Classes:
 import { Injectable } 										from '@angular/core';
 
 // Import Application Classes:
@@ -14,12 +8,31 @@ import { ValueChartService }								from '../../app/services/ValueChart.service'
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
 import { User }												from '../../../model/User';
 
+/*
+	This class provides methods to update the ValueChart model when the Objective structure changes.
+*/
+
 @Injectable()
 export class UpdateObjectiveReferencesService {
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(private valueChartService: ValueChartService) { }
 
-	// Set users' WeightMaps to default
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	/*
+		@returns {void}
+		@description 	Resets the Objective weights to their default values.
+	*/
 	resetWeightMaps() {
 		let weightMap = this.valueChartService.getDefaultWeightMap();
 		for (let user of this.valueChartService.getUsers()) {
@@ -27,7 +40,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Reinitialize users' ScoreFunction for specified Objective
+	/*
+		@returns {void}
+		@description 	Resets Users' ScoreFunctions for obj to default.
+	*/
 	resetScoreFunctions(obj: PrimitiveObjective) {
 		let scoreFunction = this.valueChartService.getInitialScoreFunction(obj);
 		for (let user of this.valueChartService.getUsers()) {
@@ -38,7 +54,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Create ScoreFunctions for new PrimitiveObjectives
+	/*
+		@returns {void}
+		@description 	Adds new ScoreFunctions for each Objective in objNames to users' scoreFunctionMaps.
+	*/
 	addScoreFunctions(objNames: string[]) {
 		for (let objname of objNames) {
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
@@ -46,14 +65,17 @@ export class UpdateObjectiveReferencesService {
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
-					scoreFunctionMap.setObjectiveScoreFunction(obj.getName(),scoreFunction);
+					scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
 				}
 			}
 		}
 	}
 
-	// Insert a new element into users' DiscreteScoreFunctions for specified Objective
-	// Initialize score to 0 for now
+	/*
+		@returns {void}
+		@description 	Inserts a new element into users' DiscreteScoreFunctions for specified Objective.
+						(For now, the score of this element is initialized to 0.5.)
+	*/
 	addElementToScoreFunctions(objName: string, element: string) {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
@@ -66,7 +88,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Remove element fron users' DiscreteScoreFunctions for specified Objective
+	/*
+		@returns {void}
+		@description 	Removes element from users' DiscreteScoreFunctions for specified Objective.
+	*/
 	removeElementFromScoreFunctions(objName: string, element: string) {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
@@ -79,7 +104,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Transform users' ScoreFunctions so that the best outcome has score of 1 and worst outcome has score of 0
+	/*
+		@returns {void}
+		@description 	 Transforms users' ScoreFunctions so that the best outcome has score of 1 and worst outcome has score of 0.
+	*/
 	rescaleScoreFunctions(objName: string) {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
@@ -93,7 +121,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
-	// Remove all entities that refer to specified Objectives
+	/*
+		@returns {void}
+		@description 	 Removes all references to the Objectives in objNames.
+	*/
 	removeReferences(objNames: string[]) {
 		for (let objname of objNames) {
 			for (let alt of this.valueChartService.getAlternatives()) {
@@ -109,6 +140,10 @@ export class UpdateObjectiveReferencesService {
 		}
 	}
 
+	/*
+		@returns {void}
+		@description 	 Updates all references to Objectives in oldObjNames to newObjNames.
+	*/
 	updateObjectiveNames(oldObjNames: string[], newObjNames: string[]) {
 		for (let i = 0; i < oldObjNames.length; i++) {
 			let oldName: string = oldObjNames[i];
