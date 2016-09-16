@@ -246,9 +246,11 @@ export class ValueChartService implements ValueChartStateContainer {
 	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
 		let weight = parentWeight * 1.0 / objectives.length;
 		for (let obj of objectives) {
-			weightMap.setObjectiveWeight(obj.getName(), weight);
 			if (obj.objectiveType === 'abstract') {
 				this.initializeDefaultWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
+			}
+			else {
+				weightMap.setObjectiveWeight(obj.getName(), weight);			
 			}
 		}
 	}

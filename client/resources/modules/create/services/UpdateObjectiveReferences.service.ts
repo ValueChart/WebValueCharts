@@ -7,6 +7,9 @@ import { ValueChartService }								from '../../app/services/ValueChart.service'
 // Import Model Classes:
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
 import { User }												from '../../../model/User';
+import { CategoricalDomain }								from '../../../model/CategoricalDomain';
+
+import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 
 /*
 	This class provides methods to update the ValueChart model when the Objective structure changes.
@@ -65,7 +68,7 @@ export class UpdateObjectiveReferencesService {
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
-					scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
+					scoreFunctionMap.setObjectiveScoreFunction(objname, scoreFunction);
 				}
 			}
 		}
@@ -122,18 +125,45 @@ export class UpdateObjectiveReferencesService {
 	}
 
 	/*
+		@returns {boolean}
+		@description 	 Check each Alternative's value for obj. Clear if no longer valid.
+						 Returns true iff any Alternatives's value for obj was cleared.
+	*/
+	clearAlternativeValues(obj: PrimitiveObjective): boolean {
+		let valsCleared: boolean = false;
+		for (let alt of this.valueChartService.getAlternatives()) {
+			if (obj.getDomainType() === "continuous") {
+				let dom = <ContinuousDomain>obj.getDomain();
+				let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
+				if (altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
+					alt.removeObjective(obj.getName());
+					valsCleared = true;
+				}
+			}
+			else {
+				let altVal: string = String(alt.getObjectiveValue(obj.getName()));
+				if ((<CategoricalDomain>obj.getDomain()).getElements().indexOf(altVal) === -1) {
+					alt.removeObjective(obj.getName());
+					valsCleared = true;
+				}
+			}
+		}
+		return valsCleared;
+	}
+
+	/*
 		@returns {void}
 		@description 	 Removes all references to the Objectives in objNames.
 	*/
 	removeReferences(objNames: string[]) {
 		for (let objname of objNames) {
 			for (let alt of this.valueChartService.getAlternatives()) {
-				alt.removeObjective(name);
+				alt.removeObjective(objname);
 			}
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
-					scoreFunctionMap.removeObjectiveScoreFunction(name);
+					scoreFunctionMap.removeObjectiveScoreFunction(objname);
 				}
 
 			}

@@ -59,6 +59,7 @@ export class CreateObjectivesComponent implements OnInit {
     // Validation fields:
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
 										  // If true, validation messages will be shown whenever conditions fail
+	alternativesInvalidated: boolean = false; // Set to true if changes to objective domains renders current values for Alternatives invalid.
 
 	// ========================================================================================
 	// 									Constructor
@@ -203,6 +204,10 @@ export class CreateObjectivesComponent implements OnInit {
 					}
 				}		
 			}
+			this.alternativesInvalidated = this.updateObjRefService.clearAlternativeValues(obj);
+		}
+		if (this.alternativesInvalidated) {
+			toastr.warning("Some Alternative outcomes are no longer valid.");
 		}
 	}
 
