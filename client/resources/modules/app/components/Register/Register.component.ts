@@ -76,7 +76,7 @@ export class RegisterComponent {
 				this.setUsername(username);
 			},
 			(error) => {
-				this.invalidMessage = 'That username is not available';
+				this.invalidMessage = 'That username is already taken.';
 				this.invalidCredentials = true;
 			}
 			);
@@ -90,7 +90,7 @@ export class RegisterComponent {
 				this.setUsername(username);
 			},
 			(error) => {
-				this.invalidMessage = 'That username is not available';
+				this.invalidMessage = 'That username and password combination is not correct.';
 				this.invalidCredentials = true;
 			}
 			);
@@ -98,7 +98,7 @@ export class RegisterComponent {
 
 	validatePasswords(passwordOne: string, passwordTwo: string): void {
 		if (passwordOne !== passwordTwo) {
-			this.invalidMessage = 'The entered passwords do not match';
+			this.invalidMessage = 'The entered passwords do not match.';
 			this.invalidCredentials = true;
 		} else {
 			this.invalidCredentials = false;

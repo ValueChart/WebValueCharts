@@ -22,7 +22,7 @@ import { IntervalDomain }														from '../../../model/IntervalDomain';
 import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Type Definitions:
-import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '../../../types/ScoreFunctionViewer.types.ts';
+import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '../../../types/ScoreFunctionViewer.types';
 
 
 /*
