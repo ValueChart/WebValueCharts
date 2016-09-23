@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:19:56
+* @Last Modified time: 2016-09-22 20:32:43
 */
 	
 // Import Model Classes:
@@ -22,12 +22,13 @@ import * as Formatter															from '../modules/utilities/classes/Formatter
 
 
 /*
-	This class is the representation of a ValueChart's internal data. It uses the Alternative class to represent the 
-	decision options in a ValueChart, a hierarchical structure of of Objectives to represent criteria for the
-	decision, and an array of Users to represent user preferences. A ValueChart with one user
-	is referred to as a "individual" ValueChart, while a ValueChart with multiple users is referred to as a 
-	"group" ValueChart. These ValueCharts sub-types are rendered differently by the ValueChartDirective, 
-	but data-wise differ only in the number of users.
+	This class is the representation of all of a ValueChart's internal data. It uses the Alternative class to represent the decision options
+	in a ValueChart, a hierarchical structure of of Objectives to represent criteria for the decision, and an array of Users to represent 
+	user preferences. The ValueChart class is actually both a structural and preference class because of this array of users. A ValueChart 
+	with one user is referred to as a "individual" ValueChart, while a ValueChart with multiple users is referred to as a "group" ValueChart.
+	These ValueCharts sub-types are rendered differently by the ValueChartDirective, but data-wise differ only in the number of users. 
+	A ValueChart with no users is a called a ValueChart structure and is used when new users join a ValueChart and require ONLY its structural 
+	elements.
 */
 
 

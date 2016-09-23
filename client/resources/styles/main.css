@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   Emily Hindalong
-* @Last Modified time: 2016-08-10 16:15:34
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2016-09-22 21:33:16
 */
 
 /* Global Styles */
@@ -218,6 +218,11 @@ a.upload {
 
 .users-list {
     top: 16rem;
+}
+
+.btn-xxs {
+    font-size: 9px !important;
+    padding: 0px 5px !important;
 }
 
 /* ValueChart SVG Styles */

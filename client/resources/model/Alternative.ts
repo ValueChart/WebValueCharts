@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:19:57
+* @Last Modified time: 2016-09-22 20:35:14
 */
 
 // Import Utility Classes:
@@ -10,8 +10,11 @@ import *	as Formatter																	from '../modules/utilities/classes/Formatt
 
 
 /*
-	This class is the data representation of a decision option in a ValueChart. It uses an internal map object to 
-	associate decision consequences with PrimitiveObjectives in the ValueChart.
+	This class is the data representation of a decision option in a ValueChart. It uses an internal map object to associate 
+	decision consequences with PrimitiveObjectives in the ValueChart. Each instance of the Alternative class must be a complete 
+	mapping of a consequence to each PrimitiveObjective in the ValueChart to be valid, and each consequence must be within the 
+	domain of the corresponding PrimitiveObjective. It is best to think about Alternatives as points in the consequence space 
+	defined by the ValueChart's set of PrimitiveObjectives.
 */
 
 export class Alternative {

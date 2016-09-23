@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:19:58
+* @Last Modified time: 2016-09-22 20:40:21
 */
 
 // Import Model Classes:
@@ -16,10 +16,11 @@ import *	as Formatter		from '../modules/utilities/classes/Formatter';
 
 
 /*
-	A primitive objective is a criteria used to evaluate alternatives in a decision that cannot be broken down into further criteria.
-	This is why it is called primitive. Primitive objectives are a key component of a ValueChart. They are assigned weights by users to rank
-	their importance relative to other PrimitiveObjectives, and given user defined score functions, which assign scores to every element in the 
-	objectives domain. An objectives domain is the range of values that an alternative may assign to that objective.
+	A PrimitiveObjective is a criteria used to evaluate Alternatives in a decision that cannot, or should not, be broken down 
+	into further criteria. This is why it is called primitive. PrimitiveObjectives are a key component of a ValueChart. 
+	They are assigned weights by users to rank their importance relative to other PrimitiveObjectives, and given user defined 
+	score functions (see ScoreFunction below), which assign scores to every element in the PrimitiveObjective's domain. A 
+	PrimitiveObjective's domain is the range of values that an Alternative may assign to that objective.
 */
 
 export class PrimitiveObjective implements Objective {
