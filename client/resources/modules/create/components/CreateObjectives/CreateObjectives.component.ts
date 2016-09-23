@@ -204,7 +204,9 @@ export class CreateObjectivesComponent implements OnInit {
 					}
 				}		
 			}
-			this.alternativesInvalidated = this.updateObjRefService.clearAlternativeValues(obj);
+			if (this.updateObjRefService.clearAlternativeValues(obj)) {
+				this.alternativesInvalidated = true;
+			}
 		}
 		if (this.alternativesInvalidated) {
 			toastr.warning("Some Alternative outcomes are no longer valid.");
