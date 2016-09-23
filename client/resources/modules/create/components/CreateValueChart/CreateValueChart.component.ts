@@ -216,6 +216,7 @@ export class CreateValueChartComponent implements OnInit {
 	openNavigationModal(): Observable<boolean> {
 		$('#navigation-warning-modal').modal('show');
 
+		this.navigationResponse = new Subject<boolean>();
 		return this.navigationResponse.asObservable();
 	}
 
