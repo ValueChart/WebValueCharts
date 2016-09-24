@@ -126,7 +126,7 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		if (this.saveOnDestroy) {
-			(this.valueChart._id) ? this.updateValueChartInDatabase(this.valueChart) : this.saveValueChartToDatabase(this.valueChart);
+			this.autoSaveValueChart(this.valueChart);	// TODO: Why are we doing this here?
 		}
 	}
 
@@ -141,9 +141,7 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	back() {
 		if (this.creationStepsService.validate(this.step)) {
-			if (!this.currentUserService.isJoiningChart()) {
-				this.updateValueChartInDatabase(this.valueChart);
-			}
+			this.autoSaveValueChart(this.valueChart);
 			this.step = this.creationStepsService.previous(this.step, this.purpose);
 		}
 		else {
@@ -163,11 +161,9 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	next() {
 		if (this.creationStepsService.validate(this.step)) {
-			if (this.purpose === "newChart" && this.step === this.creationStepsService.BASICS) {
-				this.saveValueChartToDatabase(this.valueChart);
-			} else if (!this.currentUserService.isJoiningChart()) {
-				this.updateValueChartInDatabase(this.valueChart);
-			}
+			
+			this.autoSaveValueChart(this.valueChart);
+
 			if (this.step === this.creationStepsService.PRIORITIES) {
 				window.onpopstate = () => { };
 				(<any>this.valueChart).incomplete = false;
@@ -199,7 +195,7 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	 Return text for 'Next' button. Differs only at last step.
 	*/
 	nextButtonText(): string {
-		let text = "Next >>";
+		let text = "Next Stage >>";
 		if (this.step === this.creationStepsService.PRIORITIES) {
 			text = "View Chart >>";
 		}
@@ -254,8 +250,16 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
-	updateValueChartInDatabase(valueChart: ValueChart): void {
-		if (this.valueChart._id) {
+	autoSaveValueChart(valueChart: ValueChart): void {
+		if (this.currentUserService.isJoiningChart()) {
+			return;	// Don't autosave. The user is joining an existing ValueChart.
+		}
+
+		if (!valueChart._id) {		// Do not autosave for users who are joining the ValueChart.
+			// Save the ValueChart for the first time.
+			this.saveValueChartToDatabase(valueChart);
+		} else {
+			// Update the ValueChart.
 			this.valueChartHttpService.updateValueChart(this.valueChart)
 				.subscribe(
 				(valuechart) => { toastr.success('ValueChart auto-saved'); },
@@ -271,19 +275,17 @@ export class CreateValueChartComponent implements OnInit {
 		@description	Create a new ValueChart in the database. Set valueChart._id to the id assigned by the database.
 	*/
 	saveValueChartToDatabase(valueChart: ValueChart): void {
-		if (!valueChart._id) {
-			this.valueChartHttpService.createValueChart(valueChart)
-				.subscribe(
-				(valueChart: ValueChart) => {
-					// Set the id of the ValueChart.
-					this.valueChart._id = valueChart._id;
-					toastr.success('ValueChart auto-saved');
-				},
-				// Handle Server Errors
-				(error) => {
-					toastr.warning('Auto-saving failed');
-				});
-		}
+		this.valueChartHttpService.createValueChart(valueChart)
+			.subscribe(
+			(valueChart: ValueChart) => {
+				// Set the id of the ValueChart.
+				this.valueChart._id = valueChart._id;
+				toastr.success('ValueChart auto-saved');
+			},
+			// Handle Server Errors
+			(error) => {
+				toastr.warning('Auto-saving failed');
+			});
 	}
 
 	/* 	

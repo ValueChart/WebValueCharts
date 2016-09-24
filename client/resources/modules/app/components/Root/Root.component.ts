@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:53:35
+* @Last Modified time: 2016-09-24 14:52:15
 */
 
 // Import Angular Classes:
@@ -123,12 +123,19 @@ export class RootComponent implements OnInit {
 						or if the user is a temporary user.
 	*/
 	logout(): void {
-		this.userHttpService.logout()
-			.subscribe(logoutResult => {
-				this.currentUserService.setLoggedIn(false);
-				(<any> window).destination = '/register';
-				this.router.navigate(['/register']);
-			});
+		if (this.currentUserService.isLoggedIn()) {
+			this.userHttpService.logout()
+				.subscribe(logoutResult => {
+					this.currentUserService.setLoggedIn(false);
+					this.currentUserService.setUsername(undefined);
+					(<any> window).destination = '/register';
+					this.router.navigate(['/register']);
+				});
+		} else {
+			this.currentUserService.setUsername(undefined);
+			(<any> window).destination = '/register';
+			this.router.navigate(['/register']);
+		}
 	}
 
 	/* 	

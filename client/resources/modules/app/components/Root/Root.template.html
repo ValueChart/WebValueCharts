@@ -30,7 +30,7 @@
 								My Account
 							</a>
 						</div>
-						<div class="form-group navbar-group" *ngIf="currentUserService.isLoggedIn()">
+						<div class="form-group navbar-group" *ngIf="currentUserService.getUsername()">
 							<a class="btn btn-warning" (click)="logout()" id="log-out">
 								Log Out
 							</a>

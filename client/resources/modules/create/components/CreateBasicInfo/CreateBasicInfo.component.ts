@@ -29,7 +29,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	// ValueChart info fields:
 	valueChartName: string;
 	valueChartDescription: string;
-	valueChartPassword: string;
+	valueChartPassword: string = '';
 
 	// Validation fields:
 	validationTriggered: boolean = false;

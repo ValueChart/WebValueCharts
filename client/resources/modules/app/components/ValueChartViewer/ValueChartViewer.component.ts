@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 10:59:25
+* @Last Modified time: 2016-09-24 14:48:53
 */
 
 // Import Angular Classes:
@@ -149,6 +149,7 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.15;
 
 	detailBoxCurrentTab: string;
+	DETAIL_BOX_CHART_TAB: string = 'chart';
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	DETAIL_BOX_USERS_TAB: string = 'users';
 
@@ -202,7 +203,6 @@ export class ValueChartViewerComponent implements OnInit {
 		// Display either the current ValueChart, or the average of the current ValueChart depending on the route parameters:
 		this.sub = this.route.params.subscribe(params => {
 			let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
-			this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 
 			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
 				this.valueChartService.inactiveValueCharts.push(this.valueChartService.getValueChart());
@@ -240,7 +240,7 @@ export class ValueChartViewerComponent implements OnInit {
 		this.setObjectiveColors = false;
 
 		// Detail Box
-		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
+		this.detailBoxCurrentTab = this.DETAIL_BOX_CHART_TAB;
 		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
@@ -334,7 +334,11 @@ export class ValueChartViewerComponent implements OnInit {
 			// Handle Server Errors
 			(error) => {
 				// Add something to handle when the host has disabled user changes
-				toastr.warning('Preference submission failed. The Host has disabled new submissions');
+				console.log(error);
+				if (error === '403 - Forbidden')
+					toastr.warning('Preference submission failed. The Host has disabled new submissions');
+				else 
+					toastr.error('Preference submission failed. There was an error submitting your preferences');
 			});
 	}
 

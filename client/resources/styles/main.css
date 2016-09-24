@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-22 21:33:16
+* @Last Modified time: 2016-09-24 14:45:43
 */
 
 /* Global Styles */
@@ -145,7 +145,7 @@ a.upload {
 .svg-content-createvaluechart {
     position: relative;
     height: 30%;
-    width: 30%;
+    width: 70%;
     top: 1rem;
     left: 1%;
 }
@@ -195,13 +195,7 @@ a.upload {
     outline: none !important;
 }
 
-#alternative-header-container {
-    position: relative;
-    top: 5rem;
-    z-index: -10;
-}
-
-#user-list-header-container {
+.detail-box-header {
     position: relative;
     top: 5rem;
     z-index: -10;

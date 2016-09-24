@@ -1,22 +1,24 @@
 <h4>Define Score Functions</h4>
-<label class="control-label">Select Objective:</label>
-<div class="input-group">
-    <select class="form-control" id="score-function-dropdown" [(ngModel)]="selectedObjective" name="selectedObjective">
-        <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
-    </select>
-    <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
-        Next
-    </button>
+<div class="col-xs-offset-5">
+    <label class="control-label">Select Objective:</label>
+    <div class="input-group">
+        <select class="form-control" id="score-function-dropdown" [(ngModel)]="selectedObjective" name="selectedObjective">
+            <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+        </select>
+        <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
+            Next Objective
+        </button>
+    </div>
 </div>
-<div>
+<div class="col-xs-offset-3">
     <ScoreFunction 
         [objective]="valueChartService.getObjectiveByName(selectedObjective)"
-        [width]="300"
+        [width]="440"
         [height]="300"
         [orientation]="'vertical'"
         [services]="services"
         [individualOnly]="true">
-        <svg class="svg-content-createvaluechart" viewBox="0 0, 300, 300" preserveAspectRatio="xMinYMin meet">
+        <svg class="svg-content-createvaluechart" viewBox="0 0, 450, 300" preserveAspectRatio="xMinYMin meet">
             <g class="expanded-score-function"></g>
         </svg>
     </ScoreFunction>  

@@ -232,13 +232,19 @@
 		[class.detail-box-vertical]="orientation === 'vertical'">
 		<form class="form-inline col-xs-5" class="detail-toolbar">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-lg btn-default detail-box-tab" id="alternative-header-container"
+				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="chart-information-header-container"
+				(click)="detailBoxCurrentTab = DETAIL_BOX_CHART_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
+				<h5 id="alternative-header">Chart Details</h5>
+				</button>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-left">
+				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="alternative-header-container"
 				(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 				<h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChart.isIndividual()">
-				<button class="btn btn-lg btn-default detail-box-tab" id="user-list-header-container"
+				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="user-list-header-container"
 				(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 				<h5 id="user-list-headers">User List</h5>
 				</button>
@@ -247,6 +253,16 @@
 		<div class="well well-lg" id="alternative-detail-box"
 			[style.height.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
 			[style.width.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET">
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
+				<div>
+					<span class="col-xl-4 col-md-5"><b>Name:</b></span>
+					<span class="col-xl-8 col-md-7">{{valueChart.getName()}}</span>
+				</div>
+				<div>
+					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
+					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
+				</div>
+			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 				<div *ngFor="let alternative of alternatives">
 					<div class="col-sm-12">
