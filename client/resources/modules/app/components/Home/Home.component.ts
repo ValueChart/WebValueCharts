@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 10:55:30
+* @Last Modified time: 2016-09-24 15:16:22
 */
 
 // Import Angular Classes:
 import { Component }									from '@angular/core';
-import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
+import { Router }										from '@angular/router';
 
 // Import Application Classes:
 import { XMLValueChartParserService } 							from '../../services/XMLValueChartParser.service';
@@ -32,7 +32,6 @@ import { singleHotel, groupHotel, waterManagement}		from '../../../../data/DemoV
 @Component({
 	selector: 'home',
 	templateUrl: 'client/resources/modules/app/components/Home/Home.template.html',
-	directives: [ROUTER_DIRECTIVES]
 })
 export class HomeComponent {
 

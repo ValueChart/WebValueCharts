@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 16:30:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 10:39:00
+* @Last Modified time: 2016-09-24 15:16:26
 */
 
 import { Component } 												from '@angular/core';
 import { OnInit }													from '@angular/core';
-import { Router, ROUTER_DIRECTIVES }								from '@angular/router';
+import { Router }													from '@angular/router';
 
 // Application classes
 import { CurrentUserService }										from '../../services/CurrentUser.service';
@@ -22,7 +22,6 @@ import { UserHttpService }											from '../../services/UserHttp.service';
 @Component({
 	selector: 'account',
 	templateUrl: 'client/resources/modules/app/components/Account/Account.template.html',
-	directives: [ROUTER_DIRECTIVES],
 })
 export class AccountComponent implements OnInit {
 

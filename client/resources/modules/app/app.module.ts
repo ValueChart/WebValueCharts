@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:15:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 16:23:47
+* @Last Modified time: 2016-09-24 15:12:51
 */
 
 
@@ -11,7 +11,6 @@ import { NgModule }    						  	from '@angular/core';
 import { BrowserModule } 						from '@angular/platform-browser';
 import { FormsModule }							from '@angular/forms';
 import { HttpModule } 							from '@angular/http';
-import { HTTP_PROVIDERS } 						from '@angular/http';
 
 // Import Application Classes:
 import { APP_ROUTER_PROVIDERS, ROUTER }			from './app.routes';

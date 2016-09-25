@@ -2,14 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 14:52:15
+* @Last Modified time: 2016-09-24 15:25:52
 */
 
 // Import Angular Classes:
 import { Component } 												from '@angular/core';
 import { OnInit } 													from '@angular/core';
-import { Router, ROUTER_DIRECTIVES }								from '@angular/router';
-import { TemplateRef, ViewContainerRef, ElementRef }				from '@angular/core';
+import { Router }													from '@angular/router';
 import { ApplicationRef } 											from '@angular/core';
 
 
@@ -39,9 +38,7 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 @Component({
 	selector: 'root',
 	templateUrl: 'client/resources/modules/app/components/Root/Root.template.html',
-	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent],
-	providers: [TemplateRef,
-		ViewContainerRef,
+	providers: [
 		XMLValueChartParserService,
 		ValueChartXMLEncoder,
 		UserHttpService]

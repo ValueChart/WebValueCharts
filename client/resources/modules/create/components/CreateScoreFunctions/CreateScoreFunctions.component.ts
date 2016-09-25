@@ -32,7 +32,6 @@ import { ContinuousScoreFunction }								  from '../../../../model/ContinuousSc
 @Component({
   selector: 'CreateScoreFunctions',
   templateUrl: 'client/resources/modules/create/components/CreateScoreFunctions/CreateScoreFunctions.template.html',
-  directives: [ScoreFunctionDirective],
   providers: [ScoreFunctionViewerService]
 })
 export class CreateScoreFunctionsComponent implements OnInit {

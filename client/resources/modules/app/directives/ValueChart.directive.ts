@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 20:34:22
+* @Last Modified time: 2016-09-24 17:15:33
 */
 
 // Import Angular Resources:
 import { Directive, Input } 													from '@angular/core';
 import { OnInit, DoCheck, SimpleChange }										from '@angular/core';
-import { TemplateRef, ViewContainerRef, ElementRef }							from '@angular/core';
+import { ElementRef }															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
@@ -82,8 +82,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	constructor(
 		// Angular Resources:
-		private template: TemplateRef<any>,
-		private viewContainer: ViewContainerRef,
 		private elementRef: ElementRef,
 		// Services:
 		private valueChartService: ValueChartService,

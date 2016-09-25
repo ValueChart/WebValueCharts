@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 10:37:48
+* @Last Modified time: 2016-09-24 15:17:07
 */
 
 // Import Angular Classes:
 import { Component }										from '@angular/core';
-import { ROUTER_DIRECTIVES, Router }						from '@angular/router';
+import { Router }											from '@angular/router';
 
 // Import Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';
@@ -28,7 +28,6 @@ import { UserHttpService }									from '../../services/UserHttp.service';
 @Component({
 	selector: 'register',
 	templateUrl: 'client/resources/modules/app/components/Register/Register.template.html',
-	directives: [ROUTER_DIRECTIVES]
 })
 export class RegisterComponent {
 

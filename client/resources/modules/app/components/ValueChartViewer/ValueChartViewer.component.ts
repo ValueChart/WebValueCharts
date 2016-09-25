@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 14:48:53
+* @Last Modified time: 2016-09-24 15:17:42
 */
 
 // Import Angular Classes:
 import { Component }															from '@angular/core';
 import { OnInit, OnDestroy }													from '@angular/core';
-import { Router, ActivatedRoute, ROUTER_DIRECTIVES }							from '@angular/router';
+import { Router, ActivatedRoute }												from '@angular/router';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
@@ -64,7 +64,6 @@ import { PrimitiveObjective } 													from '../../../../model/PrimitiveObje
 @Component({
 	selector: 'ValueChartViewer',
 	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
-	directives: [ROUTER_DIRECTIVES, ValueChartDirective],
 	providers: [
 		// Services:
 		RendererDataService,

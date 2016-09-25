@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 11:25:58
+* @Last Modified time: 2016-09-24 15:16:40
 */
 
 // Import Angular Classes:
 import { Component }									from '@angular/core';
-import { Router, ROUTER_DIRECTIVES }					from '@angular/router';
+import { Router }										from '@angular/router';
 import { OnInit }										from '@angular/core';
 
 // Import Application Classes:
@@ -36,7 +36,6 @@ import { ValueChart }									from '../../../../model/ValueChart';
 @Component({
 	selector: 'myValueCharts',
 	templateUrl: 'client/resources/modules/app/components/MyValueCharts/MyValueCharts.template.html',
-	directives: [ROUTER_DIRECTIVES, ExportValueChartComponent]
 })
 export class MyValueChartsComponent implements OnInit {
 

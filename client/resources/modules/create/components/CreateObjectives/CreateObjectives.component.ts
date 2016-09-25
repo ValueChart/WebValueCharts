@@ -31,8 +31,7 @@ import { RescaleError }													from '../../../../model/ScoreFunction';
 
 @Component({
 	selector: 'CreateObjectives',
-	templateUrl: 'client/resources/modules/create/components/CreateObjectives/CreateObjectives.template.html',
-	directives: [NgClass]
+	templateUrl: 'client/resources/modules/create/components/CreateObjectives/CreateObjectives.template.html'
 })
 export class CreateObjectivesComponent implements OnInit {
 

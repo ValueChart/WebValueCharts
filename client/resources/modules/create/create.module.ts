@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:51:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 16:23:51
+* @Last Modified time: 2016-09-24 15:13:01
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { NgModule }    						  	from '@angular/core';
 import { CommonModule }   						from '@angular/common';
 import { FormsModule }							from '@angular/forms';
 import { HttpModule } 							from '@angular/http';
-import { HTTP_PROVIDERS } 						from '@angular/http';
 
 // Import Application Classes:
 import { CREATION_ROUTER }						from './Create.routes';

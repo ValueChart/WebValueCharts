@@ -1,6 +1,6 @@
 // Import Angular Classes:
 import { Component, OnInit, OnDestroy }									from '@angular/core';
-import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
+import { Router, ActivatedRoute }										from '@angular/router';
 import { Observable }     												from 'rxjs/Observable';
 import { Subject }														from 'rxjs/Subject';
 import '../../../utilities/rxjs-operators';
@@ -34,7 +34,6 @@ import { User }															from '../../../../model/User';
 @Component({
 	selector: 'createValueChart',
 	templateUrl: 'client/resources/modules/create/components/CreateValueChart/CreateValueChart.template.html',
-	directives: [ROUTER_DIRECTIVES],
 	providers: [CreationStepsService, UpdateObjectiveReferencesService]
 })
 export class CreateValueChartComponent implements OnInit {

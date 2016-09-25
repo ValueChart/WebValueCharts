@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 11:43:16
+* @Last Modified time: 2016-09-24 15:17:31
 */
 
 // Import Angular Classes:
 import { Component }													from '@angular/core';
 import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
 import { NgZone }														from '@angular/core';
-import { Router, ActivatedRoute, ROUTER_DIRECTIVES }					from '@angular/router';
+import { Router, ActivatedRoute }										from '@angular/router';
 
 // Import Libraries:
 import * as d3 															from 'd3';
@@ -48,7 +48,6 @@ import { UserDomainElements, DomainElement }							from '../../../../types/Score
 @Component({
 	selector: 'ScoreFunctionViewer',
 	templateUrl: 'client/resources/modules/app/components/ScoreFunctionViewer/ScoreFunctionViewer.template.html',
-	directives: [ScoreFunctionDirective]
 })
 export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck {
 
