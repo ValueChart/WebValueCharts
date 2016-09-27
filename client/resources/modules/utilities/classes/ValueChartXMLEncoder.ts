@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-27 14:25:05
+* @Last Modified time: 2016-09-27 14:49:16
 */
 
 // Import Model Classes:
@@ -242,7 +242,9 @@ export class ValueChartXMLEncoder {
 		users.forEach((user: User) => {
 			let userElement: Element = xmlDocument.createElement('User');
 			userElement.setAttribute('name', user.getUsername());
-			userElement.setAttribute('color', user.color);
+			if (user.color) {
+				userElement.setAttribute('color', user.color);
+			}
 			userElement.appendChild(this.convertWeightMapIntoElement(user.getWeightMap(), xmlDocument));				// Encode the User's WeightMap.
 			userElement.appendChild(this.convertScoreFunctionMapIntoElement(user.getScoreFunctionMap(), xmlDocument));  // Encode the User's ScoreFunctionMap (and all their ScoreFunctions).
 
