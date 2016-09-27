@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:34:07
+* @Last Modified time: 2016-09-27 14:28:06
 */
 
 // Import Model Classes:
@@ -66,6 +66,7 @@ export class XmlValueChartParser {
 
 		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
 		valueChart._id = valueChartElement.getAttribute('id');
+		valueChart.password = valueChartElement.getAttribute('password');
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
 		var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');

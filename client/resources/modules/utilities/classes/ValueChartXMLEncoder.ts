@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:14:48
+* @Last Modified time: 2016-09-27 14:25:05
 */
 
 // Import Model Classes:
@@ -115,6 +115,7 @@ export class ValueChartXMLEncoder {
 		valueChartElement.setAttribute('creator', valueChart.getCreator());
 		valueChartElement.setAttribute('version', '2.0');
 		valueChartElement.setAttribute('id', valueChart._id);
+		valueChartElement.setAttribute('password', valueChart.password);
 
 		var chartStructureElement: Element = xmlDocument.createElement('ChartStructure');
 		valueChartElement.appendChild(chartStructureElement);
