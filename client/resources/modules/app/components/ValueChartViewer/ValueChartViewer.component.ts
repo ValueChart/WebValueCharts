@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:17:42
+* @Last Modified time: 2016-09-27 15:20:10
 */
 
 // Import Angular Classes:
@@ -306,8 +306,16 @@ export class ValueChartViewerComponent implements OnInit {
 				(error) => {
 
 				});
+
 		} else {
-			this.hostService.hostGroupValueChart(this.valueChart._id);
+
+		this.valueChartHttpService.updateValueChart(this.valueChart)
+			.subscribe(
+			(valueChart: ValueChart) => { 
+				this.hostService.hostGroupValueChart(this.valueChart._id);
+			},
+			(error) => { 
+			});
 		}
 
 	}

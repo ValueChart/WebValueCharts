@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 12:34:56
+* @Last Modified time: 2016-09-27 15:31:24
 */
 
 // Import Libraries and Express Middleware:
@@ -110,18 +110,37 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var chartId: string = (<any> req).chartId;
 
-	valueChartsCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
-		if (err) {
-			res.status(400)
-				.json({ data: err });
+	valueChartsCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+		if (doc) {
+			valueChartsCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
 
-		} else if (doc) {
-			req.body._id = chartId;
-			res.location('/ValueCharts/' + chartId)
-				.status(200)
-				.json({ data: req.body });
+				} else if (doc) {
+					req.body._id = chartId;
+					res.location('/ValueCharts/' + chartId)
+						.status(200)
+						.json({ data: req.body });
+				} else {
+					res.sendStatus(404);
+				}
+			});
 		} else {
-			res.sendStatus(404);
+
+			valueChartsCollection.insert(req.body, function(err: Error, doc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+
+				} else if (doc) {
+					res.location('/ValueCharts/' + doc._id)
+						.status(201)
+						.json({ data: doc });
+				} else {
+					res.sendStatus(404);				
+				}
+			});
 		}
 	});
 });
