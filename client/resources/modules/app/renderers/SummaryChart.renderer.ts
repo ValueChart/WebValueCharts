@@ -413,7 +413,7 @@ export class SummaryChartRenderer {
 
 	/*
 		@returns {void}
-		@description	Changes the color of the score total label for the best alternative for each user to be yellow. This should 
+		@description	Changes the color of the score total label for the best alternative for each user to be red. This should 
 						be exactly one highlighted score total label per user.
 	*/
 	highlightBestUserScores() {

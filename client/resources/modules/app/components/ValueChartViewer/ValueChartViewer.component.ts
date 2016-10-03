@@ -263,6 +263,10 @@ export class ValueChartViewerComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
+		if (this.hostService.hostWebSocket) {
+			this.hostService.endCurrentHosting();
+		}
+
 		// Unsubscribe from the route parameters to prevent a memory leak.
 		this.sub.unsubscribe();
 
