@@ -266,7 +266,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getName() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any> = d3.select(cell);
