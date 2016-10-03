@@ -116,11 +116,13 @@ export class RootComponent implements OnInit {
 				.subscribe(logoutResult => {
 					this.currentUserService.setLoggedIn(false);
 					this.currentUserService.setUsername(undefined);
+					this.currentUserService.setJoiningChart(false);
 					(<any> window).destination = '/register';
 					this.router.navigate(['/register']);
 				});
 		} else {
 			this.currentUserService.setUsername(undefined);
+			this.currentUserService.setJoiningChart(false);
 			(<any> window).destination = '/register';
 			this.router.navigate(['/register']);
 		}

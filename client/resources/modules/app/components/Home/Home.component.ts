@@ -66,6 +66,15 @@ export class HomeComponent {
 	// ========================================================================================
 
 	/*
+		@returns {void}
+		@description 	Directs the user to the creation workflow.
+	*/
+	createValueChart() {
+		this.currentUserService.setJoiningChart(false);
+		this.router.navigate(['/createValueChart/newChart/BasicInfo']);
+	}
+
+	/*
 		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
 		@param chartPassword - The password of the ValueChart to join. 
 		@returns {void}

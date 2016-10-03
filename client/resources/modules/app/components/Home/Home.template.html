@@ -3,9 +3,9 @@
 		<div class="flex-row column-container col-xs-12">
 			<form class="form-inline flex-row column-container">
 				<div class="form-group">
-					<a class="btn btn-success btn-lg" [routerLink]="['/createValueChart/newChart/BasicInfo']" id="createValueChart">
+					<button class="btn btn-success btn-lg" (click)="createValueChart()" id="createValueChart">
 						Create a ValueChart
-					</a>
+					</button>
 					<a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
 						<button class="btn btn-success btn-lg">
 						Import a ValueChart
@@ -13,7 +13,7 @@
 						<input type="file" class="upload" (change)="uploadValueChart($event)"/>
 					</a>
 					<button class="btn btn-success btn-lg" type="button" data-toggle="modal" data-target="#chart-credentials-modal">
-					Join Existing ValueChart
+						Join Existing ValueChart
 					</button>
 					<div class="modal fade" id="chart-credentials-modal" tabindex="-1" role="dialog">
 						<div class="modal-dialog" role="document">
