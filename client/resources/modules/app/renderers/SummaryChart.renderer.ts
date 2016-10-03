@@ -419,7 +419,7 @@ export class SummaryChartRenderer {
 	highlightBestUserScores() {
 		var maxUserScores: any = {};
 		this.valueChartService.getUsers().forEach((user: User) => {
-			maxUserScores[user.getUsername()] = 0;
+			maxUserScores[user.getUsername()] = -1;
 		});
 
 		var bestTotalScoreSelections: any = {};
