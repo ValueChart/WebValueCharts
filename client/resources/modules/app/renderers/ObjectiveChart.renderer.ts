@@ -126,7 +126,7 @@ export class ObjectiveChartRenderer {
 						It also creates the cells cell in each row, and users score bars in each cell through a call to createObjectiveCells. It will remove any
 						rows that are no longer have an associated element in the rows parameter, and add rows if rows contains new elements. It also will add/remove
 						cells and user score bars via createObjectiveCell. ONLY this method should be used to add/remove rows, cells, and user score bars to objective chart
-						when objectives, alternatives, or user are added/removed from the ValueChart. createObjectiveCells should NOT be manually called. 
+						when objectives, alternatives, or user are added/removed from the ValueChart. createObjectiveRows should NOT be manually called. 
 	*/
 	createObjectiveRows(rowsContainer: d3.Selection<any>, rowOutlinesContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, alternativeLabelsContainer: d3.Selection<any>, rows: RowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
