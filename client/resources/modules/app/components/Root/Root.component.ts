@@ -103,15 +103,6 @@ export class RootComponent implements OnInit {
 	}
 
 	/* 	
-		@returns {boolean} - True if ValueChart is a group ValueChart. False otherwise.
-		@description 	Determines if the current ValueChart is a group ValueChart (i.e. has more than one user) or an individual ValueChart (i.e. has exactly one user).
-	*/
-	isGroupChart(): boolean {
-		return (this.valueChartService.getValueChart() && !this.valueChartService.getValueChart().isIndividual()) || 		// Check the currentUserService
-			(window.opener && !(<any>window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window
-	}
-
-	/* 	
 		@returns {void} - 
 		@description 	Logs the current user out by making a call to the logout endpoint. This endpoint deletes the current user's 
 						session. This method then redirects the application to the register page no matter what the current URL path is.
@@ -133,32 +124,6 @@ export class RootComponent implements OnInit {
 			(<any> window).destination = '/register';
 			this.router.navigate(['/register']);
 		}
-	}
-
-	/* 	
-		@returns {void} - 
-		@description 	Changes the current url path in order to cause the ValueChartViewer to display the average
-						of the current ValueChart. ValueChart viewer displays an average of the current ValueChart when the view route parameter
-						is this string: 'average'. This method should only be called when the current route is '/view', or when
-						that is the desired route as it will navigate there.
-	*/
-	viewAverageChart(): void {
-		if (this.isGroupChart()) {
-			this.chartType = 'average';
-			this.router.navigate(['/view', this.valueChartService.getValueChartName() + '-average']);
-		}
-	}
-
-	/* 	
-		@returns {void} - 
-		@description 	Changes the current url path in order to cause the ValueChartViewer to display the current ValueChart.
-						This method should only be called when the current route is '/view', or when that is the desired route as it will navigate there.
-						The most frequent use case for viewGroupChart is to return to viewing the group ValueChart after calling viewAverageChart to view the average.
-	*/
-	viewGroupChart(): void {
-		this.chartType = 'normal';
-		this.valueChartService.setValueChart(this.valueChartService.inactiveValueCharts.pop());
-		this.router.navigate(['/view', this.valueChartService.getValueChartName()]);
 	}
 
 	/* 	

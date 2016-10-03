@@ -105,7 +105,7 @@ export class CreateValueChartComponent implements OnInit {
 			this.step = this.creationStepsService.BASICS;
 		}
 		else if (this.purpose === "editStructure") {
-			this.step = this.creationStepsService.OBJECTIVES;
+			this.step = this.creationStepsService.BASICS;
 		}
 		else if (this.purpose === "editPreferences") {
 			this.step = this.creationStepsService.PREFERENCES;

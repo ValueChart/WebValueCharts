@@ -3,14 +3,17 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !currentUserService.isJoiningChart() && chartType === 'normal'" [routerLink]="['/createValueChart/editStructure/Objectives']">
-				Edit Structure
+				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !currentUserService.isJoiningChart() && chartType === 'normal'" [routerLink]="['/createValueChart/editStructure/BasicInfo']">
+				Edit ValueChart
+				</a>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-left" >
+				<a class="btn btn-default" *ngIf="currentUserService.isJoiningChart()" [routerLink]="['/createValueChart/editPreferences/ScoreFunctions']">
+				Edit Preferences
 				</a>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" [routerLink]="['/createValueChart/editPreferences/ScoreFunctions']">
-				Edit Preference Model
-				</a>
+					<ExportValueChart></ExportValueChart>
 			</div>
 			<div *ngIf="currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" >
@@ -224,6 +227,16 @@
 						</li>
 					</ul>
 				</div>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-right" *ngIf="chartType === 'normal' && !valueChart.isIndividual()">
+				<a class="btn btn-default" (click)="viewAverageChart()" id="view-average-chart">
+					View Average Chart
+				</a>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-right" *ngIf="chartType === 'average'">
+				<a class="btn btn-default" (click)="viewGroupChart()" id="view-normal-chart">
+					View Group Chart
+				</a>
 			</div>
 		</form>
 	</div>
