@@ -3,9 +3,9 @@
 		<div class="flex-row column-container col-xs-12">
 			<form class="form-inline flex-row column-container">
 				<div class="form-group">
-					<button class="btn btn-success btn-lg" (click)="createValueChart()" id="createValueChart">
+					<a class="btn btn-success btn-lg" [routerLink]="['/createValueChart/newChart/BasicInfo']" id="createValueChart">
 						Create a ValueChart
-					</button>
+					</a>
 					<a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
 						<button class="btn btn-success btn-lg">
 						Import a ValueChart

@@ -203,6 +203,18 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	/* 	
+		@returns {string}
+		@description 	 Return text for 'Next' button. Differs only at last step.
+	*/
+	navigationModalText(): string {
+		let text = "Do you want to keep this ValueChart?";
+		if (this.currentUserService.isJoiningChart()) {
+			text = "Are you sure you want to leave this ValueChart?";
+		}
+		return text;
+	}
+
+	/* 	
 		@returns {Observable<boolean>}
 		@description	This method is called whenever the user attempts to navigate away from the CreateValueChart component
 						via the "Home" button, "ValueCharts" main bar button, or any of the browser navigation controls.
