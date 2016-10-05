@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-10-05 10:29:53
+* @Last Modified time: 2016-10-05 10:31:04
 */
 
 // Import Angular Classes:
@@ -356,6 +356,10 @@ export class ValueChartViewerComponent implements OnInit {
 			});
 	}
 
+	getValueChartUrl(): string {
+		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getName() + '?password=' + this.valueChart.password;
+	}
+
 	// ================================ Switching between Group and Average ValueChart ====================================	
 
 	/* 	
@@ -389,9 +393,6 @@ export class ValueChartViewerComponent implements OnInit {
 	isGroupChart(): boolean {
 		return (!this.valueChart.isIndividual()); 		// Check the currentUserService
 //			|| (window.opener && !(<any>window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window (TODO: is this still required?)
-	}
-	getValueChartUrl(): string {
-		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getName() + '?password=' + this.valueChart.password;
 	}
 
 	// ================================ Detail Box Methods ====================================

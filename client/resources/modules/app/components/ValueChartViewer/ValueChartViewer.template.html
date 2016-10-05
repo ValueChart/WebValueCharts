@@ -257,7 +257,7 @@
 					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
 					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
 				</div>
-				<div>
+				<div *ngIf="!currentUserService.isJoiningChart()">
 					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
 					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
 				</div>
