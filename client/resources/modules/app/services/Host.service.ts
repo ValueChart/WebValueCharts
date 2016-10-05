@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 18:00:10
+* @Last Modified time: 2016-10-05 10:25:43
 */
 
 import { Injectable } 												from '@angular/core';
@@ -91,6 +91,8 @@ export class HostService {
 	*/
 	setUserChangesAccepted(userChangesAccepted: boolean, chartId: string): void {
 		this.userChangesAccepted = userChangesAccepted;
+		var messageString: string = ((userChangesAccepted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be blocked');
+		toastr.warning(messageString);
 		// Send a message via the websocket that will cause the server to change user permissions for the ValueChart with the given id.
 		this.hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, chartId: chartId, data: userChangesAccepted }));
 	}
@@ -121,7 +123,6 @@ export class HostService {
 		switch (hostMessage.type) {
 			// The server is notifying the client that initialization has been completed on the server-side.
 			case MessageType.ConnectionInit:
-				toastr.success('ValueChart successfully hosted');
 				break;
 
 			// The server will send a message confirming success change of user submission settings. Nothing needs to be done here.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-27 15:20:10
+* @Last Modified time: 2016-10-05 10:29:53
 */
 
 // Import Angular Classes:
@@ -253,6 +253,10 @@ export class ValueChartViewerComponent implements OnInit {
 			this.resizeValueChart()
 		});
 
+		if (!this.currentUserService.isJoiningChart()) {
+			this.hostValueChart();
+		}
+
 		// Set Alternative labels to link to the Alternative detail box. 
 		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
@@ -269,6 +273,10 @@ export class ValueChartViewerComponent implements OnInit {
 
 		// Unsubscribe from the route parameters to prevent a memory leak.
 		this.sub.unsubscribe();
+
+		// if (this.hostService.hostWebSocket) {
+		// 	this.hostService.endCurrentHosting();
+		// }
 
 		// Destroy the ValueChart manually to prevent memory leaks.
 		$('ValueChart').remove();
@@ -293,9 +301,6 @@ export class ValueChartViewerComponent implements OnInit {
 						This method should NEVER be called by a user that is joining an existing ValueChart. 
 	*/
 	hostValueChart(): void {
-		// Close the Modal
-		$('#host-chart-modal').modal('hide');
-
 		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
 		if (!this.valueChart._id) {
 			this.valueChartHttpService.createValueChart(this.valueChart)
@@ -310,16 +315,14 @@ export class ValueChartViewerComponent implements OnInit {
 				(error) => {
 
 				});
-
 		} else {
-
-		this.valueChartHttpService.updateValueChart(this.valueChart)
-			.subscribe(
-			(valueChart: ValueChart) => { 
-				this.hostService.hostGroupValueChart(this.valueChart._id);
-			},
-			(error) => { 
-			});
+			this.valueChartHttpService.updateValueChart(this.valueChart)
+				.subscribe(
+				(valueChart: ValueChart) => { 
+					this.hostService.hostGroupValueChart(this.valueChart._id);
+				},
+				(error) => { 
+				});
 		}
 
 	}
@@ -386,6 +389,9 @@ export class ValueChartViewerComponent implements OnInit {
 	isGroupChart(): boolean {
 		return (!this.valueChart.isIndividual()); 		// Check the currentUserService
 //			|| (window.opener && !(<any>window.opener).valueChartService.isIndividual()); 					// Check to see if this is a pop-up window (TODO: is this still required?)
+	}
+	getValueChartUrl(): string {
+		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getName() + '?password=' + this.valueChart.password;
 	}
 
 	// ================================ Detail Box Methods ====================================

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 17:19:19
+* @Last Modified time: 2016-10-03 10:16:15
 */
 
 // Import Angular Classes:
@@ -55,8 +55,8 @@ export class JoinGuardService implements CanActivate {
 		// Retrieve the ValueChart ID from the URL router parameters.
 		var name: string = route.params['ValueChart'];
 		// Retrieve the ValueChart password from the URL query parameters.
-		var password: string = (<any> state).queryParams['password'];
-
+		var password: string = document.location.search.substring(document.location.search.indexOf('password=') + 'password='.length);
+		console.log(password);
 
 		// Retrieve the structure of that ValueChart that the user is joining.
 		this.valueChartHttpService.getValueChartStructure(name, password)
