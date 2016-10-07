@@ -107,8 +107,6 @@ export class HostService {
 		this.hostWebSocket.close(1000);
 
 		this.hostWebSocket = null;
-		// Inform the user with a toast that the ValueChart is no longer hosted.
-		toastr.warning('ValueChart is no longer hosted');
 	}
 
 
