@@ -22,7 +22,7 @@ import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 import { ValueChart }									from '../../../model/ValueChart';
 import { Objective }									from '../../../model/Objective';
 import { PrimitiveObjective }							from '../../../model/PrimitiveObjective';
-import { ScoreFunction }								from '../../../model/ScoreFunction';
+import { ScoreFunction, RescaleError }					from '../../../model/ScoreFunction';
 import { ContinuousScoreFunction }						from '../../../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction';
 
@@ -282,6 +282,26 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
 				// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
 				this.ngZone.run(() => { scoreFunction.setElementScore(<string>d.element, score) });
+			});
+
+			dragToChangeScore.on('end', (d: DomainElement, i: number) => {
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				this.ngZone.run(() => { 
+					try {
+						if (scoreFunction.rescale()) {
+							toastr.warning("Score function rescaled so that scores range from 0 to 1.");
+						}
+					}
+					catch (e) {
+						if (e instanceof RescaleError) {
+							this.chartUndoRedoService.undo(this.valueChartService);
+							toastr.error("Outcomes can't all have the same score.");
+						}
+						else {
+							throw e;
+						}
+					}
+				});
 			});
 		}
 
