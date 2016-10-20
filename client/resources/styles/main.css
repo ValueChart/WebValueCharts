@@ -380,6 +380,14 @@ input {
     margin-right: 5px;
 }
 
+.select-objective-control {
+    margin-left: 20px;
+}
+
+#objective-description{
+    margin-top: 20px;
+}
+
 .worst-outcome {
     background-color: #ffcccc;
 }

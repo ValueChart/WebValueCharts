@@ -3,9 +3,9 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-offset-3">
-            <label class="control-label">Select Objective:</label>
+            <label class="control-label select-objective-control">Select Objective:</label>
             <div class="input-group">
-                <select class="form-control" id="score-function-dropdown" [(ngModel)]="selectedObjective" name="selectedObjective">
+                <select class="form-control select-objective-control" id="score-function-dropdown" [(ngModel)]="selectedObjective" name="selectedObjective">
                     <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                 </select>
                 <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
@@ -15,8 +15,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-2">
-            <textarea style="border: none; overflow-y: scroll; height: 200px; width: 200px; resize: none; margin: 10px" readonly>{{valueChartService.getObjectiveByName(selectedObjective).getDescription()}}</textarea>
+        <div class="col-xs-3">
+            <body id="objective-description">{{valueChartService.getObjectiveByName(selectedObjective).getDescription()}}</body>
         </div>
         <div class="col-xs-offset-3">
             <ScoreFunction 

@@ -164,7 +164,7 @@ export abstract class ScoreFunctionRenderer {
 
 		let unitsText = "";
 		let dom = this.objective.getDomain();
-		if (dom.type === 'continuous') {
+		if (dom.type === 'continuous' && (<ContinuousDomain>dom).unit !== undefined ) {
 			unitsText = (<ContinuousDomain>dom).unit;
 		}
 
@@ -260,7 +260,7 @@ export abstract class ScoreFunctionRenderer {
 
 		// Give the plot outline the correct dimensions.
 		this.plotOutline
-			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize - 2)
+			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize - 1)
 			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
 
 		this.renderScoreFunctionAxis(this.axisContainer, viewOrientation);
@@ -286,7 +286,7 @@ export abstract class ScoreFunctionRenderer {
 
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.UNITS_LABEL)
 			.attr(this.viewConfig.coordinateOne, this.domainAxisMaxCoordinateOne / 2)
-			.attr(this.viewConfig.coordinateTwo,  this.domainAxisCoordinateTwo + this.labelOffset - 1);
+			.attr(this.viewConfig.coordinateTwo,  this.domainAxisCoordinateTwo + this.labelOffset - 2);
 
 
 		// Delete the elements of the previous utility axis.
