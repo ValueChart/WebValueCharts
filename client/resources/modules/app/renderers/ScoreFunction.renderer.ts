@@ -98,8 +98,6 @@ export abstract class ScoreFunctionRenderer {
 		protected scoreFunctionViewerService: ScoreFunctionViewerService,
 		protected chartUndoRedoService: ChartUndoRedoService) { }
 
-
-
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
@@ -226,7 +224,7 @@ export abstract class ScoreFunctionRenderer {
 			this.viewConfig.dimensionOneSize = width;
 			this.viewConfig.dimensionTwoSize = height;
 
-			// Determine the positions of the two axis.
+			// Determine the positions of the two axes.
 			this.domainAxisCoordinateTwo = Math.min((19 / 20) * this.viewConfig.dimensionTwoSize, this.viewConfig.dimensionTwoSize - this.labelOffset);
 
 			this.utilityAxisMaxCoordinateTwo = Math.max(this.viewConfig.dimensionTwoSize / 20, 5);
@@ -241,7 +239,7 @@ export abstract class ScoreFunctionRenderer {
 			this.viewConfig.dimensionOneSize = height;
 			this.viewConfig.dimensionTwoSize = width;
 
-			// Determine the positions of the two axis.
+			// Determine the positions of the two axes.
 			this.domainAxisCoordinateTwo = Math.max((1 / 20) * this.viewConfig.dimensionTwoSize, this.labelOffset) + 10;
 
 			this.utilityAxisMaxCoordinateTwo = Math.max(this.viewConfig.dimensionTwoSize * (19 / 20), 5);
@@ -263,7 +261,6 @@ export abstract class ScoreFunctionRenderer {
 
 	/*
 		@param axisContainer - The 'g' element that the axes elements are in.
-		@param objectiveId - The Id of the objective this score function plot is for. Used for creating SVG element IDs.
 		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
 		@returns {void}
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
@@ -279,13 +276,13 @@ export abstract class ScoreFunctionRenderer {
 			.attr(this.viewConfig.coordinateTwo + '2', this.domainAxisCoordinateTwo);
 
 
-		// Delete the elements of the previous utility axis:
+		// Delete the elements of the previous utility axis.
 		var elements: any = (<any>axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].remove();
 		}
 
-		// Create the new Scale for use creating the utility axis:
+		// Create the new Scale for use creating the utility axis.
 		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
 			.domain([0, 1])
 

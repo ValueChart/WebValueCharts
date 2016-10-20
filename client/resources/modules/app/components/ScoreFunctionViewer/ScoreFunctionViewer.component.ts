@@ -99,7 +99,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 	/* 	
 		@returns {void}
-		@description 	Initializes the ValueChartViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
+		@description 	Initializes the ScoreFunctionViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
 						Calling ngOnInit should be left to Angular. Do not call it manually. All initialization logic for the component should be put in this
 						method rather than in the constructor.
 	*/

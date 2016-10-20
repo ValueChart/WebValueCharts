@@ -33,6 +33,11 @@ import { UserDomainElements, DomainElement }							from '../../../types/ScoreFun
 	selector: 'ScoreFunction'
 })
 export class ScoreFunctionDirective implements OnInit, DoCheck {
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================	
+
 	// Input fields:
 	private objectiveToDisplay: PrimitiveObjective;
 	private plotWidth: number;
@@ -55,8 +60,20 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	private user: User;
 
+	// ========================================================================================
+	// 									Constructor
+	// ========================================================================================
 
+	/*
+		@returns {void}
+		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+	*/
 	constructor(private ngZone: NgZone) { }
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
 
 	ngOnInit() {
 
@@ -92,7 +109,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		} else {
 			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 		}
-
 
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements);
 		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
