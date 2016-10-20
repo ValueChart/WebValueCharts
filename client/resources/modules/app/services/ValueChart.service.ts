@@ -97,7 +97,13 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	addUser(user: User) {
-		this.valueChart.addUser(user);
+		// If current valueChart is an average chart, add the user to the underlying Group ValueChart instead.
+		if (this.inactiveValueCharts.length > 0) {
+			this.inactiveValueCharts[0].addUser(user);
+		}
+		else {
+			this.valueChart.addUser(user);	
+		}
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
@@ -107,6 +113,14 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	getUsers(): User[] {
 		return this.valueChart.getUsers();
+	}
+
+	// If current valueChart is an average chart, this method will return the users for the underlying Group ValueChart instead.
+	getGroupValueChartUsers(): User[] {
+		if (this.inactiveValueCharts.length > 0) {
+			return this.inactiveValueCharts[0].getUsers();
+		}
+		return this.getUsers();	
 	}
 
 	getNumUsers(): number {

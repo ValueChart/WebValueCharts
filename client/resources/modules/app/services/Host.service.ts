@@ -115,8 +115,6 @@ export class HostService {
 
 		var hostMessage: HostMessage = JSON.parse(msg.data);	// Messages are always stringified JSON that must be parsed.
 
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
-
 		// Handle the message depending on its type. 
 		switch (hostMessage.type) {
 			// The server is notifying the client that initialization has been completed on the server-side.
@@ -138,7 +136,7 @@ export class HostService {
 			// An existing user has resubmitted their preferences.
 			case MessageType.UserChanged:
 				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
+				var userIndex: number = this.valueChartService.getGroupValueChartUsers().findIndex((user: User) => {
 					return user.getUsername() === updatedUser.getUsername();
 				});
 
@@ -147,7 +145,7 @@ export class HostService {
 					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 				} else {
 					// Update the user's preferences by reference. This lets us avoid recomputing the renderer data for the ValueChart directive.
-					var oldUser: User = valueChart.getUsers()[userIndex];
+					var oldUser: User = this.valueChartService.getGroupValueChartUsers()[userIndex];
 					oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
 					oldUser.getScoreFunctionMap().getAllKeyScoreFunctionPairs().forEach((pair: { key: string, scoreFunction: ScoreFunction}) => {
 						let newScores = updatedUser.getScoreFunctionMap().getObjectiveScoreFunction(pair.key).getElementScoreMap();
@@ -163,11 +161,11 @@ export class HostService {
 			case MessageType.UserRemoved:
 				var userToDelete: string = hostMessage.data;
 
-				var userIndex: number = valueChart.getUsers().findIndex((user: User) => {
+				var userIndex: number = this.valueChartService.getGroupValueChartUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
 				// Delete the user from the ValueChart
-				valueChart.getUsers().splice(userIndex, 1);
+				this.valueChartService.getGroupValueChartUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:
