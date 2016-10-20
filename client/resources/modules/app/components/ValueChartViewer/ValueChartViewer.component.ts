@@ -310,10 +310,11 @@ export class ValueChartViewerComponent implements OnInit {
 					this.valueChart._id = valueChart._id;
 					// Host the ValueChart.
 					this.hostService.hostGroupValueChart(valueChart._id);
+					toastr.success('ValueChart auto-saved');
 				},
 				// Handle Server Errors
 				(error) => {
-
+					toastr.warning('Auto-saving failed');
 				});
 		} else {
 			this.valueChartHttpService.updateValueChart(this.valueChart)

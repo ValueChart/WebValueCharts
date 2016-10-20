@@ -126,7 +126,7 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnDestroy() {
 		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		if (this.saveOnDestroy) {
-			this.autoSaveValueChart(this.valueChart);	// TODO: Why are we doing this here?
+			this.autoSaveValueChart(this.valueChart);
 		}
 	}
 

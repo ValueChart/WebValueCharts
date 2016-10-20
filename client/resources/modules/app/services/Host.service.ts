@@ -22,9 +22,9 @@ import { HostMessage, MessageType }									from '../../../types/HostMessage';
 /*
 	This class contains all the methods require to host a ValueChart. A hosted ValueChart is a ValueChart
 	that other users, on different clients, can join and submit their preferences to. A hosted ValueChart
-	is automatically updated whenever a user joins, leaves, or changes their preferences. T
+	is automatically updated whenever a user joins, leaves, or changes their preferences. 
 
-	his class can open and maintain a websocket connection with the server that is used to send and 
+	This class can open and maintain a websocket connection with the server that is used to send and 
 	receive messages about the state of a hosted ValueChart and its users. All the functionality for 
 	sending these messages and handling messages from the server is located in this class.
 */
