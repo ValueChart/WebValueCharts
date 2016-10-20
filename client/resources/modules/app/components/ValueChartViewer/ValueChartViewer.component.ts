@@ -321,11 +321,11 @@ export class ValueChartViewerComponent implements OnInit {
 				.subscribe(
 				(valueChart: ValueChart) => { 
 					this.hostService.hostGroupValueChart(this.valueChart._id);
+					toastr.success('ValueChart auto-saved');
 				},
 				(error) => { 
 				});
 		}
-
 	}
 
 	/* 	

@@ -161,14 +161,14 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	next() {
 		if (this.creationStepsService.validate(this.step)) {
-			
-			this.autoSaveValueChart(this.valueChart);
-
 			if (this.step === this.creationStepsService.PRIORITIES) {
 				window.onpopstate = () => { };
 				(<any>this.valueChart).incomplete = false;
 				(<any>window).destination = '/view/ValueChart';
 				this.router.navigate(['/view/ValueChart']);
+			}
+			else {
+				this.autoSaveValueChart(this.valueChart);
 			}
 			this.step = this.creationStepsService.next(this.step, this.purpose);
 		}
