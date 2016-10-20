@@ -22,6 +22,7 @@ import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { ContinuousScoreFunction }									from '../../../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunction';
+import { ContinuousDomain }											from '../../../model/ContinuousDomain';
 
 import { DomainElement, UserDomainElements } 						from '../../../types/ScoreFunctionViewer.types';
 
@@ -49,8 +50,6 @@ export abstract class ScoreFunctionRenderer {
 	public plotElementsContainer: d3.Selection<any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
 	public userContainers: d3.Selection<any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
 	public axisContainer: d3.Selection<any>;				// The 'g' element that conntains the y and x axis.
-	public utilityLabelContainer: d3.Selection<any>;		// The 'g' element that contains the labels for utility axis.
-
 
 	// View Configuration Fields:
 	protected viewConfig: any = {};							// The viewConfig object for this renderer. It is not configured using the renderConfigService because this class has
@@ -61,7 +60,7 @@ export abstract class ScoreFunctionRenderer {
 	protected domainAxisMaxCoordinateOne: number;			// The x coordinate of the rightmost end of the x-axis.
 
 	// Constants for Rendering:
-	protected labelOffset: number = 15;						// Minimum offset of the x and y axis from the edge of the container in a score function plot.
+	protected labelOffset: number = 25;						// Minimum offset of the x and y axis from the edge of the container in a score function plot.
 
 
 	// class name definitions for SVG elements that are created by this renderer.
@@ -80,8 +79,8 @@ export abstract class ScoreFunctionRenderer {
 
 		AXES_CONTAINER: 'scorefunction-axes-container',
 		UTILITY_AXIS_CONTAINER: 'scorefunction-utility-axis',
-		DOMAIN_AXIS: 'scorefunction-domain-axis'
-
+		DOMAIN_AXIS: 'scorefunction-domain-axis',
+		UNITS_LABEL: 'scorefunction-units-label'
 	};
 
 	// ========================================================================================
@@ -113,7 +112,6 @@ export abstract class ScoreFunctionRenderer {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
 		this.usersDomainElements = usersDomainElements.slice();
-
 
 		// The root container is passed in.
 		this.rootContainer = el;
@@ -163,6 +161,18 @@ export abstract class ScoreFunctionRenderer {
 			.attr('id', 'scorefunction-' + objectiveId + '-domain-axis')
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
+
+		let unitsText = "";
+		let dom = this.objective.getDomain();
+		if (dom.type === 'continuous') {
+			unitsText = (<ContinuousDomain>dom).unit;
+		}
+
+		this.axisContainer.append('text')
+			.classed(ScoreFunctionRenderer.defs.UNITS_LABEL, true)
+			.attr('id', 'scorefunction-' + objectiveId + '-units-label')			
+			.text(unitsText)
+			.style('font-size', '10px');
 
 		this.axisContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER, true)
@@ -250,9 +260,8 @@ export abstract class ScoreFunctionRenderer {
 
 		// Give the plot outline the correct dimensions.
 		this.plotOutline
-			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize - 1)
+			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize - 2)
 			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
-
 
 		this.renderScoreFunctionAxis(this.axisContainer, viewOrientation);
 
@@ -274,6 +283,10 @@ export abstract class ScoreFunctionRenderer {
 			.attr(this.viewConfig.coordinateTwo + '1', this.domainAxisCoordinateTwo)
 			.attr(this.viewConfig.coordinateOne + '2', this.domainAxisMaxCoordinateOne)
 			.attr(this.viewConfig.coordinateTwo + '2', this.domainAxisCoordinateTwo);
+
+		axisContainer.select('.' + ScoreFunctionRenderer.defs.UNITS_LABEL)
+			.attr(this.viewConfig.coordinateOne, this.domainAxisMaxCoordinateOne / 2)
+			.attr(this.viewConfig.coordinateTwo,  this.domainAxisCoordinateTwo + this.labelOffset - 1);
 
 
 		// Delete the elements of the previous utility axis.
@@ -332,7 +345,7 @@ export abstract class ScoreFunctionRenderer {
 
 		if (viewOrientation === 'vertical') {
 			labelCoordinateOneOffset = this.labelOffset;
-			labelCoordinateTwo = this.domainAxisCoordinateTwo + this.labelOffset - 2;
+			labelCoordinateTwo = this.domainAxisCoordinateTwo + this.labelOffset - 12;
 		} else {
 			labelCoordinateOneOffset = (1.5 * this.labelOffset);
 			labelCoordinateTwo = this.domainAxisCoordinateTwo - (this.labelOffset);
