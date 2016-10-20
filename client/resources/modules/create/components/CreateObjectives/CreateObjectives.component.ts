@@ -279,7 +279,8 @@ export class CreateObjectivesComponent implements OnInit {
 		if (parentID !== "") {
 			this.objectiveRows[parentID].removeChild(objID);
 		}
-		for (let child of this.objectiveRows[objID].children) {
+		let children = this.objectiveRows[objID].children.slice();
+		for (let child of children) {
 			this.deleteObjRow(child);
 		}
 		delete this.objectiveRows[objID];
