@@ -4,6 +4,9 @@ import { Router }								from '@angular/router';
 import { Observable }     						from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
+// ImportApplication Classes:
+import { ValueChartService }											from '../../app/services/ValueChart.service';
+
 /*
 	This class defines the names and orders of steps in the Creation workflow and the transitions between them.
 */
@@ -27,6 +30,10 @@ export class CreationStepsService {
 																// These are set by each step's component during ngInit.
 																// This enables the parent component (CreateValueChart)
 																// to trigger validation in its children and observe the result.
+	nameChanged: Observable<boolean>; // This is set by the CreateBasicInfo component.
+									  // It enables the parent component (CreateValueChart)
+									  // to check whether or not the name has been changed,
+									  // so it can check or not check for uniqueness accordingly.
 
 	// ========================================================================================
 	// 									Constructor
@@ -36,7 +43,7 @@ export class CreationStepsService {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private router: Router) {
+	constructor(private router: Router, private valueChartService: ValueChartService) {
 
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
@@ -60,9 +67,15 @@ export class CreationStepsService {
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
 	next(step: string, purpose: string): string {
-		if (step !== this.PRIORITIES)
+		if (step === this.PRIORITIES) {
+			window.onpopstate = () => { };
+			(<any>this.valueChartService.getValueChart()).incomplete = false;
+			(<any>window).destination = '/view/ValueChart';
+			this.router.navigate(['/view/ValueChart']);
+		}
+		else {
 			this.router.navigate(['createValueChart/' + purpose + '/' + this.nextStep[step]]);
-
+		}
 		return this.nextStep[step];
 	}
 
@@ -86,5 +99,18 @@ export class CreationStepsService {
 			valid = isValid;
 		});
         return valid;
+	}
+
+	/* 	
+		@returns {boolean}
+		@description 	Subscribes to the Observable nameChanged, which triggers check for name change in CreateBasicInfo.
+						Returns true iff the name has been changed.
+	*/
+	checkNameChanged(): boolean {
+		let changed: boolean;
+		this.nameChanged.subscribe(hasChanged => {
+			changed = hasChanged;
+		});
+        return changed;
 	}
 }

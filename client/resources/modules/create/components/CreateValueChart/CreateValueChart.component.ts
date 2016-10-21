@@ -142,7 +142,7 @@ export class CreateValueChartComponent implements OnInit {
 	back() {
 		if (this.creationStepsService.validate(this.step)) {
 			this.autoSaveValueChart(this.valueChart);
-			this.step = this.creationStepsService.previous(this.step, this.purpose);
+			this.step = this.creationStepsService.previous(this.step, this.purpose);				
 		}
 		else {
 			toastr.error('There were problems with your submission. Please fix them to proceed.');
@@ -161,20 +161,38 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	next() {
 		if (this.creationStepsService.validate(this.step)) {
-			if (this.step === this.creationStepsService.PRIORITIES) {
-				window.onpopstate = () => { };
-				(<any>this.valueChart).incomplete = false;
-				(<any>window).destination = '/view/ValueChart';
-				this.router.navigate(['/view/ValueChart']);
+			if (this.step === this.creationStepsService.BASICS && this.creationStepsService.checkNameChanged()) {
+				this.nextIfNameAvailable();
 			}
 			else {
-				this.autoSaveValueChart(this.valueChart);
+				if (this.step !== this.creationStepsService.PRIORITIES) {
+					this.autoSaveValueChart(this.valueChart);
+				}
+				this.step = this.creationStepsService.next(this.step, this.purpose);	
 			}
-			this.step = this.creationStepsService.next(this.step, this.purpose);
 		}
 		else {
 			toastr.error('There were problems with your submission. Please fix them to proceed.');
 		}
+	}
+
+	/* 	
+		@returns {void}
+		@description 	If on step BASICS and the name has been changed, then we need to check if the name is available before proceeding.
+						This can't be done along with the rest of validation because it requires an asynchronous call.
+						Everything from here until navigation needs to be wrapped in this call; otherwise it may proceed before the call has finished.
+						
+	*/
+	nextIfNameAvailable() {
+		this.valueChartHttpService.isNameAvailable(this.valueChart.getName()).subscribe(isUnique => {
+			if (isUnique === true) {
+				this.autoSaveValueChart(this.valueChart);
+				this.step = this.creationStepsService.next(this.step, this.purpose);
+			}
+			else {
+				toastr.error('That name is already taken. Please choose another.')
+			}
+		});
 	}
 
 	/* 	
@@ -235,25 +253,49 @@ export class CreateValueChartComponent implements OnInit {
 						If this.saveOnDestroy is set to true, the chart will be saved when ngDestroy is called.
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
-		let cancelNavigation = false;
-		if (navigate) {
-			if (keepValueChart) {
-				if (this.creationStepsService.validate(this.step)) {
-					this.saveOnDestroy = true;
+		if (navigate && keepValueChart && this.step === this.creationStepsService.BASICS && 
+			this.creationStepsService.checkNameChanged() && this.creationStepsService.validate(this.step)) {
+			this.navigateAndSaveIfNameAvailable();
+		}
+		else {
+			if (navigate) {
+				if (keepValueChart) {
+					if (this.creationStepsService.validate(this.step)) {
+						this.saveOnDestroy = true;
+					}
+					else {
+						navigate = false;
+						toastr.error("There were problems with your submission. Please fix them if you'd like to save the chart.");
+					}
 				}
-				else {
-					cancelNavigation = true;
-					toastr.error("There were problems with your submission. Please fix them if you'd like to save the chart.");
+				else if (this.valueChart._id) {
+					this.deleteValueChart(this.valueChart);
 				}
-			} else if (this.valueChart._id) {
-				this.deleteValueChart(this.valueChart);
 			}
-		}
-		if (!cancelNavigation) {
 			this.navigationResponse.next(navigate);
+			$('#navigation-warning-modal').modal('hide');
 		}
+	}
 
-		$('#navigation-warning-modal').modal('hide');
+	/* 	
+		@returns {void}
+		@description 	If on step BASICS and the name has been changed, then we need to check if the name is available before proceeding.
+						This can't be done along with the rest of validation because it requires an asynchronous call.
+						Everything from here until navigation needs to be wrapped in this call; otherwise it may proceed before the call has finished.
+						
+	*/
+	navigateAndSaveIfNameAvailable() {
+		this.valueChartHttpService.isNameAvailable(this.valueChart.getName()).subscribe(isUnique => {
+			if (isUnique === true) {
+				this.saveOnDestroy = true;
+				this.navigationResponse.next(true);
+			}
+			else {
+				toastr.error("That name is already taken. Please choose another if you'd like to save the chart.");
+				this.navigationResponse.next(false);
+			}
+			$('#navigation-warning-modal').modal('hide');
+		});
 	}
 
 	// ================================ Database Access Methods ====================================

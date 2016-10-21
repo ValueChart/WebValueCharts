@@ -27,13 +27,12 @@ export class CreateBasicInfoComponent implements OnInit {
 	// ========================================================================================
 
 	// ValueChart info fields:
-	valueChartName: string;
 	valueChartDescription: string;
 	valueChartPassword: string = '';
 
 	// Validation fields:
 	validationTriggered: boolean = false;
-	nameAvailable: boolean = true;
+	originalName: string = '';
 
 	// ========================================================================================
 	// 									Constructor
@@ -63,9 +62,13 @@ export class CreateBasicInfoComponent implements OnInit {
             subscriber.next(this.validate());
             subscriber.complete();
         });
-		this.valueChartName = this.valueChartService.getValueChartName();
+        this.creationStepsService.nameChanged = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
+            subscriber.next(this.nameChanged());
+            subscriber.complete();
+        });
 		this.valueChartDescription = this.valueChartService.getValueChart().getDescription();
 		this.valueChartPassword = this.valueChartService.getValueChart().password ? this.valueChartService.getValueChart().password : "";
+		this.originalName = this.valueChartService.getValueChart().getName();
 	}
 
 	/* 	
@@ -74,7 +77,6 @@ export class CreateBasicInfoComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-		this.valueChartService.getValueChart().setName(this.valueChartName);
 		this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
 		this.valueChartService.getValueChart().password = this.valueChartPassword;
 	}
@@ -88,7 +90,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.nameValid() && this.nameUnique() && this.passwordValid();
+		return this.nameValid() && this.passwordValid();
 	}
 
 	/* 	
@@ -98,21 +100,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	*/
 	nameValid(): boolean {
 		let regex = new RegExp("^[\\s\\w-]+$");
-		return (this.valueChartName.search(regex) !== -1);
-	}
-
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff the name is not already taken by another ValueChart in the database.
-	*/
-	// Because the HTTP call is asynchronous, this function returns before nameAvailable has been correctly set
-	// Need to find a way around this (promises?)
-	nameUnique(): boolean {
-		this.valueChartHttpService.isNameAvailable(this.valueChartName).subscribe(isUnique => {
-			this.nameAvailable = isUnique;
-		});
-		return this.nameAvailable;
+		return (this.valueChartService.getValueChart().getName().search(regex) !== -1);
 	}
 
 	/* 	
@@ -122,5 +110,9 @@ export class CreateBasicInfoComponent implements OnInit {
 	passwordValid() {
 		let regex = new RegExp("^[^\\s]+$");
 		return (this.valueChartPassword.search(regex) !== -1);
+	}
+
+	nameChanged(): boolean {
+		return this.originalName !== this.valueChartService.getValueChart().getName();
 	}
 }
