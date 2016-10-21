@@ -522,7 +522,7 @@ export class CreateObjectivesComponent implements OnInit {
 						and only alphanumeric characters, spaces, hyphens, and underscores.
 	*/
 	allNamesValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-]+$");
+		let regex = new RegExp("^[\\s\\w-,.]+$");
 		for (let name of this.getNames()) {
 			if (name.search(regex) === -1) {
 				return false;
@@ -571,7 +571,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Returns true iff every category name is valid (i.e., contains only alphanumeric characters).
 	*/
 	categoryNamesValid(): boolean {
-		let regex = new RegExp("^[\\w]+$");
+		let regex = new RegExp("^[\\s\\w-,.]+$");
 		for (let key of this.objKeys()) {
 			let objrow: ObjectiveRow = this.objectiveRows[key];
 			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {

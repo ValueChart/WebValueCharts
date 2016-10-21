@@ -99,7 +99,7 @@ export class CreateBasicInfoComponent implements OnInit {
 						and only alphanumeric characters, spaces, hyphens, and underscores.
 	*/
 	nameValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-]+$");
+		let regex = new RegExp("^[\\s\\w-,.]+$");
 		return (this.valueChartService.getValueChart().getName().search(regex) !== -1);
 	}
 

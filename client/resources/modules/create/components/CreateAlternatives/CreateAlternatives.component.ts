@@ -231,7 +231,7 @@ export class CreateAlternativesComponent implements OnInit {
 						and only alphanumeric characters, spaces, hyphens, and underscores.
 	*/
 	allNamesValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-]+$");
+		let regex = new RegExp("^[\\s\\w-,.]+$");
 		for (let name of this.getNames()) {
 			if (name.search(regex) === -1) {
 				return false;

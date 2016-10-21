@@ -10,7 +10,7 @@
 </div>
 <div *ngIf="(validationTriggered || name.dirty) && name.valid && !nameValid()" 
              class="alert alert-danger">
-          Names may only contain alphanumeric characters, hyphens, underscores, and spaces.
+          Name contains disallowed characters. (Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)
 </div>
 <div *ngIf="(validationTriggered || password.dirty) && !password.valid" 
              class="alert alert-danger">
