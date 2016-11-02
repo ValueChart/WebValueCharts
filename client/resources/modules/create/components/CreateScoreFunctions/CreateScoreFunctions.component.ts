@@ -7,7 +7,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
-import { CreationStepsService }                      from '../../services/CreationSteps.service';
+import { CreationStepsService }                     from '../../services/CreationSteps.service';
 import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
 import { ScoreFunctionViewerService }								from '../../../app/services/ScoreFunctionViewer.service';
 

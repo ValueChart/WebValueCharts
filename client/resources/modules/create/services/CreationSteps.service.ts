@@ -5,7 +5,7 @@ import { Observable }     						from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
 // ImportApplication Classes:
-import { ValueChartService }											from '../../app/services/ValueChart.service';
+import { ValueChartService }					from '../../app/services/ValueChart.service';
 
 /*
 	This class defines the names and orders of steps in the Creation workflow and the transitions between them.
@@ -34,6 +34,19 @@ export class CreationStepsService {
 									  // It enables the parent component (CreateValueChart)
 									  // to check whether or not the name has been changed,
 									  // so it can check or not check for uniqueness accordingly.
+
+	goBack: Observable<void>;    // This is set by the CreateValueChart component.
+								 // It allows CreationGuard to trigger call to "back()" in CreateValueChart.
+
+	goNext: Observable<void>;  	 // This is set by the CreateValueChart component.
+								 // It allows CreationGuard to trigger call to "next()" in CreateValueChart.
+
+	allowedToNavigateInternally: boolean = false; // This is set by CreateValueChart indicating that navigation was triggered
+												  // by a component method.
+												  // This allows CreationGuard to intercept navigation triggered by browser buttons.
+
+	step: string = ""; // The current step that CreateValueCharts is on.
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -66,26 +79,26 @@ export class CreationStepsService {
 		@returns {string}
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
-	next(step: string, purpose: string): string {
-		if (step === this.PRIORITIES) {
+	next(purpose: string) {
+		if (this.step === this.PRIORITIES) {
 			window.onpopstate = () => { };
 			(<any>this.valueChartService.getValueChart()).incomplete = false;
 			(<any>window).destination = '/view/ValueChart';
 			this.router.navigate(['/view/ValueChart']);
 		}
 		else {
-			this.router.navigate(['createValueChart/' + purpose + '/' + this.nextStep[step]]);
+			this.step = this.nextStep[this.step];
+			this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
 		}
-		return this.nextStep[step];
 	}
 
 	/* 	
 		@returns {string}
 		@description 	Navigates to the component for the previous step and returns the previous step.
 	*/
-	previous(step: string, purpose: string): string {
-		this.router.navigate(['createValueChart/' + purpose + '/' + this.previousStep[step]]);
-		return this.previousStep[step];
+	previous(purpose: string) {
+		this.step = this.previousStep[this.step];
+		this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
 	}
 
 	/* 	
@@ -93,9 +106,9 @@ export class CreationStepsService {
 		@description 	Subscribes to the Observable for step's component, which triggers validation in that component.
 						Returns true iff validation passes.
 	*/
-	validate(step: string): boolean {
+	validate(): boolean {
 		let valid: boolean;
-		this.observables[step].subscribe(isValid => {
+		this.observables[this.step].subscribe(isValid => {
 			valid = isValid;
 		});
         return valid;

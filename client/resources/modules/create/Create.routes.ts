@@ -34,11 +34,11 @@ const creationRoutes: Routes = [
 		canActivate: [AuthGuardService],
 		canDeactivate: [CreationGuardService],
 		children: [
-			{ path: 'BasicInfo', component: CreateBasicInfoComponent },
-			{ path: 'Objectives', component: CreateObjectivesComponent },
-			{ path: 'Alternatives', component: CreateAlternativesComponent },
-			{ path: 'ScoreFunctions', component: CreateScoreFunctionsComponent },
-			{ path: 'Weights', component: CreateWeightsComponent }
+			{ path: 'BasicInfo', component: CreateBasicInfoComponent, canActivate: [CreationGuardService] },
+			{ path: 'Objectives', component: CreateObjectivesComponent, canActivate: [CreationGuardService] },
+			{ path: 'Alternatives', component: CreateAlternativesComponent, canActivate: [CreationGuardService] },
+			{ path: 'ScoreFunctions', component: CreateScoreFunctionsComponent, canActivate: [CreationGuardService] },
+			{ path: 'Weights', component: CreateWeightsComponent, canActivate: [CreationGuardService] }
 		]
 	}
 ];
