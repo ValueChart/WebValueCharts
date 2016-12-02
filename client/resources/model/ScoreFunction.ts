@@ -170,7 +170,7 @@ export abstract class ScoreFunction implements Memento {
 		if (bestOutcomeScore !== 1 || worstOutcomeScore !== 0) {
 			var range = bestOutcomeScore - worstOutcomeScore;
 			if (range === 0) {
-				throw new RescaleError("Objective outcome scores are all the same.");
+				throw new RescaleError("Objective outcome scores are all the same. (This should not be allowed.)");
 			}
 			for (var element of this.getAllElements()) {
 				var newScore = (this.getScore(element) - worstOutcomeScore) / range;
