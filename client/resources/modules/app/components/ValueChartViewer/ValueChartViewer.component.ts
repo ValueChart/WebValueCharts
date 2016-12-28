@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-10-05 10:31:04
+* @Last Modified time: 2016-12-28 15:03:59
 */
 
 // Import Angular Classes:
@@ -14,6 +14,8 @@ import { Router, ActivatedRoute }												from '@angular/router';
 import * as d3 																	from 'd3';
 
 // Import Application Classes:
+import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
+
 import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
@@ -47,12 +49,13 @@ import { ValueChart } 															from '../../../../model/ValueChart';
 import { Alternative } 															from '../../../../model/Alternative';
 import { PrimitiveObjective } 													from '../../../../model/PrimitiveObjective';
 
-
+// Import Types:
+import { ViewConfig }															from '../../../../types/Config.types';
+					
 
 /*
 	This class is responsible for displaying a ValueChart visualization. It uses the ValueChartDirective to create and render a ValueChart, and
-	provides itself the UI elements and logic needed for the visualization's controls. The ValueChart that is displayed by this class is either
-	the ValueChart currently stored by the ValueChartService, or its average depending on the current route parameters. 
+	provides itself the UI elements and logic needed for the visualization's controls.
 
 	The visualization controls provided by ValueChartViewer are of three basic types: interaction toggles, view option toggles, and hosting controls.
 	Interaction toggles allow users to control what interactions provided by the ValueChartDirective are enabled by modifying
@@ -120,16 +123,8 @@ export class ValueChartViewerComponent implements OnInit {
 	sub: any;
 
 	valueChart: ValueChart;
-	alternatives: Alternative[];
 
-
-	// ValueChart Display Configuration Options:
-	orientation: string;
-	displayScoreFunctions: boolean;
-	displayDomainValues: boolean;
-	displayScales: boolean;
-	displayTotalScores: boolean;
-	displayScoreFunctionValueLabels: boolean;
+	viewConfig: ViewConfig = <any> {};
 
 	// ValueChart Interactions Configuration:
 	weightResizeType: string;
@@ -151,9 +146,6 @@ export class ValueChartViewerComponent implements OnInit {
 	DETAIL_BOX_CHART_TAB: string = 'chart';
 	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	DETAIL_BOX_USERS_TAB: string = 'users';
-
-	chartType: string;
-
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
 
@@ -199,46 +191,42 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
-		// Display either the current ValueChart, or the average of the current ValueChart depending on the route parameters:
-		this.sub = this.route.params.subscribe(params => {
-			let valueChartName: string = params['ValueChart']; // (+) converts string 'id' to a number
-
-			if (valueChartName.toLowerCase().indexOf('average') !== -1) {
-				this.valueChartService.inactiveValueCharts.push(this.valueChartService.getValueChart());
-				this.valueChartService.setValueChart(this.valueChartService.getValueChart().getAverageValueChart());
-				this.valueChart = this.valueChartService.getValueChart();
-				this.chartType = 'average';
-				this.weightResizeType = this.RESIZE_NEIGHBOR;
-
-			} else {
-				this.valueChart = this.valueChartService.getValueChart();
-				this.chartType = 'normal';
-				this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
-			}
-
-		});
-
-
+		// Attach Jquery to the component so that it can be accessed inside the template.
 		this.$ = $;
-		this.alternatives = this.valueChart.getAlternatives();
 
-		// View Configuration
-		this.orientation = 'vertical';
-		this.displayScoreFunctions = this.valueChart.isIndividual();
+		this.valueChart = this.valueChartService.getValueChart();
 
-		this.displayTotalScores = true;
-		this.displayScales = false;
-		this.displayDomainValues = false;
-		this.displayScoreFunctionValueLabels = false;
+		this.initInteractions();
+		this.initDetailBox();
 
-		// Interactions
+		if (!this.currentUserService.isJoiningChart()) {
+			this.hostValueChart();
+		}
+	}
+
+	updateView(viewConfig: ViewConfig) {
+		this.viewConfig = viewConfig;
+
+
+		let detailBoxContainer: any = $('.detail-box')[0];
+		detailBoxContainer.style.left = 60 + 'px';
+
+		if (this.viewConfig.viewOrientation === 'horizontal') {
+			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
+
+			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
+		}
+	}
+
+	initInteractions() {
 		this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
 		this.reorderObjectives = false;
 		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
 		this.pumpWeights = this.PUMP_OFF;
 		this.setObjectiveColors = false;
+	}
 
-		// Detail Box
+	initDetailBox() {
 		this.detailBoxCurrentTab = this.DETAIL_BOX_CHART_TAB;
 		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
@@ -253,10 +241,6 @@ export class ValueChartViewerComponent implements OnInit {
 			this.resizeValueChart()
 		});
 
-		if (!this.currentUserService.isJoiningChart()) {
-			this.hostValueChart();
-		}
-
 		// Set Alternative labels to link to the Alternative detail box. 
 		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
@@ -270,13 +254,6 @@ export class ValueChartViewerComponent implements OnInit {
 		if (this.hostService.hostWebSocket) {
 			this.hostService.endCurrentHosting();
 		}
-
-		// Unsubscribe from the route parameters to prevent a memory leak.
-		this.sub.unsubscribe();
-
-		// if (this.hostService.hostWebSocket) {
-		// 	this.hostService.endCurrentHosting();
-		// }
 
 		// Destroy the ValueChart manually to prevent memory leaks.
 		$('ValueChart').remove();
@@ -411,8 +388,10 @@ export class ValueChartViewerComponent implements OnInit {
 			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
 			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
 		}
+		
+		alternativeDetailBox.style.left = 60 + 'px';
 
-		if (this.orientation === 'horizontal') {
+		if (this.viewConfig.viewOrientation === 'horizontal') {
 			let detailBoxContainer: any = $('.detail-box')[0];
 			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
 			if (labelOutline) {
@@ -488,39 +467,6 @@ export class ValueChartViewerComponent implements OnInit {
 	redoChartChange(): void {
 		this.chartUndoRedoService.redo(this.valueChartService);
 	}
-
-	// ================================ Handlers for View Config Controls ====================================
-
-	setOrientation(viewOrientation: string): void {
-		this.orientation = viewOrientation;
-
-		if (this.orientation === 'horizontal') {
-			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
-
-			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
-		}
-	}
-
-	setDisplayScoreFunctions(newVal: boolean): void {
-		this.displayScoreFunctions = newVal;
-	}
-
-	setDisplayDomainValues(newVal: boolean): void {
-		this.displayDomainValues = newVal;
-	}
-
-	setDisplayScales(newVal: boolean): void {
-		this.displayScales = newVal;
-	}
-
-	setDisplayTotalScores(newVal: boolean): void {
-		this.displayTotalScores = newVal;
-	}
-	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
-		this.displayScoreFunctionValueLabels = newVal;
-	}
-
 
 	// ================================ Handlers for User Interaction Controls ====================================
 

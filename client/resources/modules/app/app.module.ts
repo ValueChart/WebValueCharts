@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:15:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:12:51
+* @Last Modified time: 2016-12-28 13:40:30
 */
 
 
@@ -20,6 +20,7 @@ import { RootComponent }						from './components/Root/Root.component';
 import { RegisterComponent }					from './components/Register/Register.component';
 import { HomeComponent }						from './components/Home/Home.component';
 import { ValueChartViewerComponent }			from './components/ValueChartViewer/ValueChartViewer.component';
+import { ViewOptionsComponent }					from './components/widgets/ViewOptions/ViewOptions.component';
 import { AccountComponent }						from './components/Account/Account.component';
 import { MyValueChartsComponent }				from './components/MyValueCharts/MyValueCharts.component';
 import { ScoreFunctionViewerComponent }			from './components/ScoreFunctionViewer/ScoreFunctionViewer.component';
@@ -56,6 +57,7 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 		RegisterComponent,
 		HomeComponent,
 		ValueChartViewerComponent,
+		ViewOptionsComponent,
 		AccountComponent,
 		MyValueChartsComponent,
 		ScoreFunctionViewerComponent,

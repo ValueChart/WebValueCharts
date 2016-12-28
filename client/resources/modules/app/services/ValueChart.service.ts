@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 12:09:00
+* @Last Modified time: 2016-12-28 13:01:57
 */
 
 // Import Angular Classes:
@@ -239,6 +239,8 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
+	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.
+
 	wasWeightMapReset(user: User) {
 		return this.weightMapReset[user.getUsername()];
 	}
@@ -255,6 +257,7 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.initializeDefaultWeightMap(this.getRootObjectives(), weightMap, 1);
 		return weightMap;
 	}
+
 
 	// Recursively add entries to weight map
 	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {

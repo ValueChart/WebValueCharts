@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-31 17:15:28
+* @Last Modified time: 2016-12-28 14:53:31
 */
 
 // Import Angular Classes:
@@ -148,7 +148,7 @@ export class ResizeWeightsInteraction {
 		var labelDividers: d3.Selection<any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-			return (resizeType !== 'none') ? (this.renderConfigService.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+			return (resizeType !== 'none') ? (this.renderConfigService.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
 		});
 
 		labelDividers.call(dragToResizeWeights);

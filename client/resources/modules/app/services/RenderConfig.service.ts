@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 13:28:47
+* @Last Modified time: 2016-12-28 14:54:27
 */
 
 // Import Angular Classes:
@@ -29,8 +29,6 @@ export class RenderConfigService {
 	// ========================================================================================
 
 	public CHART_COMPONENT_RATIO: number = 0.47;		// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
-
-	public viewOrientation: string;						// String representing the current orientation of the ValueChart. Either 'vertical' or 'horizontal'
 
 	public viewConfig: ViewConfig = <any>{};			// Object with the current view configuration. The fields of this object are set by the ValueChartDirective input methods. 
 
@@ -159,7 +157,7 @@ export class RenderConfigService {
 		}
 
 
-		if (this.viewOrientation === 'vertical') {
+		if (this.viewConfig.viewOrientation === 'vertical') {
 			return 'translate(' + (xTransform + deltaCoordinateOne) + ',' + (yTransform + deltaCoordinateTwo) + ')';
 		} else {
 			return 'translate(' + (xTransform + deltaCoordinateTwo) + ',' + (yTransform + deltaCoordinateOne) + ')';

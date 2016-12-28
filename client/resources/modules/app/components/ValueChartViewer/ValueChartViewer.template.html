@@ -3,7 +3,7 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !currentUserService.isJoiningChart() && chartType === 'normal'" [routerLink]="['/createValueChart/editChart/BasicInfo']">
+				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !currentUserService.isJoiningChart()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
 				Edit ValueChart
 				</a>
 			</div>
@@ -45,67 +45,7 @@
 				</button>
 			</div>
 			<div class="col-xs-1 pull-right"></div>
-			<div class="form-group valuechart-toolbar-group pull-right">
-				<div class="dropdown"  id="viewoptions-menu">
-					<button class="btn btn-default dropdown-toggle" type="button" id="viewoptions-dropdown" data-toggle="dropdown"
-					aria-haspopup="true" aria-expanded="true">
-					View Options
-					<span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="viewoptions-dropdown">
-						<li class="dropdown dropdown-submenu">
-							<a href="javascript:void(0)" id="orientation-dropdown" data-toggle="dropdown"
-								aria-haspopup="true" aria-expanded="true">
-								Chart Orientation
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="orientation-dropdown">
-								<li [class.disabled]="orientation === 'vertical'">
-									<a href="javascript:void(0)" (click)="setOrientation('vertical')">
-										Vertical
-										<span *ngIf="orientation === 'vertical'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-									</a>
-								</li>
-								<li [class.disabled]="orientation === 'horizontal'">
-									<a href="javascript:void(0)" (click)="setOrientation('horizontal')">
-										Horizontal
-										<span *ngIf="orientation === 'horizontal'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-									</a>
-								</li>
-							</ul>
-						</li>
-						<li>
-							<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!displayScoreFunctions)">
-								Utility Graphs
-								<span *ngIf="displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-						<li>
-							<a href="javascript:void(0)" (click)="setDisplayDomainValues(!displayDomainValues)">
-								Domain Values
-								<span *ngIf="displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-						<li>
-							<a href="javascript:void(0)" (click)="setDisplayScales(!displayScales)">
-								Utility Scale
-								<span *ngIf="displayScales" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-						<li>
-							<a href="javascript:void(0)" (click)="setDisplayTotalScores(!displayTotalScores)">
-								Total Scores
-								<span *ngIf="displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-						<li>
-							<a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!displayScoreFunctionValueLabels)">
-								Score Labels
-								<span *ngIf="displayScoreFunctionValueLabels" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</div>
+			<ViewOptions (viewConfig)="updateView($event)"></ViewOptions>
 			<div class="form-group valuechart-toolbar-group pull-right">
 				<div class="dropdown" id="alternatives-menu">
 					<button class="btn btn-default dropdown-toggle" type="button" id="alternatives-dropdown" data-toggle="dropdown"
@@ -210,21 +150,11 @@
 					</ul>
 				</div>
 			</div>
-			<div class="form-group valuechart-toolbar-group pull-right" *ngIf="chartType === 'normal' && !valueChart.isIndividual()">
-				<a class="btn btn-default" (click)="viewAverageChart()" id="view-average-chart">
-					View Average Chart
-				</a>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-right" *ngIf="chartType === 'average'">
-				<a class="btn btn-default" (click)="viewGroupChart()" id="view-normal-chart">
-					View Group Chart
-				</a>
-			</div>
 		</form>
 	</div>
 	<div id="detail-box" class="detail-box"
-		[class.detail-box-horizontal]="orientation === 'horizontal'"
-		[class.detail-box-vertical]="orientation === 'vertical'">
+		[class.detail-box-horizontal]="viewOrientation === 'horizontal'"
+		[class.detail-box-vertical]="viewOrientation === 'vertical'">
 		<form class="form-inline col-xs-5" class="detail-toolbar">
 			<div class="form-group valuechart-toolbar-group pull-left">
 				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="chart-information-header-container"
@@ -263,7 +193,7 @@
 				</div>
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
-				<div *ngFor="let alternative of alternatives">
+				<div *ngFor="let alternative of valueChart.getAlternatives()">
 					<div class="col-sm-12">
 						<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxAlternativeTab === 'Alternatives'">
 							{{alternative.getName()}}
@@ -300,14 +230,9 @@
 	<div >
 		<ValueChart
 		[data]="valueChart"
-		[orientation]="orientation"
 		[width]="valueChartWidth"
 		[height]="valueChartHeight"
-		[displayScoreFunctions]="displayScoreFunctions"
-		[displayDomainValues]="displayDomainValues"
-		[displayScales]="displayScales"
-		[displayTotalScores]="displayTotalScores"
-		[displayScoreFunctionValueLabels]="displayScoreFunctionValueLabels"
+		[viewConfig]="viewConfig"
 		[weightResizeType]="weightResizeType"
 		[reorderObjectives]="reorderObjectives"
 		[sortAlternatives]="sortAlternatives"
