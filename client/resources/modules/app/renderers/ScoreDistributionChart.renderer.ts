@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:02:43
+* @Last Modified time: 2016-12-31 21:56:09
 */
 
 // Import Angular Classes:
@@ -38,22 +38,22 @@ export class ScoreDistributionChartRenderer {
 	// ========================================================================================
 
 	// d3 Selections:
-	public rootContainer: d3.Selection<any>;					// The 'g' element that acts as the root container of the entire distribution chart. All elements of the distribution chart will be children of this element.
-	public chartOutline: d3.Selection<any>;						// The 'rect' element that outlines the distribution chart.
-	public chartContainer: d3.Selection<any>;					// The 'g' element that contains the elements which make up the actual chart.
-	public boxplotContainers: d3.Selection<any>;				// The selection of 'g' elements that contain the elements making up the box plots. There should be only one box plot per 'g' element.
-	public boxplotQuartileOutlines: d3.Selection<any>;			// The selection of 'rect' elements used as the each box plots main rectangle. The tops of these rectangles are located at the third quartile, and the bottom at the first quartile.
-	public boxplotMaxLines: d3.Selection<any>;					// The selection of 'line' elements used to indicate the maximum value in box plot. These lines are connected to the top of the boxplotQuartileOutlines by the boxplotUpperDashedLines.
-	public boxplotMinLines: d3.Selection<any>;					// The selection of 'line' elements used to indicate the minimum value in box plot. These lines are connected to the bottom of the boxplotQuartileOutlines by the boxplotLowerDashedLines.
-	public boxplotMedianLines: d3.Selection<any>;				// The selection of 'line' elements used to indicated the median value in the box plots.
-	public boxplotUpperDashedLines: d3.Selection<any>;			// The selection of 'line' elements used to connect the boxplotMaxLines to the top of the boxplotQuartileOutlines. These lines indicate the range of values in the distribution from the third quartile to the maximum value.
-	public boxplotLowerDashedLines: d3.Selection<any>;			// The selection of 'line' elements used to connect the boxplotMinLines to the bottom of the boxplotQuartileOutlines. These lines indicate the range of values in the distribution from the first quartile to the minimum value.
-	public axesContainer: d3.Selection<any>;					// The 'g' element that contains the elements making up the axis of the score distribution chart.
-	public scoreAxisContainer: d3.Selection<any>;				// The 'g' element that contains the elements making up the score (y) axis.
-	public domainAxisContainer: d3.Selection<any>;				// The 'g' element that contains the elements making up the domain value (x) axis.
-	public domainAxis: d3.Selection<any>;						// The 'line' element used as the domain axis.
-	public domainLabelsContainer: d3.Selection<any>;			// The 'g' element that contains the 'text' elements used as labels for the domain axis.
-	public domainLabels: d3.Selection<any>;						// The 'text' elements used as labels for the domain axis.
+	public rootContainer: d3.Selection<any, any, any, any>;					// The 'g' element that acts as the root container of the entire distribution chart. All elements of the distribution chart will be children of this element.
+	public chartOutline: d3.Selection<any, any, any, any>;						// The 'rect' element that outlines the distribution chart.
+	public chartContainer: d3.Selection<any, any, any, any>;					// The 'g' element that contains the elements which make up the actual chart.
+	public boxplotContainers: d3.Selection<any, any, any, any>;				// The selection of 'g' elements that contain the elements making up the box plots. There should be only one box plot per 'g' element.
+	public boxplotQuartileOutlines: d3.Selection<any, any, any, any>;			// The selection of 'rect' elements used as the each box plots main rectangle. The tops of these rectangles are located at the third quartile, and the bottom at the first quartile.
+	public boxplotMaxLines: d3.Selection<any, any, any, any>;					// The selection of 'line' elements used to indicate the maximum value in box plot. These lines are connected to the top of the boxplotQuartileOutlines by the boxplotUpperDashedLines.
+	public boxplotMinLines: d3.Selection<any, any, any, any>;					// The selection of 'line' elements used to indicate the minimum value in box plot. These lines are connected to the bottom of the boxplotQuartileOutlines by the boxplotLowerDashedLines.
+	public boxplotMedianLines: d3.Selection<any, any, any, any>;				// The selection of 'line' elements used to indicated the median value in the box plots.
+	public boxplotUpperDashedLines: d3.Selection<any, any, any, any>;			// The selection of 'line' elements used to connect the boxplotMaxLines to the top of the boxplotQuartileOutlines. These lines indicate the range of values in the distribution from the third quartile to the maximum value.
+	public boxplotLowerDashedLines: d3.Selection<any, any, any, any>;			// The selection of 'line' elements used to connect the boxplotMinLines to the bottom of the boxplotQuartileOutlines. These lines indicate the range of values in the distribution from the first quartile to the minimum value.
+	public axesContainer: d3.Selection<any, any, any, any>;					// The 'g' element that contains the elements making up the axis of the score distribution chart.
+	public scoreAxisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the elements making up the score (y) axis.
+	public domainAxisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the elements making up the domain value (x) axis.
+	public domainAxis: d3.Selection<any, any, any, any>;						// The 'line' element used as the domain axis.
+	public domainLabelsContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the 'text' elements used as labels for the domain axis.
+	public domainLabels: d3.Selection<any, any, any, any>;						// The 'text' elements used as labels for the domain axis.
 
 	// Data:
 	private elementUserScoresSummaries: ElementUserScoresSummary[];
@@ -115,7 +115,7 @@ export class ScoreDistributionChartRenderer {
 		@description	Creates the base containers and elements for a score distribution chart. It should be called when
 						creating an score distribution chart for the first time.
 	*/
-	createScoreDistributionChart(el: d3.Selection<any>, objective: PrimitiveObjective): void {
+	createScoreDistributionChart(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
 		this.rootContainer = el;
 
 		var objectiveId = objective.getId();
@@ -165,7 +165,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the domain axis for a score distribution plot. It should NOT be called manually. 
 	*/
-	createDomainAxis(domainAxisContainer: d3.Selection<any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createDomainAxis(domainAxisContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
 
 		// Create the line that will act as the domain axis.
 		this.domainAxis = domainAxisContainer.append('line')
@@ -195,7 +195,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the box plots for the score distribution chart by first creating the box plot containers and then calling createBoxPlotElements.
 	*/
-	createBoxPlots(chartContainer: d3.Selection<any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createBoxPlots(chartContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
 
 		chartContainer.append('g')
 			.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINERS_CONTAINER, true)
@@ -219,7 +219,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the box plots for the score distribution chart by first creating the box plot containers and then calling createBoxPlotElements.
 	*/
-	createBoxPlotElements(boxplotContainers: d3.Selection<any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createBoxPlotElements(boxplotContainers: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
 
 		// Create the quartile outline rectangles for each box plot.
 		this.boxplotQuartileOutlines = boxplotContainers.append('rect')
@@ -298,7 +298,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Position and styles the domain and score axes of the chart. This method should NOT be called manually.
 	*/
-	renderAxes(axesContainer: d3.Selection<any>, viewOrientation: string): void {
+	renderAxes(axesContainer: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		// Delete the elements of the previous scale:
 
 		this.renderDomainAxis(this.domainAxis, this.domainLabels, viewOrientation);
@@ -313,7 +313,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Positions and styles the domain axis of the chart. This method should NOT be called manually.
 	*/
-	renderDomainAxis(domainAxis: d3.Selection<any>, domainLabels: d3.Selection<any>, viewOrientation: string): void {
+	renderDomainAxis(domainAxis: d3.Selection<any, any, any, any>, domainLabels: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 
 		// This function is used to determine the coordinate two position of the domain axis.
 		var calculateDomainAxisCoordinateTwo = () => {
@@ -350,7 +350,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Positions and styles the score axis of the chart. This method should NOT be called manually.
 	*/
-	renderScoreAxis(scoreAxisContainer: d3.Selection<any>, viewOrientation: string): void {
+	renderScoreAxis(scoreAxisContainer: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 
 		// Delete elements from a previous rendering of the score axis. This must be done because we are using d3's axis generating methods.
 		var elements: any = (<any>scoreAxisContainer.node()).children;
@@ -359,7 +359,7 @@ export class ScoreDistributionChartRenderer {
 		}
 
 		// Create the new Scale to be used to create the score axis.
-		var scoreAxisScale: d3.Linear<number, number> = d3.scaleLinear()
+		var scoreAxisScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 1])	// Set the domain of the score axis to be from 0 to 1, inclusive.
 
 		// Calculate the height of the score axis based on the size of the score distribution chart.
@@ -393,7 +393,7 @@ export class ScoreDistributionChartRenderer {
 						and then it calls renderBoxPlotElements to render their elements. This method should NOT be called manually. Instead, call renderScoreDistributionChart 
 						to render the entire chart at once.
 	*/
-	renderBoxPlots(boxplotContainers: d3.Selection<any>, elementUserScoresSummaries: ElementUserScoresSummary[], viewOrientation: string) {
+	renderBoxPlots(boxplotContainers: d3.Selection<any, any, any, any>, elementUserScoresSummaries: ElementUserScoresSummary[], viewOrientation: string) {
 
 		// Position each of the box plots by positioning their containers. 
 		boxplotContainers.attr('transform', (d: ElementUserScoresSummary, i: number) => {
@@ -415,7 +415,7 @@ export class ScoreDistributionChartRenderer {
 		var boxplotWidth: number = ((this.viewConfig.dimensionOneSize / elementUserScoresSummaries.length) / 2);
 
 		// Configure the scale that is used to translate between score values and pixel coordinates.
-		var heightScale: d3.Linear<number, number> = d3.scaleLinear()
+		var heightScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 1])
 			.range([0, (this.viewConfig.dimensionTwoSize - (1.5 * this.coordinateTwoOffset)) - 1]);
 

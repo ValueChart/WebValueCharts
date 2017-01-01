@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:12:03
+* @Last Modified time: 2016-12-31 21:35:04
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -51,7 +51,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private chartUndoRedoService: ChartUndoRedoService;
 
 	// Renderer Fields:
-	private scoreFunctionPlotContainer: d3.Selection<any>;
+	private scoreFunctionPlotContainer: d3.Selection<any, any, any, any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
 
 	// Change detection fields:

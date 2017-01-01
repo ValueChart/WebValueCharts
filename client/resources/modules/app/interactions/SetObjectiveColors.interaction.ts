@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 21:04:24
+* @Last Modified time: 2016-12-31 21:41:37
 */
 
 // Import Angular Classes:
@@ -54,7 +54,7 @@ export class SetObjectiveColorsInteraction {
 		// clicks on one of the labels.
 		if (setObjectiveColors) {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
-				var targetObjective: PrimitiveObjective = d3.select(eventObject.target).datum().objective;
+				var targetObjective: PrimitiveObjective = (<any> d3.select(<any> eventObject.target).datum()).objective;
 				var colorPicker = $('#primitiveObjective-color-picker');
 				
 				colorPicker.off('change');	// Remove any old listeners from the color picker.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 16:46:44
+* @Last Modified time: 2016-12-31 21:44:36
 */
 
 // Require Node Libraries:
@@ -49,7 +49,7 @@ describe('ValueCharts Routes', () => {
 
 			context('when the ValuChartName is available', () => {
 
-				it('return a copy of the created resource along with status code 201', (done) => {
+				it('return a copy of the created resource along with status code 201', (done: any) => {
 					user.post('ValueCharts').send(JsonGroupHotel)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
@@ -74,7 +74,7 @@ describe('ValueCharts Routes', () => {
 
 			context('when the ValueChart name is already in use', () => {
 
-				it(' should return status code 400', (done) => {
+				it(' should return status code 400', (done: any) => {
 					user.post('ValueCharts').send(JsonGroupHotel)
 						.set('Accept', 'application/json')
 						.expect(400)
@@ -93,7 +93,7 @@ describe('ValueCharts Routes', () => {
 
 			context('when the ValueChart name is taken', () => {
 
-				it('should return false to indicate that the name is taken, along with status code 200', (done) => {
+				it('should return false to indicate that the name is taken, along with status code 200', (done: any) => {
 					user.get('ValueCharts/' + JsonGroupHotel.name + '/available')
 							.set('Accept', 'application/json')
 							.expect('Content-Type', /json/)
@@ -113,7 +113,7 @@ describe('ValueCharts Routes', () => {
 			});
 
 			context('when the ValueChart name is not taken', () => {
-				it('shold return true to indicate that the name is free, along with status code 200', (done) => {
+				it('shold return true to indicate that the name is free, along with status code 200', (done: any) => {
 					user.get('ValueCharts/AFreeName/available')
 							.set('Accept', 'application/json')
 							.expect('Content-Type', /json/)
@@ -136,7 +136,7 @@ describe('ValueCharts Routes', () => {
 
 		describe('Method: Get', () => {
 			context('when the ValueChart exists', () => {
-				it('should retrieve the ValueChart along with status code 200', (done) => {
+				it('should retrieve the ValueChart along with status code 200', (done: any) => {
 					user.get('ValueCharts/' + chartId + '?password=' + password)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
@@ -158,7 +158,7 @@ describe('ValueCharts Routes', () => {
 			});
 
 			context('when the ValueChart does not exist', () => {
-				it('should return status code 404', (done) => {
+				it('should return status code 404', (done: any) => {
 					user.get('ValueCharts/' + 'e910f9c9c759bb6d76faa975' + '?password=' + password)
 						.expect(404)
 						.end(function(err, res) {
@@ -178,7 +178,7 @@ describe('ValueCharts Routes', () => {
 				alternative = JsonGroupHotel.alternatives.pop();
 			})
 
-			it('should replace the ValueChart, and return the new representation along with status code 200', (done) => {
+			it('should replace the ValueChart, and return the new representation along with status code 200', (done: any) => {
 				user.put('ValueCharts/' + chartId).send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
@@ -202,7 +202,7 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Delete', () => {
 
 			context('when the ValueChart exists', () => {
-				it('should return status code 200', (done) => {					user.delete('ValueCharts/' + chartId)
+				it('should return status code 200', (done: any) => {					user.delete('ValueCharts/' + chartId)
 						.expect(200)
 						.end(function(err, res) {
 					        if (err) return done(err);
@@ -212,7 +212,7 @@ describe('ValueCharts Routes', () => {
 			});
 
 		context('when the ValueChart does not exist', () => {
-				it('should return status code 200 (because delete is idempotent', (done) => {
+				it('should return status code 200 (because delete is idempotent', (done: any) => {
 					user.delete('ValueCharts/' + 'e910f9c9c759bb6d76faa975')
 						.expect(200)
 						.end(function(err, res) {
@@ -227,7 +227,7 @@ describe('ValueCharts Routes', () => {
 
 	describe('Route: /ValueCharts/:Chart/structure', () => {
 
-		before(function(done) {
+		before(function(done: any) {
 			user.post('ValueCharts').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect((res: request.Response) => {
@@ -240,7 +240,7 @@ describe('ValueCharts Routes', () => {
 		});
 
 		describe('Method: Get', () => {
-			it('should retrieve the ValueChart structure along with status code 200', (done) => {
+			it('should retrieve the ValueChart structure along with status code 200', (done: any) => {
 				user.get('ValueCharts/' + 'TestHotelSelectionProblem' + '/structure?password=' + password)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
@@ -269,7 +269,7 @@ describe('ValueCharts Routes', () => {
 				JsonGroupHotel.rootObjectives.push(JsonGroupHotel.rootObjectives[0].subObjectives[0]);
 			});
 
-			it('should replace the ValueChart structure and return the new representation with status code 200', (done) => {
+			it('should replace the ValueChart structure and return the new representation with status code 200', (done: any) => {
 				user.put('ValueCharts/' + 'TestHotelSelectionProblem' + '/structure').send(JsonGroupHotel)
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
@@ -307,7 +307,7 @@ describe('ValueCharts Routes', () => {
 
 		describe('Method: Post', () => {
 			
-			it('should add the user to the ValueChart and return the added user with status code 201', (done) => {
+			it('should add the user to the ValueChart and return the added user with status code 201', (done: any) => {
 				user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
@@ -332,7 +332,7 @@ describe('ValueCharts Routes', () => {
 
 		describe('Method: Get', () => {
 			context('when the user exists', () => {
-				it('should get the user along with status code 200', (done) => {
+				it('should get the user along with status code 200', (done: any) => {
 					user.get('ValueCharts/' + chartId + '/users/Argile')
 						.set('Accept', 'application/json')
 							.expect('Content-Type', /json/)
@@ -351,7 +351,7 @@ describe('ValueCharts Routes', () => {
 			});
 
 			context('when the user does not exist', () => {
-				it('should return status code 404', (done) => {
+				it('should return status code 404', (done: any) => {
 					user.get('ValueCharts/' + chartId + '/users/Niel')
 						.set('Accept', 'application/json')
 							.expect(404)
@@ -376,7 +376,7 @@ describe('ValueCharts Routes', () => {
 				argileJson.weightMap = JsonGroupHotel.users[0].weightMap;
 			});	
 
-			it('should replace the user in the ValueChart and return the new representation with status code 200', (done) => {
+			it('should replace the user in the ValueChart and return the new representation with status code 200', (done: any) => {
 				user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
@@ -398,7 +398,7 @@ describe('ValueCharts Routes', () => {
 
 		describe('Method: Delete', () => {
 			context('when the user exists', () => {
-				it('should delete the user and return status code 200', (done) => {
+				it('should delete the user and return status code 200', (done: any) => {
 					user.delete('ValueCharts/' + chartId + '/users/Argile')
 						.set('Accept', 'application/json')
 							.expect(200)
@@ -409,7 +409,7 @@ describe('ValueCharts Routes', () => {
 				});
 			});
 			context('when the user does not exist', () => {
-				it('should return status code 200', (done) => {
+				it('should return status code 200', (done: any) => {
 					user.delete('ValueCharts/' + chartId + '/users/Niel')
 						.set('Accept', 'application/json')
 							.expect(200)
@@ -422,7 +422,7 @@ describe('ValueCharts Routes', () => {
 		});
 	});
 
-	after(function(done) {
+	after(function(done: any) {
 		// Remove the test ValueChart from the database.
 		user.delete('ValueCharts/' + chartId)
 			.expect(200)

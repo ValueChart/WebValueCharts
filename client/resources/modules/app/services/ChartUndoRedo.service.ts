@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 13:19:34
+* @Last Modified time: 2016-12-31 21:59:22
 */
 
 // Import Application Classes:
@@ -63,7 +63,7 @@ export class ChartUndoRedoService {
 	private undoStateRecords: Memento[];
 	private redoStateRecords: Memento[];
 
-	public undoRedoDispatcher: d3.Dispatch;
+	public undoRedoDispatcher: d3.Dispatch<any>;
 
 	// ========================================================================================
 	// 									Constructor

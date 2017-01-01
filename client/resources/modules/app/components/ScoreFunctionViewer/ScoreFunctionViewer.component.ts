@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:17:31
+* @Last Modified time: 2016-12-31 21:35:20
 */
 
 // Import Angular Classes:
@@ -64,9 +64,9 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 	private services: any = {};
 
-	private scoreFunctionPlotContainer: d3.Selection<any>;
+	private scoreFunctionPlotContainer: d3.Selection<any, any, any, any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
-	private scoreDistributionChartContainer: d3.Selection<any>;
+	private scoreDistributionChartContainer: d3.Selection<any, any, any, any>;
 	private scoreDistributionChartRenderer: ScoreDistributionChartRenderer;
 
 	private users: User[];

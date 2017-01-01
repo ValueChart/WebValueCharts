@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 13:04:32
+* @Last Modified time: 2016-12-31 21:56:08
 */
 
 // Import Angular Classes
@@ -48,18 +48,18 @@ export class SummaryChartRenderer {
 	public viewConfig: ViewConfig = <ViewConfig>{};
 
 	// d3 Selections:
-	public chart: d3.Selection<any>;						// The 'g' element that contains all the elements making up the summary chart.
-	public outline: d3.Selection<any>;						// The 'rect' element that outlines the summary chart.
-	public rowsContainer: d3.Selection<any>;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any>;							// The selection of all 'g' elements s.t. each element is a row container.
-	public cells: d3.Selection<any>;						// The selection of all 'g' elements s.t. each element is a cell container.
-	public userScores: d3.Selection<any>;					// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public scoreTotalsContainer: d3.Selection<any>;			// The 'g' element that holds the containers for user score text elements.
-	public scoreTotalsSubContainers: d3.Selection<any>;		// The selection of 'g' elements that hold the user score text elements. There is one container per cell.
-	public scoreTotals: d3.Selection<any>;					// The selection of 'text' elements used to display the total utility of each alternative for each user.
-	public utilityAxisContainer: d3.Selection<any>;			// The 'g' element that holds the optional utility (y) axis that can be displayed to the left of the summary chart. 
-	public alternativeBoxesContainer: d3.Selection<any>;	// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any>;				// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
+	public chart: d3.Selection<any, any, any, any>;						// The 'g' element that contains all the elements making up the summary chart.
+	public outline: d3.Selection<any, any, any, any>;						// The 'rect' element that outlines the summary chart.
+	public rowsContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public rows: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a row container.
+	public cells: d3.Selection<any, any, any, any>;						// The selection of all 'g' elements s.t. each element is a cell container.
+	public userScores: d3.Selection<any, any, any, any>;					// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public scoreTotalsContainer: d3.Selection<any, any, any, any>;			// The 'g' element that holds the containers for user score text elements.
+	public scoreTotalsSubContainers: d3.Selection<any, any, any, any>;		// The selection of 'g' elements that hold the user score text elements. There is one container per cell.
+	public scoreTotals: d3.Selection<any, any, any, any>;					// The selection of 'text' elements used to display the total utility of each alternative for each user.
+	public utilityAxisContainer: d3.Selection<any, any, any, any>;			// The 'g' element that holds the optional utility (y) axis that can be displayed to the left of the summary chart. 
+	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;	// The 'g' element that holds the alternative boxes.
+	public alternativeBoxes: d3.Selection<any, any, any, any>;				// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
 
 	// Misc. Fields:
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
@@ -91,7 +91,7 @@ export class SummaryChartRenderer {
 						creating a summary chart for the first time, but not when updating as the basic framework of the chart never needs to be
 						constructed again.
 	*/
-	createSummaryChart(el: d3.Selection<any>, rows: RowData[]): void {
+	createSummaryChart(el: d3.Selection<any, any, any, any>, rows: RowData[]): void {
 
 		// Create the base container for the chart.
 		this.chart = el.append('g')
@@ -135,7 +135,7 @@ export class SummaryChartRenderer {
 						chart rows by removing and adding rows to conform to the structure of the rows parameter. It also updates summary chart cells through a call to createSummaryChartCells.
 						Updating cells should ALWAYS be done through a call to this method, rather than by directly calling createSummaryChartCells.
 	*/
-	createSummaryChartRows(rowsContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, scoreTotalsContainer: d3.Selection<any>, rows: RowData[]): void {
+	createSummaryChartRows(rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>, rows: RowData[]): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
 		var updateRows = rowsContainer.selectAll('.' + this.defs.ROW)
 			.data(rows);
@@ -195,7 +195,7 @@ export class SummaryChartRenderer {
 						of users assigned to each cell in the row data. Row data cannot be assigned in this method, which is why cells and user scores should ALWAYS be updated by calling createSummaryChartRows,
 						 rather than this method.
 	*/
-	createSummaryChartCells(stackedBarRows: d3.Selection<any>): void {
+	createSummaryChartCells(stackedBarRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
 		var updateCells = stackedBarRows.selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; });
@@ -238,19 +238,19 @@ export class SummaryChartRenderer {
 		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
 
 		// Update the data behind the cells.
-		var cellsToUpdate: d3.Selection<any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
+		var cellsToUpdate: d3.Selection<any, any, any, any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
 
 		// Update the data behind the user scores.
-		var userScoresToUpdate: d3.Selection<any> = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
+		var userScoresToUpdate: d3.Selection<any, any, any, any> = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 		// Update the data behind the alternative boxes.
-		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+		var alternativeBoxesToUpdate: d3.Selection<any, any, any, any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
 			.data(alternatives);
 
 		// Update the data behind the score totals.
-		var scoreTotalsToUpdate: d3.Selection<any> = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+		var scoreTotalsToUpdate: d3.Selection<any, any, any, any> = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; })
 			.selectAll('.' + this.defs.SCORE_TOTAL)
 			.data((d: CellData) => { return d.userScores; });
@@ -321,7 +321,7 @@ export class SummaryChartRenderer {
 	*/
 	renderUtilityAxis(viewOrientation: string): void {
 		// Create the linear scale that the utility axis will represent.
-		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
+		var uilityScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 100])	// The domain of the utility axis is from 0 to 100.
 
 
@@ -352,7 +352,7 @@ export class SummaryChartRenderer {
 						containers because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 						Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should called to re-render objective rows.
 	*/
-	renderSummaryChartRows(alternativeBoxes: d3.Selection<any>, scoreTotals: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
+	renderSummaryChartRows(alternativeBoxes: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		// Give dimensions to the alternative boxes so that each one completely covers on alternative column. Position them exactly above those columns. This is so that they can be the targets of any user clicks on top of those columns.
 		alternativeBoxes
 			.attr(this.viewConfig.dimensionOne, (d: CellData, i: number) => { return this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives(); })
@@ -385,7 +385,7 @@ export class SummaryChartRenderer {
 						for each alternative. Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should 
 						called to re-render objective rows.
 	*/
-	renderScoreTotalLabels(scoreTotals: d3.Selection<any>, viewOrientation: string): void {
+	renderScoreTotalLabels(scoreTotals: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 
 		var verticalOffset: number = 15;
 		var horizontalOffset: number = 10;
@@ -426,7 +426,7 @@ export class SummaryChartRenderer {
 		var bestTotalScoreSelections: any = {};
 		this.chart.selectAll('.' + this.defs.SCORE_TOTAL).nodes().forEach((element: Element) => {
 			if (element.nodeName === 'text') {
-				let selection: d3.Selection<any> = d3.select(element);
+				let selection: d3.Selection<any, any, any, any> = d3.select(element);
 				let userScore: UserScoreData = selection.datum();
 				let scoreValue: number = this.calculateTotalScore(userScore);
 				if (scoreValue > maxUserScores[userScore.user.getUsername()]) {
@@ -451,7 +451,7 @@ export class SummaryChartRenderer {
 						called to re-render objective rows.
 
 	*/
-	renderSummaryChartCells(cells: d3.Selection<any>, userScores: d3.Selection<any>, viewOrientation: string): void {
+	renderSummaryChartCells(cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		// Position each row's cells next to each other in the row.  
 		cells
 			.attr('transform', (d: CellData, i: number) => {

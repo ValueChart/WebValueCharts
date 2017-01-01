@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:02:00
+* @Last Modified time: 2016-12-31 21:55:55
 */
 
 // Import Angular Classes:
@@ -39,15 +39,15 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// ========================================================================================
 
 	// d3 Selections:
-	public pointsContainer: d3.Selection<any>;				// The 'g' element that contains the 'circle' elements used as points in the scatter plot.
-	public plottedPoints: d3.Selection<any>;				// The 'circle' elements used as points in the scatter plot.
-	public linesContainer: d3.Selection<any>;				// The 'g' element that contains the 'line' elements used as fitlines between points in the scatter plot. 
-	public fitLines: d3.Selection<any>;						// The 'line' elements used as fitlines between points in the scatter plot. 
-	public pointLabelContainer: d3.Selection<any>;			// The 'g' element that contains the 'text' elements used to labels points in the scatter plot with their scores.
-	public pointLabels: d3.Selection<any>;					// The 'text' elements used to labels points in the scatter plot with their scores.
+	public pointsContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'circle' elements used as points in the scatter plot.
+	public plottedPoints: d3.Selection<any, any, any, any>;				// The 'circle' elements used as points in the scatter plot.
+	public linesContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'line' elements used as fitlines between points in the scatter plot. 
+	public fitLines: d3.Selection<any, any, any, any>;						// The 'line' elements used as fitlines between points in the scatter plot. 
+	public pointLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the 'text' elements used to labels points in the scatter plot with their scores.
+	public pointLabels: d3.Selection<any, any, any, any>;					// The 'text' elements used to labels points in the scatter plot with their scores.
 
 	// The linear scale used to translate from scores to pixel coordinates. This is used to determine the locations of the points and fitlines.
-	private heightScale: d3.Linear<number, number>;
+	private heightScale: d3.ScaleLinear<number, number>;
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
@@ -91,7 +91,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
 
@@ -125,7 +125,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createContinuousPlotElements(pointsContainer: d3.Selection<any>, linesContainer: d3.Selection<any>, labelsContainer: d3.Selection<any>, objective: PrimitiveObjective): void {
+	createContinuousPlotElements(pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
 			.data((d: UserDomainElements) => { return d.elements; })
@@ -178,7 +178,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 						This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
 
 		this.renderContinuousPlot(objective, usersDomainElements, viewOrientation);

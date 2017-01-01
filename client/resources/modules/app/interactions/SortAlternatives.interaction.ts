@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-31 18:07:03
+* @Last Modified time: 2016-12-31 21:42:14
 */
 
 // Import Angular Classes:
@@ -71,16 +71,16 @@ export class SortAlternativesInteraction {
 
 
 	// Fields for sorting alternatives manually - Please see ReorderObjectivesInteraction for more information.
-	private cellsToMove: d3.Selection<any>;
-	private alternativeBox: d3.Selection<any>;
-	private alternativeLabelToMove: d3.Selection<any>;
-	private totalScoreLabelToMove: d3.Selection<any>;
+	private cellsToMove: d3.Selection<any, any, any, any>;
+	private alternativeBox: d3.Selection<any, any, any, any>;
+	private alternativeLabelToMove: d3.Selection<any, any, any, any>;
+	private totalScoreLabelToMove: d3.Selection<any, any, any, any>;
 
 	private alternativeDimensionOneSize: number;
 	private minCoordOne: number;
 	private maxCoordOne: number;
 	private totalCoordOneChange: number;
-	private siblingBoxes: d3.Selection<any>;
+	private siblingBoxes: d3.Selection<any, any, any, any>;
 
 	private currentAlternativeIndex: number;
 	private newAlternativeIndex: number;
@@ -187,7 +187,7 @@ export class SortAlternativesInteraction {
 	private sortByObjective = (eventObject: Event) => {
 		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
-		var objective: Objective = (<any>eventObject.target).__data__.objective;
+		var objective: Objective = (<any> d3.select(<any> eventObject.target).datum()).objective;
 		var objectivesToReorderBy: PrimitiveObjective[];
 		if (objective.objectiveType === 'abstract') {
 			objectivesToReorderBy = (<AbstractObjective>objective).getAllPrimitiveSubObjectives();
@@ -231,7 +231,7 @@ export class SortAlternativesInteraction {
 
 		this.siblingBoxes.nodes().forEach((alternativeBox: Element) => {
 			if (alternativeBox !== undefined) {
-				let selection: d3.Selection<any> = d3.select(alternativeBox);
+				let selection: d3.Selection<any, any, any, any> = d3.select(alternativeBox);
 				let jumpPoint: number = (+selection.attr(this.summaryChartRenderer.viewConfig.dimensionOne) / 2) + +selection.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
 				this.jumpPoints.push(jumpPoint);
 			}
@@ -269,7 +269,7 @@ export class SortAlternativesInteraction {
 		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
-			var cellSelection: d3.Selection<any> = d3.select(cell);
+			var cellSelection: d3.Selection<any, any, any, any> = d3.select(cell);
 			var previousTransform: string = cellSelection.attr('transform');
 			cellSelection.attr('transform', this.renderConfigService.incrementTransform(previousTransform, deltaCoordOne, 0));
 		});

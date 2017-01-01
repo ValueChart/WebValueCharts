@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 14:53:31
+* @Last Modified time: 2016-12-31 21:53:40
 */
 
 // Import Angular Classes:
@@ -98,7 +98,7 @@ export class ResizeWeightsInteraction {
 
 				// Calculate the correct weight increment.
 				var totalWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getWeightTotal();
-				var labelDatum: LabelData = d3.select(eventObject.target).datum();
+				var labelDatum: LabelData = <any> d3.select(<any> eventObject.target).datum();
 				var previousWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 				var percentChange: number = ((pumpType === 'increase') ? 0.01 : -0.01);
 				var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
@@ -121,7 +121,7 @@ export class ResizeWeightsInteraction {
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
 	public toggleDragToResizeWeights(resizeType: string): void {
-		var dragToResizeWeights: d3.Drag<{}> = d3.drag();
+		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
 		this.resizeType = resizeType;
 		if (resizeType !== 'none') {
 			dragToResizeWeights
@@ -144,8 +144,8 @@ export class ResizeWeightsInteraction {
 		@description 	Helper function for toggleDragToResizeWeights that uses a recursive strategy to turn on the 
 						desired type of dragging to resize weights for all labels in the label area.
 	*/
-	private toggleResizingForSublabels(labelSpaces: d3.Selection<any>, dragToResizeWeights: d3.Drag<{}>, resizeType: string) {
-		var labelDividers: d3.Selection<any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
+	private toggleResizingForSublabels(labelSpaces: d3.Selection<any, any, any, any>, dragToResizeWeights: d3.DragBehavior<any, any, any>, resizeType: string) {
+		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
 			return (resizeType !== 'none') ? (this.renderConfigService.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
@@ -157,7 +157,7 @@ export class ResizeWeightsInteraction {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
 
-			let subLabelSpaces: d3.Selection<any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
+			let subLabelSpaces: d3.Selection<any, any, any, any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
 				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, resizeType);	// Toggle dragging for the sub labels.
@@ -180,9 +180,9 @@ export class ResizeWeightsInteraction {
 		// Use the dimensionTwo scale to convert the drag distance to a change in weight.
 		var deltaWeight: number = this.labelRenderer.viewConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.labelRenderer.viewConfig.coordinateTwo]);
 
-		var container: d3.Selection<any> = d3.select('#label-' + d.objective.getId() + '-container');
+		var container: d3.Selection<any, any, any, any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
-		var parentContainer: d3.Selection<any> = d3.select('#label-' + parentName + '-container');
+		var parentContainer: d3.Selection<any, any, any, any> = d3.select('#label-' + parentName + '-container');
 		var siblings: LabelData[] = (<LabelData>parentContainer.datum()).subLabelData;
 
 		// Run inside the angular zone so that change detection is triggered.

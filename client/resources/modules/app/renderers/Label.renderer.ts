@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:02:26
+* @Last Modified time: 2016-12-31 21:35:11
 */
 
 // Import Angular Classes:
@@ -55,10 +55,10 @@ export class LabelRenderer {
 	public viewConfig: ViewConfig = <ViewConfig>{};
 
 	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
-	public rootContainer: d3.Selection<any>;				// The 'g' element that is the root container of the Label area.
-	public labelSpaceOutline: d3.Selection<any>;			// The 'rect' element that is the outline of the label area.
-	public labelContainer: d3.Selection<any>;				// The 'g' element that contains the hierarchical label structure.
-	public scoreFunctionContainer: d3.Selection<any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
+	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the Label area.
+	public labelSpaceOutline: d3.Selection<any, any, any, any>;			// The 'rect' element that is the outline of the label area.
+	public labelContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the hierarchical label structure.
+	public scoreFunctionContainer: d3.Selection<any, any, any, any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
 	// space that the label area is rendered in.
@@ -101,7 +101,7 @@ export class LabelRenderer {
 						the label area must be destroyed and reconstructed. This is partly because assigning different data to a label may change the number of children it has,
 						which requires a complete change in the structure of SVG elements.
 	*/
-	createLabelSpace(el: d3.Selection<any>, labelData: LabelData[], objectiveData: PrimitiveObjective[]): void {
+	createLabelSpace(el: d3.Selection<any, any, any, any>, labelData: LabelData[], objectiveData: PrimitiveObjective[]): void {
 		// Create the root container which will hold all label related SVG elements.
 		this.rootContainer = el.append('g')
 			.classed(this.defs.ROOT_CONTAINER, true)
@@ -142,9 +142,9 @@ export class LabelRenderer {
 						be used to update the existing label area to have a different structure. Instead, the label area must be deleted and rebuilt using createLabelSpace.
 						This method should NOT be called manually.
 	*/
-	createLabels(el: d3.Selection<any>, labelContainer: d3.Selection<any>, labelData: LabelData[], parentName: string): void {
+	createLabels(el: d3.Selection<any, any, any, any>, labelContainer: d3.Selection<any, any, any, any>, labelData: LabelData[], parentName: string): void {
 		// Create a new container for each element in labelData.
-		var newLabelContainers: d3.Selection<any> = labelContainer.selectAll('g[parent=' + parentName + ']')
+		var newLabelContainers: d3.Selection<any, any, any, any> = labelContainer.selectAll('g[parent=' + parentName + ']')
 			.data(labelData)
 			.enter().append('g')
 			.classed(this.defs.LABEL_SUBCONTAINER, true)
@@ -215,7 +215,7 @@ export class LabelRenderer {
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
 		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
-		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
+		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
 		if (this.displayScoreFunctions) {
 			// Render the score function plots.
@@ -264,7 +264,7 @@ export class LabelRenderer {
 		var labelSpaces = this.rootContainer.selectAll('g[parent="' + this.defs.ROOT_CONTAINER_NAME + '"]');
 		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
 
-		var scoreFunctionContainer: d3.Selection<any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
+		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
 		// Render or hide the score function pots depending on the value of the displayScoreFunctions attribute on the ValueChartDirective.
 		if (this.displayScoreFunctions) {
@@ -289,7 +289,7 @@ export class LabelRenderer {
 						labels as well, allowing it to either update, or simply render the a label and its children. Note that this method should generally NOT
 						be called manually. Use updateLabelSpace if the goal is to update all labels, or renderLabelSpace if the label space must be rendered.
 	*/
-	renderLabels(labelSpaces: d3.Selection<any>, labelData: LabelData[], viewOrientation: string, isDataUpdate: boolean): void {
+	renderLabels(labelSpaces: d3.Selection<any, any, any, any>, labelData: LabelData[], viewOrientation: string, isDataUpdate: boolean): void {
 		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
 		var weightOffsets: number[] = [];
 		var weightSum: number = 0;	// The weight offset for the first objective at this level is 0.
@@ -309,7 +309,7 @@ export class LabelRenderer {
 		labelData.forEach((labelDatum: LabelData, index: number) => {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
-			let subLabelSpaces: d3.Selection<any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
+			let subLabelSpaces: d3.Selection<any, any, any, any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			let scaledWeightOffset: number = this.viewConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.renderConfigService.generateTransformTranslation(viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
@@ -329,7 +329,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the outlines of a set of sibling labels. 
 	*/
-	renderLabelOutline(labelOutlines: d3.Selection<any>, weightOffsets: number[], viewOrientation: string): void {
+	renderLabelOutline(labelOutlines: d3.Selection<any, any, any, any>, weightOffsets: number[], viewOrientation: string): void {
 		// Render the styles of the outline rectangle.
 
 		labelOutlines.style('fill', 'white')
@@ -356,7 +356,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the label text of a set of sibling labels. This includes rendering the name, weight (in percentage points), and best and worst elements.
 	*/
-	renderLabelText(labelTexts: d3.Selection<any>, weightOffsets: number[], viewOrientation: string): void {
+	renderLabelText(labelTexts: d3.Selection<any, any, any, any>, weightOffsets: number[], viewOrientation: string): void {
 
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
@@ -405,7 +405,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the dividers between a set of sibling labels. These dividers are used to implement clicking and dragging to change objective weights, and are the click targets.
 	*/
-	renderLabelDividers(labelDividers: d3.Selection<any>, weightOffsets: number[], viewOrientation: string): void {
+	renderLabelDividers(labelDividers: d3.Selection<any, any, any, any>, weightOffsets: number[], viewOrientation: string): void {
 
 		var calculateDimensionTwoOffset = (d: LabelData, i: number) => {
 			return this.viewConfig.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
@@ -428,10 +428,10 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
-	createScoreFunctions(scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {
+	createScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
 		this.scoreFunctionRenderers = {}
 
-		var newScoreFunctionPlots: d3.Selection<any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
+		var newScoreFunctionPlots: d3.Selection<any, any, any, any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(data)
 			.enter().append('g')
 			.classed(this.defs.SCORE_FUNCTION, true)
@@ -439,7 +439,7 @@ export class LabelRenderer {
 
 		// Use the ScoreFunctionRenderer to create each score function.
 		newScoreFunctionPlots.nodes().forEach((scoreFunctionPlot: Element) => {
-			var el: d3.Selection<any> = d3.select(scoreFunctionPlot);
+			var el: d3.Selection<any, any, any, any> = d3.select(scoreFunctionPlot);
 			var datum: PrimitiveObjective = el.data()[0];
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
@@ -461,11 +461,11 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Uses the ScoreFunctionRenderer and its subclasses to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	*/
-	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: d3.Selection<any>, data: PrimitiveObjective[]): void {
+	renderScoreFunctions(viewOrientation: string, scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
-		var el: d3.Selection<any>;
+		var el: d3.Selection<any, any, any, any>;
 		var datum: PrimitiveObjective;
 		var objectiveWeight: number;
 		var dimensionOneTransform: number;

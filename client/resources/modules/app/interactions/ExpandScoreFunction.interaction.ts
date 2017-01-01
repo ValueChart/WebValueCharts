@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 21:00:10
+* @Last Modified time: 2016-12-31 21:45:42
 */
 
 // Import Angular Classes:
@@ -116,7 +116,7 @@ export class ExpandScoreFunctionInteraction {
 
 	// This is defined as a field rather than a method to avoid creating a new scope.
 	private expandScoreFunction = (eventObject: Event) => {
-		var objective: PrimitiveObjective = d3.select(eventObject.target).datum();
+		var objective: PrimitiveObjective = <any> d3.select(<any> eventObject.target).datum();
 		this.openPopUp(this.valueChartService.getUsers(), objective);
 	}
 }

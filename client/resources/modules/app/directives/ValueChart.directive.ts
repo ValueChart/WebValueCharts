@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-30 18:56:38
+* @Last Modified time: 2016-12-31 21:35:16
 */
 
 // Import Angular Resources:
@@ -61,7 +61,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private interactionConfig: InteractionConfig = <any>{};	// Configuration options for user interactions.
 
 	// d3 Selections:
-	private el: d3.Selection<any>; 								// The SVG base element for the ValueChart.
+	private el: d3.Selection<any, any, any, any>; 								// The SVG base element for the ValueChart.
 
 	// Default Size of ValueChart components. These components are the: labels, objective chart, summary chart. 
 	private defaultChartComponentWidth: number;

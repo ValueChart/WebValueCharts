@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:16:48
+* @Last Modified time: 2016-12-31 21:44:39
 */
 
 // Require Node Libraries:
@@ -37,7 +37,7 @@ describe('WebSocket: /Host', () => {
 	var hostWebSocket: any;
 
 
-	before(function(done) {
+	before(function(done: any) {
 		user = request.agent('http://localhost:3000/');
 
 		JsonGroupHotel.name = 'TestHotel';
@@ -57,7 +57,7 @@ describe('WebSocket: /Host', () => {
 
 	describe('Opening the host connection', () => {
 
-		it('should send a message to the client confirming successful connection with the correct chart ID', (done) => {
+		it('should send a message to the client confirming successful connection with the correct chart ID', (done: any) => {
 			hostWebSocket = new WebSocket(hostUrl + chartId);
 			
 			hostWebSocket.onmessage = (msg: MessageEvent) => {
@@ -73,7 +73,7 @@ describe('WebSocket: /Host', () => {
 
 	describe('changing the userChangesAccepted setting', () => {
 		
-			it('should send a message to the client confirming the new status is false', (done) => {
+			it('should send a message to the client confirming the new status is false', (done: any) => {
 				hostWebSocket.onmessage = (msg: MessageEvent) => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
@@ -86,7 +86,7 @@ describe('WebSocket: /Host', () => {
 				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
 			});
 
-			it('should send a message to the client confirming the new status is true', (done) => {
+			it('should send a message to the client confirming the new status is true', (done: any) => {
 				hostWebSocket.onmessage = (msg: MessageEvent) => {
 					var hostMessage: HostMessage = JSON.parse(msg.data);
 
@@ -104,7 +104,7 @@ describe('WebSocket: /Host', () => {
 		var argile: User;
 		var argileJson: any;
 
-		before(function(done) {
+		before(function(done: any) {
 			argile = new User('Argile');
 			argile.setWeightMap(new WeightMap());
 			argile.setScoreFunctionMap(new ScoreFunctionMap());
@@ -118,7 +118,7 @@ describe('WebSocket: /Host', () => {
 		});	
 
 		context('when attempting to post a new user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: any) => {
 				user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect(403)
@@ -130,7 +130,7 @@ describe('WebSocket: /Host', () => {
 		});
 
 		context('when attempting to delete new user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: any) => {
 				user.delete('ValueCharts/' + chartId + '/users/Argile')
 					.set('Accept', 'application/json')
 						.expect(403)
@@ -142,7 +142,7 @@ describe('WebSocket: /Host', () => {
 		});
 
 		context('when attempting to modify a user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done) => {
+			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: any) => {
 				user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
 					.set('Accept', 'application/json')
 						.expect(403)
@@ -154,7 +154,7 @@ describe('WebSocket: /Host', () => {
 		});
 
 
-		after(function(done) {
+		after(function(done: any) {
 			hostWebSocket.onmessage = (msg: MessageEvent) => {
 				done();
 			};
@@ -175,7 +175,7 @@ describe('WebSocket: /Host', () => {
 			argileJson = JSON.parse(JSON.stringify(argile));
 		});	
 
-		it('should send a message to the client with the new user to notify it of the change', (done) => {
+		it('should send a message to the client with the new user to notify it of the change', (done: any) => {
 			// Add the user to the ValueChart:
 			user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
 					.set('Accept', 'application/json')
@@ -214,7 +214,7 @@ describe('WebSocket: /Host', () => {
 			argileJson.weightMap = JsonGroupHotel.users[0].weightMap;
 		});	
 
-		it('should send a message to the client with the modified user to notify it of the change', (done) => {
+		it('should send a message to the client with the modified user to notify it of the change', (done: any) => {
 			// Add the user to the ValueChart:
 			user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
 					.set('Accept', 'application/json')
@@ -245,7 +245,7 @@ describe('WebSocket: /Host', () => {
 
 	describe('Deleting a user from a hosted ValueChart', () => {
 
-		it('should send a message to the client with the deleted user\'s name to notify it of the change', (done) => {
+		it('should send a message to the client with the deleted user\'s name to notify it of the change', (done: any) => {
 			// Add the user to the ValueChart:
 			user.delete('ValueCharts/' + chartId + '/users/Argile')
 						.set('Accept', 'application/json')
@@ -267,14 +267,14 @@ describe('WebSocket: /Host', () => {
 
 	describe('Closing the host connection', () => {
 
-		it('should successfully terminate the connection', (done) => {
+		it('should successfully terminate the connection', (done: any) => {
 			hostWebSocket.close(1000);
 			done();
 		});
 	});
 
 
-	after(function(done) {
+	after(function(done: any) {
 		// Delete the ValueChart used for testing.
 		user.delete('ValueCharts/' + chartId)
 			.set('Accept', 'application/json')

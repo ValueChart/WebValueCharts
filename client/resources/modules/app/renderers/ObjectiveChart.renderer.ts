@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 13:04:24
+* @Last Modified time: 2016-12-31 21:55:01
 */
 
 // Import Angular Classes
@@ -49,19 +49,19 @@ export class ObjectiveChartRenderer {
 	public viewConfig: ViewConfig = <ViewConfig>{};
 
 	// d3 Selections:
-	public chart: d3.Selection<any>;							// The 'g' element that contains all the elements making up the objective chart.
-	public rowOutlinesContainer: d3.Selection<any>;				// The 'g' element that contains all the row outline elements
-	public rowOutlines: d3.Selection<any>;						// The selection of all 'rect' elements that are used outline each row.
-	public rowsContainer: d3.Selection<any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any>;								// The selection of 'g' elements s.t. each element is a row container.
-	public alternativeLabelsContainer: d3.Selection<any>;		// The 'g' element that contains the alternative labels.
-	public alternativeLabels: d3.Selection<any>;				// The selection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
-	public cells: d3.Selection<any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
-	public userScores: d3.Selection<any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public weightColumns: d3.Selection<any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
-	public objectiveDomainLabels: d3.Selection<any>;			// The selection of 'text' elements used to label what domain element each cell represents.
-	public alternativeBoxesContainer: d3.Selection<any>;		// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
+	public chart: d3.Selection<any, any, any, any>;							// The 'g' element that contains all the elements making up the objective chart.
+	public rowOutlinesContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains all the row outline elements
+	public rowOutlines: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements that are used outline each row.
+	public rowsContainer: d3.Selection<any, any, any, any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
+	public rows: d3.Selection<any, any, any, any>;								// The selection of 'g' elements s.t. each element is a row container.
+	public alternativeLabelsContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the alternative labels.
+	public alternativeLabels: d3.Selection<any, any, any, any>;				// The selection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
+	public cells: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
+	public userScores: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public weightColumns: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
+	public objectiveDomainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
+	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
+	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
 
 
 	// ========================================================================================
@@ -92,7 +92,7 @@ export class ObjectiveChartRenderer {
 						constructed again. Instead, call the createObjectiveRows method to add or remove rows, and user columns from the 
 						objective chart.
 	*/
-	createObjectiveChart(el: d3.Selection<any>, rows: RowData[]): void {
+	createObjectiveChart(el: d3.Selection<any, any, any, any>, rows: RowData[]): void {
 		// Create the root container for the objective chart.
 		this.chart = el.append('g')
 			.classed(this.defs.CHART, true);
@@ -128,7 +128,7 @@ export class ObjectiveChartRenderer {
 						cells and user score bars via createObjectiveCell. ONLY this method should be used to add/remove rows, cells, and user score bars to objective chart
 						when objectives, alternatives, or user are added/removed from the ValueChart. createObjectiveRows should NOT be manually called. 
 	*/
-	createObjectiveRows(rowsContainer: d3.Selection<any>, rowOutlinesContainer: d3.Selection<any>, boxesContainer: d3.Selection<any>, alternativeLabelsContainer: d3.Selection<any>, rows: RowData[]): void {
+	createObjectiveRows(rowsContainer: d3.Selection<any, any, any, any>, rowOutlinesContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, alternativeLabelsContainer: d3.Selection<any, any, any, any>, rows: RowData[]): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
 		var updateRowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE)
 			.data(rows);
@@ -189,7 +189,7 @@ export class ObjectiveChartRenderer {
 						It will add and delete cells and user score bars so that the objective chart is properly configured to its background data. Note that his method should NEVER be called directly
 						to updated to objective chart cells and user scores bars as it provides no way of setting the background data. createObjectiveRows should ALWAYS be used instead.
 	*/
-	createObjectiveCells(objectiveRows: d3.Selection<SVGGElement>): void {
+	createObjectiveCells(objectiveRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
 		var updateCells = objectiveRows.selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; });
@@ -263,7 +263,7 @@ export class ObjectiveChartRenderer {
 		var alternativeLabelsToUpdate = this.alternativeLabels.data(this.valueChartService.getAlternatives());
 
 		// Update the data behind the alternative boxes.
-		var alternativeBoxesToUpdate: d3.Selection<any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+		var alternativeBoxesToUpdate: d3.Selection<any, any, any, any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
 			.data(this.valueChartService.getAlternatives());
 
 		// Update the data behind the cells.
@@ -328,7 +328,7 @@ export class ObjectiveChartRenderer {
 						position the row containers here because the positions of the scores (and therefore row containers) are are absolute. (no stacking).
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartRows(rowOutlines: d3.Selection<any>, rows: d3.Selection<any>, alternativeLabels: d3.Selection<any>, alternativeBoxes: d3.Selection<any>, cells: d3.Selection<any>, userScores: d3.Selection<any>, weightColumns: d3.Selection<any>, viewOrientation: string): void {
+	renderObjectiveChartRows(rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightColumns: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		rowOutlines
 			.attr('transform', (d: RowData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(viewOrientation, 0, (this.viewConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
@@ -377,7 +377,7 @@ export class ObjectiveChartRenderer {
 		@description	Positions and gives widths + heights to the elements created by createObjectiveCells.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartCells(cells: d3.Selection<any>, userScores: d3.Selection<any>, weightColumns: d3.Selection<any>, viewOrientation: string): void {
+	renderObjectiveChartCells(cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightColumns: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		cells
 			.attr('transform', (d: CellData, i: number) => {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i);
@@ -409,7 +409,7 @@ export class ObjectiveChartRenderer {
 		@description	Positions and gives widths + heights to the elements to 'rect' elements used to display user score bars in the objective chart.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderUserScores(userScores: d3.Selection<any>, viewOrientation: string): void {
+	renderUserScores(userScores: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		userScores
 			.style('fill', (d: UserScoreData, i: number) => {
 				if (this.valueChartService.isIndividual())
@@ -443,7 +443,7 @@ export class ObjectiveChartRenderer {
 						displayed for group ValueCharts.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderWeightColumns(weightColumns: d3.Selection<any>, viewOrientation: string): void {
+	renderWeightColumns(weightColumns: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 		var calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
 			let weightDimensionTwoOffset: number = 2;
 			let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:02:55
+* @Last Modified time: 2016-12-31 21:56:09
 */
 
 // Import Angular Classes:
@@ -42,14 +42,14 @@ export abstract class ScoreFunctionRenderer {
 	protected usersDomainElements: UserDomainElements[];		// The data that this class is rendering. 
 
 	// d3 Selections:
-	public rootContainer: d3.Selection<any>;				// The 'g' element that is the root container of the score function plot.
-	public plotOutline: d3.Selection<any>;					// The 'rect' element that is used to outline the score function plot
-	public plotContainer: d3.Selection<any>;				// The 'g' element that contains the plot itself.
-	public domainLabelContainer: d3.Selection<any>;			// The 'g' element that contains the labels for each domain element. 
-	public domainLabels: d3.Selection<any>;					// The selection of 'text' elements s.t. each element is a label for one domain element.
-	public plotElementsContainer: d3.Selection<any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
-	public userContainers: d3.Selection<any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
-	public axisContainer: d3.Selection<any>;				// The 'g' element that conntains the y and x axis.
+	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the score function plot.
+	public plotOutline: d3.Selection<any, any, any, any>;					// The 'rect' element that is used to outline the score function plot
+	public plotContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the plot itself.
+	public domainLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the labels for each domain element. 
+	public domainLabels: d3.Selection<any, any, any, any>;					// The selection of 'text' elements s.t. each element is a label for one domain element.
+	public plotElementsContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
+	public userContainers: d3.Selection<any, any, any, any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
+	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
 
 	// View Configuration Fields:
 	protected viewConfig: any = {};							// The viewConfig object for this renderer. It is not configured using the renderConfigService because this class has
@@ -108,7 +108,7 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
 						sub classes of this class should call createScoreFunction before creating any of their specific elements.
 	*/
-	createScoreFunction(el: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createScoreFunction(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
 		this.usersDomainElements = usersDomainElements.slice();
@@ -150,7 +150,7 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the axes of a score function plot, both x and y, and creates the utility axis labels. 
 						Note that the domain labels are created in createPlot because they are data dependent.
 	*/
-	createScoreFunctionAxis(plotContainer: d3.Selection<any>, objectiveId: string): void {
+	createScoreFunctionAxis(plotContainer: d3.Selection<any, any, any, any>, objectiveId: string): void {
 
 		this.axisContainer = plotContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.AXES_CONTAINER, true)
@@ -189,7 +189,7 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the user containers, which will contain each users plot elements, and the domain labels for the domain element axis. 
 						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
 	*/
-	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId = objective.getId();
 		// Create the user containers. Each user should have one 'g' element that will hold the elements of its plot. Elements refers to bars, points, fit lines, etc.
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
@@ -275,7 +275,7 @@ export abstract class ScoreFunctionRenderer {
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
 						the axes elements should be done as part of a call to renderScoreFunction instead.
 	*/
-	renderScoreFunctionAxis(axisContainer: d3.Selection<any>, viewOrientation: string): void {
+	renderScoreFunctionAxis(axisContainer: d3.Selection<any, any, any, any>, viewOrientation: string): void {
 
 		// Position the domain axis.
 		axisContainer.select('.' + ScoreFunctionRenderer.defs.DOMAIN_AXIS)
@@ -296,7 +296,7 @@ export abstract class ScoreFunctionRenderer {
 		}
 
 		// Create the new Scale for use creating the utility axis.
-		var uilityScale: d3.Linear<number, number> = d3.scaleLinear()
+		var uilityScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 1])
 
 		// Calculate the correct height of the utility axis.
@@ -336,7 +336,7 @@ export abstract class ScoreFunctionRenderer {
 						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
 						the entire score function plot. Note that parameters not actively used in this method are used in the extended methods of the subclasses.
 	*/
-	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 
 		this.domainSize = usersDomainElements[0].elements.length;
 

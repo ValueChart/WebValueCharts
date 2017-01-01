@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-30 18:49:44
+* @Last Modified time: 2016-12-31 21:40:09
 */
 
 // Import Angular Classes:
@@ -426,7 +426,7 @@ export class ValueChartViewerComponent implements OnInit {
 			.classed('alternative-link', true);
 
 		$('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
-			var selection: d3.Selection<any> = d3.select(eventObject.target);
+			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);
 			this.expandAlternative(selection.datum());
 		});
 	};

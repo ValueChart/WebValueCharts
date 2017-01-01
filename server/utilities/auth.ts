@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 22:13:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 18:18:16
+* @Last Modified time: 2016-12-31 22:58:19
 */
 
 // Import Libraries and Express Middleware:
@@ -53,7 +53,7 @@ var localAuthentication = (username: string, password: string, req: express.Requ
 
 // Configure Serialization for User Sessions:
 
-Passport.serializeUser(function(user, done) {
+Passport.serializeUser(function(user: any, done: any) {
 	done(null, user._id);
 });
 

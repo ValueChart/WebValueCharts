@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:02:13
+* @Last Modified time: 2016-12-31 21:56:10
 */
 
 // Import Angular Classes:
@@ -42,14 +42,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// ========================================================================================
 
 	// d3 Selections:
-	public barContainer: d3.Selection<any>;				// The 'g' element that contains the 'rect' elements used as bars in the plot.
-	public utilityBars: d3.Selection<any>;				// The selection of 'rect' elements used as bars in the plot. There should be one per user per domain element. 
-	public barTops: d3.Selection<any>;					// The selection of 'rect' elements used as the filled tops of bars in the plot. These are for implementing clicking and dragging to change a score function.
-	public barLabelContainer: d3.Selection<any>;		// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
-	public barLabels: d3.Selection<any>;				// The selection of 'text' elements used as score labels for bars.
+	public barContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'rect' elements used as bars in the plot.
+	public utilityBars: d3.Selection<any, any, any, any>;				// The selection of 'rect' elements used as bars in the plot. There should be one per user per domain element. 
+	public barTops: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements used as the filled tops of bars in the plot. These are for implementing clicking and dragging to change a score function.
+	public barLabelContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
+	public barLabels: d3.Selection<any, any, any, any>;				// The selection of 'text' elements used as score labels for bars.
 
 	// The linear scale used to translate from scores to pixel coordinates. This is used to determine the dimensions of the bars.
-	private heightScale: d3.Linear<number, number>;
+	private heightScale: d3.ScaleLinear<number, number>;
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
@@ -89,7 +89,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(plotElementsContainer: d3.Selection<any>, domainLabelContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createPlot(plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		// Call the create plot method in ScoreFunctionRenderer. This will create the user containers and create the domain labels.
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
 
@@ -115,7 +115,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createDiscretePlotElements(barsContainer: d3.Selection<any>, labelsContainer: d3.Selection<any>, objective: PrimitiveObjective) {
+	createDiscretePlotElements(barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
 			.data((d: UserDomainElements) => { return d.elements; })
@@ -162,7 +162,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderPlot(domainLabels: d3.Selection<any>, plotElementsContainer: d3.Selection<any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+	renderPlot(domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 		// Use the super class' method to render position domain labels.
 		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
 
