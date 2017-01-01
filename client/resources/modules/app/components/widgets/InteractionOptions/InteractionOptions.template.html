@@ -1,0 +1,104 @@
+<div class="form-group valuechart-toolbar-group pull-right">
+				<div class="dropdown" id="alternatives-menu">
+					<button class="btn btn-default dropdown-toggle" type="button" id="alternatives-dropdown" data-toggle="dropdown"
+					aria-haspopup="true" aria-expanded="true">
+					Alternatives
+					<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="alternatives-dropdown">
+						<li class="dropdown dropdown-submenu">
+							<a href="javascript:void(0)"
+								type="button" id="alternative-sort-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+								Sort Alternatives
+							</a>
+							<ul class="dropdown-menu " aria-labelledby="alternative-sort-dropdown">
+								<li>
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_OBJECTIVE)">
+										Objective Score
+										<span *ngIf="config.sortAlternatives === ALTERNATIVE_SORT_OBJECTIVE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_ALPHABET)">
+										Alphabetically
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_MANUAL)">
+										Manually
+										<span *ngIf="config.sortAlternatives === ALTERNATIVE_SORT_MANUAL" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_RESET)">
+										Reset Order
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="form-group valuechart-toolbar-group pull-right">
+				<div class="dropdown" id="objectives-menu">
+					<button class="btn btn-default dropdown-toggle" type="button" id="objectives-dropdown" data-toggle="dropdown"
+					aria-haspopup="true" aria-expanded="true">
+					Objectives
+					<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="objectives-dropdown">
+						<li class="dropdown dropdown-submenu" *ngIf="chartType === 'individual'">
+							<a href="javascript:void(0)" id="pump-dropdown" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="true">
+								Pump Weights
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="pump-dropdown">
+								<li>
+									<a href="javascript:void(0)" (click)="setPumpType(PUMP_INCREASE)">
+										Inflate
+										<span *ngIf="config.pumpWeights === PUMP_INCREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0)" (click)="setPumpType(PUMP_DECREASE)">
+										Deflate
+										<span *ngIf="config.pumpWeights === PUMP_DECREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="dropdown dropdown-submenu" *ngIf="chartType === 'individual'">
+							<a href="javascript:void(0)" id="weightResizeType-dropdown" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="true">
+								Weight Resize Strategy
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="weightResizeType-dropdown">
+								<li [class.disabled]="config.weightResizeType === RESIZE_NEIGHBOR">
+									<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_NEIGHBOR)">
+										Adjacent Only
+										<span *ngIf="config.weightResizeType === RESIZE_NEIGHBOR" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+								<li [class.disabled]="config.weightResizeType === RESIZE_SIBLINGS">
+									<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_SIBLINGS)">
+										All
+										<span *ngIf="config.weightResizeType === RESIZE_SIBLINGS" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="toggleReorderObjectives(!config.reorderObjectives)">
+								Reorder Objectives
+								<span *ngIf="config.reorderObjectives" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="toggleSetObjectiveColors(!config.setObjectiveColors)">
+								Set Objective Colors
+								<span *ngIf="config.setObjectiveColors" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>

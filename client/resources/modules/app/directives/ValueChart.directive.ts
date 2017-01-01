@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 14:53:32
+* @Last Modified time: 2016-12-30 18:56:38
 */
 
 // Import Angular Resources:
@@ -42,7 +42,7 @@ import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Types:
 import { RowData, CellData, LabelData }											from '../../../types/RendererData.types';
-import { InteractionConfig }													from '../../../types/Config.types';
+import { ViewConfig, InteractionConfig }										from '../../../types/Config.types';
 
 @Directive({
 	selector: 'ValueChart',
@@ -497,15 +497,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 
 // inputs: ['data', 							// The data to be rendered. Must be an instance of the ValueChart class.
-// 		'orientation',							// The orientation of the rendered ValueChart. Must be the string "vertical" or "horizontal".
 // 		'width',								// The width of the area in which to render the ValueChart. Must be a number.
 // 		'height',								// The height of the area in which to render the ValueChart. Must be a number.
-// 		'weightResizeType',						// The type of objective weight resizing that is accomplished by dragging label dividers. Must be one of the strings: 'neighbor' or 'siblings', or 'none'. 'neighbor' sets dragging label dividers to change the weights of only objectives adjacent to the divider. 'siblings' sets dragging label dividers to change the weights of all the objectives at that level with the same parent (i.e. siblings). 'none' disables dragging to change objective weights.
-// 		'reorderObjectives',					// Toggle for dragging to reorder objectives. True enables objectives to be reordered by clicking and dragging. Must be a boolean.
-// 		'sortAlternatives',						// Type of sorting for alternatives. Must be one of the strings: 'manual', 'objective', 'alphabet', 'reset', or 'none'. 'manual' sets alternative sorting to be accomplished manually by clicking and dragging alternatives. 'objective' sets alternative sorting to be by objective score, which is accomplished by clicking on the objective to sort by. Note that clicking on the root objective sorts by total score. 'reset' resets the alternative order to be the original order, and can be used to undo user driven changes to the ordering.'none' turns off alternative sorting.
-// 		'pumpWeights',							// Toggle for the pump tool. Must be one of the strings: 'increase', 'decrease', or 'none'. 'increase' sets clicking on objectives to increase their weights, 'decrease' to 'decrease' their weights, and 'none' to do nothing.
-// 		'setObjectiveColors']					// Toggle clicking on objectives to open a color picker for changing their colors. Must be a boolean.
-
+// 		'viewConfig',							// Options for configuring the ValueChart's appearance. Must be of type ViewConfig.
+// 		'interactions',							// Options for configuring enabled and disabled interactions. Must be of type InteractionConfig. 
 
 	// ========================================================================================
 	// 								Input Variable Binding Methods
@@ -541,41 +536,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// View Options:
 
-	// Binds to the directive attribute 'displayScoreFunctions', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives displayScoreFunctions attribute.
-	@Input() set viewConfig(config: any) {
+	// Binds to the directive attribute 'viewConfig', and is automatically called before ngOnInit. 
+	// The variable 'config' is whatever was input to the directives viewConfig attribute.
+	@Input() set viewConfig(config: ViewConfig) {
 		this.renderConfigService.viewConfig = config;
 	}
 
 	// Interaction Options:
 
-	// Binds to the directive attribute 'weightResizeType', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives weightResizeType attribute.
-	@Input() set weightResizeType(value: any) {
-		this.interactionConfig.weightResizeType = <string>value;
-	}
-
-	// Binds to the directive attribute 'reorderObjectives', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives reorderObjectives attribute.
-	@Input() set reorderObjectives(value: any) {
-		this.interactionConfig.reorderObjectives = <boolean>value;
-	}
-
-	// Binds to the directive attribute 'sortAlternatives', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives sortAlternatives attribute.
-	@Input() set sortAlternatives(value: any) {
-		this.interactionConfig.sortAlternatives = <string>value;
-	}
-
-	// Binds to the directive attribute 'pumpWeights', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives pumpWeights attribute.
-	@Input() set pumpWeights(value: any) {
-		this.interactionConfig.pumpWeights = <string>value;
-	}
-
-	// Binds to the directive attribute 'setObjectiveColors', and is automatically called upon before ngOnInit. 
-	// The variable 'value' is whatever was input to the directives setObjectiveColors attribute.
-	@Input() set setObjectiveColors(value: any) {
-		this.interactionConfig.setObjectiveColors = <boolean>value;
+	// Binds to the directive attribute 'interactions', and is automatically called before ngOnInit. 
+	// The variable 'config' is whatever was input to the directives interactions attribute.
+	@Input() set interactions(config: InteractionConfig) {
+		this.interactionConfig = config;
 	}
 }

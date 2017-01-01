@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:15:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 13:40:30
+* @Last Modified time: 2016-12-31 15:42:43
 */
 
 
@@ -21,6 +21,7 @@ import { RegisterComponent }					from './components/Register/Register.component'
 import { HomeComponent }						from './components/Home/Home.component';
 import { ValueChartViewerComponent }			from './components/ValueChartViewer/ValueChartViewer.component';
 import { ViewOptionsComponent }					from './components/widgets/ViewOptions/ViewOptions.component';
+import { InteractionOptionsComponent }			from './components/widgets/InteractionOptions/InteractionOptions.component';
 import { AccountComponent }						from './components/Account/Account.component';
 import { MyValueChartsComponent }				from './components/MyValueCharts/MyValueCharts.component';
 import { ScoreFunctionViewerComponent }			from './components/ScoreFunctionViewer/ScoreFunctionViewer.component';
@@ -58,6 +59,7 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 		HomeComponent,
 		ValueChartViewerComponent,
 		ViewOptionsComponent,
+		InteractionOptionsComponent,
 		AccountComponent,
 		MyValueChartsComponent,
 		ScoreFunctionViewerComponent,

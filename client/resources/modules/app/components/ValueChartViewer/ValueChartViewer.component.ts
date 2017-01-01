@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 15:03:59
+* @Last Modified time: 2016-12-30 18:49:44
 */
 
 // Import Angular Classes:
@@ -15,6 +15,7 @@ import * as d3 																	from 'd3';
 
 // Import Application Classes:
 import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
+import { InteractionOptionsComponent }											from '../widgets/InteractionOptions/InteractionOptions.component'
 
 import { ValueChartDirective }													from '../../directives/ValueChart.directive';
 
@@ -50,7 +51,7 @@ import { Alternative } 															from '../../../../model/Alternative';
 import { PrimitiveObjective } 													from '../../../../model/PrimitiveObjective';
 
 // Import Types:
-import { ViewConfig }															from '../../../../types/Config.types';
+import { ViewConfig, InteractionConfig }										from '../../../../types/Config.types';
 					
 
 /*
@@ -97,23 +98,6 @@ export class ValueChartViewerComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	// Pump Sorting Values:
-	private PUMP_OFF: string = 'none';
-	private PUMP_DECREASE: string = 'decrease';
-	private PUMP_INCREASE: string = 'increase';
-
-	// Alternative Sorting Values:
-	private ALTERNATIVE_SORT_MANUAL: string = 'manual';
-	private ALTERNATIVE_SORT_OBJECTIVE: string = 'objective';
-	private ALTERNATIVE_SORT_ALPHABET: string = 'alphabet';
-	private ALTERNATIVE_SORT_RESET: string = 'reset';
-	private ALTERNATIVE_SORT_OFF: string = 'none';
-
-	// Weight Resizing Values:
-	private RESIZE_NEIGHBOR: string = 'neighbor';
-	private RESIZE_SIBLINGS: string = 'siblings';
-	private NO_RESIZING: string = 'none';
-
 	private valueChartWidth: number;
 	private valueChartHeight: number;
 
@@ -124,14 +108,9 @@ export class ValueChartViewerComponent implements OnInit {
 
 	valueChart: ValueChart;
 
+	// ValueChart Configuration:
 	viewConfig: ViewConfig = <any> {};
-
-	// ValueChart Interactions Configuration:
-	weightResizeType: string;
-	reorderObjectives: boolean;
-	sortAlternatives: string;
-	pumpWeights: string;
-	setObjectiveColors: boolean;
+	interactionConfig: InteractionConfig = <any> {};
 
 	// Detail Box 
 	detailBoxAlternativeTab: string;
@@ -196,7 +175,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.valueChart = this.valueChartService.getValueChart();
 
-		this.initInteractions();
 		this.initDetailBox();
 
 		if (!this.currentUserService.isJoiningChart()) {
@@ -218,12 +196,8 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 	}
 
-	initInteractions() {
-		this.weightResizeType = (this.valueChart.isIndividual()) ? this.RESIZE_NEIGHBOR : this.NO_RESIZING;
-		this.reorderObjectives = false;
-		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.pumpWeights = this.PUMP_OFF;
-		this.setObjectiveColors = false;
+	updateInteractions(interactionConfig: InteractionConfig) {
+		this.interactionConfig = interactionConfig;
 	}
 
 	initDetailBox() {
@@ -388,7 +362,7 @@ export class ValueChartViewerComponent implements OnInit {
 			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
 			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
 		}
-		
+
 		alternativeDetailBox.style.left = 60 + 'px';
 
 		if (this.viewConfig.viewOrientation === 'horizontal') {
@@ -466,54 +440,5 @@ export class ValueChartViewerComponent implements OnInit {
 
 	redoChartChange(): void {
 		this.chartUndoRedoService.redo(this.valueChartService);
-	}
-
-	// ================================ Handlers for User Interaction Controls ====================================
-
-	setWeightResizeType(resizeType: string): void {
-		this.weightResizeType = resizeType;
-	}
-
-
-	toggleReorderObjectives(newVal: boolean): void {
-		this.reorderObjectives = newVal;
-
-		// Turn off all other interactions.
-		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.pumpWeights = this.PUMP_OFF;
-		this.setObjectiveColors = false;
-	}
-
-	toggleSortAlternatives(sortType: string): void {
-		this.sortAlternatives = (this.sortAlternatives === sortType && (sortType === this.ALTERNATIVE_SORT_OBJECTIVE || sortType === this.ALTERNATIVE_SORT_MANUAL)) ? this.ALTERNATIVE_SORT_OFF : sortType;
-
-		if (sortType === this.ALTERNATIVE_SORT_ALPHABET || sortType === this.ALTERNATIVE_SORT_RESET) {
-			window.setTimeout(() => {
-				this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-			}, 10);
-		}
-
-		// Turn off all other interactions.
-		this.reorderObjectives = false;
-		this.pumpWeights = this.PUMP_OFF;
-		this.setObjectiveColors = false;
-	}
-
-	setPumpType(pumpType: string): void {
-		this.pumpWeights = (this.pumpWeights === pumpType) ? this.PUMP_OFF : pumpType;
-
-		// Turn off all other interactions.
-		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.reorderObjectives = false;
-		this.setObjectiveColors = false;
-	}
-
-	toggleSetObjectiveColors(newVal: boolean): void {
-		this.setObjectiveColors = newVal;
-
-		// Turn off all other interactions.
-		this.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.reorderObjectives = false;
-		this.pumpWeights = this.PUMP_OFF;
 	}
 }
