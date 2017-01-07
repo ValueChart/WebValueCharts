@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-30 18:30:53
+* @Last Modified time: 2017-01-06 21:24:45
 */
 
 // Import Angular Classes:
-import { Component, Output }													from '@angular/core';
+import { Component, Output, Input }												from '@angular/core';
 import { OnInit }																from '@angular/core';
 import { EventEmitter }															from '@angular/core';
 
@@ -25,6 +25,8 @@ export class ViewOptionsComponent implements OnInit {
 	@Output() viewConfig = new EventEmitter<ViewConfig>();
 	private config: ViewConfig;
 
+	@Input() chartType: string;
+
 	constructor() { }
 
 	ngOnInit() {
@@ -34,7 +36,8 @@ export class ViewOptionsComponent implements OnInit {
 			displayTotalScores: true,
 			displayScales: false,
 			displayDomainValues: false,
-			displayScoreFunctionValueLabels: false
+			displayScoreFunctionValueLabels: false,
+			displayAverageScoreLines: false
 		}
 		this.updateViewConfig(this.config);
 	}
@@ -70,6 +73,10 @@ export class ViewOptionsComponent implements OnInit {
 	setDisplayScoreFunctionValueLabels(newVal: boolean): void {
 		this.config.displayScoreFunctionValueLabels = newVal;
 		this.updateViewConfig(this.config);
+	}
+	setDisplayAverageScoreLines(newVal: boolean): void {
+		this.config.displayAverageScoreLines = newVal;
+		this.updateViewConfig;
 	}
 
 }

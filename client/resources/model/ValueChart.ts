@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 12:58:32
+* @Last Modified time: 2017-01-06 21:19:37
 */
 	
 // Import Model Classes:
@@ -288,119 +288,6 @@ export class ValueChart {
 
 		return maximumWeightMap;
 	}
-
-
-	// ================== TODO: Delete all methods below this point. ==================== \\
-
-	/*
-		@returns {ValueChart} - A ValueChart with one user, whose ScoreFunctions and WeightMap are averages of the users in the current ValueChart. 
-		@description	Computes the average user of the current ValueChart by averaging their weights and scores separately. The name of the average 
-						ValueChart is the name of the current ValueChart, but with ' Average' added to it. This method is most often used to determine the 
-						average of a group ValueChart for rendering by the ValueChartDirective.
-	*/
-	getAverageValueChart(): ValueChart {
-		var averageValueChart: ValueChart = new ValueChart(this.name + ' Average', this.description, this.creator, [this.getAverageUser()]);
-		averageValueChart.setRootObjectives(this.rootObjectives);
-		averageValueChart.setAlternatives(this.alternatives);
-		return averageValueChart;
-	}
-
-	/*
-		@returns {User} - A user whose ScoreFunctions and WeightMap are averages of the users in the current ValueChart. 
-		@description	Computes the average user of the current ValueChart by averaging their weights and scores separately. The name of the average 
-						user is 'AverageUser'. This method is most often used to determine the average of a user for averaging a group ValueChart.
-	*/
-	getAverageUser(): User {
-		var averageUser: User = new User('Average User');
-
-		if (this.users.length === 1) {
-			averageUser = new User("AverageUser");
-			averageUser.setWeightMap(this.users[0].getWeightMap());
-			averageUser.setScoreFunctionMap(this.users[0].getScoreFunctionMap());
-			return;
-		}
-
-		averageUser = new User("AverageUser");
-		averageUser.setWeightMap(this.calculateAverageWeightMap());
-		averageUser.setScoreFunctionMap(this.calculateAverageScoreFunctionMap());
-
-		return averageUser;
-	}
-
-	/*
-		@returns {WeightMap} - A WeightMap that is an average of the WeightMaps of the users in the current ValueChart. 
-		@description	Computes the average weight of each objective in the ValueChart by iterating over each user's WeightMap.
-	*/
-	calculateAverageWeightMap(): WeightMap {
-		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
-		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
-		var averageWeightMap = new WeightMap();
-
-		this.users.forEach((user: User) => {
-			let normalizedUserWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-			for (var i = 0; i < normalizedUserWeights.length; i++) {
-				combinedWeights[i] += normalizedUserWeights[i];
-			}
-		});
-
-		for (var i = 0; i < primitiveObjectives.length; i++) {
-			let averageWeight = combinedWeights[i] / this.users.length;
-			averageWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), averageWeight);
-		}
-		return averageWeightMap;
-	}
-
-	/*
-		@returns {ScoreFunctionMap} - A ScoreFunctionMap whose ScoreFunctions are averages of the ScoreFunctions of the users in the current ValueChart. 
-		@description	Computes the average ScoreFunction for each objective in the ValueChart by iterating over each user's ScoreFunction for that objective.
-						These ScoreFunctions are then assigned to a new ScoreFuntionMap that is returned.
-	*/
-	calculateAverageScoreFunctionMap(): ScoreFunctionMap {
-		var averageScoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
-		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
-
-		primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-			let scoreFunctions: ScoreFunction[] = [];
-			this.users.forEach((user: User) => {
-				let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-				scoreFunctions.push(scoreFunction);
-			});
-			let averageScoreFunction = this.calculateAverageScoreFunction(scoreFunctions, objective);
-			averageScoreFunctionMap.setObjectiveScoreFunction(objective.getName(), averageScoreFunction);
-		});
-
-		return averageScoreFunctionMap;
-	}
-
-	/*
-		@param scoreFunctions - An array of ScoreFunctions that are to be averaged into a new ScoreFunction. These score functions must be for the given objective.
-		@param objective - A PrimitiveObjective whose ScoreFunctions are to be averaged. 
-		@returns {ScoreFunctionMap} - A ScoreFunction that is an average of the given ScoreFunction
-		@description	Computes the average ScoreFunction for the given objective in the ValueChart by iterating over the given ScoreFunction, which must be for that objective.
-	*/
-	calculateAverageScoreFunction(scoreFunctions: ScoreFunction[], objective: PrimitiveObjective): ScoreFunction {
-		var averageScoreFunction: ScoreFunction;
-		if (objective.getDomainType() === 'continuous') {
-			averageScoreFunction = new ContinuousScoreFunction();
-		} else {
-			averageScoreFunction = new DiscreteScoreFunction();
-		}
-
-		var elements: (string | number)[] = scoreFunctions[0].getAllElements();
-
-		elements.forEach((element: string | number) => {
-			let scoreTotal: number = 0;
-
-			scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
-				scoreTotal += scoreFunction.getScore(element);
-			});
-
-			averageScoreFunction.setElementScore(element, (scoreTotal / scoreFunctions.length));
-		});
-
-		return averageScoreFunction;
-	}
-
 }
 
 

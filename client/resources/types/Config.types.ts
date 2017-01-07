@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-13 13:46:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 14:39:27
+* @Last Modified time: 2017-01-06 21:22:19
 */
 
 export interface InteractionConfig {
@@ -20,4 +20,5 @@ export interface ViewConfig {
 	displayScales: boolean;
 	displayTotalScores: boolean;
 	displayScoreFunctionValueLabels: boolean;
+	displayAverageScoreLines: boolean;
 }

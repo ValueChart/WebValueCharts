@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-23 12:03:10
+* @Last Modified time: 2017-01-06 23:42:25
 */
 
 // Import Angular Classes:
@@ -39,7 +39,6 @@ export class ChangeDetectionService {
 	public previousInteractionConfig: InteractionConfig = <any>{};	// Old values of the interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
 	public previousWidth: number;									// The old width. Its should equal the width in ValueChartDirective unless a change has taken place.
 	public previousHeight: number;									// The old height. Its should equal the height in ValueChartDirective unless a change has taken place.
-	public previousOrientation: string;								// The old view orientation. Its should equal the orientation in ValueChartDirective unless a change has taken place.
 	public previousNumUsers: number;								// The old number of users. Its should equal the number of users in the ValueChart in the ValueChartDirective unless a change has taken place.
 
 	// Differ classes for checking the data inputs for changes:
@@ -110,12 +109,14 @@ export class ChangeDetectionService {
 		@returns {void}
 		@description	Initialize the previousViewConfig object.
 	*/
-	initPreviousViewConfig(viewConfig: any): void {
+	initPreviousViewConfig(viewConfig: ViewConfig): void {
+		this.previousViewConfig.viewOrientation = viewConfig.viewOrientation;
 		this.previousViewConfig.displayScoreFunctions = viewConfig.displayScoreFunctions;
 		this.previousViewConfig.displayDomainValues = viewConfig.displayDomainValues;
 		this.previousViewConfig.displayScales = viewConfig.displayScales;
 		this.previousViewConfig.displayTotalScores = viewConfig.displayTotalScores;
-		this.previousViewConfig.displayScoreFunctionValueLabels = viewConfig.displayScoreFunctionValueLabels
+		this.previousViewConfig.displayScoreFunctionValueLabels = viewConfig.displayScoreFunctionValueLabels;
+		this.previousViewConfig.displayAverageScoreLines = viewConfig.displayAverageScoreLines;
 	}
 
 	/*

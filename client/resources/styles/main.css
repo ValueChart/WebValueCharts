@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 14:45:43
+* @Last Modified time: 2017-01-06 23:46:48
 */
 
 /* Global Styles */
@@ -261,6 +261,12 @@ a.upload {
 .objective-weight-outline {
     fill: transparent;
     stroke: red;
+    stroke-width: 3px;
+}
+
+.summary-averageline {
+    fill: transparent;
+    stroke: #23b708;
     stroke-width: 3px;
 }
 

@@ -50,6 +50,12 @@
 								<span *ngIf="config.displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 							</a>
 						</li>
+						<li *ngIf="chartType === 'group'">
+							<a href="javascript:void(0)" (click)="setDisplayAverageScoreLines(!config.displayAverageScoreLines)">
+								Score Averages
+								<span *ngIf="config.displayAverageScoreLines" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
 						<li>
 							<a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!config.displayScoreFunctionValueLabels)">
 								Score Labels

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 12:55:18
+* @Last Modified time: 2017-01-06 21:16:48
 */
 
 // Import Angular Classes:
@@ -111,6 +111,24 @@ export class RendererDataService {
 
 		this.generateLabelData();
 		return this.labelData;
+	}
+
+
+	// ================================ Methods for Parsing Scores From Data  ====================================
+
+	calculateNormalizedTotalScore = (d: UserScoreData) => {
+		var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+		var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
+		return (score + d.offset) / d.user.getWeightMap().getWeightTotal();
+	};
+
+	calculateAverageScore = (d: CellData) => {
+		var totalScore: number = 0;
+		d.userScores.forEach((userScore: UserScoreData) => {
+			totalScore += (this.calculateNormalizedTotalScore(userScore));
+		});
+
+		return (totalScore / d.userScores.length);
 	}
 
 	// ================================ Data Creation and Update Methods  ====================================

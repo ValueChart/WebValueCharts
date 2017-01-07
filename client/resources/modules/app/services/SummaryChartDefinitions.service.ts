@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-05 15:13:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-05 16:36:44
+* @Last Modified time: 2017-01-03 18:18:06
 */
 
 import { Injectable } 												from '@angular/core';
@@ -25,8 +25,11 @@ export class SummaryChartDefinitions {
 
 	SCORE_TOTAL_CONTAINER: string = 'summary-scoretotals-container';
 	SCORE_TOTAL_SUBCONTAINER: string = 'summary-scoretotal-subcontainer';
-	SCORE_TOTAL: string = 'summary-score-total';
+	SCORE_TOTAL: string = 'summary-scoretotal';
 	BEST_SCORE: string = 'best-score-label';
+
+	AVERAGE_LINES_CONTAINER: string = 'summary-averagelines-container';
+	AVERAGE_LINE: string = 'summary-averageline';
 
 	UTILITY_AXIS_CONTAINER: string = 'summary-utilityaxis-container';
 

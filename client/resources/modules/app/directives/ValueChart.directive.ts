@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:35:16
+* @Last Modified time: 2017-01-06 23:43:09
 */
 
 // Import Angular Resources:
@@ -202,7 +202,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.changeDetectionService.initDiffers(this.valueChart);
 
 		// Init change detection for the view configuration:
-		this.changeDetectionService.previousOrientation = this.renderConfigService.viewConfig.viewOrientation;
 		this.changeDetectionService.previousWidth = this.chartWidth;
 		this.changeDetectionService.previousHeight = this.chartHeight;
 		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfig);
@@ -324,8 +323,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	detectViewConfigChanges(): void {
 		// Change for and handle changes to the orientation.
-		if (this.changeDetectionService.previousOrientation !== this.renderConfigService.viewConfig.viewOrientation) {
-			this.changeDetectionService.previousOrientation = this.renderConfigService.viewConfig.viewOrientation;
+		if (this.changeDetectionService.previousViewConfig.viewOrientation !== this.renderConfigService.viewConfig.viewOrientation) {
+			this.changeDetectionService.previousViewConfig.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
 			this.updateViewOrientation();
 		}
 		// Change for and handle changes to the width and height of the ValueChart.
@@ -362,6 +361,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.renderConfigService.viewConfig.displayScoreFunctionValueLabels !== this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels) {
 			this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels = this.renderConfigService.viewConfig.displayScoreFunctionValueLabels;
 			this.labelRenderer.toggleScoreFunctionValueLabels();
+		}
+
+		if (this.renderConfigService.viewConfig.displayAverageScoreLines !== this.changeDetectionService.previousViewConfig.displayAverageScoreLines) {
+			this.changeDetectionService.previousViewConfig.displayAverageScoreLines = this.renderConfigService.viewConfig.displayAverageScoreLines;
+			this.summaryChartRenderer.toggleAverageLines();
 		}
 	}
 

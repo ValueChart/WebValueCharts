@@ -45,7 +45,7 @@
 				</button>
 			</div>
 			<div class="col-xs-1 pull-right"></div>
-			<ViewOptions (viewConfig)="updateView($event)"></ViewOptions>
+			<ViewOptions [chartType]="(this.valueChart.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
 			<InteractionOptions [chartType]="(this.valueChart.isIndividual() ? 'individual' : 'group')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
