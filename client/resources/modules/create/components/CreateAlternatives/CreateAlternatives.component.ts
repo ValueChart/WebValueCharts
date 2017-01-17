@@ -227,7 +227,7 @@ export class CreateAlternativesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff every Altenrativehas a name that contains at least one character
+		@description 	Returns true iff every Alternative has a name that contains at least one character
 						and only alphanumeric characters, spaces, hyphens, and underscores.
 	*/
 	allNamesValid(): boolean {
@@ -250,7 +250,7 @@ export class CreateAlternativesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff a value has been set/selected in evern Objective column for every Alternative.
+		@description 	Returns true iff a value has been set/selected in every Objective column for every Alternative.
 	*/
 	allObjectivesHaveValues(): boolean {
 		for (let altID of this.altKeys()) {

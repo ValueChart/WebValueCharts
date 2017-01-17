@@ -131,24 +131,19 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {void}
-		@description 	Navigates to previous step if validation of current step succeeds.
+		@description 	Navigates to previous step
 						Update ValueChart in database unless changes were made by a new user that is joining a group chart.
 						(In this case, the user gets added to the chart in the database after the final submission.)
 						browserTriggered indicates whether or not navigation was triggered by browser controls.
-						If it was and navigation does not go through, we need to fix the navigation history.			
+						(Parameter currently unused in this method.)			
 	*/
 	back(browserTriggered = false) {
-		if (this.creationStepsService.validate()) {
-			this.autoSaveValueChart(this.valueChart);
-			this.creationStepsService.allowedToNavigateInternally = true;
-			this.creationStepsService.previous(this.purpose);				
+		if (!this.creationStepsService.validate()) {
+			(<any>this.valueChartService.getValueChart()).incomplete = true;
 		}
-		else {
-			toastr.error('There were problems with your submission. Please fix them to proceed.');
-			if (browserTriggered) {
-				history.forward();
-			}
-		}
+		this.autoSaveValueChart(this.valueChart);
+		this.creationStepsService.allowedToNavigateInternally = true;
+		this.creationStepsService.previous(this.purpose);				
 	}
 
 	/* 	
@@ -276,12 +271,9 @@ export class CreateValueChartComponent implements OnInit {
 		else {
 			if (navigate) {
 				if (keepValueChart) {
-					if (this.creationStepsService.validate()) {
-						this.saveOnDestroy = true;
-					}
-					else {
-						navigate = false;
-						toastr.error("There were problems with your submission. Please fix them if you'd like to save the chart.");
+					this.saveOnDestroy = true;
+					if (!this.creationStepsService.validate()) {
+						(<any>this.valueChartService.getValueChart()).incomplete = true;
 					}
 				}
 				else if (this.valueChart._id) {
