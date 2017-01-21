@@ -183,9 +183,21 @@ export class ValueChart {
 	}
 
 	/*
+		@returns {string[]} - An array of the names of all objectives in the ValueChart. This array is NOT ordered.	
+		@description	Parses the ValueChart's hierarchical objective structure to find every objective's name.
+	*/
+	getAllObjectivesByName(): string[] {
+		var primObj: string[] = [];
+		for (var obj of this.getAllObjectives()) {
+			primObj.push(obj.getName());
+		}
+		return primObj;
+	}
+
+	/*
 		@returns {string[]} - An array of the names of all primitive objectives in the ValueChart. This array is NOT ordered.	
 		@description	Parses the ValueChart's hierarchical objective structure to find every primitive objective's name.
-						This method is used surprisingly useful considering WeightMaps, ScoreFunctionMaps, and alternatives use
+						This method is surprisingly useful considering WeightMaps, ScoreFunctionMaps, and alternatives use
 						objective names as keys.
 	*/
 	getAllPrimitiveObjectivesByName(): string[] {

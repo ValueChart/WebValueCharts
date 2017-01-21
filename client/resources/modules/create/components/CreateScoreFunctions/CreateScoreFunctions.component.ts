@@ -153,7 +153,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   /*   
    @returns {void}
-   @description   Sets badScoreFunctions to contain names of all Objective whoses ScoreFunctions are invalid.
+   @description   Sets badScoreFunctions to contain names of all Objectives whose ScoreFunctions are invalid.
                   Currently, it simply checks where each ScoreFunctions has distinct best and worst outcome scores.
  */
   setBadScoreFunctions(): void {
