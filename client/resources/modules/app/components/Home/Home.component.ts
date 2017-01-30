@@ -96,7 +96,7 @@ export class HomeComponent {
 						This method will be removed when demonstration charts are removed from the home page.
 	*/
 	selectDemoValueChart(demoChart: any): void {
-		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
+		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString), true);
 		this.currentUserService.setJoiningChart(false);
 		var parameters = this.valueChartService.getValueChartName();
 		this.router.navigate(['/view/', parameters]);

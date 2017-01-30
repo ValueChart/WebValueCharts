@@ -6,7 +6,7 @@
 */
 
 export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts creator="Aaron Mishkin" name="Hotel" version="2.0">
+<ValueCharts creator="Aaron Mishkin" name="Hotel" password="password" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
@@ -103,7 +103,7 @@ export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalon
 			</Weights>
 			<ScoreFunctions>
 				<ScoreFunction objective="area" type="discrete">
-					<Score domain-element="nightlife" value="0.25"/>
+					<Score domain-element="nightlife" value="0.0"/>
 					<Score domain-element="beach" value="0.5"/>
 					<Score domain-element="airport" value="1"/>
 				</ScoreFunction>
@@ -119,7 +119,7 @@ export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalon
 					<Score domain-element="237.5" value="0.8"/>
 					<Score domain-element="275" value="0.6"/>
 					<Score domain-element="312.5" value="0.4"/>
-					<Score domain-element="350" value="0.2"/>
+					<Score domain-element="350" value="0.0"/>
 				</ScoreFunction>
 				<ScoreFunction objective="internet-access" type="discrete">
 					<Score domain-element="none" value="0"/>
@@ -142,7 +142,7 @@ export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalon
 
 
 export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts creator="Aaron" name="Hotel" version="2.0">
+<ValueCharts creator="Aaron" name="Hotel" password="password" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
@@ -239,7 +239,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 			</Weights>
 			<ScoreFunctions>
 				<ScoreFunction objective="area" type="discrete">
-					<Score domain-element="nightlife" value="0.25"/>
+					<Score domain-element="nightlife" value="0.0"/>
 					<Score domain-element="beach" value="0.5"/>
 					<Score domain-element="airport" value="1"/>
 				</ScoreFunction>
@@ -255,7 +255,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 					<Score domain-element="237.5" value="0.8"/>
 					<Score domain-element="275" value="0.6"/>
 					<Score domain-element="312.5" value="0.4"/>
-					<Score domain-element="350" value="0.2"/>
+					<Score domain-element="350" value="0.0"/>
 				</ScoreFunction>
 				<ScoreFunction objective="internet-access" type="discrete">
 					<Score domain-element="none" value="0"/>
@@ -281,7 +281,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 			</Weights>
 			<ScoreFunctions>
 				<ScoreFunction objective="area" type="discrete">
-					<Score domain-element="nightlife" value="0.25"/>
+					<Score domain-element="nightlife" value="0.0"/>
 					<Score domain-element="beach" value="0.5"/>
 					<Score domain-element="airport" value="1"/>
 				</ScoreFunction>
@@ -290,7 +290,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 					<Score domain-element="3" value="0.8"/>
 					<Score domain-element="5" value="0.6"/>
 					<Score domain-element="7" value="0.4"/>
-					<Score domain-element="9" value="0.2"/>
+					<Score domain-element="9" value="0.0"/>
 				</ScoreFunction>
 				<ScoreFunction objective="size" type="continuous">
 					<Score domain-element="200" value="0"/>
@@ -353,7 +353,7 @@ export var waterManagement: string = `<?xml version="1.0" encoding="UTF-8" stand
 						<ContinuousValue x="6.0" y="0.4"/>
 						<ContinuousValue x="8.0" y="0.3"/>
 						<ContinuousValue x="10.0" y="0.2"/>
-						<ContinuousValue x="12.0" y="0.15"/>
+						<ContinuousValue x="12.0" y="0.0"/>
 					</Domain>
 				</Criterion>
 			</Criterion>
