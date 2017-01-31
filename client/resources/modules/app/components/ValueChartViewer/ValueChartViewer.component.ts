@@ -129,6 +129,9 @@ export class ValueChartViewerComponent implements OnInit {
 	$: JQueryStatic;
 
 
+	// This gets set each time the "Remove" button for a user is clicked
+	// The user will be removed from chart upon confirmation
+	userToRemove: User;
 
 	// ========================================================================================
 	// 									Constructor

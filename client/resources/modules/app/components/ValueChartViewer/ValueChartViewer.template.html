@@ -3,7 +3,7 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !currentUserService.isJoiningChart()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
+				<a class="btn btn-default" *ngIf="valueChart.isIndividual() && !valueChartService.isDemo() && !currentUserService.isJoiningChart()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
 				Edit ValueChart
 				</a>
 			</div>
@@ -118,7 +118,7 @@
 					<h5>
 					{{user.getUsername()}}
 					<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-					<button class="pull-right btn btn-danger btn-xs btn-xxs" *ngIf="user.getUsername() !== currentUserService.getUsername()" (click)="removeUser(user)">Remove</button>
+					<button class="pull-right btn btn-danger btn-xs btn-xxs" *ngIf="user.getUsername() !== currentUserService.getUsername()" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
 					</h5>
 				</div>
 			</div>
@@ -133,4 +133,27 @@
 		[interactions]="interactionConfig">
 		</ValueChart>
 	</div>
+	<div class="modal fade" id="remove-user-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" id="close-remove-user-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-header">Remove User</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <h3>Are you sure you want to remove this user from the chart? (Their data will not be saved.)</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn btn-lg btn-success" (click)="removeUser(userToRemove)" data-dismiss="modal">OK</button>
+                            <button type="submit" class="btn btn-lg btn-danger" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

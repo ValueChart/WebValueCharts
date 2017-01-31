@@ -60,6 +60,8 @@ export class ValueChartService implements ValueChartStateContainer {
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
 															 // has been reset since they last did SMARTER
 
+	private demo: boolean;	// Is the current valueChart a demo chart
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -87,8 +89,9 @@ export class ValueChartService implements ValueChartStateContainer {
 	// ========================================================================================
 
 	// Initialize Service fields based on the passed-in ValueChart.
-	setValueChart(valueChart: ValueChart): void {
+	setValueChart(valueChart: ValueChart, isDemo: boolean = false): void {
 		this.valueChart = valueChart;
+		this.demo = isDemo;
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 	}
 
@@ -239,6 +242,10 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
+	isDemo() {
+		return this.demo;
+	}
+
 	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.
 
 	wasWeightMapReset(user: User) {
@@ -257,7 +264,6 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.initializeDefaultWeightMap(this.getRootObjectives(), weightMap, 1);
 		return weightMap;
 	}
-
 
 	// Recursively add entries to weight map
 	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {

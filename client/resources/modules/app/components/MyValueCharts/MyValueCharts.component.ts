@@ -120,7 +120,7 @@ export class MyValueChartsComponent implements OnInit {
 			});
 	}
 
-	openExportChartModal(chartId: string, password: string): void {
+	setValueChart(chartId: string, password: string): void {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
