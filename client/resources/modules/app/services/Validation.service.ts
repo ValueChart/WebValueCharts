@@ -36,8 +36,8 @@ import { ScoreFunctionRecord }								from '../../../types/Record.types';
 /*
 	This class validates a ValueChart object to ensure that the data adheres to certain rules.
 
-	TODO: Think of constraints that are built into create workflow that need to be checked here,
-		add undefined checks throughout, consider any problems that might arise from invalid keys, double check names
+	It assumes that all data model fields are defined.
+	It is the job of parsers to check that all required fields are present (e.g. every PrimitiveObjective has a Domain).
 */
 
 @Injectable()
