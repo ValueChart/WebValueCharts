@@ -1,16 +1,7 @@
-/*
-* @Author: aaronpmishkin
-* @Date:   2016-06-03 10:09:41
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 13:01:57
-*/
-
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core';
 
 // Import Application Classes:
-import { CurrentUserService }								from './CurrentUser.service';
-import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 import *	as Formatter									from '../../utilities/classes/Formatter';
 
 // Import Model Classes:
@@ -29,10 +20,6 @@ import { CategoricalDomain }								from '../../../model/CategoricalDomain';
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 import { IntervalDomain }									from '../../../model/IntervalDomain';
 
-// Import Type Definitions:
-import { ValueChartStateContainer }							from '../../../types/StateContainer.types';
-import { ScoreFunctionRecord }								from '../../../types/Record.types';
-
 /*
 	This class validates a ValueChart object to ensure that the data adheres to certain rules.
 
@@ -41,7 +28,7 @@ import { ScoreFunctionRecord }								from '../../../types/Record.types';
 */
 
 @Injectable()
-export class ValueChartService {
+export class ValidationService {
 
 	// ========================================================================================
 	// 									Fields
@@ -57,24 +44,23 @@ export class ValueChartService {
 	OBJECTIVE_NAMES_NOT_UNIQUE: string = "Objective names must be unique.";
 	OBJECTIVE_NAMES_INVALID: string = "The following Objective names contain disallowed characters: ";
 	CHILDLESS_ABSTRACT_OBJECTIVE: string = "Every parent Objective must have at least one child. Please fix the following Objectives: ";
-	CATEGORY_NAMES_NOT_UNIQUE: string = "Category names must be unique. Please fix the following Objectives: ";
 	CATEGORY_NAMES_INVALID: string = "Category names contain disallowed characters. Please change the following: ";
 	TOO_FEW_CATEGORIES: string = "Categorical domains must have at least two categories. Please fix the following Objectives: ";
-	CONT_DOMAIN_INCOMPLETE: string ="Continuous domains must have a min and a max. Please fix the following Objectives: "; 
-	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix the following Objectives: "; 
-	RANGE_INVALID: string = " Min must be less than max. Please fix the following Objectives: ";
+	CONT_DOMAIN_INCOMPLETE: string ="Continuous domains must have a min and a max. Please fix the following Objectives: ";
+	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix the following Objectives: ";
+	RANGE_INVALID: string = "Min must be less than max. Please fix the following Objectives: ";
 	INTERVAL_INVALID: string = "Interval must be greater than 0 and less than max - min. Please fix the following Objectives: ";
 	NO_ALTERNATIVES: string = "Chart must have at least one Alternative.";
 	ALTERNATIVE_NAMES_MISSING: string = "Every Alternative must have a name.";
 	ALTERNATIVE_NAMES_NOT_UNIQUE: string = "Alternative names must be unique.";
-	ALTERNATIVE_NAMES_INVALID: string = "Alternative names contain disallowed characters. Please change the following: ";
+	ALTERNATIVE_NAMES_INVALID: string = "The following Alternative names contain disallowed characters: ";
 	OBJECTIVE_OUTCOMES_MISSING: string = "You must select an outcome for every Objective on every Alternative. Please supply the following: ";
 	OBJECTIVE_OUTCOMES_INVALID: string = "Objective outcomes must fall within the specified range. Please fix the following: ";
-	SCORE_FUNCTIONS_MISSING: string = "Every user must define a score function for every Objective. The following users need to define the specified socre functions: ";
-	SCORE_FUNCTIONS_INCOMPLETE: string = "Every user must assign a score to every Objective outcome. The following users need to complete the specified score functions: ";
+	SCORE_FUNCTIONS_MISSING: string = "Every user must define a score function for every Objective. The following pairs are missing: ";
+	SCORE_FUNCTIONS_INCOMPLETE: string = "Every user must assign a score to every Objective outcome. The following pairs are incomplete: ";
 	SCORE_FUNCTION_VALUE_INVALID: string = "Score function values must be between 0 and 1. The following Users need to fix their score functions for the specified Objectives: ";
-	SCORE_FUNCTION_RANGE_INVALID: string = "The score function must assign score of 0 and 1 to the worst and best outcomes, respectively.  The following Users need to fix there score functions for the specified Objectives: ";
-	WEIGHTS_MISSING: string = "The following users need to set their weights for the specified Objectives: ";
+	SCORE_FUNCTION_RANGE_INVALID: string = "The score function must assign a score of 0 and 1 to the worst and best outcomes, respectively.  The following Users need to fix their score functions for the specified Objectives: ";
+	WEIGHTS_MISSING: string = "Every user must assign a weight to every Objective. The following pairs are missing: ";
 	WEIGHTS_SUM_INVALID: string = "A user's weights must sum to 1. The following users need to fix their weights: ";
 	WEIGHTS_RANGE_INVALID: string = "A user's weights must range from 0 to 1. The following users need to fix their weights: ";
 	ALLOWED_CHARACTERS: string = "(Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)";
@@ -99,8 +85,15 @@ export class ValueChartService {
 	// ========================================================================================
 
 	validate(valueChart: ValueChart): string[] {
+		return this.validateStructure(valueChart).concat(this.validateUsers(valueChart));
+	}
 
-		return this.validateBasicInfo(valueChart).concat(this.validateObjectives(valueChart), this.validateAlternatives(valueChart), this.validateScoreFunctions(valueChart));
+	validateStructure(valueChart: ValueChart): string[] {
+		return this.validateBasicInfo(valueChart).concat(this.validateObjectives(valueChart), this.validateAlternatives(valueChart));
+	}
+
+	validateUsers(valueChart: ValueChart): string[] {
+		return this.validateScoreFunctions(valueChart).concat(this.validateWeights(valueChart));
 	}
 
 	// ================================ Validate Basic Info ====================================
@@ -175,39 +168,35 @@ export class ValueChartService {
 		}
 		let invalidNames = this.invalidObjectiveNames(valueChart);
 		if (invalidNames.length > 0) {
-			errorMessages.push(this.OBJECTIVE_NAMES_INVALID.concat(invalidNames.join(','), this.ALLOWED_CHARACTERS));
+			errorMessages.push(this.OBJECTIVE_NAMES_INVALID.concat(invalidNames.join(', ')));
 		}
-		let childless = this.childlessAbstactObjectives(valueChart);
+		let childless = this.childlessAbstractObjectives(valueChart);
 		if (childless.length > 0) {
-			errorMessages.push(this.CHILDLESS_ABSTRACT_OBJECTIVE.concat(childless.join(',')));
-		}
-		let duplicateCats = this.duplicateCategories(valueChart);
-		if (duplicateCats.length > 0) {
-			errorMessages.push(this.CATEGORY_NAMES_NOT_UNIQUE.concat(duplicateCats.join(',')));
+			errorMessages.push(this.CHILDLESS_ABSTRACT_OBJECTIVE.concat(childless.join(', ')));
 		}
 		let invalidCats = this.invalidCategoryNames(valueChart);
 		if (invalidCats.length > 0) {
-			errorMessages.push(this.CATEGORY_NAMES_INVALID.concat(invalidCats.join(';'), this.ALLOWED_CHARACTERS));
+			errorMessages.push(this.CATEGORY_NAMES_INVALID.concat(invalidCats.join('; ')));
 		}
 		let tooFewCats = this.fewerThanTwoCategories(valueChart);
 		if (tooFewCats.length > 0) {
-			errorMessages.push(this.TOO_FEW_CATEGORIES.concat(tooFewCats.join(',')));
+			errorMessages.push(this.TOO_FEW_CATEGORIES.concat(tooFewCats.join(', ')));
 		}
 		let contIncomplete = this.continuousIncomplete(valueChart);
 		if (contIncomplete.length > 0) {
-			errorMessages.push(this.CONT_DOMAIN_INCOMPLETE.concat(contIncomplete.join(',')));
+			errorMessages.push(this.CONT_DOMAIN_INCOMPLETE.concat(contIncomplete.join(', ')));
 		}
 		let intervalIncomplete = this.intervalIncomplete(valueChart);
 		if (intervalIncomplete.length > 0) {
-			errorMessages.push(this.INTERVAL_DOMAIN_INCOMPLETE.concat(intervalIncomplete.join(',')));
+			errorMessages.push(this.INTERVAL_DOMAIN_INCOMPLETE.concat(intervalIncomplete.join(', ')));
 		}
 		let rangeInvalid = this.rangeInvalid(valueChart);
 		if (rangeInvalid.length > 0) {
-			errorMessages.push(this.RANGE_INVALID.concat(rangeInvalid.join(',')));
+			errorMessages.push(this.RANGE_INVALID.concat(rangeInvalid.join(', ')));
 		}
 		let intervalInvalid = this.intervalInvalid(valueChart);
 		if (intervalInvalid.length > 0) {
-			errorMessages.push(this.INTERVAL_INVALID.concat(intervalInvalid.join(',')));
+			errorMessages.push(this.INTERVAL_INVALID.concat(intervalInvalid.join(', ')));
 		}
 		return errorMessages;
 	}
@@ -258,26 +247,11 @@ export class ValueChartService {
 		@returns {string[]}
 		@description 	Returns the names of childless abstract Objectives.
 	*/
-	childlessAbstactObjectives(valueChart: ValueChart): string[] {
+	childlessAbstractObjectives(valueChart: ValueChart): string[] {
 		let objectives = [];
 		for (let obj of valueChart.getAllObjectives()) {
 			if (obj.objectiveType === 'abstract' && (<AbstractObjective>obj).getAllSubObjectives().length < 1)  {
 				objectives.push(obj.getName());
-			}
-		}
-		return objectives;
-	}
-
-	/* 	
-		@returns {string[]}
-		@description 	Returns the names of Objectives with duplicate categories.
-	*/
-	duplicateCategories(valueChart: ValueChart): string[] {
-		let objectives = [];
-		for (let obj of valueChart.getAllPrimitiveObjectives()) {
-			if (obj.getDomainType() === 'categorical' &&
-				(<CategoricalDomain>obj.getDomain()).getElements().length !== (new Set((<CategoricalDomain>obj.getDomain()).getElements())).size) {
-					objectives.push(obj.getName());
 			}
 		}
 		return objectives;
@@ -300,7 +274,7 @@ export class ValueChartService {
 				}
 			}
 			if (cats.length > 0) {
-				objectives.push(obj.getName() + ": " + cats.join(','));
+				objectives.push(obj.getName() + ": " + cats.join(', '));
 			}
 		}
 		return objectives;
@@ -406,15 +380,15 @@ export class ValueChartService {
 		}
 		let invalidNames = this.invalidAlternativeNames(valueChart);
 		if (invalidNames.length > 0) {
-			errorMessages.push(this.ALTERNATIVE_NAMES_INVALID.concat(invalidNames.join(','), this.ALLOWED_CHARACTERS));
+			errorMessages.push(this.ALTERNATIVE_NAMES_INVALID.concat(invalidNames.join(', ')));
 		}
 		let missingOutcomes = this.missingObjectiveOutcomes(valueChart);
 		if (missingOutcomes.length > 0) {
-			errorMessages.push(this.OBJECTIVE_OUTCOMES_MISSING.concat(missingOutcomes.join(';')));
+			errorMessages.push(this.OBJECTIVE_OUTCOMES_MISSING.concat(missingOutcomes.join('; ')));
 		}
-		let invalidOutcomes = this.missingObjectiveOutcomes(valueChart);
+		let invalidOutcomes = this.invalidOutcomes(valueChart);
 		if (invalidOutcomes.length > 0) {
-			errorMessages.push(this.OBJECTIVE_OUTCOMES_INVALID.concat(invalidOutcomes.join(';')));
+			errorMessages.push(this.OBJECTIVE_OUTCOMES_INVALID.concat(invalidOutcomes.join('; ')));
 		}
 		return errorMessages;
 	}
@@ -445,7 +419,11 @@ export class ValueChartService {
 		@description 	Returns true iff all Alternatives names are unique after converting to ID format.
 	*/
 	allAlternativeNamesUnique(valueChart: ValueChart): boolean {
-		let formattedNames = valueChart.getAllObjectivesByName().map(x => Formatter.nameToID(x));
+		let alternatives = [];
+		for (let alt of valueChart.getAlternatives()) {
+			alternatives.push(alt.getName());
+		}
+		let formattedNames = alternatives.map(x => Formatter.nameToID(x));
 		return formattedNames.length === (new Set(formattedNames)).size;
 	}
 
@@ -456,7 +434,7 @@ export class ValueChartService {
 	*/
 	invalidAlternativeNames(valueChart: ValueChart): string[] {
 		let alternatives = [];
-		let regex = new RegExp("^[\\s\\w-,.]+$");
+		let regex = new RegExp("^[\\s\\w-,.]*$");
 		for (let alt of valueChart.getAlternatives()) {
 			if (alt.getName().search(regex) === -1) {
 				alternatives.push(alt.getName());
@@ -472,14 +450,14 @@ export class ValueChartService {
 	missingObjectiveOutcomes(valueChart: ValueChart): string[] {
 		let alternatives = [];
 		for (let alt of valueChart.getAlternatives()) {
-			let objectives = [];
+			let objectives: string[] = [];
 			for (let objname of valueChart.getAllPrimitiveObjectivesByName()) {
 				if (alt.getObjectiveValue(objname) === undefined) {
-					alternatives.push(alt.getName());
+					objectives.push(objname);
 				}
 			}
 			if (objectives.length > 0) {
-				alternatives.push(alt.getName() + ": " + objectives.join(','));
+				alternatives.push(alt.getName() + ": " + objectives.join(', '));
 			}
 		}
 		return alternatives;
@@ -495,28 +473,30 @@ export class ValueChartService {
 			let objectives = [];
 			for (let obj of valueChart.getAllPrimitiveObjectives()) {
 				let objValue = alt.getObjectiveValue(obj.getName());
-				if (obj.getDomainType() === 'continuous') {
-					let dom: ContinuousDomain = <ContinuousDomain>obj.getDomain();
-					if (objValue > dom.getMaxValue() || objValue < dom.getMinValue()) {
-						objectives.push(obj.getName());
+				if (objValue !== undefined) {
+					if (obj.getDomainType() === 'continuous') {
+						let dom: ContinuousDomain = <ContinuousDomain>obj.getDomain();
+						if (<number>objValue > dom.getMaxValue() || <number>objValue < dom.getMinValue()) {
+							objectives.push(obj.getName());
+						}
 					}
-				}
-				else if (obj.getDomainType() === 'interval') {
-					let dom: IntervalDomain = <IntervalDomain>obj.getDomain();
-					if (objValue > dom.getMaxValue() || objValue < dom.getMinValue()
-						|| ((<number>objValue - dom.getMinValue()) % dom.getInterval()) !== 0 ) {
-						objectives.push(obj.getName());
+					else if (obj.getDomainType() === 'interval') {
+						let dom: IntervalDomain = <IntervalDomain>obj.getDomain();
+						if (<number>objValue > dom.getMaxValue() || <number>objValue < dom.getMinValue()
+							|| ((<number>objValue - dom.getMinValue()) % dom.getInterval()) !== 0 ) {
+							objectives.push(obj.getName());
+						}
 					}
-				}
-				else {
-					let dom: CategoricalDomain = <CategoricalDomain>obj.getDomain();
-					if (dom.getElements().indexOf(<string>objValue) === -1 ) {
-						objectives.push(obj.getName());
-					}
+					else {
+						let dom: CategoricalDomain = <CategoricalDomain>obj.getDomain();
+						if (dom.getElements().indexOf(<string>objValue) === -1 ) {
+							objectives.push(obj.getName());
+						}
+					}					
 				}
 			}
 			if (objectives.length > 0) {
-				alternatives.push(alt.getName() + ": " + objectives.join(','));
+				alternatives.push(alt.getName() + ": " + objectives.join(', '));
 			}
 		}
 		return alternatives;
@@ -529,19 +509,19 @@ export class ValueChartService {
 		let errorMessages = [];
 		let missingScoreFunctions = this.missingScoreFunctions(valueChart);
 		if (missingScoreFunctions.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTIONS_MISSING.concat(missingScoreFunctions.join(';')));
+			errorMessages.push(this.SCORE_FUNCTIONS_MISSING.concat(missingScoreFunctions.join('; ')));
 		}
 		let incompleteScoreFunctions = this.incompleteScoreFunctions(valueChart);
 		if (incompleteScoreFunctions.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join(';')));
+			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join('; ')));
 		}
 		let invalidScoreFunctionValues = this.invalidScoreFunctionValues(valueChart);
 		if (invalidScoreFunctionValues.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join(';')));
+			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join('; ')));
 		}
 		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart);
 		if (invalidScoreFunctionValues.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join(';')));
+			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join('; ')));
 		}
 		return errorMessages;
 	}
@@ -557,7 +537,7 @@ export class ValueChartService {
 				}
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;
@@ -571,19 +551,21 @@ export class ValueChartService {
 			for (let obj of valueChart.getAllPrimitiveObjectives()) {
 				if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
 					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
-					let elements = [] ;
-					for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
-	      				if (scoreFunction.getScore(elt) === undefined) {
-	      					elements.push(elt);
-	      				}
-	      			}
-	      			if (elements.length > 0) {
-	      				objectives.push(obj.getName());
-	      			}
+					if (scoreFunction !== undefined) {
+						let elements = [] ;
+						for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
+		      				if (scoreFunction.getScore(elt) === undefined) {
+		      					elements.push(elt);
+		      				}
+		      			}
+		      			if (elements.length > 0) {
+		      				objectives.push(obj.getName());
+		      			}
+					}	
 				}	
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;
@@ -596,18 +578,20 @@ export class ValueChartService {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
-				let elements = [] ;
-				for (let elt of scoreFunction.getAllElements()) {
-	      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
-	      				elements.push(elt);
+				if (scoreFunction !== undefined) {
+					let elements = [] ;
+					for (let elt of scoreFunction.getAllElements()) {
+		      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
+		      				elements.push(elt);
+		      			}
 	      			}
-      			}
-      			if (elements.length > 0) {
-	      				objectives.push(objName);
+	      			if (elements.length > 0) {
+		      			objectives.push(objName);
+		      		}
 	      		}	
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;
@@ -619,13 +603,15 @@ export class ValueChartService {
 			let objectives = [];
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
-				if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
-      				objectives.push(objName);
+				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
+				if (scoreFunction !== undefined) {	
+					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+	      				objectives.push(objName);
+	      			}
       			}
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;
@@ -636,17 +622,17 @@ export class ValueChartService {
 
 	validateWeights(valueChart: ValueChart): string[] {
 		let errorMessages = [];
-		let missingWeights = this.missingScoreFunctions(valueChart);
+		let missingWeights = this.missingWeights(valueChart);
 		if (missingWeights.length > 0) {
-			errorMessages.push(this.WEIGHTS_MISSING.concat(missingWeights.join(';')));
+			errorMessages.push(this.WEIGHTS_MISSING.concat(missingWeights.join('; ')));
 		}
 		let invalidWeightSum = this.invalidWeightSum(valueChart);
 		if (invalidWeightSum.length > 0) {
-			errorMessages.push(this.WEIGHTS_SUM_INVALID.concat(invalidWeightSum.join(',')));
+			errorMessages.push(this.WEIGHTS_SUM_INVALID.concat(invalidWeightSum.join(', ')));
 		}
 		let invalidWeightRange = this.invalidWeightSum(valueChart);
 		if (invalidWeightRange.length > 0) {
-			errorMessages.push(this.WEIGHTS_RANGE_INVALID.concat(invalidWeightRange.join(';')));
+			errorMessages.push(this.WEIGHTS_RANGE_INVALID.concat(invalidWeightRange.join('; ')));
 		}
 		return errorMessages;
 	}
@@ -662,7 +648,7 @@ export class ValueChartService {
 				}
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;
@@ -695,7 +681,7 @@ export class ValueChartService {
 				}
 			}
 			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(','));
+				users.push(user.getUsername() + ": " + objectives.join(', '));
 			}
 		}
 		return users;

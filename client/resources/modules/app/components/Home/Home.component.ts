@@ -10,11 +10,12 @@ import { Component }									from '@angular/core';
 import { Router }										from '@angular/router';
 
 // Import Application Classes:
-import { XMLValueChartParserService } 							from '../../services/XMLValueChartParser.service';
+import { XMLValueChartParserService } 					from '../../services/XMLValueChartParser.service';
 import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
+import { ValidationService }							from '../../services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
@@ -44,6 +45,7 @@ export class HomeComponent {
 	private valueChartName: string;
 	private valueChartPassword: string;
 	private invalidCredentials: boolean;
+	private validationMessage: string;
 
 	// ========================================================================================
 	// 									Constructor
@@ -59,7 +61,8 @@ export class HomeComponent {
 		private valueChartParser: XMLValueChartParserService,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
-		private valueChartHttpService: ValueChartHttpService) { }
+		private valueChartHttpService: ValueChartHttpService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -119,14 +122,35 @@ export class HomeComponent {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;	// Retrieve the file contents string from the file reader.
 				// Parse the XML string and set it to be the ValueChartService's active chart.
 				this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
-				this.currentUserService.setJoiningChart(false);	// The user uploaded a ValueChart so they aren't joining an existing one.
-
-				// Navigate to the ValueChartViewerComponent to display the ValueChart.
-				this.router.navigate(['/view/', this.valueChartService.getValueChartName()]);
+				
+				// The user uploaded a ValueChart so they aren't joining an existing one.
+				this.currentUserService.setJoiningChart(false);
+				
+				// Validate the chart.
+				let validationErrors = this.validationService.validate(this.valueChartService.getValueChart());
+				if (validationErrors.length === 0) {
+					// Navigate to the ValueChartViewerComponent to display the ValueChart.
+					this.router.navigate(['/view/', this.valueChartService.getValueChartName()]);
+				}
+				else {
+					this.validationMessage = "There were problems with this chart: \n- " + validationErrors.join('\n- ') + "\n\nWould you like to fix them now?";
+					$('#validate-modal').modal('show');
+				}			
 			}
 		};
 		// Read the file as a text string. This should be fine because ONLY XML files should be uploaded.
 		reader.readAsText(xmlFile);
+		// Reset upload file so that user can try the same file again after fixing it.
+		(<HTMLSelectElement>document.getElementsByName("file-to-upload")[0]).value = null;
 	}
 
+	/*
+		@returns {void}
+		@description 	Called in response to validation error modal.
+						Redirects user to create workflow to edit an invalid chart.
+	*/
+	fixChart() {
+		(<any>this.valueChartService.getValueChart()).incomplete = true;
+		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
+	}
 }

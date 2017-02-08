@@ -437,7 +437,7 @@ export class CreateObjectivesComponent implements OnInit {
 	/* 	
 	@returns {void}
 	@description 	Removes selected categories from modal list.
-*/
+	*/
 	removeSelectedCategoriesModal() {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
 		for (let cat of selected) {
