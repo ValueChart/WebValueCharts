@@ -106,6 +106,7 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 		else {
 			this.editing = true;
+			this.validationTriggered = true;
 			let rootObjective: Objective = this.valueChartService.getRootObjectives()[0];
 			rootObjective.setName(this.valueChartService.getValueChartName());
 			this.objectiveToObjRow(rootObjective, "", 0);
@@ -203,12 +204,7 @@ export class CreateObjectivesComponent implements OnInit {
 					}
 				}		
 			}
-			if (this.updateObjRefService.clearAlternativeValues(obj)) {
-				this.alternativesInvalidated = true;
-			}
-		}
-		if (this.alternativesInvalidated) {
-			toastr.warning("Some Alternative outcomes are no longer valid.");
+			this.updateObjRefService.clearAlternativeValues(obj);
 		}
 	}
 

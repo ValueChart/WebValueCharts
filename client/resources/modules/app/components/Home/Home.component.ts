@@ -150,7 +150,6 @@ export class HomeComponent {
 						Redirects user to create workflow to edit an invalid chart.
 	*/
 	fixChart() {
-		(<any>this.valueChartService.getValueChart()).incomplete = true;
 		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 	}
 }

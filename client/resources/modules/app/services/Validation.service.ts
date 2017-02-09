@@ -288,7 +288,7 @@ export class ValidationService {
 		let objectives = [];
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
 			if (obj.getDomainType() === 'categorical' &&
-				(<CategoricalDomain>obj.getDomain()).getElements().length < 3) {
+				(<CategoricalDomain>obj.getDomain()).getElements().length < 2) {
 					objectives.push(obj.getName());
 			}
 		}
@@ -487,7 +487,7 @@ export class ValidationService {
 							objectives.push(obj.getName());
 						}
 					}
-					else {
+					else if (obj.getDomainType() === 'categorical') {
 						let dom: CategoricalDomain = <CategoricalDomain>obj.getDomain();
 						if (dom.getElements().indexOf(<string>objValue) === -1 ) {
 							objectives.push(obj.getName());
@@ -520,7 +520,7 @@ export class ValidationService {
 			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join('; ')));
 		}
 		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart);
-		if (invalidScoreFunctionValues.length > 0) {
+		if (invalidScoreFunctionRange.length > 0) {
 			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join('; ')));
 		}
 		return errorMessages;
@@ -548,21 +548,23 @@ export class ValidationService {
 		for (let user of valueChart.getUsers()) {
 			let objectives = [];
 			let scoreFunctionMap = user.getScoreFunctionMap();
-			for (let obj of valueChart.getAllPrimitiveObjectives()) {
-				if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
-					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
-					if (scoreFunction !== undefined) {
-						let elements = [] ;
-						for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
-		      				if (scoreFunction.getScore(elt) === undefined) {
-		      					elements.push(elt);
-		      				}
-		      			}
-		      			if (elements.length > 0) {
-		      				objectives.push(obj.getName());
-		      			}
+			if (scoreFunctionMap) {
+				for (let obj of valueChart.getAllPrimitiveObjectives()) {
+					if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
+						if (scoreFunction) {
+							let elements = [] ;
+							for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
+			      				if (scoreFunction.getScore(elt) === undefined) {
+			      					elements.push(elt);
+			      				}
+			      			}
+			      			if (elements.length > 0) {
+			      				objectives.push(obj.getName());
+			      			}
+						}	
 					}	
-				}	
+				}
 			}
 			if (objectives.length > 0) {
 				users.push(user.getUsername() + ": " + objectives.join(', '));
@@ -574,24 +576,26 @@ export class ValidationService {
 	invalidScoreFunctionValues(valueChart: ValueChart): string[] {
 		let users = [];
 		for (let user of valueChart.getUsers()) {
-			let objectives = [];
 			let scoreFunctionMap = user.getScoreFunctionMap();
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
-				if (scoreFunction !== undefined) {
-					let elements = [] ;
-					for (let elt of scoreFunction.getAllElements()) {
-		      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
-		      				elements.push(elt);
+			if (scoreFunctionMap) {
+				let objectives = [];
+				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
+					if (scoreFunction) {
+						let elements = [] ;
+						for (let elt of scoreFunction.getAllElements()) {
+			      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
+			      				elements.push(elt);
+			      			}
 		      			}
-	      			}
-	      			if (elements.length > 0) {
-		      			objectives.push(objName);
-		      		}
-	      		}	
-			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
+		      			if (elements.length > 0) {
+			      			objectives.push(objName);
+			      		}
+		      		}	
+				}
+				if (objectives.length > 0) {
+					users.push(user.getUsername() + ": " + objectives.join(', '));
+				}
 			}
 		}
 		return users;
@@ -600,18 +604,20 @@ export class ValidationService {
 	invalidScoreFunctionRange(valueChart: ValueChart): string[] {
 		let users = [];
 		for (let user of valueChart.getUsers()) {
-			let objectives = [];
 			let scoreFunctionMap = user.getScoreFunctionMap();
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				if (scoreFunction !== undefined) {	
-					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
-	      				objectives.push(objName);
+			if (scoreFunctionMap) {
+				let objectives = [];
+				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
+					if (scoreFunction) {	
+						if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+		      				objectives.push(objName);
+		      			}
 	      			}
-      			}
-			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
+				}
+				if (objectives.length > 0) {
+					users.push(user.getUsername() + ": " + objectives.join(', '));
+				}
 			}
 		}
 		return users;
@@ -640,8 +646,8 @@ export class ValidationService {
 	missingWeights(valueChart: ValueChart): string[] {
 		let users = [];
 		for (let user of valueChart.getUsers()) {
-			let objectives = [];
 			let weightMap = user.getWeightMap();
+			let objectives = [];
 			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
 				if (weightMap === undefined || weightMap.getObjectiveWeight(objName) === undefined) {
 					objectives.push(objName);
@@ -649,7 +655,7 @@ export class ValidationService {
 			}
 			if (objectives.length > 0) {
 				users.push(user.getUsername() + ": " + objectives.join(', '));
-			}
+			}	
 		}
 		return users;
 	}
@@ -657,14 +663,15 @@ export class ValidationService {
 	invalidWeightSum(valueChart: ValueChart): string[] {
 		let users = [];
 		for (let user of valueChart.getUsers()) {
-			let objectives = [];
 			let weightMap = user.getWeightMap();
-			let sum = 0;
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				sum = sum + weightMap.getObjectiveWeight(objName);
-			}
-			if (sum !== 1) {
-				users.push(user.getUsername());
+			if (weightMap) {
+				let sum = 0;
+				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+					sum = sum + weightMap.getObjectiveWeight(objName);
+				}
+				if (sum !== 1) {
+					users.push(user.getUsername());
+				}
 			}
 		}
 		return users;
@@ -673,15 +680,17 @@ export class ValidationService {
 	invalidWeightRange(valueChart: ValueChart): string[] {
 		let users = [];
 		for (let user of valueChart.getUsers()) {
-			let objectives = [];
 			let weightMap = user.getWeightMap();
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				if (weightMap.getObjectiveWeight(objName) < 0 || weightMap.getObjectiveWeight(objName) > 1) {
-					objectives.push(objName);
+			if (weightMap) {
+				let objectives = [];
+				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+					if (weightMap.getObjectiveWeight(objName) < 0 || weightMap.getObjectiveWeight(objName) > 1) {
+						objectives.push(objName);
+					}
 				}
-			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
+				if (objectives.length > 0) {
+					users.push(user.getUsername() + ": " + objectives.join(', '));
+				}
 			}
 		}
 		return users;

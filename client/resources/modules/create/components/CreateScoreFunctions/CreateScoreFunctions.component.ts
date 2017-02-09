@@ -95,6 +95,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
       this.user.setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
     }
     for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      this.validationTriggered = true;
       this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
       this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
     }

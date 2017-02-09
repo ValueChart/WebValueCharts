@@ -18,6 +18,7 @@ import { CurrentUserService }											from '../../../app/services/CurrentUser.
 import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { ValidationService }											from '../../../app/services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -54,6 +55,9 @@ export class CreateValueChartComponent implements OnInit {
 	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 
+	// Whole chart validation:
+	validationMessage: string;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -71,6 +75,7 @@ export class CreateValueChartComponent implements OnInit {
 		private creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService,
+		private validationService: ValidationService,
 		private updateObjectiveReferencesService: UpdateObjectiveReferencesService) { }
 
 	// ========================================================================================
@@ -104,7 +109,6 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.purpose == "newChart") {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
-			(<any>valueChart).incomplete = true;
 			this.valueChartService.setValueChart(valueChart); // Set the chart
 			this.valueChartService.addUser(new User(this.currentUserService.getUsername())); // Add a new user
 		}
@@ -121,7 +125,12 @@ export class CreateValueChartComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-		this.sub.unsubscribe();		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
+		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
+		this.sub.unsubscribe();	
+
+		// Check whole chart for validity. Set to incomplete if not valid.
+		(<any>this.valueChart).incomplete = this.validationService.validate(this.valueChart).length > 0 ? true : false; 
+		
 		if (this.saveOnDestroy) {
 			this.autoSaveValueChart(this.valueChart);
 		}
@@ -138,9 +147,6 @@ export class CreateValueChartComponent implements OnInit {
 						(Parameter currently unused in this method.)			
 	*/
 	back(browserTriggered = false) {
-		if (!this.creationStepsService.validate()) {
-			(<any>this.valueChartService.getValueChart()).incomplete = true;
-		}
 		this.autoSaveValueChart(this.valueChart);
 		this.creationStepsService.allowedToNavigateInternally = true;
 		this.creationStepsService.previous(this.purpose);				
@@ -169,7 +175,7 @@ export class CreateValueChartComponent implements OnInit {
 					this.autoSaveValueChart(this.valueChart);
 				}
 				this.creationStepsService.allowedToNavigateInternally = true;
-				this.creationStepsService.next(this.purpose);	
+				this.creationStepsService.next(this.purpose);
 			}
 		}
 		else {
@@ -272,9 +278,6 @@ export class CreateValueChartComponent implements OnInit {
 			if (navigate) {
 				if (keepValueChart) {
 					this.saveOnDestroy = true;
-					if (!this.creationStepsService.validate()) {
-						(<any>this.valueChartService.getValueChart()).incomplete = true;
-					}
 				}
 				else if (this.valueChart._id) {
 					this.deleteValueChart(this.valueChart);

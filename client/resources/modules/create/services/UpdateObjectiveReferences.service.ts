@@ -125,30 +125,25 @@ export class UpdateObjectiveReferencesService {
 	}
 
 	/*
-		@returns {boolean}
+		@returns {void}
 		@description 	 Check each Alternative's value for obj. Clear if no longer valid.
-						 Returns true iff any Alternatives's value for obj was cleared.
 	*/
-	clearAlternativeValues(obj: PrimitiveObjective): boolean {
-		let valsCleared: boolean = false;
+	clearAlternativeValues(obj: PrimitiveObjective) {
 		for (let alt of this.valueChartService.getAlternatives()) {
 			if (obj.getDomainType() === "continuous") {
 				let dom = <ContinuousDomain>obj.getDomain();
 				let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
 				if (altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
 					alt.removeObjective(obj.getName());
-					valsCleared = true;
 				}
 			}
 			else {
 				let altVal: string = String(alt.getObjectiveValue(obj.getName()));
 				if ((<CategoricalDomain>obj.getDomain()).getElements().indexOf(altVal) === -1) {
 					alt.removeObjective(obj.getName());
-					valsCleared = true;
 				}
 			}
 		}
-		return valsCleared;
 	}
 
 	/*

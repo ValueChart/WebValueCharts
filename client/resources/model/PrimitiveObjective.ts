@@ -92,7 +92,12 @@ export class PrimitiveObjective implements Objective {
 	}
 
 	getDomainType(): string {
-		return this.domain.type;
+		if (this.domain) {
+			return this.domain.type;
+		}
+		else {
+			return "";
+		}
 	}
 
 	getDomain(): Domain {

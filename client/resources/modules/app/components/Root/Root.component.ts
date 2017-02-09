@@ -13,8 +13,7 @@ import { ApplicationRef } 											from '@angular/core';
 
 
 // Import Application Classes:
-import { XMLValueChartParserService } 								from '../../services/XMLValueChartParser.service';
-import { ValidationService }										from '../../services/Validation.service';		
+import { XMLValueChartParserService } 								from '../../services/XMLValueChartParser.service';	
 import { CurrentUserService }										from '../../services/CurrentUser.service';
 import { ValueChartService }										from '../../services/ValueChart.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
@@ -41,7 +40,6 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 	templateUrl: 'client/resources/modules/app/components/Root/Root.template.html',
 	providers: [
 		XMLValueChartParserService,
-		ValidationService,
 		ValueChartXMLEncoder,
 		UserHttpService]
 })

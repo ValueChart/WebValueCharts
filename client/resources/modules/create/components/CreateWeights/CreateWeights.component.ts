@@ -85,6 +85,7 @@ export class CreateWeightsComponent implements OnInit {
 		}
 		// Weights have already been set by the user
 		else {
+			this.validationTriggered = true;
 			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
 			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });

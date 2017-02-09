@@ -69,10 +69,8 @@ export class CreateAlternativesComponent implements OnInit {
 		this.isSelected = {};
 		this.alternativesCount = 0;
 
-		if (this.valueChartService.getAlternatives().length === 0) {
-			this.addEmptyAlternative();
-		}
-		else {
+		if (this.valueChartService.getAlternatives().length > 0) {
+			this.validationTriggered = true;
 			for (let alt of this.valueChartService.getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;

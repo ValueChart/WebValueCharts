@@ -6,6 +6,7 @@ import '../../utilities/rxjs-operators';
 
 // ImportApplication Classes:
 import { ValueChartService }					from '../../app/services/ValueChart.service';
+import { ValidationService }					from '../../app/services/Validation.service';
 
 /*
 	This class defines the names and orders of steps in the Creation workflow and the transitions between them.
@@ -56,7 +57,9 @@ export class CreationStepsService {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private router: Router, private valueChartService: ValueChartService) {
+	constructor(private router: Router, 
+		private valueChartService: ValueChartService, 
+		private validationService: ValidationService) {
 
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
@@ -76,15 +79,14 @@ export class CreationStepsService {
 	// ========================================================================================
 
 	/* 	
-		@returns {string}
+		@returns {void}
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
 	next(purpose: string) {
 		if (this.step === this.PRIORITIES) {
 			window.onpopstate = () => { };
-			(<any>this.valueChartService.getValueChart()).incomplete = false;
 			(<any>window).destination = '/view/ValueChart';
-			this.router.navigate(['/view/ValueChart']);
+			this.router.navigate(['/view/ValueChart']);				
 		}
 		else {
 			this.step = this.nextStep[this.step];
@@ -93,7 +95,7 @@ export class CreationStepsService {
 	}
 
 	/* 	
-		@returns {string}
+		@returns {void}
 		@description 	Navigates to the component for the previous step and returns the previous step.
 	*/
 	previous(purpose: string) {
