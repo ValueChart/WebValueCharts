@@ -16,6 +16,7 @@ import { Objective }													from '../../../../model/Objective';
 import { AbstractObjective }											from '../../../../model/AbstractObjective';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { ScoreFunction }												from '../../../../model/ScoreFunction';
+import { Alternative }													from '../../../../model/Alternative';
 
 /*
   This component defines the UI for eliciting weights with SMARTER.
@@ -147,20 +148,40 @@ export class CreateWeightsComponent implements OnInit {
 
 	/* 	
 		@returns {string or number}
-		@description 	Gets best outcome for Objective. Used to fill the Best Outcome column.
+		@description 	Gets best Alternative outcome for Objective. Used to fill the Best Outcome column.
 	*/
 	getBestOutcome(objName: string): string | number {
+		let bestOutcome;
+		let bestOutcomeScore = 0;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		return scoreFunction.bestElement;
+		for (let alt of this.valueChartService.getAlternatives()) {
+			let outcome = alt.getObjectiveValue(objName);
+			let outcomeScore = scoreFunction.getScore(outcome);
+			if (outcomeScore > bestOutcomeScore) {
+				bestOutcome = outcome;
+				bestOutcomeScore = outcomeScore;
+			}
+		}
+		return bestOutcome;
 	}
 
 	/* 	
 		@returns {string or number}
-		@description 	Gets worst outcome for Objective. Used to fill the Worst Outcome column.
+		@description 	Gets worst Alternative outcome for Objective. Used to fill the Worst Outcome column.
 	*/
 	getWorstOutcome(objName: string): string | number {
+		let worstOutcome;
+		let worstOutcomeScore = 1;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		return scoreFunction.worstElement;
+		for (let alt of this.valueChartService.getAlternatives()) {
+			let outcome = alt.getObjectiveValue(objName);
+			let outcomeScore = scoreFunction.getScore(outcome);
+			if (outcomeScore < worstOutcomeScore) {
+				worstOutcome = outcome;
+				worstOutcomeScore = outcomeScore;
+			}
+		}
+		return worstOutcome;
 	}
 
 	/* 	
