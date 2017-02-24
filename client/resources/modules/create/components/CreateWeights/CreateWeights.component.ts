@@ -37,9 +37,9 @@ export class CreateWeightsComponent implements OnInit {
 	user: User;
 	rankedObjectives: string[]; // Objectives that have already been ranked
     isRanked: { [objName: string]: boolean; }; // Indicates whether each Objective has been ranked
-    updateOnDestroy: boolean; // Indicates whether or not the weights should be computed and set on destroy.
-    						  // True if the weights have not yet been set by the user or if the user has clicked "Reset Weights".
-    						  // This is to ensure that previosly-made adjutments to weights are preserved.
+    updateOnDestroy: boolean = false; // Indicates whether or not the weights should be computed and set on destroy.
+    						  		  // True if user changes weights in any way (clicking on a row or clicking "Reset Weights").
+    						  		  // This is to ensure that previosly-made adjustments to weights are preserved.
 
 
     // Validation fields:
@@ -82,7 +82,6 @@ export class CreateWeightsComponent implements OnInit {
 			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
-			this.updateOnDestroy = true;
 		}
 		// Weights have already been set by the user
 		else {
@@ -91,11 +90,14 @@ export class CreateWeightsComponent implements OnInit {
 			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
-			let sortedObjectives = sortedPairs.map(function(e, i) { return sortedPairs[i][0]; });
-			for (let obj of sortedObjectives) {
-				this.rankObjective(<string>obj);
+			for (let pair of sortedPairs) {
+				if (pair[1] === undefined) {
+					this.isRanked[pair[0]] = false;
+				}
+				else {
+					this.rankObjective(<string>pair[0], false);
+				}
 			}
-			this.updateOnDestroy = false;
 		}
 	}
 
@@ -202,10 +204,14 @@ export class CreateWeightsComponent implements OnInit {
 		@returns {void}
 		@description 	Ranks an Objective by adding it to rankedObjectives.
 						Its rank is its index in rankedObjectives.
+						Parameter 'clicked' indicates whether or not this was called by a user clicking on a row
 	*/
-	rankObjective(primObj: string) {
+	rankObjective(primObj: string, clicked: boolean) {
 		this.rankedObjectives.push(primObj);
 		this.isRanked[primObj] = true;
+		if (clicked) {
+			this.updateOnDestroy = true;
+		}
 	}
 
 	/* 	

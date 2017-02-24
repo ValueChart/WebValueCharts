@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName)">
+        <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName,true)">
             <th>{{objName}}</th>
             <th class="worst-outcome">{{getWorstOutcome(objName)}}</th>
             <th class="best-outcome">{{getBestOutcome(objName)}}</th>
