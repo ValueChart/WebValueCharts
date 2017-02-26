@@ -8,8 +8,9 @@ import { ValueChartService }								from '../../app/services/ValueChart.service'
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
 import { User }												from '../../../model/User';
 import { CategoricalDomain }								from '../../../model/CategoricalDomain';
-
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
+import { DiscreteScoreFunction }							from '../../../model/DiscreteScoreFunction';
+import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFunction';
 
 /*
 	This class provides methods to update the ValueChart model when the Objective structure changes.
@@ -48,11 +49,10 @@ export class UpdateObjectiveReferencesService {
 		@description 	Resets Users' ScoreFunctions for obj to default.
 	*/
 	resetScoreFunctions(obj: PrimitiveObjective) {
-		let scoreFunction = this.valueChartService.getInitialScoreFunction(obj);
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
-				scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
+				scoreFunctionMap.getObjectiveScoreFunction(obj.getName()).initialize(<PrimitiveObjective>obj,'flat');
 			}
 		}
 	}
@@ -64,7 +64,8 @@ export class UpdateObjectiveReferencesService {
 	addScoreFunctions(objNames: string[]) {
 		for (let objname of objNames) {
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
-			let scoreFunction = this.valueChartService.getInitialScoreFunction(obj);
+			let scoreFunction = obj.getDomainType() === 'continuous' ? new ContinuousScoreFunction() : new DiscreteScoreFunction();
+			scoreFunction.initialize(obj,'flat');
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {

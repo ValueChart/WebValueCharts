@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 23:46:48
+* @Last Modified by:   MalakronikMausi
+* @Last Modified time: 2017-02-26 14:54:36
 */
 
 /* Global Styles */
@@ -386,6 +386,11 @@ input {
 }
 
 #score-function-dropdown {
+    width: 245px; 
+    margin-right: 5px;
+}
+
+#default-function-dropdown {
     width: 245px; 
     margin-right: 5px;
 }

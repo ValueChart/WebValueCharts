@@ -7,6 +7,7 @@
 
 // Import Model Classes:
 import { Memento }										from './Memento';
+import { PrimitiveObjective }							from './PrimitiveObjective';
 
 
 /*
@@ -27,6 +28,10 @@ export abstract class ScoreFunction implements Memento {
 	public worstElement: string | number;						// The element of the objective's domain that has the lowest score.
 	protected elementScoreMap: Map<number | string, number>;	// The Map object used by this class to map user assigned scores to objective domain elements.
 
+	// Default initial function types
+	static FLAT: string = 'flat';
+	static POSLIN: string = 'poslin';
+	static NEGLIN: string = 'neglin';
 
 	// ========================================================================================
 	// 									Constructor
@@ -180,6 +185,8 @@ export abstract class ScoreFunction implements Memento {
 		}
 		return false;
 	}
+
+	abstract initialize(obj: PrimitiveObjective, type: string): void;
 
 	abstract setElementScore(domainElement: number | string, score: number): void;
 

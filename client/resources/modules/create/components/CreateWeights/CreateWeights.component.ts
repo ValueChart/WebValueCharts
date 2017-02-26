@@ -164,6 +164,9 @@ export class CreateWeightsComponent implements OnInit {
 				bestOutcomeScore = outcomeScore;
 			}
 		}
+		if (bestOutcome === undefined) {
+			bestOutcome = this.getWorstOutcome(objName);
+		}
 		return bestOutcome;
 	}
 
@@ -182,6 +185,9 @@ export class CreateWeightsComponent implements OnInit {
 				worstOutcome = outcome;
 				worstOutcomeScore = outcomeScore;
 			}
+		}
+		if (worstOutcome === undefined) {
+			worstOutcome = this.getBestOutcome(objName);
 		}
 		return worstOutcome;
 	}

@@ -16,6 +16,7 @@ import { ValueChart } 													    from '../../../../model/ValueChart';
 import { User }														      	  from '../../../../model/User';
 import { ScoreFunctionMap }												  from '../../../../model/ScoreFunctionMap';
 import { Objective }													      from '../../../../model/Objective';
+import { PrimitiveObjective }                       from '../../../../model/PrimitiveObjective';
 import { Domain }														        from '../../../../model/Domain';
 import { CategoricalDomain }											  from '../../../../model/CategoricalDomain';
 import { ContinuousDomain }												  from '../../../../model/ContinuousDomain';
@@ -46,11 +47,18 @@ export class CreateScoreFunctionsComponent implements OnInit {
                                                                // so we can reset weights if it changes
   initialWorstOutcomes: { [objName: string]: string | number }; // Track initial best outcomes for each Objective
                                                                 // so we can reset weights if it changes
+  latestDefaults: { [objName: string]: string }; // Track latest default function so we can set dropdown accordingly
   private services: any = {}; // Services container to pass to ScoreFunctionDirective
+
 
   // Validation fields:
   validationTriggered: boolean = false;
   badScoreFunctions: string[] = []; // Score functions that failed validation
+
+  // Default initial function types
+  flat: string = ScoreFunction.FLAT;
+  poslin: string = ScoreFunction.POSLIN;
+  neglin: string = ScoreFunction.NEGLIN;
 
   // ========================================================================================
   //                   Constructor
@@ -90,6 +98,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.user = this.valueChartService.getCurrentUser();
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
+    this.latestDefaults = {};
 
     if (!this.user.getScoreFunctionMap()) {
       this.user.setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
@@ -133,6 +142,18 @@ export class CreateScoreFunctionsComponent implements OnInit {
       nextIndex = 0;
     }
     this.selectedObjective = primObjs[nextIndex];
+  }
+
+  // ================================ Default Function Selection Methods ====================================
+
+  /*   
+    @returns {void}
+    @description   Reinitializes the score function to the selected default.
+                   (Currently called when user selects a new default from the dropdown or clicks 'Reset').
+  */
+  resetScoreFunction() {
+    let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(this.selectedObjective);
+    this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective).initialize(obj,this.latestDefaults[this.selectedObjective]);
   }
 
   // ================================ Validation Methods ====================================

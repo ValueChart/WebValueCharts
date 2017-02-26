@@ -7,6 +7,9 @@
 
 import { Memento }				from './Memento';
 import { ScoreFunction } 		from './ScoreFunction';
+import { PrimitiveObjective } 	from './PrimitiveObjective';
+import { CategoricalDomain } 	from './CategoricalDomain';
+import { IntervalDomain } 		from './IntervalDomain';
 
 
 /*
@@ -35,6 +38,41 @@ export class DiscreteScoreFunction extends ScoreFunction {
 	// 									Methods
 	// ========================================================================================
 
+	/*
+		@param obj - The Primitive Objective for which to initialize the score function.
+		@param type - The type of function (for now, one of: flat, positive linear, negative linear).
+		@returns {void}	
+		@description	Initializes the score function to a specified default for some objective.
+	*/
+	initialize(obj: PrimitiveObjective, type: string) {
+		this.elementScoreMap.clear();
+		let dom = (<CategoricalDomain | IntervalDomain>obj.getDomain()).getElements();
+		if (type === ScoreFunction.FLAT) {
+			for (let item of dom) {
+				this.setElementScore(item, 0.5);
+			}
+		}
+		else if (type === ScoreFunction.POSLIN) {
+			let increment = 1.0 / (dom.length - 1);
+			let currentScore = 0;
+			for (let item of dom) {
+				this.setElementScore(item, currentScore);
+				currentScore += increment;
+			}
+		}
+		else if (type === ScoreFunction.NEGLIN) {
+			let increment = 1.0 / (dom.length - 1);
+			let currentScore = 1;
+			for (let item of dom) {
+				this.setElementScore(item, currentScore);
+				currentScore -= increment;
+			}
+		}
+		else {
+			throw ("Unknown initial score function type");
+		}	
+	}
+
 	getScore(domainElement: string): number {
 		return this.elementScoreMap.get(domainElement);
 	}
@@ -52,7 +90,6 @@ export class DiscreteScoreFunction extends ScoreFunction {
 	*/
 	getMemento(): DiscreteScoreFunction {
 		var scoreFunctionCopy: DiscreteScoreFunction;
-
 
 		scoreFunctionCopy = new DiscreteScoreFunction();
 

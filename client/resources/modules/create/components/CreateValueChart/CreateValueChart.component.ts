@@ -109,6 +109,7 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.purpose == "newChart") {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
+			(<any>valueChart).incomplete = true; // Initialize ValueChart to incomplete
 			this.valueChartService.setValueChart(valueChart); // Set the chart
 			this.valueChartService.addUser(new User(this.currentUserService.getUsername())); // Add a new user
 		}

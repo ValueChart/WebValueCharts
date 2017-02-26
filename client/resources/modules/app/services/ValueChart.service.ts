@@ -247,6 +247,7 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.
+	// Keeping these here until we decide how to adjust users' preferences in response to structural changes.
 
 	wasWeightMapReset(user: User) {
 		return this.weightMapReset[user.getUsername()];
@@ -283,37 +284,10 @@ export class ValueChartService implements ValueChartStateContainer {
 	getInitialScoreFunctionMap(): ScoreFunctionMap {
 		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 		for (let obj of this.getPrimitiveObjectives()) {
-			let scoreFunction = this.getInitialScoreFunction(obj);
+			let scoreFunction = obj.getDomainType() === 'continuous' ? new ContinuousScoreFunction() : new DiscreteScoreFunction();
+			scoreFunction.initialize(obj,ScoreFunction.FLAT);
 			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
 		}
 		return scoreFunctionMap;
-	}
-
-	getInitialScoreFunction(obj: PrimitiveObjective): ScoreFunction {
-		let scoreFunction: ScoreFunction;
-		if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
-			scoreFunction = new DiscreteScoreFunction();
-			let dom = (<CategoricalDomain>obj.getDomain()).getElements();
-			let increment = 1.0 / (dom.length - 1);
-			let currentScore = 0;
-			for (let item of dom) {
-				scoreFunction.setElementScore(item, currentScore);
-				currentScore += increment;
-			}
-		}
-		else {
-			let min: number = (<ContinuousDomain>obj.getDomain()).getMinValue();
-			let max: number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
-			scoreFunction = new ContinuousScoreFunction(min, max);
-			// Add three evenly-spaced points between min and max
-			let increment = (max - min) / 4.0;
-			let slope = 1.0 / (max - min);
-			scoreFunction.setElementScore(min, 0);
-			scoreFunction.setElementScore(min + increment, slope * increment);
-			scoreFunction.setElementScore(min + 2 * increment, slope * 2 * increment);
-			scoreFunction.setElementScore(min + 3 * increment, slope * 3 * increment);
-			scoreFunction.setElementScore(max, 1);
-		}
-		return scoreFunction;
 	}
 }

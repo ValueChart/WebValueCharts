@@ -9,6 +9,8 @@
 // Import Model Classes:
 import { Memento }				from './Memento';
 import { ScoreFunction } 		from './ScoreFunction';
+import { PrimitiveObjective } 	from './PrimitiveObjective';
+import { ContinuousDomain } 	from './ContinuousDomain';
 
 // The interface that all interpolation functions must be implement.
 interface InterpolationStrategy {
@@ -58,6 +60,46 @@ export class ContinuousScoreFunction extends ScoreFunction {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	/*
+		@param obj - The Primitive Objective for which to initialize the score function.
+		@param type - The type of function (for now, one of: flat, positive linear, negative linear).
+		@returns {void}	
+		@description	Initializes the score function to a specified default for some objective.
+	*/
+	initialize(obj: PrimitiveObjective, type: string) {
+		this.elementScoreMap.clear();
+		let min: number = (<ContinuousDomain>obj.getDomain()).getMinValue();
+		let max: number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
+		let increment = (max - min) / 4.0;
+		// Add three evenly-spaced points between min and max
+		if (type === ScoreFunction.FLAT) {
+			this.setElementScore(min, 0.5);
+			this.setElementScore(min + increment, 0.5);
+			this.setElementScore(min + 2 * increment, 0.5);
+			this.setElementScore(min + 3 * increment, 0.5);
+			this.setElementScore(max, 0.5);
+		}
+		else if (type === ScoreFunction.POSLIN) {
+			let slope = 1.0 / (max - min);
+			this.setElementScore(min, 0);
+			this.setElementScore(min + increment, slope * increment);
+			this.setElementScore(min + 2 * increment, slope * 2 * increment);
+			this.setElementScore(min + 3 * increment, slope * 3 * increment);
+			this.setElementScore(max, 1);
+		}
+		else if (type === ScoreFunction.NEGLIN) {
+			let slope = 1.0 / (max - min);
+			this.setElementScore(min, 1);
+			this.setElementScore(min + increment, 1.0 - slope * increment);
+			this.setElementScore(min + 2 * increment, 1.0 - slope * 2 * increment);
+			this.setElementScore(min + 3 * increment, 1.0 - slope * 3 * increment);
+			this.setElementScore(max, 0);
+		}
+		else {
+			throw ("Unknown initial score function type");
+		}	
+	}
 
 	/*
 		@param domainElement - The domain element for which the score should be set.
