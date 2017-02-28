@@ -43,8 +43,11 @@ export class MyValueChartsComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartSummaries: any[];	// The array of ValueChart summary objects belonging to the current user. These are retrieved from the server
+	private valueChartOwnerships: any[];	// The array of ValueChart summary objects belonging to the current user. These are retrieved from the server
 										// Belonging is defined as having the creator field of the ValueChart match the user's username.
+
+	private valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
+										// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
 	
 	private downloadLink: any;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
 										// on the client side using object URLs.	
@@ -81,8 +84,15 @@ export class MyValueChartsComponent implements OnInit {
 		//	Retrieve summary objects for all of the ValueCharts created by the current user.
 		this.userHttpService.getUserValueCharts(this.currentUserService.getUsername())
 			.subscribe(
-			valueChartSummaries => {
-				this.valueChartSummaries = valueChartSummaries;
+			valueChartOwnerships => {
+				this.valueChartOwnerships = valueChartOwnerships;
+			});
+
+		//	Retrieve summary objects for all of the ValueCharts the current user is a member of.
+		this.userHttpService.getUserValueChartMemberships(this.currentUserService.getUsername())
+			.subscribe(
+			valueChartMemberships => {
+				this.valueChartMemberships = valueChartMemberships;
 			});
 
 		this.downloadLink = $('#download-user-weights');
@@ -110,13 +120,34 @@ export class MyValueChartsComponent implements OnInit {
 			});
 	}
 
+	editPreferences(chartId: string, password: string): void {
+		password = password || '';
+
+		this.valueChartHttpService.getValueChartSingleUser(chartId, password, this.currentUserService.getUsername())
+			.subscribe(valueChart => {
+				this.valueChartService.setValueChart(valueChart);
+				this.currentUserService.setJoiningChart(true);
+				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+			});
+	}
+
+	leaveChart(chartId: string): void {
+		this.valueChartHttpService.deleteUser(chartId, this.currentUserService.getUsername())
+			.subscribe(username => {
+				var index: number = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
+					return valueChartSummary._id === chartId;
+				});
+				this.valueChartMemberships.splice(index, 1);
+		});
+	}
+
 	deleteValueChart(chartId: string): void {
 		this.valueChartHttpService.deleteValueChart(chartId)
 			.subscribe(status => {
-				var index: number = this.valueChartSummaries.findIndex((valueChartSummary: any) => {
+				var index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
 					return valueChartSummary._id === chartId;
 				});
-				this.valueChartSummaries.splice(index, 1);
+				this.valueChartOwnerships.splice(index, 1);
 			});
 	}
 

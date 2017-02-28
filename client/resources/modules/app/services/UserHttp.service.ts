@@ -135,6 +135,18 @@ export class UserHttpService {
 			.catch(this.handleError);
 	}
 
+		/*
+		@param username - The username of the user whose ValueChart memberships should be retrieved. 
+		@returns {Observable<any[]>} - An observable of an array of summaries of the ValueCharts that the specified user belongs to.
+		@description 	Sends a request to the server to retrieve summaries of the given user's ValueChart memberships. Note that this method does NOT
+						return the entire ValueCharts, just summaries of them.
+	*/
+	getUserValueChartMemberships(username: string): Observable<any[]> {
+		return this.http.get(this.usersUrl + username + '/ValueChartMemberships')
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
 	// This method extracts the data from the response object and returns it as an observable.l
 	extractData = (res: Response): { username: string, password: string, loginResult: boolean } => {
 		let body = res.json();

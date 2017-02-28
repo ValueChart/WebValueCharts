@@ -46,7 +46,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	valueChart: ValueChart;
 	user: User;
-	purpose: string; // "newChart" or "newUser" or "editChart"
+	purpose: string; // "newChart" or "newUser" or "editChart" or "editPreferences"
 
 	// Navigation Control:
 	sub: any;

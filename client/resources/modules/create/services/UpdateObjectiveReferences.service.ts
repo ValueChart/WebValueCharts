@@ -9,6 +9,7 @@ import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
 import { User }												from '../../../model/User';
 import { CategoricalDomain }								from '../../../model/CategoricalDomain';
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
+import { ScoreFunction }									from '../../../model/ScoreFunction';
 import { DiscreteScoreFunction }							from '../../../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFunction';
 
@@ -52,7 +53,7 @@ export class UpdateObjectiveReferencesService {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
-				scoreFunctionMap.getObjectiveScoreFunction(obj.getName()).initialize(<PrimitiveObjective>obj,'flat');
+				scoreFunctionMap.getObjectiveScoreFunction(obj.getName()).initialize(<PrimitiveObjective>obj,ScoreFunction.FLAT);
 			}
 		}
 	}
@@ -65,7 +66,7 @@ export class UpdateObjectiveReferencesService {
 		for (let objname of objNames) {
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
 			let scoreFunction = obj.getDomainType() === 'continuous' ? new ContinuousScoreFunction() : new DiscreteScoreFunction();
-			scoreFunction.initialize(obj,'flat');
+			scoreFunction.initialize(obj,ScoreFunction.FLAT);
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {

@@ -137,4 +137,34 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 	}
 });
 
+// Get summaries of all ValueCharts the user is a member of. These are just summaries, rather than full ValueCharts.
+// This endpoint will return summaries of all ValueChart's whose members contain the user parameter in the route.
+usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var username = req.params.user;	
+
+	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
+	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
+		res.sendStatus(401);	
+	} else {
+		valueChartCollection.find({ "users.username": username }, function(err: Error, docs: any[]) {
+			if (err) {
+				res.sendStatus(400)
+					.json({ data: err });
+			} else if (docs) {
+				var vcSummaries: any[] = [];
+				docs.forEach((doc: any) => {
+					// Create a summary object from the ValueChart.
+					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
+				});
+				res.status(200)
+					.location('/Users/' + username + '/ValueChartMemberships')
+					.json({ data: vcSummaries });
+			} else {
+				res.sendStatus(404);
+			}
+		});
+	}
+});
+
 

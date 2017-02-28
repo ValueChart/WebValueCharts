@@ -83,6 +83,30 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	});
 });
 
+// Get an existing ValueChart by id. Only include the preferences for the user with the specified username.
+valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var chartId: string = (<any> req).chartId;
+	var password: string = req.query.password;
+	var username: string = req.query.username;
+
+	valueChartsCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+
+		} else if (doc) {
+			// Remove all users except the one with the specified username.
+			doc.users = (<any[]>doc.users).filter(function(e) { return e.username === username });
+			res.location('/ValueCharts/' + chartId)
+				.status(200)
+				.json({ data: doc });
+		} else {	// No ValueChart with that id + password combination was found. Return 404: Not Found.
+			res.sendStatus(404)
+		}
+	});
+});
+
 // Check to see if a ValueChart name is available. Returns true in response body if it is, false if taken.
 valueChartRoutes.get('/:chart/available', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
