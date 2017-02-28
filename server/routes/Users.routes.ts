@@ -154,8 +154,10 @@ usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, r
 			} else if (docs) {
 				var vcSummaries: any[] = [];
 				docs.forEach((doc: any) => {
-					// Create a summary object from the ValueChart.
-					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
+					// Exclude charts that the user owns
+					if (doc.creator !== username) {
+						vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
+					}		
 				});
 				res.status(200)
 					.location('/Users/' + username + '/ValueChartMemberships')
