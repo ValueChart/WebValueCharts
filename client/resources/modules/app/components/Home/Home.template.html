@@ -12,15 +12,18 @@
 						</button>
 						<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
 					</a>
-					<button class="btn btn-success btn-lg" type="button" data-toggle="modal" data-target="#chart-credentials-modal">
+					<button class="btn btn-success btn-lg" type="button" (click)="isJoining = true" data-toggle="modal" data-target="#chart-credentials-modal">
 						Join Existing ValueChart
+					</button>
+					<button class="btn btn-success btn-lg" type="button" (click)="isJoining = false" data-toggle="modal" data-target="#chart-credentials-modal">
+						View Existing ValueChart
 					</button>
 					<div class="modal fade" id="chart-credentials-modal" tabindex="-1" role="dialog">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" id="close-chart-credentials-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-									<h4 class="modal-title" id="modal-header">Join Existing ValueChart</h4>
+									<h4 class="modal-title" id="modal-header">{{getModalTitle()}}</h4>
 								</div>
 								<div class="modal-body">
 									<div class="row">
@@ -37,7 +40,7 @@
 									</div>
 									<div class="row">
 										<div class="col-sm-offset-5 col-sm-7">
-											<button type="submit" class="btn btn-success" (click)="joinValueChart(valueChartName, valueChartPassword)">Join ValueChart</button>
+											<button type="submit" class="btn btn-success" (click)="handleModalInputs(valueChartName, valueChartPassword)">Continue</button>
 										</div>
 									</div>
 									<div class="row">

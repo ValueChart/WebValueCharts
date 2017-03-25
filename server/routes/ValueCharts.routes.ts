@@ -83,6 +83,28 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	});
 });
 
+// Get an existing ValueChart by name. Note that the chart id (which comes from the db) and the password must both be correct.
+valueChartRoutes.get('/:chart/byname', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var chartName: string = (<any> req).chartId; // ChartId is misleading here. It is the name, not id.
+	
+	var password: string = req.query.password;
+
+	valueChartsCollection.findOne({ name: chartName, password: password }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+
+		} else if (doc) {
+			res.location('/ValueCharts/' + chartName + '/byname')
+				.status(200)
+				.json({ data: doc });
+		} else {	// No ValueChart with that name + password combination was found. Return 404: Not Found.
+			res.sendStatus(404)
+		}
+	});
+});
+
 // Get an existing ValueChart by id. Only include the preferences for the user with the specified username.
 valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');

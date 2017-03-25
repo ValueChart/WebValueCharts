@@ -44,9 +44,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	// ========================================================================================
 
 	private valueChart: ValueChart;
-	public inactiveValueCharts: ValueChart[] = [];		// The ValueCharts not currently being used by the application. This should have a 
-														// maximum on ONE element, and ONLY when the average of the current ValueChart is being
-														// displayed by the ValueChartViewerComponent. 
 
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
@@ -59,8 +56,6 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
 															 // has been reset since they last did SMARTER
-
-	private demo: boolean;	// Is the current valueChart a demo chart
 
 
 	// ========================================================================================
@@ -89,9 +84,8 @@ export class ValueChartService implements ValueChartStateContainer {
 	// ========================================================================================
 
 	// Initialize Service fields based on the passed-in ValueChart.
-	setValueChart(valueChart: ValueChart, isDemo: boolean = false): void {
+	setValueChart(valueChart: ValueChart): void {
 		this.valueChart = valueChart;
-		this.demo = isDemo;
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 	}
 
@@ -100,13 +94,7 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	addUser(user: User) {
-		// If current valueChart is an average chart, add the user to the underlying Group ValueChart instead.
-		if (this.inactiveValueCharts.length > 0) {
-			this.inactiveValueCharts[0].addUser(user);
-		}
-		else {
-			this.valueChart.addUser(user);	
-		}
+		this.valueChart.addUser(user);	
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
@@ -118,11 +106,7 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getUsers();
 	}
 
-	// If current valueChart is an average chart, this method will return the users for the underlying Group ValueChart instead.
 	getGroupValueChartUsers(): User[] {
-		if (this.inactiveValueCharts.length > 0) {
-			return this.inactiveValueCharts[0].getUsers();
-		}
 		return this.getUsers();	
 	}
 
@@ -240,10 +224,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	setWeightMap(user: User, weightMap: WeightMap) {
 		user.setWeightMap(weightMap);
 		this.weightMapReset[user.getUsername()] = false;
-	}
-
-	isDemo() {
-		return this.demo;
 	}
 
 	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.

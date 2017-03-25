@@ -46,6 +46,8 @@ export class HomeComponent {
 	private valueChartPassword: string;
 	private invalidCredentials: boolean;
 	private validationMessage: string;
+	private isJoining: boolean = false; // boolean toggle indicating whether user clicked to join or view an existing chart 
+										// this is needed so we can use the same credentials modal in both cases
 
 	// ========================================================================================
 	// 									Constructor
@@ -67,6 +69,23 @@ export class HomeComponent {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	
+	/*
+		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
+		@param chartPassword - The password of the ValueChart to join. 
+		@returns {void}
+		@description 	Called when credentials modal is closed. 
+						Delegates to joinValueChart or viewValueChart based on which button was clicked.
+	*/
+	handleModalInputs(chartName: string, chartPassword: string): void {
+		if (this.isJoining) {
+			this.joinValueChart(chartName, chartPassword);
+		}
+		else {
+			this.viewValueChart(chartName, chartPassword);
+		}
+	}
 
 	/*
 		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
@@ -93,13 +112,37 @@ export class HomeComponent {
 	}
 
 	/*
+		@param chartName - The name of the ValueChart to view. This is NOT the _id field set by the server, but rather the user defined name.
+		@param chartPassword - The password of the ValueChart to join. 
+		@returns {void}
+		@description 	Retrieves the ValueChart that matches the given credentials and directs the user to the ValueChartViewerComponent to view it. 
+						Notifies the user using a banner warning if no ValueChart exists with the given name and password.
+	*/
+	viewValueChart(chartName: string, chartPassword: string): void {
+		this.valueChartHttpService.getValueChartByName(chartName, chartPassword)
+			.subscribe(
+			(valueChart: ValueChart) => {
+				this.valueChartService.setValueChart(valueChart);
+				this.currentUserService.setJoiningChart(false);
+				$('#chart-credentials-modal').modal('hide');
+				var parameters = this.valueChartService.getValueChartName();
+				this.router.navigate(['/view/', parameters]);
+			},
+			// Handle Server Errors (like not finding the ValueChart)
+			(error) => {
+				if (error === '404 - Not Found')
+					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
+			});
+	}
+
+	/*
 		@param demoChart - A demonstration chart to view. 
 		@returns {void}
 		@description 	Opens a demonstration ValueChart and directs the user to the ValueChartViewerComponent to view it.
 						This method will be removed when demonstration charts are removed from the home page.
 	*/
 	selectDemoValueChart(demoChart: any): void {
-		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString), true);
+		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
 		var parameters = this.valueChartService.getValueChartName();
 		this.router.navigate(['/view/', parameters]);
@@ -151,5 +194,18 @@ export class HomeComponent {
 	*/
 	fixChart() {
 		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
+	}
+
+	/*
+		@returns {string}
+		@description 	Title for the credentials modal.
+	*/
+	getModalTitle(): string {
+		if (this.isJoining) {
+			return "Join Existing Chart";
+		}
+		else {
+			return "View Existing Chart";
+		}
 	}
 }

@@ -131,6 +131,19 @@ export class ValueChartHttpService {
 	}
 
 	/*
+		@param chartName - The name of the ValueChart whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
+		@param password - The password for the ValueChart whose structure is to be retrieved.
+		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
+		@description 	Queries the server to retrieve a copy of the ValueChart resource with the given name and password. This will fail
+						to return the desired ValueChart if the name and password are not correct. 
+	*/
+	getValueChartByName(chartName: string, password: string): Observable<ValueChart> {
+		return this.http.get(this.valueChartsUrl + chartName + '/byname?password=' + password)
+			.map(this.extractValueChartData)
+			.catch(this.handleError);
+	}
+
+	/*
 		@param chartId - The id of the ValueChart resource to be deleted. This id is provided by the server upon creating/updating a ValueChart resource.
 		@returns {Observable<any>} - An observable of either a string if the deletion was successful, or a JSON object with an error if it was not. 
 		@description 	Queries the server to delete the ValueChart resource with the given id. 
@@ -159,7 +172,7 @@ export class ValueChartHttpService {
 		@param chartName - The name of the ValueChart whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
 		@param password - The password for the ValueChart whose structure is to be retrieved.
 		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
-		@description 	Queries the server to retrieve the structure of the ValueChart resource with the given id and password.
+		@description 	Queries the server to retrieve the structure of the ValueChart resource with the given name and password.
 						Structure means that the retrieved ValueChart only has Objectives, and Alternatives. It has NO users.
 	*/
 	getValueChartStructure(chartName: string, password: string): Observable<ValueChart> {
