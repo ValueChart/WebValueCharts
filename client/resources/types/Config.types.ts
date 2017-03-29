@@ -11,6 +11,7 @@ export interface InteractionConfig {
 	sortAlternatives: string;
 	pumpWeights: string;
 	setObjectiveColors: boolean;
+	adjustScoreFunctions: boolean;
 }
 
 export interface ViewConfig {

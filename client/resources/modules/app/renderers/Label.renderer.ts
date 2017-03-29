@@ -101,7 +101,7 @@ export class LabelRenderer {
 						the label area must be destroyed and reconstructed. This is partly because assigning different data to a label may change the number of children it has,
 						which requires a complete change in the structure of SVG elements.
 	*/
-	createLabelSpace(el: d3.Selection<any, any, any, any>, labelData: LabelData[], objectiveData: PrimitiveObjective[]): void {
+	createLabelSpace(el: d3.Selection<any, any, any, any>, labelData: LabelData[], objectiveData: PrimitiveObjective[], enableInteraction: boolean): void {
 		// Create the root container which will hold all label related SVG elements.
 		this.rootContainer = el.append('g')
 			.classed(this.defs.ROOT_CONTAINER, true)
@@ -125,7 +125,7 @@ export class LabelRenderer {
 		this.createLabels(el, this.labelContainer, labelData, this.defs.ROOT_CONTAINER_NAME);
 
 		// Create the score Functions.
-		this.createScoreFunctions(this.scoreFunctionContainer, objectiveData);
+		this.createScoreFunctions(this.scoreFunctionContainer, objectiveData, enableInteraction);
 	
 		// Fire the Construction Over event on completion of construction.
 		(<any>this.renderEventsService.labelsDispatcher).call('Construction-Over');
@@ -428,7 +428,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
-	createScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
+	createScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[], enableInteraction: boolean): void {
 		this.scoreFunctionRenderers = {}
 
 		var newScoreFunctionPlots: d3.Selection<any, any, any, any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
@@ -449,7 +449,7 @@ export class LabelRenderer {
 
 			var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
 
-			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum, usersDomainElements);
+			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum, usersDomainElements, enableInteraction);
 		});
 	}
 	/*

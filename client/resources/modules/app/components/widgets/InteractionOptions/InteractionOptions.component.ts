@@ -50,7 +50,8 @@ export class InteractionOptionsComponent implements OnInit {
 			reorderObjectives: false,
 			sortAlternatives: this.ALTERNATIVE_SORT_OFF,
 			pumpWeights: this.PUMP_OFF,
-			setObjectiveColors: false
+			setObjectiveColors: false,
+			adjustScoreFunctions: (this.chartType === 'interactive')
 		}
 
 		this.updateInteractionConfig(this.config);

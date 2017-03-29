@@ -71,6 +71,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 	private users: User[];
 	private objectiveToDisplay: PrimitiveObjective;
+	private enableInteraction: boolean;
 	private previousScoreFunctions: ScoreFunction[];
 
 	private viewType: string;
@@ -116,6 +117,8 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.valueChartService = (<any>window.opener).valueChartService;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
 			this.scoreFunctionViewerService = new ScoreFunctionViewerService(this.valueChartService);
+			this.enableInteraction = false; // Setting interaction to false wholesale temporarily
+											// Need to find a clean way to pass parameter in from ValueChartViewer
 		}
 
 		this.services.valueChartService = this.valueChartService;

@@ -189,7 +189,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						is encapsulated in its own method. 
 	*/
 	createLabels(): void {
-		this.labelRenderer.createLabelSpace(this.el, this.rendererDataService.getLabelData(), this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.createLabelSpace(this.el, this.rendererDataService.getLabelData(), this.valueChartService.getPrimitiveObjectives(), this.interactionConfig.adjustScoreFunctions);
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
 

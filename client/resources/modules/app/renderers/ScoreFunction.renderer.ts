@@ -39,7 +39,8 @@ export abstract class ScoreFunctionRenderer {
 
 	protected domainSize: number;							// The number of domain elements the score function needs to plot.
 	protected objective: PrimitiveObjective;				// The primitive objective this renderer is creating a plot for.
-	protected usersDomainElements: UserDomainElements[];		// The data that this class is rendering. 
+	protected usersDomainElements: UserDomainElements[];		// The data that this class is rendering.
+	protected enableInteraction: boolean;					// Whether or not the score functions may be adjusted
 
 	// d3 Selections:
 	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the score function plot.
@@ -108,10 +109,11 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
 						sub classes of this class should call createScoreFunction before creating any of their specific elements.
 	*/
-	createScoreFunction(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createScoreFunction(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], enableInteraction: boolean): void {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
 		this.usersDomainElements = usersDomainElements.slice();
+		this.enableInteraction = enableInteraction;
 
 		// The root container is passed in.
 		this.rootContainer = el;

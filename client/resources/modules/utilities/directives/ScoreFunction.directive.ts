@@ -44,6 +44,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private plotHeight: number;
 	private viewOrientation: string;
 	private individual: boolean;
+	private enableInteraction: boolean;
 
 	// Services:
 	private valueChartService: ValueChartService;
@@ -110,7 +111,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 		}
 
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements);
+		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
 		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 	}
 
@@ -175,5 +176,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	@Input() set individualOnly(value: any) {
 		this.individual = <boolean> value;
+	}
+
+	@Input() set interaction(value: any) {
+		this.enableInteraction = <boolean> value;
 	}
 }

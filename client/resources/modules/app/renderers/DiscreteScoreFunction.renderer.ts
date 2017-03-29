@@ -245,8 +245,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			})
 			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); });
 
-		// Enable or disable dragging to change user score functions depending on whether the ValueChart is has multiple users (should be disabled) or has one user (should be enabled).
-		this.toggleDragToChangeScore((this.usersDomainElements.length === 1), objective, viewOrientation);
+		// Enable or disable dragging to change user score functions depending on whether interaction is enabled
+		this.toggleDragToChangeScore(this.enableInteraction, objective, viewOrientation);
 	}
 
 	/*
