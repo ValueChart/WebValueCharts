@@ -227,6 +227,8 @@ export class ValueChartViewerComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
+		this.rescaleScoreFunctions();
+
 		if (this.hostService.hostWebSocket) {
 			this.hostService.endCurrentHosting();
 		}
@@ -259,6 +261,25 @@ export class ValueChartViewerComponent implements OnInit {
 				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()
 				&& this.valueChart.getCreator() === this.currentUserService.getUsername()));
 	}
+
+	  /*   
+    @returns {void}
+    @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
+  */
+  rescaleScoreFunctions(): void {
+	    let rescaled: boolean = false;
+	    for (let user of this.valueChartService.getUsers()) {
+			for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+      			if (scoreFunction.rescale()) {
+        			rescaled = true;
+      			}
+	    	}
+	    }
+	    if (rescaled) {
+	    	toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
+	    }
+  }
 
 	// ================================ Hosting/Joining a ValueChart ====================================
 
@@ -305,6 +326,7 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	submitPreferences(): void {
 		var currentUser: User = this.valueChartService.getCurrentUser();
+		this.rescaleScoreFunctions();
 
 		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 		// that has been retrieved from the server.
