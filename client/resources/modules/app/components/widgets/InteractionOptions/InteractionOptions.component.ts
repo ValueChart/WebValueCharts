@@ -46,7 +46,7 @@ export class InteractionOptionsComponent implements OnInit {
 
 	ngOnInit() {
 		this.config = {
-			weightResizeType: (this.chartType === 'individual') ? this.RESIZE_NEIGHBOR : this.NO_RESIZING,
+			weightResizeType: (this.chartType === 'interactive') ? this.RESIZE_NEIGHBOR : this.NO_RESIZING,
 			reorderObjectives: false,
 			sortAlternatives: this.ALTERNATIVE_SORT_OFF,
 			pumpWeights: this.PUMP_OFF,

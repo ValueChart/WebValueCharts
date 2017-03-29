@@ -98,6 +98,10 @@ export class ValueChartService implements ValueChartStateContainer {
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
+	addCurrentUser() {
+		this.addUser(new User(this.currentUserService.getUsername()));
+	}
+
 	getValueChartName() {
 		return this.valueChart.getName();
 	}
@@ -191,14 +195,21 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.getCurrentUser() !== undefined;
 	}
 
+	isCurrentUserInChart(): boolean {
+		return this.valueChart.getUsers().filter((user: User) => {
+			return user.getUsername() === this.currentUserService.getUsername();
+		}).length > 0;
+	}
+
 	getCurrentUser(): User {
 		// Obviously we should have it so that two usernames are never the same.
 		var user: User = this.valueChart.getUsers().filter((user: User) => {
 			return user.getUsername() === this.currentUserService.getUsername();
 		})[0];
 
-		if (!user)
-			user = this.valueChart.getUsers()[0];
+		if (!user) {
+			throw "Current user is not in the chart";
+		}
 
 		return user;
 	}
@@ -211,6 +222,10 @@ export class ValueChartService implements ValueChartStateContainer {
 	getCurrentUserWeightMap(): WeightMap {
 		if (this.currentUserIsDefined())
 			return this.getCurrentUser().getWeightMap();
+	}
+
+	getDefaultWeightMap(): WeightMap {
+		return this.valueChart.getDefaultWeightMap();
 	}
 
 	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
@@ -237,26 +252,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	resetWeightMap(user: User, weightMap: WeightMap) {
 		user.setWeightMap(weightMap);
 		this.weightMapReset[user.getUsername()] = true;
-	}
-
-	// Create initial weight map for the Objective hierarchy with evenly distributed weights
-	getDefaultWeightMap(): WeightMap {
-		let weightMap: WeightMap = new WeightMap();
-		this.initializeDefaultWeightMap(this.getRootObjectives(), weightMap, 1);
-		return weightMap;
-	}
-
-	// Recursively add entries to weight map
-	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
-		let weight = parentWeight * 1.0 / objectives.length;
-		for (let obj of objectives) {
-			if (obj.objectiveType === 'abstract') {
-				this.initializeDefaultWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
-			}
-			else {
-				weightMap.setObjectiveWeight(obj.getName(), weight);			
-			}
-		}
 	}
 
 	// Set up initial ScoreFunctions

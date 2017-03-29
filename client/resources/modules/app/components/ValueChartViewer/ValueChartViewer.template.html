@@ -12,7 +12,7 @@
 				Edit Preferences
 				</a>
 			</div>
-			<div *ngIf="!currentUserService.isJoiningChart()" class="form-group valuechart-toolbar-group pull-left">
+			<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()" class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
 			<div *ngIf="currentUserService.isJoiningChart()">
@@ -22,7 +22,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="!currentUserService.isJoiningChart()">
+			<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="hostService.userChangesAccepted">
 					<button class="btn btn-danger" (click)="hostService.setUserChangesAccepted(false, valueChart._id)">
 					Lock Chart
@@ -45,8 +45,8 @@
 				</button>
 			</div>
 			<div class="col-xs-1 pull-right"></div>
-			<ViewOptions [chartType]="(this.valueChart.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [chartType]="(this.valueChart.isIndividual() ? 'individual' : 'group')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
+			<ViewOptions [chartType]="(this.valueChartService.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
+			<InteractionOptions [chartType]="(this.isInteractive() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<div id="detail-box" class="detail-box"
@@ -65,7 +65,7 @@
 				<h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
 				</button>
 			</div>
-			<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChart.isIndividual()">
+			<div class="form-group valuechart-toolbar-group pull-left">
 				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="user-list-header-container"
 				(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 				<h5 id="user-list-headers">User List</h5>
@@ -84,7 +84,7 @@
 					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
 					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
 				</div>
-				<div *ngIf="!currentUserService.isJoiningChart()">
+				<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()">
 					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
 					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
 				</div>

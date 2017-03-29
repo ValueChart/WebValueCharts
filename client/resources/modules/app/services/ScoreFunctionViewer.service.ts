@@ -54,16 +54,10 @@ export class ScoreFunctionViewerService {
 		var allUsersDomainElements: UserDomainElements[] = [];
 		var domainElements: (string | number)[] = [];
 
-		if (objective.getDomainType() === 'categorical') {
-			domainElements = (<CategoricalDomain>objective.getDomain()).getElements();
-		} else if (objective.getDomainType() === 'interval') {
-			domainElements = (<IntervalDomain>objective.getDomain()).getElements();
-		} else {
-			domainElements = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
-		}
-
 		users.forEach((user: User) => {
 			var userDomainElements: UserDomainElements = { user: user, elements: [] };
+
+			domainElements = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
 
 			domainElements.forEach((domainElement: string | number) => {
 				userDomainElements.elements.push({ user: user, element: domainElement });

@@ -245,6 +245,21 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHeight = ($(window).height() * 0.75) * 1.5;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Whether or not the current user may interactively change the scores and weights.
+						True iff the current user is joining the chart OR the chart contains exactly ONE user who is:
+							(a) the current user AND
+							(b) the chart creator
+						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
+	*/
+	isInteractive(): boolean {
+		return (this.currentUserService.isJoiningChart() 
+			|| (this.valueChartService.isIndividual()
+				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()
+				&& this.valueChart.getCreator() === this.currentUserService.getUsername()));
+	}
+
 	// ================================ Hosting/Joining a ValueChart ====================================
 
 	/* 	

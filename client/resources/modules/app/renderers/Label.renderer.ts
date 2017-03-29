@@ -381,8 +381,8 @@ export class LabelRenderer {
 			.attr('dy', '1.2em')
 			.text((d: LabelData) => {
 				var bestWorstText = '';
-				if (d.objective.objectiveType === 'primitive') {
-					var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+				if (d.objective.objectiveType === 'primitive' && this.valueChartService.getUsers().length > 0) {
+					var scoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
 				return bestWorstText;

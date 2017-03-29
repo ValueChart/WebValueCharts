@@ -200,7 +200,7 @@ export abstract class ScoreFunctionRenderer {
 
 		// Create one label for each element of the PrimitiveObjective's domain.
 		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
-			.data(usersDomainElements[0].elements)
+			.data(usersDomainElements.length > 0 ? usersDomainElements[0].elements : [])
 			.enter().append('text')
 			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
 			.attr('id', (d: DomainElement) => {
@@ -338,7 +338,7 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	renderPlot(domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
 
-		this.domainSize = usersDomainElements[0].elements.length;
+		this.domainSize = usersDomainElements.length > 0 ? usersDomainElements[0].elements.length : 0;
 
 		var labelCoordinateOneOffset: number;
 		var labelCoordinateTwo: number;

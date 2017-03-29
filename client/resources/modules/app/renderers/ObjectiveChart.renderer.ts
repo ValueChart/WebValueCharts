@@ -392,7 +392,10 @@ export class ObjectiveChartRenderer {
 			.text((d: CellData, i: number) => { return d.value })
 			.attr(this.viewConfig.coordinateOne, (this.viewConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / 3)
 			.attr(this.viewConfig.coordinateTwo, (d: CellData, i: number) => {
-				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());
+				let maxObjectiveWeight: number = 0;
+				if (d.userScores.length > 0) {
+					this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());				
+				}
 				return (viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
 

@@ -45,7 +45,6 @@ export class CreateValueChartComponent implements OnInit {
 	// ========================================================================================
 
 	valueChart: ValueChart;
-	user: User;
 	purpose: string; // "newChart" or "newUser" or "editChart" or "editPreferences"
 
 	// Navigation Control:
@@ -111,13 +110,8 @@ export class CreateValueChartComponent implements OnInit {
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			(<any>valueChart).incomplete = true; // Initialize ValueChart to incomplete
 			this.valueChartService.setValueChart(valueChart); // Set the chart
-			this.valueChartService.addUser(new User(this.currentUserService.getUsername())); // Add a new user
-		}
-		else if (this.purpose == "newUser") {
-			this.valueChartService.addUser(new User(this.currentUserService.getUsername())); // Add a new user to current chart
 		}
 		this.valueChart = this.valueChartService.getValueChart();
-		this.user = this.valueChartService.getCurrentUser();
 	}
 
 	/* 	

@@ -274,10 +274,13 @@ export class ValueChart {
 		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
 		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
 						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
-						one user the in ValueChart, that user's weight map is simply returned. The maximum weight map is to determine label heights
-						by the LabelRenderer, and row heights by the objective chart renderer.
+						one user the in ValueChart, that user's weight map is simply returned. If there are no users, the default weight map is returned.
+						The maximum weight map is to determine label heights by the LabelRenderer, and row heights by the objective chart renderer.
 	*/
 	getMaximumWeightMap(): WeightMap {
+		if (this.users.length === 0)
+			return this.getDefaultWeightMap();
+	
 		if (this.users.length === 1)
 			return this.users[0].getWeightMap();
 
@@ -299,6 +302,32 @@ export class ValueChart {
 		}
 
 		return maximumWeightMap;
+	}
+
+	/*
+		@returns {WeightMap} - The default WeightMap.
+		@description	Create a default weight map for the Objective hierarchy with evenly distributed weights
+	*/
+	getDefaultWeightMap(): WeightMap {
+		let weightMap: WeightMap = new WeightMap();
+		this.initializeDefaultWeightMap(this.getRootObjectives(), weightMap, 1);
+		return weightMap;
+	}
+
+	/*
+		@returns {void}
+		@description	Helper method for getDefaultWeightMap(). Recursively add entries to the WeightMap.
+	*/
+	private initializeDefaultWeightMap(objectives: Objective[], weightMap: WeightMap, parentWeight: number) {
+		let weight = parentWeight * 1.0 / objectives.length;
+		for (let obj of objectives) {
+			if (obj.objectiveType === 'abstract') {
+				this.initializeDefaultWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
+			}
+			else {
+				weightMap.setObjectiveWeight(obj.getName(), weight);			
+			}
+		}
 	}
 }
 
