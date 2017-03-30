@@ -354,7 +354,7 @@ export class CreateValueChartComponent implements OnInit {
 			return;	// Don't autosave. The user is joining an existing ValueChart.
 		}
 
-		if (!valueChart._id) {		// Do not autosave for users who are joining the ValueChart.
+		if (!valueChart._id) {
 			// Save the ValueChart for the first time.
 			this.saveValueChartToDatabase(valueChart);
 		} else {

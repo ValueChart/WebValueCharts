@@ -227,7 +227,18 @@ export class ValueChartViewerComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-		this.rescaleScoreFunctions();
+
+		// Make sure to save any changes to score functions and weights to database
+		if (this.isInteractive() && !this.currentUserService.isJoiningChart()) {
+			this.rescaleScoreFunctions();
+			this.valueChartHttpService.updateValueChart(this.valueChart)
+				.subscribe(
+				(valuechart) => { toastr.success('ValueChart auto-saved'); },
+				(error) => {
+					// Handle any errors here.
+					toastr.warning('Auto-saving failed');
+				});
+		}
 
 		if (this.hostService.hostWebSocket) {
 			this.hostService.endCurrentHosting();
