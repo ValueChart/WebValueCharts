@@ -83,15 +83,8 @@ export class CreationStepsService {
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
 	next(purpose: string) {
-		if (this.step === this.PRIORITIES) {
-			window.onpopstate = () => { };
-			(<any>window).destination = '/view/ValueChart';
-			this.router.navigate(['/view/ValueChart']);				
-		}
-		else {
-			this.step = this.nextStep[this.step];
-			this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
-		}
+		this.step = this.nextStep[this.step];
+		this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
 	}
 
 	/* 	

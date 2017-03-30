@@ -166,9 +166,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.nextIfNameAvailable(browserTriggered);
 			}
 			else {
-				if (this.creationStepsService.step !== this.creationStepsService.PRIORITIES) {
-					this.autoSaveValueChart(this.valueChart);
-				}
+				this.autoSaveValueChart(this.valueChart);
 				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.purpose);
 			}
@@ -178,6 +176,21 @@ export class CreateValueChartComponent implements OnInit {
 			if (browserTriggered) {
 				history.forward();
 			}
+		}
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Navigates to ValueChartViewer if validation of current step succeeds.
+	*/
+	viewChart() {
+		if (this.creationStepsService.validate()) {
+			window.onpopstate = () => { };
+			(<any>window).destination = '/view/ValueChart';
+			this.router.navigate(['/view/ValueChart']);
+		}
+		else {
+			toastr.error('There were problems with your submission. Please fix them to proceed.');
 		}
 	}
 
@@ -221,13 +234,39 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	/* 	
+		@returns {boolean}
+		@description 	Show View Chart button if on Alternatives or Priorities step
+						We can consider showing this at every step once global validation is integrated into create workflow.
+	*/
+	showViewChartButton(): boolean {
+		return (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES
+			|| this.creationStepsService.step === this.creationStepsService.PRIORITIES);
+	}
+
+	/* 	
+		@returns {boolean}
+		@description 	Disable View Chart button if the step is Alternatives and current user is already a member of the chart.
+						This is to prevent users from invalidating their preferences and then viewing chart through the Alternatives step.
+						We will improve this once global validation is integrated into create workflow.
+	*/
+	disableViewChartButton(): boolean {
+		return (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES 
+				&& this.valueChartService.isCurrentUserInChart());
+	}
+
+	/* 	
 		@returns {string}
 		@description 	 Return text for 'Next' button. Differs only at last step.
 	*/
 	nextButtonText(): string {
 		let text = "Next Stage >>";
-		if (this.creationStepsService.step === this.creationStepsService.PRIORITIES) {
-			text = "View Chart >>";
+		if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
+			if (!this.valueChartService.isCurrentUserInChart()) {
+				text = "Add Preferences >>";
+			}
+			else {
+				text = "Edit Preferences >>";
+			}
 		}
 		return text;
 	}

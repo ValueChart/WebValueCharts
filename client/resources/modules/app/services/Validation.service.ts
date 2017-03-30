@@ -663,15 +663,11 @@ export class ValidationService {
 	invalidWeightSum(valueChart: ValueChart): string[] {
 		let users = [];
 		let objs = valueChart.getAllPrimitiveObjectivesByName();
-		let error = 1e-6 * objs.length;
+		let error = 1e-3 * objs.length;
 		for (let user of valueChart.getUsers()) {
 			let weightMap = user.getWeightMap();
 			if (weightMap) {
-				let sum = 0;
-				for (let objName of objs) {
-					sum = sum + weightMap.getObjectiveWeight(objName);
-				}
-				if (sum < 1 - error || sum > 1 + error) {
+				if (weightMap.getWeightTotal() < 1 - error || weightMap.getWeightTotal() > 1 + error) {
 					users.push(user.getUsername());
 				}
 			}
