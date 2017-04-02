@@ -3,7 +3,7 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
+				<a class="btn btn-default" *ngIf="enableManagement()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
 				Edit ValueChart
 				</a>
 			</div>
@@ -12,7 +12,7 @@
 				Edit Preferences
 				</a>
 			</div>
-			<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()" class="form-group valuechart-toolbar-group pull-left">
+			<div *ngIf="enableManagement()" class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
 			<div *ngIf="currentUserService.isJoiningChart()">
@@ -22,7 +22,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()">
+			<div *ngIf="enableManagement()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="hostService.userChangesAccepted">
 					<button class="btn btn-danger" (click)="hostService.setUserChangesAccepted(false, valueChart._id)">
 					Lock Chart
@@ -31,6 +31,13 @@
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!hostService.userChangesAccepted">
 					<button class="btn btn-success" (click)="hostService.setUserChangesAccepted(true, valueChart._id)">
 					Unlock Chart
+					</button>
+				</div>
+			</div>
+			<div *ngIf="!currentUserService.isJoiningChart() && enableInteraction()">
+				<div class="form-group valuechart-toolbar-group pull-left" >
+					<button class="btn btn-success" (click)="saveChart()">
+					Save Chart
 					</button>
 				</div>
 			</div>
@@ -46,7 +53,7 @@
 			</div>
 			<div class="col-xs-1 pull-right"></div>
 			<ViewOptions [chartType]="(this.valueChartService.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [chartType]="(this.isInteractive() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
+			<InteractionOptions [chartType]="(this.enableInteraction() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<div id="detail-box" class="detail-box"
@@ -84,7 +91,7 @@
 					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
 					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
 				</div>
-				<div *ngIf="this.valueChart.getCreator() === this.currentUserService.getUsername()">
+				<div *ngIf="enableManagement()">
 					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
 					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
 				</div>
@@ -118,7 +125,7 @@
 					<h5>
 					{{user.getUsername()}}
 					<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-					<button class="pull-right btn btn-danger btn-xs btn-xxs" *ngIf="user.getUsername() !== currentUserService.getUsername()" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
+					<button *ngIf="enableManagement()" class="pull-right btn btn-danger btn-xs btn-xxs" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
 					</h5>
 				</div>
 			</div>

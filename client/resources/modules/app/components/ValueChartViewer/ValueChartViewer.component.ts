@@ -228,18 +228,6 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	ngOnDestroy() {
 
-		// Make sure to save any changes to score functions and weights to database
-		if (this.isInteractive() && !this.currentUserService.isJoiningChart()) {
-			this.rescaleScoreFunctions();
-			this.valueChartHttpService.updateValueChart(this.valueChart)
-				.subscribe(
-				(valuechart) => { toastr.success('ValueChart auto-saved'); },
-				(error) => {
-					// Handle any errors here.
-					toastr.warning('Auto-saving failed');
-				});
-		}
-
 		if (this.hostService.hostWebSocket) {
 			this.hostService.endCurrentHosting();
 		}
@@ -266,11 +254,21 @@ export class ValueChartViewerComponent implements OnInit {
 							(b) the chart creator
 						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
 	*/
-	isInteractive(): boolean {
+	enableInteraction(): boolean {
 		return (this.currentUserService.isJoiningChart() 
 			|| (this.valueChartService.isIndividual()
 				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()
 				&& this.valueChart.getCreator() === this.currentUserService.getUsername()));
+	}
+
+	/* 	
+		@returns {boolean}
+		@description 	Whether or not the current user should be permitted to manage the chart.
+						Management activities include: Edit chart, export chart, lock/unlock chart, and remove users
+	*/
+	enableManagement(): boolean {
+		return (!this.currentUserService.isJoiningChart() 
+			&& this.valueChart.getCreator() === this.currentUserService.getUsername());
 	}
 
 	  /*   
@@ -292,7 +290,7 @@ export class ValueChartViewerComponent implements OnInit {
 	    }
   }
 
-	// ================================ Hosting/Joining a ValueChart ====================================
+	// ================================ Hosting/Joining/Saving a ValueChart ====================================
 
 	/* 	
 		@returns {void}
@@ -355,6 +353,21 @@ export class ValueChartViewerComponent implements OnInit {
 					toastr.warning('Preference submission failed. The Host has disabled new submissions');
 				else 
 					toastr.error('Preference submission failed. There was an error submitting your preferences');
+			});
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Updates the chart on the database.
+	*/
+	saveChart(): void {
+		this.rescaleScoreFunctions();
+		this.valueChartHttpService.updateValueChart(this.valueChart)
+			.subscribe(
+			(valuechart) => { toastr.success('ValueChart saved'); },
+			(error) => {
+				// Handle any errors here.
+				toastr.warning('Saving failed');
 			});
 	}
 
