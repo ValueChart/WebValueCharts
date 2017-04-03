@@ -95,7 +95,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.services.chartUndoRedoService = this.chartUndoRedoService;
     this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
 
-    if (!this.valueChartService.isCurrentUserInChart()) {
+    if (!this.valueChartService.currentUserIsDefined()) {
       this.valueChartService.addCurrentUser();
     }
     this.user = this.valueChartService.getCurrentUser();

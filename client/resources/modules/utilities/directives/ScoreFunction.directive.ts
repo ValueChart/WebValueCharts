@@ -77,9 +77,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	// ========================================================================================
 
 	ngOnInit() {
-
-		this.user = this.valueChartService.getCurrentUser();
-
+		
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
 
 		this.initChangeDetection();
@@ -88,9 +86,11 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initChangeDetection(): void {
 
-		let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
-		this.previousScoreFunction = currentScoreFunction;
-		this.previousObjectiveToDisplay = this.objectiveToDisplay;
+		if (this.enableInteraction) {
+			let currentScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
+			this.previousScoreFunction = currentScoreFunction;
+			this.previousObjectiveToDisplay = this.objectiveToDisplay;
+		}	
 	}
 
 	initScoreFunctionPlot(): void {
@@ -101,15 +101,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
 		}
 
-		this.valueChartService.getCurrentUser()
-
 		var usersDomainElements: UserDomainElements[]
 
-		if (this.individual) {
-			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, [this.valueChartService.getCurrentUser()]);
-		} else {
-			usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
-		}
+		usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
 		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
@@ -137,16 +131,18 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		}
 
 		else {
-			let currentScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
-			var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
+			if (this.enableInteraction) {
+				let currentScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
+				var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
 
-			if (scoreFunctionChange) {
-				this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
-				this.previousScoreFunction = currentScoreFunction.getMemento();
+				if (scoreFunctionChange) {
+					this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
+					this.previousScoreFunction = currentScoreFunction.getMemento();
 
-				// If this is a sub window, update the parent window in response to the changes.
-				if (window.opener) {
-					(<any>window.opener).angularAppRef.tick();
+					// If this is a sub window, update the parent window in response to the changes.
+					if (window.opener) {
+						(<any>window.opener).angularAppRef.tick();
+					}
 				}
 			}
 		}

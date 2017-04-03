@@ -251,7 +251,7 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	disableViewChartButton(): boolean {
 		return (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES 
-				&& this.valueChartService.isCurrentUserInChart());
+				&& this.valueChartService.currentUserIsDefined());
 	}
 
 	/* 	
@@ -261,7 +261,7 @@ export class CreateValueChartComponent implements OnInit {
 	nextButtonText(): string {
 		let text = "Next Stage >>";
 		if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
-			if (!this.valueChartService.isCurrentUserInChart()) {
+			if (!this.valueChartService.currentUserIsDefined()) {
 				text = "Add Preferences >>";
 			}
 			else {
