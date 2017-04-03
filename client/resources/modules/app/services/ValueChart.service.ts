@@ -192,10 +192,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	currentUserIsDefined(): boolean {
-		return this.getCurrentUser() !== undefined;
-	}
-
-	isCurrentUserInChart(): boolean {
 		return this.valueChart.getUsers().filter((user: User) => {
 			return user.getUsername() === this.currentUserService.getUsername();
 		}).length > 0;
