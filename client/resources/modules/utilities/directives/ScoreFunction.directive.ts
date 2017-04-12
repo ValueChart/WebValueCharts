@@ -96,9 +96,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	initScoreFunctionPlot(): void {
 
 		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
 		}
 
 		var usersDomainElements: UserDomainElements[]

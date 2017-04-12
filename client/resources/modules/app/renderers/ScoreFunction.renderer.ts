@@ -13,7 +13,6 @@ import * as d3 														from 'd3';
 
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
-import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 // Import Model Classes:
@@ -95,7 +94,6 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	constructor(
 		protected valueChartService: ValueChartService,
-		protected scoreFunctionViewerService: ScoreFunctionViewerService,
 		protected chartUndoRedoService: ChartUndoRedoService) { }
 
 	// ========================================================================================

@@ -14,7 +14,6 @@ import * as d3 											from 'd3';
 
 // Import Application Classes
 import { ValueChartService }							from '../services/ValueChart.service';
-import { ScoreFunctionViewerService }					from '../services/ScoreFunctionViewer.service';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
@@ -70,8 +69,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(valueChartService: ValueChartService, scoreFunctionViewerService: ScoreFunctionViewerService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
-		super(valueChartService, scoreFunctionViewerService, chartUndoRedoService);
+	constructor(valueChartService: ValueChartService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
+		super(valueChartService, chartUndoRedoService);
 	}
 
 	// ========================================================================================

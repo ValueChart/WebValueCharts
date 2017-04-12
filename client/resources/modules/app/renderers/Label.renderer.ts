@@ -443,9 +443,9 @@ export class LabelRenderer {
 			var datum: PrimitiveObjective = el.data()[0];
 
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
 			else
-				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.scoreFunctionViewerService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
 
 			var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
 
