@@ -255,9 +255,7 @@ export class ValueChartService implements ValueChartStateContainer {
 	getInitialScoreFunctionMap(): ScoreFunctionMap {
 		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 		for (let obj of this.getPrimitiveObjectives()) {
-			let scoreFunction = obj.getDomainType() === 'continuous' ? new ContinuousScoreFunction() : new DiscreteScoreFunction();
-			scoreFunction.initialize(obj,ScoreFunction.FLAT);
-			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), scoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction().getMemento());
 		}
 		return scoreFunctionMap;
 	}

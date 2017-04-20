@@ -59,8 +59,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private previousObjectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunction: ScoreFunction;
 
-	private user: User;
-
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -104,7 +102,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		var usersDomainElements: UserDomainElements[]
 
 		usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
-
+		
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
 		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
 	}

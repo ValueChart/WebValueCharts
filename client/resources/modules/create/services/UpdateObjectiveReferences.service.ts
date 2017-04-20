@@ -53,7 +53,7 @@ export class UpdateObjectiveReferencesService {
 		for (let user of this.valueChartService.getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
-				scoreFunctionMap.getObjectiveScoreFunction(obj.getName()).initialize(<PrimitiveObjective>obj,ScoreFunction.FLAT);
+				scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction().getMemento());
 			}
 		}
 	}
@@ -65,12 +65,10 @@ export class UpdateObjectiveReferencesService {
 	addScoreFunctions(objNames: string[]) {
 		for (let objname of objNames) {
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
-			let scoreFunction = obj.getDomainType() === 'continuous' ? new ContinuousScoreFunction() : new DiscreteScoreFunction();
-			scoreFunction.initialize(obj,ScoreFunction.FLAT);
 			for (let user of this.valueChartService.getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
-					scoreFunctionMap.setObjectiveScoreFunction(objname, scoreFunction);
+					scoreFunctionMap.setObjectiveScoreFunction(objname, obj.getDefaultScoreFunction().getMemento());
 				}
 			}
 		}

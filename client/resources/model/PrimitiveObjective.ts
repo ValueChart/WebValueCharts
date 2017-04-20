@@ -6,9 +6,12 @@
 */
 
 // Import Model Classes:
-import { Objective } 			from './Objective';
-import { Domain } 				from './Domain';
-import { ScoreFunction } 		from './ScoreFunction';
+import { Objective } 					from './Objective';
+import { Domain } 						from './Domain';
+import { ContinuousDomain } 			from './ContinuousDomain';
+import { ScoreFunction } 				from './ScoreFunction';
+import { DiscreteScoreFunction } 		from './DiscreteScoreFunction';
+import { ContinuousScoreFunction } 		from './ContinuousScoreFunction';
 
 import { Memento }				from './Memento';
 
@@ -37,7 +40,7 @@ export class PrimitiveObjective implements Objective {
 	private description: string;			// The description of the objective.
 	private color: string;					// The color of the objective in a ValueChart.
 	private domain: Domain;					// The domain of the objective. 
-	private defaultScoreFunction: ScoreFunction;	// The default score function for all users. (Optional. If undefined, each user will start with a flat score function.)
+	private defaultScoreFunction: ScoreFunction;	// The default score function for all users.
 	private scoreFunctionFixed: boolean 	// True if defaultScoreFunction is common to all users and cannot be customized.
 
 
@@ -109,6 +112,23 @@ export class PrimitiveObjective implements Objective {
 
 	setDomain(domain: Domain): void {
 		this.domain = domain;
+	}
+
+	getDefaultScoreFunction(): ScoreFunction {
+		if (this.defaultScoreFunction === undefined) {
+			this.initializeDefaultScoreFunction();
+		}
+		return this.defaultScoreFunction;
+	}
+
+	initializeDefaultScoreFunction(): void {
+		if (this.getDomainType() === 'categorical' || this.getDomainType() === 'interval') {
+			this.defaultScoreFunction = new DiscreteScoreFunction();
+		}
+		else {
+			this.defaultScoreFunction = new ContinuousScoreFunction((<ContinuousDomain>this.domain).getMinValue(),(<ContinuousDomain>this.domain).getMaxValue());
+		}
+		this.defaultScoreFunction.initialize(this, ScoreFunction.FLAT);
 	}
 
 

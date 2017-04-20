@@ -88,20 +88,21 @@ export class ExpandScoreFunctionInteraction {
 	}
 
 	/*
-		@param users - The array of users whose ScoreFunctions should be plotted in the pop-up.
 		@param objective - The objective to display ScoreFunction plots for.
 		@returns {void}
 		@description	Opens a pop-up window that displays plots of user defined ScoreFunction for the given objective in a larger space. This makes them
 						more visible and easier to interact with than the small ScoreFunction plots embedded in a ValueChart. The pop-up also allows users
 						to view distributions of user assigned scores via a set of box plots.
 	*/
-	openPopUp(users: User[], objective: PrimitiveObjective): void {
+	openPopUp(objective: PrimitiveObjective): void {
 		// Pass relevant data to the pop-up by attaching it to the window object. These
 		// variables will be accessible to child window via its window.opener field, which is 
 		// a reference to this window.
 		(<any>window).objectiveToPlot = objective;
 		(<any>window).valueChartService = this.valueChartService;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
+		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily
+														// Need to find a clean way to pass parameter in from ValueChartViewer										
 
 		// Open the pop-up. Note that this.popUpRef is a reference to the child window.
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
@@ -111,12 +112,11 @@ export class ExpandScoreFunctionInteraction {
 		// Save the reference to the child window.
 		(<any>window).childWindows = (<any>window).childWindows || {};
 		(<any>window).childWindows.scoreFunctionViewer = this.popUpRef;
-
 	}
 
 	// This is defined as a field rather than a method to avoid creating a new scope.
 	private expandScoreFunction = (eventObject: Event) => {
 		var objective: PrimitiveObjective = <any> d3.select(<any> eventObject.target).datum();
-		this.openPopUp(this.valueChartService.getUsers(), objective);
+		this.openPopUp(objective);
 	}
 }
