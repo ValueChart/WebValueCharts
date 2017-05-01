@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 23:42:25
+* @Last Modified time: 2017-05-01 15:08:12
 */
 
 // Import Angular Classes:
@@ -42,10 +42,10 @@ export class ChangeDetectionService {
 	public previousNumUsers: number;								// The old number of users. Its should equal the number of users in the ValueChart in the ValueChartDirective unless a change has taken place.
 
 	// Differ classes for checking the data inputs for changes:
-	public userDiffers: KeyValueDiffer[];
-	public weightMapDiffers: KeyValueDiffer[];
-	public scoreFunctionMapDiffers: KeyValueDiffer[];
-	public scoreFunctionDiffers: KeyValueDiffer[];
+	public userDiffers: KeyValueDiffer<any, any>[];
+	public weightMapDiffers: KeyValueDiffer<any, any>[];
+	public scoreFunctionMapDiffers: KeyValueDiffer<any, any>[];
+	public scoreFunctionDiffers: KeyValueDiffer<any, any>[];
 
 	// ========================================================================================
 	// 									Constructor
