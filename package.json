@@ -5,13 +5,11 @@
   "main": "index.js",
   "author": "aaronpmishkin",
   "scripts": {
-    "postinstall": "typings install",
     "client": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
     "start": "node WebValueCharts.js",
     "lite": "lite-server",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "typings": "typings",
     "pretest": "tsc",
     "test": "mocha test.js"
   },
