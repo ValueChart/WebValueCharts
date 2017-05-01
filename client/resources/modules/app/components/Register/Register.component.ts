@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:17:07
+* @Last Modified time: 2017-05-01 14:15:14
 */
 
 // Import Angular Classes:
 import { Component }										from '@angular/core';
-import { Router }											from '@angular/router';
+import { Router, NavigationExtras }							from '@angular/router';
 
 // Import Application Classes:
 import { CurrentUserService }								from '../../services/CurrentUser.service';
@@ -113,7 +113,6 @@ export class RegisterComponent {
 	}
 
 	getRedirectRoute(): string[] {
-
 		// If the user is joining a chart, then navigate to createValueChart
 		if (this.currentUserService.isJoiningChart()) {
 			return ['createValueChart/newUser/ScoreFunctions'];
@@ -123,8 +122,8 @@ export class RegisterComponent {
 	}
 
 	setUsername(username: string): void {
-		let navigationExtras = {
-			preserveQueryParams: true,
+		let navigationExtras: NavigationExtras = {
+			queryParamsHandling: "merge",
 			preserveFragment: true
 		};
 
