@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-02 18:31:48
+* @Last Modified time: 2017-05-02 16:48:28
 */
 
 // Import CategoricalDomain, the class to be tested.
-import { CategoricalDomain } from '../../client/resources/model/CategoricalDomain';
+import { CategoricalDomain } from '../../../client/resources/model/CategoricalDomain';
 
 import { expect }				from 'chai';
 

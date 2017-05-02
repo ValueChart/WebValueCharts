@@ -2,17 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 21:27:54
+* @Last Modified time: 2017-05-02 16:48:24
 */
 
 
-import { ValueChart } 			from '../../client/resources/model/ValueChart';
-import { Alternative } 			from '../../client/resources/model/Alternative';
-import { User } 				from '../../client/resources/model/User';
-import { Objective } 			from '../../client/resources/model/Objective';
-import { PrimitiveObjective } 	from '../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective } 	from '../../client/resources/model/AbstractObjective';
-import { WeightMap }			from '../../client/resources/model/WeightMap';
+import { ValueChart } 			from '../../../client/resources/model/ValueChart';
+import { Alternative } 			from '../../../client/resources/model/Alternative';
+import { User } 				from '../../../client/resources/model/User';
+import { Objective } 			from '../../../client/resources/model/Objective';
+import { PrimitiveObjective } 	from '../../../client/resources/model/PrimitiveObjective';
+import { AbstractObjective } 	from '../../../client/resources/model/AbstractObjective';
+import { WeightMap }			from '../../../client/resources/model/WeightMap';
 
 
 import { expect }				from 'chai';
