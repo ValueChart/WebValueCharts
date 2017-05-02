@@ -6,10 +6,7 @@
   "author": "aaronpmishkin",
   "scripts": {
     "start": "gulp start",
-    "tsc": "tsc",
-    "tsc:w": "tsc -w",
-    "pretest": "tsc",
-    "test": "mocha test.js"
+    "test": "gulp test"
   },
   "dependencies": {
     "@angular/animations": "^4.1.0",
@@ -72,7 +69,6 @@
     "@types/toastr": "^2.1.33",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "concurrently": "^3.1.0",
     "connect-history-api-fallback": "^1.3.0",
     "glob": "^7.1.1",
     "gulp": "^3.9.1",
