@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 22:18:34
+* @Last Modified time: 2017-05-03 12:37:02
 */
 
 // Import gulp packages:
@@ -18,7 +18,9 @@ var gulp = 			require("gulp"),
 var	merge = 		require("merge2"),	
 	path = 			require("path"),	
 	glob = 			require("glob"),
-	del = 			require("del");
+	del = 			require("del"),
+	emitStream = 	require("emit-stream"),
+	Server = 		require("karma").Server;
 
 // Retrieve the protractor and webdriver objects from gulp-
 var webdriver_standalone = pt.webdriver_standalone;
@@ -59,15 +61,17 @@ startServer = function() {
 }
 
 // Execute Mocha unit tests.
-unit = function() {
-	return gulp.src(['test/unit/**/*.js'], { read: false })
-		.pipe(mocha({
-	  		reporter: "mochawesome",
-	 		reporterOptions: {
-				reportDir: 'test/reports',
-				reportFilename: 'unit-report'
-			}
-		}));
+unit = function(done) {
+	var server = new Server({
+		configFile: __dirname + '/karma.conf.js',
+		singleRun: true
+	}, done);
+	server.start();
+
+	var stream = emitStream(server);
+	stream.once('end', () => { console.log('Unit tests completed.')});
+
+	return stream;
 }
 
 // Execute protractor end-to-end tests.
@@ -85,23 +89,29 @@ runTests = function(tests) {
 	var serverStream = startServer();
 
 	return tests().once('end', () => {
+		console.log('Shutting down local server.');
 		serverStream.emit('quit');			
 		process.exit();
 	});
 }
 
 // Definition of gulp tasks:
+// Start a standalone instance of webdriver.
 gulp.task('webdriver_standalone', webdriver_standalone);
-// Execute unit tests. Assumes pre-compilation and a running local server.
+
+// ====== Testing Tasks ======
+
+// Execute unit tests. Assumes pre-compilation of project source and a running local server.
 gulp.task('unit', ['compile:tests'], unit)
-// Executes end-to-end tests. Assumes pre-compilation and a running local server.
+// Executes end-to-end tests. Assumes pre-compilation of project source and a running local server.
 gulp.task('e2e', ['compile:tests'], e2e)
 // Executes unit tests after compiling tests and source; starts its own local server.
 gulp.task('test:unit', ['compile'], () => { return runTests(unit); });
 // Executes end-to-end tests after compiling tests and source; starts its own local server.
 gulp.task('test:e2e', ['compile'], () => { return runTests(e2e); });
-// Executes all tests after compiling tests and source; starts its own local server.
-gulp.task('test', ['compile'], () => { runTests(() => { return merge([unit(), e2e()]) })});
+
+
+// ====== Compilation Tasks ======
 
 // Compile the project tests.
 gulp.task('compile:tests', compileTests);
@@ -109,6 +119,8 @@ gulp.task('compile:tests', compileTests);
 gulp.task('compile:source', compileSource);
 // Compile the entire project - both source code and tests.
 gulp.task('compile', ['compile:source', 'compile:tests'])
+
+// ====== Local Server Tasks ======
 
 // Start a local server in watch mode after compiling the project source code.
 gulp.task('start', ['compile:source'], startServer);

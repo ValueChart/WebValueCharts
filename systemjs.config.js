@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-01 17:12:05
+* @Last Modified time: 2017-05-03 11:42:10
 */
 
 // =========================================================================================================================================
@@ -14,6 +14,11 @@
 // This is a self executing anonymous function. The first set of brackets contain the function to be executed, 
 // the second set execute it with the given parameters.
 (function(global) {
+
+	var paths = {
+      // paths serve as alias
+      'npm:': 'node_modules/'
+    };
 
 	// This is a map of package names to their locations in our project structure. This is necessary for SystemJS to know how to load packages.
 	var map = {
@@ -29,20 +34,34 @@
 		'@angular/platform-browser-dynamic': 		'node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
 		'@angular/http': 							'node_modules/@angular/http/bundles/http.umd.js',
 		'@angular/router': 							'node_modules/@angular/router/bundles/router.umd.js',
-		'@angular/forms': 							'node_modules/@angular/forms/bundles/forms.umd.js'
+		'@angular/forms': 							'node_modules/@angular/forms/bundles/forms.umd.js',
+		'chai': 									'node_modules/chai/chai.js',
+		'chai-as-promised': 						'node_modules/chai-as-promised/lib/chai-as-promised.js',
 	};
 
 	// Defines default extensions and files.
 	var packages = {
-		'client':                     { main: 'main.js',  defaultExtension: 'js' },
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
-		'd3':						  { main: 'd3.js', defaultExtension: 'js' }
+		'd3':						  { main: 'd3.js', defaultExtension: 'js' },
+		'client': {
+        	defaultExtension: 'js',
+        	meta: {
+          		'./*.js': {
+            		loader: 'systemjs-angular-loader.js'
+          		}
+        	},
+        	main:'main.js'
+      	},
+      	'rxjs': {
+        	defaultExtension: 'js'
+     	}
 	};
 
 	var config = {
 		map: map,
-		packages: packages
+		packages: packages,
+		paths: paths
 	};
 
 	System.config(config);
