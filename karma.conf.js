@@ -4,8 +4,8 @@ module.exports = function(config) {
   var appSrcBase = appBase;      // app source TS files
 
   // Testing helpers (optional) are conventionally in a folder called `testing`
-  var testingBase    = 'test/unit/model/'; // transpiled test JS and map files
-  var testingSrcBase = 'test/unit/model/'; // test source TS files
+  var testingBase    = 'test/client/unit/'; // transpiled test JS and map files
+  var testingSrcBase = 'test/client/unit/'; // test source TS files
 
   config.set({
     basePath: '',
@@ -58,7 +58,7 @@ module.exports = function(config) {
       // Angular itself
       { pattern: 'node_modules/@angular/**/*.js', included: false, watched: false },
       { pattern: 'node_modules/@angular/**/*.js.map', included: false, watched: false },
-
+      
       { pattern: 'systemjs.config.js', included: false, watched: false },
       { pattern: 'systemjs-angular-loader.js', included: false, watched: false },
       'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
@@ -90,7 +90,7 @@ module.exports = function(config) {
     reporters: ['progress', 'html'],
 
     htmlReporter: {
-      outputFile: 'test/reports/unit-report.html'
+      outputFile: 'test/reports/client-unit-report.html'
     },
 
     port: 9876,

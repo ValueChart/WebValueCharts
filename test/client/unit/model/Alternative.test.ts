@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:10:54
 */
 
 
-import { Alternative }			from '../../../client/resources/model/Alternative';
-import { PrimitiveObjective }	from '../../../client/resources/model/PrimitiveObjective';
+import { Alternative }			from '../../../../client/resources/model/Alternative';
+import { PrimitiveObjective }	from '../../../../client/resources/model/PrimitiveObjective';
 
 
 import { expect }				from 'chai';

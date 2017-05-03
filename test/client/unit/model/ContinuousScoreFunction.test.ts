@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 16:33:37
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:10:52
 */
 
-import { ContinuousScoreFunction } 		from '../../../client/resources/model/ContinuousScoreFunction';
+import { ContinuousScoreFunction } 		from '../../../../client/resources/model/ContinuousScoreFunction';
 
 
 import { expect }						from 'chai';

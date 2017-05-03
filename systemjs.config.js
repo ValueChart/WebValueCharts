@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 11:42:10
+* @Last Modified time: 2017-05-03 14:45:08
 */
 
 // =========================================================================================================================================
@@ -26,7 +26,6 @@
 		'rxjs':                       				'node_modules/rxjs',
 		'@angular':                   				'node_modules/@angular',
 		'd3': 						  				'node_modules/d3/build',
-		'supertest': 				  				'node_modules/supertest',
 		'@angular/core': 							'node_modules/@angular/core/bundles/core.umd.js',
 		'@angular/common': 							'node_modules/@angular/common/bundles/common.umd.js',
 		'@angular/compiler': 						'node_modules/@angular/compiler/bundles/compiler.umd.js',
@@ -37,6 +36,7 @@
 		'@angular/forms': 							'node_modules/@angular/forms/bundles/forms.umd.js',
 		'chai': 									'node_modules/chai/chai.js',
 		'chai-as-promised': 						'node_modules/chai-as-promised/lib/chai-as-promised.js',
+		'superagent': 								'node_modules/superagent/superagent.js'
 	};
 
 	// Defines default extensions and files.

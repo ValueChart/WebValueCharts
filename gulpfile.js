@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 12:37:02
+* @Last Modified time: 2017-05-03 15:39:48
 */
 
 // Import gulp packages:
@@ -76,12 +76,24 @@ unit = function(done) {
 
 // Execute protractor end-to-end tests.
 e2e = function() {
-	return gulp.src(["test/e2e/*.js"])
+	return gulp.src(["test/client/e2e/**/*.js"])
 	    .pipe(protractor({
 	        configFile: "protractor.conf.js"
 	    }))
 	    .on('error', function(e) { throw e });
 }
+
+serverTests = function() {
+  	return gulp.src(['test/server/**/*.js'], { read: false })
+ 		.pipe(mocha({
+ 	  		reporter: "mochawesome",
+ 	 		reporterOptions: {
+ 				reportDir: 'test/reports',
+ 				reportFilename: 'server-report'
+ 			}
+  		}));
+  }
+
 
 // runTests is a wrapper that starts up a local server before executing
 // the passed-in function and then shuts the server down afterwards.
@@ -99,6 +111,7 @@ runTests = function(tests) {
 // Start a standalone instance of webdriver.
 gulp.task('webdriver_standalone', webdriver_standalone);
 
+
 // ====== Testing Tasks ======
 
 // Execute unit tests. Assumes pre-compilation of project source and a running local server.
@@ -106,9 +119,13 @@ gulp.task('unit', ['compile:tests'], unit)
 // Executes end-to-end tests. Assumes pre-compilation of project source and a running local server.
 gulp.task('e2e', ['compile:tests'], e2e)
 // Executes unit tests after compiling tests and source; starts its own local server.
-gulp.task('test:unit', ['compile'], () => { return runTests(unit); });
+gulp.task('test:unit', ['compile'], unit);
 // Executes end-to-end tests after compiling tests and source; starts its own local server.
 gulp.task('test:e2e', ['compile'], () => { return runTests(e2e); });
+// Execute server tests after compiling tests and source; starts its own local server.
+gulp.task('test:server', ['compile'], () => { return runTests(serverTests); });
+// Execute all tests after compiling tests and source; starts its own local server.
+gulp.task('test', ['test:unit'], () => { return runTests(() => { return merge([e2e(), serverTests()]); }); });
 
 
 // ====== Compilation Tasks ======
@@ -119,6 +136,7 @@ gulp.task('compile:tests', compileTests);
 gulp.task('compile:source', compileSource);
 // Compile the entire project - both source code and tests.
 gulp.task('compile', ['compile:source', 'compile:tests'])
+
 
 // ====== Local Server Tasks ======
 

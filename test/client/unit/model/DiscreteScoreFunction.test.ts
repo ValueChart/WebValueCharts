@@ -2,10 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-30 16:33:48
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:10:51
 */
 
-import { DiscreteScoreFunction } 		from '../../../client/resources/model/DiscreteScoreFunction';
+import { DiscreteScoreFunction } 		from '../../../../client/resources/model/DiscreteScoreFunction';
 
 
 import { expect }						from 'chai';

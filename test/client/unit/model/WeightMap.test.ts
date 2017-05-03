@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 11:10:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:21
+* @Last Modified time: 2017-05-03 15:10:44
 */
 
-import { WeightMap } 			from '../../../client/resources/model/WeightMap';
-import { PrimitiveObjective } 	from '../../../client/resources/model/PrimitiveObjective';
+import { WeightMap } 			from '../../../../client/resources/model/WeightMap';
+import { PrimitiveObjective } 	from '../../../../client/resources/model/PrimitiveObjective';
 
 import { expect }				from 'chai';
 

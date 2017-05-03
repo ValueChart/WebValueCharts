@@ -2,31 +2,31 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:19
+* @Last Modified time: 2017-05-03 15:10:43
 */
 
 // Import Node Libraries: 
 import { expect }												from 'chai';
 
 // Import Application Classes:
-import { XmlValueChartParser }									from '../../../client/resources/modules/utilities/classes/XmlValueChartParser';
+import { XmlValueChartParser }									from '../../../../client/resources/modules/utilities/classes/XmlValueChartParser';
 
 // Import Model Classes:
-import { ValueChart }											from '../../../client/resources/model/ValueChart';
-import { Alternative }											from '../../../client/resources/model/Alternative';
-import { User } 												from '../../../client/resources/model/User';
-import { Objective } 											from '../../../client/resources/model/Objective';
-import { PrimitiveObjective } 									from '../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective } 									from '../../../client/resources/model/AbstractObjective';
-import { CategoricalDomain }									from '../../../client/resources/model/CategoricalDomain';
-import { ContinuousDomain }										from '../../../client/resources/model/ContinuousDomain';
-import { WeightMap } 											from '../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap } 									from '../../../client/resources/model/ScoreFunctionMap';
-import { ContinuousScoreFunction } 								from '../../../client/resources/model/ContinuousScoreFunction';
-import { DiscreteScoreFunction } 								from '../../../client/resources/model/DiscreteScoreFunction';
+import { ValueChart }											from '../../../../client/resources/model/ValueChart';
+import { Alternative }											from '../../../../client/resources/model/Alternative';
+import { User } 												from '../../../../client/resources/model/User';
+import { Objective } 											from '../../../../client/resources/model/Objective';
+import { PrimitiveObjective } 									from '../../../../client/resources/model/PrimitiveObjective';
+import { AbstractObjective } 									from '../../../../client/resources/model/AbstractObjective';
+import { CategoricalDomain }									from '../../../../client/resources/model/CategoricalDomain';
+import { ContinuousDomain }										from '../../../../client/resources/model/ContinuousDomain';
+import { WeightMap } 											from '../../../../client/resources/model/WeightMap';
+import { ScoreFunctionMap } 									from '../../../../client/resources/model/ScoreFunctionMap';
+import { ContinuousScoreFunction } 								from '../../../../client/resources/model/ContinuousScoreFunction';
+import { DiscreteScoreFunction } 								from '../../../../client/resources/model/DiscreteScoreFunction';
 
 
-/*
+
 
 describe('XmlValueChartParser', () => {
 	var valueChartParser: XmlValueChartParser;
@@ -473,5 +473,5 @@ var XMLTestString: string =
 	</Users>
 </ValueCharts>`
 
-*/
+
 

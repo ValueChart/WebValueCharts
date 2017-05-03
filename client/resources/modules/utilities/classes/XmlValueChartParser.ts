@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-27 14:28:06
+* @Last Modified time: 2017-05-03 12:53:03
 */
 
 // Import Model Classes:
@@ -52,7 +52,7 @@ export class XmlValueChartParser {
 		@returns {ValueChart}	- A ValueChart object parsed from the xmlDocument parameter. 
 		@description	Parses a ValueChart from an XML document and into the proper class instances so that it can be used by the 
 						application. ONLY this method should be called manually when parsing an XML ValueChart; the other methods in the file
-						are private helpers.
+						are public helpers.
 	*/
 	public parseValueChart(xmlDocument: Document): ValueChart {
 		var valueChartElement: Element = xmlDocument.querySelector('ValueCharts');
@@ -85,7 +85,7 @@ export class XmlValueChartParser {
 		@description	Parses the hierarchical structure of objectives from an XML document representing a ValueChart.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseObjectives(objectivesParentElement: Element): Objective[] {
+	public parseObjectives(objectivesParentElement: Element): Objective[] {
 		var objectives: Objective[] = [];
 
 		var objectiveElements: Element[] = (<any>objectivesParentElement).children;
@@ -122,7 +122,7 @@ export class XmlValueChartParser {
 		@description	Parses a <Domain> element to construct a Domain object of the right type for a Primitive Objective. 
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseDomain(domainElement: Element): Domain {
+	public parseDomain(domainElement: Element): Domain {
 		var domain: Domain;
 
 		var type: string = domainElement.getAttribute('type');
@@ -155,7 +155,7 @@ export class XmlValueChartParser {
 						alternatives. This updating is done in-place.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
+	public parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
 		var alternatives: Alternative[] = [];
 
 		var alternativeElements: NodeListOf<Element> = alternativesParentElement.querySelectorAll('Alternative');
@@ -203,7 +203,7 @@ export class XmlValueChartParser {
 						child of the provided <Users> element to produce complete user objects.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseUsers(usersParentElement: Element): User[] {
+	public parseUsers(usersParentElement: Element): User[] {
 		var users: User[] = [];
 
 		var userElements: NodeListOf<Element> = usersParentElement.querySelectorAll('User');
@@ -233,7 +233,7 @@ export class XmlValueChartParser {
 		@description	Parses a <Weights> element from a ValueChart's XML document to obtain a WeightMap.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseWeightMap(weightsParentElement: Element): WeightMap {
+	public parseWeightMap(weightsParentElement: Element): WeightMap {
 		var weightMap: WeightMap = new WeightMap();
 
 		var weightElements: NodeListOf<Element> = weightsParentElement.querySelectorAll('Weight');
@@ -256,7 +256,7 @@ export class XmlValueChartParser {
 						the map are parsed as a part of this methods execution.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
+	public parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
 		var scoreFunctionElements: NodeListOf<Element> = scoreFunctionsParentElement.querySelectorAll('ScoreFunction');
@@ -279,7 +279,7 @@ export class XmlValueChartParser {
 		@description	Parses a <ScoreFunction> element from a ValueChart's XML document to obtain a ScoreFunction.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseScoreFunction(scoreFunctionElement: Element): ScoreFunction {
+	public parseScoreFunction(scoreFunctionElement: Element): ScoreFunction {
 		var scoreFunction: ScoreFunction;
 
 		var type: string = scoreFunctionElement.getAttribute('type');

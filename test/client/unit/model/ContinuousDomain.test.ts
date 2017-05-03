@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 09:37:49
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:13:24
 */
 
 
-import { ContinuousDomain } 	from "../../../client/resources/model/ContinuousDomain";
+import { ContinuousDomain } 	from "../../../../client/resources/model/ContinuousDomain";
 
 import { expect }				from 'chai';
 

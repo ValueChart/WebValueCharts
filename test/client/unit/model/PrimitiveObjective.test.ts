@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:47:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:10:48
 */
 
-import { PrimitiveObjective } 		from '../../../client/resources/model/PrimitiveObjective';
-import { CategoricalDomain } 		from '../../../client/resources/model/CategoricalDomain';
-import { ContinuousDomain } 		from '../../../client/resources/model/ContinuousDomain';
+import { PrimitiveObjective } 		from '../../../../client/resources/model/PrimitiveObjective';
+import { CategoricalDomain } 		from '../../../../client/resources/model/CategoricalDomain';
+import { ContinuousDomain } 		from '../../../../client/resources/model/ContinuousDomain';
 
 
 import { expect }					from 'chai';

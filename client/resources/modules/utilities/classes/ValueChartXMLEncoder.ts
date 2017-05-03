@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-27 15:11:29
+* @Last Modified time: 2017-05-03 12:52:54
 */
 
 // Import Model Classes:
@@ -108,7 +108,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element representing the ValueChart that was provided. 
 		@description	Encodes a ValueChart and all its fields as an XML element. 
 	*/
-	private convertValueChartIntoElement(valueChart: ValueChart, xmlDocument: XMLDocument): Element {
+	public convertValueChartIntoElement(valueChart: ValueChart, xmlDocument: XMLDocument): Element {
 		var valueChartElement: Element = xmlDocument.createElement('ValueCharts');
 
 		valueChartElement.setAttribute('name', valueChart.getName());
@@ -150,7 +150,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element representing the objective that was provided. 
 		@description	Encodes an objective and all its fields (including any subobjectives) as an XML element. 
 	*/
-	private convertObjectiveIntoElement(objective: Objective, xmlDocument: XMLDocument): Element {
+	public convertObjectiveIntoElement(objective: Objective, xmlDocument: XMLDocument): Element {
 		var objectiveElement = xmlDocument.createElement('Objective');
 		objectiveElement.setAttribute('name', objective.getName());
 		objectiveElement.setAttribute('type', objective.objectiveType);
@@ -179,7 +179,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element representing the Domain object that was provided. 
 		@description	Encodes a Domain object and all its fields as an XML element. 
 	*/
-	private convertDomainIntoElement(domain: Domain, xmlDocument: XMLDocument): Element {
+	public convertDomainIntoElement(domain: Domain, xmlDocument: XMLDocument): Element {
 		var domainElement: Element = xmlDocument.createElement('Domain');
 		domainElement.setAttribute('type', domain.type);
 
@@ -205,7 +205,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element that is a parent of the XML elements representing the provided Alternative objects.
 		@description	Encodes an array of Alternatives objects as XML elements. 
 	*/
-	private convertAlternativesIntoElement(alternatives: Alternative[], xmlDocument: XMLDocument): Element {
+	public convertAlternativesIntoElement(alternatives: Alternative[], xmlDocument: XMLDocument): Element {
 		var alternativesParentElement: Element = xmlDocument.createElement('Alternatives');
 
 		alternatives.forEach((alternative: Alternative) => {
@@ -241,7 +241,7 @@ export class ValueChartXMLEncoder {
 		@description	Encodes an array of User objects as XML elements. This method encodes each Users WeightMap, ScoreFunctionMap and ScoreFunctions
 						as a part of its execution.
 	*/
-	private convertUsersIntoElement(users: User[], xmlDocument: XMLDocument): Element {
+	public convertUsersIntoElement(users: User[], xmlDocument: XMLDocument): Element {
 		var usersParentElement: Element = xmlDocument.createElement('Users');
 
 		users.forEach((user: User) => {
@@ -266,7 +266,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element that represents the given WeightMap. 
 		@description	Encodes a WeightMap object as an XML element.
 	*/
-	private convertWeightMapIntoElement(weightMap: WeightMap, xmlDocument: XMLDocument): Element {
+	public convertWeightMapIntoElement(weightMap: WeightMap, xmlDocument: XMLDocument): Element {
 		var weightsParentElement: Element = xmlDocument.createElement('Weights');
 
 		var map: Map<string, number> = weightMap.getInternalWeightMap();
@@ -293,7 +293,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element that represents the given ScoreFunctionMap. 
 		@description	Encodes a ScoreFunctionMap object as an XML element.
 	*/
-	private convertScoreFunctionMapIntoElement(scoreFunctionMap: ScoreFunctionMap, xmlDocument: XMLDocument): Element {
+	public convertScoreFunctionMapIntoElement(scoreFunctionMap: ScoreFunctionMap, xmlDocument: XMLDocument): Element {
 		var scoreFunctionsParentElement: Element = xmlDocument.createElement('ScoreFunctions');
 
 		var scoreFunctionKeyPairs: { key: string, scoreFunction: ScoreFunction }[] = scoreFunctionMap.getAllKeyScoreFunctionPairs();
@@ -314,7 +314,7 @@ export class ValueChartXMLEncoder {
 		@returns {Element} - An XML element that represents the given ScoreFunction. 
 		@description	Encodes a ScoreFunction object as an XML element.
 	*/
-	private convertScoreFunctionIntoElement(scoreFunction: ScoreFunction, objectiveName: string, xmlDocument: XMLDocument): Element {
+	public convertScoreFunctionIntoElement(scoreFunction: ScoreFunction, objectiveName: string, xmlDocument: XMLDocument): Element {
 		var scoreFunctionElement: Element = xmlDocument.createElement('ScoreFunction');
 		scoreFunctionElement.setAttribute('objective', objectiveName);
 		scoreFunctionElement.setAttribute('type', scoreFunction.type);

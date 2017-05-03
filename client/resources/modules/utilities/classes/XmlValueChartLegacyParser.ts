@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:48:46
+* @Last Modified time: 2017-05-03 12:48:59
 */
 
 // Import Model Classes:
@@ -52,7 +52,7 @@ export class XmlValueChartLegacyParser {
 		@returns {ValueChart}	- A ValueChart object parsed from the xmlDocument parameter. 
 		@description	Parses a ValueChart from an XML document and into the proper class instances so that it can be used by the 
 						application. ONLY this method should be called manually when parsing an XML ValueChart; the other methods in the file
-						are private helpers.
+						are public helpers.
 	*/
 	public parseValueChart(xmlDocument: Document): ValueChart {
 
@@ -83,7 +83,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses the hierarchical structure of objectives from an XML document representing a ValueChart.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseObjectives(objectiveElements: Element[]): Objective[] {
+	public parseObjectives(objectiveElements: Element[]): Objective[] {
 		var parsedObjectives: Objective[] = [];
 
 		for (var i: number = 0; i < objectiveElements.length; i++) {
@@ -103,7 +103,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses an abstract objective element from a ValueChart's XML document, including all of the element's children. 
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseAbstractObjective(abstractObjectiveElement: Element): AbstractObjective {
+	public parseAbstractObjective(abstractObjectiveElement: Element): AbstractObjective {
 		var name: string = abstractObjectiveElement.getAttribute('name');
 		// The data files have no description for abstract objectives at the moment.
 		var abstractObjective: AbstractObjective = new AbstractObjective(name, '');
@@ -118,7 +118,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses an primitive objective element from a ValueChart's XML document.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parsePrimitiveObjective(primitiveObjectiveElement: Element): PrimitiveObjective {
+	public parsePrimitiveObjective(primitiveObjectiveElement: Element): PrimitiveObjective {
 		var name: string = primitiveObjectiveElement.getAttribute('name');
 		if (primitiveObjectiveElement.querySelector('Description'))
 			var description: string = primitiveObjectiveElement.querySelector('Description').innerHTML;
@@ -142,7 +142,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses a <Domain> element to construct a ContinuousDomain object for a Primitive Objective. 
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseContinuousDomain(domainElement: Element): ContinuousDomain {
+	public parseContinuousDomain(domainElement: Element): ContinuousDomain {
 		var minValue = +(<any>domainElement).children[0].getAttribute('x');
 		var maxValue = +(<any>domainElement).children[(<any>domainElement).children.length - 1].getAttribute('x');
 
@@ -155,7 +155,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses a <Domain> element to construct a CategoricalDomain object for a Primitive Objective. 
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseCategoricalDomain(domainElement: Element): CategoricalDomain {
+	public parseCategoricalDomain(domainElement: Element): CategoricalDomain {
 		var categoricalDomain: CategoricalDomain = new CategoricalDomain(false);
 
 		for (var i: number = 0; i < (<any>domainElement).children.length; i++) {
@@ -174,7 +174,7 @@ export class XmlValueChartLegacyParser {
 						are not stored within a single element in the ValueChartsPlus schema, but rather are stored within the <Criterion> elements.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseUser(xmlDocument: Document, objectives: PrimitiveObjective[]): User {
+	public parseUser(xmlDocument: Document, objectives: PrimitiveObjective[]): User {
 		var user: User = new User('temp');
 		user.setScoreFunctionMap(new ScoreFunctionMap());
 		user.setWeightMap(new WeightMap());
@@ -218,7 +218,7 @@ export class XmlValueChartLegacyParser {
 		@description	Parses the <Alternative> elements from a ValueChart's XML document to obtain the array of Alternatives belonging to the ValueChart.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private parseAlternatives(alternativeElements: Element[], objectives: PrimitiveObjective[]): Alternative[] {
+	public parseAlternatives(alternativeElements: Element[], objectives: PrimitiveObjective[]): Alternative[] {
 
 		var alternatives: Alternative[] = [];
 
@@ -262,7 +262,7 @@ export class XmlValueChartLegacyParser {
 						given PrimitiveObjectives to have its assigned color.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	private setObjectiveColors(xmlDocument: Document, objectives: PrimitiveObjective[]): void {
+	public setObjectiveColors(xmlDocument: Document, objectives: PrimitiveObjective[]): void {
 		objectives.forEach((objective: PrimitiveObjective) => {
 			let color: Element = xmlDocument.querySelector('Color[name="' + objective.getName() + '"]');
 			objective.setColor('rgb(' + color.getAttribute('r') + ', ' + color.getAttribute('g') + ', ' + color.getAttribute('b') + ')');

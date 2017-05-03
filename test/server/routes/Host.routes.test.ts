@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-05-03 15:23:34
 */
 
 // Require Node Libraries:
@@ -26,7 +26,7 @@ import { ScoreFunctionMap }						from '../../../client/resources/model/ScoreFunc
 import { HostMessage,  MessageType}				from '../../../client/resources/types/HostMessage';
 
 // Import Test Data:
-import { JsonGroupHotel }						from '../testData/ValueChartsData';
+import { JsonGroupHotel }						from '../../testData/ValueChartsData';
 
 describe('WebSocket: /Host', () => {
 	var hostUrl: string  = 'ws://localhost:3000/host/';
