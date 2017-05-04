@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:39:48
+* @Last Modified time: 2017-05-03 17:44:12
 */
 
 // Import gulp packages:
@@ -118,6 +118,8 @@ gulp.task('webdriver_standalone', webdriver_standalone);
 gulp.task('unit', ['compile:tests'], unit)
 // Executes end-to-end tests. Assumes pre-compilation of project source and a running local server.
 gulp.task('e2e', ['compile:tests'], e2e)
+// Executes server-side unit tests. Assumes pre-compilation of project source and a running local server.
+gulp.task('server', ['compile:tests'], serverTests)
 // Executes unit tests after compiling tests and source; starts its own local server.
 gulp.task('test:unit', ['compile'], unit);
 // Executes end-to-end tests after compiling tests and source; starts its own local server.
