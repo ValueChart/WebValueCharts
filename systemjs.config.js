@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 18:31:16
+* @Last Modified time: 2017-05-05 12:48:38
 */
 
 // =========================================================================================================================================
@@ -43,7 +43,7 @@
 	// Defines default extensions and files.
 	var packages = {
 		'test':                       { defaultExtension: 'js' },
-		'rxjs':                       { defaultExtension: 'js' },
+		'rxjs':                       { defaultExtension: 'js', main: 'Rx.js' },
 		'd3':						  { main: 'd3.js', defaultExtension: 'js' },
 		'lodash': 					  { main: 'lodash.js'},
 		'client': {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 22:23:27
+* @Last Modified time: 2017-05-05 14:22:50
 */
 
 // Import Angular Resources:
@@ -312,10 +312,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 			this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
 			this.sortAlternativesInteraction.toggleAlternativeSorting(this.changeDetectionService.previousInteractionConfig.sortAlternatives);
-			if (this.interactionConfig.setObjectiveColors != this.changeDetectionService.previousInteractionConfig.setObjectiveColors)
-				this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
-			else if (this.interactionConfig.pumpWeights != this.changeDetectionService.previousInteractionConfig.pumpWeights)
-				this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
+			this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
+			this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
 
 			this.changeDetectionService.previousInteractionConfig = _.cloneDeep(this.interactionConfig);
 		}
