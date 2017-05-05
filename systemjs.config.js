@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 14:45:08
+* @Last Modified time: 2017-05-04 18:31:16
 */
 
 // =========================================================================================================================================
@@ -26,6 +26,7 @@
 		'rxjs':                       				'node_modules/rxjs',
 		'@angular':                   				'node_modules/@angular',
 		'd3': 						  				'node_modules/d3/build',
+		'lodash':									'node_modules/lodash',
 		'@angular/core': 							'node_modules/@angular/core/bundles/core.umd.js',
 		'@angular/common': 							'node_modules/@angular/common/bundles/common.umd.js',
 		'@angular/compiler': 						'node_modules/@angular/compiler/bundles/compiler.umd.js',
@@ -44,6 +45,7 @@
 		'test':                       { defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
 		'd3':						  { main: 'd3.js', defaultExtension: 'js' },
+		'lodash': 					  { main: 'lodash.js'},
 		'client': {
         	defaultExtension: 'js',
         	meta: {

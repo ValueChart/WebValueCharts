@@ -2,12 +2,16 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-01 15:08:12
+* @Last Modified time: 2017-05-04 22:00:24
 */
 
 // Import Angular Classes:
 import { Injectable } 															from '@angular/core';
 import { KeyValueDiffers, KeyValueDiffer }										from '@angular/core';
+
+// Import libraries:
+import * as _ 																	from 'lodash';
+
 
 // Import Application Classes:
 import { ChartUndoRedoService }													from './ChartUndoRedo.service';
@@ -41,12 +45,6 @@ export class ChangeDetectionService {
 	public previousHeight: number;									// The old height. Its should equal the height in ValueChartDirective unless a change has taken place.
 	public previousNumUsers: number;								// The old number of users. Its should equal the number of users in the ValueChart in the ValueChartDirective unless a change has taken place.
 
-	// Differ classes for checking the data inputs for changes:
-	public userDiffers: KeyValueDiffer<any, any>[];
-	public weightMapDiffers: KeyValueDiffer<any, any>[];
-	public scoreFunctionMapDiffers: KeyValueDiffer<any, any>[];
-	public scoreFunctionDiffers: KeyValueDiffer<any, any>[];
-
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -75,61 +73,17 @@ export class ChangeDetectionService {
 		@description	Initialize differ classes for use in detecting changes to a ValueChart. This should be called whenever a new ValueChart is input to
 						the ValueChartDirective, or when the number of users changes. 
 	*/
-	initDiffers(valueChart: ValueChart): void {
-		this.previousValueChart = valueChart;
+	initChangeDetection(valueChart: ValueChart, chartWidth: number, chartHeight: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig): void {
+		this.previousValueChart = _.cloneDeep(valueChart);
 		var users = valueChart.getUsers();
-
-		this.userDiffers = [];
-		this.weightMapDiffers = [];
-		this.scoreFunctionMapDiffers = [];
-		this.scoreFunctionDiffers = [];
-
 		this.previousNumUsers = users.length;
 
-		users.forEach((user: User) => {
-			let userDiffer = this.objectDiffers.find({}).create(null);
-			this.userDiffers.push(userDiffer);
+		// Init change detection for the view configuration:
+		this.previousWidth = chartWidth;
+		this.previousHeight = chartHeight;
 
-			let weightMapDiffer = this.objectDiffers.find({}).create(null);
-			this.weightMapDiffers.push(weightMapDiffer);
-
-			let scoreFunctionMapDiffer = this.objectDiffers.find({}).create(null);
-			this.scoreFunctionMapDiffers.push(scoreFunctionMapDiffer);
-
-			var scoreFunctions: ScoreFunction[] = user.getScoreFunctionMap().getAllScoreFunctions();
-			scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
-				let scoreFunctionDiffer = this.objectDiffers.find({}).create(null);
-				this.scoreFunctionDiffers.push(scoreFunctionDiffer);
-			});
-		});
-	}
-
-	/*
-		@param viewConfig - The current viewConfig object for the ValueChartDirective. Usually the viewConfig object in RenderConfigService.
-		@returns {void}
-		@description	Initialize the previousViewConfig object.
-	*/
-	initPreviousViewConfig(viewConfig: ViewConfig): void {
-		this.previousViewConfig.viewOrientation = viewConfig.viewOrientation;
-		this.previousViewConfig.displayScoreFunctions = viewConfig.displayScoreFunctions;
-		this.previousViewConfig.displayDomainValues = viewConfig.displayDomainValues;
-		this.previousViewConfig.displayScales = viewConfig.displayScales;
-		this.previousViewConfig.displayTotalScores = viewConfig.displayTotalScores;
-		this.previousViewConfig.displayScoreFunctionValueLabels = viewConfig.displayScoreFunctionValueLabels;
-		this.previousViewConfig.displayAverageScoreLines = viewConfig.displayAverageScoreLines;
-	}
-
-	/*
-		@param interactionConfig - The current interactionConfig object for the ValueChartDirective. Usually the interactionConfig object in ValueChartDirective.
-		@returns {void}
-		@description	Initialize the previousInteractionConfig object.
-	*/
-	initPreviousInteractionConfig(interactionConfig: any) {
-		this.previousInteractionConfig.weightResizeType = interactionConfig.weightResizeType;
-		this.previousInteractionConfig.reorderObjectives = interactionConfig.reorderObjectives;
-		this.previousInteractionConfig.sortAlternatives = interactionConfig.sortAlternatives;
-		this.previousInteractionConfig.pumpWeights = interactionConfig.pumpWeights;
-		this.previousInteractionConfig.setObjectiveColors = interactionConfig.setObjectiveColors;
+		this.previousViewConfig = _.cloneDeep(viewConfig);
+		this.previousInteractionConfig = _.cloneDeep(interactionConfig);
 	}
 
 }

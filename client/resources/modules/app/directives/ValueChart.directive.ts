@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:17:06
+* @Last Modified time: 2017-05-04 22:23:27
 */
 
 // Import Angular Resources:
@@ -12,6 +12,7 @@ import { ElementRef }															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
+import * as _ 																	from 'lodash';
 
 // Import Application Classes:
 // Services:
@@ -121,7 +122,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.configureChartData();
 
 		// Initialize Change Detection:
-		this.initChangeDetection();
+		this.changeDetectionService.initChangeDetection(this.valueChart, this.chartWidth, this.chartHeight, this.renderConfigService.viewConfig, this.interactionConfig);
 
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
@@ -193,23 +194,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 	}
 
-	/*
-		@returns {void}
-		@description	Initializes change detection for the directive using ChangeDetectionService. 
-	*/
-	initChangeDetection(): void {
-		// Init change detection for the input data:
-		this.changeDetectionService.initDiffers(this.valueChart);
-
-		// Init change detection for the view configuration:
-		this.changeDetectionService.previousWidth = this.chartWidth;
-		this.changeDetectionService.previousHeight = this.chartHeight;
-		this.changeDetectionService.initPreviousViewConfig(this.renderConfigService.viewConfig);
-
-		// Init change detection for the interaction configuration:
-		this.changeDetectionService.initPreviousInteractionConfig(this.interactionConfig)
-	}
-
 	// ========================================================================================
 	// 								Change Detection Methods:
 	// ========================================================================================
@@ -239,55 +223,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Check for and handle changes to the ValueChart input to the directive.
 	*/
 	detectDataModelChanges(): void {
-		// Check for and handle changes to the ValueChart. This is by reference.
-		if (this.valueChart !== this.changeDetectionService.previousValueChart) {
-			this.updateValueChart();
-		}
-
 		// Check to see if users have been added to deleted.
 		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
-
 			this.updateUsers();
+			this.updateValueChartDisplay()
+			return;
 		}
 
-		// Check for and handle changes to the users.
-		this.valueChartService.getUsers().forEach((user: User, i: number) => {
-			// Check for and handle changes to the user's fields.
-			let userChanges = this.changeDetectionService.userDiffers[i].diff(user);
-			if (userChanges) {
-				this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-				this.updateValueChartDisplay();
-
-			}
-
-			// Check for and handle changes to the user's WeightMap.
-			let internalWeightMap = user.getWeightMap().getInternalWeightMap();
-			let weightMapChanges = this.changeDetectionService.weightMapDiffers[i].diff(internalWeightMap);
-			if (weightMapChanges) {
-				this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-				this.updateValueChartDisplay();
-
-			}
-
-			// Check for and handle changes to the user's ScoreFunctionMap.
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			let scoreFunctionMapChanges = this.changeDetectionService.scoreFunctionMapDiffers[i].diff(scoreFunctionMap);
-			if (scoreFunctionMapChanges) {
-				this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-				this.updateValueChartDisplay();
-			}
-
-			// Check for and handle changes to the user's ScoreFunctions
-			var scoreFunctions: ScoreFunction[] = scoreFunctionMap.getAllScoreFunctions();
-			scoreFunctions.forEach((scoreFunction: ScoreFunction, j: number) => {
-				var functionIndex: number = j + (i * scoreFunctions.length)
-				var scoreFunctionChanges = this.changeDetectionService.scoreFunctionDiffers[functionIndex].diff(scoreFunction.getElementScoreMap());
-				if (scoreFunctionChanges) {
-					this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-					this.updateValueChartDisplay();
-				}
-			});
-		});
+		if (!_.isEqual(this.valueChartService.getValueChart(), this.changeDetectionService.previousValueChart)) {
+			this.changeDetectionService.previousValueChart = _.cloneDeep(this.valueChartService.getValueChart());
+			this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
+			this.updateValueChartDisplay();
+			return; 
+		}
 
 		// Check for and handle changes to the objectives' colors.
 		if (this.changeDetectionService.colorsHaveChanged) {
@@ -295,7 +243,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.changeDetectionService.colorsHaveChanged = false;
 			this.updateObjectiveOrder();
 			this.updateValueChartDisplay();
-
 		}
 	}
 
@@ -343,33 +290,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Change for and handle changes to the display options:
 
-		if (this.renderConfigService.viewConfig.displayScoreFunctions !== this.changeDetectionService.previousViewConfig.displayScoreFunctions) {
-			this.changeDetectionService.previousViewConfig.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
+		if (!_.isEqual(this.renderConfigService.viewConfig, this.changeDetectionService.previousViewConfig)) {
+			this.changeDetectionService.previousViewConfig = _.cloneDeep(this.renderConfigService.viewConfig);
+
 			this.updateScoreFunctionDisplay();
-		}
-
-		if (this.renderConfigService.viewConfig.displayDomainValues !== this.changeDetectionService.previousViewConfig.displayDomainValues) {
-			this.changeDetectionService.previousViewConfig.displayDomainValues = this.renderConfigService.viewConfig.displayDomainValues;
 			this.objectiveChartRenderer.toggleDomainLabels();
-		}
-
-		if (this.renderConfigService.viewConfig.displayScales !== this.changeDetectionService.previousViewConfig.displayScales) {
-			this.changeDetectionService.previousViewConfig.displayScales = this.renderConfigService.viewConfig.displayScales;
 			this.summaryChartRenderer.toggleUtilityAxis();
-		}
-
-		if (this.renderConfigService.viewConfig.displayTotalScores !== this.changeDetectionService.previousViewConfig.displayTotalScores) {
-			this.changeDetectionService.previousViewConfig.displayTotalScores = this.renderConfigService.viewConfig.displayTotalScores;
 			this.summaryChartRenderer.toggleScoreTotals();
-		}
-
-		if (this.renderConfigService.viewConfig.displayScoreFunctionValueLabels !== this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels) {
-			this.changeDetectionService.previousViewConfig.displayScoreFunctionValueLabels = this.renderConfigService.viewConfig.displayScoreFunctionValueLabels;
 			this.labelRenderer.toggleScoreFunctionValueLabels();
-		}
-
-		if (this.renderConfigService.viewConfig.displayAverageScoreLines !== this.changeDetectionService.previousViewConfig.displayAverageScoreLines) {
-			this.changeDetectionService.previousViewConfig.displayAverageScoreLines = this.renderConfigService.viewConfig.displayAverageScoreLines;
 			this.summaryChartRenderer.toggleAverageLines();
 		}
 	}
@@ -379,30 +307,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Check for and handle changes to the interaction options.
 	*/
 	detectInteractionConfigChanges(): void {
-		if (this.interactionConfig.weightResizeType !== this.changeDetectionService.previousInteractionConfig.weightResizeType) {
-			this.changeDetectionService.previousInteractionConfig.weightResizeType = this.interactionConfig.weightResizeType;
+		if (!_.isEqual(this.interactionConfig, this.changeDetectionService.previousInteractionConfig)) {
 
 			this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
-		}
-
-		if (this.interactionConfig.reorderObjectives !== this.changeDetectionService.previousInteractionConfig.reorderObjectives) {
-			this.changeDetectionService.previousInteractionConfig.reorderObjectives = this.interactionConfig.reorderObjectives;
 			this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
-		}
-
-		if (this.interactionConfig.sortAlternatives !== this.changeDetectionService.previousInteractionConfig.sortAlternatives) {
-			this.changeDetectionService.previousInteractionConfig.sortAlternatives = this.interactionConfig.sortAlternatives;
 			this.sortAlternativesInteraction.toggleAlternativeSorting(this.changeDetectionService.previousInteractionConfig.sortAlternatives);
-		}
+			if (this.interactionConfig.setObjectiveColors != this.changeDetectionService.previousInteractionConfig.setObjectiveColors)
+				this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
+			else if (this.interactionConfig.pumpWeights != this.changeDetectionService.previousInteractionConfig.pumpWeights)
+				this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
 
-		if (this.interactionConfig.pumpWeights !== this.changeDetectionService.previousInteractionConfig.pumpWeights) {
-			this.changeDetectionService.previousInteractionConfig.pumpWeights = this.interactionConfig.pumpWeights;
-			this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
-		}
-
-		if (this.interactionConfig.setObjectiveColors !== this.changeDetectionService.previousInteractionConfig.setObjectiveColors) {
-			this.changeDetectionService.previousInteractionConfig.setObjectiveColors = this.interactionConfig.setObjectiveColors;
-			this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
+			this.changeDetectionService.previousInteractionConfig = _.cloneDeep(this.interactionConfig);
 		}
 	}
 
@@ -412,35 +327,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	/*
 		@returns {void}
-		@description	Update the entire ValueChart. This method should be used when the ValueChart input the directive changes to a different reference.
-						Re-renders the ValueChart.
-	*/
-	updateValueChart(): void {
-		this.chartUndoRedoService.resetUndoRedo();
-		this.configureChartData();
-		this.updateUserPreferences();
-		this.updateObjectiveOrder();
-		this.updateValueChartDisplay();
-	}
-
-	/*
-		@returns {void}
 		@description	Update the ValueChart's user columns in response to a new user, or a deleted user. Re-renders the ValueChart.
 	*/
 	updateUsers(): void {
-		this.changeDetectionService.initDiffers(this.valueChart);
+		this.changeDetectionService.previousNumUsers = this.valueChartService.getNumUsers();
 		this.renderConfigService.initUserColors();
 		this.rendererDataService.generateRowData();
 		this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-		this.updateUserPreferences();
-		this.updateValueChartDisplay()
-	}
-
-	/*
-		@returns {void}
-		@description	Create and delete user preference columns in response to new or deleted users. Does NOT re-render the ValueChart.
-	*/
-	updateUserPreferences(): void {
+		
+		// Update the ValueChart's SVG structure.
 		this.labelRenderer.updateScoreFunctions(this.labelRenderer.scoreFunctionContainer, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.rendererDataService.getRowData());
 		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.rendererDataService.getRowData());

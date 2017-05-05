@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:53:40
+* @Last Modified time: 2017-05-04 22:23:40
 */
 
 // Import Angular Classes:
@@ -91,6 +91,7 @@ export class ResizeWeightsInteraction {
 	public togglePump(pumpType: string): void {
 		var primitiveObjectiveLabels: JQuery = $('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		primitiveObjectiveLabels.off('click');
+	
 		if (pumpType !== 'none') {
 			primitiveObjectiveLabels.click((eventObject: Event) => {
 				// Save the current state of the Weight Map.
@@ -106,7 +107,6 @@ export class ResizeWeightsInteraction {
 				if (previousWeight + pumpAmount < 0) {
 					pumpAmount = 0 - previousWeight;
 				}
-
 				this.valueChartService.getCurrentUser().getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
 			});
 		}
