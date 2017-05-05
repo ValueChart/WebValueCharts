@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:55:55
+* @Last Modified time: 2017-05-04 17:14:10
 */
 
 // Import Angular Classes:
@@ -97,20 +97,43 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Create the continuous score function specific element containers:
 
 		// Create the fitline container.
-		this.linesContainer = this.userContainers.append('g')
+		var updateLinesContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINES_CONTAINER)
+			.data((d, i) => { return [d]; });
+
+		updateLinesContainer.exit().remove();
+
+		updateLinesContainer.enter().append('g')
 			.classed(ContinuousScoreFunctionRenderer.defs.FITLINES_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-fitlines-container');
 
+		this.linesContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINES_CONTAINER);
+
+
 		// Create the points container.
-		this.pointsContainer = this.userContainers.append('g')
+		var updatePointsContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINTS_CONTAINER)
+			.data((d,i) => { return [d]; });
+
+		updatePointsContainer.exit().remove();
+
+		updatePointsContainer.enter()
+			.append('g')
 			.classed(ContinuousScoreFunctionRenderer.defs.POINTS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-points-container');
 
+		this.pointsContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINTS_CONTAINER);
+
+
 		// Create the point labels container.
-		this.pointLabelContainer = this.userContainers.append('g')
+		var updatePointLabelContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER);
+
+		updatePointLabelContainer.exit().remove();
+
+		updatePointLabelContainer.enter()
+			.append('g')
 			.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-point-labels-container');
 
+		this.pointLabelContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER)
 
 		this.createContinuousPlotElements(this.pointsContainer, this.linesContainer, this.pointLabelContainer, objective);
 	}
@@ -126,8 +149,12 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	*/
 	createContinuousPlotElements(pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
-			.data((d: UserDomainElements) => { return d.elements; })
+		var updatePlottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
+			.data((d: UserDomainElements) => { return d.elements; });
+
+		updatePlottedPoints.exit().remove();
+
+		updatePlottedPoints
 			.enter().append('circle')
 			.classed(ContinuousScoreFunctionRenderer.defs.POINT, true)
 			.attr('id', (d: DomainElement) => {
@@ -136,8 +163,12 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.plottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT);
 
-		labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL)
-			.data((d: UserDomainElements) => { return d.elements; })
+		var updatePointLabels = labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL)
+			.data((d: UserDomainElements) => { return d.elements; });
+
+		updatePointLabels.exit().remove();
+
+		updatePointLabels
 			.enter().append('text')
 			.classed(ContinuousScoreFunctionRenderer.defs.POINT_LABEL, true)
 			.attr('id', (d: DomainElement) => {
@@ -147,7 +178,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.pointLabels = labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL);
 
 		// Create a slope line for each new adjacent pair of elements in the Objective's domain. Note that this is all elements when the plot is first created.
-		linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE)
+		var updateFitLines = linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE)
 			.data((d: UserDomainElements) => {
 				// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
 				// To do this, we simply remove the last domain element from the list before we create the lines.
@@ -155,7 +186,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				var data = d.elements.slice();	// Copy the array.
 				d.elements.push(temp);			// Add the domain element back.
 				return data;
-			})
+			});
+
+		updateFitLines.exit().remove();
+
+		updateFitLines
 			.enter().append('line')
 			.classed(ContinuousScoreFunctionRenderer.defs.FITLINE, true)
 			.attr('id', (d: DomainElement) => {
@@ -208,7 +243,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
 			return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d.element)) : this.heightScale(scoreFunction.getScore(+d.element));
 		};
 

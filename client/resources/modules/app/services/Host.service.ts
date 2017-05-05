@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-10-05 10:25:43
+* @Last Modified time: 2017-05-04 10:13:35
 */
 
 import { Injectable } 												from '@angular/core';
@@ -121,7 +121,7 @@ export class HostService {
 			case MessageType.ConnectionInit:
 				break;
 
-			// The server will send a message confirming success change of user submission settings. Nothing needs to be done here.
+			// The server will send a message confirming successful change of user submission settings. Nothing needs to be done here.
 			case MessageType.ChangePermissions:
 				break;
 

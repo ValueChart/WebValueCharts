@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 23:43:09
+* @Last Modified time: 2017-05-04 17:17:06
 */
 
 // Import Angular Resources:
@@ -246,6 +246,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Check to see if users have been added to deleted.
 		if (this.valueChartService.getUsers().length !== this.changeDetectionService.previousNumUsers) {
+
 			this.updateUsers();
 		}
 
@@ -256,6 +257,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			if (userChanges) {
 				this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
 				this.updateValueChartDisplay();
+
 			}
 
 			// Check for and handle changes to the user's WeightMap.
@@ -264,6 +266,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			if (weightMapChanges) {
 				this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
 				this.updateValueChartDisplay();
+
 			}
 
 			// Check for and handle changes to the user's ScoreFunctionMap.
@@ -292,6 +295,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.changeDetectionService.colorsHaveChanged = false;
 			this.updateObjectiveOrder();
 			this.updateValueChartDisplay();
+
 		}
 	}
 
@@ -326,6 +330,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.changeDetectionService.previousViewConfig.viewOrientation !== this.renderConfigService.viewConfig.viewOrientation) {
 			this.changeDetectionService.previousViewConfig.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
 			this.updateViewOrientation();
+
 		}
 		// Change for and handle changes to the width and height of the ValueChart.
 		if (this.changeDetectionService.previousWidth !== this.chartWidth || this.changeDetectionService.previousHeight !== this.chartHeight) {
@@ -413,7 +418,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	updateValueChart(): void {
 		this.chartUndoRedoService.resetUndoRedo();
 		this.configureChartData();
-		this.updateUserPreferenceColumns();
+		this.updateUserPreferences();
 		this.updateObjectiveOrder();
 		this.updateValueChartDisplay();
 	}
@@ -427,7 +432,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.renderConfigService.initUserColors();
 		this.rendererDataService.generateRowData();
 		this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-		this.updateUserPreferenceColumns();
+		this.updateUserPreferences();
 		this.updateValueChartDisplay()
 	}
 
@@ -435,7 +440,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@returns {void}
 		@description	Create and delete user preference columns in response to new or deleted users. Does NOT re-render the ValueChart.
 	*/
-	updateUserPreferenceColumns(): void {
+	updateUserPreferences(): void {
+		this.labelRenderer.updateScoreFunctions(this.labelRenderer.scoreFunctionContainer, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.rendererDataService.getRowData());
 		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.rendererDataService.getRowData());
 	}

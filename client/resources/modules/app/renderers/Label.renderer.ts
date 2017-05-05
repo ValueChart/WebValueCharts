@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:35:11
+* @Last Modified time: 2017-05-04 17:15:35
 */
 
 // Import Angular Classes:
@@ -452,6 +452,26 @@ export class LabelRenderer {
 			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum, usersDomainElements, enableInteraction);
 		});
 	}
+
+
+	updateScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
+		var el: d3.Selection<any, any, any, any>;
+		var datum: PrimitiveObjective;
+		
+
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
+			.data(data);
+
+		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
+			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
+			datum = el.data()[0];
+			let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
+			let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
+
+			renderer.createPlot(renderer.plotElementsContainer, renderer.domainLabelContainer, datum, usersDomainElements);
+		});	
+	}
+
 	/*
 		@param viewOrientation - The view orientation that the label space is to be displayed in. Either 'vertical' or 'horizontal'.
 		@param scoreFunctionContainer - The 'g' element that contains all the score function plots to be rendered.
@@ -495,8 +515,12 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionRenderers[datum.getId()].renderScoreFunction(datum, width, height, viewOrientation);
-			this.scoreFunctionRenderers[datum.getId()].toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
+			let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
+
+			let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
+
+			renderer.renderScoreFunction(datum, usersDomainElements, width, height, viewOrientation);
+			renderer.toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
 
 			weightOffset += objectiveWeight;
 		});

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:56:10
+* @Last Modified time: 2017-05-04 17:15:21
 */
 
 // Import Angular Classes:
@@ -93,14 +93,30 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
 
 		// Create the bar container element.
-		this.barContainer = this.userContainers.append('g')
+
+		var updateBarContainers = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER)
+									.data((d,i) =>{ return [d]; });
+
+		updateBarContainers.exit().remove();
+
+		updateBarContainers.enter().append('g')
 			.classed(DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-bars-container');
 
-		// Create the bar label container element.
-		this.barLabelContainer = this.userContainers.append('g')
+		this.barContainer = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER)
+
+
+		var updateBarLabelsContainer = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER)
+										.data((d,i) =>{ return [d]; });
+
+		updateBarLabelsContainer.exit().remove();
+
+		updateBarLabelsContainer.enter().append('g')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
+
+		// Create the bar label container element.
+		this.barLabelContainer = this.userContainers.select('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER);
 
 		// Create the bars, bar tops, and bar labels.
 		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective);
@@ -116,8 +132,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	*/
 	createDiscretePlotElements(barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
-			.data((d: UserDomainElements) => { return d.elements; })
+		var updateUtilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
+			.data((d: UserDomainElements) => { return d.elements; });
+
+		updateUtilityBars.exit().remove();
+
+		updateUtilityBars
 			.enter().append('rect')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR, true)
 			.attr('id', (d: DomainElement) => {
@@ -126,8 +146,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		this.utilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR);
 
-		labelsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL)
+		var updateBarLabels = labelsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL)
 			.data((d: UserDomainElements) => { return d.elements; })
+
+		updateBarLabels.exit().remove();
+
+		updateBarLabels
 			.enter().append('text')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABEL, true)
 			.attr('id', (d: DomainElement) => {
@@ -137,8 +161,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barLabels = labelsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL);
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
+		var updateBartTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
 			.data((d: UserDomainElements) => { return d.elements; })
+
+		updateBartTops.exit().remove();
+
+		updateBartTops
 			.enter().append('rect')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_TOP, true)
 			.attr('id', (d: DomainElement) => {

@@ -122,10 +122,10 @@
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 				<div *ngFor="let user of valueChart.getUsers(); let i = index ">
-					<h5>
+					<h5 class="remove-user">
 					{{user.getUsername()}}
 					<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-					<button *ngIf="enableManagement()" class="pull-right btn btn-danger btn-xs btn-xxs" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
+					<button *ngIf="enableManagement()" class="pull-right btn btn-danger btn-xxs" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
 					</h5>
 				</div>
 			</div>

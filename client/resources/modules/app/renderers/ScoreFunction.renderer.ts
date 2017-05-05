@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:56:09
+* @Last Modified time: 2017-05-04 17:15:27
 */
 
 // Import Angular Classes:
@@ -110,7 +110,6 @@ export abstract class ScoreFunctionRenderer {
 	createScoreFunction(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], enableInteraction: boolean): void {
 		var objectiveId: string = objective.getId();
 		this.objective = objective;
-		this.usersDomainElements = usersDomainElements.slice();
 		this.enableInteraction = enableInteraction;
 
 		// The root container is passed in.
@@ -186,21 +185,32 @@ export abstract class ScoreFunctionRenderer {
 		@param objective - The objective for which the score function plot is going to be created.
 		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
-		@description 	Creates the user containers, which will contain each users plot elements, and the domain labels for the domain element axis. 
+		@description 	Creates the user containers, which will contain each user's plot elements, and the domain labels for the domain element axis. 
 						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
+						This method is also used to update a score function plot when the Users change.
 	*/
 	createPlot(plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
 		var objectiveId = objective.getId();
 		// Create the user containers. Each user should have one 'g' element that will hold the elements of its plot. Elements refers to bars, points, fit lines, etc.
-		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
-			.data(usersDomainElements)
-			.enter().append('g')
+		
+		var updateUserContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
+			.data(usersDomainElements);
+
+		updateUserContainers.exit().remove();
+		updateUserContainers.enter().append('g')
 			.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
 			.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.user.getUsername().replace(/\s+/g, '') + '-container'; });
 
+		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
+
+
+		var updateDomainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
+			.data(usersDomainElements.length > 0 ? usersDomainElements[0].elements : []);
+
+		updateDomainLabels.exit().remove();
+
 		// Create one label for each element of the PrimitiveObjective's domain.
-		domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
-			.data(usersDomainElements.length > 0 ? usersDomainElements[0].elements : [])
+		updateDomainLabels
 			.enter().append('text')
 			.classed(ScoreFunctionRenderer.defs.DOMAIN_LABEL, true)
 			.attr('id', (d: DomainElement) => {
@@ -221,7 +231,7 @@ export abstract class ScoreFunctionRenderer {
 						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
 						render plot method (which is overwritten by subclasses), and the renderScoreFunctionAxis to render the different parts of the score function plot.
 	*/
-	renderScoreFunction(objective: PrimitiveObjective, width: number, height: number, viewOrientation: string): void {
+	renderScoreFunction(objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], width: number, height: number, viewOrientation: string): void {
 		var objectiveId: string = objective.getId();
 
 		// Initialize the view configuration. This code is very similar to that in RenderConfigService, but is duplicated here to avoid a dependency on that class.
@@ -265,7 +275,7 @@ export abstract class ScoreFunctionRenderer {
 
 		this.renderScoreFunctionAxis(this.axisContainer, viewOrientation);
 
-		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, this.usersDomainElements, viewOrientation);
+		this.renderPlot(this.domainLabels, this.plotElementsContainer, objective, usersDomainElements, viewOrientation);
 	}
 
 	/*

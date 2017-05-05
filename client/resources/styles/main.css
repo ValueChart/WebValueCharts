@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2017-02-28 14:46:07
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2017-05-04 09:55:03
 */
 
 /* Global Styles */
@@ -208,6 +208,10 @@ a.upload {
     position: relative;
     top: 5rem;
     z-index: -10;
+}
+
+.remove-user {
+    margin-top: 12px;
 }
 
 .toolbar-row {

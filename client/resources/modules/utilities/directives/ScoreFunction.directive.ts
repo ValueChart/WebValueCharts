@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:35:04
+* @Last Modified time: 2017-05-04 17:06:24
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -104,7 +104,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 		
 		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
-		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
+		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
 	}
 
 	detectScoreFunctionChange(previousScoreFunction: ScoreFunction, currentScoreFunction: ScoreFunction): boolean {
@@ -134,7 +134,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 				var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
 
 				if (scoreFunctionChange) {
-					this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, this.plotWidth, this.plotHeight, this.viewOrientation);
+					var usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
+					
+					this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
 					this.previousScoreFunction = currentScoreFunction.getMemento();
 
 					// If this is a sub window, update the parent window in response to the changes.
