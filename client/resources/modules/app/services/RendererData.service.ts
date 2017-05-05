@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 21:16:48
+* @Last Modified time: 2017-05-05 15:52:20
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 										from '@angular/core';
 
 // Import Libraries:
 import * as d3 												from 'd3';
+import * as _												from 'lodash';
 
 // Import Application Classes:
 import { ValueChartService }								from './ValueChart.service';
@@ -434,39 +435,6 @@ export class RendererDataService {
 		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
 
 		return dimensionOneSize / maxDepthOfChildren;
-	}
-
-	public incrementObjectivesWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number): void {
-
-		var weightTotal: number = 0;
-		var nonZeroWeights: number = 0;
-
-		labelData.forEach((child: LabelData) => {
-			if (child.weight !== 0) {
-				weightTotal += child.weight;
-				nonZeroWeights++;
-			}
-		});
-
-		if (nonZeroWeights && weightIncrement < 0) {
-			weightIncrement = weightIncrement / nonZeroWeights;
-		} else {
-			weightIncrement = weightIncrement / labelData.length;
-		}
-
-		labelData.forEach((labelDatum: LabelData) => {
-			let labelDatumMax: number = maxWeight;
-			if (weightTotal !== 0 && labelDatum.weight !== 0) {
-				labelDatumMax = maxWeight * (labelDatum.weight / weightTotal);
-			}
-
-			if (labelDatum.subLabelData === undefined) {
-				var newWeight = Math.max(Math.min(labelDatum.weight + weightIncrement, labelDatumMax), 0);
-				weightMap.setObjectiveWeight(labelDatum.objective.getName(), newWeight);
-			} else {
-				this.incrementObjectivesWeights(labelDatum.subLabelData, weightMap, weightIncrement, labelDatumMax);
-			}
-		});
 	}
 
 	changeAlternativesOrder = (cellIndices: number[]) => {

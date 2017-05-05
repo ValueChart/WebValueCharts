@@ -2,15 +2,15 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 14:32:29
+* @Last Modified time: 2017-05-05 16:06:20
 */
 
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core';
-import { NgZone }													from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import * as _														from 'lodash';
 import { Observable }												from 'rxjs/Observable';
 import { Subscription } 											from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
@@ -72,7 +72,6 @@ export class ResizeWeightsInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private ngZone: NgZone,
 		private renderConfigService: RenderConfigService,
 		private labelRenderer: LabelRenderer,
 		private valueChartService: ValueChartService,
@@ -129,7 +128,8 @@ export class ResizeWeightsInteraction {
 		if (previousWeight + pumpAmount < 0) {
 			pumpAmount = 0 - previousWeight;
 		}
-		this.valueChartService.getCurrentUser().getWeightMap().setObjectiveWeight(labelDatum.objective.getName(), previousWeight + pumpAmount);
+		var newWeight: number = previousWeight + pumpAmount;
+		this.incrementObjectiveWeight(labelDatum, this.valueChartService.getCurrentUser().getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
 	}
 
 	/*
@@ -204,58 +204,104 @@ export class ResizeWeightsInteraction {
 		var parentName = (<Element>container.node()).getAttribute('parent');
 		var parentContainer: d3.Selection<any, any, any, any> = d3.select('#label-' + parentName + '-container');
 		var siblings: LabelData[] = (<LabelData>parentContainer.datum()).subLabelData;
+		var combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
 
 		// Run inside the angular zone so that change detection is triggered.
-		this.ngZone.run(() => {
-			if (this.resizeType === 'neighbor') {	// Neighbor resizing:
-				let combinedWeight: number = d.weight + siblings[i - 1].weight;
+		if (this.resizeType === 'neighbor') {	// Neighbor resizing:
+			this.resizeNeighbors(d, i, deltaWeight, weightMap, siblings);
+		} else {	// Sibling resizing:
+			this.resizeSiblings(d, i, deltaWeight, combinedWeight, weightMap, siblings);
+		}
+	};
 
-				// Determine the weights of the two siblings based on the weight change, and the total prior weight. Note that neither objective can have a weight greater than the total prior weight.
-				let siblingElementWeight: number = Math.max(Math.min(siblings[i - 1].weight - deltaWeight, combinedWeight), 0);
-				let currentElementWeight: number = Math.max(Math.min(d.weight + deltaWeight, combinedWeight), 0);
+	resizeNeighbors = (d: LabelData, i: number, deltaWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
+		let combinedWeight: number = d.weight + siblings[i - 1].weight;
 
-				// It is important to realize that the objective label that contains the divider is ALWAYS below the label. This means that the neighbor being
-				// changed by dragging is ALWAYS the sibling directly before the current label (i - 1).
-				
-				// Update the objective's weights, or update the weights of their children if they AbstractObjectives.
-				if (d.objective.objectiveType === 'abstract') {
-					this.rendererDataService.incrementObjectivesWeights(d.subLabelData, weightMap, deltaWeight, combinedWeight);
-				} else {
-					weightMap.setObjectiveWeight(d.objective.getName(), currentElementWeight);
-				}
+		// Determine the weights of the two siblings based on the weight change, and the total prior weight. Note that neither objective can have a weight greater than the total prior weight.
+		let siblingWeight: number = _.clamp(siblings[i - 1].weight - deltaWeight, 0, combinedWeight);
+		let currentWeight: number = _.clamp(d.weight + deltaWeight, 0, combinedWeight);
 
-				if (siblings[i - 1].objective.objectiveType === 'abstract') {
-					this.rendererDataService.incrementObjectivesWeights(siblings[i - 1].subLabelData, weightMap, -1 * deltaWeight, combinedWeight);
-				} else {
-					weightMap.setObjectiveWeight(siblings[i - 1].objective.getName(), siblingElementWeight);
-				}
-			} else {	// Sibling resizing:
-				let combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
-				let siblingsToIncrease: LabelData[] = [];
-				let siblingsToDecrease: LabelData[] = [];
+		// It is important to realize that the objective label that contains the divider is ALWAYS below the label. This means that the neighbor being
+		// changed by dragging is ALWAYS the sibling directly before the current label (i - 1).
+		
+		// Update the objective's weights, or update the weights of their children if they AbstractObjectives.
+		this.incrementObjectiveWeight(d, weightMap, currentWeight, deltaWeight, combinedWeight);	// Update Children's weights.
+		this.incrementObjectiveWeight(siblings[i - 1], weightMap, siblingWeight, -deltaWeight, combinedWeight); // Update Children's weights.
 
-				// If deltaWeight is negative, then the user is dragging the divider down, and the set of labels whose weights should increase are all those
-				// siblings ABOVE the label that contains the divider being dragged. If deltaWeight is positive, then the user is dragging the divider up and the set
-				// of labels whose weights should increase are the label containing the divider and ALL the siblings below it. 
+	}
 
-				if (deltaWeight < 0) {		 
+	resizeSiblings = (d: LabelData, i: number, deltaWeight: number, combinedWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
+		let siblingsToIncrease: LabelData[] = [];
+		let siblingsToDecrease: LabelData[] = [];
 
-					siblingsToIncrease = siblings.slice(0, i);	// All the siblings above the divider.
-					siblingsToDecrease = siblings.slice(i); 	// The label containing the divider and all siblings those below it.
+		// If deltaWeight is negative, then the user is dragging the divider down, and the set of labels whose weights should increase are all those
+		// siblings ABOVE the label that contains the divider being dragged. If deltaWeight is positive, then the user is dragging the divider up and the set
+		// of labels whose weights should increase are the label containing the divider and ALL the siblings below it. 
 
-					this.rendererDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (-1 * deltaWeight), combinedWeight);
-					this.rendererDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (deltaWeight), combinedWeight);
+		var siblingsAbove = siblings.slice(0, i);	// All the siblings above the divider.
+		var siblingsBelow = siblings.slice(i);		// The label containing the divider and all siblings those below it.
 
-				} else {
+			this.incrementChildrenWeights(siblingsAbove, weightMap, -deltaWeight, combinedWeight);
+			this.incrementChildrenWeights(siblingsBelow, weightMap, deltaWeight, combinedWeight);
+	}
 
-					siblingsToIncrease = siblings.slice(i);		// The label containing the divider and all siblings those below it.
-					siblingsToDecrease = siblings.slice(0, i);	// All the siblings above the divider.
 
-					this.rendererDataService.incrementObjectivesWeights(siblingsToIncrease, weightMap, (deltaWeight), combinedWeight);
-					this.rendererDataService.incrementObjectivesWeights(siblingsToDecrease, weightMap, (-1 * deltaWeight), combinedWeight);
-				}
+
+	/*
+		@param labelDatum - The labelData object corresponding to the Objective whose weight should be incremented.
+		@param weightMap - The current user's WeightMap.
+		@param newWeight - The new weight for the Objective.
+		@param WeightIncrement - The amount that the Objective's weight has been incremented by.
+		@param maxWeight - The maximum allowed weight for the Objective. The incremented will be truncated if would cause this value to be exceeded.
+		@returns {void} 
+		@description	Updates the weight of an Objective by weightIncrement to be newWeight. PrimitiveObjective's are updated directly.
+						If the Objective is Abstract, then IncrementChildWeights is used to update the sub-objectives.
+	*/
+	public incrementObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, newWeight: number, weightIncrement: number, maxWeight: number): void {
+		if (labelDatum.objective.objectiveType === 'primitive') {
+			weightMap.setObjectiveWeight(labelDatum.objective.getName(), newWeight);		
+		} else {
+			var labelData = labelDatum.subLabelData;
+			this.incrementChildrenWeights(labelData, weightMap, weightIncrement, maxWeight);
+		}
+	}
+
+	/*
+		@param labelData - The array of labelData objects whose weight should be incremented.
+		@param weightMap - The current user's WeightMap.
+		@param WeightIncrement - The amount that the Objective's weight has been incremented by.
+		@param maxWeight - The maximum allowed weight for the Objective. The incremented will be truncated if would cause this value to be exceeded.
+		@returns {void} 
+		@description	Updates the weight of a set of objectives by distributing a weightIncrement amongst them. 
+	*/
+	public incrementChildrenWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number) {
+		var weightTotal: number = 0;
+		var nonZeroWeights: number = 0;
+
+		labelData.forEach((child: LabelData) => {
+			if (child.weight !== 0) {
+				weightTotal += child.weight;
+				nonZeroWeights++;
 			}
 		});
-	};
+
+		if (nonZeroWeights && weightIncrement < 0) {		// If there are objectives with non-zero weights and the weight increment is negative:
+
+			weightIncrement = weightIncrement / nonZeroWeights;	// Then, divide the weight increment amongst the objectives with non-zero weights.
+		} else {
+			weightIncrement = weightIncrement / labelData.length; // Otherwise, just divide the weight increment evenly amongst the objectives.
+		}
+
+		labelData.forEach((labelDatum: LabelData) => {
+			let labelDatumMax: number = maxWeight;
+			if (weightTotal !== 0 && labelDatum.weight !== 0) {
+				// Compute the maximum allowed weight for the current objective. This is calculated to be proportional to its 
+				// current percentage of the total weight.
+				labelDatumMax = maxWeight * (labelDatum.weight / weightTotal);	
+			}
+			let newWeight = _.clamp(labelDatum.weight + weightIncrement, 0, labelDatumMax); // The new weight must be within [0, labelDatumMax]
+			this.incrementObjectiveWeight(labelDatum, weightMap, newWeight, weightIncrement, labelDatumMax);
+		});
+	}
 
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 14:22:50
+* @Last Modified time: 2017-05-05 14:41:01
 */
 
 // Import Angular Resources:
@@ -13,6 +13,10 @@ import { ElementRef }															from '@angular/core';
 // Import Libraries:
 import * as d3 																	from 'd3';
 import * as _ 																	from 'lodash';
+import { Observable }															from 'rxjs/Observable';
+import { Subscription } 														from 'rxjs/Subscription';
+import '../../utilities/rxjs-operators';
+
 
 // Import Application Classes:
 // Services:
