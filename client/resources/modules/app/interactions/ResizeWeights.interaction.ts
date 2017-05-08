@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 16:06:20
+* @Last Modified time: 2017-05-05 16:44:34
 */
 
 // Import Angular Classes:
-import { Injectable } 										from '@angular/core';
+import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
@@ -17,7 +17,6 @@ import '../../utilities/rxjs-operators';
 
 // Import Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
-import { RendererDataService }										from '../services/RendererData.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -75,7 +74,6 @@ export class ResizeWeightsInteraction {
 		private renderConfigService: RenderConfigService,
 		private labelRenderer: LabelRenderer,
 		private valueChartService: ValueChartService,
-		private rendererDataService: RendererDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { 
 	}
@@ -188,7 +186,7 @@ export class ResizeWeightsInteraction {
 	// drag events.
 	private resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getMaximumWeightMap());
+		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getCurrentUser().getWeightMap());
 	}
 
 	// An anonymous function that is used to handle the regular drag events that are fired whenever the user continues to drag label divider.

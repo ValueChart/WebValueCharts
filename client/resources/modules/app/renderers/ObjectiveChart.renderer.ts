@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:55:01
+* @Last Modified time: 2017-05-07 22:29:43
 */
 
 // Import Angular Classes
@@ -238,6 +238,8 @@ export class ObjectiveChartRenderer {
 	}
 
 
+	// TODO <@aaron> : Update the description for this method.
+
 	/*
 		@param width - The width the objective chart should be rendered in. Together with height this parameter determines the size of the objective chart.
 		@param height - The height the objective chart should be rendered in. Together with width this parameter determines the size of the objective chart. 
@@ -248,9 +250,18 @@ export class ObjectiveChartRenderer {
 						It should be used to update the objective chart when the data underlying the it (rows) has changed, and the appearance of the objective chart needs to be updated to reflect
 						this change. It should NOT be used to initially render the objective chart, or change the view orientation of the objective chart. Use renderObjectiveChart for this purpose.
 	*/
-	updateObjectiveChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
+	renderObjectiveChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
 		// Update the objective chart view configuration with the new width, height, and orientation. This method modifies this.viewConfig in place.
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
+
+		// Position the objective chart.
+		this.chart
+			.attr('transform', () => {
+				if (viewOrientation == 'vertical')
+					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, this.viewConfig.dimensionTwoSize + 10);
+				else
+					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, 0);	// TODO: Fix this.
+			});
 
 		// Update the data behind the row outlines 
 		var rowOutlinesToUpdate = this.rowOutlines
@@ -284,35 +295,6 @@ export class ObjectiveChartRenderer {
 		// Fire the Rendering Over event on completion of rendering.
 		(<any>this.renderEventsService.objectiveChartDispatcher).call('Rendering-Over');
 	}
-
-
-	/*
-		@param width - The width the objective chart should be rendered in. Together with height this parameter determines the size of the objective chart.
-		@param height - The height the objective chart should be rendered in. Together with width this parameter determines the size of the objective chart. 
-		@param viewOrientation - The orientation the objective chart should be rendered with. Either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	Positions and gives widths + heights to the elements created by the createObjectiveChart method. It should be used to display the objective chart 
-						for the first time after creation, and to change the orientation of the objective chart. It does NOT update the data underlying the summary chart, and as such should not be used in response to changes 
-						to the underlying ValueChart data. 
-	*/
-	renderObjectiveChart(width: number, height: number, viewOrientation: string): void {
-		// Update the objective chart view configuration with the new width, height, and orientation. This method modifies this.viewConfig in place.
-		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
-
-		// Position the objective chart.
-		this.chart
-			.attr('transform', () => {
-				if (viewOrientation == 'vertical')
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, this.viewConfig.dimensionTwoSize + 10);
-				else
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, 0);	// TODO: Fix this.
-			});
-
-		this.renderObjectiveChartRows(this.rowOutlines, this.rows, this.alternativeLabels, this.alternativeBoxes, this.cells, this.userScores, this.weightColumns, viewOrientation);
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.objectiveChartDispatcher).call('Rendering-Over');
-	}
-
 
 	/*
 		@param rowOutlines - The selection of 'rect' elements that outline the rows to be rendered.

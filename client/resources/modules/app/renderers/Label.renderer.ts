@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:15:35
+* @Last Modified time: 2017-05-07 22:21:32
 */
 
 // Import Angular Classes:
@@ -14,7 +14,6 @@ import * as d3 														from 'd3';
 
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
-import { RendererDataService }										from '../services/RendererData.service';
 import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
@@ -80,7 +79,6 @@ export class LabelRenderer {
 		private renderConfigService: RenderConfigService,
 		private renderEventsService: RenderEventsService,
 		private valueChartService: ValueChartService,
-		private rendererDataService: RendererDataService,
 		private scoreFunctionViewerService: ScoreFunctionViewerService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private defs: LabelDefinitions,
@@ -195,6 +193,8 @@ export class LabelRenderer {
 		});
 	}
 
+
+	// TODO <@aaron>: update this methods description.
 	/*
 		@param width - The width of the area to render the label space in. This is NOT the width of the label to be rendered.
 		@param height - The height of the area to render the label space in. This is NOT the height of the label to be rendered.
@@ -206,45 +206,13 @@ export class LabelRenderer {
 		@description 	Updates the data behind the labels using the renderLabels method. This method is mainly used to handle changes to user assigned objective weights.
 						It should NOT be used to render the label space for the first time, or to render it in a different orientation. This is what renderLabelSpace is for.
 	*/
-	updateLabelSpace(width: number, height: number, labelData: LabelData[], parentName: string, viewOrientation: string, objectives: PrimitiveObjective[]) {
+	renderLabelSpace(width: number, height: number, labelData: LabelData[], parentName: string, viewOrientation: string, objectives: PrimitiveObjective[]) {
 		// Update the label area view configuration with the new width, height, and orientation. This method modifies this.viewConfig in place.
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
 
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
-		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
-		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
-
-		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
-
-		if (this.displayScoreFunctions) {
-			// Render the score function plots.
-			scoreFunctionContainer.style('display', 'block');
-			this.renderScoreFunctions(viewOrientation, scoreFunctionContainer, objectives);
-		} else {
-			scoreFunctionContainer.style('display', 'none');
-		}
-
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.labelsDispatcher).call('Rendering-Over');
-	}
-
-	/*
-		@param width - The width of the area to render the label space in. This is NOT the width of the label to be rendered.
-		@param height - The height of the area to render the label space in. This is NOT the height of the label to be rendered.
-		@param labelData - The data for the labels to be updated and then displayed. Note that this data has a recursive (or nested) structure.
-		@param viewOrientation - The view orientation that the label space is to be displayed in. Either 'vertical' or 'horizontal'.
-		@param objectives - The collection of primitive objectives in the ValueChart. Used for rendering score function plots.
-		@returns {void}
-		@description 	Positions and gives widths + heights to the elements created by the createLabelSpace method. This method should be used to render the label space
-						for the first time, or to change the view orientation of the labels. It should NOT be used to update the data behind the labels; this is what updateLabelSpace is for.
-	*/
-	renderLabelSpace(width: number, height: number, labelData: LabelData[], viewOrientation: string, objectives: PrimitiveObjective[]): void {
-		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
-
-		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.displayScoreFunctions = this.renderConfigService.viewConfig.displayScoreFunctions;
-		this.labelWidth = this.rendererDataService.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
+		this.labelWidth = this.calculateMinLabelWidth(labelData, this.viewConfig.dimensionOneSize, this.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
@@ -255,18 +223,12 @@ export class LabelRenderer {
 					return 'translate(0,0)';
 			});
 
-		// Set the width and height of labelSpaceOutline 'rect' to the width and hight of the label area.
-		this.labelSpaceOutline
-			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
-			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
 
-		// Render the labels, starting with the labels for the highest level AbstractObjectives, which are in the 'g' directly under the root container.
-		var labelSpaces = this.rootContainer.selectAll('g[parent="' + this.defs.ROOT_CONTAINER_NAME + '"]');
-		this.renderLabels(labelSpaces, labelData, viewOrientation, false);
+		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
+		this.renderLabels(labelSpaces, labelData, viewOrientation, true);
 
 		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
-		// Render or hide the score function pots depending on the value of the displayScoreFunctions attribute on the ValueChartDirective.
 		if (this.displayScoreFunctions) {
 			// Render the score function plots.
 			scoreFunctionContainer.style('display', 'block');
@@ -550,5 +512,17 @@ export class LabelRenderer {
 
 		return retValue;
 	};
+
+	calculateMinLabelWidth = (labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean) => {
+		var maxDepthOfChildren = 0;
+		labelData.forEach((labelDatum: LabelData) => {
+			if (labelDatum.depthOfChildren > maxDepthOfChildren)
+				maxDepthOfChildren = labelDatum.depthOfChildren;
+		});
+
+		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
+
+		return dimensionOneSize / maxDepthOfChildren;
+	}
 
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 15:52:20
+* @Last Modified time: 2017-05-07 22:55:02
 */
 
 // Import Angular Classes:
@@ -81,9 +81,9 @@ export class RendererDataService {
 	// 									Methods
 	// ========================================================================================
 
+
 	// ================================  Getters ====================================
-
-
+	
 	/*
 		@returns {RowData[]} - The RowData stored by this class for use with the ObjectiveChartRenderer and SummaryChartRenderer classes.
 		@description	Gets the RowData for the active ValueChart. This method ONLY creates the row data for the active ValueChart if
@@ -115,22 +115,6 @@ export class RendererDataService {
 	}
 
 
-	// ================================ Methods for Parsing Scores From Data  ====================================
-
-	calculateNormalizedTotalScore = (d: UserScoreData) => {
-		var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
-		var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
-		return (score + d.offset) / d.user.getWeightMap().getWeightTotal();
-	};
-
-	calculateAverageScore = (d: CellData) => {
-		var totalScore: number = 0;
-		d.userScores.forEach((userScore: UserScoreData) => {
-			totalScore += (this.calculateNormalizedTotalScore(userScore));
-		});
-
-		return (totalScore / d.userScores.length);
-	}
 
 	// ================================ Data Creation and Update Methods  ====================================
 
@@ -368,11 +352,6 @@ export class RendererDataService {
 
 	// ================================ Public Methods Generating Row Orders ====================================
 
-
-	// Calculate the weight offset for each row. The weight offset for one row is the combined weights of all rows
-	// prior in the row ordering. This is needed to determine the y (or x if in vertical orientation) position for each row,
-	// seeing as the weight of the previous rows depends on the their weights.
-
 	public generateCellOrderByObjectiveScore(rowsToReorder: RowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
@@ -423,18 +402,6 @@ export class RendererDataService {
 		});
 
 		return cellIndices;
-	}
-
-	public calculateMinLabelWidth(labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean): number {
-		var maxDepthOfChildren = 0;
-		labelData.forEach((labelDatum: LabelData) => {
-			if (labelDatum.depthOfChildren > maxDepthOfChildren)
-				maxDepthOfChildren = labelDatum.depthOfChildren;
-		});
-
-		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
-
-		return dimensionOneSize / maxDepthOfChildren;
 	}
 
 	changeAlternativesOrder = (cellIndices: number[]) => {

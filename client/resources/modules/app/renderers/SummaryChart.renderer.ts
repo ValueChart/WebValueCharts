@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 23:47:16
+* @Last Modified time: 2017-05-07 22:54:04
 */
 
 // Import Angular Classes
@@ -12,11 +12,11 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
+import { ChangeDetectionService }									from '../services/ChangeDetection.service';
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
-import { RendererDataService }										from '../services/RendererData.service';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
@@ -66,6 +66,7 @@ export class SummaryChartRenderer {
 
 	// Misc. Fields:
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
+	private scoreTotalFontSize: number = 22;
 
 	// ========================================================================================
 	// 									Constructor
@@ -80,7 +81,6 @@ export class SummaryChartRenderer {
 		private renderConfigService: RenderConfigService,
 		private renderEventsService: RenderEventsService,
 		private valueChartService: ValueChartService,
-		private rendererDataService: RendererDataService,
 		private defs: SummaryChartDefinitions) { }
 
 	// ========================================================================================
@@ -130,6 +130,7 @@ export class SummaryChartRenderer {
 		// Fire the Construction Over event on completion of construction.
 		(<any>this.renderEventsService.summaryChartDispatcher).call('Construction-Over');
 	}
+
 
 	/*
 		@param rowsContainer - The 'g' element that contains/will contain the rows of the summary chart.
@@ -201,6 +202,7 @@ export class SummaryChartRenderer {
 
 		this.createSummaryChartCells(this.rows);
 	}
+
 	/*
 		@param stackedBarRows - The selection of summary chart rows. Each one is a 'g' element that contains, or will contain, row cells.
 		@returns {void}
@@ -234,6 +236,8 @@ export class SummaryChartRenderer {
 		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
 	}
 
+	// TODO <@aaron>: Update this method description.
+
 	/*
 		@param width - The width the summary chart should be rendered in. Together with height this parameter determines the size of the summary chart.
 		@param height - The height the summary chart should be rendered in. Together with width this parameter determines the size of the summary chart. 
@@ -245,9 +249,28 @@ export class SummaryChartRenderer {
 						this change. It should NOT be used to initially render the summary chart, or change the view orientation of the summary chart. Use renderSummaryChart for this purpose.
 
 	*/
-	updateSummaryChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
+	renderSummaryChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
 		// Update the summary chart view configuration with the new width, height, and orientation. This method modifies this.viewConfig in place.
 		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
+
+		// Position the chart in the viewport. All the chart's children will inherit this position.
+		this.summaryChartScale = d3.scaleLinear()
+			.range([0, this.viewConfig.dimensionTwoSize]);
+
+		// Position the entire chart in the view box.
+		this.chart
+			.attr('transform', () => {
+				if (viewOrientation == 'vertical')
+					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, 0);
+				else
+					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, this.viewConfig.dimensionTwoSize + 10);
+			});
+
+		// Give the proper width and height to the chart outline. 
+		this.outline
+			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
+			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
+
 
 		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
 
@@ -272,61 +295,12 @@ export class SummaryChartRenderer {
 		var averageLinesToUpdate: d3.Selection<any, any, any, any> = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
 			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; });
 
-		// Render the summary chart using the selections with updated data.
-		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate, viewOrientation);
-	
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
-	}
-
-	/*
-		@param width - The width the summary chart should be rendered in. Together with height this parameter determines the size of the summary chart.
-		@param height - The height the summary chart should be rendered in. Together with width this parameter determines the size of the summary chart. 
-		@param rows - The data that the summary chart is intended to display.
-		@param viewOrientation - The orientation the summary chart should be rendered with. Either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	Positions and gives widths + heights to the elements created by the createSummaryChart method. It should be used to display the summary chart 
-						for the first time after creation, and to change the orientation of the summary chart. It does NOT update the data underlying the summary chart, and as such should not be used in response to changes 
-						to the underlying ValueChart data. 
-
-	*/
-	renderSummaryChart(width: number, height: number, rows: RowData[], viewOrientation: string): void {
-		this.renderConfigService.updateViewConfig(this.viewConfig, viewOrientation, width, height);
-
-		// Position the chart in the viewport. All the chart's children will inherit this position.
-		this.summaryChartScale = d3.scaleLinear()
-			.range([0, this.viewConfig.dimensionTwoSize]);
-
-		// Position the entire chart in the view box.
-		this.chart
-			.attr('transform', () => {
-				if (viewOrientation == 'vertical')
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, 0);
-				else
-					return this.renderConfigService.generateTransformTranslation(viewOrientation, this.viewConfig.dimensionOneSize, this.viewConfig.dimensionTwoSize + 10);
-			});
-
-		// Give the proper width and height to the chart outline. 
-		this.outline
-			.attr(this.viewConfig.dimensionOne, this.viewConfig.dimensionOneSize)
-			.attr(this.viewConfig.dimensionTwo, this.viewConfig.dimensionTwoSize);
-
-		this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; })
-			.selectAll('.' + this.defs.SCORE_TOTAL)
-			.data((d: CellData) => { return d.userScores; });
-
-		this.scoreTotals = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.selectAll('.' + this.defs.SCORE_TOTAL);
-
-		this.averageLines = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
-			.data(() => { return (viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; });
-
 		this.renderUtilityAxis(viewOrientation);
 
 		this.toggleUtilityAxis();
 
-		this.renderSummaryChartRows(this.alternativeBoxes, this.scoreTotals, this.cells, this.userScores, this.averageLines, viewOrientation);
+		// Render the summary chart using the selections with updated data.
+		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate, viewOrientation);
 	
 		// Fire the Rendering Over event on completion of rendering.
 		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
@@ -399,13 +373,13 @@ export class SummaryChartRenderer {
 			.attr(this.viewConfig.coordinateOne + '2', (d: CellData, i: number) => { return this.calculateCellCoordinateOne(d, 1); })
 			.attr(this.viewConfig.coordinateTwo + '1', (d: CellData, i: number) => { 
 				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
-				var yVal = this.viewConfig.dimensionTwoScale(weightTotal * this.rendererDataService.calculateAverageScore(d));
+				var yVal = this.viewConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
 				return (yVal * ((viewOrientation === 'vertical') ? -1 : 1)) + 
 					((viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoSize : 0);
 			})
 			.attr(this.viewConfig.coordinateTwo + '2', (d: CellData, i: number) => { 
 				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
-				var yVal = this.viewConfig.dimensionTwoScale(weightTotal * this.rendererDataService.calculateAverageScore(d));
+				var yVal = this.viewConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
 				return (yVal * ((viewOrientation === 'vertical') ? -1 : 1)) + 
 					((viewOrientation === 'vertical') ? this.viewConfig.dimensionTwoSize : 0);
 			});
@@ -433,7 +407,7 @@ export class SummaryChartRenderer {
 		var horizontalOffset: number = 10;
 
 		scoreTotals
-			.text((d: UserScoreData, i: number) => { return Math.round(100 * this.rendererDataService.calculateNormalizedTotalScore(d)); })
+			.text((d: UserScoreData, i: number) => { return Math.round(100 * this.calculateNormalizedTotalScore(d)); })
 			.attr(this.viewConfig.coordinateOne, (d: UserScoreData, i: number) => {
 				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
@@ -441,12 +415,12 @@ export class SummaryChartRenderer {
 			.attr(this.viewConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
 
-				return (this.viewConfig.dimensionTwoScale(weightTotal * this.rendererDataService.calculateNormalizedTotalScore(d)) * 
+				return (this.viewConfig.dimensionTwoScale(weightTotal * this.calculateNormalizedTotalScore(d)) * 
 					((viewOrientation === 'vertical') ? -1 : 1)) + 
 					((viewOrientation === 'vertical') ? (this.viewConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
 			})
-			.attr(this.viewConfig.coordinateTwo + '1', this.rendererDataService.calculateNormalizedTotalScore)
-			.style('font-size', 22)
+			.attr(this.viewConfig.coordinateTwo + '1', this.calculateNormalizedTotalScore)
+			.style('font-size', this.scoreTotalFontSize)
 			.classed(this.defs.BEST_SCORE, false);
 
 
@@ -469,7 +443,7 @@ export class SummaryChartRenderer {
 			if (element.nodeName === 'text') {
 				let selection: d3.Selection<any, any, any, any> = d3.select(element);
 				let userScore: UserScoreData = selection.datum();
-				let scoreValue: number = this.rendererDataService.calculateNormalizedTotalScore(userScore);
+				let scoreValue: number = this.calculateNormalizedTotalScore(userScore);
 				if (scoreValue > maxUserScores[userScore.user.getUsername()]) {
 					maxUserScores[userScore.user.getUsername()] = scoreValue;
 					bestTotalScoreSelections[userScore.user.getUsername()] = selection;
@@ -574,4 +548,22 @@ export class SummaryChartRenderer {
 
 		return this.summaryChartScale(score * userObjectiveWeight);
 	};
+
+
+	// ================================ Methods for Parsing Scores From Data  ====================================
+
+	calculateNormalizedTotalScore = (d: UserScoreData) => {
+		var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+		var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
+		return (score + d.offset) / d.user.getWeightMap().getWeightTotal();
+	};
+
+	calculateAverageScore = (d: CellData) => {
+		var totalScore: number = 0;
+		d.userScores.forEach((userScore: UserScoreData) => {
+			totalScore += (this.calculateNormalizedTotalScore(userScore));
+		});
+
+		return (totalScore / d.userScores.length);
+	}
 }
