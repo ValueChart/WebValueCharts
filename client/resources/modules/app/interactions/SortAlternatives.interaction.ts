@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:19:27
+* @Last Modified time: 2017-05-08 13:02:37
 */
 
 // Import Angular Classes:
@@ -10,7 +10,8 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
-
+import { Subject }												from 'rxjs/Subject';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
@@ -140,7 +141,6 @@ export class SortAlternativesInteraction {
 			this.sortAlternativesByObjective(false);
 			this.sortAlternativesManually(false);
 		}
-
 	}
 
 	/*

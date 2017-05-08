@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:21:32
+* @Last Modified time: 2017-05-08 12:15:45
 */
 
 // Import Angular Classes:
@@ -89,10 +89,23 @@ export class LabelRenderer {
 	// 									Methods
 	// ========================================================================================
 
+
+	valueChartChanged = (d: any) => {
+		console.log('change pushed to labels');
+		console.log(d.labelData);
+		var primitiveObjectives = d.valueChart.getAllPrimitiveObjectives();
+		
+		if (this.rootContainer == undefined)
+			this.createLabelSpace(d.el, d.labelData, primitiveObjectives, true); // TODO <@aaron>: Remove temporary true parameter.
+
+		this.renderLabelSpace(d.width, d.height, d.labelData, this.defs.ROOT_CONTAINER_NAME, d.viewConfig.viewOrientation, primitiveObjectives);
+	}
+
 	/*
 		@param el - The element that is will be used as the parent of the summary chart.
 		@param labelData - The data that labels are going to represent. Note that this data has a recursive (or nested) structure.
 		@param objectiveData - The list of primitive objectives in the ValueChart. This is used to render the score function plots.
+		@param enableInteraction - 
 		@returns {void}
 		@description 	Creates the base containers and all elements for the labels of a ValueChart. It should be called when creating the labels for the first time
 						and when rebuilding them. The label area's recursive structure means that when objectives are added/deleted, or the order of objectives is changed,

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:54:04
+* @Last Modified time: 2017-05-08 13:30:44
 */
 
 // Import Angular Classes
@@ -86,6 +86,19 @@ export class SummaryChartRenderer {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	valueChartChanged = (d: any) => {
+		console.log('change pushed to summary chart');
+
+		if (this.chart == undefined)
+			this.createSummaryChart(d.el, d.rowData);
+
+		if (this.rows.data().length != d.rowData.length)
+			this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, d.rowData);
+
+		this.renderSummaryChart(d.width, d.height, d.rowData, d.viewConfig.viewOrientation);
+	}
+
 
 	/*
 		@param el - The element that is will be used as the parent of the summary chart.

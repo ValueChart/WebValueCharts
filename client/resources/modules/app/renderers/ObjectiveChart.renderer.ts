@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:29:43
+* @Last Modified time: 2017-05-08 13:14:12
 */
 
 // Import Angular Classes
@@ -16,6 +16,7 @@ import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
+import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
@@ -82,6 +83,19 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+
+	valueChartChanged = (d: any) => {
+		console.log('change pushed to objective chart');
+
+		if (this.chart == undefined)
+			this.createObjectiveChart(d.el, d.rowData);
+
+		if (this.rows.data().length != d.rowData.length)
+			this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer, d.rowData);
+
+		this.renderObjectiveChart(d.width, d.height, d.rowData, d.viewConfig.viewOrientation);
+	}
 
 	/*
 		@param el - The element that to be used as the parent of the objective chart.

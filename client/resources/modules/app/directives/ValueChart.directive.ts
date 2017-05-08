@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:54:46
+* @Last Modified time: 2017-05-08 13:14:04
 */
 
 // Import Angular Classes:
@@ -31,7 +31,6 @@ import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.r
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
 // Interactions:
-import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
 import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
 import { SetObjectiveColorsInteraction }										from '../interactions/SetObjectiveColors.interaction';
@@ -82,7 +81,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private defaultChartComponentHeight: number;
 
 	public valueChartSubject: Subject<ValueChart>;
-
 
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
@@ -141,6 +139,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Initialize Change Detection:
 		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.renderConfigService.viewConfig, this.interactionConfig);
 
+		this.valueChartSubject = new Subject();
+
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
 
@@ -186,19 +186,25 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
+		var renderInformation = this.valueChartSubject.map((valueChart: ValueChart) => {
+			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
+		});
 
-		// Create the labels:
-		this.createLabels();
+		var rowRenderInformation = renderInformation.map(this.rendererDataService.produceRowData);
+
+		rowRenderInformation
+			.subscribe(this.summaryChartRenderer.valueChartChanged);
+
+		rowRenderInformation
+			.subscribe(this.objectiveChartRenderer.valueChartChanged);
+
+		renderInformation.map(this.rendererDataService.produceLabelData)
+			.subscribe(this.labelRenderer.valueChartChanged)
+
+		this.valueChartSubject.next(this.valueChart);
+
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
-
-		// Create the objective chart:
-		this.objectiveChartRenderer.createObjectiveChart(this.el, this.rendererDataService.getRowData());
-		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
-
-		// Create the summary chart:
-		this.summaryChartRenderer.createSummaryChart(this.el, this.rendererDataService.getRowData());
-		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
 	}
 
 	/*
@@ -250,9 +256,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}
 
 		if (!_.isEqual(this.valueChartService.getValueChart(), this.changeDetectionService.valueChartRecord)) {
+			this.valueChartSubject.next(this.valueChart);
+
 			this.changeDetectionService.valueChartRecord = _.cloneDeep(this.valueChartService.getValueChart());
-			this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-			this.updateValueChartDisplay();
 			return; 
 		}
 
@@ -273,8 +279,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Check for and handle changes to the alternative ordering.
 		if (this.changeDetectionService.alternativeOrderChanged) {
 			this.changeDetectionService.alternativeOrderChanged = false;
-			this.updateAlternativeOrder();
-			this.updateValueChartDisplay();
+			this.valueChartSubject.next(this.valueChart);
 		}
 
 		// Check for and handle changes to the objective ordering.
@@ -295,8 +300,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Change for and handle changes to the orientation.
 		if (this.changeDetectionService.viewConfigRecord.viewOrientation !== this.renderConfigService.viewConfig.viewOrientation) {
 			this.changeDetectionService.viewConfigRecord.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
-			this.updateViewOrientation();
-
+			
+			this.valueChartSubject.next(this.valueChart);
 		}
 		// Change for and handle changes to the width and height of the ValueChart.
 		if (this.changeDetectionService.widthRecord !== this.width || this.changeDetectionService.heightRecord !== this.height) {
@@ -353,7 +358,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		
 		// Update the ValueChart's SVG structure.
 		this.labelRenderer.updateScoreFunctions(this.labelRenderer.scoreFunctionContainer, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.rendererDataService.getRowData());
+		// this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.rendererDataService.getRowData());
 		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.rendererDataService.getRowData());
 	}
 
@@ -389,7 +394,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		@description	Update the orientation of the ValueChart. Re-renders the ValueChart.
 	*/
 	updateViewOrientation(): void {
-		this.renderConfigService.viewConfig.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
 		this.rendererDataService.updateStackedBarOffsets(this.renderConfigService.viewConfig.viewOrientation);
 		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
 		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
