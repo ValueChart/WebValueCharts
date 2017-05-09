@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:39:17
+* @Last Modified time: 2017-05-09 15:29:54
 */
 
 // Import Angular Classes:
@@ -55,7 +55,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// ========================================================================================
 
 	// Directive Inputs: 
-	//		'valueChart', 						// The data to be rendered. Must be an instance of the ValueChart class.
+	//		'valueChart', 							// The data to be rendered. Must be an instance of the ValueChart class.
 	// 		'width',								// The width of the area in which to render the ValueChart. Must be a number.
 	// 		'height',								// The height of the area in which to render the ValueChart. Must be a number.
 	// 		'viewConfig',							// Options for configuring the ValueChart's appearance. Must be of type ViewConfig.
@@ -64,13 +64,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Chart Inputs:
 	@Input() private valueChart: ValueChart;								// The main data input to the directive.
-	@Input() private width: number;										// The width of the ValueChart.
+	@Input() private width: number;											// The width of the ValueChart.
 	@Input() private height: number;										// The Height of the ValueChart.
-	@Input() private viewConfig: ViewConfig = <any>{};					// Configuration options for view settings;
+	@Input() private viewConfig: ViewConfig = <any>{};						// Configuration options for view settings;
 	@Input() private interactionConfig: InteractionConfig = <any>{};		// Configuration options for user interactions.
 
 	// d3 Selections:
-	private el: d3.Selection<any, any, any, any>; 				// The SVG base element for the ValueChart.
+	private el: d3.Selection<any, any, any, any>; 							// The SVG base element for the ValueChart.
 
 	// Default Size of ValueChart components. These components are the: labels, objective chart, summary chart. 
 	private defaultChartComponentWidth: number;
@@ -125,12 +125,13 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.calculateDefaultComponentSize();
 		this.renderConfigService.viewConfig = this.viewConfig;
 		this.renderConfigService.initUserColors();
+		this.rendererDataService.recordOriginalAlternativeOrder(this.valueChart);
 
 		// Configure the directive for the input data:
 		// this.configureChartData();
 
 		// Initialize Change Detection:
-		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.renderConfigService.viewConfig, this.interactionConfig);
+		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig);
 
 		this.valueChartSubject 	= new Subject();
 		this.interactionSubject = new Subject();
@@ -168,17 +169,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		var renderInformation = this.valueChartSubject.map((valueChart: ValueChart) => {
 			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
-		});
+		}).map(this.rendererDataService.produceRowData)
+			.map(this.rendererDataService.produceLabelData)
+			.map(this.renderConfigService.produceRendererConfig);
 
-		var rowRenderInformation = renderInformation.map(this.rendererDataService.produceRowData);
-
-		rowRenderInformation
+		renderInformation
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
 
-		rowRenderInformation
+		renderInformation
 			.subscribe(this.objectiveChartRenderer.valueChartChanged);
 
-		renderInformation.map(this.rendererDataService.produceLabelData)
+		renderInformation
 			.subscribe(this.labelRenderer.valueChartChanged)
 
 		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);
@@ -210,10 +211,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig))
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig)) {
 			// TODO <@aaron> : Remove this temporary call to initUserColors.
 			this.renderConfigService.initUserColors();
 			this.valueChartSubject.next(this.valueChart);
+		}
 
 		if (this.changeDetectionService.detectViewConfigChanges(this.viewConfig))
 			this.viewConfigSubject.next(this.viewConfig);

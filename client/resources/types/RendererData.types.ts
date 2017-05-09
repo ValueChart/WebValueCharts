@@ -2,14 +2,16 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 14:16:54
+* @Last Modified time: 2017-05-09 13:56:52
 */
 
-import { Objective }					from '../model/Objective';
-import { PrimitiveObjective }			from '../model/PrimitiveObjective';
-import { Alternative }					from '../model/Alternative';
-import { User }							from '../model/User';
+import { Objective }						from '../model/Objective';
+import { PrimitiveObjective }				from '../model/PrimitiveObjective';
+import { Alternative }						from '../model/Alternative';
+import { User }								from '../model/User';
+import { ValueChart }						from '../model/ValueChart';
 
+import { ViewConfig, InteractionConfig }	from './Config.types';
 
 export interface RowData {
 	objective: PrimitiveObjective;
@@ -38,6 +40,18 @@ export interface LabelData {
 	subLabelData?: LabelData[]
 }
 
+export interface RendererUpdate {
+	el: d3.Selection<any, any, any, any>,
+	valueChart: ValueChart,
+	rowData: RowData[],
+	labelData: LabelData[],
+	width: number,
+	height: number,
+	viewConfig: ViewConfig,
+	interactionConfig: InteractionConfig,
+	rendererConfig: RendererConfig
+}
+
 export interface RendererConfig {
 	viewOrientation: string;
 	chartComponentWidth: number;
@@ -51,5 +65,4 @@ export interface RendererConfig {
 	dimensionTwoSize: number;
 
 	dimensionTwoScale: any;
-
 }

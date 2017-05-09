@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:29:30
+* @Last Modified time: 2017-05-09 14:06:32
 */
 
 // Import Angular Classes:
@@ -19,7 +19,7 @@ import { User }														from '../../../model/User';
 
 // Import Types:
 import { ViewConfig }												from '../../../types/Config.types';
-import { RendererConfig }											from '../../../types/RendererData.types';
+import { RendererConfig, RendererUpdate }							from '../../../types/RendererData.types';
 
 @Injectable()
 export class RenderConfigService {
@@ -65,38 +65,41 @@ export class RenderConfigService {
 						Note that the size of the graph is not changed during this process. 
 
 	*/
-	updateRendererConfig(rendererConfig: RendererConfig, viewOrientation: string, componentWidth: number, componentHeight: number): void {
-		rendererConfig.viewOrientation = viewOrientation;
-		rendererConfig.chartComponentWidth = componentWidth;
-		rendererConfig.chartComponentHeight = componentHeight;
+	produceRendererConfig(u: RendererUpdate): RendererUpdate {
+		u.rendererConfig = <any> {};
 
-		if (viewOrientation === 'vertical') {
+		u.rendererConfig.viewOrientation = u.viewConfig.viewOrientation;
+		u.rendererConfig.chartComponentWidth = u.width;
+		u.rendererConfig.chartComponentHeight = u.height;
+
+		if (u.viewConfig.viewOrientation === 'vertical') {
 			// We want to render the ValueChart horizontally
-			rendererConfig.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
-			rendererConfig.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
-			rendererConfig.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
-			rendererConfig.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
+			u.rendererConfig.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
+			u.rendererConfig.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
+			u.rendererConfig.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
+			u.rendererConfig.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
 
-			rendererConfig.dimensionOneSize = rendererConfig.chartComponentWidth;	// This is the width of the graph
-			rendererConfig.dimensionTwoSize = rendererConfig.chartComponentHeight;	// This is the height of the graph
+			u.rendererConfig.dimensionOneSize = u.rendererConfig.chartComponentWidth;	// This is the width of the graph
+			u.rendererConfig.dimensionTwoSize = u.rendererConfig.chartComponentHeight;	// This is the height of the graph
 
-			rendererConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal()])
-				.range([0, componentHeight]);
+			u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
+				.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
+				.range([0, u.height]);
 
-		} else if (viewOrientation === 'horizontal') {
-			rendererConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
-			rendererConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
-			rendererConfig.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
-			rendererConfig.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
+		} else if (u.viewConfig.viewOrientation === 'horizontal') {
+			u.rendererConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
+			u.rendererConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
+			u.rendererConfig.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
+			u.rendererConfig.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
 
-			rendererConfig.dimensionOneSize = rendererConfig.chartComponentHeight;	// This is the height of the graph
-			rendererConfig.dimensionTwoSize = rendererConfig.chartComponentWidth;	// This is the width of the graph
+			u.rendererConfig.dimensionOneSize = u.rendererConfig.chartComponentHeight;	// This is the height of the graph
+			u.rendererConfig.dimensionTwoSize = u.rendererConfig.chartComponentWidth;	// This is the width of the graph
 
-			rendererConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal()])
-				.range([0, componentWidth]);
+			u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
+				.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
+				.range([0, u.height]);
 		}
+		return u;
 	}
 
 	/*

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:27:19
+* @Last Modified time: 2017-05-09 15:30:02
 */
 
 // Import Angular Classes:
@@ -28,7 +28,8 @@ import { ScoreFunctionMap }									from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }									from '../../../model/ScoreFunction';
 
 // Import Type Definitions:
-import { RowData, CellData, UserScoreData, LabelData}		from '../../../types/RendererData.types';
+import { RowData, CellData, UserScoreData, LabelData }		from '../../../types/RendererData.types';
+import { RendererUpdate }									from '../../../types/RendererData.types';
 import { ObjectivesRecord }									from '../../../types/Record.types';
 import { AlternativeOrderRecord }							from '../../../types/Record.types';
 
@@ -85,7 +86,7 @@ export class RendererDataService {
 
 		// TODO<@aaron>: update this output type of this method.
 
-	produceRowData = (d: any) => {
+	produceRowData = (d: RendererUpdate) => {
 		if (!this.rowData || d.valueChart.getUsers().length != this.rowData.length) {
 			this.generateRowData();
 		}
@@ -97,7 +98,7 @@ export class RendererDataService {
 		return d;
 	}
 
-	produceLabelData = (d: any) => {
+	produceLabelData = (d: RendererUpdate) => {
 		if (!this.labelData) {
 			this.generateLabelData();
 		}
@@ -343,6 +344,10 @@ export class RendererDataService {
 		});
 
 		this.reorderAllCells(cellIndices);
+	}
+
+	public recordOriginalAlternativeOrder(valueChart: ValueChart) {
+		this.originalAlternativeOrder = new AlternativeOrderRecord(valueChart.getAlternatives());
 	}
 
 	// ================================ Public Methods Generating Row Orders ====================================

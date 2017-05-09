@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:15:27
+* @Last Modified time: 2017-05-09 15:11:41
 */
 
 // Import Angular Classes:
@@ -24,6 +24,8 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 import { ContinuousDomain }											from '../../../model/ContinuousDomain';
 
 import { DomainElement, UserDomainElements } 						from '../../../types/ScoreFunctionViewer.types';
+import { RendererUpdate }											from '../../../types/RendererData.types';
+import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
 // axis, labels, and base containers of a ScoreFunction. It is an abstract class and should NOT be instantiated or used for any reason. This class has 
@@ -99,6 +101,7 @@ export abstract class ScoreFunctionRenderer {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
 
 	/*
 		@param el - The element that to be used as the parent of the objective chart.

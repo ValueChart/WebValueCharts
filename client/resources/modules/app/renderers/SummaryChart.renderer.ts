@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:54:20
+* @Last Modified time: 2017-05-09 15:16:30
 */
 
 // Import Angular Classes
@@ -12,8 +12,6 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
-import { ChangeDetectionService }									from '../services/ChangeDetection.service';
-import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
@@ -25,8 +23,9 @@ import { Alternative }												from '../../../model/Alternative';
 import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 
-import {RowData, CellData, UserScoreData, RendererConfig}			from '../../../types/RendererData.types';
-import { InteractionConfig, ViewConfig }										from '../../../types/Config.types'
+import { RowData, CellData, UserScoreData, RendererConfig }			from '../../../types/RendererData.types';
+import { RendererUpdate }											from '../../../types/RendererData.types';
+import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 
 
 // This class renders a ValueChart's Alternatives into a stacked bar chart that summarizes the utilities users 
@@ -85,7 +84,6 @@ export class SummaryChartRenderer {
 	constructor(
 		private renderConfigService: RenderConfigService,
 		private renderEventsService: RenderEventsService,
-		private valueChartService: ValueChartService,
 		private sortAlternativesInteraction: SortAlternativesInteraction, 
 		private defs: SummaryChartDefinitions) { }
 
@@ -93,16 +91,17 @@ export class SummaryChartRenderer {
 	// 									Methods
 	// ========================================================================================
 
-	valueChartChanged = (d: any) => {
+	valueChartChanged = (update: RendererUpdate) => {
 		if (this.chart == undefined)
-			this.createSummaryChart(d.el, d.rowData);
+			this.createSummaryChart(update);
 
-		if (this.numUsers != d.valueChart.getUsers().length)
-			this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, d.rowData);
+		if (this.numUsers != update.valueChart.getUsers().length)
+			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 
-		this.numUsers = d.valueChart.getUsers().length;
+		this.numUsers = update.valueChart.getUsers().length;
+		this.rendererConfig = update.rendererConfig;
 
-		this.renderSummaryChart(d.width, d.height, d.rowData, d.viewConfig);
+		this.renderSummaryChart(update);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -125,10 +124,10 @@ export class SummaryChartRenderer {
 						creating a summary chart for the first time, but not when updating as the basic framework of the chart never needs to be
 						constructed again.
 	*/
-	createSummaryChart(el: d3.Selection<any, any, any, any>, rows: RowData[]): void {
+	createSummaryChart(u: RendererUpdate): void {
 
 		// Create the base container for the chart.
-		this.chart = el.append('g')
+		this.chart = u.el.append('g')
 			.classed(this.defs.CHART, true);
 
 		// Create the rectangle which acts as an outline for the chart.
@@ -155,7 +154,7 @@ export class SummaryChartRenderer {
 		this.alternativeBoxesContainer = this.chart.append('g')
 			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
-		this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, rows);
+		this.createSummaryChartRows(u, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 	
 		// Fire the Construction Over event on completion of construction.
 		(<any>this.renderEventsService.summaryChartDispatcher).call('Construction-Over');
@@ -173,10 +172,10 @@ export class SummaryChartRenderer {
 						chart rows by removing and adding rows to conform to the structure of the rows parameter. It also updates summary chart cells through a call to createSummaryChartCells.
 						Updating cells should ALWAYS be done through a call to this method, rather than by directly calling createSummaryChartCells.
 	*/
-	createSummaryChartRows(rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>, rows: RowData[]): void {
+	createSummaryChartRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
 		var updateRows = rowsContainer.selectAll('.' + this.defs.ROW)
-			.data(rows);
+			.data(u.rowData);
 
 		// Update rows to conform to the data.
 		updateRows.exit().remove();				// Remove row containers that do not have a matching data element.
@@ -188,10 +187,10 @@ export class SummaryChartRenderer {
 		// This is true for any situation where we need to remove and then add new elements to an existing selection.
 		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);	// Update the row field.
 
-		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
+		var alternatives: Alternative[] = u.valueChart.getAlternatives();
 
 		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.data((rows[0].cells));
+			.data((u.rowData[0].cells));
 
 		// Update score total sub-containers to conform to the data.
 		updateSubContainers.exit().remove();	// Remove score total sub-containers that do not have a matching alternative.
@@ -211,7 +210,7 @@ export class SummaryChartRenderer {
 		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL);	// Update the score totals field.
 
 		var updateAverageLines = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
-			.data((rows[0].cells));
+			.data((u.rowData[0].cells));
 
 		updateAverageLines.exit().remove();
 		updateAverageLines.enter().append('line')
@@ -220,7 +219,7 @@ export class SummaryChartRenderer {
 		this.averageLines = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE);
 
 		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(this.valueChartService.getAlternatives());
+			.data(u.valueChart.getAlternatives());
 
 		// Update alternative boxes to conform to the data.
 		updateAlternativeBoxes.exit().remove();				// Remove alternative boxes that do not have a matching alternative.
@@ -279,33 +278,30 @@ export class SummaryChartRenderer {
 						this change. It should NOT be used to initially render the summary chart, or change the view orientation of the summary chart. Use renderSummaryChart for this purpose.
 
 	*/
-	renderSummaryChart(width: number, height: number, rows: RowData[], viewConfig: ViewConfig): void {
-		// Update the summary chart view configuration with the new width, height, and orientation. This method modifies this.rendererConfig in place.
-		this.renderConfigService.updateRendererConfig(this.rendererConfig, viewConfig.viewOrientation, width, height);
-
+	renderSummaryChart(u: RendererUpdate): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
 		this.summaryChartScale = d3.scaleLinear()
-			.range([0, this.rendererConfig.dimensionTwoSize]);
+			.range([0, u.rendererConfig.dimensionTwoSize]);
 
 		// Position the entire chart in the view box.
 		this.chart
 			.attr('transform', () => {
-				if (viewConfig.viewOrientation == 'vertical')
-					return this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, this.rendererConfig.dimensionOneSize, 0);
+				if (u.viewConfig.viewOrientation == 'vertical')
+					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);
 				else
-					return this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, this.rendererConfig.dimensionOneSize, this.rendererConfig.dimensionTwoSize + 10);
+					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
 			});
 
 		// Give the proper width and height to the chart outline. 
 		this.outline
-			.attr(this.rendererConfig.dimensionOne, this.rendererConfig.dimensionOneSize)
-			.attr(this.rendererConfig.dimensionTwo, this.rendererConfig.dimensionTwoSize);
+			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize)
+			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.dimensionTwoSize);
 
 
-		var alternatives: Alternative[] = this.valueChartService.getAlternatives();
+		var alternatives: Alternative[] = u.valueChart.getAlternatives();
 
 		// Update the data behind the cells.
-		var cellsToUpdate: d3.Selection<any, any, any, any> = this.rows.data(rows).selectAll('.' + this.defs.CELL)
+		var cellsToUpdate: d3.Selection<any, any, any, any> = this.rows.data(u.rowData).selectAll('.' + this.defs.CELL)
 			.data((d: RowData) => { return d.cells; })
 
 		// Update the data behind the user scores.
@@ -318,19 +314,19 @@ export class SummaryChartRenderer {
 
 		// Update the data behind the score totals.
 		var scoreTotalsToUpdate: d3.Selection<any, any, any, any> = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.data(() => { return (viewConfig.viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; })
+			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; })
 			.selectAll('.' + this.defs.SCORE_TOTAL)
 			.data((d: CellData) => { return d.userScores; });
 
 		var averageLinesToUpdate: d3.Selection<any, any, any, any> = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
-			.data(() => { return (viewConfig.viewOrientation === 'vertical') ? rows[0].cells : rows[rows.length - 1].cells; });
+			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
 
-		this.renderUtilityAxis(viewConfig);
+		this.renderUtilityAxis(u);
 
-		this.toggleUtilityAxis(viewConfig.displayScales);
+		this.toggleUtilityAxis(u.viewConfig.displayScales);
 
 		// Render the summary chart using the selections with updated data.
-		this.renderSummaryChartRows(alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate, viewConfig);
+		this.renderSummaryChartRows(u, alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate);
 	
 		// Fire the Rendering Over event on completion of rendering.
 		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
@@ -343,7 +339,7 @@ export class SummaryChartRenderer {
 						be used to change the visibility of the utility axis. 
 
 	*/
-	renderUtilityAxis(viewConfig: ViewConfig): void {
+	renderUtilityAxis(u: RendererUpdate): void {
 		// Create the linear scale that the utility axis will represent.
 		var uilityScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 100])	// The domain of the utility axis is from 0 to 100.
@@ -352,16 +348,16 @@ export class SummaryChartRenderer {
 		var utilityAxis: any;
 
 		// Position the utility axis properly depending on the current view orientation. 
-		if (viewConfig.viewOrientation === 'vertical') {
-			uilityScale.range([this.rendererConfig.dimensionTwoSize, 0]);
+		if (u.viewConfig.viewOrientation === 'vertical') {
+			uilityScale.range([u.rendererConfig.dimensionTwoSize, 0]);
 			utilityAxis = d3.axisLeft(uilityScale);
 		} else {
-			uilityScale.range([0, this.rendererConfig.dimensionTwoSize]);
+			uilityScale.range([0, u.rendererConfig.dimensionTwoSize]);
 			utilityAxis = d3.axisTop(uilityScale);
 		}
 
 		this.utilityAxisContainer
-			.attr('transform', this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, -20, 0))
+			.attr('transform', this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, -20, 0))
 			.call(utilityAxis);
 	}
 
@@ -376,50 +372,49 @@ export class SummaryChartRenderer {
 						containers because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 						Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should called to re-render objective rows.
 	*/
-	renderSummaryChartRows(alternativeBoxes: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>, viewConfig: ViewConfig): void {
+	renderSummaryChartRows(u: RendererUpdate, alternativeBoxes: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>): void {
 		// Give dimensions to the alternative boxes so that each one completely covers on alternative column. Position them exactly above those columns. This is so that they can be the targets of any user clicks on top of those columns.
 		alternativeBoxes
-			.attr(this.rendererConfig.dimensionOne, (d: CellData, i: number) => { return this.rendererConfig.dimensionOneSize / this.valueChartService.getNumAlternatives(); })
-			.attr(this.rendererConfig.dimensionTwo, this.rendererConfig.dimensionTwoSize)
-			.attr(this.rendererConfig.coordinateOne, this.calculateCellCoordinateOne)
-			.attr(this.rendererConfig.coordinateTwo, 0)
+			.attr(u.rendererConfig.dimensionOne, (d: CellData, i: number) => { return u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length })
+			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.dimensionTwoSize)
+			.attr(u.rendererConfig.coordinateOne, (d: CellData, i: number) => { return this.calculateCellCoordinateOne(d, i, u); })
+			.attr(u.rendererConfig.coordinateTwo, 0)
 			.attr('alternative', (d: Alternative) => { return d.getId(); })
 			.attr('id', (d: Alternative) => { return 'summary-' + d.getId() + '-box' });
 
 		// Position the score total containers.
 		this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
 			.attr('transform', (d: CellData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
+				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 			})
 			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 
 		averageLines.attr('transform', (d: CellData, i: number) => {
-			return this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
+			return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 		});
 
 
 		averageLines
-			.attr(this.rendererConfig.coordinateOne + '1', 0)
-			.attr(this.rendererConfig.coordinateOne + '2', (d: CellData, i: number) => { return this.calculateCellCoordinateOne(d, 1); })
-			.attr(this.rendererConfig.coordinateTwo + '1', (d: CellData, i: number) => { 
-				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
-				var yVal = this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
-				return (yVal * ((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((viewConfig.viewOrientation === 'vertical') ? this.rendererConfig.dimensionTwoSize : 0);
+			.attr(u.rendererConfig.coordinateOne + '1', 0)
+			.attr(u.rendererConfig.coordinateOne + '2', (d: CellData, i: number) => { return this.calculateCellCoordinateOne(d, 1, u); })
+			.attr(u.rendererConfig.coordinateTwo + '1', (d: CellData, i: number) => { 
+				var weightTotal: number = u.valueChart.getMaximumWeightMap().getWeightTotal();
+				var yVal = u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
+				return (yVal * ((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize : 0);
 			})
-			.attr(this.rendererConfig.coordinateTwo + '2', (d: CellData, i: number) => { 
-				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
-				var yVal = this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
-				return (yVal * ((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((viewConfig.viewOrientation === 'vertical') ? this.rendererConfig.dimensionTwoSize : 0);
+			.attr(u.rendererConfig.coordinateTwo + '2', (d: CellData, i: number) => { 
+				var weightTotal: number = u.valueChart.getMaximumWeightMap().getWeightTotal();
+				var yVal = u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
+				return (yVal * ((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize : 0);
 			});
 
-		this.renderScoreTotalLabels(scoreTotals, viewConfig);
+		this.renderScoreTotalLabels(u, scoreTotals);
+		this.toggleAverageLines(u.viewConfig.displayAverageScoreLines);
+		this.toggleScoreTotals(u.viewConfig.displayTotalScores);
 
-		this.toggleAverageLines(viewConfig.displayAverageScoreLines);
-		this.toggleScoreTotals(viewConfig.displayTotalScores);
-
-		this.renderSummaryChartCells(cells, userScores, viewConfig)
+		this.renderSummaryChartCells(u, cells, userScores)
 	}
 
 
@@ -431,30 +426,30 @@ export class SummaryChartRenderer {
 						for each alternative. Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should 
 						called to re-render objective rows.
 	*/
-	renderScoreTotalLabels(scoreTotals: d3.Selection<any, any, any, any>, viewConfig: ViewConfig): void {
+	renderScoreTotalLabels(u: RendererUpdate, scoreTotals: d3.Selection<any, any, any, any>): void {
 
 		var verticalOffset: number = 15;
 		var horizontalOffset: number = 10;
 
 		scoreTotals
 			.text((d: UserScoreData, i: number) => { return Math.round(100 * this.calculateNormalizedTotalScore(d)); })
-			.attr(this.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => {
-				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i);
+			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => {
+				var userScoreBarSize = this.calculateUserScoreDimensionOne(d, i, u);
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
 			})
-			.attr(this.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
+			.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
+				var weightTotal: number = u.valueChart.getMaximumWeightMap().getWeightTotal();
 
-				return (this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateNormalizedTotalScore(d)) * 
-					((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((viewConfig.viewOrientation === 'vertical') ? (this.rendererConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
+				return (u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateNormalizedTotalScore(d)) * 
+					((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === 'vertical') ? (u.rendererConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
 			})
-			.attr(this.rendererConfig.coordinateTwo + '1', this.calculateNormalizedTotalScore)
+			.attr(u.rendererConfig.coordinateTwo + '1', this.calculateNormalizedTotalScore)
 			.style('font-size', this.scoreTotalFontSize)
 			.classed(this.defs.BEST_SCORE, false);
 
 
-		this.highlightBestUserScores();
+		this.highlightBestUserScores(u);
 	}
 
 	/*
@@ -462,9 +457,9 @@ export class SummaryChartRenderer {
 		@description	Changes the color of the score total label for the best alternative for each user to be red. This should 
 						be exactly one highlighted score total label per user.
 	*/
-	highlightBestUserScores() {
+	highlightBestUserScores(u: RendererUpdate) {
 		var maxUserScores: any = {};
-		this.valueChartService.getUsers().forEach((user: User) => {
+		u.valueChart.getUsers().forEach((user: User) => {
 			maxUserScores[user.getUsername()] = -1;
 		});
 
@@ -481,7 +476,7 @@ export class SummaryChartRenderer {
 			}
 		});
 
-		this.valueChartService.getUsers().forEach((user: User) => {
+		u.valueChart.getUsers().forEach((user: User) => {
 			bestTotalScoreSelections[user.getUsername()].classed(this.defs.BEST_SCORE, true);
 		});
 	}
@@ -496,34 +491,34 @@ export class SummaryChartRenderer {
 						called to re-render objective rows.
 
 	*/
-	renderSummaryChartCells(cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, viewConfig: ViewConfig): void {
+	renderSummaryChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>): void {
 		// Position each row's cells next to each other in the row.  
 		cells
 			.attr('transform', (d: CellData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i), 0);
+				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 			})
 			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 
 		// Position and give heights and widths to the user scores.
 		userScores
 			.style('fill', (d: UserScoreData, i: number) => {
-				if (this.valueChartService.isIndividual())
+				if (u.valueChart.isIndividual())
 					return d.objective.getColor();
 				else
 					return d.user.color;
 			})
-			.attr(this.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i) - this.USER_SCORE_SPACING, 0); })
-			.attr(this.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
-			.attr(this.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i) * i) + (this.USER_SCORE_SPACING / 2); })
+			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
+			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
+			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); })
 
 
-		userScores.attr(this.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
+		userScores.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 			var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 			var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 			this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
-			if (viewConfig.viewOrientation == 'vertical')
+			if (u.viewConfig.viewOrientation == 'vertical')
 				// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
-				return (this.rendererConfig.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
+				return (u.rendererConfig.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
 			else
 				return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 		});
@@ -567,9 +562,9 @@ export class SummaryChartRenderer {
 
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
-	calculateCellCoordinateOne = (d: CellData, i: number) => { return i * (this.rendererConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()); };
+	calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };
 	// The width (or height) should be such that the user scores for one cell fill that cell.
-	calculateUserScoreDimensionOne = (d: UserScoreData, i: number) => { return (this.rendererConfig.dimensionOneSize / this.valueChartService.getNumAlternatives()) / this.valueChartService.getNumUsers() };
+	calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.valueChart.getUsers().length };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
