@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:53:19
+* @Last Modified time: 2017-05-08 16:53:11
 */
 
 // Import Angular Classes:
@@ -19,8 +19,6 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
-import { LabelRenderer }											from '../renderers/Label.renderer';
-
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
 
 // Import Model Classes:
@@ -28,7 +26,7 @@ import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';
 
-import {RowData, CellData, LabelData}								from '../../../types/RendererData.types';
+import {RowData, CellData, LabelData, RendererConfig}				from '../../../types/RendererData.types';
 
 
 /*
@@ -44,6 +42,11 @@ export class ReorderObjectivesInteraction {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
+
+	private rendererConfig: RendererConfig;
+	private labelRootContainer: d3.Selection<any,any,any,any>;
+	private labelScoreFunctionContainer: d3.Selection<any,any,any,any>;
+
 
 	private ignoreReorder: boolean;						// Whether the drag events should be ignored. If true, all dragging of the current label is ignored.
 
@@ -81,7 +84,6 @@ export class ReorderObjectivesInteraction {
 		private rendererDataService: RendererDataService,
 		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private labelRenderer: LabelRenderer,
 		private labelDefinitions: LabelDefinitions) { }
 
 
@@ -100,9 +102,13 @@ export class ReorderObjectivesInteraction {
 						the handler for these events, reorderObjectives, only updates the visual display of the objective area. 'end' is used to
 						actually reorder the objectives within the objective hierarchy, and then re-render the ValueChart via the ValueChartDirective.
 	*/
-	public toggleObjectiveReordering(enableReordering: boolean): void {
-		var labelOutlines: d3.Selection<any, any, any, any> = this.labelRenderer.rootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
-		var labelTexts: d3.Selection<any, any, any, any> = this.labelRenderer.rootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
+	public toggleObjectiveReordering(enableReordering: boolean, rendererConfig: RendererConfig, labelRootContainer: d3.Selection<any, any, any, any>, labelScoreFunctionContainer: d3.Selection<any, any, any, any>): void {
+		this.rendererConfig = rendererConfig;
+		this.labelRootContainer = labelRootContainer;
+		this.labelScoreFunctionContainer = labelScoreFunctionContainer;
+
+		var labelOutlines: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
+		var labelTexts: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
 
 		var dragToReorder: d3.DragBehavior<any, any, any> = d3.drag();
 
@@ -144,14 +150,14 @@ export class ReorderObjectivesInteraction {
 		this.containerToReorder.style('opacity', 1);
 
 		// Just until the location of score functions is fixed.
-		this.labelRenderer.scoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 0.5);
+		this.labelScoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 0.5);
 
 		var parentOutline: d3.Selection<any, any, any, any> = this.parentContainer.select('rect'); 		// Select the rect that outlines the parent label of the label being reordered.
 		var currentOutline: d3.Selection<any, any, any, any> = this.containerToReorder.select('rect');		// Select the rect that outlines the label being reordered.
 
-		this.objectiveDimensionTwo = +currentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo);							// Determine the Dimension Two (height if vertical, width of horizontal) of the label being dragged.
-		this.maxCoordinateTwo = +parentOutline.attr(this.labelRenderer.viewConfig.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label being reordered.
-		this.objectiveCoordTwoOffset = +currentOutline.attr(this.labelRenderer.viewConfig.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label being reordered.
+		this.objectiveDimensionTwo = +currentOutline.attr(this.rendererConfig.dimensionTwo);							// Determine the Dimension Two (height if vertical, width of horizontal) of the label being dragged.
+		this.maxCoordinateTwo = +parentOutline.attr(this.rendererConfig.dimensionTwo) - this.objectiveDimensionTwo;	// Determine the maximum Coordinate Two of the label being reordered.
+		this.objectiveCoordTwoOffset = +currentOutline.attr(this.rendererConfig.coordinateTwo);						// Determine the initial Coordinate Two position (y if vertical, x if horizontal) of the label being reordered.
 
 		this.currentObjectiveIndex = this.siblingContainers.nodes().indexOf(this.containerToReorder.node());					// Determine the index of the label being reordered in the list of siblings.
 		this.newObjectiveIndex = this.currentObjectiveIndex;
@@ -161,12 +167,12 @@ export class ReorderObjectivesInteraction {
 			if (el !== undefined) {
 				// For each of the labels that the label being reordered can be switched with, determine its Coordinate Two midpoint. This is used to determine what position the label being reordered has been moved to.
 				let selection: d3.Selection<any, any, any, any> = d3.select(el);
-				let jumpPoint: number = (+selection.attr(this.labelRenderer.viewConfig.dimensionTwo) / 2) + +selection.attr(this.labelRenderer.viewConfig.coordinateTwo);
+				let jumpPoint: number = (+selection.attr(this.rendererConfig.dimensionTwo) / 2) + +selection.attr(this.rendererConfig.coordinateTwo);
 				this.jumpPoints.push(jumpPoint);
 			}
 		});
 
-		this.jumpPoints.push(this.labelRenderer.viewConfig.dimensionTwoSize);
+		this.jumpPoints.push(this.rendererConfig.dimensionTwoSize);
 	}
 
 	// This function is called whenever a label that is being reordered is dragged by the user. It contains the logic which updates the
@@ -179,7 +185,7 @@ export class ReorderObjectivesInteraction {
 		// Get the change in Coordinate Two from the d3 event. Note that although we are getting coordinateTwo, not dCoordinateTwo, this is the still the change.
 		// The reason for this is because when a label is dragged, the transform of label container is changed, which can changes cooordinateTwo of the outline rectangle inside the container.
 		// THis change is equal to deltaCoordinateTwo, meaning d3.event.cooordinateTwo is reset to 0 at the end of cooordinateTwo drag event, making cooordinateTwo really dCoordinateTwo
-		var deltaCoordinateTwo: number = (<any>d3.event)[this.labelRenderer.viewConfig.coordinateTwo];
+		var deltaCoordinateTwo: number = (<any>d3.event)[this.rendererConfig.coordinateTwo];
 
 		// If we have not yet determined the mouse offset, then this is the first drag event that has been fired, and the mouse offset from 0 should the current mouse position.
 		if (this.reorderObjectiveMouseOffset === undefined) {
@@ -226,7 +232,7 @@ export class ReorderObjectivesInteraction {
 		// Apply the new transformation to the label.
 		this.containerToReorder.attr('transform', labelTransform);
 		// Apply a similar translation to the affect score function plots.
-		this.adjustScoreFunctionPosition(this.labelRenderer.scoreFunctionContainer, deltaCoordinateTwo, d.objective);
+		this.adjustScoreFunctionPosition(this.labelScoreFunctionContainer, deltaCoordinateTwo, d.objective);
 
 	}
 
@@ -291,7 +297,7 @@ export class ReorderObjectivesInteraction {
 				this.adjustScoreFunctionPosition(container, deltaCoordinateTwo, subObjective);
 			});
 		} else {
-			var scoreFunction: d3.Selection<any, any, any, any> = this.labelRenderer.rootContainer.select('#label-' + objective.getId() + '-scorefunction');
+			var scoreFunction: d3.Selection<any, any, any, any> = this.labelRootContainer.select('#label-' + objective.getId() + '-scorefunction');
 			let previousTransform: string = scoreFunction.attr('transform');
 			let scoreFunctionTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
 			scoreFunction.attr('transform', scoreFunctionTransform);

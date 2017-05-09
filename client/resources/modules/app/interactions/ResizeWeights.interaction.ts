@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 16:44:34
+* @Last Modified time: 2017-05-08 15:12:33
 */
 
 // Import Angular Classes:
@@ -18,7 +18,6 @@ import '../../utilities/rxjs-operators';
 // Import Application Classes
 import { ValueChartService }										from '../services/ValueChart.service';
 import { RenderConfigService } 										from '../services/RenderConfig.service';
-import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
@@ -31,7 +30,7 @@ import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { WeightMap }												from '../../../model/WeightMap';
 
-import {RowData, CellData, LabelData}								from '../../../types/RendererData.types';
+import {RowData, CellData, LabelData, RendererConfig}				from '../../../types/RendererData.types';
 
 
 /*
@@ -57,6 +56,8 @@ export class ResizeWeightsInteraction {
 	// 									Fields
 	// ========================================================================================
 
+	private rendererConfig: RendererConfig;
+
 	private resizeType: string;	// The type of Weight Resizing that is currently enabled. Must be one of the strings: 'neighbor', 'siblings', or 'none'.
 
 	private clicks: Observable<Event>;
@@ -72,7 +73,6 @@ export class ResizeWeightsInteraction {
 	*/
 	constructor(
 		private renderConfigService: RenderConfigService,
-		private labelRenderer: LabelRenderer,
 		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { 
@@ -90,9 +90,8 @@ export class ResizeWeightsInteraction {
 						'decrease' turns on clicking PrimitiveObjective labels to increase the objective's weight by one percent.
 						A pumpType of 'none' turns off the pump interaction.
 	*/
-	public togglePump(pumpType: string): void {
+	public togglePump(pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>): void {
 		// Initialize the observable that is used to detect clicks and notifies handlers.
-		let primitiveObjectiveLabels = document.querySelectorAll('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
 
 		if (this.onClick != undefined)
@@ -138,7 +137,9 @@ export class ResizeWeightsInteraction {
 						resizeType of 'siblings' turns on dragging the divider between two objective labels to modify the weights of ALL
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
-	public toggleDragToResizeWeights(resizeType: string): void {
+	public toggleDragToResizeWeights(resizeType: string, rendererConfig: RendererConfig): void {
+		this.rendererConfig = rendererConfig;
+
 		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
 		this.resizeType = resizeType;
 		if (resizeType !== 'none') {
@@ -196,7 +197,7 @@ export class ResizeWeightsInteraction {
 		var weightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
 
 		// Use the dimensionTwo scale to convert the drag distance to a change in weight.
-		var deltaWeight: number = this.labelRenderer.viewConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.labelRenderer.viewConfig.coordinateTwo]);
+		var deltaWeight: number = this.rendererConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.rendererConfig.coordinateTwo]);
 
 		var container: d3.Selection<any, any, any, any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');

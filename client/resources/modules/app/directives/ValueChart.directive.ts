@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 13:14:04
+* @Last Modified time: 2017-05-08 17:58:20
 */
 
 // Import Angular Classes:
@@ -30,11 +30,7 @@ import { ChangeDetectionService }												from '../services/ChangeDetection.s
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
-// Interactions:
-import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction }										from '../interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
+
 // Definitions:
 import { LabelDefinitions }														from '../services/LabelDefinitions.service';
 
@@ -81,6 +77,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private defaultChartComponentHeight: number;
 
 	public valueChartSubject: Subject<ValueChart>;
+	public interactionSubject: Subject<InteractionConfig>;
+	public viewConfigSubject: Subject<ViewConfig>;
 
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
@@ -108,12 +106,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private objectiveChartRenderer: ObjectiveChartRenderer,
 		private summaryChartRenderer: SummaryChartRenderer,
 		private labelRenderer: LabelRenderer,
-		// Interactions:
-		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
-		private resizeWeightsInteraction: ResizeWeightsInteraction,
-		private sortAlternatives: SortAlternativesInteraction,
-		private setObjectiveColorsInteraction: SetObjectiveColorsInteraction,
-		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction,
 		// Definitions:
 		private labelDefinitions: LabelDefinitions) { }
 
@@ -139,7 +131,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Initialize Change Detection:
 		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.renderConfigService.viewConfig, this.interactionConfig);
 
-		this.valueChartSubject = new Subject();
+		this.valueChartSubject 	= new Subject();
+		this.interactionSubject = new Subject();
+		this.viewConfigSubject 	= new Subject();
 
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
@@ -201,10 +195,17 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		renderInformation.map(this.rendererDataService.produceLabelData)
 			.subscribe(this.labelRenderer.valueChartChanged)
 
-		this.valueChartSubject.next(this.valueChart);
+		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);
+		this.interactionSubject.subscribe(this.objectiveChartRenderer.interactionsChanged);
+		this.interactionSubject.subscribe(this.labelRenderer.interactionsChanged);
 
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
-		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
+		this.viewConfigSubject.subscribe(this.summaryChartRenderer.viewConfigChanged);
+		this.viewConfigSubject.subscribe(this.objectiveChartRenderer.viewConfigChanged);
+		this.viewConfigSubject.subscribe(this.labelRenderer.viewConfigChanged);
+
+		this.valueChartSubject.next(this.valueChart);
+		this.interactionSubject.next(this.interactionConfig);
+		this.viewConfigSubject.next(this.viewConfig);
 	}
 
 	/*
@@ -214,7 +215,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	createLabels(): void {
 		this.labelRenderer.createLabelSpace(this.el, this.rendererDataService.getLabelData(), this.valueChartService.getPrimitiveObjectives(), this.interactionConfig.adjustScoreFunctions);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewConfig, this.valueChartService.getPrimitiveObjectives());
 	}
 
 	// ========================================================================================
@@ -315,14 +316,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Change for and handle changes to the display options:
 
 		if (!_.isEqual(this.renderConfigService.viewConfig, this.changeDetectionService.viewConfigRecord)) {
+			if (this.viewConfig.displayScoreFunctions != this.changeDetectionService.viewConfigRecord.displayScoreFunctions)
+				this.valueChartSubject.next(this.valueChart);
+			
+			this.viewConfigSubject.next(this.viewConfig);
 			this.changeDetectionService.viewConfigRecord = _.cloneDeep(this.renderConfigService.viewConfig);
-
-			this.updateScoreFunctionDisplay();
-			this.objectiveChartRenderer.toggleDomainLabels();
-			this.summaryChartRenderer.toggleUtilityAxis();
-			this.summaryChartRenderer.toggleScoreTotals();
-			this.labelRenderer.toggleScoreFunctionValueLabels();
-			this.summaryChartRenderer.toggleAverageLines();
 		}
 	}
 
@@ -332,13 +330,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	detectInteractionConfigChanges(): void {
 		if (!_.isEqual(this.interactionConfig, this.changeDetectionService.interactionConfigRecord)) {
-			this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
-			this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
-			this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
-			this.resizeWeightsInteraction.togglePump(this.interactionConfig.pumpWeights);
-			this.sortAlternatives.toggleAlternativeSorting(this.interactionConfig.sortAlternatives);
-
 			this.changeDetectionService.interactionConfigRecord = _.cloneDeep(this.interactionConfig);
+			this.interactionSubject.next(this.interactionConfig);
 		}
 	}
 
@@ -373,10 +366,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.createLabels();
 
 		// Turn on any interactions that were removed when the labels were reconstructed. 
-		this.reorderObjectivesInteraction.toggleObjectiveReordering(this.interactionConfig.reorderObjectives);
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(this.interactionConfig.weightResizeType);
-		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(this.interactionConfig.setObjectiveColors);
-
 		this.updateAlternativeOrder()
 	}
 
@@ -395,17 +384,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	*/
 	updateViewOrientation(): void {
 		this.rendererDataService.updateStackedBarOffsets(this.renderConfigService.viewConfig.viewOrientation);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
-		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
-	}
-
-	/*
-		@returns {void}
-		@description	Remove or display the ScoreFunction plots.
-	*/
-	updateScoreFunctionDisplay(): void {
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig, this.valueChartService.getPrimitiveObjectives());
+		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
+		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
 	}
 
 	/*
@@ -415,8 +396,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						the visual appearance of the ValueChart by re-rendering its components.
 	*/
 	updateValueChartDisplay(): void {
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig.viewOrientation, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
-		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig.viewOrientation);
+		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig, this.valueChartService.getPrimitiveObjectives());
+		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
+		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
 	}
 }

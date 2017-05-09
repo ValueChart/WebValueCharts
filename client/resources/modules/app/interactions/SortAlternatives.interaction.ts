@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 13:02:37
+* @Last Modified time: 2017-05-08 15:00:19
 */
 
 // Import Angular Classes:
@@ -20,8 +20,6 @@ import { RenderConfigService } 										from '../services/RenderConfig.service'
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 
-import { SummaryChartRenderer }										from '../renderers/SummaryChart.renderer';
-
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
@@ -32,7 +30,7 @@ import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';
 import { Alternative }												from '../../../model/Alternative';
 
-import {RowData, CellData, LabelData}								from '../../../types/RendererData.types';
+import {RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
 
 
 
@@ -87,6 +85,9 @@ export class SortAlternativesInteraction {
 	private newAlternativeIndex: number;
 	private jumpPoints: number[];
 
+
+	private rendererConfig: RendererConfig;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -97,7 +98,6 @@ export class SortAlternativesInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private summaryChartRenderer: SummaryChartRenderer,
 		private renderConfigService: RenderConfigService,
 		private valueChartService: ValueChartService,
 		private rendererDataService: RendererDataService,
@@ -117,7 +117,10 @@ export class SortAlternativesInteraction {
 		@description 	Toggles the active type of alternative sorting. Sorting types 'alphabet', and 'reset' immediate sort the
 						alternative order while 'objective', and 'manual' are user drive. Type 'none' simply turns off all sorting.
 	*/
-	public toggleAlternativeSorting(sortingType: string): void {
+	public toggleAlternativeSorting(sortingType: string, rendererConfig: RendererConfig): void {
+		// TODO <@aaron>: Evaluate whether attaching the rendererConfig to this object as a field is reasonable...
+		this.rendererConfig = rendererConfig;
+
 		// Toggle Dragging to sort objectives:
 		if (sortingType === this.SORT_BY_OBJECTIVE) {
 			this.sortAlternativesByObjective(true);
@@ -204,11 +207,11 @@ export class SortAlternativesInteraction {
 		this.chartUndoRedoService.saveAlternativeOrderRecord(this.valueChartService.getAlternatives());
 
 		this.minCoordOne = 0;
-		this.maxCoordOne = this.summaryChartRenderer.viewConfig.dimensionOneSize;
+		this.maxCoordOne = this.rendererConfig.dimensionOneSize;
 		this.totalCoordOneChange = 0;
 
 		this.alternativeBox = d3.select((<any>d3.event).sourceEvent.target)
-		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.dimensionOne);
+		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.rendererConfig.dimensionOne);
 
 		this.siblingBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
 
@@ -232,18 +235,18 @@ export class SortAlternativesInteraction {
 		this.siblingBoxes.nodes().forEach((alternativeBox: Element) => {
 			if (alternativeBox !== undefined) {
 				let selection: d3.Selection<any, any, any, any> = d3.select(alternativeBox);
-				let jumpPoint: number = (+selection.attr(this.summaryChartRenderer.viewConfig.dimensionOne) / 2) + +selection.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
+				let jumpPoint: number = (+selection.attr(this.rendererConfig.dimensionOne) / 2) + +selection.attr(this.rendererConfig.coordinateOne);
 				this.jumpPoints.push(jumpPoint);
 			}
 		});
 
-		this.jumpPoints.push(this.summaryChartRenderer.viewConfig.dimensionOneSize);
+		this.jumpPoints.push(this.rendererConfig.dimensionOneSize);
 	}
 
 	// This function is called whenever an alternative that is being reordered is dragged any distance by the user. 
 	private sortAlternatives = (d: Alternative, i: number) => {
-		var deltaCoordOne: number = (<any>d3.event)['d' + this.summaryChartRenderer.viewConfig.coordinateOne];
-		var currentCoordOne: number = +this.alternativeBox.attr(this.summaryChartRenderer.viewConfig.coordinateOne);
+		var deltaCoordOne: number = (<any>d3.event)['d' + this.rendererConfig.coordinateOne];
+		var currentCoordOne: number = +this.alternativeBox.attr(this.rendererConfig.coordinateOne);
 
 		if (currentCoordOne + deltaCoordOne < 0) {
 			deltaCoordOne = 0 - currentCoordOne;
@@ -266,7 +269,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.summaryChartRenderer.viewConfig.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.rendererConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any, any, any, any> = d3.select(cell);
@@ -275,7 +278,7 @@ export class SortAlternativesInteraction {
 		});
 
 		if (this.alternativeLabelToMove)
-			this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne, +this.alternativeLabelToMove.attr(this.summaryChartRenderer.viewConfig.coordinateOne) + deltaCoordOne);
+			this.alternativeLabelToMove.attr(this.rendererConfig.coordinateOne, +this.alternativeLabelToMove.attr(this.rendererConfig.coordinateOne) + deltaCoordOne);
 
 		if (this.totalScoreLabelToMove)
 			this.totalScoreLabelToMove.attr('transform', this.renderConfigService.incrementTransform(this.totalScoreLabelToMove.attr('transform'), deltaCoordOne, 0));

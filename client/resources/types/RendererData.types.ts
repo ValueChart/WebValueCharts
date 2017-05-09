@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-01 15:29:55
+* @Last Modified time: 2017-05-08 14:16:54
 */
 
 import { Objective }					from '../model/Objective';
@@ -38,7 +38,7 @@ export interface LabelData {
 	subLabelData?: LabelData[]
 }
 
-export interface ViewConfig {
+export interface RendererConfig {
 	viewOrientation: string;
 	chartComponentWidth: number;
 	chartComponentHeight: number;
