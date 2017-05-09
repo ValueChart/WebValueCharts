@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 12:15:13
+* @Last Modified time: 2017-05-09 12:27:19
 */
 
 // Import Angular Classes:
@@ -90,7 +90,6 @@ export class RendererDataService {
 			this.generateRowData();
 		}
 
-		this.valueChartService.updateMaximumWeightMap();
 		this.updateWeightOffsets();
 		this.updateStackedBarOffsets(d.viewConfig.viewOrientation);		// TODO<@aaron>: Remove hard-coded "vertical" orientation.
 
@@ -110,8 +109,6 @@ export class RendererDataService {
 		d.labelData = this.labelData;
 		return d;
 	}
-
-
 
 	// ================================  Getters ====================================
 	
@@ -148,39 +145,6 @@ export class RendererDataService {
 
 
 	// ================================ Data Creation and Update Methods  ====================================
-
-	/*
-		@returns {void}
-		@description 	Initializes the rowData, labelData, and originalAlternativeOrder fields based on the ValueChartService's active ValueChart.
-						This methods should only be called when a ValueChart visualization is FIRST created. Instead, the updateAllValueChartData method
-						should be used to update the existing rowData and LabelData, or the generateRowData and generateLabelData should be used to
-						re-generate the rowData/LabelData separately from each other.
-	*/
-	public initialize() {
-		this.originalAlternativeOrder = new AlternativeOrderRecord(this.valueChartService.getAlternatives());
-		this.generateLabelData();
-		this.generateRowData();
-	}
-
-	/*
-		@param viewOrientation - The view orientation that the ValueChart is going to be displayed in. This is for determining Stacked Bar offsets in the RowData.
-		@returns {void}
-		@description 	Updates the LabelData and RowData stored in the labelData and rowData to handle changes to the active ValueChart's 
-						user scores and weights. This method will update the maximum WeightMap in the ValueChartService, update weight offsets for 
-						labelData and rowData to conform to the maximum WeightMap, and update the rowData's weighted score offsets for the 
-						summary chart. This method CANNOT handle the addition or deletion of users, alternatives, or objectives. The labelData and
-						rowData must be regenerated using the generateLabelData and generateRowData methods to handle structural changes to the 
-						active ValueChart.
-	*/
-	public updateAllValueChartData(viewOrientation: string): void {
-		this.valueChartService.updateMaximumWeightMap();
-		this.updateWeightOffsets();
-		this.updateStackedBarOffsets(viewOrientation);
-
-		this.getLabelData().forEach((labelDatum: LabelData) => {
-			this.updateLabelDataWeights(labelDatum);
-		});
-	}
 
 	/*
 		@returns {void} 
@@ -226,7 +190,7 @@ export class RendererDataService {
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.valueChartService.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
+			weightOffset += this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
 		}
 	}
 
@@ -296,7 +260,7 @@ export class RendererDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
 		} else if (objective.objectiveType === 'primitive') {
-			labelData = { 'objective': objective, 'weight': this.valueChartService.getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
+			labelData = { 'objective': objective, 'weight': this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
 		}
 
 		return labelData;
@@ -310,7 +274,7 @@ export class RendererDataService {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 		}
 	}
 
@@ -391,7 +355,7 @@ export class RendererDataService {
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
 				var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getName());
+				var weight: number = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getName());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});

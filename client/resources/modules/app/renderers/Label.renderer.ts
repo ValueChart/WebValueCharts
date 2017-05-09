@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 18:05:23
+* @Last Modified time: 2017-05-09 12:54:09
 */
 
 // Import Angular Classes:
@@ -71,6 +71,8 @@ export class LabelRenderer {
 	public scoreFunctionRenderers: any;						// A JS object literal used as a map to store instances of score function renderers.  Its field names are the names of primitive objectives,
 	// and the values are score function renderers.
 
+	private numUsers: number;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -107,6 +109,11 @@ export class LabelRenderer {
 			this.interactionsChanged(d.interactionConfig);
 		}
 
+		if (this.numUsers != d.valueChart.getUsers().length)
+			this.updateScoreFunctions(this.scoreFunctionContainer, primitiveObjectives);
+
+		this.numUsers = d.valueChart.getUsers().length;
+
 		this.renderLabelSpace(d.width, d.height, d.labelData, this.defs.ROOT_CONTAINER_NAME, d.viewConfig, primitiveObjectives);
 	}
 
@@ -114,12 +121,20 @@ export class LabelRenderer {
 		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + this.defs.PRIMITIVE_OBJECTIVE_LABEL));
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rendererConfig);
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors);
-		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rendererConfig, this.rootContainer, this.scoreFunctionContainer);
+		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rendererConfig, this.rootContainer, this.scoreFunctionContainer)
+			.subscribe(this.handleObjectivesReordered)
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleScoreFunctionValueLabels(viewConfig.displayScoreFunctionValueLabels);		
+	}
+
+	handleObjectivesReordered = (reordered: boolean) => {
+		if (reordered) {
+			this.rootContainer.node().remove();
+			this.rootContainer = undefined;
+		}
 	}
 
 	/*
@@ -369,7 +384,7 @@ export class LabelRenderer {
 		labelTexts.select('.' + this.defs.SUBCONTAINER_NAME)
 			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
-				return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
+				return d.objective.getName() + ' (' + (Math.round((d.weight / this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
 			});
 
 		labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
@@ -496,7 +511,7 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(datum.getName());
+			objectiveWeight = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(datum.getName());
 			dimensionOneTransform = (this.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
 

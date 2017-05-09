@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 17:58:20
+* @Last Modified time: 2017-05-09 12:39:17
 */
 
 // Import Angular Classes:
@@ -124,9 +124,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
 		this.renderConfigService.viewConfig = this.viewConfig;
+		this.renderConfigService.initUserColors();
 
 		// Configure the directive for the input data:
-		this.configureChartData();
+		// this.configureChartData();
 
 		// Initialize Change Detection:
 		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.renderConfigService.viewConfig, this.interactionConfig);
@@ -150,21 +151,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	calculateDefaultComponentSize(): void {
 		this.defaultChartComponentWidth = (this.width * this.renderConfigService.CHART_COMPONENT_RATIO);
 		this.defaultChartComponentHeight = (this.height * this.renderConfigService.CHART_COMPONENT_RATIO);
-	}
-
-	/*
-		@returns {void}
-		@description	Configures ValueChartViewerService and RenderConfigService using the directive's input data. This must be done before
-						constructing and/or rendering a ValueChart for the first time as these services are what provide data to the renderer classes.
-	*/
-	configureChartData(): void {
-		// Configure ValueChartViewerService.
-		this.rendererDataService.initialize();
-		this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-
-		// Configure RenderConfigService.
-		this.renderConfigService.viewConfig.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
-		this.renderConfigService.initUserColors();
 	}
 
 	/*
@@ -208,16 +194,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewConfigSubject.next(this.viewConfig);
 	}
 
-	/*
-		@returns {void}
-		@description	Creates and renders the labels using the LabelRenderer. This is used more frequently than the other component create + render calls so it
-						is encapsulated in its own method. 
-	*/
-	createLabels(): void {
-		this.labelRenderer.createLabelSpace(this.el, this.rendererDataService.getLabelData(), this.valueChartService.getPrimitiveObjectives(), this.interactionConfig.adjustScoreFunctions);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.viewConfig, this.valueChartService.getPrimitiveObjectives());
-	}
-
 	// ========================================================================================
 	// 								Change Detection Methods:
 	// ========================================================================================
@@ -234,170 +210,21 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		this.changeDetectionService.detectChanges(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig);
-
-		// Check for the Changes to the input data.
-		this.detectDataModelChanges();			// Check for and handle changes to the ValueChart.
-		this.detectDataOrderChanges();			// Check for and handle changes to the objective and alternative orderings. 
-
-		this.detectViewConfigChanges();			// Check for and handle changes to the view config.
-		this.detectInteractionConfigChanges();	// Check for and handle changes to the interaction config.
-	}
-
-	/*
-		@returns {void}
-		@description	Check for and handle changes to the ValueChart input to the directive.
-	*/
-	detectDataModelChanges(): void {
-		// Check to see if users have been added to deleted.
-		if (this.valueChartService.getUsers().length !== this.changeDetectionService.usersRecord) {
-			this.updateUsers();
-			this.updateValueChartDisplay()
-			return;
-		}
-
-		if (!_.isEqual(this.valueChartService.getValueChart(), this.changeDetectionService.valueChartRecord)) {
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig))
+			// TODO <@aaron> : Remove this temporary call to initUserColors.
+			this.renderConfigService.initUserColors();
 			this.valueChartSubject.next(this.valueChart);
 
-			this.changeDetectionService.valueChartRecord = _.cloneDeep(this.valueChartService.getValueChart());
-			return; 
-		}
+		if (this.changeDetectionService.detectViewConfigChanges(this.viewConfig))
+			this.viewConfigSubject.next(this.viewConfig);
 
-		// Check for and handle changes to the objectives' colors.
-		if (this.changeDetectionService.colorsHaveChanged) {
-			// Objective colors have been changed
-			this.changeDetectionService.colorsHaveChanged = false;
-			this.updateObjectiveOrder();
-			this.updateValueChartDisplay();
-		}
-	}
+		if (this.changeDetectionService.detectInteractionConfigChanges(this.interactionConfig))
+			this.interactionSubject.next(this.interactionConfig);
 
-	/*
-		@returns {void}
-		@description	Check for and handle changes to the Alternative and Objective orderings.
-	*/
-	detectDataOrderChanges(): void {
-		// Check for and handle changes to the alternative ordering.
-		if (this.changeDetectionService.alternativeOrderChanged) {
-			this.changeDetectionService.alternativeOrderChanged = false;
-			this.valueChartSubject.next(this.valueChart);
-		}
-
-		// Check for and handle changes to the objective ordering.
-		if (this.changeDetectionService.objectiveOrderChanged) {
-			this.changeDetectionService.objectiveOrderChanged = false;
-			// Set alternative order changed to false as well since updating the objective order will update the alternative order.
-			this.changeDetectionService.alternativeOrderChanged = false;
-			this.updateObjectiveOrder();
-			this.updateValueChartDisplay();
-		}
-	}
-
-	/*
-		@returns {void}
-		@description	Check for and handle changes to the ValueChart's orientation, size, and display options.
-	*/
-	detectViewConfigChanges(): void {
-		// Change for and handle changes to the orientation.
-		if (this.changeDetectionService.viewConfigRecord.viewOrientation !== this.renderConfigService.viewConfig.viewOrientation) {
-			this.changeDetectionService.viewConfigRecord.viewOrientation = this.renderConfigService.viewConfig.viewOrientation;
-			
-			this.valueChartSubject.next(this.valueChart);
-		}
-		// Change for and handle changes to the width and height of the ValueChart.
-		if (this.changeDetectionService.widthRecord !== this.width || this.changeDetectionService.heightRecord !== this.height) {
-			this.changeDetectionService.widthRecord = this.width;
-			this.changeDetectionService.heightRecord = this.height;
+		if (this.changeDetectionService.detectWidthHeightChanges(this.width, this.height)) {
 			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
 			this.calculateDefaultComponentSize();
-			this.updateViewOrientation();
+			this.valueChartSubject.next(this.valueChart);
 		}
-
-		// Change for and handle changes to the display options:
-
-		if (!_.isEqual(this.renderConfigService.viewConfig, this.changeDetectionService.viewConfigRecord)) {
-			if (this.viewConfig.displayScoreFunctions != this.changeDetectionService.viewConfigRecord.displayScoreFunctions)
-				this.valueChartSubject.next(this.valueChart);
-			
-			this.viewConfigSubject.next(this.viewConfig);
-			this.changeDetectionService.viewConfigRecord = _.cloneDeep(this.renderConfigService.viewConfig);
-		}
-	}
-
-	/*
-		@returns {void}
-		@description	Check for and handle changes to the interaction options.
-	*/
-	detectInteractionConfigChanges(): void {
-		if (!_.isEqual(this.interactionConfig, this.changeDetectionService.interactionConfigRecord)) {
-			this.changeDetectionService.interactionConfigRecord = _.cloneDeep(this.interactionConfig);
-			this.interactionSubject.next(this.interactionConfig);
-		}
-	}
-
-	// ========================================================================================
-	// 								Change Handling Methods
-	// ========================================================================================
-
-	/*
-		@returns {void}
-		@description	Update the ValueChart's user columns in response to a new user, or a deleted user. Re-renders the ValueChart.
-	*/
-	updateUsers(): void {
-		this.changeDetectionService.usersRecord = this.valueChartService.getNumUsers();
-		this.renderConfigService.initUserColors();
-		this.rendererDataService.generateRowData();
-		this.rendererDataService.updateAllValueChartData(this.renderConfigService.viewConfig.viewOrientation);
-		
-		// Update the ValueChart's SVG structure.
-		this.labelRenderer.updateScoreFunctions(this.labelRenderer.scoreFunctionContainer, this.valueChartService.getPrimitiveObjectives());
-		// this.objectiveChartRenderer.createObjectiveRows(this.objectiveChartRenderer.rowsContainer, this.objectiveChartRenderer.rowOutlinesContainer, this.objectiveChartRenderer.alternativeBoxesContainer, this.objectiveChartRenderer.alternativeLabelsContainer, this.rendererDataService.getRowData());
-		this.summaryChartRenderer.createSummaryChartRows(this.summaryChartRenderer.rowsContainer, this.summaryChartRenderer.alternativeBoxesContainer, this.summaryChartRenderer.scoreTotalsContainer, this.rendererDataService.getRowData());
-	}
-
-	/*
-		@returns {void}
-		@description	Update ValueChart's objective order. Does NOT re-render the ValueChart.
-	*/
-	updateObjectiveOrder(): void {
-		// Destroy the previous label area.
-		(<Element>d3.select('.' + this.labelDefinitions.ROOT_CONTAINER).node()).remove();
-		// Rebuild and re-render the label area.
-		this.createLabels();
-
-		// Turn on any interactions that were removed when the labels were reconstructed. 
-		this.updateAlternativeOrder()
-	}
-
-	/*
-		@returns {void}
-		@description	Update the ValueChart's alternative order. Does NOT re-render the ValueChart.
-	*/
-	updateAlternativeOrder(): void {
-		this.rendererDataService.updateWeightOffsets();
-		this.rendererDataService.updateStackedBarOffsets(this.renderConfigService.viewConfig.viewOrientation);
-	}
-
-	/*
-		@returns {void}
-		@description	Update the orientation of the ValueChart. Re-renders the ValueChart.
-	*/
-	updateViewOrientation(): void {
-		this.rendererDataService.updateStackedBarOffsets(this.renderConfigService.viewConfig.viewOrientation);
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
-		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
-	}
-
-	/*
-		@returns {void}
-		@description	Update the ValueChart's visual appearance. Does not do anything structural, like update objective/alternative ordering, add/delete new user columns, etc. 
-						It will update existing features like user column heights, objective widths, etc. This should be used as the last stage of handling change to update
-						the visual appearance of the ValueChart by re-rendering its components.
-	*/
-	updateValueChartDisplay(): void {
-		this.labelRenderer.renderLabelSpace(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getLabelData(), this.labelDefinitions.ROOT_CONTAINER_NAME, this.renderConfigService.viewConfig, this.valueChartService.getPrimitiveObjectives());
-		this.objectiveChartRenderer.renderObjectiveChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
-		this.summaryChartRenderer.renderSummaryChart(this.defaultChartComponentWidth, this.defaultChartComponentHeight, this.rendererDataService.getRowData(), this.renderConfigService.viewConfig);
 	}
 }

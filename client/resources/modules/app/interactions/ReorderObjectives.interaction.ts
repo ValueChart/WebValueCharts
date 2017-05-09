@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 16:53:11
+* @Last Modified time: 2017-05-09 11:17:32
 */
 
 // Import Angular Classes:
@@ -11,6 +11,8 @@ import { NgZone }													from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import { Subject }													from 'rxjs/Subject';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes
 import { ValueChartService}											from '../services/ValueChart.service';
@@ -47,7 +49,7 @@ export class ReorderObjectivesInteraction {
 	private labelRootContainer: d3.Selection<any,any,any,any>;
 	private labelScoreFunctionContainer: d3.Selection<any,any,any,any>;
 
-
+	private reorderSubject: Subject<boolean>;
 	private ignoreReorder: boolean;						// Whether the drag events should be ignored. If true, all dragging of the current label is ignored.
 
 	// Fields used to store information about the active dragging event chain.  
@@ -102,7 +104,7 @@ export class ReorderObjectivesInteraction {
 						the handler for these events, reorderObjectives, only updates the visual display of the objective area. 'end' is used to
 						actually reorder the objectives within the objective hierarchy, and then re-render the ValueChart via the ValueChartDirective.
 	*/
-	public toggleObjectiveReordering(enableReordering: boolean, rendererConfig: RendererConfig, labelRootContainer: d3.Selection<any, any, any, any>, labelScoreFunctionContainer: d3.Selection<any, any, any, any>): void {
+	public toggleObjectiveReordering(enableReordering: boolean, rendererConfig: RendererConfig, labelRootContainer: d3.Selection<any, any, any, any>, labelScoreFunctionContainer: d3.Selection<any, any, any, any>): Subject<boolean> {
 		this.rendererConfig = rendererConfig;
 		this.labelRootContainer = labelRootContainer;
 		this.labelScoreFunctionContainer = labelScoreFunctionContainer;
@@ -121,6 +123,9 @@ export class ReorderObjectivesInteraction {
 
 		labelOutlines.call(dragToReorder);
 		labelTexts.call(dragToReorder);
+
+		this.reorderSubject = new Subject();
+		return this.reorderSubject;
 	}
 
 	// This function is called when a user first begins to drag a label to rearrange the ordering of objectives. It contains all the logic required to initialize the drag,
@@ -274,6 +279,7 @@ export class ReorderObjectivesInteraction {
 		this.valueChartService.setPrimitivesObjectives(primitiveObjectives);
 
 		this.changeDetectionService.objectiveOrderChanged = true;
+		this.reorderSubject.next(true);
 	}
 
 	// This function extracts the ordering of objectives from the ordering of labels.

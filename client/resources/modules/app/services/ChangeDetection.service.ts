@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:55:59
+* @Last Modified time: 2017-05-09 12:30:55
 */
 
 // Import Angular Classes:
@@ -33,16 +33,15 @@ export class ChangeDetectionService {
 	public valueChartRecord: ValueChart;
 
 	// Public flags that can be set to notify the ValueChartDirective about changes.
-	public objectiveOrderChanged: boolean;						// whether the objective order been changed or not. Set this to be true when you do something that changes the objective order.
-	public alternativeOrderChanged: boolean ;					// Whether the alternative order been changed or not. Set this to be true when you do something that changes the alternative order.
-	public colorsHaveChanged: boolean;							// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
+	public objectiveOrderChanged: boolean;							// whether the objective order been changed or not. Set this to be true when you do something that changes the objective order.
+	public alternativeOrderChanged: boolean ;						// Whether the alternative order been changed or not. Set this to be true when you do something that changes the alternative order.
+	public colorsHaveChanged: boolean;								// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
 
 	// Old input values to the ValueChartDirective. Used for comparison purposes.
-	public viewConfigRecord: ViewConfig = <any>{};				// Old values of the view config. Its fields should equal those of the viewConfig object in RenderConfigService unless a change has taken place.
+	public viewConfigRecord: ViewConfig = <any>{};					// Old values of the view config. Its fields should equal those of the viewConfig object in RenderConfigService unless a change has taken place.
 	public interactionConfigRecord: InteractionConfig = <any>{};	// Old values of the interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
-	public widthRecord: number;									// The old width. Its should equal the width in ValueChartDirective unless a change has taken place.
+	public widthRecord: number;										// The old width. Its should equal the width in ValueChartDirective unless a change has taken place.
 	public heightRecord: number;									// The old height. Its should equal the height in ValueChartDirective unless a change has taken place.
-	public usersRecord: number;								// The old number of users. Its should equal the number of users in the ValueChart in the ValueChartDirective unless a change has taken place.
 
 	// ========================================================================================
 	// 									Constructor
@@ -74,8 +73,6 @@ export class ChangeDetectionService {
 	*/
 	startChangeDetection(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig): void {
 		this.valueChartRecord = _.cloneDeep(valueChart);
-		this.usersRecord = _.clone(valueChart.getUsers().length);
-
 		this.widthRecord = _.clone(width);
 		this.heightRecord = _.clone(height);
 
@@ -92,11 +89,42 @@ export class ChangeDetectionService {
 		@returns {void}
 		@description	
 	*/
-	detectChanges(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig): void {
+	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig): boolean {
+		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
+		var renderDataChanged: boolean = this.alternativeOrderChanged || this.objectiveOrderChanged || this.colorsHaveChanged;
+		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 
-		
+		this.valueChartRecord = _.cloneDeep(valueChart);
+		this.colorsHaveChanged = false;
+		this.alternativeOrderChanged = false;
+		this.objectiveOrderChanged = false;
+		this.viewConfigRecord.viewOrientation = viewConfig.viewOrientation;
+
+		return valueChartChanged || renderDataChanged || viewOrientationChanged;
 	}
 
+	detectWidthHeightChanges(width: number, height: number) {
+		var widthHeightChanges: boolean = this.widthRecord !== width || this.heightRecord !== height;
+
+		this.widthRecord = _.clone(width);
+		this.heightRecord = _.clone(height);
+
+		return widthHeightChanges;
+	}
+
+	detectViewConfigChanges(viewConfig: ViewConfig): boolean {
+		var viewConfigChanged: boolean = !_.isEqual(this.viewConfigRecord, viewConfig);
+		this.viewConfigRecord = _.cloneDeep(viewConfig);
+
+		return viewConfigChanged;
+	}
+
+	detectInteractionConfigChanges(interactionConfig: InteractionConfig): boolean {
+		var interactionConfigChanged: boolean = !_.isEqual(this.interactionConfigRecord, interactionConfig);
+		this.interactionConfigRecord = _.cloneDeep(interactionConfig);
+
+		return interactionConfigChanged;
+	}
 
 
 

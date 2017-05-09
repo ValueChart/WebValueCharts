@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 21:19:37
+* @Last Modified time: 2017-05-09 12:42:38
 */
 	
 // Import Model Classes:
@@ -48,6 +48,8 @@ export class ValueChart {
 
 	public _id: string;						// The id of the ValueChart in the database. This field should ONLY be set if the ValueChart has been added to the database. 
 	public password: string;				// The password to access this ValueChart.
+
+	private maximumWeightMap: WeightMap;
 
 	// ========================================================================================
 	// 									Constructor
@@ -255,11 +257,13 @@ export class ValueChart {
 
 	setUsers(users: User[]): void {
 		this.users = users;
+		this.updateMaximumWeightMap();
 	}
 
 	addUser(user: User): void {
 		if (this.users.indexOf(user) === -1) {
 			this.users.push(user);
+			this.updateMaximumWeightMap();
 		}
 	}
 
@@ -267,6 +271,7 @@ export class ValueChart {
 		var index: number = this.users.indexOf(user);
 		if (index !== -1) {
 			this.users.splice(index, 1);
+			this.updateMaximumWeightMap();
 		}
 	}
 
@@ -280,10 +285,17 @@ export class ValueChart {
 	getMaximumWeightMap(): WeightMap {
 		if (this.users.length === 0)
 			return this.getDefaultWeightMap();
-	
+
 		if (this.users.length === 1)
 			return this.users[0].getWeightMap();
 
+		if (this.maximumWeightMap == undefined)
+			this.updateMaximumWeightMap();
+
+		return this.maximumWeightMap;
+	}
+
+	updateMaximumWeightMap(): void {
 		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
 		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
 		var maximumWeightMap = new WeightMap();
@@ -301,7 +313,7 @@ export class ValueChart {
 			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
 		}
 
-		return maximumWeightMap;
+		this.maximumWeightMap = maximumWeightMap;
 	}
 
 	/*

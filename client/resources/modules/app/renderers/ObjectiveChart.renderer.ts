@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 18:05:19
+* @Last Modified time: 2017-05-09 12:54:15
 */
 
 // Import Angular Classes
@@ -65,6 +65,8 @@ export class ObjectiveChartRenderer {
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
 	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
 
+	private numUsers: number;
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -91,8 +93,10 @@ export class ObjectiveChartRenderer {
 		if (this.chart == undefined)
 			this.createObjectiveChart(d.el, d.rowData);
 
-		if (this.rows.data().length != d.rowData.length)
+		if (this.numUsers != d.valueChart.getUsers().length) 
 			this.createObjectiveRows(this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer, d.rowData);
+
+		this.numUsers = d.valueChart.getUsers().length;
 
 		this.renderObjectiveChart(d.width, d.height, d.rowData, d.viewConfig);
 	}
@@ -339,7 +343,7 @@ export class ObjectiveChartRenderer {
 			})
 			.attr(this.rendererConfig.dimensionOne, this.rendererConfig.dimensionOneSize)
 			.attr(this.rendererConfig.dimensionTwo, (d: RowData) => {
-				let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+				let maxObjectiveWeight: number = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
 				return this.rendererConfig.dimensionTwoScale(maxObjectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
@@ -398,7 +402,7 @@ export class ObjectiveChartRenderer {
 			.attr(this.rendererConfig.coordinateTwo, (d: CellData, i: number) => {
 				let maxObjectiveWeight: number = 0;
 				if (d.userScores.length > 0) {
-					this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());				
+					this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());				
 				}
 				return (viewConfig.viewOrientation === 'vertical') ? this.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
@@ -430,7 +434,7 @@ export class ObjectiveChartRenderer {
 		if (viewConfig.viewOrientation === 'vertical') {
 			userScores
 				.attr(this.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let maxObjectiveWeight: number = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
 					let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 					let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return this.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - this.rendererConfig.dimensionTwoScale(score * userObjectiveWeight);
@@ -472,7 +476,7 @@ export class ObjectiveChartRenderer {
 		if (viewConfig.viewOrientation === 'vertical') {
 			weightColumns
 				.attr(this.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = this.valueChartService.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let maxObjectiveWeight: number = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
 					return this.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - calculateWeightColumnDimensionTwo(d, i);
 				});
 		} else {

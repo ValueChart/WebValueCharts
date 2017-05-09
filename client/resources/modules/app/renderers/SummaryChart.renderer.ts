@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-08 18:05:14
+* @Last Modified time: 2017-05-09 12:54:20
 */
 
 // Import Angular Classes
@@ -70,6 +70,9 @@ export class SummaryChartRenderer {
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
 	private scoreTotalFontSize: number = 22;
 
+	private numUsers: number;
+
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -94,8 +97,10 @@ export class SummaryChartRenderer {
 		if (this.chart == undefined)
 			this.createSummaryChart(d.el, d.rowData);
 
-		if (this.rows.data().length != d.rowData.length)
+		if (this.numUsers != d.valueChart.getUsers().length)
 			this.createSummaryChartRows(this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer, d.rowData);
+
+		this.numUsers = d.valueChart.getUsers().length;
 
 		this.renderSummaryChart(d.width, d.height, d.rowData, d.viewConfig);
 	}
@@ -397,13 +402,13 @@ export class SummaryChartRenderer {
 			.attr(this.rendererConfig.coordinateOne + '1', 0)
 			.attr(this.rendererConfig.coordinateOne + '2', (d: CellData, i: number) => { return this.calculateCellCoordinateOne(d, 1); })
 			.attr(this.rendererConfig.coordinateTwo + '1', (d: CellData, i: number) => { 
-				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
+				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
 				var yVal = this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
 				return (yVal * ((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
 					((viewConfig.viewOrientation === 'vertical') ? this.rendererConfig.dimensionTwoSize : 0);
 			})
 			.attr(this.rendererConfig.coordinateTwo + '2', (d: CellData, i: number) => { 
-				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
+				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
 				var yVal = this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
 				return (yVal * ((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
 					((viewConfig.viewOrientation === 'vertical') ? this.rendererConfig.dimensionTwoSize : 0);
@@ -438,7 +443,7 @@ export class SummaryChartRenderer {
 				return (userScoreBarSize * i) + (userScoreBarSize / 2) - horizontalOffset;
 			})
 			.attr(this.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-				var weightTotal: number = this.valueChartService.getMaximumWeightMap().getWeightTotal();
+				var weightTotal: number = this.valueChartService.getValueChart().getMaximumWeightMap().getWeightTotal();
 
 				return (this.rendererConfig.dimensionTwoScale(weightTotal * this.calculateNormalizedTotalScore(d)) * 
 					((viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
