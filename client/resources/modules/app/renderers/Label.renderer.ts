@@ -2,15 +2,16 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 15:13:34
+* @Last Modified time: 2017-05-09 22:56:19
 */
 
 // Import Angular Classes:
 import { Injectable } 												from '@angular/core';
-import { NgZone }													from '@angular/core';
 
 // Import libraries:
 import * as d3 														from 'd3';
+import { Subject }													from 'rxjs/Subject';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }										from '../services/ValueChart.service';
@@ -72,7 +73,8 @@ export class LabelRenderer {
 	public scoreFunctionRenderers: any;						// A JS object literal used as a map to store instances of score function renderers.  Its field names are the names of primitive objectives,
 	// and the values are score function renderers.
 
-	private numUsers: number;
+	private scoreFunctionSubjects: any;
+	private viewSubject: Subject<boolean>;
 
 	// ========================================================================================
 	// 									Constructor
@@ -93,8 +95,7 @@ export class LabelRenderer {
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private setObjectiveColorsInteraction: SetObjectiveColorsInteraction,
 		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
-		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction,
-		private ngZone: NgZone) {
+		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
 	}
 
 	// ========================================================================================
@@ -108,10 +109,6 @@ export class LabelRenderer {
 			this.interactionsChanged(update.interactionConfig);
 		}
 
-		if (this.numUsers != update.valueChart.getUsers().length)
-			this.updateScoreFunctions(this.scoreFunctionContainer, update.valueChart.getAllPrimitiveObjectives());
-
-		this.numUsers = update.valueChart.getUsers().length;
 		this.rendererConfig = update.rendererConfig;
 
 		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
@@ -127,7 +124,7 @@ export class LabelRenderer {
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
-		this.toggleScoreFunctionValueLabels(viewConfig.displayScoreFunctionValueLabels);		
+		this.viewSubject.next(viewConfig.displayScoreFunctionValueLabels);
 	}
 
 	handleObjectivesReordered = (reordered: boolean) => {
@@ -257,7 +254,7 @@ export class LabelRenderer {
 	*/
 	renderLabelSpace(u: RendererUpdate, labelData: LabelData[], parentName: string) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, this.displayScoreFunctions);
+		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
@@ -274,10 +271,10 @@ export class LabelRenderer {
 
 		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
-		if (this.displayScoreFunctions) {
+		if (u.viewConfig.displayScoreFunctions) {
 			// Render the score function plots.
 			scoreFunctionContainer.style('display', 'block');
-			this.renderScoreFunctions(u.viewConfig, scoreFunctionContainer, u.valueChart.getAllPrimitiveObjectives());
+			this.renderScoreFunctions(u, scoreFunctionContainer);
 		} else {
 			scoreFunctionContainer.style('display', 'none');
 		}
@@ -343,7 +340,7 @@ export class LabelRenderer {
 			});
 
 		labelOutlines
-			.attr(u.rendererConfig.dimensionOne, this.determineLabelWidth)
+			.attr(u.rendererConfig.dimensionOne, (d, i) => { return this.determineLabelWidth(d, u); })
 			.attr(u.rendererConfig.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
 			.attr(u.rendererConfig.dimensionTwo, (d: LabelData, i: number) => {
 				return Math.max(u.rendererConfig.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
@@ -418,7 +415,7 @@ export class LabelRenderer {
 		labelDividers
 			.attr(u.rendererConfig.coordinateOne + '1', 0)
 			.attr(u.rendererConfig.coordinateOne + '2', (d: LabelData, i: number) => {		 // Expand the last label to fill the rest of the space.
-				return (i === 0) ? 0 : this.determineLabelWidth(d);
+				return (i === 0) ? 0 : this.determineLabelWidth(d, u);
 			})
 			.attr(u.rendererConfig.coordinateTwo + '1', calculateDimensionTwoOffset)
 			.attr(u.rendererConfig.coordinateTwo + '2', calculateDimensionTwoOffset);
@@ -434,6 +431,7 @@ export class LabelRenderer {
 	*/
 	createScoreFunctions(u: RendererUpdate, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
 		this.scoreFunctionRenderers = {}
+		this.scoreFunctionSubjects = {};
 
 		var newScoreFunctionPlots: d3.Selection<any, any, any, any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(u.valueChart.getAllPrimitiveObjectives())
@@ -446,35 +444,51 @@ export class LabelRenderer {
 			var el: d3.Selection<any, any, any, any> = d3.select(scoreFunctionPlot);
 			var datum: PrimitiveObjective = el.data()[0];
 
+			// TODO <@aaron> : Remove scoreFunctionRenderers field.
+
 			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 			else
-				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 
-			var usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, u.valueChart.getUsers());
+			var scoreFunctionSubject = new Subject();
 
-			this.scoreFunctionRenderers[datum.getId()].createScoreFunction(el, datum, usersDomainElements, u.interactionConfig.adjustScoreFunctions);
+			scoreFunctionSubject.map((sfU: any) => { 
+				sfU.el = el;
+				sfU.valueChart = u.valueChart;
+				sfU.objective = datum;
+				sfU.viewOrientation = u.viewConfig.viewOrientation;
+				sfU.interactive = u.interactionConfig.adjustScoreFunctions;
+				
+				return sfU;
+			}).map(this.scoreFunctionViewerService.produceUsersDomainElements)
+				.map(this.scoreFunctionViewerService.produceViewConfig)
+				.subscribe(this.scoreFunctionRenderers[datum.getId()].scoreFunctionChanged);
+
+			this.scoreFunctionSubjects[datum.getId()] = scoreFunctionSubject;
 		});
+
+		this.viewSubject = new Subject();
 	}
 
 
-	updateScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
-		var el: d3.Selection<any, any, any, any>;
-		var datum: PrimitiveObjective;
+	// updateScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
+	// 	var el: d3.Selection<any, any, any, any>;
+	// 	var datum: PrimitiveObjective;
 		
 
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
-			.data(data);
+	// 	var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
+	// 		.data(data);
 
-		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
-			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
-			datum = el.data()[0];
-			let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
-			let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
+	// 	scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
+	// 		el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
+	// 		datum = el.data()[0];
+	// 		let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
+	// 		let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
 
-			renderer.createPlot(renderer.plotElementsContainer, renderer.domainLabelContainer, datum, usersDomainElements);
-		});	
-	}
+	// 		renderer.createPlot(renderer.plotElementsContainer, renderer.domainLabelContainer, datum, usersDomainElements);
+	// 	});	
+	// }
 
 	/*
 		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
@@ -485,7 +499,9 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Uses the ScoreFunctionRenderer and its subclasses to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	*/
-	renderScoreFunctions(viewConfig: ViewConfig, scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
+	renderScoreFunctions(u: RendererUpdate, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
+		var data = u.valueChart.getAllPrimitiveObjectives();
+
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
@@ -509,9 +525,9 @@ export class LabelRenderer {
 			dimensionTwoTransform = this.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
 
 			// Place the score function plot in the correct location.
-			el.attr('transform', this.renderConfigService.generateTransformTranslation(viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
+			el.attr('transform', this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
 
-			if (viewConfig.viewOrientation === 'vertical') {
+			if (u.viewConfig.viewOrientation === 'vertical') {
 				width = this.labelWidth;
 				height = this.rendererConfig.dimensionTwoScale(objectiveWeight);
 			} else {
@@ -519,34 +535,19 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
-
-			let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
-
-			renderer.renderScoreFunction(datum, usersDomainElements, width, height, viewConfig.viewOrientation);
-			renderer.toggleValueLabels(this.renderConfigService.viewConfig.displayScoreFunctionValueLabels);
-
+			this.scoreFunctionSubjects[datum.getId()].next({ width: width, height: height });
 			weightOffset += objectiveWeight;
 		});
-	}
 
-
-	/*
-		@returns {void}
-		@description	Display or hide the utility labels on the score function plot's points/bars depending on the value of the displayTotalScores attribute on the ValueChartDirective.
-	*/
-	toggleScoreFunctionValueLabels(displayScoreFunctionValueLabels: boolean): void {
-		for (var field in this.scoreFunctionRenderers) {
-			this.scoreFunctionRenderers[field].toggleValueLabels(displayScoreFunctionValueLabels);
-		}
+		this.viewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
 	}
 
 	// ========================================================================================
 	// 				Anonymous functions that are used enough to be made class fields
 	// ========================================================================================
 
-	determineLabelWidth = (d: LabelData) => {		 // Expand the last label to fill the rest of the space.
-		var scoreFunctionOffset: number = ((this.displayScoreFunctions) ? this.labelWidth : 0);
+	determineLabelWidth = (d: LabelData, u: RendererUpdate) => {		 // Expand the last label to fill the rest of the space.
+		var scoreFunctionOffset: number = ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
 		var retValue = (d.depthOfChildren === 0) ?
 			(this.rendererConfig.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
 			:

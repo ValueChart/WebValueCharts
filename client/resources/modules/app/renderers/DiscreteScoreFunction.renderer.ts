@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:15:21
+* @Last Modified time: 2017-05-09 23:14:41
 */
 
 // Import Angular Classes:
@@ -13,7 +13,6 @@ import { NgZone }										from '@angular/core';
 import * as d3 											from 'd3';
 
 // Import Application Classes
-import { ValueChartService }							from '../services/ValueChart.service';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
@@ -60,6 +59,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		BAR_LABEL: 'scorefunction-bar-label',
 	}
 
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -69,8 +69,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(valueChartService: ValueChartService, chartUndoRedoService: ChartUndoRedoService, private ngZone: NgZone) {
-		super(valueChartService, chartUndoRedoService);
+	constructor(chartUndoRedoService: ChartUndoRedoService) {
+		super(chartUndoRedoService);
 	}
 
 	// ========================================================================================
@@ -88,9 +88,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[]): void {
+	createPlot(u: any, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		// Call the create plot method in ScoreFunctionRenderer. This will create the user containers and create the domain labels.
-		super.createPlot(plotElementsContainer, domainLabelContainer, objective, usersDomainElements);
+		super.createPlot(u, plotElementsContainer, domainLabelContainer);
 
 		// Create the bar container element.
 
@@ -101,7 +101,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		updateBarContainers.enter().append('g')
 			.classed(DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER, true)
-			.attr('id', 'scorefunction-' + objective.getId() + '-bars-container');
+			.attr('id', 'scorefunction-' + u.objective.getId() + '-bars-container');
 
 		this.barContainer = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER)
 
@@ -113,13 +113,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		updateBarLabelsContainer.enter().append('g')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER, true)
-			.attr('id', 'scorefunction-' + objective.getId() + '-pointlabels-container');
+			.attr('id', 'scorefunction-' + u.objective.getId() + '-pointlabels-container');
 
 		// Create the bar label container element.
 		this.barLabelContainer = this.userContainers.select('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER);
 
 		// Create the bars, bar tops, and bar labels.
-		this.createDiscretePlotElements(this.barContainer, this.barLabelContainer, objective);
+		this.createDiscretePlotElements(u, this.barContainer, this.barLabelContainer);
 	}
 
 	/*
@@ -130,7 +130,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createDiscretePlotElements(barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective) {
+	createDiscretePlotElements(u: any, barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updateUtilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
 			.data((d: UserDomainElements) => { return d.elements; });
@@ -141,7 +141,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('rect')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR, true)
 			.attr('id', (d: DomainElement) => {
-				return 'scorefunction-' + objective.getId() + '-' + d.element + '-bar';
+				return 'scorefunction-' + u.objective.getId() + '-' + d.element + '-bar';
 			});
 
 		this.utilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR);
@@ -155,26 +155,25 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.enter().append('text')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_LABEL, true)
 			.attr('id', (d: DomainElement) => {
-				return 'scorefunction-' + objective.getId() + '-' + d.element + '-label';
+				return 'scorefunction-' + u.objective.getId() + '-' + d.element + '-label';
 			});
 
 		this.barLabels = labelsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL);
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
-		var updateBartTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
+		var updateBarTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
 			.data((d: UserDomainElements) => { return d.elements; })
 
-		updateBartTops.exit().remove();
+		updateBarTops.exit().remove();
 
-		updateBartTops
+		updateBarTops
 			.enter().append('rect')
 			.classed(DiscreteScoreFunctionRenderer.defs.BAR_TOP, true)
 			.attr('id', (d: DomainElement) => {
-				return 'scorefunction-' + objective.getId() + '-' + d.element + '-bartop';
+				return 'scorefunction-' + u.objective.getId() + '-' + d.element + '-bartop';
 			});
 
 		this.barTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
-
 	}
 
 	/*
@@ -189,21 +188,21 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderPlot(domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
+	renderPlot(u: any, domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>): void {
 		// Use the super class' method to render position domain labels.
-		super.renderPlot(domainLabels, plotElementsContainer, objective, usersDomainElements, viewOrientation);
+		super.renderPlot(u, domainLabels, plotElementsContainer);
 
 		var labelCoordinateOneOffset: number;
-		if (viewOrientation === 'vertical') {
-			labelCoordinateOneOffset = this.labelOffset + 5;
+		if (u.viewOrientation === 'vertical') {
+			labelCoordinateOneOffset = u.rendererConfig.labelOffset + 5;
 		} else {
-			labelCoordinateOneOffset = (1.5 * this.labelOffset) + 5;
+			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset) + 5;
 		}
 		// Fix domain labels positions specifically for the discrete plot.
-		domainLabels.attr(this.viewConfig.coordinateOne, (d: DomainElement, i: number) => { return (((this.domainAxisMaxCoordinateOne - this.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+		domainLabels.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 
 		// Render the discrete plot elements.
-		this.renderDiscretePlot(objective, usersDomainElements, viewOrientation);
+		this.renderDiscretePlot(u);
 	}
 
 	/*
@@ -215,65 +214,65 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						of the bar chart. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderDiscretePlot(objective: PrimitiveObjective, usersDomainElements: UserDomainElements[], viewOrientation: string): void {
-		var barWidth: number = ((this.viewConfig.dimensionOneSize / this.domainSize) / usersDomainElements.length) / 2;
+	renderDiscretePlot(u: any): void {
+		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.usersDomainElements.length) / 2;
 
 		// Position each users' container so theirs bars are properly offset from each other.
 		this.userContainers
 			.attr('transform', (d: UserDomainElements, i: number) => {
-				return 'translate(' + ((viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
+				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
 			});
 
 		// Configure the linear scale that translates scores into pixel units.
 		this.heightScale = d3.scaleLinear()
 			.domain([0, 1]);
-		if (viewOrientation === 'vertical') {
-			this.heightScale.range([0, this.domainAxisCoordinateTwo - this.utilityAxisMaxCoordinateTwo]);
+		if (u.viewOrientation === 'vertical') {
+			this.heightScale.range([0, u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
 		} else {
-			this.heightScale.range([0, this.utilityAxisMaxCoordinateTwo - this.domainAxisCoordinateTwo]);
+			this.heightScale.range([0, u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo]);
 
 		}
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
-			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			return Math.max(this.heightScale(scoreFunction.getScore('' + d.element)), this.labelOffset);
+			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
+			return Math.max(this.heightScale(scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
 		};
 
 		// Render the utility bars.
 		this.utilityBars
-			.attr(this.viewConfig.dimensionOne, barWidth)
-			.attr(this.viewConfig.dimensionTwo, calculateBarDimensionTwo)
-			.attr(this.viewConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
-			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
-				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo;
+			.attr(u.rendererConfig.dimensionOne, barWidth)
+			.attr(u.rendererConfig.dimensionTwo, calculateBarDimensionTwo)
+			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
+				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
 			})
-			.style('stroke', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); })
+			.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.user.color); })
 
 		// Render the bar labels.
 		this.barLabels
 			.text((d: any, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				return Math.round(100 * scoreFunction.getScore(d.element)) / 100;
 			})
-			.attr(this.viewConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
-			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
-				return (viewOrientation === 'vertical') ? (this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
+			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
+			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
+				return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			})
 			.style('font-size', 8);
 
 		// Render the bar tops.
 		this.barTops
-			.attr(this.viewConfig.dimensionOne, barWidth)
-			.attr(this.viewConfig.dimensionTwo, this.labelOffset)
-			.attr(this.viewConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
-			.attr(this.viewConfig.coordinateTwo, (d: DomainElement) => {
-				return (viewOrientation === 'vertical') ? this.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : this.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - this.labelOffset;
+			.attr(u.rendererConfig.dimensionOne, barWidth)
+			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.labelOffset)
+			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
+			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
+				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
 			})
-			.style('fill', (d: DomainElement) => { return ((usersDomainElements.length === 1) ? objective.getColor() : d.user.color); });
+			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.user.color); });
 
 		// Enable or disable dragging to change user score functions depending on whether interaction is enabled
-		this.toggleDragToChangeScore(this.enableInteraction, objective, viewOrientation);
+		this.toggleDragToChangeScore(u);
 	}
 
 	/*
@@ -283,32 +282,30 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@returns {void}
 		@description	This method toggles the interaction that allows clicking and dragging on bar tops to alter a user's score function.
 	*/
-	toggleDragToChangeScore(enableDragging: boolean, objective: PrimitiveObjective, viewOrientation: string): void {
+	toggleDragToChangeScore(u: any): void {
 		var dragToChangeScore = d3.drag();
 
-		if (enableDragging) {
+		if (u.interactive) {
 			dragToChangeScore.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				// Save the current state of the ScoreFunction.
-				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, objective);
+				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, u.objective);
 			});
 
 			dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-				if (viewOrientation === 'vertical') {
+				if (u.viewOrientation === 'vertical') {
 					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-					score = this.heightScale.invert(this.domainAxisCoordinateTwo - (<any>d3.event)[this.viewConfig.coordinateTwo]);
+					score = this.heightScale.invert(u.rendererConfig.domainAxisCoordinateTwo - (<any>d3.event)[u.rendererConfig.coordinateTwo]);
 				} else {
 					// No need to do anything with offsets here because x is already left to right.
-					score = this.heightScale.invert((<any>d3.event)[this.viewConfig.coordinateTwo]);
+					score = this.heightScale.invert((<any>d3.event)[u.rendererConfig.coordinateTwo]);
 				}
 				score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
 
-				// Run inside the angular zone. Angular is not necessarily aware of this function executing because it is triggered by a d3 event, which 
-				// exists outside of angular. In order to make sure that change detection is triggered, we must do the value assignment inside the "Angular Zone".
-				this.ngZone.run(() => { scoreFunction.setElementScore(<string>d.element, score) });
+				scoreFunction.setElementScore(<string>d.element, score);
 			});
 		}
 
@@ -317,10 +314,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Set the cursor style for the bar tops to indicate that they are drag-able (if dragging was enabled).
 		this.barTops.style('cursor', () => {
-			if (!enableDragging) {
+			if (!u.interactive) {
 				return 'auto';
 			} else {
-				return (viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+				return (u.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			}
 		});
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 12:55:30
+* @Last Modified time: 2017-05-09 21:07:07
 */
 
 // Import Angular Classes:
@@ -32,7 +32,8 @@ import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '.
 
 @Injectable()
 export class ScoreFunctionViewerService {
-	
+
+	// TODO <@aaron> : Speed up getAllUsersDomainElements by caching the result.
 
 	// ========================================================================================
 	// 									Constructor
@@ -49,6 +50,13 @@ export class ScoreFunctionViewerService {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	produceUsersDomainElements = (u: any) => {
+		u.usersDomainElements = this.getAllUsersDomainElements(u.objective, u.valueChart.getUsers());
+
+		return u;
+	}
+
 
 	getAllUsersDomainElements(objective: PrimitiveObjective, users: User[]): UserDomainElements[] {
 		var allUsersDomainElements: UserDomainElements[] = [];
@@ -106,5 +114,49 @@ export class ScoreFunctionViewerService {
 		});
 
 		return elementUserScoresSummaries;
+	}
+
+	// TODO <@aaron> : Add type annotations 
+
+	produceViewConfig = (u: any) => {
+		u.rendererConfig = <any>{};
+		u.rendererConfig.labelOffset = 25;
+
+				// Initialize the view configuration. This code is very similar to that in RenderConfigService, but is duplicated here to avoid a dependency on that class.
+		if (u.viewOrientation === 'vertical') {
+			u.rendererConfig.dimensionOne = 'width';
+			u.rendererConfig.dimensionTwo = 'height';
+			u.rendererConfig.coordinateOne = 'x';
+			u.rendererConfig.coordinateTwo = 'y';
+
+			u.rendererConfig.dimensionOneSize = u.width;
+			u.rendererConfig.dimensionTwoSize = u.height;
+
+			// Determine the positions of the two axes.
+			u.rendererConfig.domainAxisCoordinateTwo = Math.min((19 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.dimensionTwoSize - u.rendererConfig.labelOffset);
+
+			u.rendererConfig.utilityAxisMaxCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize / 20, 5);
+			u.rendererConfig.utilityAxisCoordinateOne = u.rendererConfig.labelOffset;
+
+		} else {
+			u.rendererConfig.dimensionOne = 'height';
+			u.rendererConfig.dimensionTwo = 'width';
+			u.rendererConfig.coordinateOne = 'y';
+			u.rendererConfig.coordinateTwo = 'x';
+
+			u.rendererConfig.dimensionOneSize = u.height;
+			u.rendererConfig.dimensionTwoSize = u.width;
+
+			// Determine the positions of the two axes.
+			u.rendererConfig.domainAxisCoordinateTwo = Math.max((1 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.labelOffset) + 10;
+
+			u.rendererConfig.utilityAxisMaxCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize * (19 / 20), 5);
+			u.rendererConfig.utilityAxisCoordinateOne = u.rendererConfig.labelOffset;
+		}
+
+		u.rendererConfig.domainAxisMaxCoordinateOne = Math.min((19 / 20) * u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionOneSize - u.rendererConfig.labelOffset);
+
+
+		return u;
 	}
 }

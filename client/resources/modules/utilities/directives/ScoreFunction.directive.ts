@@ -2,15 +2,17 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:06:24
+* @Last Modified time: 2017-05-09 23:36:48
 */
 
 import { Directive, Input }												from '@angular/core';
 import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
-import { NgZone }														from '@angular/core';
 
 // d3
 import * as d3 															from 'd3';
+import * as _															from 'lodash';
+import { Subject }														from 'rxjs/Subject';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ScoreFunctionRenderer }										from '../../app/renderers/ScoreFunction.renderer';
@@ -59,6 +61,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	private previousObjectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunction: ScoreFunction;
 
+	private scoreFunctionSubject: Subject<any>;
+	private viewSubject: Subject<boolean>;	
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -68,7 +73,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private ngZone: NgZone) { }
+	constructor() { }
 
 	// ========================================================================================
 	// 									Methods
@@ -94,17 +99,26 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	initScoreFunctionPlot(): void {
 
 		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 		}
-
-		var usersDomainElements: UserDomainElements[]
-
-		usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 		
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
-		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
+		this.scoreFunctionSubject = new Subject();
+
+		this.scoreFunctionSubject.map((sfU: any) => { 
+			sfU.el = this.scoreFunctionPlotContainer;
+			sfU.valueChart = this.valueChartService.getValueChart();
+			sfU.objective = this.objectiveToDisplay;
+			sfU.viewOrientation = this.viewOrientation;
+			sfU.interactive = this.enableInteraction;
+			
+			return sfU;
+		}).map(this.scoreFunctionViewerService.produceUsersDomainElements)
+			.map(this.scoreFunctionViewerService.produceViewConfig)
+			.subscribe(this.scoreFunctionRenderer.scoreFunctionChanged);
+
+		this.scoreFunctionSubject.next({ width: this.plotWidth, height: this.plotHeight });
 	}
 
 	detectScoreFunctionChange(previousScoreFunction: ScoreFunction, currentScoreFunction: ScoreFunction): boolean {
@@ -124,6 +138,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	ngDoCheck() {
 
 		if (this.previousObjectiveToDisplay !== this.objectiveToDisplay) {
+			this.scoreFunctionRenderer.outlineContainer.node().remove();
+			this.scoreFunctionRenderer.plotContainer.node().remove();
+			this.scoreFunctionRenderer = null;
 			this.initScoreFunctionPlot();
 			this.previousObjectiveToDisplay = this.objectiveToDisplay;
 		}
@@ -131,12 +148,10 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		else {
 			if (this.enableInteraction) {
 				let currentScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
-				var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
 
-				if (scoreFunctionChange) {
-					var usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
+				if (!_.isEqual(this.previousScoreFunction, currentScoreFunction)) {
 					
-					this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
+					this.scoreFunctionSubject.next({ width: this.plotWidth, height: this.plotHeight });
 					this.previousScoreFunction = currentScoreFunction.getMemento();
 
 					// If this is a sub window, update the parent window in response to the changes.

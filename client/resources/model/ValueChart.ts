@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:42:38
+* @Last Modified time: 2017-05-09 23:23:11
 */
 	
 // Import Model Classes:
@@ -300,17 +300,21 @@ export class ValueChart {
 		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
 		var maximumWeightMap = new WeightMap();
 
-		this.users.forEach((user: User) => {
-			let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-			for (var i = 0; i < objectiveWeights.length; i++) {
-				if (combinedWeights[i] < objectiveWeights[i]) {
-					combinedWeights[i] = objectiveWeights[i];
+		if (this.users) {
+			this.users.forEach((user: User) => {
+				if (user.getWeightMap()) {
+				let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
+					for (var i = 0; i < objectiveWeights.length; i++) {
+						if (combinedWeights[i] < objectiveWeights[i]) {
+							combinedWeights[i] = objectiveWeights[i];
+						}
+					}
 				}
-			}
-		});
+			});
 
-		for (var i = 0; i < primitiveObjectives.length; i++) {
-			maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+			for (var i = 0; i < primitiveObjectives.length; i++) {
+				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+			}
 		}
 
 		this.maximumWeightMap = maximumWeightMap;

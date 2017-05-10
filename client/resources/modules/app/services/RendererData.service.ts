@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 15:30:02
+* @Last Modified time: 2017-05-09 16:18:32
 */
 
 // Import Angular Classes:
@@ -84,21 +84,21 @@ export class RendererDataService {
 
 
 
-		// TODO<@aaron>: update this output type of this method.
+		// TODO <@aaron>: update this output type of this method.
 
-	produceRowData = (d: RendererUpdate) => {
-		if (!this.rowData || d.valueChart.getUsers().length != this.rowData.length) {
+	produceRowData = (u: RendererUpdate) => {
+		if (!this.rowData || u.valueChart.getUsers().length != this.rowData.length) {
 			this.generateRowData();
 		}
 
 		this.updateWeightOffsets();
-		this.updateStackedBarOffsets(d.viewConfig.viewOrientation);		// TODO<@aaron>: Remove hard-coded "vertical" orientation.
+		this.updateStackedBarOffsets(u.viewConfig.viewOrientation);		// TODO <@aaron>: Remove hard-coded "vertical" orientation.
 
-		d.rowData = this.rowData;
-		return d;
+		u.rowData = this.rowData;
+		return u;
 	}
 
-	produceLabelData = (d: RendererUpdate) => {
+	produceLabelData = (u: RendererUpdate) => {
 		if (!this.labelData) {
 			this.generateLabelData();
 		}
@@ -107,8 +107,8 @@ export class RendererDataService {
 			this.updateLabelDataWeights(labelDatum);
 		});
 
-		d.labelData = this.labelData;
-		return d;
+		u.labelData = this.labelData;
+		return u;
 	}
 
 	// ================================  Getters ====================================

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:30:55
+* @Last Modified time: 2017-05-09 22:59:43
 */
 
 // Import Angular Classes:
@@ -64,7 +64,7 @@ export class ChangeDetectionService {
 	// 									Methods
 	// ========================================================================================
 
-	// TODO<@aaron>: Add method signature.
+	// TODO <@aaron>: Add method signature.
 
 	/*
 		@param valueChart - 
@@ -82,7 +82,7 @@ export class ChangeDetectionService {
 
 	
 
-	// TODO<@aaron>: Add method signature.
+	// TODO <@aaron>: Add method signature.
 
 	/*
 		@param 
@@ -93,14 +93,16 @@ export class ChangeDetectionService {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
 		var renderDataChanged: boolean = this.alternativeOrderChanged || this.objectiveOrderChanged || this.colorsHaveChanged;
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
+		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
 
 		this.valueChartRecord = _.cloneDeep(valueChart);
 		this.colorsHaveChanged = false;
 		this.alternativeOrderChanged = false;
 		this.objectiveOrderChanged = false;
 		this.viewConfigRecord.viewOrientation = viewConfig.viewOrientation;
+		this.viewConfigRecord.displayScoreFunctions = viewConfig.displayScoreFunctions;
 
-		return valueChartChanged || renderDataChanged || viewOrientationChanged;
+		return valueChartChanged || renderDataChanged || viewOrientationChanged || scoreFunctionDisplayChanged;
 	}
 
 	detectWidthHeightChanges(width: number, height: number) {
