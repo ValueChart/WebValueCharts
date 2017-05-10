@@ -25,13 +25,15 @@
         </div> 
         <div class="col-xs-offset-3">
             <ScoreFunction 
+                [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(selectedObjective)]"
+                [colors]="[user.color]"
                 [objective]="valueChartService.getObjectiveByName(selectedObjective)"
                 [width]="440"
                 [height]="300"
-                [orientation]="'vertical'"
+                [viewOrientation]="'vertical'"
                 [services]="services"
                 [individualOnly]="true"
-                [interaction]="true">
+                [enableInteraction]="true">
                 <svg class="svg-content-createvaluechart" viewBox="0 0, 440, 300" preserveAspectRatio="xMinYMin meet">
                     <g class="expanded-score-function"></g>
                 </svg>

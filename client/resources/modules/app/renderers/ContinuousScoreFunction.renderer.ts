@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 22:44:45
+* @Last Modified time: 2017-05-10 13:44:13
 */
 
 // Import Angular Classes:
@@ -15,6 +15,8 @@ import * as d3 											from 'd3';
 // Import Application Classes:
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
+
+import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
 
 // Import Model Classes:
 import { Objective }									from '../../../model/Objective';
@@ -70,8 +72,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService) {
-		super(chartUndoRedoService);
+	constructor(chartUndoRedoService: ChartUndoRedoService, expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+		super(chartUndoRedoService, expandScoreFunctionInteraction);
 	}
 
 	// ========================================================================================
@@ -123,7 +125,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 
 		// Create the point labels container.
-		var updatePointLabelContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER);
+		var updatePointLabelContainer = this.userContainers.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABELS_CONTAINER)
+			.data((d,i) => { return [d]; });
 
 		updatePointLabelContainer.exit().remove();
 
@@ -242,8 +245,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction> d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
-			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - this.heightScale(scoreFunction.getScore(+d.element)) : this.heightScale(scoreFunction.getScore(+d.element));
+			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - this.heightScale(d.scoreFunction.getScore(+d.element)) : this.heightScale(d.scoreFunction.getScore(+d.element));
 		};
 
 		// Render the scatter plot points for each user.
@@ -251,7 +253,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr('c' + u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
 			.attr('c' + u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo)
 			.attr('r', pointRadius)
-			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.user.color); })
+			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
 			.style('fill-opacity', 0.5)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');
@@ -259,8 +261,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Render the point labels for each user.
 		this.pointLabels
 			.text((d: any, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
-				return Math.round(100 * scoreFunction.getScore(+d.element)) / 100;
+				return Math.round(100 * d.scoreFunction.getScore(+d.element)) / 100;
 			})
 			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
 			.attr(u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo)
@@ -273,7 +274,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
 			.attr(u.rendererConfig.coordinateTwo + '2', (d: DomainElement, i: number) => {
 				var userElements = u.usersDomainElements.find((userElements: UserDomainElements) => {
-					return userElements.user.getUsername() === d.user.getUsername();
+					return userElements.color === d.color;
 				});
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]);
 			});
@@ -294,13 +295,11 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		if (u.interactive) {
 			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				// Save the current state of the ScoreFunction.
-				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, u.objective);
+				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, u.objective);
 			});
 
 			dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: ContinuousScoreFunction = <ContinuousScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (u.viewOrientation === 'vertical') {
@@ -312,7 +311,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				}
 				score = Math.max(0, Math.min(score, 1)); // Normalize the score to be between 0 and 1.
 
-				scoreFunction.setElementScore(<number>d.element, score);
+				d.scoreFunction.setElementScore(<number>d.element, score);
 			});
 		}
 
@@ -335,6 +334,9 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description	This method toggles the visibility of score labels next to the bars in the bar chart.
 	*/
 	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+		if (!this.pointLabelContainer)
+			return;
+
 		if (displayScoreFunctionValueLabels) {
 			// Display the labels.
 			this.pointLabelContainer.style('display', 'block');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 23:14:41
+* @Last Modified time: 2017-05-10 13:44:24
 */
 
 // Import Angular Classes:
@@ -11,10 +11,13 @@ import { NgZone }										from '@angular/core';
 
 // Import Libraries:
 import * as d3 											from 'd3';
+import * as _											from 'lodash';
 
 // Import Application Classes
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
+
+import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../model/ValueChart';
@@ -69,8 +72,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService) {
-		super(chartUndoRedoService);
+	constructor(chartUndoRedoService: ChartUndoRedoService, expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+		super(chartUndoRedoService, expandScoreFunctionInteraction);
 	}
 
 	// ========================================================================================
@@ -107,7 +110,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 
 		var updateBarLabelsContainer = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABELS_CONTAINER)
-										.data((d,i) =>{ return [d]; });
+			.data((d,i) =>{ return [d]; });
 
 		updateBarLabelsContainer.exit().remove();
 
@@ -235,8 +238,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
-			let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
-			return Math.max(this.heightScale(scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
+			return Math.max(this.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
 		};
 
 		// Render the utility bars.
@@ -247,13 +249,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
 			})
-			.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.user.color); })
+			.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
 
 		// Render the bar labels.
 		this.barLabels
 			.text((d: any, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
-				return Math.round(100 * scoreFunction.getScore(d.element)) / 100;
+				return Math.round(100 * d.scoreFunction.getScore(d.element)) / 100;
 			})
 			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
@@ -269,7 +270,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
 			})
-			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.user.color); });
+			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); });
 
 		// Enable or disable dragging to change user score functions depending on whether interaction is enabled
 		this.toggleDragToChangeScore(u);
@@ -287,13 +288,10 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		if (u.interactive) {
 			dragToChangeScore.on('start', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
-				// Save the current state of the ScoreFunction.
-				this.chartUndoRedoService.saveScoreFunctionRecord(scoreFunction, u.objective);
+				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, u.objective);
 			});
 
 			dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
-				let scoreFunction: DiscreteScoreFunction = <DiscreteScoreFunction>d.user.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName());
 				var score: number;
 				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 				if (u.viewOrientation === 'vertical') {
@@ -303,9 +301,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 					// No need to do anything with offsets here because x is already left to right.
 					score = this.heightScale.invert((<any>d3.event)[u.rendererConfig.coordinateTwo]);
 				}
-				score = Math.max(0, Math.min(score, 1));	// Make sure the score is between 0 and 1.
+				score = _.clamp(score, 0, 1);	// Make sure the score is between 0 and 1.
 
-				scoreFunction.setElementScore(<string>d.element, score);
+				d.scoreFunction.setElementScore(<string>d.element, score);
 			});
 		}
 
@@ -328,6 +326,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description	This method toggles the visibility of score labels next to the bars in the bar chart.
 	*/
 	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+		if (!this.barLabelContainer)
+			return;
 		if (displayScoreFunctionValueLabels) {
 			// Display the labels.
 			this.barLabelContainer.style('display', 'block');

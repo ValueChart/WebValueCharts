@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:45:42
+* @Last Modified time: 2017-05-10 13:19:04
 */
 
 // Import Angular Classes:
@@ -76,13 +76,11 @@ export class ExpandScoreFunctionInteraction {
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean): void {
-		var ScoreFunctionPlots: JQuery = $('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE);
-
-		ScoreFunctionPlots.off('dblclick');
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery): void {
+		scoreFunctionPlots.off('dblclick');
 
 		if (enableExpanding) {
-			ScoreFunctionPlots.dblclick(this.expandScoreFunction);
+			scoreFunctionPlots.dblclick(this.expandScoreFunction);
 		}
 
 	}
@@ -98,8 +96,8 @@ export class ExpandScoreFunctionInteraction {
 		// Pass relevant data to the pop-up by attaching it to the window object. These
 		// variables will be accessible to child window via its window.opener field, which is 
 		// a reference to this window.
+		(<any>window).valueChart = this.valueChartService.getValueChart();
 		(<any>window).objectiveToPlot = objective;
-		(<any>window).valueChartService = this.valueChartService;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily
 														// Need to find a clean way to pass parameter in from ValueChartViewer										

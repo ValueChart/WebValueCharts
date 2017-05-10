@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 22:56:19
+* @Last Modified time: 2017-05-10 13:31:41
 */
 
 // Import Angular Classes:
@@ -30,6 +30,7 @@ import { ReorderObjectivesInteraction }								from '../interactions/ReorderObje
 import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
 
 // Import Model Classes:
+import { User }														from '../../../model/User';
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 import { AbstractObjective }										from '../../../model/AbstractObjective';
@@ -69,12 +70,11 @@ export class LabelRenderer {
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
 	// space that the label area is rendered in.
 	private displayScoreFunctions: boolean;					// Should score function plots be displayed? 
-
-	public scoreFunctionRenderers: any;						// A JS object literal used as a map to store instances of score function renderers.  Its field names are the names of primitive objectives,
 	// and the values are score function renderers.
 
 	private scoreFunctionSubjects: any;
-	private viewSubject: Subject<boolean>;
+	private scoreFunctionViewSubject: Subject<boolean>;
+	private scoreFunctionInteractionSubject: Subject<boolean>;
 
 	// ========================================================================================
 	// 									Constructor
@@ -110,7 +110,6 @@ export class LabelRenderer {
 		}
 
 		this.rendererConfig = update.rendererConfig;
-
 		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
 	}
 
@@ -120,11 +119,10 @@ export class LabelRenderer {
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors);
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rendererConfig, this.rootContainer, this.scoreFunctionContainer)
 			.subscribe(this.handleObjectivesReordered)
-		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
-		this.viewSubject.next(viewConfig.displayScoreFunctionValueLabels);
+		this.scoreFunctionViewSubject.next(viewConfig.displayScoreFunctionValueLabels);
 	}
 
 	handleObjectivesReordered = (reordered: boolean) => {
@@ -430,8 +428,10 @@ export class LabelRenderer {
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
 	createScoreFunctions(u: RendererUpdate, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
-		this.scoreFunctionRenderers = {}
 		this.scoreFunctionSubjects = {};
+
+		this.scoreFunctionViewSubject = new Subject();
+		this.scoreFunctionInteractionSubject = new Subject();
 
 		var newScoreFunctionPlots: d3.Selection<any, any, any, any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
 			.data(u.valueChart.getAllPrimitiveObjectives())
@@ -442,53 +442,43 @@ export class LabelRenderer {
 		// Use the ScoreFunctionRenderer to create each score function.
 		newScoreFunctionPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			var el: d3.Selection<any, any, any, any> = d3.select(scoreFunctionPlot);
-			var datum: PrimitiveObjective = el.data()[0];
+			var objective: PrimitiveObjective = el.data()[0];
+			var renderer: ScoreFunctionRenderer
 
-			// TODO <@aaron> : Remove scoreFunctionRenderers field.
-
-			if (datum.getDomainType() === 'categorical' || datum.getDomainType() === 'interval')
-				this.scoreFunctionRenderers[datum.getId()] = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
+			if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
+				renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, this.expandScoreFunctionInteraction);
 			else
-				this.scoreFunctionRenderers[datum.getId()] = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
+				renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, this.expandScoreFunctionInteraction);
 
 			var scoreFunctionSubject = new Subject();
 
+			var scoreFunctions: ScoreFunction[] = [];
+			var colors: string[] = [];
+
+			u.valueChart.getUsers().forEach((user: User) => {
+				scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
+				colors.push(user.color);
+			});
+
 			scoreFunctionSubject.map((sfU: any) => { 
 				sfU.el = el;
-				sfU.valueChart = u.valueChart;
-				sfU.objective = datum;
+				sfU.scoreFunctions = scoreFunctions;
+				sfU.colors = colors;
+				sfU.objective = objective;
 				sfU.viewOrientation = u.viewConfig.viewOrientation;
 				sfU.interactive = u.interactionConfig.adjustScoreFunctions;
 				
 				return sfU;
 			}).map(this.scoreFunctionViewerService.produceUsersDomainElements)
 				.map(this.scoreFunctionViewerService.produceViewConfig)
-				.subscribe(this.scoreFunctionRenderers[datum.getId()].scoreFunctionChanged);
+				.subscribe(renderer.scoreFunctionChanged);
 
-			this.scoreFunctionSubjects[datum.getId()] = scoreFunctionSubject;
+			this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
+
+			this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
+			this.scoreFunctionInteractionSubject.subscribe(renderer.interactionConfigChanged);
 		});
-
-		this.viewSubject = new Subject();
 	}
-
-
-	// updateScoreFunctions(scoreFunctionContainer: d3.Selection<any, any, any, any>, data: PrimitiveObjective[]): void {
-	// 	var el: d3.Selection<any, any, any, any>;
-	// 	var datum: PrimitiveObjective;
-		
-
-	// 	var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
-	// 		.data(data);
-
-	// 	scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
-	// 		el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
-	// 		datum = el.data()[0];
-	// 		let renderer: ScoreFunctionRenderer = this.scoreFunctionRenderers[datum.getId()];
-	// 		let usersDomainElements: UserDomainElements[] = this.scoreFunctionViewerService.getAllUsersDomainElements(datum, this.valueChartService.getUsers());
-
-	// 		renderer.createPlot(renderer.plotElementsContainer, renderer.domainLabelContainer, datum, usersDomainElements);
-	// 	});	
-	// }
 
 	/*
 		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
@@ -539,7 +529,8 @@ export class LabelRenderer {
 			weightOffset += objectiveWeight;
 		});
 
-		this.viewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
+		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
+		this.scoreFunctionInteractionSubject.next(true);
 	}
 
 	// ========================================================================================

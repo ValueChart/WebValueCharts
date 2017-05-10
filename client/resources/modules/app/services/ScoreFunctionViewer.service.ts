@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 21:07:07
+* @Last Modified time: 2017-05-10 12:01:40
 */
 
 // Import Angular Classes:
@@ -10,9 +10,6 @@ import { Injectable } 															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
-
-// Import Application Classes:
-import { ValueChartService }													from './ValueChart.service';
 
 // Import Model Classes:
 import { PrimitiveObjective }													from '../../../model/PrimitiveObjective';
@@ -45,43 +42,44 @@ export class ScoreFunctionViewerService {
 						method.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService) { }
+	constructor() { }
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
 
 	produceUsersDomainElements = (u: any) => {
-		u.usersDomainElements = this.getAllUsersDomainElements(u.objective, u.valueChart.getUsers());
+		u.usersDomainElements = this.getAllUsersDomainElements(u.objective, u.scoreFunctions, u.colors);
 
 		return u;
 	}
 
 
-	getAllUsersDomainElements(objective: PrimitiveObjective, users: User[]): UserDomainElements[] {
+	getAllUsersDomainElements(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): UserDomainElements[] {
 		var allUsersDomainElements: UserDomainElements[] = [];
 		var domainElements: (string | number)[] = [];
 
-		users.forEach((user: User) => {
-			var userDomainElements: UserDomainElements = { user: user, elements: [] };
+		for (var i = 0; i < scoreFunctions.length; i++) {
+			if (!colors[i])
+				colors[i] = "#000000";
 
-			domainElements = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+			var userDomainElements: UserDomainElements = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
+			domainElements = scoreFunctions[i].getAllElements();
 
 			domainElements.forEach((domainElement: string | number) => {
-				userDomainElements.elements.push({ user: user, element: domainElement });
+				userDomainElements.elements.push({ scoreFunction: scoreFunctions[i], color: colors[i],  element: domainElement });
 			});
-
+			
 			allUsersDomainElements.push(userDomainElements);
-		});
+		}
 
 		return allUsersDomainElements;
 	}
 
-	getElementUserScoresSummary(objectiveName: string, element: (number | string)): ElementUserScoresSummary {
+	getElementUserScoresSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ElementUserScoresSummary {
 		var userScores: number[] = [];
 
-		this.valueChartService.getUsers().forEach((user: User) => {
-			let scoreFunction: ScoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objectiveName);
+		scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
 			userScores.push(scoreFunction.getScore(element));
 		});
 
@@ -105,12 +103,11 @@ export class ScoreFunctionViewerService {
 		return elementScoresSummary;
 	}
 
-	getAllElementUserScoresSummaries(objective: PrimitiveObjective): ElementUserScoresSummary[] {
+	getAllElementUserScoresSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ElementUserScoresSummary[] {
 		var elementUserScoresSummaries: ElementUserScoresSummary[] = [];
 
-		var scoreFunction: ScoreFunction = this.valueChartService.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-		scoreFunction.getAllElements().forEach((element: (number | string)) => {
-			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getName(), element));
+		scoreFunctions[0].getAllElements().forEach((element: (number | string)) => {
+			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getName(), scoreFunctions, element));
 		});
 
 		return elementUserScoresSummaries;

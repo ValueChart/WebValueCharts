@@ -91,7 +91,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
       subscriber.next(this.validate());
       subscriber.complete();
     });
-    this.services.valueChartService = this.valueChartService;
     this.services.chartUndoRedoService = this.chartUndoRedoService;
     this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
 

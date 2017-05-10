@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:56:09
+* @Last Modified time: 2017-05-10 11:31:27
 */
 
 // Import Angular Classes:
@@ -115,7 +115,7 @@ export class ScoreDistributionChartRenderer {
 		@description	Creates the base containers and elements for a score distribution chart. It should be called when
 						creating an score distribution chart for the first time.
 	*/
-	createScoreDistributionChart(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
+	createScoreDistributionChart(el: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): void {
 		this.rootContainer = el;
 
 		var objectiveId = objective.getId();
@@ -151,7 +151,7 @@ export class ScoreDistributionChartRenderer {
 
 
 		// Retrieve the data for the summary chart and save it as a class field.
-		var elementUserScoresSummaries: ElementUserScoresSummary[] = this.scoreFunctionViewerService.getAllElementUserScoresSummaries(objective);
+		var elementUserScoresSummaries: ElementUserScoresSummary[] = this.scoreFunctionViewerService.getAllElementUserScoresSummaries(objective, scoreFunctions);
 		this.elementUserScoresSummaries = elementUserScoresSummaries.slice();
 
 		this.createDomainAxis(this.domainAxisContainer, objective, elementUserScoresSummaries);

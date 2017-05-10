@@ -3,13 +3,15 @@
 		<h3>Score Function for: {{objectiveToDisplay.getName()}}</h3>
 	</div>
 	<ScoreFunction 
+		[scoreFunctions]="scoreFunctions"
+        [colors]="colors"
         [objective]="objectiveToDisplay"
         [width]="375"
         [height]="300"
-        [orientation]="'vertical'"
+        [viewOrientation]="'vertical'"
         [services]="services"
         [individualOnly]="false"
-        [interaction]="enableInteraction">
+        [enableInteraction]="enableInteraction">
 		<svg class="svg-content-valuechart score-function-viewer" viewBox="0 -10, 300, 315" preserveAspectRatio="xMinYMin meet">
 			<g class="expanded-score-function"></g>
 			<g class="score-distribution-plot"></g>

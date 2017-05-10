@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 23:37:13
+* @Last Modified time: 2017-05-10 13:31:09
 */
 
 // Import Angular Classes:
@@ -21,6 +21,8 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { ContinuousScoreFunction }									from '../../../model/ContinuousScoreFunction';
 import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunction';
 import { ContinuousDomain }											from '../../../model/ContinuousDomain';
+
+import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
 
 import { DomainElement, UserDomainElements } 						from '../../../types/ScoreFunctionViewer.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
@@ -96,7 +98,8 @@ export abstract class ScoreFunctionRenderer {
 						This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
 	constructor(
-		protected chartUndoRedoService: ChartUndoRedoService) { }
+		protected chartUndoRedoService: ChartUndoRedoService,
+		protected expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -107,10 +110,10 @@ export abstract class ScoreFunctionRenderer {
 		if (this.rootContainer == undefined)
 			this.createScoreFunction(update);
 
-		if (this.numUsers != update.valueChart.getUsers().length)
+		if (this.numUsers != update.scoreFunctions.length)
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
 
-		this.numUsers = update.valueChart.getUsers().length;
+		this.numUsers = update.scoreFunctions.length;
 		this.rendererConfig = update.rendererConfig;
 
 		this.renderScoreFunction(update);
@@ -118,6 +121,11 @@ export abstract class ScoreFunctionRenderer {
 
 	viewConfigChanged = (displayScoreFunctionValueLabels: boolean) => {
 		this.toggleValueLabels(displayScoreFunctionValueLabels);		
+	}
+
+	interactionConfigChanged = (expandScoreFunctions: boolean) => {
+		console.log(this.rootContainer);
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)));
 	}
 
 	/*
@@ -221,7 +229,7 @@ export abstract class ScoreFunctionRenderer {
 		updateUserContainers.exit().remove();
 		updateUserContainers.enter().append('g')
 			.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
-			.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.user.getUsername().replace(/\s+/g, '') + '-container'; });
+			.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.color.replace(/\s+/g, '') + '-container'; });
 
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
 

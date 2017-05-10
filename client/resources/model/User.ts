@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 15:21:55
+* @Last Modified time: 2017-05-10 11:39:54
 */
 
 import { WeightMap } 			from './WeightMap';
@@ -22,7 +22,7 @@ export class User {
 	// ========================================================================================
 
 	private username: string;						// These username of the user who created the preferences.
-	public color: string;							// The color assigned to the user's preferences in a ValueChart.
+	public color: string = "#000000";				// The color assigned to the user's preferences in a ValueChart.
 
 	private weightMap: WeightMap;					// The WeightMap object used to map the user's weight assignments to the proper objectives.
 	private scoreFunctionMap: ScoreFunctionMap;		// The ScoreFunctionmap object usd to map the user's ScoreFunctions to the proper objectives.
