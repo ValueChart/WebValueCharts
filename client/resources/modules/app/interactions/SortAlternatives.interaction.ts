@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:34:03
+* @Last Modified time: 2017-05-11 10:37:20
 */
 
 // Import Angular Classes:
@@ -11,6 +11,8 @@ import { Injectable } 												from '@angular/core';
 // Import Libraries:
 import * as d3 														from 'd3';
 import { Subject }													from 'rxjs/Subject';
+import { Observable }												from 'rxjs/Observable';
+import { Subscription }												from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes
@@ -72,6 +74,9 @@ export class SortAlternativesInteraction {
 	private originalAlternativeOrder: AlternativeOrderRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
 																// class to reset the alternative order.
 
+	private clicks: Observable<Event>;
+	private onClick: Subscription;
+
 	// Fields for sorting alternatives manually - Please see ReorderObjectivesInteraction for more information.
 	private cellsToMove: d3.Selection<any, any, any, any>;
 	private alternativeBox: d3.Selection<any, any, any, any>;
@@ -114,8 +119,11 @@ export class SortAlternativesInteraction {
 	// ========================================================================================
 
 
-	public recordOriginalAlternativeOrder(u: RendererUpdate) {
-		this.originalAlternativeOrder = new AlternativeOrderRecord(u.valueChart.getAlternatives());
+	public initialize(u: RendererUpdate) {
+		if (!this.originalAlternativeOrder && u)
+			this.originalAlternativeOrder = new AlternativeOrderRecord(u.valueChart.getAlternatives());
+
+		this.lastRendererUpdate = u;
 	}
 
 	/*
@@ -123,25 +131,19 @@ export class SortAlternativesInteraction {
 		@returns {void}
 		@description 	Toggles the active type of alternative sorting. Sorting types 'alphabet', and 'reset' immediate sort the
 						alternative order while 'objective', and 'manual' are user drive. Type 'none' simply turns off all sorting.
+						Alternative sorting (with the exception of by objective score) is managed by the ObjectiveChart and SummaryChart renderers.
 	*/
-	public toggleAlternativeSorting(sortingType: string, lastRendererUpdate: RendererUpdate): void {
-		if (!this.originalAlternativeOrder)
-			this.recordOriginalAlternativeOrder(lastRendererUpdate);
+	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
+		this.initialize(lastRendererUpdate);
 
-		this.lastRendererUpdate = lastRendererUpdate;
-
-		// Toggle Dragging to sort objectives:
-		if (sortingType === this.SORT_BY_OBJECTIVE) {
-			this.sortAlternativesByObjective(true);
-
-		} else if (sortingType === this.SORT_ALPHABETICALLY) {
+		if (sortingType === this.SORT_ALPHABETICALLY) {
 			this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
 			this.reorderAllCells(this.generateCellOrderAlphabetically());
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_MANUALLY) {
-			this.sortAlternativesManually(true);
+			this.sortAlternativesManually(true, alternativeBoxes);
 
 		} else if (sortingType === this.RESET_SORT) {
 			this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
@@ -150,8 +152,7 @@ export class SortAlternativesInteraction {
 			this.changeDetectionService.alternativeOrderChanged = true;
 
 		} else if (sortingType === this.SORT_OFF) {
-			this.sortAlternativesByObjective(false);
-			this.sortAlternativesManually(false);
+			this.sortAlternativesManually(false, alternativeBoxes);
 		}
 	}
 
@@ -159,18 +160,26 @@ export class SortAlternativesInteraction {
 		@param enable - Whether or not to enable clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective.
 		@returns {void}
 		@description 	Toggles the clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective. This method
-						uses the sortByObjective anonymous function defined below to handle the actual sorting.
+						uses the sortByObjective anonymous function defined below to handle the actual sorting. Sorting by objectives is managed by the LabelRenderer.
 	*/
-	private sortAlternativesByObjective(enableSorting: boolean): void {
-		var objectiveLabels: JQuery = $('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
-		var objectiveText: JQuery = $('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
+	public sortAlternativesByObjective(enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate): void {
+		this.initialize(lastRendererUpdate);
 
-		objectiveLabels.off('dblclick');
-		objectiveText.off('dblclick');
+		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
+		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
 
+		var clicksLabels = Observable.fromEvent(objectiveLabels, 'click');
+		var clicksText =  Observable.fromEvent(objectiveText, 'click');
+
+		this.clicks = Observable.merge(clicksLabels, clicksText);
+
+		if (this.onClick != undefined)
+			this.onClick.unsubscribe();
+		
+		// Attach the click listener to the labels if enableSorting is true. The body of this listener will be executed whenever a user
+		// clicks on one of the labels.
 		if (enableSorting) {
-			objectiveLabels.dblclick(this.sortByObjective);
-			objectiveText.dblclick(this.sortByObjective);
+			this.onClick = this.clicks.subscribe(this.sortByObjective);
 		}
 	}
 
@@ -180,9 +189,7 @@ export class SortAlternativesInteraction {
 		@description 	Toggles the clicking and dragging alternatives to change their order. Please see ReorderObjectivesInteraction
 						for a well commented implementation of clicking and dragging.
 	*/
-	private sortAlternativesManually(enableSorting: boolean): void {
-		var alternativeBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
-
+	private sortAlternativesManually(enableSorting: boolean, alternativeBoxes: d3.Selection<any, any, any, any>): void {
 		var dragToSort = d3.drag();
 
 		if (enableSorting) {
@@ -191,8 +198,8 @@ export class SortAlternativesInteraction {
 				.on('drag', this.sortAlternatives)
 				.on('end', this.endSortAlternatives);
 		}
-
-		alternativeBoxes.call(dragToSort);
+		if (alternativeBoxes)
+			alternativeBoxes.call(dragToSort);
 	}
 
 	// This function handles user clicks on objective labels by sorting the alternatives by their score for that objective.

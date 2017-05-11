@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:35:01
+* @Last Modified time: 2017-05-11 10:39:41
 */
 
 // Import Angular Classes:
@@ -148,10 +148,10 @@ export class ResizeWeightsInteraction {
 				.on('drag', this.resizeWeights);
 		}
 
-		var labelSpaces = rootContainer.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
-
-		this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
-
+		if (rootContainer) {
+			var labelSpaces = rootContainer.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
+			this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
+		}
 	}
 
 	/*

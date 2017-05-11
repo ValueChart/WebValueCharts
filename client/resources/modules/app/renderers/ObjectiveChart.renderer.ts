@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:32:36
+* @Last Modified time: 2017-05-11 13:09:25
 */
 
 // Import Angular Classes
@@ -88,6 +88,8 @@ export class ObjectiveChartRenderer {
 
 
 	valueChartChanged = (update: RendererUpdate) => {
+		this.lastRendererUpdate = update;
+		
 		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
 		}
@@ -96,13 +98,12 @@ export class ObjectiveChartRenderer {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 
 		this.numUsers = update.valueChart.getUsers().length;
-		this.lastRendererUpdate = update;
 
 		this.renderObjectiveChart(update);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives,  this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes,  this.lastRendererUpdate);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
@@ -119,6 +120,8 @@ export class ObjectiveChartRenderer {
 						objective chart.
 	*/
 	createObjectiveChart(u: RendererUpdate): void {
+		// Indicate that rendering of the objective chart is just starting.
+		this.renderEventsService.objectiveChartDispatcher.next(0);
 		// Create the root container for the objective chart.
 		this.chart = u.el.append('g')
 			.classed(this.defs.CHART, true);
@@ -136,9 +139,6 @@ export class ObjectiveChartRenderer {
 			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createObjectiveRows(u, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
-
-		// Fire the Construction Over event on completion of construction.
-		(<any>this.renderEventsService.objectiveChartDispatcher).call('Construction-Over');
 	}
 
 	/*
@@ -315,8 +315,8 @@ export class ObjectiveChartRenderer {
 
 		this.renderObjectiveChartRows(u, rowOutlinesToUpdate, rowsToUpdate, alternativeLabelsToUpdate, alternativeBoxesToUpdate, cellsToUpdate, userScoresToUpdate, weightColumnsToUpdate);
 	
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.objectiveChartDispatcher).call('Rendering-Over');
+		// Indicate that the objective chart is finished rendering.
+		this.renderEventsService.objectiveChartDispatcher.next(1);	
 	}
 
 	/*

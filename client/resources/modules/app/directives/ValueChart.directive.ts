@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:38:09
+* @Last Modified time: 2017-05-11 13:14:52
 */
 
 // Import Angular Classes:
@@ -21,7 +21,7 @@ import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 // Services:
-import { ValueChartService}														from '../services/ValueChart.service';
+import { RenderEventsService }													from '../services/RenderEvents.service';
 import { RendererService }														from '../services/Renderer.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
@@ -86,6 +86,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
+	private waitForRenderers: Subscription;
 
 	// ========================================================================================
 	// 									Constructor
@@ -101,7 +102,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Angular Resources:
 		private elementRef: ElementRef,
 		// Services:
-		private valueChartService: ValueChartService,
+		private renderEventsService: RenderEventsService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private rendererService: RendererService,
 		private changeDetectionService: ChangeDetectionService,
@@ -140,9 +141,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Create the Visual Elements of the ValueChart.
 		this.createValueChart();
-
-		// Set initialization to be complete.
-		this.isInitialized = true;
 	}
 
 	/*
@@ -168,11 +166,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
-		var renderInformation = this.valueChartSubject.map((valueChart: ValueChart) => {
+
+
+		var renderInformation = new Subject();
+
+		this.valueChartSubject.map((valueChart: ValueChart) => {
 			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
 		}).map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
-			.map(this.rendererConfigUtility.produceRendererConfig);
+			.map(this.rendererConfigUtility.produceRendererConfig)
+			.subscribe(renderInformation);
 
 		renderInformation
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
@@ -191,9 +194,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.viewConfigSubject.subscribe(this.objectiveChartRenderer.viewConfigChanged);
 		this.viewConfigSubject.subscribe(this.labelRenderer.viewConfigChanged);
 
+		this.waitForRenderers = this.renderEventsService.rendersCompleted.subscribe(this.rendersCompleted);
+
 		this.valueChartSubject.next(this.valueChart);
-		this.interactionSubject.next(this.interactionConfig);
-		this.viewConfigSubject.next(this.viewConfig);
+	}
+
+	rendersCompleted = (rendersCompleted: number) => {
+		if (rendersCompleted >= 3) {
+			this.interactionSubject.next(this.interactionConfig);
+			this.viewConfigSubject.next(this.viewConfig);
+			// Unsubscribe and set initialization to be complete.
+			this.waitForRenderers.unsubscribe();
+			this.isInitialized = true;
+		}
 	}
 
 	// ========================================================================================
@@ -201,7 +214,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// ========================================================================================
 
 	/*
-		@returns {void}
+		@returns {void}s
 		@description	Detects and handles any changes to the directive's inputs (data, and view + interactions). This method is called by Angular whenever it detects that a change to this directive's inputs 
 						MAY have occurred. The method body is an implementation of change detection for the directive's various inputs. We are implementing our own change detection because 
 						Angular's change detection (provided by the ngOnChanges method) is by reference. Note that when a a class implements DoCheck, ngOnChanges is never called, even if

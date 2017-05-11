@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:59:33
+* @Last Modified time: 2017-05-11 13:16:56
 */
 
 // Import Angular Classes:
@@ -28,6 +28,7 @@ import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.
 import { SetObjectiveColorsInteraction }							from '../interactions/SetObjectiveColors.interaction';
 import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
 import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
+import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
@@ -85,14 +86,15 @@ export class LabelRenderer {
 						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
 	*/
 	constructor(
+		private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
 		private rendererService: RendererService,
 		private renderEventsService: RenderEventsService,
-		private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private defs: LabelDefinitions,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private setObjectiveColorsInteraction: SetObjectiveColorsInteraction,
-		private reorderObjectivesInteraction: ReorderObjectivesInteraction) {
+		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
+		private sortAlternativesInteraction: SortAlternativesInteraction) {
 	}
 
 	// ========================================================================================
@@ -101,21 +103,24 @@ export class LabelRenderer {
 
 
 	valueChartChanged = (update: RendererUpdate) => {		
+		this.lastRendererUpdate = update;
+
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
 			this.interactionsChanged(update.interactionConfig);
 		}
 
-		this.lastRendererUpdate = update;
 		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + this.defs.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
-		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors);
-		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.scoreFunctionContainer, this.lastRendererUpdate,)
+		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
+		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.scoreFunctionContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
+	
+		this.sortAlternativesInteraction.sortAlternativesByObjective(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
@@ -141,6 +146,8 @@ export class LabelRenderer {
 						which requires a complete change in the structure of SVG elements.
 	*/
 	createLabelSpace(u: RendererUpdate): void {
+		// Indicate that rendering of the label area is just starting.
+		this.renderEventsService.labelsDispatcher.next(0);
 		// Create the root container which will hold all label related SVG elements.
 		this.rootContainer = u.el.append('g')
 			.classed(this.defs.ROOT_CONTAINER, true)
@@ -165,9 +172,6 @@ export class LabelRenderer {
 
 		// Create the score Functions.
 		this.createScoreFunctions(u, this.scoreFunctionContainer);
-	
-		// Fire the Construction Over event on completion of construction.
-		(<any>this.renderEventsService.labelsDispatcher).call('Construction-Over');
 	}
 
 
@@ -274,8 +278,8 @@ export class LabelRenderer {
 			scoreFunctionContainer.style('display', 'none');
 		}
 
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.labelsDispatcher).call('Rendering-Over');
+		// Indicate that rendering of the label area is complete.
+		this.renderEventsService.labelsDispatcher.next(1);
 	}
 
 	/*

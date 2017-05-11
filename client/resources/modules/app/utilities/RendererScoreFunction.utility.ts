@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:59:13
+* @Last Modified time: 2017-05-11 10:38:38
 */
 
 // Import Angular Classes:
@@ -31,6 +31,14 @@ import { DomainElement, ScoreFunctionData, ScoreFunctionDataSummary }			from '..
 export class RendererScoreFunctionUtility {
 
 	// TODO <@aaron> : Speed up getAllScoreFunctionData by caching the result.
+
+	// ========================================================================================
+	// 									Fields
+	// ========================================================================================
+
+
+	private ScoreFunctionData: any = {};
+
 
 	// ========================================================================================
 	// 									Constructor

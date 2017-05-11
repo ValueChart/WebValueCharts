@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:35:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 12:56:25
+* @Last Modified time: 2017-05-11 11:17:27
 */
 
 /* 
@@ -17,6 +17,7 @@
 // Statics
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/observable/merge';
 
 // Operators
 import 'rxjs/add/operator/catch';
@@ -25,3 +26,5 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/multicast';
+import 'rxjs/add/operator/scan';

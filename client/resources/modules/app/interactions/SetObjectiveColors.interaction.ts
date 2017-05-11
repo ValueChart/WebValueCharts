@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:13:46
+* @Last Modified time: 2017-05-11 10:03:54
 */
 
 // Import Angular Classes:
@@ -58,9 +58,9 @@ export class SetObjectiveColorsInteraction {
 		@description 	Toggles clicking on a PrimitiveObjective's label in the label area to open a color picker that can be used to
 						change that objective's color. Only one objective's color can be modified at one time using the color picker.
 	*/
-	public toggleSettingObjectiveColors(setObjectiveColors: boolean): void {
+	public toggleSettingObjectiveColors(setObjectiveColors: boolean, rootContainer: Element): void {
 		// Initialize the observable that is used to detect clicks and notifies handlers.
-		let primitiveObjectiveLabels = document.querySelectorAll('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
+		let primitiveObjectiveLabels = rootContainer.querySelectorAll('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
 
 		if (this.onClick != undefined)

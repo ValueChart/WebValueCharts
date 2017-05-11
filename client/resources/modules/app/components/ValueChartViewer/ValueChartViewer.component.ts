@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 23:00:14
+* @Last Modified time: 2017-05-11 12:46:06
 */
 
 // Import Angular Classes:
@@ -12,6 +12,7 @@ import { Router, ActivatedRoute }												from '@angular/router';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
+import { Subscription }															from 'rxjs/Subscription';
 
 // Import Application Classes:
 import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
@@ -132,6 +133,8 @@ export class ValueChartViewerComponent implements OnInit {
 	$: JQueryStatic;
 
 
+	subscription: Subscription
+
 	// This gets set each time the "Remove" button for a user is clicked
 	// The user will be removed from chart upon confirmation
 	userToRemove: User;
@@ -196,8 +199,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 		if (this.viewConfig.viewOrientation === 'horizontal') {
 			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
-
-			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
+			if (labelOutline)
+				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
 		}
 	}
 
@@ -221,7 +224,7 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 
 		// Set Alternative labels to link to the Alternative detail box. 
-		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
+		this.subscription = this.renderEventsService.objectiveChartDispatcher.subscribe((done: number) => { done ? this.linkAlternativeLabelsToDetailBox() : null });
 	}
 
 	/* 	
@@ -453,6 +456,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
 	linkAlternativeLabelsToDetailBox = () => {
+		this.subscription.unsubscribe();
+
 		d3.selectAll('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL)
 			.classed('alternative-link', true);
 

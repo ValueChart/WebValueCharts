@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 23:04:52
+* @Last Modified time: 2017-05-11 13:09:36
 */
 
 // Import Angular Classes
@@ -91,6 +91,8 @@ export class SummaryChartRenderer {
 	// ========================================================================================
 
 	valueChartChanged = (update: RendererUpdate) => {
+		this.lastRendererUpdate = update;
+
 		if (this.chart == undefined)
 			this.createSummaryChart(update);
 
@@ -98,13 +100,12 @@ export class SummaryChartRenderer {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 
 		this.numUsers = update.valueChart.getUsers().length;
-		this.lastRendererUpdate = update;
 
 		this.renderSummaryChart(update);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes, this.lastRendererUpdate);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
@@ -124,7 +125,8 @@ export class SummaryChartRenderer {
 						constructed again.
 	*/
 	createSummaryChart(u: RendererUpdate): void {
-
+		// Indicate that rendering of the summary chart is just starting.
+		this.renderEventsService.summaryChartDispatcher.next(0);
 		// Create the base container for the chart.
 		this.chart = u.el.append('g')
 			.classed(this.defs.CHART, true);
@@ -154,9 +156,6 @@ export class SummaryChartRenderer {
 			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createSummaryChartRows(u, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
-	
-		// Fire the Construction Over event on completion of construction.
-		(<any>this.renderEventsService.summaryChartDispatcher).call('Construction-Over');
 	}
 
 
@@ -327,8 +326,8 @@ export class SummaryChartRenderer {
 		// Render the summary chart using the selections with updated data.
 		this.renderSummaryChartRows(u, alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate);
 	
-		// Fire the Rendering Over event on completion of rendering.
-		(<any>this.renderEventsService.summaryChartDispatcher).call('Rendering-Over');
+		// Indicate that the summary chart is finished rendering.
+		this.renderEventsService.summaryChartDispatcher.next(1);	
 	}
 
 	/*
