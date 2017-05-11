@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 22:59:43
+* @Last Modified time: 2017-05-10 22:30:01
 */
 
 // Import Angular Classes:
@@ -38,7 +38,7 @@ export class ChangeDetectionService {
 	public colorsHaveChanged: boolean;								// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
 
 	// Old input values to the ValueChartDirective. Used for comparison purposes.
-	public viewConfigRecord: ViewConfig = <any>{};					// Old values of the view config. Its fields should equal those of the viewConfig object in RenderConfigService unless a change has taken place.
+	public viewConfigRecord: ViewConfig = <any>{};					// Old values of the view config. Its fields should equal those of the viewConfig object in RendererConfigUtility unless a change has taken place.
 	public interactionConfigRecord: InteractionConfig = <any>{};	// Old values of the interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
 	public widthRecord: number;										// The old width. Its should equal the width in ValueChartDirective unless a change has taken place.
 	public heightRecord: number;									// The old height. Its should equal the height in ValueChartDirective unless a change has taken place.

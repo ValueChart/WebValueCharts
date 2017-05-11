@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:53:44
+* @Last Modified time: 2017-05-10 22:48:06
 */
 
 // Import Angular Classes:
@@ -23,7 +23,7 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 
-import { UserDomainElements, DomainElement }						from '../../../types/ScoreFunctionViewer.types';
+import { ScoreFunctionData, DomainElement }						from '../../../types/RendererData.types';
 
 
 /*

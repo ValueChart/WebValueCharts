@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 16:19:08
+* @Last Modified time: 2017-05-10 23:04:52
 */
 
 // Import Angular Classes
@@ -12,7 +12,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
-import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RendererService } 											from '../services/Renderer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
 import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
@@ -46,7 +46,6 @@ export class SummaryChartRenderer {
 	// Constants for use in rendering the summary chart.
 	private USER_SCORE_SPACING: number = 10;				// The spacing between user score bars, in pixels.
 
-	// The viewConfig object for this renderer. It is configured using the renderConfigService.
 	public lastRendererUpdate: RendererUpdate;
 
 	// d3 Selections:
@@ -82,7 +81,7 @@ export class SummaryChartRenderer {
 						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
+		private renderConfigService: RendererService,
 		private renderEventsService: RenderEventsService,
 		private sortAlternativesInteraction: SortAlternativesInteraction, 
 		private defs: SummaryChartDefinitions) { }
@@ -97,8 +96,6 @@ export class SummaryChartRenderer {
 
 		if (this.numUsers != update.valueChart.getUsers().length)
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
-
-		console.log("re-rendering");
 
 		this.numUsers = update.valueChart.getUsers().length;
 		this.lastRendererUpdate = update;

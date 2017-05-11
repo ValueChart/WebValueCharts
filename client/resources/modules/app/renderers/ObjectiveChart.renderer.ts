@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:48:24
+* @Last Modified time: 2017-05-10 22:32:36
 */
 
 // Import Angular Classes
@@ -12,7 +12,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
-import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RendererService } 											from '../services/Renderer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
 import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
 import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
@@ -77,7 +77,7 @@ export class ObjectiveChartRenderer {
 						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
+		private rendererService: RendererService,
 		private renderEventsService: RenderEventsService,
 		private sortAlternativesInteraction: SortAlternativesInteraction,
 		private defs: ObjectiveChartDefinitions) { }
@@ -281,9 +281,9 @@ export class ObjectiveChartRenderer {
 		this.chart
 			.attr('transform', () => {
 				if (u.viewConfig.viewOrientation == 'vertical')
-					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
 				else
-					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);	// TODO: Fix this.
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);	// TODO: Fix this.
 			});
 
 		// Update the data behind the row outlines 
@@ -336,7 +336,7 @@ export class ObjectiveChartRenderer {
 	renderObjectiveChartRows(u: RendererUpdate, rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightColumns: d3.Selection<any, any, any, any>): void {
 		rowOutlines
 			.attr('transform', (d: RowData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
+				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
 			})
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize)
 			.attr(u.rendererConfig.dimensionTwo, (d: RowData) => {
@@ -346,7 +346,7 @@ export class ObjectiveChartRenderer {
 
 		rows
 			.attr('transform', (d: RowData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset)));	// Transform each row container to have the correct y (or x) position based on the combined weights of the previous rows.
+				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset)));	// Transform each row container to have the correct y (or x) position based on the combined weights of the previous rows.
 			});
 
 		var alternativeLabelCoordOneOffset: number = ((u.viewConfig.viewOrientation === 'vertical') ? 20 : 40);
@@ -386,7 +386,7 @@ export class ObjectiveChartRenderer {
 		cells
 			.attr('transform', (d: CellData, i: number) => {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i, u);
-				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, coordinateOne, 0);
+				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, coordinateOne, 0);
 			})
 			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 

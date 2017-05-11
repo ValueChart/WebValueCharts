@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 11:31:27
+* @Last Modified time: 2017-05-10 22:59:22
 */
 
 // Import Angular Classes:
@@ -12,7 +12,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes: 
-import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
+import { RendererScoreFunctionUtility }								from '../utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { Objective }												from '../../../model/Objective';
@@ -22,7 +22,7 @@ import { ContinuousScoreFunction }									from '../../../model/ContinuousScoreF
 import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunction';
 
 // Import Types:
-import { ElementUserScoresSummary } 								from '../../../types/ScoreFunctionViewer.types';
+import { ScoreFunctionDataSummary } 								from '../../../types/RendererData.types';
 
 // This class renders multiple users' ScoreFunctions for the same PrimitiveObjective into a series of box plots. These box plots visualize the 
 // distribution of users' scores for the domain elements of the PrimitiveObjective and facilitate identification of disagreements concerning score assignments.
@@ -56,7 +56,7 @@ export class ScoreDistributionChartRenderer {
 	public domainLabels: d3.Selection<any, any, any, any>;						// The 'text' elements used as labels for the domain axis.
 
 	// Data:
-	private elementUserScoresSummaries: ElementUserScoresSummary[];
+	private elementUserScoresSummaries: ScoreFunctionDataSummary[];
 
 	// View configuration object:
 	private viewConfig: any = {};
@@ -100,7 +100,7 @@ export class ScoreDistributionChartRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is also frequently constructed manually unlike the other renderer classes. 
 						This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(private scoreFunctionViewerService: ScoreFunctionViewerService) { }
+	constructor(private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
 
 	// ========================================================================================
@@ -151,7 +151,7 @@ export class ScoreDistributionChartRenderer {
 
 
 		// Retrieve the data for the summary chart and save it as a class field.
-		var elementUserScoresSummaries: ElementUserScoresSummary[] = this.scoreFunctionViewerService.getAllElementUserScoresSummaries(objective, scoreFunctions);
+		var elementUserScoresSummaries: ScoreFunctionDataSummary[] = this.rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 		this.elementUserScoresSummaries = elementUserScoresSummaries.slice();
 
 		this.createDomainAxis(this.domainAxisContainer, objective, elementUserScoresSummaries);
@@ -165,7 +165,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the domain axis for a score distribution plot. It should NOT be called manually. 
 	*/
-	createDomainAxis(domainAxisContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createDomainAxis(domainAxisContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ScoreFunctionDataSummary[]): void {
 
 		// Create the line that will act as the domain axis.
 		this.domainAxis = domainAxisContainer.append('line')
@@ -182,7 +182,7 @@ export class ScoreDistributionChartRenderer {
 			.data(elementUserScoresSummaries)
 			.enter().append('text')
 			.classed(ScoreDistributionChartRenderer.defs.DOMAIN_LABEL, true)
-			.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-domain-label'; });
+			.attr('id', (d: ScoreFunctionDataSummary) => { return 'distribution-' + d.element + '-domain-label'; });
 
 		// Save the domain labels as a field.
 		this.domainLabels = this.domainLabelsContainer.selectAll('.' + ScoreDistributionChartRenderer.defs.DOMAIN_LABEL);
@@ -195,7 +195,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the box plots for the score distribution chart by first creating the box plot containers and then calling createBoxPlotElements.
 	*/
-	createBoxPlots(chartContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createBoxPlots(chartContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ScoreFunctionDataSummary[]): void {
 
 		chartContainer.append('g')
 			.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINERS_CONTAINER, true)
@@ -204,7 +204,7 @@ export class ScoreDistributionChartRenderer {
 			.data(elementUserScoresSummaries)
 			.enter().append('g')
 			.classed(ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER, true)
-			.attr('id', (d: ElementUserScoresSummary) => { return 'distribution-' + d.element + '-boxplot-container'; });
+			.attr('id', (d: ScoreFunctionDataSummary) => { return 'distribution-' + d.element + '-boxplot-container'; });
 
 		this.boxplotContainers = chartContainer.selectAll('.' + ScoreDistributionChartRenderer.defs.BOXPLOT_CONTAINER);
 
@@ -219,7 +219,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Creates the box plots for the score distribution chart by first creating the box plot containers and then calling createBoxPlotElements.
 	*/
-	createBoxPlotElements(boxplotContainers: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ElementUserScoresSummary[]): void {
+	createBoxPlotElements(boxplotContainers: d3.Selection<any, any, any, any>, objective: PrimitiveObjective, elementUserScoresSummaries: ScoreFunctionDataSummary[]): void {
 
 		// Create the quartile outline rectangles for each box plot.
 		this.boxplotQuartileOutlines = boxplotContainers.append('rect')
@@ -337,8 +337,8 @@ export class ScoreDistributionChartRenderer {
 
 		// Position the domain labels along the axis.
 		domainLabels
-			.text((d: ElementUserScoresSummary) => { return d.element })
-			.attr(this.viewConfig.coordinateOne, (d: ElementUserScoresSummary, i: number) => { return this.calculateBoxPlotCoordinateOne(i) + labelOffset; })
+			.text((d: ScoreFunctionDataSummary) => { return d.element })
+			.attr(this.viewConfig.coordinateOne, (d: ScoreFunctionDataSummary, i: number) => { return this.calculateBoxPlotCoordinateOne(i) + labelOffset; })
 			.attr(this.viewConfig.coordinateTwo, () => { return calculateDomainAxisCoordinateTwo() + ((viewOrientation === 'vertical') ? (this.coordinateTwoOffset / 2) : -(this.coordinateTwoOffset / 2)); })
 			.style('font-size', 8);
 
@@ -393,10 +393,10 @@ export class ScoreDistributionChartRenderer {
 						and then it calls renderBoxPlotElements to render their elements. This method should NOT be called manually. Instead, call renderScoreDistributionChart 
 						to render the entire chart at once.
 	*/
-	renderBoxPlots(boxplotContainers: d3.Selection<any, any, any, any>, elementUserScoresSummaries: ElementUserScoresSummary[], viewOrientation: string) {
+	renderBoxPlots(boxplotContainers: d3.Selection<any, any, any, any>, elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: string) {
 
 		// Position each of the box plots by positioning their containers. 
-		boxplotContainers.attr('transform', (d: ElementUserScoresSummary, i: number) => {
+		boxplotContainers.attr('transform', (d: ScoreFunctionDataSummary, i: number) => {
 			let offset: number = this.calculateBoxPlotCoordinateOne(i);
 			return 'translate(' + ((viewOrientation === 'vertical') ? offset : 0) + ',' + ((viewOrientation === 'vertical') ? 0 : offset) + ')';
 		});
@@ -411,7 +411,7 @@ export class ScoreDistributionChartRenderer {
 		@description	Positions and styles the elements making up the score distribution chart's box plots. This method should NOT be called manually. Instead, call renderScoreDistributionChart 
 						to render the entire chart at once.
 	*/
-	renderBoxPlotElements(elementUserScoresSummaries: ElementUserScoresSummary[], viewOrientation: string) {
+	renderBoxPlotElements(elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: string) {
 		var boxplotWidth: number = ((this.viewConfig.dimensionOneSize / elementUserScoresSummaries.length) / 2);
 
 		// Configure the scale that is used to translate between score values and pixel coordinates.
@@ -424,9 +424,9 @@ export class ScoreDistributionChartRenderer {
 		// Render the quartile outlines.
 		this.boxplotQuartileOutlines
 			.attr(this.viewConfig.dimensionOne, boxplotWidth)
-			.attr(this.viewConfig.dimensionTwo, (d: ElementUserScoresSummary, i: number) => { return heightScale(d.thirdQuartile - d.firstQuartile); })
+			.attr(this.viewConfig.dimensionTwo, (d: ScoreFunctionDataSummary, i: number) => { return heightScale(d.thirdQuartile - d.firstQuartile); })
 			.attr(this.viewConfig.coordinateOne, 0)
-			.attr(this.viewConfig.coordinateTwo, (d: ElementUserScoresSummary, i: number) => { return calculateCoordinateTwoPosition(d.thirdQuartile); })
+			.attr(this.viewConfig.coordinateTwo, (d: ScoreFunctionDataSummary, i: number) => { return calculateCoordinateTwoPosition(d.thirdQuartile); })
 			.style('fill', 'white')
 			.style('fill-opactiy', 0)
 			.style('stroke', '#5a5757')
@@ -435,43 +435,43 @@ export class ScoreDistributionChartRenderer {
 		// Render the median lines.
 		this.boxplotMedianLines
 			.attr(this.viewConfig.coordinateOne + '1', 0)
-			.attr(this.viewConfig.coordinateTwo + '1', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.median); })
+			.attr(this.viewConfig.coordinateTwo + '1', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.median); })
 			.attr(this.viewConfig.coordinateOne + '2', boxplotWidth)
-			.attr(this.viewConfig.coordinateTwo + '2', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.median); })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.median); })
 			.style('stroke', 'black')
 			.style('stroke-width', 2);
 
 		// Render the max lines.
 		this.boxplotMaxLines
 			.attr(this.viewConfig.coordinateOne + '1', 0)
-			.attr(this.viewConfig.coordinateTwo + '1', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.max); })
+			.attr(this.viewConfig.coordinateTwo + '1', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.max); })
 			.attr(this.viewConfig.coordinateOne + '2', boxplotWidth)
-			.attr(this.viewConfig.coordinateTwo + '2', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.max); })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.max); })
 			.style('stroke', 'black')
 			.style('stroke-width', 2);
 
 		// Render the min lines.
 		this.boxplotMinLines
 			.attr(this.viewConfig.coordinateOne + '1', 0)
-			.attr(this.viewConfig.coordinateTwo + '1', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.min); })
+			.attr(this.viewConfig.coordinateTwo + '1', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.min); })
 			.attr(this.viewConfig.coordinateOne + '2', boxplotWidth)
-			.attr(this.viewConfig.coordinateTwo + '2', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.min); })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.min); })
 			.style('stroke', 'black')
 			.style('stroke-width', 2);
 
 		// Render the lines connecting the max lines and quartile outlines.
 		this.boxplotUpperDashedLines
 			.attr(this.viewConfig.coordinateOne + '1', boxplotWidth / 2)
-			.attr(this.viewConfig.coordinateTwo + '1', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.max); })
+			.attr(this.viewConfig.coordinateTwo + '1', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.max); })
 			.attr(this.viewConfig.coordinateOne + '2', boxplotWidth / 2)
-			.attr(this.viewConfig.coordinateTwo + '2', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.thirdQuartile) })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.thirdQuartile) })
 
 		// Render the lines connecting the min lines and quartile outlines.
 		this.boxplotLowerDashedLines
 			.attr(this.viewConfig.coordinateOne + '1', boxplotWidth / 2)
-			.attr(this.viewConfig.coordinateTwo + '1', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.firstQuartile) })
+			.attr(this.viewConfig.coordinateTwo + '1', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.firstQuartile) })
 			.attr(this.viewConfig.coordinateOne + '2', boxplotWidth / 2)
-			.attr(this.viewConfig.coordinateTwo + '2', (d: ElementUserScoresSummary) => { return calculateCoordinateTwoPosition(d.min); })
+			.attr(this.viewConfig.coordinateTwo + '2', (d: ScoreFunctionDataSummary) => { return calculateCoordinateTwoPosition(d.min); })
 
 	}
 

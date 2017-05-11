@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 12:01:40
+* @Last Modified time: 2017-05-10 22:59:13
 */
 
 // Import Angular Classes:
@@ -19,7 +19,7 @@ import { IntervalDomain }														from '../../../model/IntervalDomain';
 import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Type Definitions:
-import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '../../../types/ScoreFunctionViewer.types';
+import { DomainElement, ScoreFunctionData, ScoreFunctionDataSummary }			from '../../../types/RendererData.types';
 
 
 /*
@@ -28,9 +28,9 @@ import { DomainElement, UserDomainElements, ElementUserScoresSummary }			from '.
 */
 
 @Injectable()
-export class ScoreFunctionViewerService {
+export class RendererScoreFunctionUtility {
 
-	// TODO <@aaron> : Speed up getAllUsersDomainElements by caching the result.
+	// TODO <@aaron> : Speed up getAllScoreFunctionData by caching the result.
 
 	// ========================================================================================
 	// 									Constructor
@@ -48,22 +48,22 @@ export class ScoreFunctionViewerService {
 	// 									Methods
 	// ========================================================================================
 
-	produceUsersDomainElements = (u: any) => {
-		u.usersDomainElements = this.getAllUsersDomainElements(u.objective, u.scoreFunctions, u.colors);
+	produceScoreFunctionData = (u: any) => {
+		u.usersDomainElements = this.getAllScoreFunctionData(u.objective, u.scoreFunctions, u.colors);
 
 		return u;
 	}
 
 
-	getAllUsersDomainElements(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): UserDomainElements[] {
-		var allUsersDomainElements: UserDomainElements[] = [];
+	getAllScoreFunctionData(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): ScoreFunctionData[] {
+		var allUsersDomainElements: ScoreFunctionData[] = [];
 		var domainElements: (string | number)[] = [];
 
 		for (var i = 0; i < scoreFunctions.length; i++) {
 			if (!colors[i])
 				colors[i] = "#000000";
 
-			var userDomainElements: UserDomainElements = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
+			var userDomainElements: ScoreFunctionData = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
 			domainElements = scoreFunctions[i].getAllElements();
 
 			domainElements.forEach((domainElement: string | number) => {
@@ -76,7 +76,7 @@ export class ScoreFunctionViewerService {
 		return allUsersDomainElements;
 	}
 
-	getElementUserScoresSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ElementUserScoresSummary {
+	getScoreFunctionDataSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ScoreFunctionDataSummary {
 		var userScores: number[] = [];
 
 		scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
@@ -90,7 +90,7 @@ export class ScoreFunctionViewerService {
 				return 1;
 		});
 
-		var elementScoresSummary: ElementUserScoresSummary = {
+		var elementScoresSummary: ScoreFunctionDataSummary = {
 			element: element,
 
 			min: d3.min(userScores),
@@ -103,11 +103,11 @@ export class ScoreFunctionViewerService {
 		return elementScoresSummary;
 	}
 
-	getAllElementUserScoresSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ElementUserScoresSummary[] {
-		var elementUserScoresSummaries: ElementUserScoresSummary[] = [];
+	getAllScoreFunctionDataSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ScoreFunctionDataSummary[] {
+		var elementUserScoresSummaries: ScoreFunctionDataSummary[] = [];
 
 		scoreFunctions[0].getAllElements().forEach((element: (number | string)) => {
-			elementUserScoresSummaries.push(this.getElementUserScoresSummary(objective.getName(), scoreFunctions, element));
+			elementUserScoresSummaries.push(this.getScoreFunctionDataSummary(objective.getName(), scoreFunctions, element));
 		});
 
 		return elementUserScoresSummaries;
@@ -119,7 +119,7 @@ export class ScoreFunctionViewerService {
 		u.rendererConfig = <any>{};
 		u.rendererConfig.labelOffset = 25;
 
-				// Initialize the view configuration. This code is very similar to that in RenderConfigService, but is duplicated here to avoid a dependency on that class.
+				// Initialize the view configuration. This code is very similar to that in RendererService, but is duplicated here to avoid a dependency on that class.
 		if (u.viewOrientation === 'vertical') {
 			u.rendererConfig.dimensionOne = 'width';
 			u.rendererConfig.dimensionTwo = 'height';

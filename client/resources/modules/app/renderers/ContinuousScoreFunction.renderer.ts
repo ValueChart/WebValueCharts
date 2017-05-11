@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 13:44:13
+* @Last Modified time: 2017-05-10 22:48:07
 */
 
 // Import Angular Classes:
@@ -26,7 +26,7 @@ import { ContinuousScoreFunction }						from '../../../model/ContinuousScoreFunc
 import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction';
 
 // Import Types:
-import { DomainElement, UserDomainElements } 			from '../../../types/ScoreFunctionViewer.types';
+import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
 
 // This class contains the logic for creating and rendering multiple users' ContinuousScoreFunctions for a single objective with a continuous 
 // (either categorical or interval) domain. The score functions are rendered as scatter plots where the points are the elements in the objective's 
@@ -152,7 +152,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	createContinuousPlotElements(u: any, pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updatePlottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
-			.data((d: UserDomainElements) => { return d.elements; });
+			.data((d: ScoreFunctionData) => { return d.elements; });
 
 		updatePlottedPoints.exit().remove();
 
@@ -166,7 +166,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.plottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT);
 
 		var updatePointLabels = labelsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT_LABEL)
-			.data((d: UserDomainElements) => { return d.elements; });
+			.data((d: ScoreFunctionData) => { return d.elements; });
 
 		updatePointLabels.exit().remove();
 
@@ -181,7 +181,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Create a slope line for each new adjacent pair of elements in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updateFitLines = linesContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.FITLINE)
-			.data((d: UserDomainElements) => {
+			.data((d: ScoreFunctionData) => {
 				// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
 				// To do this, we simply remove the last domain element from the list before we create the lines.
 				var temp = d.elements.pop();	// Remove the last domain element.
@@ -273,7 +273,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateTwo + '1', calculatePointCoordinateTwo)
 			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
 			.attr(u.rendererConfig.coordinateTwo + '2', (d: DomainElement, i: number) => {
-				var userElements = u.usersDomainElements.find((userElements: UserDomainElements) => {
+				var userElements = u.usersDomainElements.find((userElements: ScoreFunctionData) => {
 					return userElements.color === d.color;
 				});
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]);

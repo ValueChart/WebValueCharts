@@ -2,13 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 16:18:19
+* @Last Modified time: 2017-05-10 23:00:48
 */
 
 // Import Angular Classes:
 import { Component }													from '@angular/core';
 import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
-import { NgZone }														from '@angular/core';
 import { Router, ActivatedRoute }										from '@angular/router';
 
 // Import Libraries:
@@ -20,7 +19,8 @@ import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteSc
 import { ContinuousScoreFunctionRenderer }								from '../../renderers/ContinuousScoreFunction.renderer';
 import { ScoreDistributionChartRenderer }								from '../../renderers/ScoreDistributionChart.renderer';
 
-import { ScoreFunctionViewerService }									from '../../services/ScoreFunctionViewer.service';
+import { RendererScoreFunctionUtility }									from '../../utilities/RendererScoreFunction.utility';
+
 import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
 
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
@@ -30,7 +30,7 @@ import { ValueChart }													from '../../../../model/ValueChart';
 import { ScoreFunction }												from '../../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { User }															from '../../../../model/User';
-import { UserDomainElements, DomainElement }							from '../../../../types/ScoreFunctionViewer.types';
+import { ScoreFunctionData, DomainElement }							from '../../../../types/RendererData.types';
 
 /*
 	This component implements the expanded score function plot page. The expanded score function plot page is a pop-up window that opens when a
@@ -58,7 +58,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	private sub: any;
 	private opener: Window;
 
-	private scoreFunctionViewerService: ScoreFunctionViewerService;
+	private rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	private chartUndoRedoService: ChartUndoRedoService;
 
 	private services: any = {};
@@ -88,7 +88,6 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private ngZone: NgZone,
 		private router: Router,
 		private route: ActivatedRoute) { }
 
@@ -117,7 +116,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.colors = (<any>window.opener).colors;
 			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
-			this.scoreFunctionViewerService = new ScoreFunctionViewerService();
+			this.rendererScoreFunctionUtility = new RendererScoreFunctionUtility();
 			this.enableInteraction = (<any>window.opener).enableInteraction;
 		}
 
@@ -147,7 +146,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 
 	initDistributionPlot(): void {
-		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.scoreFunctionViewerService);
+		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.rendererScoreFunctionUtility);
 		this.scoreDistributionChartRenderer.createScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, this.scoreFunctions);
 		this.scoreDistributionChartRenderer.renderScoreDistributionChart(375, 300, 'vertical');
 	}

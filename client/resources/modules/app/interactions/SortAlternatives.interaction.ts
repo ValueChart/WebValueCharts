@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 17:33:46
+* @Last Modified time: 2017-05-10 22:34:03
 */
 
 // Import Angular Classes:
@@ -14,7 +14,7 @@ import { Subject }													from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes
-import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RendererService } 											from '../services/Renderer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 
@@ -100,7 +100,7 @@ export class SortAlternativesInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
+		private rendererService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
 		private summaryChartDefinitions: SummaryChartDefinitions,
@@ -283,14 +283,14 @@ export class SortAlternativesInteraction {
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any, any, any, any> = d3.select(cell);
 			var previousTransform: string = cellSelection.attr('transform');
-			cellSelection.attr('transform', this.renderConfigService.incrementTransform(previousTransform, deltaCoordOne, 0));
+			cellSelection.attr('transform', this.rendererService.incrementTransform(this.lastRendererUpdate.viewConfig, previousTransform, deltaCoordOne, 0));
 		});
 
 		if (this.alternativeLabelToMove)
 			this.alternativeLabelToMove.attr(this.lastRendererUpdate.rendererConfig.coordinateOne, +this.alternativeLabelToMove.attr(this.lastRendererUpdate.rendererConfig.coordinateOne) + deltaCoordOne);
 
 		if (this.totalScoreLabelToMove)
-			this.totalScoreLabelToMove.attr('transform', this.renderConfigService.incrementTransform(this.totalScoreLabelToMove.attr('transform'), deltaCoordOne, 0));
+			this.totalScoreLabelToMove.attr('transform', this.rendererService.incrementTransform(this.lastRendererUpdate.viewConfig, this.totalScoreLabelToMove.attr('transform'), deltaCoordOne, 0));
 
 	}
 

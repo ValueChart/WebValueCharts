@@ -9,7 +9,8 @@ import { ScoreFunctionDirective }										from '../../../utilities/directives/S
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
 import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
-import { ScoreFunctionViewerService }								from '../../../app/services/ScoreFunctionViewer.service';
+
+import { RendererScoreFunctionUtility }							from '../../../app/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { ValueChart } 													    from '../../../../model/ValueChart';
@@ -33,7 +34,7 @@ import { ContinuousScoreFunction }								  from '../../../../model/ContinuousSc
 @Component({
   selector: 'CreateScoreFunctions',
   templateUrl: 'client/resources/modules/create/components/CreateScoreFunctions/CreateScoreFunctions.template.html',
-  providers: [ScoreFunctionViewerService]
+  providers: [RendererScoreFunctionUtility]
 })
 export class CreateScoreFunctionsComponent implements OnInit {
 
@@ -73,7 +74,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     private valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
     private chartUndoRedoService: ChartUndoRedoService,
-    private scoreFunctionViewerService: ScoreFunctionViewerService) { }
+    private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
   // ========================================================================================
   //                   Methods
@@ -92,7 +93,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
       subscriber.complete();
     });
     this.services.chartUndoRedoService = this.chartUndoRedoService;
-    this.services.scoreFunctionViewerService = this.scoreFunctionViewerService;
+    this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
 
     if (!this.valueChartService.currentUserIsDefined()) {
       this.valueChartService.addCurrentUser();

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:52:21
+* @Last Modified time: 2017-05-10 22:48:10
 */
 
 // Import Angular Classes:
@@ -24,7 +24,7 @@ import { ContinuousDomain }											from '../../../model/ContinuousDomain';
 
 import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
 
-import { DomainElement, UserDomainElements } 						from '../../../types/ScoreFunctionViewer.types';
+import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 
@@ -41,7 +41,7 @@ export abstract class ScoreFunctionRenderer {
 
 	protected domainSize: number;							// The number of domain elements the score function needs to plot.
 	protected objective: PrimitiveObjective;				// The primitive objective this renderer is creating a plot for.
-	protected usersDomainElements: UserDomainElements[];		// The data that this class is rendering.
+	protected usersDomainElements: ScoreFunctionData[];		// The data that this class is rendering.
 	protected enableInteraction: boolean;					// Whether or not the score functions may be adjusted
 
 	// d3 Selections:
@@ -228,7 +228,7 @@ export abstract class ScoreFunctionRenderer {
 		updateUserContainers.exit().remove();
 		updateUserContainers.enter().append('g')
 			.classed(ScoreFunctionRenderer.defs.USER_CONTAINER, true)
-			.attr('id', (d: UserDomainElements) => { return 'scorefunction-' + d.color.replace(/\s+/g, '') + '-container'; });
+			.attr('id', (d: ScoreFunctionData) => { return 'scorefunction-' + d.color.replace(/\s+/g, '') + '-container'; });
 
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
 

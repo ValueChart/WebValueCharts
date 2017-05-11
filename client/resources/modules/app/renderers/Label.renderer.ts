@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 16:16:15
+* @Last Modified time: 2017-05-10 22:59:33
 */
 
 // Import Angular Classes:
@@ -14,15 +14,15 @@ import { Subject }													from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }										from '../services/ValueChart.service';
-import { ScoreFunctionViewerService }								from '../services/ScoreFunctionViewer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
-import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RendererService } 											from '../services/Renderer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+
+import { RendererScoreFunctionUtility }								from '../utilities/RendererScoreFunction.utility';
 
 import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.interaction';
 import { SetObjectiveColorsInteraction }							from '../interactions/SetObjectiveColors.interaction';
@@ -41,7 +41,7 @@ import { WeightMap }												from '../../../model/WeightMap';
 // Import Types:
 import {RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
-import { DomainElement, UserDomainElements } 						from '../../../types/ScoreFunctionViewer.types';
+import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 
 
@@ -85,10 +85,9 @@ export class LabelRenderer {
 						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
 	*/
 	constructor(
-		private valueChartService: ValueChartService,
-		private renderConfigService: RenderConfigService,
+		private rendererService: RendererService,
 		private renderEventsService: RenderEventsService,
-		private scoreFunctionViewerService: ScoreFunctionViewerService,
+		private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private defs: LabelDefinitions,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
@@ -312,7 +311,7 @@ export class LabelRenderer {
 			let subLabelSpaces: d3.Selection<any, any, any, any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			let scaledWeightOffset: number = u.rendererConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
-			let labelTransform: string = this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
+			let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 			
 			this.renderLabels(u, labelDatum.subLabelData, subLabelSpaces.data(labelDatum.subLabelData));	// Render the sub labels using the data update selection.
@@ -467,8 +466,8 @@ export class LabelRenderer {
 				sfU.interactive = u.interactionConfig.adjustScoreFunctions;
 				
 				return sfU;
-			}).map(this.scoreFunctionViewerService.produceUsersDomainElements)
-				.map(this.scoreFunctionViewerService.produceViewConfig)
+			}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
+				.map(this.rendererScoreFunctionUtility.produceViewConfig)
 				.subscribe(renderer.scoreFunctionChanged);
 
 			this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
@@ -508,12 +507,12 @@ export class LabelRenderer {
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(datum.getName());
+			objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(datum.getName());
 			dimensionOneTransform = (this.lastRendererUpdate.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
 
 			// Place the score function plot in the correct location.
-			el.attr('transform', this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
+			el.attr('transform', this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
 
 			if (u.viewConfig.viewOrientation === 'vertical') {
 				width = this.labelWidth;

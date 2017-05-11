@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:55:48
+* @Last Modified time: 2017-05-10 22:58:48
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -12,7 +12,7 @@ import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
 import * as d3 															from 'd3';
 import * as _															from 'lodash';
 import { Subject }														from 'rxjs/Subject';
-import { Subscription }														from 'rxjs/Subscription';
+import { Subscription }													from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
@@ -23,7 +23,7 @@ import { ContinuousScoreFunctionRenderer }								from '../../app/renderers/Cont
 import { ExpandScoreFunctionInteraction }								from '../../app/interactions/ExpandScoreFunction.interaction';
 
 import { ChartUndoRedoService }											from '../../app/services/ChartUndoRedo.service';
-import { ScoreFunctionViewerService }									from '../../app/services/ScoreFunctionViewer.service';
+import { RendererScoreFunctionUtility }									from '../../app/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { ScoreFunction }												from '../../../model/ScoreFunction';
@@ -50,7 +50,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	@Input() enableInteraction: boolean;
 
 	// Services:
-	private scoreFunctionViewerService: ScoreFunctionViewerService;
+	private rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	private chartUndoRedoService: ChartUndoRedoService;
 
 	// Renderer Fields:
@@ -86,7 +86,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	ngOnInit() {		
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
-		this.scoreFunctionViewerService = new ScoreFunctionViewerService();
+		this.rendererScoreFunctionUtility = new RendererScoreFunctionUtility();
 
 		this.initChangeDetection();
 		this.initScoreFunctionPlot();
@@ -116,8 +116,8 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			sfU.interactive = this.enableInteraction;
 			
 			return sfU;
-		}).map(this.scoreFunctionViewerService.produceUsersDomainElements)
-			.map(this.scoreFunctionViewerService.produceViewConfig)
+		}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
+			.map(this.rendererScoreFunctionUtility.produceViewConfig)
 			.subscribe(this.scoreFunctionRenderer.scoreFunctionChanged);
 
 		this.scoreFunctionSubject.next({ width: this.width, height: this.height });

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 17:35:50
+* @Last Modified time: 2017-05-10 22:35:48
 */
 
 // Import Angular Classes:
@@ -15,7 +15,7 @@ import { Subject }													from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes
-import { RenderConfigService } 										from '../services/RenderConfig.service';
+import { RendererService } 											from '../services/Renderer.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
@@ -82,7 +82,7 @@ export class ReorderObjectivesInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
+		private rendererService: RendererService,
 		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { 
@@ -234,7 +234,7 @@ export class ReorderObjectivesInteraction {
 		var previousTransform: string = this.containerToReorder.attr('transform');
 
 		// Generate the new transform.
-		var labelTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
+		var labelTransform: string = this.rendererService.incrementTransform(this.lastRendererUpdate.viewConfig, previousTransform, 0, deltaCoordinateTwo);
 
 		// Apply the new transformation to the label.
 		this.containerToReorder.attr('transform', labelTransform);
@@ -303,7 +303,7 @@ export class ReorderObjectivesInteraction {
 		} else {
 			var scoreFunction: d3.Selection<any, any, any, any> = this.labelRootContainer.select('#label-' + objective.getId() + '-scorefunction');
 			let previousTransform: string = scoreFunction.attr('transform');
-			let scoreFunctionTransform: string = this.renderConfigService.incrementTransform(previousTransform, 0, deltaCoordinateTwo);
+			let scoreFunctionTransform: string = this.rendererService.incrementTransform(this.lastRendererUpdate.viewConfig, previousTransform, 0, deltaCoordinateTwo);
 			scoreFunction.attr('transform', scoreFunctionTransform);
 		}
 	}

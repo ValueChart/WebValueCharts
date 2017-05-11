@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 13:44:24
+* @Last Modified time: 2017-05-10 22:48:08
 */
 
 // Import Angular Classes:
@@ -28,7 +28,7 @@ import { ContinuousScoreFunction }						from '../../../model/ContinuousScoreFunc
 import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction';
 
 // Import Types:
-import { DomainElement, UserDomainElements } 			from '../../../types/ScoreFunctionViewer.types';
+import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
 
 
 // This class contains the logic for creating and rendering multiple users' DiscreteScoreFunctions for a single objective with a discrete 
@@ -136,7 +136,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	createDiscretePlotElements(u: any, barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updateUtilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
-			.data((d: UserDomainElements) => { return d.elements; });
+			.data((d: ScoreFunctionData) => { return d.elements; });
 
 		updateUtilityBars.exit().remove();
 
@@ -150,7 +150,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.utilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR);
 
 		var updateBarLabels = labelsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_LABEL)
-			.data((d: UserDomainElements) => { return d.elements; })
+			.data((d: ScoreFunctionData) => { return d.elements; })
 
 		updateBarLabels.exit().remove();
 
@@ -165,7 +165,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Create a selectable bar top for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updateBarTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP)
-			.data((d: UserDomainElements) => { return d.elements; })
+			.data((d: ScoreFunctionData) => { return d.elements; })
 
 		updateBarTops.exit().remove();
 
@@ -222,7 +222,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Position each users' container so theirs bars are properly offset from each other.
 		this.userContainers
-			.attr('transform', (d: UserDomainElements, i: number) => {
+			.attr('transform', (d: ScoreFunctionData, i: number) => {
 				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
 			});
 

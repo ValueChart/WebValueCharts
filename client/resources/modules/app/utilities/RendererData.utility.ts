@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 17:31:46
+* @Last Modified time: 2017-05-10 23:05:01
 */
 
 // Import Angular Classes:
@@ -43,7 +43,7 @@ import { ObjectivesRecord }									from '../../../types/Record.types';
 */
 
 @Injectable()
-export class RendererDataService {
+export class RendererDataUtility {
 
 	// ========================================================================================
 	// 									Fields
@@ -81,7 +81,6 @@ export class RendererDataService {
 		this.updateStackedBarOffsets(u.viewConfig.viewOrientation);
 
 		u.rowData = this.rowData;
-		console.log(u);
 		return u;
 	}
 
@@ -97,8 +96,6 @@ export class RendererDataService {
 		u.labelData = this.labelData;
 		return u;
 	}
-
-	// ================================  Getters ====================================
 	
 
 	// ================================ Data Creation and Update Methods  ====================================

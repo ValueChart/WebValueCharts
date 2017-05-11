@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 21:51:42
+* @Last Modified time: 2017-05-10 23:00:14
 */
 
 // Import Angular Classes:
@@ -21,14 +21,16 @@ import { ValueChartDirective }													from '../../directives/ValueChart.dir
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
 import { ValueChartService }													from '../../services/ValueChart.service';
-import { RendererDataService }													from '../../services/RendererData.service';
-import { ScoreFunctionViewerService }											from '../../services/ScoreFunctionViewer.service';
-import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 import { RenderEventsService }													from '../../services/RenderEvents.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
+import { RendererService }														from '../../services/Renderer.service';
+
+import { RendererScoreFunctionUtility }											from '../../utilities/RendererScoreFunction.utility';
+import { RendererConfigUtility }												from '../../utilities/RendererConfig.utility';
+import { RendererDataUtility }													from '../../utilities/RendererData.utility';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -70,9 +72,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
 	providers: [
 		// Services:
-		RendererDataService,
-		ScoreFunctionViewerService,
-		RenderConfigService,
+		RendererService,
 		ChangeDetectionService,
 		RenderEventsService,
 		HostService,
@@ -86,7 +86,10 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 		SortAlternativesInteraction,
 		SetObjectiveColorsInteraction,
 		ExpandScoreFunctionInteraction,
-
+		// Utilities:
+		RendererScoreFunctionUtility,
+		RendererDataUtility,
+		RendererConfigUtility,
 		// Definitions:
 		SummaryChartDefinitions,
 		ObjectiveChartDefinitions,
@@ -147,7 +150,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
-		private renderConfigService: RenderConfigService,
+		private renderConfigService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
 		private renderEventsService: RenderEventsService,

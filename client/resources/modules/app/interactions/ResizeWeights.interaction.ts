@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:16:57
+* @Last Modified time: 2017-05-10 22:35:01
 */
 
 // Import Angular Classes:
@@ -16,7 +16,6 @@ import { Subscription } 											from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes
-import { RenderConfigService } 										from '../services/RenderConfig.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
@@ -72,7 +71,6 @@ export class ResizeWeightsInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { 
 	}
@@ -168,7 +166,7 @@ export class ResizeWeightsInteraction {
 		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-			return (resizeType !== 'none') ? (this.renderConfigService.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+			return (resizeType !== 'none') ? (this.lastRendererUpdate.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
 		});
 
 		labelDividers.call(dragToResizeWeights);

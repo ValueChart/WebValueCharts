@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 15:38:08
+* @Last Modified time: 2017-05-10 22:38:09
 */
 
 // Import Angular Classes:
@@ -22,14 +22,16 @@ import '../../utilities/rxjs-operators';
 // Import Application Classes:
 // Services:
 import { ValueChartService}														from '../services/ValueChart.service';
-import { RendererDataService}													from '../services/RendererData.service';
-import { RenderConfigService }													from '../services/RenderConfig.service';
+import { RendererService }														from '../services/Renderer.service';
 import { ChartUndoRedoService }													from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
 // Renderers:
 import { ObjectiveChartRenderer }												from '../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../renderers/SummaryChart.renderer';
 import { LabelRenderer }														from '../renderers/Label.renderer';
+// Utilities
+import { RendererDataUtility }													from '../utilities/RendererData.utility';
+import { RendererConfigUtility }												from '../utilities/RendererConfig.utility';
 
 // Definitions:
 import { LabelDefinitions }														from '../services/LabelDefinitions.service';
@@ -69,6 +71,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() private viewConfig: ViewConfig = <any>{};						// Configuration options for view settings;
 	@Input() private interactionConfig: InteractionConfig = <any>{};		// Configuration options for user interactions.
 
+	public CHART_COMPONENT_RATIO: number = 0.47;		// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
+
 	// d3 Selections:
 	private el: d3.Selection<any, any, any, any>; 							// The SVG base element for the ValueChart.
 
@@ -98,14 +102,16 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private elementRef: ElementRef,
 		// Services:
 		private valueChartService: ValueChartService,
-		private rendererDataService: RendererDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private renderConfigService: RenderConfigService,
+		private rendererService: RendererService,
 		private changeDetectionService: ChangeDetectionService,
 		// Renderers:
 		private objectiveChartRenderer: ObjectiveChartRenderer,
 		private summaryChartRenderer: SummaryChartRenderer,
 		private labelRenderer: LabelRenderer,
+		// Utilities:
+		private rendererDataUtility: RendererDataUtility,
+		private rendererConfigUtility: RendererConfigUtility,
 		// Definitions:
 		private labelDefinitions: LabelDefinitions) { }
 
@@ -123,11 +129,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	ngOnInit() {
 		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
-		this.renderConfigService.viewConfig = this.viewConfig;
-		this.renderConfigService.initUserColors();
-
-		// Configure the directive for the input data:
-		// this.configureChartData();
+		this.rendererService.initUserColors(this.valueChart);
 
 		// Initialize Change Detection:
 		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig);
@@ -149,8 +151,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						and height of the ValueChart.
 	*/
 	calculateDefaultComponentSize(): void {
-		this.defaultChartComponentWidth = (this.width * this.renderConfigService.CHART_COMPONENT_RATIO);
-		this.defaultChartComponentHeight = (this.height * this.renderConfigService.CHART_COMPONENT_RATIO);
+		this.defaultChartComponentWidth = (this.width * this.CHART_COMPONENT_RATIO);
+		this.defaultChartComponentHeight = (this.height * this.CHART_COMPONENT_RATIO);
 	}
 
 	/*
@@ -168,9 +170,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		var renderInformation = this.valueChartSubject.map((valueChart: ValueChart) => {
 			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
-		}).map(this.rendererDataService.produceRowData)
-			.map(this.rendererDataService.produceLabelData)
-			.map(this.renderConfigService.produceRendererConfig);
+		}).map(this.rendererDataUtility.produceRowData)
+			.map(this.rendererDataUtility.produceLabelData)
+			.map(this.rendererConfigUtility.produceRendererConfig);
 
 		renderInformation
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
@@ -211,8 +213,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			return;
 
 		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig)) {
-			// TODO <@aaron> : Remove this temporary call to initUserColors.
-			this.renderConfigService.initUserColors();
+			this.rendererService.initUserColors(this.valueChart);
 			this.valueChartSubject.next(this.valueChart);
 		}
 
