@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 12:22:58
+* @Last Modified time: 2017-05-10 14:55:30
 */
 
 // Import Angular Classes:
@@ -150,10 +150,6 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	getPrimitiveObjectivesByName(): string[] {
 		return this.valueChart.getAllPrimitiveObjectivesByName();
-	}
-
-	setPrimitivesObjectives(objs: PrimitiveObjective[]) {
-		this.primitiveObjectives = objs;
 	}
 
 	resetPrimitiveObjectives() {

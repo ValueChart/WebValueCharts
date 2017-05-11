@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 16:18:32
+* @Last Modified time: 2017-05-10 17:31:46
 */
 
 // Import Angular Classes:
@@ -11,10 +11,6 @@ import { Injectable } 										from '@angular/core';
 // Import Libraries:
 import * as d3 												from 'd3';
 import * as _												from 'lodash';
-
-// Import Application Classes:
-import { ValueChartService }								from './ValueChart.service';
-import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
@@ -31,7 +27,6 @@ import { ScoreFunction }									from '../../../model/ScoreFunction';
 import { RowData, CellData, UserScoreData, LabelData }		from '../../../types/RendererData.types';
 import { RendererUpdate }									from '../../../types/RendererData.types';
 import { ObjectivesRecord }									from '../../../types/Record.types';
-import { AlternativeOrderRecord }							from '../../../types/Record.types';
 
 
 /*
@@ -57,9 +52,6 @@ export class RendererDataService {
 	private rowData: RowData[];				// Data from the active ValueChart formatted to work with the ObjectiveChartRenderer and the SummaryChartRenderer classes.
 	private labelData: LabelData[];			// Data from the active ValueChart formatted to work with the LabelRenderer classes.
 
-	private originalAlternativeOrder: AlternativeOrderRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
-																// class to reset the alternative order.
-
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -70,13 +62,7 @@ export class RendererDataService {
 						method.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(
-		private valueChartService: ValueChartService,
-		private chartUndoRedoService: ChartUndoRedoService) {
-
-		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
-		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);
-	}
+	constructor() {	}
 
 	// ========================================================================================
 	// 									Methods
@@ -87,24 +73,25 @@ export class RendererDataService {
 		// TODO <@aaron>: update this output type of this method.
 
 	produceRowData = (u: RendererUpdate) => {
-		if (!this.rowData || u.valueChart.getUsers().length != this.rowData.length) {
-			this.generateRowData();
+		if (!this.rowData || u.valueChart.getUsers().length != this.rowData.length ) {
+			this.generateRowData(u.valueChart);
 		}
 
-		this.updateWeightOffsets();
-		this.updateStackedBarOffsets(u.viewConfig.viewOrientation);		// TODO <@aaron>: Remove hard-coded "vertical" orientation.
+		this.updateWeightOffsets(u.valueChart);
+		this.updateStackedBarOffsets(u.viewConfig.viewOrientation);
 
 		u.rowData = this.rowData;
+		console.log(u);
 		return u;
 	}
 
 	produceLabelData = (u: RendererUpdate) => {
 		if (!this.labelData) {
-			this.generateLabelData();
+			this.generateLabelData(u.valueChart);
 		}
 
-		this.getLabelData().forEach((labelDatum: LabelData) => {
-			this.updateLabelDataWeights(labelDatum);
+		this.labelData.forEach((labelDatum: LabelData) => {
+			this.updateLabelDataWeights(u.valueChart, labelDatum);
 		});
 
 		u.labelData = this.labelData;
@@ -113,37 +100,6 @@ export class RendererDataService {
 
 	// ================================  Getters ====================================
 	
-	/*
-		@returns {RowData[]} - The RowData stored by this class for use with the ObjectiveChartRenderer and SummaryChartRenderer classes.
-		@description	Gets the RowData for the active ValueChart. This method ONLY creates the row data for the active ValueChart if
-						it has not yet been done. This should NEVER be the case as the initialize() method should ALWAYS be called before
-						renderer data is retrieved.
-	*/
-	public getRowData(): RowData[] {
-		if (this.rowData) {
-			return this.rowData;
-		}
-
-		this.generateRowData();
-		return this.rowData;
-	}
-
-	/*
-		@returns {LabelData[]} - The LabelData stored by this class for use with the LabelRenderer.
-		@description	Gets the LabelData for the active ValueChart. This method ONLY creates the label data for the active ValueChart if
-						it has not yet been done. This should NEVER be the case as the initialize() method should ALWAYS be called before
-						renderer data is retrieved.
-	*/
-	public getLabelData(): LabelData[] {
-		if (this.labelData) {
-			return this.labelData;
-		}
-
-		this.generateLabelData();
-		return this.labelData;
-	}
-
-
 
 	// ================================ Data Creation and Update Methods  ====================================
 
@@ -153,11 +109,11 @@ export class RendererDataService {
 						to either generate the LabelData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateLabelData(): void {
+	public generateLabelData(valueChart: ValueChart): void {
 		this.labelData = [];
 
-		this.valueChartService.getRootObjectives().forEach((objective: Objective) => {
-			this.labelData.push(this.getLabelDatum(objective, 0));
+		valueChart.getRootObjectives().forEach((objective: Objective) => {
+			this.labelData.push(this.getLabelDatum(valueChart, objective, 0));
 		});
 	}
 
@@ -167,14 +123,14 @@ export class RendererDataService {
 						to either generate the RowData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateRowData(): void {
+	public generateRowData(valueChart: ValueChart): void {
 		this.rowData = [];
 
-		this.valueChartService.getPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.rowData.push({
 				objective: objective,
 				weightOffset: 0,
-				cells: this.getCellData(objective)
+				cells: this.getCellData(valueChart, objective)
 			});
 		});
 	}
@@ -186,12 +142,12 @@ export class RendererDataService {
 						row above it. Recall that these weights are converted into heights by the ObjectiveChartRenderer.
 						This method should usually be called via the updateAllValueChartData instead of being used directly.
 	*/
-	public updateWeightOffsets(): void {
+	public updateWeightOffsets(valueChart: ValueChart): void {
 		var weightOffset: number = 0;
 
 		for (var i = 0; i < this.rowData.length; i++) {
 			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
+			weightOffset += valueChart.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
 		}
 	}
 
@@ -243,7 +199,7 @@ export class RendererDataService {
 
 	// ================================ Private Helpers Creating/Updating Data ====================================
 
-	private getLabelDatum(objective: Objective, depth: number): LabelData {
+	private getLabelDatum(valueChart: ValueChart, objective: Objective, depth: number): LabelData {
 		var labelData: LabelData;
 
 		if (objective.objectiveType === 'abstract') {
@@ -252,7 +208,7 @@ export class RendererDataService {
 			var maxDepthOfChildren: number = 0;
 
 			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let labelDatum: LabelData = this.getLabelDatum(subObjective, depth + 1);
+				let labelDatum: LabelData = this.getLabelDatum(valueChart, subObjective, depth + 1);
 				weight += labelDatum.weight;
 				if (labelDatum.depthOfChildren > maxDepthOfChildren)
 					maxDepthOfChildren = labelDatum.depthOfChildren;
@@ -261,36 +217,36 @@ export class RendererDataService {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
 		} else if (objective.objectiveType === 'primitive') {
-			labelData = { 'objective': objective, 'weight': this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
+			labelData = { 'objective': objective, 'weight': valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
 		}
 
 		return labelData;
 	}
 
-	private updateLabelDataWeights(labelDatum: LabelData): void {
+	private updateLabelDataWeights(valueChart: ValueChart, labelDatum: LabelData): void {
 		if (labelDatum.depthOfChildren !== 0) {
 			labelDatum.weight = 0;
 			labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
-				this.updateLabelDataWeights(subLabelDatum);
+				this.updateLabelDataWeights(valueChart, subLabelDatum);
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = valueChart.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 		}
 	}
 
-	private updateLabelData(): void {
+	private updateLabelData(valueChart: ValueChart): void {
 		// Use splice so as to avoid changing the array reference.
-		this.valueChartService.getRootObjectives().forEach((objective: Objective, index: number) => {
-			this.labelData[index] = this.getLabelDatum(objective, 0);
+		valueChart.getRootObjectives().forEach((objective: Objective, index: number) => {
+			this.labelData[index] = this.getLabelDatum(valueChart, objective, 0);
 		});
 	}
 
-	private getCellData(objective: PrimitiveObjective): CellData[] {
+	private getCellData(valueChart: ValueChart, objective: PrimitiveObjective): CellData[] {
 		var users: User[];
-		users = this.valueChartService.getUsers();
+		users = valueChart.getUsers();
 
-		var objectiveValues: any[] = this.valueChartService.getAlternativeValuesforObjective(objective);
+		var objectiveValues: any[] = valueChart.getAlternativeValuesforObjective(objective);
 
 		objectiveValues.forEach((objectiveValue: any) => {
 			objectiveValue.userScores = [];
@@ -308,114 +264,5 @@ export class RendererDataService {
 
 		return objectiveValues;
 	}
-
-	// ================================ Public Methods for Reordering Rows and Columns ====================================
-
-	public reorderRows(primitiveObjectives: PrimitiveObjective[]): void {
-		var desiredIndices: any = {};
-
-		this.rowData.sort((a: RowData, b: RowData) => {
-			let aIndex = desiredIndices[a.objective.getName()] || primitiveObjectives.indexOf(a.objective);
-			let bIndex = desiredIndices[b.objective.getName()] || primitiveObjectives.indexOf(b.objective);
-
-			desiredIndices[a.objective.getName()] = aIndex;
-			desiredIndices[b.objective.getName()] = bIndex;
-
-			if (aIndex < bIndex)
-				return -1;
-			else
-				return 1;
-		});
-	}
-
-	public reorderAllCells(cellIndices: number[]): void {
-		this.rowData.forEach((row: RowData, index: number) => {
-			row.cells = d3.permute(row.cells, cellIndices);
-		});
-
-		this.valueChartService.setAlternatives(d3.permute(this.valueChartService.getAlternatives(), cellIndices));
-	}
-
-	public resetCellOrder(): void {
-		var cellIndices: number[] = [];
-
-		this.valueChartService.getAlternatives().forEach((alternative: Alternative, index: number) => {
-			cellIndices[this.originalAlternativeOrder.alternativeIndexMap[alternative.getName()]] = index;
-		});
-
-		this.reorderAllCells(cellIndices);
-	}
-
-	public recordOriginalAlternativeOrder(valueChart: ValueChart) {
-		this.originalAlternativeOrder = new AlternativeOrderRecord(valueChart.getAlternatives());
-	}
-
-	// ================================ Public Methods Generating Row Orders ====================================
-
-	public generateCellOrderByObjectiveScore(rowsToReorder: RowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
-		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
-		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
-
-		for (var i = 0; i < rowsToReorder.length; i++) {
-			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getName());
-				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
-					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
-				});
-			}
-		}
-
-		cellIndices.sort((a: number, b: number) => {
-			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
-			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
-
-			if (aScore === bScore) {
-				return 0;						// Do not change the ordering of a and b.
-			} else if (aScore > bScore) {		// If a has a higher score it should come before b in the ordering.
-				return -1;						// a should come before b in the ordering
-			} else {
-				return 1;						// b should come before a in the ordering.
-			}
-		});
-
-		return cellIndices;
-	}
-
-	public generateCellOrderAlphabetically(): number[] {
-		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(this.valueChartService.getNumAlternatives());
-
-		cellIndices.sort((a: number, b: number) => {
-
-			var aName: string = this.valueChartService.getAlternatives()[a].getName().toLowerCase();
-			var bName: string = this.valueChartService.getAlternatives()[b].getName().toLowerCase();
-
-			if (aName === bName) {
-				return 0;						// Do not change the ordering of a and b.
-			} else if (aName < bName) {			// The earlier the letter in the alphabet, the smaller its character code.
-				return -1;						// a should come before b in the ordering
-			} else {
-				return 1;						// b should come before a in the ordering.
-			}
-		});
-
-		return cellIndices;
-	}
-
-	changeAlternativesOrder = (cellIndices: number[]) => {
-		this.reorderAllCells(cellIndices);
-	}
-
-	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
-		this.valueChartService.getValueChart().setRootObjectives(objectivesRecord.rootObjectives);
-		this.updateLabelData();
-		this.valueChartService.resetPrimitiveObjectives();
-		this.generateRowData();
-	}
-
-
-
 }
 

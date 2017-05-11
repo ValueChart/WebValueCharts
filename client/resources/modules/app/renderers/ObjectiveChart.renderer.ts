@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 15:13:27
+* @Last Modified time: 2017-05-10 15:48:24
 */
 
 // Import Angular Classes
@@ -44,11 +44,10 @@ export class ObjectiveChartRenderer {
 	// 									Fields
 	// ========================================================================================
 
+	private lastRendererUpdate: RendererUpdate;
+
 	// Constants for use in rendering the summary chart.
 	private USER_SCORE_SPACING: number = 10; // The spacing between user score bars, in pixels.
-
-	// The viewConfig object for this renderer. It is configured using the renderConfigService.
-	public rendererConfig: RendererConfig = <RendererConfig>{};
 
 	// d3 Selections:
 	public chart: d3.Selection<any, any, any, any>;							// The 'g' element that contains all the elements making up the objective chart.
@@ -89,20 +88,21 @@ export class ObjectiveChartRenderer {
 
 
 	valueChartChanged = (update: RendererUpdate) => {
-		if (this.chart == undefined)
+		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
+		}
 
 		if (this.numUsers != update.valueChart.getUsers().length) 
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 
 		this.numUsers = update.valueChart.getUsers().length;
-		this.rendererConfig = update.rendererConfig;
+		this.lastRendererUpdate = update;
 
 		this.renderObjectiveChart(update);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.rendererConfig);
+		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives,  this.lastRendererUpdate);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
@@ -519,7 +519,7 @@ export class ObjectiveChartRenderer {
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 		let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
-		return this.rendererConfig.dimensionTwoScale(score * userObjectiveWeight);
+		return this.lastRendererUpdate.rendererConfig.dimensionTwoScale(score * userObjectiveWeight);
 	};
 }
 

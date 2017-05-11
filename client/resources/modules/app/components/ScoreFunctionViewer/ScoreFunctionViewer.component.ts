@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 12:58:11
+* @Last Modified time: 2017-05-10 16:18:19
 */
 
 // Import Angular Classes:
@@ -68,13 +68,12 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	private scoreDistributionChartContainer: d3.Selection<any, any, any, any>;
 	private scoreDistributionChartRenderer: ScoreDistributionChartRenderer;
 
-	private valueChart: ValueChart;
+	protected scoreFunctions: ScoreFunction[];
+	protected colors: string[];
 	private objectiveToDisplay: PrimitiveObjective;
 	private enableInteraction: boolean;
 	private previousScoreFunctions: ScoreFunction[];
 
-	protected scoreFunctions: ScoreFunction[];
-	protected colors: string[];
 
 	private viewType: string;
 	private previousViewType: string;
@@ -114,20 +113,13 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 		if (window) {
 			this.opener = window.opener;
-			this.valueChart = (<any>window.opener).valueChart;
+			this.scoreFunctions = (<any>window.opener).scoreFunctions;
+			this.colors = (<any>window.opener).colors;
 			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
 			this.scoreFunctionViewerService = new ScoreFunctionViewerService();
 			this.enableInteraction = (<any>window.opener).enableInteraction;
 		}
-
-		this.scoreFunctions = [];
-		this.colors = [];
-
-		this.valueChart.getUsers().forEach((user: User) => {
-			this.scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()));
-			this.colors.push(user.color);
-		});
 
 		this.services.chartUndoRedoService = this.chartUndoRedoService;
 

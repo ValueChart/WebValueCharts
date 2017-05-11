@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 13:31:41
+* @Last Modified time: 2017-05-10 16:16:15
 */
 
 // Import Angular Classes:
@@ -58,8 +58,7 @@ export class LabelRenderer {
 	// 									Fields
 	// ========================================================================================
 
-	// The viewConfig object for this renderer. It is configured using the renderConfigService.
-	public rendererConfig: RendererConfig = <RendererConfig>{};
+	public lastRendererUpdate: RendererUpdate;
 
 	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
 	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the Label area.
@@ -94,8 +93,7 @@ export class LabelRenderer {
 		private defs: LabelDefinitions,
 		private resizeWeightsInteraction: ResizeWeightsInteraction,
 		private setObjectiveColorsInteraction: SetObjectiveColorsInteraction,
-		private reorderObjectivesInteraction: ReorderObjectivesInteraction,
-		private expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+		private reorderObjectivesInteraction: ReorderObjectivesInteraction) {
 	}
 
 	// ========================================================================================
@@ -109,15 +107,15 @@ export class LabelRenderer {
 			this.interactionsChanged(update.interactionConfig);
 		}
 
-		this.rendererConfig = update.rendererConfig;
+		this.lastRendererUpdate = update;
 		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + this.defs.PRIMITIVE_OBJECTIVE_LABEL));
-		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rendererConfig);
+		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + this.defs.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
+		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors);
-		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rendererConfig, this.rootContainer, this.scoreFunctionContainer)
+		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.scoreFunctionContainer, this.lastRendererUpdate,)
 			.subscribe(this.handleObjectivesReordered)
 	}
 
@@ -446,9 +444,9 @@ export class LabelRenderer {
 			var renderer: ScoreFunctionRenderer
 
 			if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
-				renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, this.expandScoreFunctionInteraction);
+				renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
 			else
-				renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, this.expandScoreFunctionInteraction);
+				renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
 
 			var scoreFunctionSubject = new Subject();
 
@@ -511,17 +509,17 @@ export class LabelRenderer {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
 			datum = el.data()[0];																			// Get the data for this score function from the selection
 			objectiveWeight = this.valueChartService.getValueChart().getMaximumWeightMap().getObjectiveWeight(datum.getName());
-			dimensionOneTransform = (this.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
-			dimensionTwoTransform = this.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
+			dimensionOneTransform = (this.lastRendererUpdate.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
+			dimensionTwoTransform = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
 
 			// Place the score function plot in the correct location.
 			el.attr('transform', this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
 
 			if (u.viewConfig.viewOrientation === 'vertical') {
 				width = this.labelWidth;
-				height = this.rendererConfig.dimensionTwoScale(objectiveWeight);
+				height = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
 			} else {
-				width = this.rendererConfig.dimensionTwoScale(objectiveWeight);
+				width = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
 				height = this.labelWidth;
 			}
 
@@ -540,7 +538,7 @@ export class LabelRenderer {
 	determineLabelWidth = (d: LabelData, u: RendererUpdate) => {		 // Expand the last label to fill the rest of the space.
 		var scoreFunctionOffset: number = ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
 		var retValue = (d.depthOfChildren === 0) ?
-			(this.rendererConfig.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
+			(this.lastRendererUpdate.rendererConfig.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
 			:
 			this.labelWidth;
 

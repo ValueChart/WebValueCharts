@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 13:19:04
+* @Last Modified time: 2017-05-10 15:53:44
 */
 
 // Import Angular Classes:
@@ -12,7 +12,6 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
-import { ValueChartService }										from '../services/ValueChart.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 
@@ -42,8 +41,10 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
+	private lastRendererUpdate: any;
+
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
-																						// route that the pop-up window will navigate to when it is opened.
+																					// route that the pop-up window will navigate to when it is opened.
 
 	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';	// The options string for the pop-up window.
 
@@ -61,7 +62,6 @@ export class ExpandScoreFunctionInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) { }
 
 
@@ -76,7 +76,9 @@ export class ExpandScoreFunctionInteraction {
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery): void {
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery, lastRendererUpdate: any): void {
+		this.lastRendererUpdate = lastRendererUpdate;
+
 		scoreFunctionPlots.off('dblclick');
 
 		if (enableExpanding) {
@@ -96,7 +98,8 @@ export class ExpandScoreFunctionInteraction {
 		// Pass relevant data to the pop-up by attaching it to the window object. These
 		// variables will be accessible to child window via its window.opener field, which is 
 		// a reference to this window.
-		(<any>window).valueChart = this.valueChartService.getValueChart();
+		(<any>window).scoreFunctions = this.lastRendererUpdate.scoreFunctions;
+		(<any>window).colors = this.lastRendererUpdate.colors;
 		(<any>window).objectiveToPlot = objective;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 13:31:09
+* @Last Modified time: 2017-05-10 15:52:21
 */
 
 // Import Angular Classes:
@@ -56,7 +56,7 @@ export abstract class ScoreFunctionRenderer {
 	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
 
 
-	private rendererConfig: any;
+	private lastRendererUpdate: any;
 	private numUsers: number;
 
 	// TODO: <@aaron> : Clear up these comments.
@@ -114,7 +114,7 @@ export abstract class ScoreFunctionRenderer {
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
 
 		this.numUsers = update.scoreFunctions.length;
-		this.rendererConfig = update.rendererConfig;
+		this.lastRendererUpdate = update;
 
 		this.renderScoreFunction(update);
 	}
@@ -124,8 +124,7 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	interactionConfigChanged = (expandScoreFunctions: boolean) => {
-		console.log(this.rootContainer);
-		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)));
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
 	}
 
 	/*
@@ -373,5 +372,5 @@ export abstract class ScoreFunctionRenderer {
 	// 			Anonymous functions that are used often enough to be made class fields
 	// ========================================================================================
 
-	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.rendererConfig.domainAxisMaxCoordinateOne - this.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + this.rendererConfig.labelOffset * 1.5; }
+	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.lastRendererUpdate.rendererConfig.domainAxisMaxCoordinateOne - this.lastRendererUpdate.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + this.lastRendererUpdate.rendererConfig.labelOffset * 1.5; }
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 15:29:54
+* @Last Modified time: 2017-05-10 15:38:08
 */
 
 // Import Angular Classes:
@@ -125,7 +125,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.calculateDefaultComponentSize();
 		this.renderConfigService.viewConfig = this.viewConfig;
 		this.renderConfigService.initUserColors();
-		this.rendererDataService.recordOriginalAlternativeOrder(this.valueChart);
 
 		// Configure the directive for the input data:
 		// this.configureChartData();

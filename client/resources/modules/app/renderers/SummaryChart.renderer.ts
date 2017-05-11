@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 15:16:30
+* @Last Modified time: 2017-05-10 16:19:08
 */
 
 // Import Angular Classes
@@ -47,7 +47,7 @@ export class SummaryChartRenderer {
 	private USER_SCORE_SPACING: number = 10;				// The spacing between user score bars, in pixels.
 
 	// The viewConfig object for this renderer. It is configured using the renderConfigService.
-	public rendererConfig: RendererConfig = <RendererConfig>{};
+	public lastRendererUpdate: RendererUpdate;
 
 	// d3 Selections:
 	public chart: d3.Selection<any, any, any, any>;						// The 'g' element that contains all the elements making up the summary chart.
@@ -98,14 +98,16 @@ export class SummaryChartRenderer {
 		if (this.numUsers != update.valueChart.getUsers().length)
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 
+		console.log("re-rendering");
+
 		this.numUsers = update.valueChart.getUsers().length;
-		this.rendererConfig = update.rendererConfig;
+		this.lastRendererUpdate = update;
 
 		this.renderSummaryChart(update);
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.rendererConfig);
+		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.lastRendererUpdate);
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
