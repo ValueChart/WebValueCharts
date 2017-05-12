@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 13:09:25
+* @Last Modified time: 2017-05-12 11:15:20
 */
 
 // Import Angular Classes
@@ -63,6 +63,7 @@ export class ObjectiveChartRenderer {
 	public objectiveDomainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
 	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
+	public domainLabels: d3.Selection<any, any, any, any>;
 
 	private numUsers: number;
 
@@ -251,9 +252,10 @@ export class ObjectiveChartRenderer {
 
 		this.weightColumns = this.cells.selectAll('.' + this.defs.WEIGHT_OUTLINE);
 
-
 		var updateDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; });
+
+		this.domainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL);
 
 		// Update domain labels to conform to the data.
 		updateDomainLabels.exit().remove();
@@ -297,19 +299,19 @@ export class ObjectiveChartRenderer {
 		var alternativeLabelsToUpdate = this.alternativeLabels.data(u.valueChart.getAlternatives());
 
 		// Update the data behind the alternative boxes.
-		var alternativeBoxesToUpdate: d3.Selection<any, any, any, any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+		var alternativeBoxesToUpdate: d3.Selection<any, any, any, any> = this.alternativeBoxes
 			.data(u.valueChart.getAlternatives());
 
 		// Update the data behind the cells.
-		var cellsToUpdate = rowsToUpdate.selectAll('.' + this.defs.CELL)
+		var cellsToUpdate = this.cells
 			.data((d: RowData) => { return d.cells; })
 
 		// Update the data behind the user score bars.
-		var userScoresToUpdate = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
+		var userScoresToUpdate = this.userScores
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 		// Update the data behind the weight outlines. Recall that these are only displayed for group ValueCharts.
-		var weightColumnsToUpdate = cellsToUpdate.selectAll('.' + this.defs.WEIGHT_OUTLINE)
+		var weightColumnsToUpdate = this.weightColumns
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 
@@ -392,7 +394,7 @@ export class ObjectiveChartRenderer {
 
 		var domainLabelCoord: number = 5;
 
-		cells.selectAll('.' + this.defs.DOMAIN_LABEL)
+		this.domainLabels
 			.data((d: CellData) => { return [d]; })
 			.text((d: CellData, i: number) => { return d.value })
 			.attr(u.rendererConfig.coordinateOne, (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / 3)

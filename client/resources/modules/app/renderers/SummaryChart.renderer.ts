@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 13:09:36
+* @Last Modified time: 2017-05-12 11:06:11
 */
 
 // Import Angular Classes
@@ -299,24 +299,23 @@ export class SummaryChartRenderer {
 		var alternatives: Alternative[] = u.valueChart.getAlternatives();
 
 		// Update the data behind the cells.
-		var cellsToUpdate: d3.Selection<any, any, any, any> = this.rows.data(u.rowData).selectAll('.' + this.defs.CELL)
-			.data((d: RowData) => { return d.cells; })
+		this.rows.data(u.rowData);
+		var cellsToUpdate = this.cells.data((d: RowData) => { return d.cells; });
 
 		// Update the data behind the user scores.
-		var userScoresToUpdate: d3.Selection<any, any, any, any> = cellsToUpdate.selectAll('.' + this.defs.USER_SCORE)
-			.data((d: CellData, i: number) => { return d.userScores; });
+		var userScoresToUpdate = this.userScores.data((d: CellData, i: number) => { return d.userScores; });
 
 		// Update the data behind the alternative boxes.
-		var alternativeBoxesToUpdate: d3.Selection<any, any, any, any> = this.alternativeBoxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
-			.data(alternatives);
+		var alternativeBoxesToUpdate = this.alternativeBoxes.data(alternatives);
 
 		// Update the data behind the score totals.
-		var scoreTotalsToUpdate: d3.Selection<any, any, any, any> = this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
-			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; })
-			.selectAll('.' + this.defs.SCORE_TOTAL)
+		var scoreSubContainersToUpdate = this.scoreTotalsSubContainers
+			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
+
+		var scoreTotalsToUpdate = this.scoreTotals
 			.data((d: CellData) => { return d.userScores; });
 
-		var averageLinesToUpdate: d3.Selection<any, any, any, any> = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
+		var averageLinesToUpdate = this.averageLines
 			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
 
 		this.renderUtilityAxis(u);
@@ -324,7 +323,7 @@ export class SummaryChartRenderer {
 		this.toggleUtilityAxis(u.viewConfig.displayScales);
 
 		// Render the summary chart using the selections with updated data.
-		this.renderSummaryChartRows(u, alternativeBoxesToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate);
+		this.renderSummaryChartRows(u, alternativeBoxesToUpdate, scoreSubContainersToUpdate, scoreTotalsToUpdate, cellsToUpdate, userScoresToUpdate, averageLinesToUpdate);
 	
 		// Indicate that the summary chart is finished rendering.
 		this.renderEventsService.summaryChartDispatcher.next(1);	
@@ -370,7 +369,7 @@ export class SummaryChartRenderer {
 						containers because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 						Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should called to re-render objective rows.
 	*/
-	renderSummaryChartRows(u: RendererUpdate, alternativeBoxes: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>): void {
+	renderSummaryChartRows(u: RendererUpdate, alternativeBoxes: d3.Selection<any, any, any, any>, scoreSubContainers: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>): void {
 		// Give dimensions to the alternative boxes so that each one completely covers on alternative column. Position them exactly above those columns. This is so that they can be the targets of any user clicks on top of those columns.
 		alternativeBoxes
 			.attr(u.rendererConfig.dimensionOne, (d: CellData, i: number) => { return u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length })
@@ -381,7 +380,7 @@ export class SummaryChartRenderer {
 			.attr('id', (d: Alternative) => { return 'summary-' + d.getId() + '-box' });
 
 		// Position the score total containers.
-		this.scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+		scoreSubContainers
 			.attr('transform', (d: CellData, i: number) => {
 				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 			})
@@ -462,7 +461,7 @@ export class SummaryChartRenderer {
 		});
 
 		var bestTotalScoreSelections: any = {};
-		this.chart.selectAll('.' + this.defs.SCORE_TOTAL).nodes().forEach((element: Element) => {
+		this.scoreTotals.nodes().forEach((element: Element) => {
 			if (element.nodeName === 'text') {
 				let selection: d3.Selection<any, any, any, any> = d3.select(element);
 				let userScore: UserScoreData = selection.datum();

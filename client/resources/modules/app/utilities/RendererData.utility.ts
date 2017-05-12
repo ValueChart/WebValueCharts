@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 13:16:50
+* @Last Modified time: 2017-05-12 15:23:55
 */
 
 // Import Angular Classes:
@@ -85,7 +85,7 @@ export class RendererDataUtility {
 	}
 
 	produceLabelData = (u: RendererUpdate) => {
-		if (!this.labelData) {
+		if (!this.labelData || !this.labelData[0]) {
 			this.generateLabelData(u.valueChart);
 		}
 

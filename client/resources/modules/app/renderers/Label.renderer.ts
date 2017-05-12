@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 18:00:52
+* @Last Modified time: 2017-05-12 15:50:30
 */
 
 // Import Angular Classes:
@@ -68,6 +68,8 @@ export class LabelRenderer {
 	public labelContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the hierarchical label structure.
 	public scoreFunctionContainer: d3.Selection<any, any, any, any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
 
+	public labelSelections: any = {};
+
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
 	// space that the label area is rendered in.
 	private displayScoreFunctions: boolean;					// Should score function plots be displayed? 
@@ -110,13 +112,15 @@ export class LabelRenderer {
 			this.createLabelSpace(update);
 		}
 
-		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
-
-		
 		if (this.reordered) {
+			this.createLabels(update, update.labelData, this.labelContainer);
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
 		}
+
+		this.renderLabelSpace(update, update.labelData);
+
+		
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -135,11 +139,7 @@ export class LabelRenderer {
 	}
 
 	handleObjectivesReordered = (reordered: boolean) => {
-		if (reordered) {
-			this.reordered = true;
-			this.rootContainer.node().remove();
-			this.rootContainer = undefined;
-		}
+		this.reordered = reordered;
 	}
 
 	/*
@@ -176,7 +176,7 @@ export class LabelRenderer {
 			.classed('' + this.defs.SCORE_FUNCTIONS_CONTAINER, true);
 
 		// Recursively create the labels based on the Objective structure.
-		this.createLabels(u, u.labelData, this.labelContainer, this.defs.ROOT_CONTAINER_NAME);
+		this.createLabels(u, u.labelData, this.labelContainer);
 
 		// Create the score Functions.
 		this.createScoreFunctions(u, this.scoreFunctionContainer);
@@ -193,47 +193,80 @@ export class LabelRenderer {
 						be used to update the existing label area to have a different structure. Instead, the label area must be deleted and rebuilt using createLabelSpace.
 						This method should NOT be called manually.
 	*/
-	createLabels(u: RendererUpdate, labelData: LabelData[], labelContainer: d3.Selection<any, any, any, any>, parentName: string): void {
+	createLabels(u: RendererUpdate, labelData: LabelData[], labelContainer: d3.Selection<any, any, any, any>, parentName: string = this.defs.ROOT_CONTAINER_NAME): void {
+		this.labelSelections[parentName] = {};
+
 		// Create a new container for each element in labelData.
-		var newLabelContainers: d3.Selection<any, any, any, any> = labelContainer.selectAll('g[parent=' + parentName + ']')
-			.data(labelData)
-			.enter().append('g')
+		var updateLabelContainers: d3.Selection<any, any, any, any> = labelContainer.selectAll('.' + this.defs.LABEL_SUBCONTAINER).filter(function() {
+			return (<Element> this).parentElement == labelContainer.node();
+		}).data(labelData);
+
+		updateLabelContainers.exit().remove();
+
+		var newLabelContainers = updateLabelContainers.enter().append('g')
+			.attr('parent', parentName)	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
 			.classed(this.defs.LABEL_SUBCONTAINER, true)
-			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-container' })
-			.attr('parent', parentName);	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-container' });
+
+		updateLabelContainers
+			.attr('parent', parentName)	// Set the name parent objective on the 'g', or this.defs.ROOT_CONTAINER_NAME if it has not parent objective. 
+			.classed(this.defs.LABEL_SUBCONTAINER, true)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-container' });
+
+		this.labelSelections[parentName].labelContainers = labelContainer.selectAll('g[parent=' + parentName + ']');
 
 		// Append an outline rectangle for label container that was just created.
-		newLabelContainers.append('rect')
+		newLabelContainers.append('rect');
+
+		this.labelSelections[parentName].labelContainers.select('rect')		
 			.classed(this.defs.SUBCONTAINER_OUTLINE, true)
 			.classed('valuechart-label-outline', true)
-			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-outline' });
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-outline' })
+			.attr('parent', parentName);
 
-		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
-		var labelText = newLabelContainers.append('text')
-			.classed(this.defs.SUBCONTAINER_TEXT, true)
-			.classed('valuechart-label-text', true)
-			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-text' });
-
-		// Append a tspan element to contain the objective's name, and weight.
-		labelText.append('tspan')
-			.classed(this.defs.SUBCONTAINER_NAME, true)
-			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-name' });
-
-		// Append a tspan element to contain the objective's best and worst elements.
-		labelText.append('tspan')
-			.classed(this.defs.SUBCONTAINER_BEST_WORST, true)
-			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-best-worst' });
+		this.labelSelections[parentName].subContainerOutlines = this.labelSelections[parentName].labelContainers.select('.' + this.defs.SUBCONTAINER_OUTLINE);
 
 		// Append the dividing line. This is what users are actually clicking on when they click and drag to change objective weights.
-		newLabelContainers.append('line')
+		newLabelContainers.append('line');
+		this.labelSelections[parentName].labelContainers.select('line')
 			.classed(this.defs.SUBCONTAINER_DIVIDER, true)
 			.classed('valuechart-label-divider', true)
 			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-divider' });
 
+		this.labelSelections[parentName].dividers = this.labelSelections[parentName].labelContainers.select('.' + this.defs.SUBCONTAINER_DIVIDER);
+
+		// Append a text element for each label container that was just created. These text elements will be the labels themselves.
+		var updateLabelText = newLabelContainers.append('text');
+		this.labelSelections[parentName].labelContainers.select('text')
+			.classed(this.defs.SUBCONTAINER_TEXT, true)
+			.classed('valuechart-label-text', true)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-text' });
+
+		this.labelSelections[parentName].labelText = this.labelSelections[parentName].labelContainers.select('.' + this.defs.SUBCONTAINER_TEXT);
+
+		// Append a tspan element to contain the objective's name, and weight.
+		updateLabelText.append('tspan')
+			.classed(this.defs.SUBCONTAINER_NAME, true);
+		this.labelSelections[parentName].labelText.select('.' + this.defs.SUBCONTAINER_NAME)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-name' });
+
+		this.labelSelections[parentName].nameText = this.labelSelections[parentName].labelText.select('.' + this.defs.SUBCONTAINER_NAME);
+
+		// Append a tspan element to contain the objective's best and worst elements.
+		updateLabelText.append('tspan')
+			.classed(this.defs.SUBCONTAINER_BEST_WORST, true);
+		this.labelSelections[parentName].labelText.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+			.attr('id', (d: LabelData) => { return 'label-' + d.objective.getId() + '-best-worst' });
+
+		this.labelSelections[parentName].bestWorstText = this.labelSelections[parentName].labelText.select('.' + this.defs.SUBCONTAINER_BEST_WORST);
 
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: LabelData) => {
-			if (labelDatum.subLabelData === undefined) {
+			if (labelDatum.subLabelData) {
+				this.createLabels(u, labelDatum.subLabelData, u.el.select('#label-' + labelDatum.objective.getId() + '-container'), labelDatum.objective.getId());
+			} else {
+				u.el.select('#label-' + labelDatum.objective.getId() + '-container').selectAll('.' + this.defs.LABEL_SUBCONTAINER).remove();
+								
 				u.el.select('#label-' + labelDatum.objective.getId() + '-outline')
 					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
 
@@ -242,7 +275,6 @@ export class LabelRenderer {
 				return;
 			}
 
-			this.createLabels(u, labelDatum.subLabelData, u.el.select('#label-' + labelDatum.objective.getId() + '-container'), labelDatum.objective.getId());
 		});
 	}
 
@@ -259,7 +291,8 @@ export class LabelRenderer {
 		@description 	Updates the data behind the labels using the renderLabels method. This method is mainly used to handle changes to user assigned objective weights.
 						It should NOT be used to render the label space for the first time, or to render it in a different orientation. This is what renderLabelSpace is for.
 	*/
-	renderLabelSpace(u: RendererUpdate, labelData: LabelData[], parentName: string) {
+
+	renderLabelSpace(u: RendererUpdate, labelData: LabelData[], parentName: string = this.defs.ROOT_CONTAINER_NAME) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
@@ -273,18 +306,16 @@ export class LabelRenderer {
 			});
 
 
-		var labelSpaces = this.rootContainer.selectAll('g[parent="' + parentName + '"]').data(labelData).order();
-		this.renderLabels(u, labelData, labelSpaces);
+		this.renderLabels(u, labelData, parentName);
 
-		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
-
-		this.renderScoreFunctions(u, scoreFunctionContainer);
+		// TODO : Only render score functions when they are displayed...
+		this.renderScoreFunctions(u, this.scoreFunctionContainer);
 
 		if (u.viewConfig.displayScoreFunctions) {
 			// Render the score function plots.
-			scoreFunctionContainer.style('display', 'block');
+			this.scoreFunctionContainer.style('display', 'block');
 		} else {
-			scoreFunctionContainer.style('display', 'none');
+			this.scoreFunctionContainer.style('display', 'none');
 		}
 
 		// Indicate that rendering of the label area is complete.
@@ -301,7 +332,8 @@ export class LabelRenderer {
 						labels as well, allowing it to either update, or simply render the a label and its children. Note that this method should generally NOT
 						be called manually. Use updateLabelSpace if the goal is to update all labels, or renderLabelSpace if the label space must be rendered.
 	*/
-	renderLabels(u: RendererUpdate, labelData: LabelData[], labelSpaces: d3.Selection<any, any, any, any>): void {
+	renderLabels(u: RendererUpdate, labelData: LabelData[], parentName: string): void {
+		this.labelSelections[parentName].labelContainers.data(labelData);
 		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
 		var weightOffsets: number[] = [];
 		var weightSum: number = 0;	// The weight offset for the first objective at this level is 0.
@@ -310,24 +342,23 @@ export class LabelRenderer {
 			weightSum += labelData[i].weight;
 		}
 
-		this.renderLabelOutline(u, labelSpaces.select('.' + this.defs.SUBCONTAINER_OUTLINE), weightOffsets);	// Render the outlining rectangle.
+		this.renderLabelOutline(u, this.labelSelections[parentName].subContainerOutlines, weightOffsets);	// Render the outlining rectangle.
 
-		this.renderLabelText(u, labelSpaces.select('.' + this.defs.SUBCONTAINER_TEXT), weightOffsets)	// Render the text within the label
+		this.renderLabelText(u, this.labelSelections[parentName].labelText, weightOffsets, parentName)	// Render the text within the label
 
-		this.renderLabelDividers(u, labelSpaces.select('.' + this.defs.SUBCONTAINER_DIVIDER), weightOffsets);
+		this.renderLabelDividers(u, this.labelSelections[parentName].dividers, weightOffsets);
 
 
 		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
 		labelData.forEach((labelDatum: LabelData, index: number) => {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
-			let subLabelSpaces: d3.Selection<any, any, any, any> = this.rootContainer.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			let scaledWeightOffset: number = u.rendererConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
-			subLabelSpaces.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
+			this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 			
-			this.renderLabels(u, labelDatum.subLabelData, subLabelSpaces.data(labelDatum.subLabelData));	// Render the sub labels using the data update selection.
+			this.renderLabels(u, labelDatum.subLabelData, labelDatum.objective.getId());	// Render the sub labels using the data update selection.
 		});
 	}
 
@@ -365,7 +396,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the label text of a set of sibling labels. This includes rendering the name, weight (in percentage points), and best and worst elements.
 	*/
-	renderLabelText(u: RendererUpdate, labelTexts: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
+	renderLabelText(u: RendererUpdate, labelTexts: d3.Selection<any, any, any, any>, weightOffsets: number[], parentName: string): void {
 
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
@@ -379,13 +410,13 @@ export class LabelRenderer {
 					u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 5) + textOffset;
 			});
 
-		labelTexts.select('.' + this.defs.SUBCONTAINER_NAME)
+		this.labelSelections[parentName].nameText
 			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
 				return d.objective.getName() + ' (' + (Math.round((d.weight / u.valueChart.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
 			});
 
-		labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+		this.labelSelections[parentName].bestWorstText
 			.attr('x', (d: LabelData, i: number) => { return (u.viewConfig.viewOrientation === 'vertical') ? 10 : u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 5) + textOffset })
 			.attr('dy', '1.2em')
 			.text((d: LabelData) => {
@@ -398,10 +429,10 @@ export class LabelRenderer {
 			});
 
 		if (u.valueChart.isIndividual()) {
-			labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+			this.labelSelections[parentName].bestWorstText
 				.style('display', 'block');
 		} else {
-			labelTexts.select('.' + this.defs.SUBCONTAINER_BEST_WORST)
+			this.labelSelections[parentName].bestWorstText
 				.style('display', 'none');
 		}
 
@@ -502,15 +533,14 @@ export class LabelRenderer {
 
 
 		// Select all the score function plot containers:
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
-			.data(data);
+		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION).nodes();
 
-		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
-			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
-			objective = el.data()[0];																			// Get the data for this score function from the selection
+		data.forEach((objective: Objective, i: number) => {
+			el = d3.select(scoreFunctionsPlots[i]);																// Convert the element into a d3 selection.
 			objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
 			dimensionOneTransform = (this.lastRendererUpdate.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
+			weightOffset += objectiveWeight;
 
 			// Place the score function plot in the correct location.
 			el.attr('transform', this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
@@ -541,7 +571,6 @@ export class LabelRenderer {
 				viewOrientation: u.viewConfig.viewOrientation,
  			});
 
-			weightOffset += objectiveWeight;
 		});
 
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);

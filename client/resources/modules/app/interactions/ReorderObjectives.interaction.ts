@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:35:48
+* @Last Modified time: 2017-05-12 15:54:12
 */
 
 // Import Angular Classes:
@@ -276,9 +276,28 @@ export class ReorderObjectivesInteraction {
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.lastRendererUpdate.valueChart.setRootObjectives(this.getOrderedRootObjectives(labelData));
+		var primitiveObjectives = this.lastRendererUpdate.valueChart.getAllPrimitiveObjectives();
+
+		this.siblingContainers.style('opacity', 1);
+		this.containerToReorder.style('opacity', 1);
+
+		// Just until the location of score functions is fixed.
+		var scoreFunctions = this.labelScoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 1);
+
+		this.reorderScoreFunctionContainers(scoreFunctions, primitiveObjectives);
 
 		this.changeDetectionService.objectiveOrderChanged = true;
 		this.reorderSubject.next(true);
+	}
+
+	public reorderScoreFunctionContainers(scoreFunctions: d3.Selection<any, any, any, any>, primitiveObjectives): void {
+		scoreFunctions.sort((a: PrimitiveObjective, b: PrimitiveObjective) => {
+
+			if (primitiveObjectives.indexOf(a) < primitiveObjectives.indexOf(b))
+				return -1
+			else 
+				return 1
+		});
 	}
 
 		// This function extracts the ordering of objectives from the ordering of labels.
@@ -310,6 +329,11 @@ export class ReorderObjectivesInteraction {
 
 	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
 		this.lastRendererUpdate.valueChart.setRootObjectives(objectivesRecord.rootObjectives);
+		this.lastRendererUpdate.labelData[0] = undefined;
+		this.reorderScoreFunctionContainers(scoreFunctions, this.lastRendererUpdate.valueChart.getAllPrimitiveObjectives());
+
+		this.reorderSubject.next(true);
+		this.changeDetectionService.objectiveOrderChanged = true;
 	}
 
 }
