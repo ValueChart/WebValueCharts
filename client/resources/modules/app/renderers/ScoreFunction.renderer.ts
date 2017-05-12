@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:48:10
+* @Last Modified time: 2017-05-11 17:43:18
 */
 
 // Import Angular Classes:
@@ -23,6 +23,7 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 import { ContinuousDomain }											from '../../../model/ContinuousDomain';
 
 import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
+import { AdjustScoreFunctionInteraction }							from '../interactions/AdjustScoreFunction.interaction';
 
 import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
@@ -56,8 +57,10 @@ export abstract class ScoreFunctionRenderer {
 	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
 
 
-	private lastRendererUpdate: any;
-	private numUsers: number;
+	protected lastRendererUpdate: any;
+	protected numUsers: number;
+
+	protected adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
 
 	// TODO: <@aaron> : Clear up these comments.
 
@@ -99,7 +102,9 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	constructor(
 		protected chartUndoRedoService: ChartUndoRedoService,
-		protected expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) { }
+		protected expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+		this.adjustScoreFunctionInteraction = new AdjustScoreFunctionInteraction(this.chartUndoRedoService);
+	}
 
 	// ========================================================================================
 	// 									Methods
@@ -123,8 +128,8 @@ export abstract class ScoreFunctionRenderer {
 		this.toggleValueLabels(displayScoreFunctionValueLabels);		
 	}
 
-	interactionConfigChanged = (expandScoreFunctions: boolean) => {
-		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(true, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
+	interactionConfigChanged = (interactionConfig: any) => {
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
 	}
 
 	/*
@@ -137,7 +142,6 @@ export abstract class ScoreFunctionRenderer {
 	createScoreFunction(u: any): void {
 		var objectiveId: string = u.objective.getId();
 		this.objective = u.objective;
-		this.enableInteraction = u.interactive;
 
 		// The root container is passed in.
 		this.rootContainer = u.el;

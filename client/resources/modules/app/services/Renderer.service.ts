@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-10 22:24:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:40:52
+* @Last Modified time: 2017-05-11 17:20:59
 */
 
 // Import Angular Classes:
@@ -59,7 +59,7 @@ export class RendererService {
 
 		// Assign a color to each user without one in the ValueChart
 		valueChart.getUsers().forEach((user: User, index: number) => {
-			if (!user.color) {
+			if (!user.color || user.color == "#000000") {
 				user.color = this.kellyColors[index];
 			}
 		});

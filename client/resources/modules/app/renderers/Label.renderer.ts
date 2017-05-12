@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 13:16:56
+* @Last Modified time: 2017-05-11 18:00:52
 */
 
 // Import Angular Classes:
@@ -60,6 +60,7 @@ export class LabelRenderer {
 	// ========================================================================================
 
 	public lastRendererUpdate: RendererUpdate;
+	public reordered: boolean = false; 
 
 	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
 	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the Label area.
@@ -74,7 +75,7 @@ export class LabelRenderer {
 
 	private scoreFunctionSubjects: any;
 	private scoreFunctionViewSubject: Subject<boolean>;
-	private scoreFunctionInteractionSubject: Subject<boolean>;
+	private scoreFunctionInteractionSubject: Subject<any>;
 
 	// ========================================================================================
 	// 									Constructor
@@ -107,10 +108,15 @@ export class LabelRenderer {
 
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
-			this.interactionsChanged(update.interactionConfig);
 		}
 
 		this.renderLabelSpace(update, update.labelData, this.defs.ROOT_CONTAINER_NAME);
+
+		
+		if (this.reordered) {
+			this.interactionsChanged(update.interactionConfig);
+			this.reordered = false;
+		}
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -119,8 +125,9 @@ export class LabelRenderer {
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.scoreFunctionContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
-	
 		this.sortAlternativesInteraction.sortAlternativesByObjective(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
+
+		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
@@ -129,6 +136,7 @@ export class LabelRenderer {
 
 	handleObjectivesReordered = (reordered: boolean) => {
 		if (reordered) {
+			this.reordered = true;
 			this.rootContainer.node().remove();
 			this.rootContainer = undefined;
 		}
@@ -270,10 +278,11 @@ export class LabelRenderer {
 
 		var scoreFunctionContainer: d3.Selection<any, any, any, any> = this.rootContainer.select('.' + this.defs.SCORE_FUNCTIONS_CONTAINER);
 
+		this.renderScoreFunctions(u, scoreFunctionContainer);
+
 		if (u.viewConfig.displayScoreFunctions) {
 			// Render the score function plots.
 			scoreFunctionContainer.style('display', 'block');
-			this.renderScoreFunctions(u, scoreFunctionContainer);
 		} else {
 			scoreFunctionContainer.style('display', 'none');
 		}
@@ -453,24 +462,12 @@ export class LabelRenderer {
 
 			var scoreFunctionSubject = new Subject();
 
-			var scoreFunctions: ScoreFunction[] = [];
-			var colors: string[] = [];
-
-			u.valueChart.getUsers().forEach((user: User) => {
-				scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
-				colors.push(user.color);
-			});
-
 			scoreFunctionSubject.map((sfU: any) => { 
 				sfU.el = el;
-				sfU.scoreFunctions = scoreFunctions;
-				sfU.colors = colors;
 				sfU.objective = objective;
-				sfU.viewOrientation = u.viewConfig.viewOrientation;
-				sfU.interactive = u.interactionConfig.adjustScoreFunctions;
 				
 				return sfU;
-			}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
+			})	.map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
 				.map(this.rendererScoreFunctionUtility.produceViewConfig)
 				.subscribe(renderer.scoreFunctionChanged);
 
@@ -497,7 +494,7 @@ export class LabelRenderer {
 		var height: number;
 		var weightOffset: number = 0;
 		var el: d3.Selection<any, any, any, any>;
-		var datum: PrimitiveObjective;
+		var objective: PrimitiveObjective;
 		var objectiveWeight: number;
 		var dimensionOneTransform: number;
 		var dimensionTwoTransform: number;
@@ -510,8 +507,8 @@ export class LabelRenderer {
 
 		scoreFunctionsPlots.nodes().forEach((scoreFunctionPlot: Element) => {
 			el = d3.select(scoreFunctionPlot);																// Convert the element into a d3 selection.
-			datum = el.data()[0];																			// Get the data for this score function from the selection
-			objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(datum.getName());
+			objective = el.data()[0];																			// Get the data for this score function from the selection
+			objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
 			dimensionOneTransform = (this.lastRendererUpdate.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
 			dimensionTwoTransform = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
 
@@ -526,12 +523,28 @@ export class LabelRenderer {
 				height = this.labelWidth;
 			}
 
-			this.scoreFunctionSubjects[datum.getId()].next({ width: width, height: height });
+			var scoreFunctions: ScoreFunction[] = [];
+			var colors: string[] = [];
+
+			u.valueChart.getUsers().forEach((user: User) => {
+				scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
+				colors.push(user.color);
+			});
+
+			this.scoreFunctionSubjects[objective.getId()].next(
+			{ 
+				width: width,
+				height: height, 
+				interactionConfig: { adjustScoreFunctions: u.interactionConfig.adjustScoreFunctions, expandScoreFunctions: true },
+				scoreFunctions: scoreFunctions,
+				colors: colors,
+				viewOrientation: u.viewConfig.viewOrientation,
+ 			});
+
 			weightOffset += objectiveWeight;
 		});
 
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
-		this.scoreFunctionInteractionSubject.next(true);
 	}
 
 	// ========================================================================================

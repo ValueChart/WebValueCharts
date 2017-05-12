@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:48:08
+* @Last Modified time: 2017-05-11 17:43:06
 */
 
 // Import Angular Classes:
@@ -18,6 +18,7 @@ import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
 import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
+import { AdjustScoreFunctionInteraction }				from '../interactions/AdjustScoreFunction.interaction';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../model/ValueChart';
@@ -49,8 +50,6 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public barLabelContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
 	public barLabels: d3.Selection<any, any, any, any>;				// The selection of 'text' elements used as score labels for bars.
 
-	// The linear scale used to translate from scores to pixel coordinates. This is used to determine the dimensions of the bars.
-	private heightScale: d3.ScaleLinear<number, number>;
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
@@ -72,9 +71,17 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService, expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+	constructor(chartUndoRedoService: ChartUndoRedoService, 
+		expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
 		super(chartUndoRedoService, expandScoreFunctionInteraction);
 	}
+
+
+	interactionConfigChanged = (interactionConfig: any) => {
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
+		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.barTops, this.lastRendererUpdate)
+	}
+
 
 	// ========================================================================================
 	// 									Methods
@@ -226,19 +233,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
 			});
 
-		// Configure the linear scale that translates scores into pixel units.
-		this.heightScale = d3.scaleLinear()
-			.domain([0, 1]);
-		if (u.viewOrientation === 'vertical') {
-			this.heightScale.range([0, u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
-		} else {
-			this.heightScale.range([0, u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo]);
-
-		}
-
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
-			return Math.max(this.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
+			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
 		};
 
 		// Render the utility bars.
@@ -271,53 +268,6 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
 			})
 			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); });
-
-		// Enable or disable dragging to change user score functions depending on whether interaction is enabled
-		this.toggleDragToChangeScore(u);
-	}
-
-	/*
-		@param enableDragging - Whether dragging to alter a user's score function should be enabled. 
-		@param objective - The objective for which the score function plot is being rendered.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	This method toggles the interaction that allows clicking and dragging on bar tops to alter a user's score function.
-	*/
-	toggleDragToChangeScore(u: any): void {
-		var dragToChangeScore = d3.drag();
-
-		if (u.interactive) {
-			dragToChangeScore.on('start', (d: DomainElement, i: number) => {
-				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, u.objective);
-			});
-
-			dragToChangeScore.on('drag', (d: DomainElement, i: number) => {
-				var score: number;
-				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-				if (u.viewOrientation === 'vertical') {
-					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-					score = this.heightScale.invert(u.rendererConfig.domainAxisCoordinateTwo - (<any>d3.event)[u.rendererConfig.coordinateTwo]);
-				} else {
-					// No need to do anything with offsets here because x is already left to right.
-					score = this.heightScale.invert((<any>d3.event)[u.rendererConfig.coordinateTwo]);
-				}
-				score = _.clamp(score, 0, 1);	// Make sure the score is between 0 and 1.
-
-				d.scoreFunction.setElementScore(<string>d.element, score);
-			});
-		}
-
-		// Set the drag listeners on the bar top elements.
-		this.barTops.call(dragToChangeScore);
-
-		// Set the cursor style for the bar tops to indicate that they are drag-able (if dragging was enabled).
-		this.barTops.style('cursor', () => {
-			if (!u.interactive) {
-				return 'auto';
-			} else {
-				return (u.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
-			}
-		});
 	}
 
 	/*

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 10:38:38
+* @Last Modified time: 2017-05-11 18:06:33
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
+import * as _																	from 'lodash';
 
 // Import Model Classes:
 import { PrimitiveObjective }													from '../../../model/PrimitiveObjective';
@@ -37,8 +38,7 @@ export class RendererScoreFunctionUtility {
 	// ========================================================================================
 
 
-	private ScoreFunctionData: any = {};
-
+	private scoreFunctionData: any = {};
 
 	// ========================================================================================
 	// 									Constructor
@@ -57,7 +57,13 @@ export class RendererScoreFunctionUtility {
 	// ========================================================================================
 
 	produceScoreFunctionData = (u: any) => {
-		u.usersDomainElements = this.getAllScoreFunctionData(u.objective, u.scoreFunctions, u.colors);
+
+		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length) {
+			console.log('we made it here');
+			this.scoreFunctionData[u.objective.getId()] = this.getAllScoreFunctionData(u.objective, u.scoreFunctions, u.colors);
+		}
+
+		u.usersDomainElements = this.scoreFunctionData[u.objective.getId()];
 
 		return u;
 	}
@@ -161,6 +167,25 @@ export class RendererScoreFunctionUtility {
 
 		u.rendererConfig.domainAxisMaxCoordinateOne = Math.min((19 / 20) * u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionOneSize - u.rendererConfig.labelOffset);
 
+		// Configure the linear scale that translates scores into pixel units. 
+		u.heightScale = d3.scaleLinear()
+			.domain([0, 1])
+
+		if (u.viewOrientation === 'vertical') {
+			u.heightScale.range([0, (u.rendererConfig.domainAxisCoordinateTwo) - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+		} else {
+			u.heightScale.range([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+		}
+
+		// 		// Configure the linear scale that translates scores into pixel units.
+		// this.heightScale = d3.scaleLinear()
+		// 	.domain([0, 1]);
+		// if (u.viewOrientation === 'vertical') {
+		// 	this.heightScale.range([0, u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+		// } else {
+		// 	this.heightScale.range([0, u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo]);
+
+		// }
 
 		return u;
 	}

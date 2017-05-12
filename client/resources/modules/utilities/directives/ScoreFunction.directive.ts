@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:58:48
+* @Last Modified time: 2017-05-11 18:11:07
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -60,9 +60,11 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	// Change detection fields:
 	private previousObjectiveToDisplay: PrimitiveObjective;
 	private previousScoreFunctions: ScoreFunction[];
+	private previousEnableInteraction: boolean;
 
 	private scoreFunctionSubject: Subject<any>;
-	private viewSubject: Subject<boolean>;	
+	private viewConfigSubject: Subject<boolean>;	
+	private interactionSubject: Subject<any>;
 	private rendererSubscription: Subscription;
 
 	// ========================================================================================
@@ -95,6 +97,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	initChangeDetection(): void {
 		this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
 		this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
+		this.previousEnableInteraction = _.clone(this.enableInteraction);
 	}
 
 	initScoreFunctionPlot(): void {
@@ -106,21 +109,30 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		}
 		
 		this.scoreFunctionSubject = new Subject();
+		this.interactionSubject = new Subject();
 
 		this.rendererSubscription = this.scoreFunctionSubject.map((sfU: any) => { 
 			sfU.el = this.scoreFunctionPlotContainer;
 			sfU.objective = this.objective;
-			sfU.colors = this.colors;
-			sfU.scoreFunctions = this.scoreFunctions;
-			sfU.viewOrientation = this.viewOrientation;
-			sfU.interactive = this.enableInteraction;
 			
 			return sfU;
 		}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
 			.map(this.rendererScoreFunctionUtility.produceViewConfig)
 			.subscribe(this.scoreFunctionRenderer.scoreFunctionChanged);
 
-		this.scoreFunctionSubject.next({ width: this.width, height: this.height });
+		this.interactionSubject.subscribe(this.scoreFunctionRenderer.interactionConfigChanged);
+
+		this.scoreFunctionSubject.next(
+			{ 
+				width: this.width, 
+				height: this.height, 				
+				colors: this.colors,
+				scoreFunctions: this.scoreFunctions,
+				viewOrientation: this.viewOrientation,
+				interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction }
+			});
+
+		this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
 	}
 
 	ngDoCheck() {
@@ -131,19 +143,28 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 			this.initScoreFunctionPlot();
 		}
 
-		else {
-			if (this.enableInteraction) {
+		if (this.enableInteraction != this.previousEnableInteraction) {
+			this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
+			this.previousEnableInteraction = _.clone(this.enableInteraction);
+		}
 
-				if (!_.isEqual(this.previousScoreFunctions, this.scoreFunctions)) {
-					
-					this.scoreFunctionSubject.next({ width: this.width, height: this.height });
-					this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
+		if (!_.isEqual(this.previousScoreFunctions, this.scoreFunctions)) {
+			
+			this.scoreFunctionSubject.next(
+				{
+					width: this.width, 
+					height: this.height, 
+					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction },
+					colors: this.colors,
+					scoreFunctions: this.scoreFunctions,
+					viewOrientation: this.viewOrientation
+				});
+			
+			this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
 
-					// If this is a sub window, update the parent window in response to the changes.
-					if (window.opener) {
-						(<any>window.opener).angularAppRef.tick();
-					}
-				}
+			// If this is a sub window, update the parent window in response to the changes.
+			if (window.opener) {
+				(<any>window.opener).angularAppRef.tick();
 			}
 		}
 	}

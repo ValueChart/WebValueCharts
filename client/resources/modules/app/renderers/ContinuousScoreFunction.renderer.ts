@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:48:07
+* @Last Modified time: 2017-05-11 17:43:03
 */
 
 // Import Angular Classes:
@@ -17,6 +17,7 @@ import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
 
 import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
+import { AdjustScoreFunctionInteraction }				from '../interactions/AdjustScoreFunction.interaction';
 
 // Import Model Classes:
 import { Objective }									from '../../../model/Objective';
@@ -46,8 +47,6 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public pointLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the 'text' elements used to labels points in the scatter plot with their scores.
 	public pointLabels: d3.Selection<any, any, any, any>;					// The 'text' elements used to labels points in the scatter plot with their scores.
 
-	// The linear scale used to translate from scores to pixel coordinates. This is used to determine the locations of the points and fitlines.
-	private heightScale: d3.ScaleLinear<number, number>;
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs: any = {
@@ -72,13 +71,20 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService, expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+	constructor(chartUndoRedoService: ChartUndoRedoService, 
+		expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
 		super(chartUndoRedoService, expandScoreFunctionInteraction);
 	}
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+
+	interactionConfigChanged = (interactionConfig: any) => {
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
+		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.plottedPoints, this.lastRendererUpdate)
+	}
 
 	/*
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. The user containers are the 'g' elements that will contain the parts of each users plot (bars/points).
@@ -233,19 +239,9 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		var pointRadius = u.rendererConfig.labelOffset / 2.5;
 		var pointOffset = 3;
 
-		// Configure the linear scale that translates scores into pixel units. 
-		this.heightScale = d3.scaleLinear()
-			.domain([0, 1])
-
-		if (u.viewOrientation === 'vertical') {
-			this.heightScale.range([0, (u.rendererConfig.domainAxisCoordinateTwo) - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
-		} else {
-			this.heightScale.range([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);
-		}
-
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - this.heightScale(d.scoreFunction.getScore(+d.element)) : this.heightScale(d.scoreFunction.getScore(+d.element));
+			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
 		};
 
 		// Render the scatter plot points for each user.
@@ -278,54 +274,6 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				});
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]);
 			});
-
-		// Enable or disable dragging to change user score functions depending on whether interaction is enabled
-		this.toggleDragToChangeScore(u);
-	}
-
-	/*
-		@param enableDragging - Whether dragging to alter a user's score function should be enabled. 
-		@param objective - The objective for which the score function plot is being rendered.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	This method toggles the interaction that allows clicking and dragging on scatter plot points to alter a user's score function.
-	*/
-	toggleDragToChangeScore(u: any): void {
-		var dragToResizeScores = d3.drag();
-
-		if (u.interactive) {
-			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
-				// Save the current state of the ScoreFunction.
-				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, u.objective);
-			});
-
-			dragToResizeScores.on('drag', (d: DomainElement, i: number) => {
-				var score: number;
-				// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-				if (u.viewOrientation === 'vertical') {
-					// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-					score = this.heightScale.invert(u.rendererConfig.domainAxisCoordinateTwo - (<any>d3.event)[u.rendererConfig.coordinateTwo]);
-				} else {
-					// No need to do anything with offsets here because x is already left to right.
-					score = this.heightScale.invert((<any>d3.event)[u.rendererConfig.coordinateTwo]);
-				}
-				score = Math.max(0, Math.min(score, 1)); // Normalize the score to be between 0 and 1.
-
-				d.scoreFunction.setElementScore(<number>d.element, score);
-			});
-		}
-
-		// Set the drag listeners on the point elements.
-		this.plottedPoints.call(dragToResizeScores);
-
-		// Set the cursor style for the points to indicate that they are drag-able (if dragging was enabled).
-		this.plottedPoints.style('cursor', () => {
-			if (!u.interactive) {
-				return 'auto';
-			} else {
-				return (u.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
-			}
-		});
 	}
 
 	/*
