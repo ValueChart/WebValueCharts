@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:56:17
+* @Last Modified time: 2017-05-12 23:28:20
 */
 
 // Import Angular Classes:
@@ -69,9 +69,7 @@ export class LabelRenderer {
 	public labelSelections: any = {};
 
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
-	// space that the label area is rendered in.
-	private displayScoreFunctions: boolean;					// Should score function plots be displayed? 
-	// and the values are score function renderers.
+															// space that the label area is rendered in.
 
 	private scoreFunctionSubjects: any = {};
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
@@ -137,11 +135,11 @@ export class LabelRenderer {
 
 	viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.scoreFunctionViewSubject.next(viewConfig.displayScoreFunctionValueLabels);
+		this.toggleDisplayScoreFunctions(viewConfig.displayScoreFunctions);
 	}
 
 	handleObjectivesReordered = (reordered: boolean) => {
 		this.reordered = reordered;
-
 	}
 
 	/*
@@ -458,7 +456,6 @@ export class LabelRenderer {
 			.classed(this.defs.SCORE_FUNCTION, true)
 			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; });
 
-
 		this.labelSelections[objective.getId()].scoreFunction = scoreFunction;
 
 		var renderer: ScoreFunctionRenderer
@@ -507,14 +504,6 @@ export class LabelRenderer {
 		var dimensionOneTransform: number;
 		var dimensionTwoTransform: number;
 
-
-		if (u.viewConfig.displayScoreFunctions) {
-			// Render the score function plots.
-			scoreFunctionContainer.style('display', 'block');
-		} else {
-			scoreFunctionContainer.style('display', 'none');
-		}
-
 		objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
@@ -548,8 +537,6 @@ export class LabelRenderer {
 	}
 
 	applyStyles(u: RendererUpdate): void {
-
-
 		this.rootContainer.selectAll('.' + this.defs.SUBCONTAINER_OUTLINE)
 			.style('fill', 'white')
 			.style('stroke', (d: LabelData) => {
@@ -565,6 +552,15 @@ export class LabelRenderer {
 		} else {
 			bestWorstText
 				.style('display', 'none');
+		}
+	}
+
+	toggleDisplayScoreFunctions(displayScoreFunctions: boolean): void {
+		if (displayScoreFunctions) {
+			this.rootContainer.selectAll('.' + this.defs.SCORE_FUNCTION).style('display', 'block');
+			this.renderLabelSpace(this.lastRendererUpdate, this.lastRendererUpdate.labelData);
+		} else {
+			this.rootContainer.selectAll('.' + this.defs.SCORE_FUNCTION).style('display', 'none');
 		}
 	}
 

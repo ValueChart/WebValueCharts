@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:30:01
+* @Last Modified time: 2017-05-12 23:27:51
 */
 
 // Import Angular Classes:
@@ -100,7 +100,6 @@ export class ChangeDetectionService {
 		this.alternativeOrderChanged = false;
 		this.objectiveOrderChanged = false;
 		this.viewConfigRecord.viewOrientation = viewConfig.viewOrientation;
-		this.viewConfigRecord.displayScoreFunctions = viewConfig.displayScoreFunctions;
 
 		return valueChartChanged || renderDataChanged || viewOrientationChanged || scoreFunctionDisplayChanged;
 	}
