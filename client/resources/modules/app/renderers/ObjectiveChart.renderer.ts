@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 11:15:20
+* @Last Modified time: 2017-05-12 18:42:30
 */
 
 // Import Angular Classes
@@ -93,10 +93,13 @@ export class ObjectiveChartRenderer {
 		
 		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
+			this.applyStyles(update);
 		}
 
-		if (this.numUsers != update.valueChart.getUsers().length) 
+		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
+			this.applyStyles(update);
+		}
 
 		this.numUsers = update.valueChart.getUsers().length;
 
@@ -360,8 +363,7 @@ export class ObjectiveChartRenderer {
 			.attr(u.rendererConfig.coordinateTwo, () => {
 				return (u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize + alternativeLabelCoordTwoOffset : alternativeLabelCoordTwoOffset;
 			})
-			.attr('alternative', (d: Alternative) => { return d.getId(); })
-			.style('font-size', '20px');
+			.attr('alternative', (d: Alternative) => { return d.getId(); });
 
 		alternativeBoxes
 			.attr(u.rendererConfig.dimensionOne, (d: CellData, i: number) => { return u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length; })
@@ -419,12 +421,6 @@ export class ObjectiveChartRenderer {
 	*/
 	renderUserScores(u: RendererUpdate, userScores: d3.Selection<any, any, any, any>): void {
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => {
-				if (u.valueChart.isIndividual())
-					return d.objective.getColor();
-				else
-					return d.user.color;
-			})
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
 			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); });
@@ -452,37 +448,46 @@ export class ObjectiveChartRenderer {
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
 	renderWeightColumns(u: RendererUpdate, weightColumns: d3.Selection<any, any, any, any>): void {
-		var calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
-			let weightDimensionTwoOffset: number = 2;
-			let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-			return Math.max(u.rendererConfig.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);
-		}
-
 		weightColumns
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1), 0); })
-			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return calculateWeightColumnDimensionTwo(d, i); })
+			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return this.calculateWeightColumnDimensionTwo(d, i); })
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + ((this.USER_SCORE_SPACING + 1) / 2); })
-			.style('stroke-dasharray', (d: UserScoreData, i: number) => {
-				let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
-				let dimensionTwo: number = calculateWeightColumnDimensionTwo(d, i);
-
-				return (u.viewConfig.viewOrientation === 'vertical') ?
-					(dimensionOne + dimensionTwo) + ', ' + dimensionOne
-					:
-					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
-			});
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			weightColumns
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 					let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
-					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - calculateWeightColumnDimensionTwo(d, i);
+					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - this.calculateWeightColumnDimensionTwo(d, i);
 				});
 		} else {
 			weightColumns.attr(u.rendererConfig.coordinateTwo, 0);
 		}
 
 		this.toggleWeightColumns(u);
+	}
+
+
+	applyStyles(u: RendererUpdate): void {
+		this.alternativeLabels.style('font-size', '20px');
+		this.userScores.style('fill', (d: UserScoreData, i: number) => {
+				if (u.valueChart.isIndividual())
+					return d.objective.getColor();
+				else
+					return d.user.color;
+			});
+
+		this.weightColumns.style('stroke-dasharray', (d: UserScoreData, i: number) => {
+			let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
+			let dimensionTwo: number = this.calculateWeightColumnDimensionTwo(d, i);
+
+			return (u.viewConfig.viewOrientation === 'vertical') ?
+				(dimensionOne + dimensionTwo) + ', ' + dimensionOne
+				:
+				(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
+		});
+
+
+
 	}
 
 	/*
@@ -512,6 +517,11 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 	// 		Anonymous functions that are used often enough to be made class fields
 	// ========================================================================================
+	calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
+		let weightDimensionTwoOffset: number = 2;
+		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
+		return Math.max(this.lastRendererUpdate.rendererConfig.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);
+	}
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
 	calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };

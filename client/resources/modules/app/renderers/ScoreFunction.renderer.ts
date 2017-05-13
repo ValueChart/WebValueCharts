@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 17:17:10
+* @Last Modified time: 2017-05-12 18:33:25
 */
 
 // Import Angular Classes:
@@ -57,6 +57,9 @@ export abstract class ScoreFunctionRenderer {
 	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
 
 	public domainAxis: d3.Selection<any, any, any, any>;
+	public unitsLabel: d3.Selection<any, any, any, any>;
+	public utilityAxisContainer: d3.Selection<any, any, any, any>;
+
 
 	protected lastRendererUpdate: any;
 	protected numUsers: number;
@@ -113,11 +116,15 @@ export abstract class ScoreFunctionRenderer {
 
 
 	scoreFunctionChanged = (update: any) => {
-		if (this.rootContainer == undefined)
+		if (this.rootContainer == undefined) {
 			this.createScoreFunction(update);
+			this.applyStyles(update);
+		}
 
-		if (this.numUsers != update.scoreFunctions.length)
+		if (this.numUsers != update.scoreFunctions.length) {
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
+			this.applyStyles(update);
+		}
 
 		this.numUsers = update.scoreFunctions.length;
 		this.lastRendererUpdate = update;
@@ -189,11 +196,9 @@ export abstract class ScoreFunctionRenderer {
 			.classed(ScoreFunctionRenderer.defs.AXES_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-axes-container');
 
-		this.axisContainer.append('line')
+		this.domainAxis = this.axisContainer.append('line')
 			.classed(ScoreFunctionRenderer.defs.DOMAIN_AXIS, true)
-			.attr('id', 'scorefunction-' + objectiveId + '-domain-axis')
-			.style('stroke-width', 1)
-			.style('stroke', 'black');
+			.attr('id', 'scorefunction-' + objectiveId + '-domain-axis');
 
 		let unitsText = "";
 		let dom = this.objective.getDomain();
@@ -201,13 +206,12 @@ export abstract class ScoreFunctionRenderer {
 			unitsText = (<ContinuousDomain>dom).unit;
 		}
 
-		this.axisContainer.append('text')
+		this.unitsLabel = this.axisContainer.append('text')
 			.classed(ScoreFunctionRenderer.defs.UNITS_LABEL, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-units-label')			
-			.text(unitsText)
-			.style('font-size', '10px');
+			.text(unitsText);
 
-		this.axisContainer.append('g')
+		this.utilityAxisContainer = this.axisContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container');
 	}
@@ -272,7 +276,7 @@ export abstract class ScoreFunctionRenderer {
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize - 1)
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.dimensionTwoSize);
 
-		this.renderScoreFunctionAxis(u, this.axisContainer);
+		this.renderScoreFunctionAxis(u);
 
 		this.renderPlot(u, this.domainLabels, this.plotElementsContainer);
 	}
@@ -284,22 +288,22 @@ export abstract class ScoreFunctionRenderer {
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
 						the axes elements should be done as part of a call to renderScoreFunction instead.
 	*/
-	renderScoreFunctionAxis(u: any, axisContainer: d3.Selection<any, any, any, any>): void {
+	renderScoreFunctionAxis(u: any): void {
 
 		// Position the domain axis.
-		axisContainer.select('.' + ScoreFunctionRenderer.defs.DOMAIN_AXIS)
+		this.domainAxis
 			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.utilityAxisCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo + '1', u.rendererConfig.domainAxisCoordinateTwo)
 			.attr(u.rendererConfig.coordinateOne + '2', u.rendererConfig.domainAxisMaxCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo + '2', u.rendererConfig.domainAxisCoordinateTwo);
 
-		axisContainer.select('.' + ScoreFunctionRenderer.defs.UNITS_LABEL)
+		this.unitsLabel
 			.attr(u.rendererConfig.coordinateOne, u.rendererConfig.domainAxisMaxCoordinateOne / 2)
 			.attr(u.rendererConfig.coordinateTwo,  u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 2);
 
 
 		// Delete the elements of the previous utility axis.
-		var elements: any = (<any>axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER).node()).children;
+		var elements: any = this.utilityAxisContainer.node().children;
 		for (var i = 0; i < elements.length; i++) {
 			elements[i].remove();
 		}
@@ -326,12 +330,11 @@ export abstract class ScoreFunctionRenderer {
 		utilityAxis.ticks(1);
 
 		// Position the axis by positioning the axis container and then create it.
-		axisContainer.select('.' + ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER)
+		this.utilityAxisContainer
 			.attr('transform', () => {
 				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((u.rendererConfig.utilityAxisCoordinateOne + 4) + ',' + (u.rendererConfig.utilityAxisMaxCoordinateTwo - .5) + ')') : ((u.rendererConfig.domainAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.utilityAxisCoordinateOne + 4) + ')'));
 			})
-			.call(utilityAxis)
-			.style('font-size', 8);
+			.call(utilityAxis);
 	}
 
 	/*
@@ -364,12 +367,23 @@ export abstract class ScoreFunctionRenderer {
 		domainLabels
 			.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 			.attr(u.rendererConfig.coordinateTwo, labelCoordinateTwo)
-			.text((d: DomainElement) => { return d.element; })
-			.style('font-size', '9px');
+			.text((d: DomainElement) => { return d.element; });
 	}
 
 	abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
 
+
+	applyStyles(u: any): void {
+		this.domainAxis
+			.style('stroke-width', 1)
+			.style('stroke', 'black');
+
+		this.unitsLabel.style('font-size', '10px');
+	
+		this.utilityAxisContainer.style('font-size', 8);
+
+		this.domainLabels.style('font-size', '9px');
+	}
 
 
 	// ========================================================================================

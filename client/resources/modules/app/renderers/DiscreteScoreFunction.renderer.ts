@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 17:43:06
+* @Last Modified time: 2017-05-12 18:32:48
 */
 
 // Import Angular Classes:
@@ -245,9 +245,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
-			})
-			.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
-
+			});
 		// Render the bar labels.
 		this.barLabels
 			.text((d: any, i: number) => {
@@ -256,8 +254,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
-			})
-			.style('font-size', 8);
+			});
+
 
 		// Render the bar tops.
 		this.barTops
@@ -266,8 +264,16 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
-			})
-			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); });
+			});
+	}
+
+
+	applyStyles(u: any): void {
+		super.applyStyles(u);
+
+		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
+		this.barLabels.style('font-size', 8);
+		this.barTops.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); });
 	}
 
 	/*

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 11:06:11
+* @Last Modified time: 2017-05-12 18:19:52
 */
 
 // Import Angular Classes
@@ -93,11 +93,15 @@ export class SummaryChartRenderer {
 	valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 
-		if (this.chart == undefined)
+		if (this.chart == undefined) {
 			this.createSummaryChart(update);
+			this.applyStyles(update);
+		}
 
-		if (this.numUsers != update.valueChart.getUsers().length)
+		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
+			this.applyStyles(update);
+		}
 
 		this.numUsers = update.valueChart.getUsers().length;
 
@@ -442,9 +446,6 @@ export class SummaryChartRenderer {
 					((u.viewConfig.viewOrientation === 'vertical') ? (u.rendererConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
 			})
 			.attr(u.rendererConfig.coordinateTwo + '1', this.calculateNormalizedTotalScore)
-			.style('font-size', this.scoreTotalFontSize)
-			.classed(this.defs.BEST_SCORE, false);
-
 
 		this.highlightBestUserScores(u);
 	}
@@ -455,6 +456,8 @@ export class SummaryChartRenderer {
 						be exactly one highlighted score total label per user.
 	*/
 	highlightBestUserScores(u: RendererUpdate) {
+		this.scoreTotals.classed(this.defs.BEST_SCORE, false);
+
 		var maxUserScores: any = {};
 		u.valueChart.getUsers().forEach((user: User) => {
 			maxUserScores[user.getUsername()] = -1;
@@ -498,12 +501,6 @@ export class SummaryChartRenderer {
 
 		// Position and give heights and widths to the user scores.
 		userScores
-			.style('fill', (d: UserScoreData, i: number) => {
-				if (u.valueChart.isIndividual())
-					return d.objective.getColor();
-				else
-					return d.user.color;
-			})
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
 			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); })
@@ -519,6 +516,19 @@ export class SummaryChartRenderer {
 			else
 				return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 		});
+	}
+
+	public applyStyles(u: RendererUpdate): void {
+		this.userScores
+			.style('fill', (d: UserScoreData, i: number) => {
+				if (u.valueChart.isIndividual())
+					return d.objective.getColor();
+				else
+					return d.user.color;
+			});
+
+		this.scoreTotals
+			.style('font-size', this.scoreTotalFontSize)
 	}
 
 	/*

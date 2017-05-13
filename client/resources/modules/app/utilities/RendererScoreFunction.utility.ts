@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 18:06:33
+* @Last Modified time: 2017-05-12 17:27:21
 */
 
 // Import Angular Classes:
@@ -59,7 +59,6 @@ export class RendererScoreFunctionUtility {
 	produceScoreFunctionData = (u: any) => {
 
 		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length) {
-			console.log('we made it here');
 			this.scoreFunctionData[u.objective.getId()] = this.getAllScoreFunctionData(u.objective, u.scoreFunctions, u.colors);
 		}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 17:17:04
+* @Last Modified time: 2017-05-12 18:56:17
 */
 
 // Import Angular Classes:
@@ -108,10 +108,12 @@ export class LabelRenderer {
 
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
+			this.applyStyles(update)
 		}
 
 		if (this.reordered) {
 			this.createLabels(update, update.labelData, this.labelContainer);
+			this.applyStyles(update)
 		}
 
 		this.renderLabelSpace(update, update.labelData);
@@ -172,6 +174,7 @@ export class LabelRenderer {
 			.classed(this.defs.LABELS_CONTAINER, true);
 
 		// Recursively create the labels based on the Objective structure.
+		this.labelWidth = this.calculateMinLabelWidth(u.labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
 		this.createLabels(u, u.labelData, this.labelContainer);
 	}
 
@@ -342,7 +345,11 @@ export class LabelRenderer {
 			if (labelDatum.depthOfChildren === 0) {	// This label has no child labels.
 				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.determineLabelWidth(labelDatum, u), scaledWeightOffset); // Generate the transformation.
 				this.labelSelections[labelDatum.objective.getId()].scoreFunction.attr('transform', labelTransform)
-				this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId()], this.labelSelections[labelDatum.objective.getId()].scoreFunction);
+			
+				// ONLY render the Score Functions if they are being displayed.
+				if (u.viewConfig.displayScoreFunctions)
+					this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId()], this.labelSelections[labelDatum.objective.getId()].scoreFunction);
+
 			} else {
 				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
 				this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
@@ -360,14 +367,6 @@ export class LabelRenderer {
 		@description 	Positions and styles the outlines of a set of sibling labels. 
 	*/
 	renderLabelOutline(u: RendererUpdate, labelOutlines: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
-		// Render the styles of the outline rectangle.
-
-		labelOutlines.style('fill', 'white')
-			.style('stroke', (d: LabelData) => {
-				// PrimitiveObjective's should have their own color unless the ValueChart has multiple users. Abstract Objectives should always be gray.
-				return (d.depthOfChildren === 0 && u.valueChart.isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
-			});
-
 		labelOutlines
 			.attr(u.rendererConfig.dimensionOne, (d, i) => { return this.determineLabelWidth(d, u); })
 			.attr(u.rendererConfig.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
@@ -417,15 +416,6 @@ export class LabelRenderer {
 				}
 				return bestWorstText;
 			});
-
-		if (u.valueChart.isIndividual()) {
-			this.labelSelections[parentName].bestWorstText
-				.style('display', 'block');
-		} else {
-			this.labelSelections[parentName].bestWorstText
-				.style('display', 'none');
-		}
-
 	}
 
 	/*
@@ -492,6 +482,8 @@ export class LabelRenderer {
 		this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
 		this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
 		this.scoreFunctionInteractionSubject.subscribe(renderer.interactionConfigChanged);
+
+		this.renderScoreFunction(u, objective, this.scoreFunctionSubjects[objective.getId()], scoreFunction);
 	}
 
 	/*
@@ -549,11 +541,33 @@ export class LabelRenderer {
 			scoreFunctions: scoreFunctions,
 			colors: colors,
 			viewOrientation: u.viewConfig.viewOrientation,
-			});
+		});
 
 
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
 	}
+
+	applyStyles(u: RendererUpdate): void {
+
+
+		this.rootContainer.selectAll('.' + this.defs.SUBCONTAINER_OUTLINE)
+			.style('fill', 'white')
+			.style('stroke', (d: LabelData) => {
+				// PrimitiveObjective's should have their own color unless the ValueChart has multiple users. Abstract Objectives should always be gray.
+				return (d.depthOfChildren === 0 && u.valueChart.isIndividual()) ? (<PrimitiveObjective>d.objective).getColor() : 'gray';
+			});
+
+
+		var bestWorstText = this.rootContainer.selectAll('.' + this.defs.SUBCONTAINER_BEST_WORST)
+		if (u.valueChart.isIndividual()) {
+			bestWorstText
+				.style('display', 'block');
+		} else {
+			bestWorstText
+				.style('display', 'none');
+		}
+	}
+
 
 	// ========================================================================================
 	// 				Anonymous functions that are used enough to be made class fields

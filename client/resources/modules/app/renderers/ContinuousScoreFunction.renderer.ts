@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 17:43:03
+* @Last Modified time: 2017-05-12 18:35:15
 */
 
 // Import Angular Classes:
@@ -248,11 +248,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.plottedPoints
 			.attr('c' + u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
 			.attr('c' + u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo)
-			.attr('r', pointRadius)
-			.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
-			.style('fill-opacity', 0.5)
-			.style('stroke-width', 1)
-			.style('stroke', 'black');
+			.attr('r', pointRadius);
 
 		// Render the point labels for each user.
 		this.pointLabels
@@ -260,8 +256,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return Math.round(100 * d.scoreFunction.getScore(+d.element)) / 100;
 			})
 			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
-			.attr(u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo)
-			.style('font-size', 8);
+			.attr(u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo);
 
 		// Render the fitlines for each user.
 		this.fitLines
@@ -274,6 +269,15 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 				});
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]);
 			});
+	}
+
+	applyStyles(u: any): void {
+		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
+			.style('fill-opacity', 0.5)
+			.style('stroke-width', 1)
+			.style('stroke', 'black');
+
+		this.pointLabels.style('font-size', 8);
 	}
 
 	/*
