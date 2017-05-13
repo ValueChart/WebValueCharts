@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 15:54:12
+* @Last Modified time: 2017-05-12 16:30:54
 */
 
 // Import Angular Classes:
@@ -48,7 +48,6 @@ export class ReorderObjectivesInteraction {
 	private lastRendererUpdate: RendererUpdate;	
 
 	private labelRootContainer: d3.Selection<any,any,any,any>;
-	private labelScoreFunctionContainer: d3.Selection<any,any,any,any>;
 
 	private reorderSubject: Subject<boolean>;
 	private ignoreReorder: boolean;						// Whether the drag events should be ignored. If true, all dragging of the current label is ignored.
@@ -105,11 +104,10 @@ export class ReorderObjectivesInteraction {
 						the handler for these events, reorderObjectives, only updates the visual display of the objective area. 'end' is used to
 						actually reorder the objectives within the objective hierarchy, and then re-render the ValueChart via the ValueChartDirective.
 	*/
-	public toggleObjectiveReordering(enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, labelScoreFunctionContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): Subject<boolean> {
+	public toggleObjectiveReordering(enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): Subject<boolean> {
 		this.lastRendererUpdate = lastRendererUpdate;
 		
 		this.labelRootContainer = labelRootContainer;
-		this.labelScoreFunctionContainer = labelScoreFunctionContainer;
 
 		var labelOutlines: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
 		var labelTexts: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
@@ -155,9 +153,6 @@ export class ReorderObjectivesInteraction {
 		// Set all the siblings that are NOT being moved to be partially transparent.
 		this.siblingContainers.style('opacity', 0.5);
 		this.containerToReorder.style('opacity', 1);
-
-		// Just until the location of score functions is fixed.
-		this.labelScoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 0.5);
 
 		var parentOutline: d3.Selection<any, any, any, any> = this.parentContainer.select('rect'); 		// Select the rect that outlines the parent label of the label being reordered.
 		var currentOutline: d3.Selection<any, any, any, any> = this.containerToReorder.select('rect');		// Select the rect that outlines the label being reordered.
@@ -238,9 +233,6 @@ export class ReorderObjectivesInteraction {
 
 		// Apply the new transformation to the label.
 		this.containerToReorder.attr('transform', labelTransform);
-		// Apply a similar translation to the affect score function plots.
-		this.adjustScoreFunctionPosition(this.labelScoreFunctionContainer, deltaCoordinateTwo, d.objective);
-
 	}
 
 	// This function is called when the label that is being reordered is released by the user, and dragging ends. It contains the logic for re-rendering the ValueChart according 
@@ -276,29 +268,15 @@ export class ReorderObjectivesInteraction {
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
 		// updates the object and summary charts. This is to avoid making the labelRenderer dependent on the other renderers.
 		this.lastRendererUpdate.valueChart.setRootObjectives(this.getOrderedRootObjectives(labelData));
-		var primitiveObjectives = this.lastRendererUpdate.valueChart.getAllPrimitiveObjectives();
 
 		this.siblingContainers.style('opacity', 1);
 		this.containerToReorder.style('opacity', 1);
-
-		// Just until the location of score functions is fixed.
-		var scoreFunctions = this.labelScoreFunctionContainer.selectAll('.' + this.labelDefinitions.SCORE_FUNCTION).style('opacity', 1);
-
-		this.reorderScoreFunctionContainers(scoreFunctions, primitiveObjectives);
 
 		this.changeDetectionService.objectiveOrderChanged = true;
 		this.reorderSubject.next(true);
 	}
 
-	public reorderScoreFunctionContainers(scoreFunctions: d3.Selection<any, any, any, any>, primitiveObjectives): void {
-		scoreFunctions.sort((a: PrimitiveObjective, b: PrimitiveObjective) => {
 
-			if (primitiveObjectives.indexOf(a) < primitiveObjectives.indexOf(b))
-				return -1
-			else 
-				return 1
-		});
-	}
 
 		// This function extracts the ordering of objectives from the ordering of labels.
 	public getOrderedRootObjectives(labelData: LabelData[]): Objective[] {
@@ -313,24 +291,9 @@ export class ReorderObjectivesInteraction {
 		return rootObjectives;
 	}
 
-	// This function moves the score functions to maintain the position within the label that is being dragged.
-	public adjustScoreFunctionPosition(container: d3.Selection<any, any, any, any>, deltaCoordinateTwo: number, objective: Objective): void {
-		if (objective.objectiveType === 'abstract') {
-			(<AbstractObjective>objective).getAllSubObjectives().forEach((subObjective: Objective) => {
-				this.adjustScoreFunctionPosition(container, deltaCoordinateTwo, subObjective);
-			});
-		} else {
-			var scoreFunction: d3.Selection<any, any, any, any> = this.labelRootContainer.select('#label-' + objective.getId() + '-scorefunction');
-			let previousTransform: string = scoreFunction.attr('transform');
-			let scoreFunctionTransform: string = this.rendererService.incrementTransform(this.lastRendererUpdate.viewConfig, previousTransform, 0, deltaCoordinateTwo);
-			scoreFunction.attr('transform', scoreFunctionTransform);
-		}
-	}
-
 	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
 		this.lastRendererUpdate.valueChart.setRootObjectives(objectivesRecord.rootObjectives);
 		this.lastRendererUpdate.labelData[0] = undefined;
-		this.reorderScoreFunctionContainers(scoreFunctions, this.lastRendererUpdate.valueChart.getAllPrimitiveObjectives());
 
 		this.reorderSubject.next(true);
 		this.changeDetectionService.objectiveOrderChanged = true;

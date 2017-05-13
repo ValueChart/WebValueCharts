@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 17:43:18
+* @Last Modified time: 2017-05-12 17:17:10
 */
 
 // Import Angular Classes:
@@ -56,6 +56,7 @@ export abstract class ScoreFunctionRenderer {
 	public userContainers: d3.Selection<any, any, any, any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
 	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
 
+	public domainAxis: d3.Selection<any, any, any, any>;
 
 	protected lastRendererUpdate: any;
 	protected numUsers: number;
@@ -235,7 +236,6 @@ export abstract class ScoreFunctionRenderer {
 			.attr('id', (d: ScoreFunctionData) => { return 'scorefunction-' + d.color.replace(/\s+/g, '') + '-container'; });
 
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
-
 
 		var updateDomainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
 			.data(u.usersDomainElements.length > 0 ? u.usersDomainElements[0].elements : []);

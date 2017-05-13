@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 15:50:30
+* @Last Modified time: 2017-05-12 17:17:04
 */
 
 // Import Angular Classes:
@@ -66,8 +66,6 @@ export class LabelRenderer {
 	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the Label area.
 	public labelSpaceOutline: d3.Selection<any, any, any, any>;			// The 'rect' element that is the outline of the label area.
 	public labelContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the hierarchical label structure.
-	public scoreFunctionContainer: d3.Selection<any, any, any, any>;		// the 'g' element that contains the score function plots for each PrimitiveObjective in the ValueChart.
-
 	public labelSelections: any = {};
 
 	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
@@ -75,9 +73,9 @@ export class LabelRenderer {
 	private displayScoreFunctions: boolean;					// Should score function plots be displayed? 
 	// and the values are score function renderers.
 
-	private scoreFunctionSubjects: any;
-	private scoreFunctionViewSubject: Subject<boolean>;
-	private scoreFunctionInteractionSubject: Subject<any>;
+	private scoreFunctionSubjects: any = {};
+	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
+	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
 	// ========================================================================================
 	// 									Constructor
@@ -114,20 +112,21 @@ export class LabelRenderer {
 
 		if (this.reordered) {
 			this.createLabels(update, update.labelData, this.labelContainer);
-			this.interactionsChanged(update.interactionConfig);
-			this.reordered = false;
 		}
 
 		this.renderLabelSpace(update, update.labelData);
 
-		
+		if (this.reordered) {
+			this.interactionsChanged(update.interactionConfig);
+			this.reordered = false;
+		}
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + this.defs.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
-		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.scoreFunctionContainer, this.lastRendererUpdate)
+		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
 		this.sortAlternativesInteraction.sortAlternativesByObjective(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
 
@@ -140,6 +139,7 @@ export class LabelRenderer {
 
 	handleObjectivesReordered = (reordered: boolean) => {
 		this.reordered = reordered;
+
 	}
 
 	/*
@@ -171,15 +171,8 @@ export class LabelRenderer {
 		this.labelContainer = this.rootContainer.append('g')
 			.classed(this.defs.LABELS_CONTAINER, true);
 
-		// Create the container which will the hold Score Functions plots for each PrimitiveObjective.
-		this.scoreFunctionContainer = this.rootContainer.append('g')
-			.classed('' + this.defs.SCORE_FUNCTIONS_CONTAINER, true);
-
 		// Recursively create the labels based on the Objective structure.
 		this.createLabels(u, u.labelData, this.labelContainer);
-
-		// Create the score Functions.
-		this.createScoreFunctions(u, this.scoreFunctionContainer);
 	}
 
 
@@ -262,17 +255,20 @@ export class LabelRenderer {
 
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: LabelData) => {
+				var container = u.el.select('#label-' + labelDatum.objective.getId() + '-container');
 			if (labelDatum.subLabelData) {
-				this.createLabels(u, labelDatum.subLabelData, u.el.select('#label-' + labelDatum.objective.getId() + '-container'), labelDatum.objective.getId());
+				container.selectAll('.' + this.defs.SCORE_FUNCTION).remove();								// Delete any score functions attached to this container.
+				this.createLabels(u, labelDatum.subLabelData,container , labelDatum.objective.getId());
 			} else {
-				u.el.select('#label-' + labelDatum.objective.getId() + '-container').selectAll('.' + this.defs.LABEL_SUBCONTAINER).remove();
+				container.selectAll('.' + this.defs.LABEL_SUBCONTAINER).remove();
 								
 				u.el.select('#label-' + labelDatum.objective.getId() + '-outline')
 					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
 
 				u.el.select('#label-' + labelDatum.objective.getId() + '-text')
 					.classed(this.defs.PRIMITIVE_OBJECTIVE_LABEL, true);
-				return;
+				
+				this.createScoreFunction(u, container, <PrimitiveObjective> labelDatum.objective);
 			}
 
 		});
@@ -308,16 +304,6 @@ export class LabelRenderer {
 
 		this.renderLabels(u, labelData, parentName);
 
-		// TODO : Only render score functions when they are displayed...
-		this.renderScoreFunctions(u, this.scoreFunctionContainer);
-
-		if (u.viewConfig.displayScoreFunctions) {
-			// Render the score function plots.
-			this.scoreFunctionContainer.style('display', 'block');
-		} else {
-			this.scoreFunctionContainer.style('display', 'none');
-		}
-
 		// Indicate that rendering of the label area is complete.
 		this.renderEventsService.labelsDispatcher.next(1);
 	}
@@ -351,14 +337,18 @@ export class LabelRenderer {
 
 		// Recursively render the labels that are children of this label (ie. the labels of the objectives that are children of those objectives in labelData)
 		labelData.forEach((labelDatum: LabelData, index: number) => {
-			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
-				return;
-
 			let scaledWeightOffset: number = u.rendererConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
-			let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
-			this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 			
-			this.renderLabels(u, labelDatum.subLabelData, labelDatum.objective.getId());	// Render the sub labels using the data update selection.
+			if (labelDatum.depthOfChildren === 0) {	// This label has no child labels.
+				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.determineLabelWidth(labelDatum, u), scaledWeightOffset); // Generate the transformation.
+				this.labelSelections[labelDatum.objective.getId()].scoreFunction.attr('transform', labelTransform)
+				this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId()], this.labelSelections[labelDatum.objective.getId()].scoreFunction);
+			} else {
+				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
+				this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
+				
+				this.renderLabels(u, labelDatum.subLabelData, labelDatum.objective.getId());	// Render the sub labels using the data update selection.
+			}
 		});
 	}
 
@@ -468,45 +458,40 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
-	createScoreFunctions(u: RendererUpdate, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
-		this.scoreFunctionSubjects = {};
+	createScoreFunction(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
+		this.labelSelections[objective.getId()] = {};
+		
+		labelContainer.selectAll('.' + this.defs.SCORE_FUNCTION).remove();
 
-		this.scoreFunctionViewSubject = new Subject();
-		this.scoreFunctionInteractionSubject = new Subject();
-
-		var newScoreFunctionPlots: d3.Selection<any, any, any, any> = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
-			.data(u.valueChart.getAllPrimitiveObjectives())
-			.enter().append('g')
+		var scoreFunction = labelContainer.selectAll('.' + this.defs.SCORE_FUNCTION)
+			.data([objective]).enter().append('g')
 			.classed(this.defs.SCORE_FUNCTION, true)
-			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; })
+			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; });
 
-		// Use the ScoreFunctionRenderer to create each score function.
-		newScoreFunctionPlots.nodes().forEach((scoreFunctionPlot: Element) => {
-			var el: d3.Selection<any, any, any, any> = d3.select(scoreFunctionPlot);
-			var objective: PrimitiveObjective = el.data()[0];
-			var renderer: ScoreFunctionRenderer
 
-			if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
-				renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
-			else
-				renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
+		this.labelSelections[objective.getId()].scoreFunction = scoreFunction;
 
-			var scoreFunctionSubject = new Subject();
+		var renderer: ScoreFunctionRenderer
 
-			scoreFunctionSubject.map((sfU: any) => { 
-				sfU.el = el;
-				sfU.objective = objective;
-				
-				return sfU;
-			})	.map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
-				.map(this.rendererScoreFunctionUtility.produceViewConfig)
-				.subscribe(renderer.scoreFunctionChanged);
+		if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
+			renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
+		else
+			renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
 
-			this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
+		var scoreFunctionSubject = new Subject();
 
-			this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
-			this.scoreFunctionInteractionSubject.subscribe(renderer.interactionConfigChanged);
-		});
+		scoreFunctionSubject.map((sfU: any) => { 
+			sfU.el = scoreFunction;
+			sfU.objective = objective;
+			
+			return sfU;
+		}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
+			.map(this.rendererScoreFunctionUtility.produceViewConfig)
+			.subscribe(renderer.scoreFunctionChanged);
+
+		this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
+		this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
+		this.scoreFunctionInteractionSubject.subscribe(renderer.interactionConfigChanged);
 	}
 
 	/*
@@ -518,7 +503,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Uses the ScoreFunctionRenderer and its subclasses to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	*/
-	renderScoreFunctions(u: RendererUpdate, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
+	renderScoreFunction(u: RendererUpdate, objective: PrimitiveObjective, scoreFunctionSubject: Subject<any>, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
 		var data = u.valueChart.getAllPrimitiveObjectives();
 
 		var width: number
@@ -531,47 +516,41 @@ export class LabelRenderer {
 		var dimensionTwoTransform: number;
 
 
+		if (u.viewConfig.displayScoreFunctions) {
+			// Render the score function plots.
+			scoreFunctionContainer.style('display', 'block');
+		} else {
+			scoreFunctionContainer.style('display', 'none');
+		}
 
-		// Select all the score function plot containers:
-		var scoreFunctionsPlots = scoreFunctionContainer.selectAll('.' + this.defs.SCORE_FUNCTION).nodes();
+		objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
 
-		data.forEach((objective: Objective, i: number) => {
-			el = d3.select(scoreFunctionsPlots[i]);																// Convert the element into a d3 selection.
-			objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
-			dimensionOneTransform = (this.lastRendererUpdate.rendererConfig.dimensionOneSize - this.labelWidth) + 1;		// Determine the dimensions the score function will occupy
-			dimensionTwoTransform = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(weightOffset);				// ^^
-			weightOffset += objectiveWeight;
+		if (u.viewConfig.viewOrientation === 'vertical') {
+			width = this.labelWidth;
+			height = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
+		} else {
+			width = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
+			height = this.labelWidth;
+		}
 
-			// Place the score function plot in the correct location.
-			el.attr('transform', this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, dimensionOneTransform, dimensionTwoTransform));
+		var scoreFunctions: ScoreFunction[] = [];
+		var colors: string[] = [];
 
-			if (u.viewConfig.viewOrientation === 'vertical') {
-				width = this.labelWidth;
-				height = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
-			} else {
-				width = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
-				height = this.labelWidth;
-			}
+		u.valueChart.getUsers().forEach((user: User) => {
+			scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
+			colors.push(user.color);
+		});
 
-			var scoreFunctions: ScoreFunction[] = [];
-			var colors: string[] = [];
-
-			u.valueChart.getUsers().forEach((user: User) => {
-				scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
-				colors.push(user.color);
+		scoreFunctionSubject.next(
+		{ 
+			width: width,
+			height: height, 
+			interactionConfig: { adjustScoreFunctions: u.interactionConfig.adjustScoreFunctions, expandScoreFunctions: true },
+			scoreFunctions: scoreFunctions,
+			colors: colors,
+			viewOrientation: u.viewConfig.viewOrientation,
 			});
 
-			this.scoreFunctionSubjects[objective.getId()].next(
-			{ 
-				width: width,
-				height: height, 
-				interactionConfig: { adjustScoreFunctions: u.interactionConfig.adjustScoreFunctions, expandScoreFunctions: true },
-				scoreFunctions: scoreFunctions,
-				colors: colors,
-				viewOrientation: u.viewConfig.viewOrientation,
- 			});
-
-		});
 
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
 	}
@@ -579,6 +558,7 @@ export class LabelRenderer {
 	// ========================================================================================
 	// 				Anonymous functions that are used enough to be made class fields
 	// ========================================================================================
+
 
 	determineLabelWidth = (d: LabelData, u: RendererUpdate) => {		 // Expand the last label to fill the rest of the space.
 		var scoreFunctionOffset: number = ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
