@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-11 15:57:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 16:23:13
+* @Last Modified time: 2017-05-13 17:47:41
 */
 
 // Import Angular Classes:
@@ -25,7 +25,7 @@ export class AdjustScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: any;
+	public lastRendererUpdate: any;
 
 
 	// ========================================================================================

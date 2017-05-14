@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:32:48
+* @Last Modified time: 2017-05-13 17:24:00
 */
 
 // Import Angular Classes:
@@ -186,33 +186,18 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
 	}
 
-	/*
-		@param domainLabels - The selection 'text' elements used to label the domain axis.
-		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
-		@param objective - The objective for which the score function plot is being rendered.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	Positions and styles the elements created by createPlot.  This method overrides the createPlot method in ScoreFunctionRenderer in order to render DiscreteScoreFunction 
-						specific elements (via renderDiscretePlot), like bars for the bar chart that is used to represent element scores.
-						This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
-						the entire score function plot.
-	*/
-	renderPlot(u: any, domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>): void {
-		// Use the super class' method to render position domain labels.
-		super.renderPlot(u, domainLabels, plotElementsContainer);
+	renderAxesDimensionOne(u: any): void {
+		super.renderAxesDimensionOne(u);
 
+		// Fix domain labels positions specifically for the discrete plot.
 		var labelCoordinateOneOffset: number;
 		if (u.viewOrientation === 'vertical') {
 			labelCoordinateOneOffset = u.rendererConfig.labelOffset + 5;
 		} else {
 			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset) + 5;
 		}
-		// Fix domain labels positions specifically for the discrete plot.
-		domainLabels.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 
-		// Render the discrete plot elements.
-		this.renderDiscretePlot(u);
+		this.domainLabels.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 	}
 
 	/*
@@ -224,7 +209,15 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						of the bar chart. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderDiscretePlot(u: any): void {
+	renderPlot(u: any, updateDimensionOne: boolean): void {
+		this.renderDiscretePlotDimensionTwo(u);
+		
+		if (updateDimensionOne) {
+			this.renderDiscretePlotDimensionOne(u);
+		}
+	}
+
+	renderDiscretePlotDimensionOne(u: any): void {
 		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.usersDomainElements.length) / 2;
 
 		// Position each users' container so theirs bars are properly offset from each other.
@@ -233,40 +226,46 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
 			});
 
+		// Render the utility bars.
+		this.utilityBars
+			.attr(u.rendererConfig.dimensionOne, barWidth)
+			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne);
+		// Render the bar labels.
+		this.barLabels
+			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); });
+
+		// Render the bar tops.
+		this.barTops
+			.attr(u.rendererConfig.dimensionOne, barWidth)
+			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne);
+	}
+
+	renderDiscretePlotDimensionTwo(u: any): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
 			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
 		};
 
-		// Render the utility bars.
 		this.utilityBars
-			.attr(u.rendererConfig.dimensionOne, barWidth)
 			.attr(u.rendererConfig.dimensionTwo, calculateBarDimensionTwo)
-			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
 			});
-		// Render the bar labels.
+
 		this.barLabels
 			.text((d: any, i: number) => {
 				return Math.round(100 * d.scoreFunction.getScore(d.element)) / 100;
-			})
-			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + (barWidth / 3); })
-			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
+			}).attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			});
 
-
-		// Render the bar tops.
 		this.barTops
-			.attr(u.rendererConfig.dimensionOne, barWidth)
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.labelOffset)
-			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
 				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
 			});
-	}
 
+	}
 
 	applyStyles(u: any): void {
 		super.applyStyles(u);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:35:15
+* @Last Modified time: 2017-05-13 17:18:41
 */
 
 // Import Angular Classes:
@@ -209,25 +209,6 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
-		@param domainLabels - The selection 'text' elements used to label the domain axis.
-		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
-		@param objective - The objective for which the score function plot is being rendered.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
-		@returns {void}
-		@description	Positions and styles the elements created by createPlot.  This method overrides the createPlot method in ScoreFunctionRenderer in order to render ContinuousScoreFunction 
-						specific elements (via renderDiscretePlot), like points and fitlines for the scatter plot that is used to represent element scores. It does this via a call to renderContinuousPlot.
-						This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
-						the entire score function plot.
-	*/
-	renderPlot(u: any, domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>): void {
-		super.renderPlot(u, domainLabels, plotElementsContainer);
-
-		this.renderContinuousPlot(u);
-
-	}
-
-	/*
 		@param objective - The objective for which the score function plot is being rendered.
 		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
@@ -235,34 +216,50 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description	This method positions and styles the ContinuousScoreFunction specific elements of the score function plot. Specifically, it renders the points, fitlines, and point labels
 						of the scatter plot.nThis method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
 	*/
-	renderContinuousPlot(u: any): void {
+	renderPlot(u: any, updateDimensionOne: boolean): void {
+		this.renderContinuousPlotDimensionTwo(u);
+
+		if (updateDimensionOne) {
+			this.renderContinuousPlotDimensionOne(u);
+		}
+	}
+
+	renderContinuousPlotDimensionOne(u: any): void {
 		var pointRadius = u.rendererConfig.labelOffset / 2.5;
 		var pointOffset = 3;
 
+		// Render the scatter plot points for each user.
+		this.plottedPoints
+			.attr('c' + u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
+			.attr('r', pointRadius);
+
+		// Render the point labels for each user.
+		this.pointLabels
+			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; });
+
+		// Render the fitlines for each user.
+		this.fitLines
+			.attr(u.rendererConfig.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
+			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; });
+	}
+
+	renderContinuousPlotDimensionTwo(u: any): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
 			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
 		};
 
-		// Render the scatter plot points for each user.
 		this.plottedPoints
-			.attr('c' + u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
-			.attr('c' + u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo)
-			.attr('r', pointRadius);
+			.attr('c' + u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo);
 
-		// Render the point labels for each user.
 		this.pointLabels
 			.text((d: any, i: number) => {
 				return Math.round(100 * d.scoreFunction.getScore(+d.element)) / 100;
 			})
-			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) + pointRadius + 1; })
 			.attr(u.rendererConfig.coordinateTwo, calculatePointCoordinateTwo);
 
-		// Render the fitlines for each user.
 		this.fitLines
-			.attr(u.rendererConfig.coordinateOne + '1', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i) - pointOffset })
 			.attr(u.rendererConfig.coordinateTwo + '1', calculatePointCoordinateTwo)
-			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; })
 			.attr(u.rendererConfig.coordinateTwo + '2', (d: DomainElement, i: number) => {
 				var userElements = u.usersDomainElements.find((userElements: ScoreFunctionData) => {
 					return userElements.color === d.color;
@@ -272,6 +269,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	applyStyles(u: any): void {
+		super.applyStyles(u);
+
 		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
 			.style('fill-opacity', 0.5)
 			.style('stroke-width', 1)

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:33:25
+* @Last Modified time: 2017-05-13 17:47:50
 */
 
 // Import Angular Classes:
@@ -60,9 +60,9 @@ export abstract class ScoreFunctionRenderer {
 	public unitsLabel: d3.Selection<any, any, any, any>;
 	public utilityAxisContainer: d3.Selection<any, any, any, any>;
 
-
 	protected lastRendererUpdate: any;
 	protected numUsers: number;
+	protected viewOrientation: string;
 
 	protected adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
 
@@ -116,9 +116,14 @@ export abstract class ScoreFunctionRenderer {
 
 
 	scoreFunctionChanged = (update: any) => {
+		this.lastRendererUpdate = update;
+
 		if (this.rootContainer == undefined) {
 			this.createScoreFunction(update);
+			this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
 			this.applyStyles(update);
+			this.numUsers = update.scoreFunctions.length;
+			return;
 		}
 
 		if (this.numUsers != update.scoreFunctions.length) {
@@ -126,10 +131,11 @@ export abstract class ScoreFunctionRenderer {
 			this.applyStyles(update);
 		}
 
+		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
+		
+		this.adjustScoreFunctionInteraction.lastRendererUpdate = this.lastRendererUpdate;
 		this.numUsers = update.scoreFunctions.length;
-		this.lastRendererUpdate = update;
-
-		this.renderScoreFunction(update);
+		this.viewOrientation = update.viewOrientation;
 	}
 
 	viewConfigChanged = (displayScoreFunctionValueLabels: boolean) => {
@@ -214,6 +220,7 @@ export abstract class ScoreFunctionRenderer {
 		this.utilityAxisContainer = this.axisContainer.append('g')
 			.classed(ScoreFunctionRenderer.defs.UTILITY_AXIS_CONTAINER, true)
 			.attr('id', 'scorefunction-' + objectiveId + '-utility-axis-container');
+
 	}
 
 
@@ -266,19 +273,45 @@ export abstract class ScoreFunctionRenderer {
 		@description	Initializes the view configuration for the score function plot, and then positions + styles its elements. This method should be used 
 						whenever the score function plot needs to be rendered for the first time, or when updated in response to changes to users' ScoreFunctions.
 						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
-						render plot method (which is overwritten by subclasses), and the renderScoreFunctionAxis to render the different parts of the score function plot.
+						render plot method (which is overwritten by subclasses), and the renderAxesDimensionTwo to render the different parts of the score function plot.
 	*/
-	renderScoreFunction(u: any): void {
-		var objectiveId: string = u.objective.getId();
+	renderScoreFunction(u: any, updateDimensionOne: boolean): void {
+		this.domainSize = u.usersDomainElements.length > 0 ? u.usersDomainElements[0].elements.length : 0;
 
 		// Give the plot outline the correct dimensions.
 		this.plotOutline
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize - 1)
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.dimensionTwoSize);
 
-		this.renderScoreFunctionAxis(u);
+		this.renderAxesDimensionTwo(u);
 
-		this.renderPlot(u, this.domainLabels, this.plotElementsContainer);
+		if (updateDimensionOne)
+			this.renderAxesDimensionOne(u);
+
+		this.renderPlot(u, updateDimensionOne);
+	}
+
+	renderAxesDimensionOne(u: any): void {
+		// Position the domain axis.
+		this.domainAxis
+			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.utilityAxisCoordinateOne)
+			.attr(u.rendererConfig.coordinateOne + '2', u.rendererConfig.domainAxisMaxCoordinateOne);
+
+		this.unitsLabel
+			.attr(u.rendererConfig.coordinateOne, u.rendererConfig.domainAxisMaxCoordinateOne / 2);
+
+		var labelCoordinateOneOffset: number;
+
+		if (u.viewOrientation === 'vertical') {
+			labelCoordinateOneOffset = u.rendererConfig.labelOffset;
+		} else {
+			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset);
+		}
+
+		// Position the domain labels along the domain (x) axis.
+		this.domainLabels
+			.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+			.text((d: DomainElement) => { return d.element; });
 	}
 
 	/*
@@ -288,19 +321,25 @@ export abstract class ScoreFunctionRenderer {
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
 						the axes elements should be done as part of a call to renderScoreFunction instead.
 	*/
-	renderScoreFunctionAxis(u: any): void {
+	renderAxesDimensionTwo(u: any): void {
 
-		// Position the domain axis.
 		this.domainAxis
-			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.utilityAxisCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo + '1', u.rendererConfig.domainAxisCoordinateTwo)
-			.attr(u.rendererConfig.coordinateOne + '2', u.rendererConfig.domainAxisMaxCoordinateOne)
 			.attr(u.rendererConfig.coordinateTwo + '2', u.rendererConfig.domainAxisCoordinateTwo);
 
 		this.unitsLabel
-			.attr(u.rendererConfig.coordinateOne, u.rendererConfig.domainAxisMaxCoordinateOne / 2)
 			.attr(u.rendererConfig.coordinateTwo,  u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 2);
 
+		var labelCoordinateTwo: number;
+
+		if (u.viewOrientation === 'vertical') {
+			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 12;
+		} else {
+			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo - (u.rendererConfig.labelOffset);
+		}
+
+		this.domainLabels
+			.attr(u.rendererConfig.coordinateTwo, labelCoordinateTwo)
 
 		// Delete the elements of the previous utility axis.
 		var elements: any = this.utilityAxisContainer.node().children;
@@ -348,27 +387,9 @@ export abstract class ScoreFunctionRenderer {
 						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
 						the entire score function plot. Note that parameters not actively used in this method are used in the extended methods of the subclasses.
 	*/
-	renderPlot(u: any, domainLabels: d3.Selection<any, any, any, any>, plotElementsContainer: d3.Selection<any, any, any, any>): void {
+	abstract renderPlot(u: any, updateDimensionOne: boolean): void; 
 
-		this.domainSize = u.usersDomainElements.length > 0 ? u.usersDomainElements[0].elements.length : 0;
 
-		var labelCoordinateOneOffset: number;
-		var labelCoordinateTwo: number;
-
-		if (u.viewOrientation === 'vertical') {
-			labelCoordinateOneOffset = u.rendererConfig.labelOffset;
-			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 12;
-		} else {
-			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset);
-			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo - (u.rendererConfig.labelOffset);
-		}
-
-		// Position the domain labels along the domain (x) axis.
-		domainLabels
-			.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
-			.attr(u.rendererConfig.coordinateTwo, labelCoordinateTwo)
-			.text((d: DomainElement) => { return d.element; });
-	}
 
 	abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
 
