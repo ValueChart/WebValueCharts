@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:19:52
+* @Last Modified time: 2017-05-15 12:32:56
 */
 
 // Import Angular Classes
@@ -69,7 +69,7 @@ export class SummaryChartRenderer {
 	private scoreTotalFontSize: number = 22;
 
 	private numUsers: number;
-
+	private viewOrientation: string;
 
 	// ========================================================================================
 	// 									Constructor
@@ -106,6 +106,12 @@ export class SummaryChartRenderer {
 		this.numUsers = update.valueChart.getUsers().length;
 
 		this.renderSummaryChart(update);
+
+		if (this.viewOrientation != update.viewConfig.viewOrientation) {
+			this.applyStyles(update);
+			this.interactionsChanged(update.interactionConfig);
+			this.viewOrientation = update.viewConfig.viewOrientation;
+		}	
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -504,7 +510,12 @@ export class SummaryChartRenderer {
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
 			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); })
-
+			.style('fill', (d: UserScoreData, i: number) => {
+				if (u.valueChart.isIndividual())
+					return d.objective.getColor();
+				else
+					return d.user.color;
+			});
 
 		userScores.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 			var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
@@ -519,13 +530,6 @@ export class SummaryChartRenderer {
 	}
 
 	public applyStyles(u: RendererUpdate): void {
-		this.userScores
-			.style('fill', (d: UserScoreData, i: number) => {
-				if (u.valueChart.isIndividual())
-					return d.objective.getColor();
-				else
-					return d.user.color;
-			});
 
 		this.scoreTotals
 			.style('font-size', this.scoreTotalFontSize)

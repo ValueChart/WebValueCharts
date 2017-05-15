@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:25:39
+* @Last Modified time: 2017-05-15 12:10:34
 */
 
 // Import Angular Classes:
@@ -76,10 +76,6 @@ export class RendererConfigUtility {
 			u.rendererConfig.dimensionOneSize = u.rendererConfig.chartComponentWidth;	// This is the width of the graph
 			u.rendererConfig.dimensionTwoSize = u.rendererConfig.chartComponentHeight;	// This is the height of the graph
 
-			u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
-				.range([0, u.height]);
-
 		} else if (u.viewConfig.viewOrientation === 'horizontal') {
 			u.rendererConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
 			u.rendererConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
@@ -89,10 +85,11 @@ export class RendererConfigUtility {
 			u.rendererConfig.dimensionOneSize = u.rendererConfig.chartComponentHeight;	// This is the height of the graph
 			u.rendererConfig.dimensionTwoSize = u.rendererConfig.chartComponentWidth;	// This is the width of the graph
 
-			u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
-				.range([0, u.height]);
 		}
+		u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
+			.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
+			.range([0, u.rendererConfig.dimensionTwoSize]);
+
 		return u;
 	}
 

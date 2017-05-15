@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 18:42:30
+* @Last Modified time: 2017-05-15 12:31:55
 */
 
 // Import Angular Classes
@@ -66,7 +66,7 @@ export class ObjectiveChartRenderer {
 	public domainLabels: d3.Selection<any, any, any, any>;
 
 	private numUsers: number;
-
+	private viewOrientation: string;
 
 	// ========================================================================================
 	// 									Constructor
@@ -104,6 +104,11 @@ export class ObjectiveChartRenderer {
 		this.numUsers = update.valueChart.getUsers().length;
 
 		this.renderObjectiveChart(update);
+		if (this.viewOrientation != update.viewConfig.viewOrientation) {
+			this.applyStyles(update);
+			this.interactionsChanged(update.interactionConfig);
+			this.viewOrientation = update.viewConfig.viewOrientation;
+		}	
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -423,8 +428,13 @@ export class ObjectiveChartRenderer {
 		userScores
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
 			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
-			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); });
-
+			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + (this.USER_SCORE_SPACING / 2); })
+			.style('fill', (d: UserScoreData, i: number) => {
+				if (u.valueChart.isIndividual())
+					return d.objective.getColor();
+				else
+					return d.user.color;
+			});
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			userScores
@@ -469,12 +479,6 @@ export class ObjectiveChartRenderer {
 
 	applyStyles(u: RendererUpdate): void {
 		this.alternativeLabels.style('font-size', '20px');
-		this.userScores.style('fill', (d: UserScoreData, i: number) => {
-				if (u.valueChart.isIndividual())
-					return d.objective.getColor();
-				else
-					return d.user.color;
-			});
 
 		this.weightColumns.style('stroke-dasharray', (d: UserScoreData, i: number) => {
 			let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));

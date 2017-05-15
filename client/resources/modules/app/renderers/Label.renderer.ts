@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 23:28:20
+* @Last Modified time: 2017-05-15 12:02:10
 */
 
 // Import Angular Classes:
@@ -75,6 +75,8 @@ export class LabelRenderer {
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
+	private viewOrientation: string;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -120,6 +122,12 @@ export class LabelRenderer {
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
 		}
+
+		if (this.viewOrientation != update.viewConfig.viewOrientation) {
+			this.applyStyles(update);
+			this.interactionsChanged(update.interactionConfig);
+			this.viewOrientation = update.viewConfig.viewOrientation;
+		}	
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
