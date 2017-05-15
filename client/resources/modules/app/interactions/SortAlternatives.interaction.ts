@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 10:37:20
+* @Last Modified time: 2017-05-15 14:52:00
 */
 
 // Import Angular Classes:
@@ -136,6 +136,9 @@ export class SortAlternativesInteraction {
 	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
 		this.initialize(lastRendererUpdate);
 
+		if (this.changeDetectionService.alternativeOrderChanged)
+			return;
+
 		if (sortingType === this.SORT_ALPHABETICALLY) {
 			this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
@@ -201,6 +204,7 @@ export class SortAlternativesInteraction {
 		if (alternativeBoxes)
 			alternativeBoxes.call(dragToSort);
 	}
+
 
 	// This function handles user clicks on objective labels by sorting the alternatives by their score for that objective.
 	private sortByObjective = (eventObject: Event) => {

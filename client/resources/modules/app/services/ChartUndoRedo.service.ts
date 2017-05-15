@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:59:22
+* @Last Modified time: 2017-05-15 14:44:05
 */
 
 // Import Application Classes:
@@ -141,6 +141,8 @@ export class ChartUndoRedoService {
 	public saveAlternativeOrderRecord(alternatives: Alternative[]): void {
 		// A new change as been made, so we should clear the redo stack.
 		this.clearRedo();
+
+		console.log('saving alternative record');
 
 		this.undoChangeTypes.push(this.ALTERNATIVE_ORDER_CHANGE);
 
