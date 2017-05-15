@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-13 17:24:00
+* @Last Modified time: 2017-05-15 14:35:41
 */
 
 // Import Angular Classes:
@@ -91,7 +91,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. The user containers are the 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
 		@param objective - The objective for which the score function plot is going to be created.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
 						like bars for the bar chart that is used to represent element scores. This method should NOT be called manually. Instead, 
@@ -105,7 +105,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Create the bar container element.
 
 		var updateBarContainers = this.userContainers.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BARS_CONTAINER)
-									.data((d,i) =>{ return [d]; });
+			.data((d,i) =>{ return [d]; });
 
 		updateBarContainers.exit().remove();
 
@@ -202,7 +202,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	/*
 		@param objective - The objective for which the score function plot is being rendered.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
 		@returns {void}
 		@description	This method positions and styles the DiscreteScoreFunction specific elements of the score function plot. Specifically, it renders the bars, bar tops, and bar labels
@@ -210,15 +210,21 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the entire score function plot.
 	*/
 	renderPlot(u: any, updateDimensionOne: boolean): void {
+		this.userContainers.data(u.scoreFunctionData);
+
+		this.barContainer.data((d,i) =>{ return [d]; });
+
+		this.utilityBars.data((d: ScoreFunctionData) => { return d.elements; });
+		this.barTops.data((d: ScoreFunctionData) => { return d.elements; });
+
 		this.renderDiscretePlotDimensionTwo(u);
-		
 		if (updateDimensionOne) {
 			this.renderDiscretePlotDimensionOne(u);
 		}
 	}
 
 	renderDiscretePlotDimensionOne(u: any): void {
-		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.usersDomainElements.length) / 2;
+		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.scoreFunctionData.length) / 2;
 
 		// Position each users' container so theirs bars are properly offset from each other.
 		this.userContainers
@@ -270,9 +276,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	applyStyles(u: any): void {
 		super.applyStyles(u);
 
-		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
+		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
 		this.barLabels.style('font-size', 8);
-		this.barTops.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); });
+		this.barTops.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); });
 	}
 
 	/*

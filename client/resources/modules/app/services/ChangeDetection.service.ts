@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:24:54
+* @Last Modified time: 2017-05-15 13:34:13
 */
 
 // Import Angular Classes:
@@ -90,8 +90,6 @@ export class ChangeDetectionService {
 		@description	
 	*/
 	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig): boolean {
-		console.log(this.colorsHaveChanged);
-
 		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
 		var renderDataChanged: boolean = this.alternativeOrderChanged || this.objectiveOrderChanged || this.colorsHaveChanged;
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;

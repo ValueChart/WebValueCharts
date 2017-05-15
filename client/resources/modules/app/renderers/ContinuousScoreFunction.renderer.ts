@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-13 17:18:41
+* @Last Modified time: 2017-05-15 14:28:56
 */
 
 // Import Angular Classes:
@@ -90,7 +90,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. The user containers are the 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
 		@param objective - The objective for which the score function plot is going to be created.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
 						like points and fitlines for the scatter plot that is used to represent element scores. This method should NOT be called manually. Instead, 
@@ -210,13 +210,29 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	/*
 		@param objective - The objective for which the score function plot is being rendered.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
 		@returns {void}
 		@description	This method positions and styles the ContinuousScoreFunction specific elements of the score function plot. Specifically, it renders the points, fitlines, and point labels
 						of the scatter plot.nThis method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
 	*/
 	renderPlot(u: any, updateDimensionOne: boolean): void {
+		this.userContainers.data(u.scoreFunctionData);
+
+		this.linesContainer.data((d, i) => { return [d]; });
+		this.pointsContainer.data((d, i) => { return [d]; });
+
+		this.plottedPoints.data((d: ScoreFunctionData) => { return d.elements; });
+		this.fitLines.data((d: ScoreFunctionData) => {
+			// Each fit line connects domain element i to i + 1 in the plot. This means that we need to create one fewer lines than domain elements.
+			// To do this, we simply remove the last domain element from the list before we create the lines.
+			var temp = d.elements.pop();	// Remove the last domain element.
+			var data = d.elements.slice();	// Copy the array.
+			d.elements.push(temp);			// Add the domain element back.
+			return data;
+		});
+
+
 		this.renderContinuousPlotDimensionTwo(u);
 
 		if (updateDimensionOne) {
@@ -261,7 +277,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.fitLines
 			.attr(u.rendererConfig.coordinateTwo + '1', calculatePointCoordinateTwo)
 			.attr(u.rendererConfig.coordinateTwo + '2', (d: DomainElement, i: number) => {
-				var userElements = u.usersDomainElements.find((userElements: ScoreFunctionData) => {
+				var userElements = u.scoreFunctionData.find((userElements: ScoreFunctionData) => {
 					return userElements.color === d.color;
 				});
 				return calculatePointCoordinateTwo(userElements.elements[i + 1]);
@@ -271,7 +287,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	applyStyles(u: any): void {
 		super.applyStyles(u);
 
-		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.usersDomainElements.length === 1) ? u.objective.getColor() : d.color); })
+		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
 			.style('fill-opacity', 0.5)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');

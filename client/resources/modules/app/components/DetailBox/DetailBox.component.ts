@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:24:52
+* @Last Modified time: 2017-05-15 13:36:46
 */
 
 // Import Angular Classes:
@@ -19,9 +19,7 @@ import { RenderEventsService }													from '../../services/RenderEvents.ser
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { HostService }															from '../../services/Host.service';
 
-import { SummaryChartDefinitions }												from '../../services/SummaryChartDefinitions.service';
 import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
-import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
 
 // Import Model Classes:
 import { ValueChart } 															from '../../../../model/ValueChart';
@@ -76,9 +74,7 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 		private renderEventsService: RenderEventsService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
-		private summaryChartDefinitions: SummaryChartDefinitions,
-		private objectiveChartDefinitions: ObjectiveChartDefinitions,
-		private labelDefinitions: LabelDefinitions) { }
+		private objectiveChartDefinitions: ObjectiveChartDefinitions) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -116,7 +112,6 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 	setUserColor(user: User, color: string): void {
 		user.color = color;
 		this.changeDetectionService.colorsHaveChanged = true;
-		console.log('setting color');
 	}
 
 	/* 	

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 17:27:21
+* @Last Modified time: 2017-05-15 14:34:15
 */
 
 // Import Angular Classes:
@@ -39,6 +39,7 @@ export class RendererScoreFunctionUtility {
 
 
 	private scoreFunctionData: any = {};
+	private colors: string[];
 
 	// ========================================================================================
 	// 									Constructor
@@ -58,35 +59,40 @@ export class RendererScoreFunctionUtility {
 
 	produceScoreFunctionData = (u: any) => {
 
-		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length) {
+		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length || !_.isEqual(this.colors, u.colors)) {
+			this.scoreFunctionData = {};
+			this.colors = _.cloneDeep(u.colors);
+			u.styleUpdate = true;
+			
 			this.scoreFunctionData[u.objective.getId()] = this.getAllScoreFunctionData(u.objective, u.scoreFunctions, u.colors);
 		}
 
-		u.usersDomainElements = this.scoreFunctionData[u.objective.getId()];
+
+		u.scoreFunctionData = this.scoreFunctionData[u.objective.getId()];
 
 		return u;
 	}
 
 
 	getAllScoreFunctionData(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): ScoreFunctionData[] {
-		var allUsersDomainElements: ScoreFunctionData[] = [];
+		var allScoreFunctionData: ScoreFunctionData[] = [];
 		var domainElements: (string | number)[] = [];
 
 		for (var i = 0; i < scoreFunctions.length; i++) {
 			if (!colors[i])
 				colors[i] = "#000000";
 
-			var userDomainElements: ScoreFunctionData = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
+			var scoreFunctionData: ScoreFunctionData = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
 			domainElements = scoreFunctions[i].getAllElements();
 
 			domainElements.forEach((domainElement: string | number) => {
-				userDomainElements.elements.push({ scoreFunction: scoreFunctions[i], color: colors[i],  element: domainElement });
+				scoreFunctionData.elements.push({ scoreFunction: scoreFunctions[i], color: colors[i],  element: domainElement });
 			});
 			
-			allUsersDomainElements.push(userDomainElements);
+			allScoreFunctionData.push(scoreFunctionData);
 		}
 
-		return allUsersDomainElements;
+		return allScoreFunctionData;
 	}
 
 	getScoreFunctionDataSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ScoreFunctionDataSummary {

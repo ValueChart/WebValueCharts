@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-13 17:47:50
+* @Last Modified time: 2017-05-15 14:31:38
 */
 
 // Import Angular Classes:
@@ -42,7 +42,7 @@ export abstract class ScoreFunctionRenderer {
 
 	protected domainSize: number;							// The number of domain elements the score function needs to plot.
 	protected objective: PrimitiveObjective;				// The primitive objective this renderer is creating a plot for.
-	protected usersDomainElements: ScoreFunctionData[];		// The data that this class is rendering.
+	protected scoreFunctionData: ScoreFunctionData[];		// The data that this class is rendering.
 	protected enableInteraction: boolean;					// Whether or not the score functions may be adjusted
 
 	// d3 Selections:
@@ -121,18 +121,20 @@ export abstract class ScoreFunctionRenderer {
 		if (this.rootContainer == undefined) {
 			this.createScoreFunction(update);
 			this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
-			this.applyStyles(update);
 			this.numUsers = update.scoreFunctions.length;
 			return;
 		}
 
 		if (this.numUsers != update.scoreFunctions.length) {
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
-			this.applyStyles(update);
 		}
 
 		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
 		
+		if (update.styleUpdate) {
+			this.applyStyles(update);
+		}
+
 		this.adjustScoreFunctionInteraction.lastRendererUpdate = this.lastRendererUpdate;
 		this.numUsers = update.scoreFunctions.length;
 		this.viewOrientation = update.viewOrientation;
@@ -228,7 +230,7 @@ export abstract class ScoreFunctionRenderer {
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. These are 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
 		@param objective - The objective for which the score function plot is going to be created.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	Creates the user containers, which will contain each user's plot elements, and the domain labels for the domain element axis. 
 						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
@@ -239,7 +241,7 @@ export abstract class ScoreFunctionRenderer {
 		// Create the user containers. Each user should have one 'g' element that will hold the elements of its plot. Elements refers to bars, points, fit lines, etc.
 		
 		var updateUserContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
-			.data(u.usersDomainElements);
+			.data(u.scoreFunctionData);
 
 		updateUserContainers.exit().remove();
 		updateUserContainers.enter().append('g')
@@ -249,7 +251,7 @@ export abstract class ScoreFunctionRenderer {
 		this.userContainers = plotElementsContainer.selectAll('.' + ScoreFunctionRenderer.defs.USER_CONTAINER)
 
 		var updateDomainLabels = domainLabelContainer.selectAll('.' + ScoreFunctionRenderer.defs.DOMAIN_LABEL)
-			.data(u.usersDomainElements.length > 0 ? u.usersDomainElements[0].elements : []);
+			.data(u.scoreFunctionData.length > 0 ? u.scoreFunctionData[0].elements : []);
 
 		updateDomainLabels.exit().remove();
 
@@ -276,7 +278,7 @@ export abstract class ScoreFunctionRenderer {
 						render plot method (which is overwritten by subclasses), and the renderAxesDimensionTwo to render the different parts of the score function plot.
 	*/
 	renderScoreFunction(u: any, updateDimensionOne: boolean): void {
-		this.domainSize = u.usersDomainElements.length > 0 ? u.usersDomainElements[0].elements.length : 0;
+		this.domainSize = u.scoreFunctionData.length > 0 ? u.scoreFunctionData[0].elements.length : 0;
 
 		// Give the plot outline the correct dimensions.
 		this.plotOutline
@@ -380,7 +382,7 @@ export abstract class ScoreFunctionRenderer {
 		@param domainLabels - The selection 'text' elements used to label the domain axis.
 		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
 		@param objective - The objective for which the score function plot is being rendered.
-		@param usersDomainElements - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
+		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
 		@returns {void}
 		@description	Positions and styles the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
