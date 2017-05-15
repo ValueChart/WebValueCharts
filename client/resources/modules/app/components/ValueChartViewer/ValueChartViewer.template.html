@@ -56,111 +56,14 @@
 			<InteractionOptions [chartType]="(this.enableInteraction() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
-	<div id="detail-box" class="detail-box"
-		[class.detail-box-horizontal]="viewOrientation === 'horizontal'"
-		[class.detail-box-vertical]="viewOrientation === 'vertical'">
-		<form class="form-inline col-xs-5" class="detail-toolbar">
-			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="chart-information-header-container"
-				(click)="detailBoxCurrentTab = DETAIL_BOX_CHART_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
-				<h5 id="alternative-header">Chart Details</h5>
-				</button>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="alternative-header-container"
-				(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
-				<h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
-				</button>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="user-list-header-container"
-				(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
-				<h5 id="user-list-headers">User List</h5>
-				</button>
-			</div>
-		</form>
-		<div class="well well-lg" id="alternative-detail-box"
-			[style.height.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().height + DETAIL_BOX_HEIGHT_OFFSET "
-			[style.width.px]="$('.' + summaryChartDefinitions.OUTLINE)[0].getBoundingClientRect().width + DETAIL_BOX_WIDTH_OFFSET">
-			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
-				<div>
-					<span class="col-xl-4 col-md-5"><b>Name:</b></span>
-					<span class="col-xl-8 col-md-7">{{valueChart.getName()}}</span>
-				</div>
-				<div>
-					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
-					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
-				</div>
-				<div *ngIf="enableManagement()">
-					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
-					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
-				</div>
-			</div>
-			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
-				<div *ngFor="let alternative of valueChart.getAlternatives()">
-					<div class="col-sm-12">
-						<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxAlternativeTab === 'Alternatives'">
-							{{alternative.getName()}}
-						</a>
-					</div>
-					<div *ngIf="detailBoxAlternativeTab === alternative.getName()">
-						<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
-							<div>
-								<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
-								<span class="col-xl-8 col-md-7">{{value}}</span>
-							</div>
-						</div>
-						<div>
-							<span class="col-xl-4 col-md-5"><b>Description</b></span>
-							<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
-						</div>
-					</div>
-				</div>
-				<div *ngIf="detailBoxAlternativeTab !== 'Alternatives'">
-					<button class="btn btn-default" (click)="collapseAlternative()">Back</button>
-				</div>
-			</div>
-			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
-				<div *ngFor="let user of valueChart.getUsers(); let i = index ">
-					<h5 class="remove-user">
-					{{user.getUsername()}}
-					<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-					<button *ngIf="enableManagement()" class="pull-right btn btn-danger btn-xxs" (click)="userToRemove=user" data-toggle="modal" data-target="#remove-user-modal">Remove</button>
-					</h5>
-				</div>
-			</div>
-		</div>
-	</div>
+	<DetailBox [valueChart]="valueChart" [enableManagement]="enableManagement()" [viewConfig]="viewConfig" [height]="valueChartHeight / 4" [width]="valueChartWidth / 3"></DetailBox>
 	<div >
 		<ValueChart
-		[data]="valueChart"
+		[valueChart]="valueChart"
 		[width]="valueChartWidth"
 		[height]="valueChartHeight"
 		[viewConfig]="viewConfig"
-		[interactions]="interactionConfig">
+		[interactionConfig]="interactionConfig">
 		</ValueChart>
 	</div>
-	<div class="modal fade" id="remove-user-modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" id="close-remove-user-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="modal-header">Remove User</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-11 col-sm-offset-1">
-                            <h3>Are you sure you want to remove this user from the chart? (Their data will not be saved.)</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button type="submit" class="btn btn-lg btn-success" (click)="removeUser(userToRemove)" data-dismiss="modal">OK</button>
-                            <button type="submit" class="btn btn-lg btn-danger" data-dismiss="modal">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>

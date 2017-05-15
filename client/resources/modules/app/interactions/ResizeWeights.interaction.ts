@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 16:06:20
+* @Last Modified time: 2017-05-11 10:39:41
 */
 
 // Import Angular Classes:
-import { Injectable } 										from '@angular/core';
+import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
@@ -16,10 +16,6 @@ import { Subscription } 											from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes
-import { ValueChartService }										from '../services/ValueChart.service';
-import { RendererDataService }										from '../services/RendererData.service';
-import { RenderConfigService } 										from '../services/RenderConfig.service';
-import { LabelRenderer }											from '../renderers/Label.renderer';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelDefinitions }											from '../services/LabelDefinitions.service';
@@ -32,7 +28,8 @@ import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { WeightMap }												from '../../../model/WeightMap';
 
-import {RowData, CellData, LabelData}								from '../../../types/RendererData.types';
+import {RowData, CellData, LabelData, RendererConfig}				from '../../../types/RendererData.types';
+import { RendererUpdate }											from '../../../types/RendererData.types';
 
 
 /*
@@ -58,6 +55,8 @@ export class ResizeWeightsInteraction {
 	// 									Fields
 	// ========================================================================================
 
+	private lastRendererUpdate: RendererUpdate;
+
 	private resizeType: string;	// The type of Weight Resizing that is currently enabled. Must be one of the strings: 'neighbor', 'siblings', or 'none'.
 
 	private clicks: Observable<Event>;
@@ -72,10 +71,6 @@ export class ResizeWeightsInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private renderConfigService: RenderConfigService,
-		private labelRenderer: LabelRenderer,
-		private valueChartService: ValueChartService,
-		private rendererDataService: RendererDataService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private labelDefinitions: LabelDefinitions) { 
 	}
@@ -92,9 +87,10 @@ export class ResizeWeightsInteraction {
 						'decrease' turns on clicking PrimitiveObjective labels to increase the objective's weight by one percent.
 						A pumpType of 'none' turns off the pump interaction.
 	*/
-	public togglePump(pumpType: string): void {
+	public togglePump(pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>, lastRendererUpdate: RendererUpdate): void {
+		this.lastRendererUpdate = lastRendererUpdate;
+
 		// Initialize the observable that is used to detect clicks and notifies handlers.
-		let primitiveObjectiveLabels = document.querySelectorAll('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
 
 		if (this.onClick != undefined)
@@ -115,13 +111,14 @@ export class ResizeWeightsInteraction {
 						This is where the actual updating of the user's weights as a result of "pumping" is accomplished.
 	*/
 	private onPump = (eventObject: Event) => {
+		var currentUser = this.lastRendererUpdate.valueChart.getUsers()[0];
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getCurrentUser().getWeightMap());
+		this.chartUndoRedoService.saveWeightMapRecord(currentUser.getWeightMap());
 
 		// Calculate the correct weight increment.
-		var totalWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getWeightTotal();
+		var totalWeight: number = currentUser.getWeightMap().getWeightTotal();
 		var labelDatum: LabelData = <any> d3.select(<any> eventObject.target).datum();
-		var previousWeight: number = this.valueChartService.getCurrentUser().getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+		var previousWeight: number = currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
 		var percentChange: number = (((<any>eventObject).pumpType === 'increase') ? 0.01 : -0.01);
 		var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
@@ -129,7 +126,7 @@ export class ResizeWeightsInteraction {
 			pumpAmount = 0 - previousWeight;
 		}
 		var newWeight: number = previousWeight + pumpAmount;
-		this.incrementObjectiveWeight(labelDatum, this.valueChartService.getCurrentUser().getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
+		this.incrementObjectiveWeight(labelDatum, currentUser.getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
 	}
 
 	/*
@@ -140,7 +137,9 @@ export class ResizeWeightsInteraction {
 						resizeType of 'siblings' turns on dragging the divider between two objective labels to modify the weights of ALL
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
-	public toggleDragToResizeWeights(resizeType: string): void {
+	public toggleDragToResizeWeights(resizeType: string, rootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
+		this.lastRendererUpdate = lastRendererUpdate;
+
 		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
 		this.resizeType = resizeType;
 		if (resizeType !== 'none') {
@@ -149,11 +148,10 @@ export class ResizeWeightsInteraction {
 				.on('drag', this.resizeWeights);
 		}
 
-		var labelSpaces = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
-			.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
-
-		this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
-
+		if (rootContainer) {
+			var labelSpaces = rootContainer.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
+			this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
+		}
 	}
 
 	/*
@@ -168,7 +166,7 @@ export class ResizeWeightsInteraction {
 		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-			return (resizeType !== 'none') ? (this.renderConfigService.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+			return (resizeType !== 'none') ? (this.lastRendererUpdate.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
 		});
 
 		labelDividers.call(dragToResizeWeights);
@@ -188,17 +186,17 @@ export class ResizeWeightsInteraction {
 	// drag events.
 	private resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
-		this.chartUndoRedoService.saveWeightMapRecord(this.valueChartService.getMaximumWeightMap());
+		this.chartUndoRedoService.saveWeightMapRecord(this.lastRendererUpdate.valueChart.getUsers()[0].getWeightMap());
 	}
 
 	// An anonymous function that is used to handle the regular drag events that are fired whenever the user continues to drag label divider.
 	// This function is responsible for updating the data behind the display. Change detection in ValueChartDirective automatically updates the display
 	// in response to these data changes. 
 	private resizeWeights = (d: LabelData, i: number) => {
-		var weightMap: WeightMap = this.valueChartService.getCurrentUser().getWeightMap();
+		var weightMap: WeightMap = this.lastRendererUpdate.valueChart.getUsers()[0].getWeightMap();
 
 		// Use the dimensionTwo scale to convert the drag distance to a change in weight.
-		var deltaWeight: number = this.labelRenderer.viewConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.labelRenderer.viewConfig.coordinateTwo]);
+		var deltaWeight: number = this.lastRendererUpdate.rendererConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.lastRendererUpdate.rendererConfig.coordinateTwo]);
 
 		var container: d3.Selection<any, any, any, any> = d3.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');

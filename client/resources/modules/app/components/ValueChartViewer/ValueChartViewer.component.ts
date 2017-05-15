@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:40:09
+* @Last Modified time: 2017-05-15 12:16:09
 */
 
 // Import Angular Classes:
@@ -21,14 +21,16 @@ import { ValueChartDirective }													from '../../directives/ValueChart.dir
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
 import { ValueChartService }													from '../../services/ValueChart.service';
-import { RendererDataService }													from '../../services/RendererData.service';
-import { ScoreFunctionViewerService }											from '../../services/ScoreFunctionViewer.service';
-import { RenderConfigService }													from '../../services/RenderConfig.service';
 import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
 import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
 import { RenderEventsService }													from '../../services/RenderEvents.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
+import { RendererService }														from '../../services/Renderer.service';
+
+import { RendererScoreFunctionUtility }											from '../../utilities/RendererScoreFunction.utility';
+import { RendererConfigUtility }												from '../../utilities/RendererConfig.utility';
+import { RendererDataUtility }													from '../../utilities/RendererData.utility';
 
 import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
 import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
@@ -70,9 +72,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
 	providers: [
 		// Services:
-		RendererDataService,
-		ScoreFunctionViewerService,
-		RenderConfigService,
+		RendererService,
 		ChangeDetectionService,
 		RenderEventsService,
 		HostService,
@@ -86,7 +86,10 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 		SortAlternativesInteraction,
 		SetObjectiveColorsInteraction,
 		ExpandScoreFunctionInteraction,
-
+		// Utilities:
+		RendererScoreFunctionUtility,
+		RendererDataUtility,
+		RendererConfigUtility,
 		// Definitions:
 		SummaryChartDefinitions,
 		ObjectiveChartDefinitions,
@@ -112,22 +115,8 @@ export class ValueChartViewerComponent implements OnInit {
 	viewConfig: ViewConfig = <any> {};
 	interactionConfig: InteractionConfig = <any> {};
 
-	// Detail Box 
-	detailBoxAlternativeTab: string;
-	alternativeObjectives: string[];
-	alternativeObjectiveValues: (string | number)[];
-
-	DETAIL_BOX_WIDTH_OFFSET: number = -50;
-	DETAIL_BOX_HEIGHT_OFFSET: number = -55;
-	DETAIL_BOX_HORIZONTAL_SCALE: number = 1.15;
-
-	detailBoxCurrentTab: string;
-	DETAIL_BOX_CHART_TAB: string = 'chart';
-	DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
-	DETAIL_BOX_USERS_TAB: string = 'users';
 	// Save Jquery as a field of the class so that it is exposed to the template.
 	$: JQueryStatic;
-
 
 	// This gets set each time the "Remove" button for a user is clicked
 	// The user will be removed from chart upon confirmation
@@ -147,13 +136,10 @@ export class ValueChartViewerComponent implements OnInit {
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
-		private renderConfigService: RenderConfigService,
+		private renderConfigService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService,
 		private changeDetectionService: ChangeDetectionService,
 		private renderEventsService: RenderEventsService,
-		private summaryChartDefinitions: SummaryChartDefinitions,
-		private objectiveChartDefinitions: ObjectiveChartDefinitions,
-		private labelDefinitions: LabelDefinitions,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 
@@ -176,49 +162,25 @@ export class ValueChartViewerComponent implements OnInit {
 		// Attach Jquery to the component so that it can be accessed inside the template.
 		this.$ = $;
 
-		this.valueChart = this.valueChartService.getValueChart();
+		this.resizeValueChart();
 
-		this.initDetailBox();
+		this.valueChart = this.valueChartService.getValueChart();
 
 		if (!this.currentUserService.isJoiningChart()) {
 			this.hostValueChart();
 		}
+
+		$(window).resize((eventObjective: Event) => {
+			this.resizeValueChart();
+		});
 	}
 
 	updateView(viewConfig: ViewConfig) {
 		this.viewConfig = viewConfig;
-
-		let detailBoxContainer: any = $('.detail-box')[0];
-		detailBoxContainer.style.left = 60 + 'px';
-
-		if (this.viewConfig.viewOrientation === 'horizontal') {
-			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
-
-			detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
-		}
 	}
 
 	updateInteractions(interactionConfig: InteractionConfig) {
 		this.interactionConfig = interactionConfig;
-	}
-
-	initDetailBox() {
-		this.detailBoxCurrentTab = this.DETAIL_BOX_CHART_TAB;
-		this.detailBoxAlternativeTab = 'Alternatives';
-		this.alternativeObjectives = [];
-		this.alternativeObjectiveValues = [];
-
-		// Size the ValueChart and detail box:
-		this.resizeValueChart();
-
-		// Resize the alternative detail box whenever the window is resized.
-		$(window).resize((eventObjective: Event) => {
-			this.resizeDetailBox();
-			this.resizeValueChart()
-		});
-
-		// Set Alternative labels to link to the Alternative detail box. 
-		this.renderEventsService.objectiveChartDispatcher.on('Rendering-Over', this.linkAlternativeLabelsToDetailBox);
 	}
 
 	/* 	
@@ -370,94 +332,6 @@ export class ValueChartViewerComponent implements OnInit {
 				toastr.warning('Saving failed');
 			});
 	}
-
-	getValueChartUrl(): string {
-		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getName() + '?password=' + this.valueChart.password;
-	}
-
-	// ================================ Detail Box Methods ====================================
-
-	/* 	
-		@returns {void}
-		@description 	Resizes the detail box depending on the dimensions of the ValueChart. This method should ONLY be called
-						when the ValueChart has already been rendered.
-	*/
-	resizeDetailBox(): void {
-		// When the window is resized, set the height of the detail box to be 50px less than the height of summary chart.
-		var alternativeDetailBox: any = $('#alternative-detail-box')[0];
-		var summaryOutline: any = $('.' + this.summaryChartDefinitions.OUTLINE)[0];
-		if (summaryOutline) {
-			alternativeDetailBox.style.height = (summaryOutline.getBoundingClientRect().height + this.DETAIL_BOX_WIDTH_OFFSET) + 'px';
-			alternativeDetailBox.style.width = (summaryOutline.getBoundingClientRect().width + this.DETAIL_BOX_HEIGHT_OFFSET) + 'px';
-		}
-
-		alternativeDetailBox.style.left = 60 + 'px';
-
-		if (this.viewConfig.viewOrientation === 'horizontal') {
-			let detailBoxContainer: any = $('.detail-box')[0];
-			let labelOutline: any = $('.' + this.labelDefinitions.OUTLINE)[0];
-			if (labelOutline) {
-				// Offset the detail box to the left if the ValueChart is in horizontal orientation.
-				detailBoxContainer.style.left = (labelOutline.getBoundingClientRect().width * this.DETAIL_BOX_HORIZONTAL_SCALE) + 'px';
-			}
-		}
-	}
-
-	expandAlternative(alternative: Alternative): void {
-		this.detailBoxAlternativeTab = alternative.getName();
-
-		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			this.alternativeObjectives[index] = objective.getName();
-			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
-		});
-
-		this.resizeDetailBox();
-	}
-
-	collapseAlternative(): void {
-		this.detailBoxAlternativeTab = 'Alternatives';
-		this.resizeDetailBox();
-	}
-
-	setUserColor(user: User, color: string): void {
-		user.color = color;
-		this.changeDetectionService.colorsHaveChanged = true;
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Removes a user from the existing ValueChart, and updates the ValueChart's resource on the database.
-	*/
-	removeUser(userToDelete: User): void {
-		this.valueChartHttpService.deleteUser(this.valueChart._id, userToDelete.getUsername())
-			.subscribe(username => {
-				if (!this.hostService.hostWebSocket) { 	// Handle the deleted user manually.
-
-					var userIndex: number = this.valueChart.getUsers().findIndex((user: User) => {
-						return user.getUsername() === userToDelete.getUsername();
-					});
-					// Delete the user from the ValueChart
-					this.valueChart.getUsers().splice(userIndex, 1);
-					toastr.warning(userToDelete.getUsername() + ' has left the ValueChart');
-				}
-
-				// The Host connection is active, so let it handle notifications about the deleted user.
-			},
-			err => {
-				toastr.error(userToDelete.getUsername() + ' could not be deleted');
-			});
-	}
-
-	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
-	linkAlternativeLabelsToDetailBox = () => {
-		d3.selectAll('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL)
-			.classed('alternative-link', true);
-
-		$('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
-			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);
-			this.expandAlternative(selection.datum());
-		});
-	};
 
 	// ================================ Undo/Redo ====================================
 

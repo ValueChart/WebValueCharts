@@ -1,36 +1,31 @@
 /*
 * @Author: aaronpmishkin
-* @Date:   2016-06-07 13:02:01
+* @Date:   2017-05-10 22:24:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 14:54:27
+* @Last Modified time: 2017-05-11 17:20:59
 */
 
 // Import Angular Classes:
 import { Injectable } 												from '@angular/core';
 
-// Import Libraries:
-import * as d3 														from 'd3';
-
-// Import Application Classes
-import { ValueChartService }										from './ValueChart.service';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
+import { ValueChart }												from '../../../model/ValueChart';
 
-// Import Types:
+// Import Types
 import { ViewConfig }												from '../../../types/Config.types';
 
 
+
+
 @Injectable()
-export class RenderConfigService {
+export class RendererService {
+
 
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
-
-	public CHART_COMPONENT_RATIO: number = 0.47;		// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
-
-	public viewConfig: ViewConfig = <any>{};			// Object with the current view configuration. The fields of this object are set by the ValueChartDirective input methods. 
 
 	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
 	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']
@@ -42,62 +37,15 @@ export class RenderConfigService {
 
 	/*
 		@returns {void}
-		@description	Used for Angular's dependency injection.
-						This constructor should NOT be called manually. Angular will automatically handle the construction of this service when it is injected.
+		@description 	Used for Angular's dependency injection ONLY. Unfortunately we are forced to assign handlers to the Undo/Redo services event emitters in this
+						method.
+						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService) { }
-
+	constructor() {	}
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
-
-	/*
-		@param viewConfig - The current viewConfig object for the ValueChartDirective.
-		@param viewOrientation - The current viewOrientation of the ValueChartDirective.
-		@param componentWidth - The width to that the ValueChartComponents are to be rendered with. Note that this currently does not support different widths for different components.
-		@param componentHeight - The height to that the ValueChartComponents are to be rendered with. Note that this currently does not support different heights for different components.
-		@returns {void}
-		@description	This function configures the variables used for height, width, x, and y attributes of SVG elements during the rendering of the ValueChart.
-						The height and width attributes of SVG elements should be set using dimensionOne, and dimensionTwo.
-						The x and y positions should be set using coordinateOne and coordinateTwo. 
-						This insures that when the orientation of the graph changes, the x and y, and height, and width attributes are switched. 
-						Note that the size of the graph is not changed during this process. 
-
-	*/
-	updateViewConfig(viewConfig: any, viewOrientation: string, componentWidth: number, componentHeight: number): void {
-		viewConfig.viewOrientation = viewOrientation;
-		viewConfig.chartComponentWidth = componentWidth;
-		viewConfig.chartComponentHeight = componentHeight;
-
-		if (viewOrientation === 'vertical') {
-			// We want to render the ValueChart horizontally
-			viewConfig.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
-			viewConfig.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
-			viewConfig.coordinateOne = 'x';		// Set coordinateOne to the x coordinate
-			viewConfig.coordinateTwo = 'y';		// Set coordinateTwo to the y coordinate
-
-			viewConfig.dimensionOneSize = viewConfig.chartComponentWidth;	// This is the width of the graph
-			viewConfig.dimensionTwoSize = viewConfig.chartComponentHeight;	// This is the height of the graph
-
-			viewConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.getMaximumWeightMap().getWeightTotal()])
-				.range([0, componentHeight]);
-
-		} else if (viewOrientation === 'horizontal') {
-			viewConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
-			viewConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
-			viewConfig.coordinateOne = 'y';		// Set coordinateOne to the y coordinate
-			viewConfig.coordinateTwo = 'x';		// Set coordinateTwo to the x coordinate
-
-			viewConfig.dimensionOneSize = viewConfig.chartComponentHeight;	// This is the height of the graph
-			viewConfig.dimensionTwoSize = viewConfig.chartComponentWidth;	// This is the width of the graph
-
-			viewConfig.dimensionTwoScale = d3.scaleLinear()
-				.domain([0, this.valueChartService.getMaximumWeightMap().getWeightTotal()])
-				.range([0, componentWidth]);
-		}
-	}
 
 	/*
 		@returns {void}
@@ -105,13 +53,13 @@ export class RenderConfigService {
 						do not have colors, so this method must be called whenever a new user joins.
 
 	*/
-	initUserColors(): void {
-		if (this.valueChartService.isIndividual())
+	initUserColors(valueChart: ValueChart): void {
+		if (valueChart.isIndividual())
 			return;
 
 		// Assign a color to each user without one in the ValueChart
-		this.valueChartService.getUsers().forEach((user: User, index: number) => {
-			if (!user.color) {
+		valueChart.getUsers().forEach((user: User, index: number) => {
+			if (!user.color || user.color == "#000000") {
 				user.color = this.kellyColors[index];
 			}
 		});
@@ -142,7 +90,7 @@ export class RenderConfigService {
 		@description	Properly increment an existing transformation by deltaCoordinateOne and deltaCoordinateTwo while taking into account the current 
 						orientation of the ValueChart.
 	*/
-	incrementTransform(previousTransform: string, deltaCoordinateOne: number, deltaCoordinateTwo: number): string {
+	incrementTransform(viewConfig: ViewConfig, previousTransform: string, deltaCoordinateOne: number, deltaCoordinateTwo: number): string {
 		var xTransform: number
 		var yTransform: number
 
@@ -157,10 +105,12 @@ export class RenderConfigService {
 		}
 
 
-		if (this.viewConfig.viewOrientation === 'vertical') {
+		if (viewConfig.viewOrientation === 'vertical') {
 			return 'translate(' + (xTransform + deltaCoordinateOne) + ',' + (yTransform + deltaCoordinateTwo) + ')';
 		} else {
 			return 'translate(' + (xTransform + deltaCoordinateTwo) + ',' + (yTransform + deltaCoordinateOne) + ')';
 		}
 	}
+
+
 }

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-28 13:01:57
+* @Last Modified time: 2017-05-10 14:55:30
 */
 
 // Import Angular Classes:
@@ -152,10 +152,6 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getAllPrimitiveObjectivesByName();
 	}
 
-	setPrimitivesObjectives(objs: PrimitiveObjective[]) {
-		this.primitiveObjectives = objs;
-	}
-
 	resetPrimitiveObjectives() {
 		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
 	}
@@ -167,17 +163,6 @@ export class ValueChartService implements ValueChartStateContainer {
 			}
 		}
 		throw "Objective not found";
-	}
-
-	// This is either: a - the current user's WeightMap if the ValueChart has one user; b - a WeightMap where each objective weight is the maximum weight assigned to the objective by a user.
-	getMaximumWeightMap(): WeightMap {
-		if (this.maximumWeightMap === undefined)
-			this.updateMaximumWeightMap();
-		return this.maximumWeightMap;
-	}
-
-	updateMaximumWeightMap(): WeightMap {
-		return this.maximumWeightMap = this.valueChart.getMaximumWeightMap();
 	}
 
 	getAlternativeValuesforObjective(obj: PrimitiveObjective): { value: (string | number), alternative: Alternative }[] {

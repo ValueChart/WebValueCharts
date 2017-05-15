@@ -2,31 +2,33 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 17:06:24
+* @Last Modified time: 2017-05-15 15:16:35
 */
 
 import { Directive, Input }												from '@angular/core';
 import { OnInit, OnDestroy, DoCheck }									from '@angular/core';
-import { NgZone }														from '@angular/core';
 
 // d3
 import * as d3 															from 'd3';
+import * as _															from 'lodash';
+import { Subject }														from 'rxjs/Subject';
+import { Subscription }													from 'rxjs/Subscription';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ScoreFunctionRenderer }										from '../../app/renderers/ScoreFunction.renderer';
 import { DiscreteScoreFunctionRenderer }								from '../../app/renderers/DiscreteScoreFunction.renderer';
 import { ContinuousScoreFunctionRenderer }								from '../../app/renderers/ContinuousScoreFunction.renderer';
 
-import { CurrentUserService }											from '../../app/services/CurrentUser.service';
-import { ValueChartService }											from '../../app/services/ValueChart.service';
+import { ExpandScoreFunctionInteraction }								from '../../app/interactions/ExpandScoreFunction.interaction';
+
 import { ChartUndoRedoService }											from '../../app/services/ChartUndoRedo.service';
-import { ScoreFunctionViewerService }									from '../../app/services/ScoreFunctionViewer.service';
+import { RendererScoreFunctionUtility }									from '../../app/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { ScoreFunction }												from '../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../model/PrimitiveObjective';
-import { User }															from '../../../model/User';
-import { UserDomainElements, DomainElement }							from '../../../types/ScoreFunctionViewer.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }						from '../../../types/RendererData.types';
 
 
 @Directive({
@@ -39,16 +41,17 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	// ========================================================================================	
 
 	// Input fields:
-	private objectiveToDisplay: PrimitiveObjective;
-	private plotWidth: number;
-	private plotHeight: number;
-	private viewOrientation: string;
-	private individual: boolean;
-	private enableInteraction: boolean;
+	@Input() scoreFunctions: ScoreFunction[];
+	@Input() colors: string[];
+	@Input() objective: PrimitiveObjective;
+	@Input() width: number;
+	@Input() height: number;
+	@Input() viewOrientation: string;
+	@Input() individualOnly: boolean;
+	@Input() enableInteraction: boolean;
 
 	// Services:
-	private valueChartService: ValueChartService;
-	private scoreFunctionViewerService: ScoreFunctionViewerService;
+	private rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	private chartUndoRedoService: ChartUndoRedoService;
 
 	// Renderer Fields:
@@ -57,7 +60,13 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	// Change detection fields:
 	private previousObjectiveToDisplay: PrimitiveObjective;
-	private previousScoreFunction: ScoreFunction;
+	private previousScoreFunctions: ScoreFunction[];
+	private previousEnableInteraction: boolean;
+
+	private scoreFunctionSubject: Subject<any>;
+	private viewConfigSubject: Subject<boolean>;	
+	private interactionSubject: Subject<any>;
+	private rendererSubscription: Subscription;
 
 	// ========================================================================================
 	// 									Constructor
@@ -68,113 +77,97 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private ngZone: NgZone) { }
+	constructor() { }
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
 
-	ngOnInit() {
-		
+	@Input() set services(value: any) {
+		this.chartUndoRedoService = value.chartUndoRedoService;
+	}
+
+	ngOnInit() {		
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
+		this.rendererScoreFunctionUtility = new RendererScoreFunctionUtility();
 
 		this.initChangeDetection();
 		this.initScoreFunctionPlot();
 	}
 
 	initChangeDetection(): void {
-
-		if (this.enableInteraction) {
-			let currentScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName()).getMemento();
-			this.previousScoreFunction = currentScoreFunction;
-			this.previousObjectiveToDisplay = this.objectiveToDisplay;
-		}	
+		this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
+		this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
+		this.previousEnableInteraction = _.clone(this.enableInteraction);
 	}
 
 	initScoreFunctionPlot(): void {
 
-		if (this.objectiveToDisplay.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+		if (this.objective.getDomainType() === 'continuous') {
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.valueChartService, this.chartUndoRedoService, this.ngZone);
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
 		}
-
-		var usersDomainElements: UserDomainElements[]
-
-		usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
 		
-		this.scoreFunctionRenderer.createScoreFunction(this.scoreFunctionPlotContainer, this.objectiveToDisplay, usersDomainElements, this.enableInteraction);
-		this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
-	}
+		this.scoreFunctionSubject = new Subject();
+		this.interactionSubject = new Subject();
 
-	detectScoreFunctionChange(previousScoreFunction: ScoreFunction, currentScoreFunction: ScoreFunction): boolean {
+		this.rendererSubscription = this.scoreFunctionSubject.map((sfU: ScoreFunctionUpdate) => { 
+			sfU.el = this.scoreFunctionPlotContainer;
+			sfU.objective = this.objective;
+			
+			return sfU;
+		}).map(this.rendererScoreFunctionUtility.produceScoreFunctionData)
+			.map(this.rendererScoreFunctionUtility.produceViewConfig)
+			.subscribe(this.scoreFunctionRenderer.scoreFunctionChanged);
 
-		var elementIterator: Iterator<number | string> = previousScoreFunction.getElementScoreMap().keys();
-		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
+		this.interactionSubject.subscribe(this.scoreFunctionRenderer.interactionConfigChanged);
 
-		while (iteratorElement.done === false) {
-			if (previousScoreFunction.getScore(iteratorElement.value) !== currentScoreFunction.getScore(iteratorElement.value)) {
-				return true;
-			}
-			iteratorElement = elementIterator.next();
-		}
-		return false;
+		this.scoreFunctionSubject.next(
+			{ 
+				width: this.width, 
+				height: this.height, 				
+				colors: this.colors,
+				scoreFunctions: this.scoreFunctions,
+				viewOrientation: this.viewOrientation,
+				interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction }
+			});
+
+		this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
 	}
 
 	ngDoCheck() {
 
-		if (this.previousObjectiveToDisplay !== this.objectiveToDisplay) {
+		if (this.previousObjectiveToDisplay !== this.objective) {
+			this.rendererSubscription.unsubscribe();
+			this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
 			this.initScoreFunctionPlot();
-			this.previousObjectiveToDisplay = this.objectiveToDisplay;
 		}
 
-		else {
-			if (this.enableInteraction) {
-				let currentScoreFunction = this.valueChartService.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(this.objectiveToDisplay.getName());
-				var scoreFunctionChange: boolean = this.detectScoreFunctionChange(this.previousScoreFunction, currentScoreFunction);
+		if (this.enableInteraction != this.previousEnableInteraction) {
+			this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
+			this.previousEnableInteraction = _.clone(this.enableInteraction);
+		}
 
-				if (scoreFunctionChange) {
-					var usersDomainElements = this.scoreFunctionViewerService.getAllUsersDomainElements(this.objectiveToDisplay, this.valueChartService.getUsers());
-					
-					this.scoreFunctionRenderer.renderScoreFunction(this.objectiveToDisplay, usersDomainElements, this.plotWidth, this.plotHeight, this.viewOrientation);
-					this.previousScoreFunction = currentScoreFunction.getMemento();
+		if (!_.isEqual(this.previousScoreFunctions, this.scoreFunctions)) {
+			
+			this.scoreFunctionSubject.next(
+				{
+					width: this.width, 
+					height: this.height, 
+					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction },
+					colors: this.colors,
+					scoreFunctions: this.scoreFunctions,
+					viewOrientation: this.viewOrientation
+				});
+			
+			this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
 
-					// If this is a sub window, update the parent window in response to the changes.
-					if (window.opener) {
-						(<any>window.opener).angularAppRef.tick();
-					}
-				}
+			// If this is a sub window, update the parent window in response to the changes.
+			if (window.opener) {
+				(<any>window.opener).angularAppRef.tick();
 			}
 		}
 	}
 
-	@Input() set objective(value: any) {
-		this.objectiveToDisplay = <PrimitiveObjective>value;
-	}
-
-	@Input() set width(value: any) {
-		this.plotWidth = <number>value;
-	}
-
-	@Input() set height(value: any) {
-		this.plotHeight = <number>value;
-	}
-
-	@Input() set orientation(value: any) {
-		this.viewOrientation = <string>value;
-	}
-
-	@Input() set services(value: any) {
-		this.valueChartService = value.valueChartService;
-		this.chartUndoRedoService = value.chartUndoRedoService;
-		this.scoreFunctionViewerService = value.scoreFunctionViewerService;
-	}
-
-	@Input() set individualOnly(value: any) {
-		this.individual = <boolean> value;
-	}
-
-	@Input() set interaction(value: any) {
-		this.enableInteraction = <boolean> value;
-	}
 }

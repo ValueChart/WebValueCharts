@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-12-31 21:45:42
+* @Last Modified time: 2017-05-15 15:08:54
 */
 
 // Import Angular Classes:
@@ -12,7 +12,6 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes:
-import { ValueChartService }										from '../services/ValueChart.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
 
@@ -24,7 +23,8 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 
-import { UserDomainElements, DomainElement }						from '../../../types/ScoreFunctionViewer.types';
+import { ScoreFunctionData, DomainElement }							from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
 
 
 /*
@@ -42,8 +42,10 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
+	private lastRendererUpdate: ScoreFunctionUpdate;
+
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
-																						// route that the pop-up window will navigate to when it is opened.
+																					// route that the pop-up window will navigate to when it is opened.
 
 	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';	// The options string for the pop-up window.
 
@@ -61,7 +63,6 @@ export class ExpandScoreFunctionInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private valueChartService: ValueChartService,
 		private chartUndoRedoService: ChartUndoRedoService) { }
 
 
@@ -76,13 +77,13 @@ export class ExpandScoreFunctionInteraction {
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean): void {
-		var ScoreFunctionPlots: JQuery = $('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE);
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery, lastRendererUpdate: ScoreFunctionUpdate): void {
+		this.lastRendererUpdate = lastRendererUpdate;
 
-		ScoreFunctionPlots.off('dblclick');
+		scoreFunctionPlots.off('dblclick');
 
 		if (enableExpanding) {
-			ScoreFunctionPlots.dblclick(this.expandScoreFunction);
+			scoreFunctionPlots.dblclick(this.expandScoreFunction);
 		}
 
 	}
@@ -98,8 +99,9 @@ export class ExpandScoreFunctionInteraction {
 		// Pass relevant data to the pop-up by attaching it to the window object. These
 		// variables will be accessible to child window via its window.opener field, which is 
 		// a reference to this window.
+		(<any>window).scoreFunctions = this.lastRendererUpdate.scoreFunctions;
+		(<any>window).colors = this.lastRendererUpdate.colors;
 		(<any>window).objectiveToPlot = objective;
-		(<any>window).valueChartService = this.valueChartService;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily
 														// Need to find a clean way to pass parameter in from ValueChartViewer										
