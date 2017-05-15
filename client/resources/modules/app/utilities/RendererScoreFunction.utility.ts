@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 14:34:15
+* @Last Modified time: 2017-05-15 15:06:20
 */
 
 // Import Angular Classes:
@@ -21,6 +21,7 @@ import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Type Definitions:
 import { DomainElement, ScoreFunctionData, ScoreFunctionDataSummary }			from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }								from '../../../types/RendererData.types';
 
 
 /*
@@ -57,7 +58,7 @@ export class RendererScoreFunctionUtility {
 	// 									Methods
 	// ========================================================================================
 
-	produceScoreFunctionData = (u: any) => {
+	produceScoreFunctionData = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
 
 		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length || !_.isEqual(this.colors, u.colors)) {
 			this.scoreFunctionData = {};
@@ -134,7 +135,7 @@ export class RendererScoreFunctionUtility {
 
 	// TODO <@aaron> : Add type annotations 
 
-	produceViewConfig = (u: any) => {
+	produceViewConfig = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
 		u.rendererConfig = <any>{};
 		u.rendererConfig.labelOffset = 25;
 
@@ -181,16 +182,6 @@ export class RendererScoreFunctionUtility {
 		} else {
 			u.heightScale.range([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);
 		}
-
-		// 		// Configure the linear scale that translates scores into pixel units.
-		// this.heightScale = d3.scaleLinear()
-		// 	.domain([0, 1]);
-		// if (u.viewOrientation === 'vertical') {
-		// 	this.heightScale.range([0, u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
-		// } else {
-		// 	this.heightScale.range([0, u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo]);
-
-		// }
 
 		return u;
 	}

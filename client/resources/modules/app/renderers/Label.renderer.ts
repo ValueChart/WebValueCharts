@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:02:10
+* @Last Modified time: 2017-05-15 15:09:55
 */
 
 // Import Angular Classes:
@@ -44,6 +44,7 @@ import {RowData, CellData, LabelData, RendererConfig }				from '../../../types/R
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
+import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
 
 
 
@@ -475,7 +476,7 @@ export class LabelRenderer {
 
 		var scoreFunctionSubject = new Subject();
 
-		scoreFunctionSubject.map((sfU: any) => { 
+		scoreFunctionSubject.map((sfU: ScoreFunctionUpdate) => { 
 			sfU.el = scoreFunction;
 			sfU.objective = objective;
 			

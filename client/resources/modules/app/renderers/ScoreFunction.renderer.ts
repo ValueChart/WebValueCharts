@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 14:31:38
+* @Last Modified time: 2017-05-15 15:17:52
 */
 
 // Import Angular Classes:
@@ -28,6 +28,8 @@ import { AdjustScoreFunctionInteraction }							from '../interactions/AdjustScor
 import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
+import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
+
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
 // axis, labels, and base containers of a ScoreFunction. It is an abstract class and should NOT be instantiated or used for any reason. This class has 
@@ -60,7 +62,7 @@ export abstract class ScoreFunctionRenderer {
 	public unitsLabel: d3.Selection<any, any, any, any>;
 	public utilityAxisContainer: d3.Selection<any, any, any, any>;
 
-	protected lastRendererUpdate: any;
+	protected lastRendererUpdate: ScoreFunctionUpdate;
 	protected numUsers: number;
 	protected viewOrientation: string;
 
@@ -115,12 +117,13 @@ export abstract class ScoreFunctionRenderer {
 	// ========================================================================================
 
 
-	scoreFunctionChanged = (update: any) => {
+	scoreFunctionChanged = (update: ScoreFunctionUpdate) => {
 		this.lastRendererUpdate = update;
 
 		if (this.rootContainer == undefined) {
 			this.createScoreFunction(update);
 			this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
+			this.applyStyles(update);
 			this.numUsers = update.scoreFunctions.length;
 			return;
 		}
@@ -155,7 +158,7 @@ export abstract class ScoreFunctionRenderer {
 		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
 						sub classes of this class should call createScoreFunction before creating any of their specific elements.
 	*/
-	createScoreFunction(u: any): void {
+	createScoreFunction(u: ScoreFunctionUpdate): void {
 		var objectiveId: string = u.objective.getId();
 		this.objective = u.objective;
 
@@ -236,7 +239,7 @@ export abstract class ScoreFunctionRenderer {
 						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
 						This method is also used to update a score function plot when the Users change.
 	*/
-	createPlot(u: any, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
+	createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		var objectiveId = u.objective.getId();
 		// Create the user containers. Each user should have one 'g' element that will hold the elements of its plot. Elements refers to bars, points, fit lines, etc.
 		
@@ -277,7 +280,7 @@ export abstract class ScoreFunctionRenderer {
 						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
 						render plot method (which is overwritten by subclasses), and the renderAxesDimensionTwo to render the different parts of the score function plot.
 	*/
-	renderScoreFunction(u: any, updateDimensionOne: boolean): void {
+	renderScoreFunction(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.domainSize = u.scoreFunctionData.length > 0 ? u.scoreFunctionData[0].elements.length : 0;
 
 		// Give the plot outline the correct dimensions.
@@ -293,7 +296,7 @@ export abstract class ScoreFunctionRenderer {
 		this.renderPlot(u, updateDimensionOne);
 	}
 
-	renderAxesDimensionOne(u: any): void {
+	renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		// Position the domain axis.
 		this.domainAxis
 			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.utilityAxisCoordinateOne)
@@ -323,7 +326,7 @@ export abstract class ScoreFunctionRenderer {
 		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
 						the axes elements should be done as part of a call to renderScoreFunction instead.
 	*/
-	renderAxesDimensionTwo(u: any): void {
+	renderAxesDimensionTwo(u: ScoreFunctionUpdate): void {
 
 		this.domainAxis
 			.attr(u.rendererConfig.coordinateTwo + '1', u.rendererConfig.domainAxisCoordinateTwo)
@@ -389,14 +392,14 @@ export abstract class ScoreFunctionRenderer {
 						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
 						the entire score function plot. Note that parameters not actively used in this method are used in the extended methods of the subclasses.
 	*/
-	abstract renderPlot(u: any, updateDimensionOne: boolean): void; 
+	abstract renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void; 
 
 
 
 	abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
 
 
-	applyStyles(u: any): void {
+	applyStyles(u: ScoreFunctionUpdate): void {
 		this.domainAxis
 			.style('stroke-width', 1)
 			.style('stroke', 'black');

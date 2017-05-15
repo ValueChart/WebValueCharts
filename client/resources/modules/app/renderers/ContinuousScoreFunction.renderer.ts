@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 14:28:56
+* @Last Modified time: 2017-05-15 15:04:08
 */
 
 // Import Angular Classes:
@@ -28,6 +28,7 @@ import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction
 
 // Import Types:
 import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }		from '../../../types/RendererData.types';
 
 // This class contains the logic for creating and rendering multiple users' ContinuousScoreFunctions for a single objective with a continuous 
 // (either categorical or interval) domain. The score functions are rendered as scatter plots where the points are the elements in the objective's 
@@ -97,7 +98,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(u: any, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
+	createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(u, plotElementsContainer, domainLabelContainer);
 
@@ -155,7 +156,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createContinuousPlotElements(u: any, pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>): void {
+	createContinuousPlotElements(u: ScoreFunctionUpdate, pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updatePlottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
 			.data((d: ScoreFunctionData) => { return d.elements; });
@@ -216,7 +217,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description	This method positions and styles the ContinuousScoreFunction specific elements of the score function plot. Specifically, it renders the points, fitlines, and point labels
 						of the scatter plot.nThis method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
 	*/
-	renderPlot(u: any, updateDimensionOne: boolean): void {
+	renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.userContainers.data(u.scoreFunctionData);
 
 		this.linesContainer.data((d, i) => { return [d]; });
@@ -240,7 +241,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
-	renderContinuousPlotDimensionOne(u: any): void {
+	renderContinuousPlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var pointRadius = u.rendererConfig.labelOffset / 2.5;
 		var pointOffset = 3;
 
@@ -259,7 +260,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; });
 	}
 
-	renderContinuousPlotDimensionTwo(u: any): void {
+	renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
 			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
@@ -284,7 +285,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			});
 	}
 
-	applyStyles(u: any): void {
+	applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
 		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })

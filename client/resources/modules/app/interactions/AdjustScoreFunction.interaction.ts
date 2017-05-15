@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-11 15:57:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-13 17:47:41
+* @Last Modified time: 2017-05-15 15:08:39
 */
 
 // Import Angular Classes:
@@ -16,6 +16,8 @@ import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service
 
 // Import Types
 import { DomainElement }											from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
+
 
 
 @Injectable()
@@ -25,7 +27,7 @@ export class AdjustScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: any;
+	public lastRendererUpdate: ScoreFunctionUpdate;
 
 
 	// ========================================================================================
@@ -51,7 +53,7 @@ export class AdjustScoreFunctionInteraction {
 		@returns {void}
 		@description	This method toggles the interaction that allows clicking and dragging on scatter plot points to alter a user's score function.
 	*/
-	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, lastRendererUpdate: any): void {
+	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, lastRendererUpdate: ScoreFunctionUpdate): void {
 		this.lastRendererUpdate = lastRendererUpdate;
 
 		var dragToResizeScores = d3.drag();

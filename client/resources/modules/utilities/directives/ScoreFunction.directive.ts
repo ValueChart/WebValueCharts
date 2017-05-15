@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 18:11:07
+* @Last Modified time: 2017-05-15 15:16:35
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -28,6 +28,7 @@ import { RendererScoreFunctionUtility }									from '../../app/utilities/Render
 // Import Model Classes:
 import { ScoreFunction }												from '../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../model/PrimitiveObjective';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }						from '../../../types/RendererData.types';
 
 
 @Directive({
@@ -111,7 +112,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 		this.scoreFunctionSubject = new Subject();
 		this.interactionSubject = new Subject();
 
-		this.rendererSubscription = this.scoreFunctionSubject.map((sfU: any) => { 
+		this.rendererSubscription = this.scoreFunctionSubject.map((sfU: ScoreFunctionUpdate) => { 
 			sfU.el = this.scoreFunctionPlotContainer;
 			sfU.objective = this.objective;
 			

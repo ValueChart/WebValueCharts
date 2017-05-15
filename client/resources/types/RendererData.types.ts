@@ -2,8 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 17:43:00
+* @Last Modified time: 2017-05-15 15:09:10
 */
+
+import * as d3								from 'd3';
 
 import { Objective }						from '../model/Objective';
 import { PrimitiveObjective }				from '../model/PrimitiveObjective';
@@ -89,3 +91,33 @@ export interface RendererConfig {
 
 	dimensionTwoScale: any;
 }
+
+export interface ScoreFunctionUpdate {
+	el: d3.Selection<any, any, any, any>,
+	viewOrientation: string;
+	interactionConfig: { adjustScoreFunctions: boolean, expandScoreFunctions: boolean };
+	width: number;
+	height: number;
+	scoreFunctions: ScoreFunction[];
+	colors: string[];
+	objective: PrimitiveObjective;
+	styleUpdate: boolean;
+	rendererConfig: ScoreFunctionConfig; 
+	heightScale: d3.ScaleLinear<any, any>;
+	scoreFunctionData: ScoreFunctionData[];
+}
+
+export interface ScoreFunctionConfig {
+	dimensionOne: string;
+	dimensionTwo: string;
+	coordinateOne: string;
+	coordinateTwo: string;
+	dimensionOneSize: number;
+	dimensionTwoSize: number;
+	domainAxisCoordinateTwo: number;
+	utilityAxisMaxCoordinateTwo: number;
+	utilityAxisCoordinateOne: number;
+	domainAxisMaxCoordinateOne: number; 
+	labelOffset: number;
+}
+

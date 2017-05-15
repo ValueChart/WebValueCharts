@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:48:06
+* @Last Modified time: 2017-05-15 15:08:54
 */
 
 // Import Angular Classes:
@@ -23,7 +23,8 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
 
-import { ScoreFunctionData, DomainElement }						from '../../../types/RendererData.types';
+import { ScoreFunctionData, DomainElement }							from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
 
 
 /*
@@ -41,7 +42,7 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: any;
+	private lastRendererUpdate: ScoreFunctionUpdate;
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
 																					// route that the pop-up window will navigate to when it is opened.
@@ -76,7 +77,7 @@ export class ExpandScoreFunctionInteraction {
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery, lastRendererUpdate: any): void {
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery, lastRendererUpdate: ScoreFunctionUpdate): void {
 		this.lastRendererUpdate = lastRendererUpdate;
 
 		scoreFunctionPlots.off('dblclick');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 14:35:41
+* @Last Modified time: 2017-05-15 15:04:18
 */
 
 // Import Angular Classes:
@@ -30,6 +30,7 @@ import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction
 
 // Import Types:
 import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
+import { ScoreFunctionUpdate, ScoreFunctionConfig }		from '../../../types/RendererData.types';
 
 
 // This class contains the logic for creating and rendering multiple users' DiscreteScoreFunctions for a single objective with a discrete 
@@ -98,7 +99,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(u: any, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
+	createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		// Call the create plot method in ScoreFunctionRenderer. This will create the user containers and create the domain labels.
 		super.createPlot(u, plotElementsContainer, domainLabelContainer);
 
@@ -140,7 +141,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createDiscretePlotElements(u: any, barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>) {
+	createDiscretePlotElements(u: ScoreFunctionUpdate, barsContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>) {
 		// Create a bar for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updateUtilityBars = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR)
 			.data((d: ScoreFunctionData) => { return d.elements; });
@@ -186,7 +187,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
 	}
 
-	renderAxesDimensionOne(u: any): void {
+	renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		super.renderAxesDimensionOne(u);
 
 		// Fix domain labels positions specifically for the discrete plot.
@@ -209,7 +210,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						of the bar chart. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderPlot(u: any, updateDimensionOne: boolean): void {
+	renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.userContainers.data(u.scoreFunctionData);
 
 		this.barContainer.data((d,i) =>{ return [d]; });
@@ -223,7 +224,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
-	renderDiscretePlotDimensionOne(u: any): void {
+	renderDiscretePlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.scoreFunctionData.length) / 2;
 
 		// Position each users' container so theirs bars are properly offset from each other.
@@ -246,7 +247,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne);
 	}
 
-	renderDiscretePlotDimensionTwo(u: any): void {
+	renderDiscretePlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
 			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
@@ -273,7 +274,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-	applyStyles(u: any): void {
+	applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
 		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
