@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:16:35
+* @Last Modified time: 2017-05-16 10:43:08
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -16,14 +16,14 @@ import { Subscription }													from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ScoreFunctionRenderer }										from '../../app/renderers/ScoreFunction.renderer';
-import { DiscreteScoreFunctionRenderer }								from '../../app/renderers/DiscreteScoreFunction.renderer';
-import { ContinuousScoreFunctionRenderer }								from '../../app/renderers/ContinuousScoreFunction.renderer';
+import { ScoreFunctionRenderer }										from '../../ValueChart/renderers/ScoreFunction.renderer';
+import { DiscreteScoreFunctionRenderer }								from '../../ValueChart/renderers/DiscreteScoreFunction.renderer';
+import { ContinuousScoreFunctionRenderer }								from '../../ValueChart/renderers/ContinuousScoreFunction.renderer';
 
-import { ExpandScoreFunctionInteraction }								from '../../app/interactions/ExpandScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }								from '../../ValueChart/interactions/ExpandScoreFunction.interaction';
 
-import { ChartUndoRedoService }											from '../../app/services/ChartUndoRedo.service';
-import { RendererScoreFunctionUtility }									from '../../app/utilities/RendererScoreFunction.utility';
+import { ChartUndoRedoService }											from '../../ValueChart/services/ChartUndoRedo.service';
+import { RendererScoreFunctionUtility }									from '../../ValueChart/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { ScoreFunction }												from '../../../model/ScoreFunction';

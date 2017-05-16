@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 13:14:52
+* @Last Modified time: 2017-05-16 12:33:00
 */
 
 // Import Angular Classes:
-import { Directive, Input } 													from '@angular/core';
-import { OnInit, DoCheck, SimpleChange }										from '@angular/core';
+import { Directive, Input, Output, } 											from '@angular/core';
+import { OnInit, DoCheck }														from '@angular/core';
 import { ElementRef }															from '@angular/core';
+import { EventEmitter }															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
@@ -32,9 +33,13 @@ import { LabelRenderer }														from '../renderers/Label.renderer';
 // Utilities
 import { RendererDataUtility }													from '../utilities/RendererData.utility';
 import { RendererConfigUtility }												from '../utilities/RendererConfig.utility';
+// Interactions
+import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
+import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
+import { SortAlternativesInteraction }											from '../interactions/SortAlternatives.interaction';
+import { SetObjectiveColorsInteraction }										from '../interactions/SetObjectiveColors.interaction';
+import { ExpandScoreFunctionInteraction }										from '../interactions/ExpandScoreFunction.interaction';
 
-// Definitions:
-import { LabelDefinitions }														from '../services/LabelDefinitions.service';
 
 // Import Model Classes:
 import { ValueChart } 															from '../../../model/ValueChart';
@@ -49,6 +54,22 @@ import { ViewConfig, InteractionConfig }										from '../../../types/Config.ty
 
 @Directive({
 	selector: 'ValueChart',
+	providers: [
+		// Services:
+		ChangeDetectionService,
+		RenderEventsService,
+		ChartUndoRedoService,
+		// Renderers:
+		ObjectiveChartRenderer,
+		SummaryChartRenderer,
+		LabelRenderer,
+		// Interactions:
+		ReorderObjectivesInteraction,
+		ResizeWeightsInteraction,
+		SortAlternativesInteraction,
+		SetObjectiveColorsInteraction,
+		ExpandScoreFunctionInteraction,
+	]
 })
 export class ValueChartDirective implements OnInit, DoCheck {
 
@@ -71,7 +92,11 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() private viewConfig: ViewConfig = <any>{};						// Configuration options for view settings;
 	@Input() private interactionConfig: InteractionConfig = <any>{};		// Configuration options for user interactions.
 
-	public CHART_COMPONENT_RATIO: number = 0.47;		// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
+	// Chart Outputs:
+	@Output() undoRedo: EventEmitter<ChartUndoRedoService> = new EventEmitter();		// Output the ChartUndoRedoService so that external modules may interface with it.
+	@Output() renderEvents: EventEmitter<RenderEventsService> = new EventEmitter();			// Output the renderEventsService so that external modules may listen to render events.
+
+	public CHART_COMPONENT_RATIO: number = 0.47;							// This ratio is used to determine the default size of the ValueChart components. e.x. componentHeight = ValueChartHeight * CHART_COMPONENT_RATIO. 
 
 	// d3 Selections:
 	private el: d3.Selection<any, any, any, any>; 							// The SVG base element for the ValueChart.
@@ -112,9 +137,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		private labelRenderer: LabelRenderer,
 		// Utilities:
 		private rendererDataUtility: RendererDataUtility,
-		private rendererConfigUtility: RendererConfigUtility,
-		// Definitions:
-		private labelDefinitions: LabelDefinitions) { }
+		private rendererConfigUtility: RendererConfigUtility) { }
 
 
 	// ========================================================================================
@@ -128,6 +151,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						Calling ngOnInit should be left to Angular. Do not call it manually.
 	*/
 	ngOnInit() {
+		this.undoRedo.emit(this.chartUndoRedoService);
+		this.renderEvents.emit(this.renderEventsService);
+
 		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
 		this.rendererService.initUserColors(this.valueChart);

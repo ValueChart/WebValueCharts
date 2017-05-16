@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 23:00:48
+* @Last Modified time: 2017-05-16 10:44:20
 */
 
 // Import Angular Classes:
@@ -14,14 +14,14 @@ import { Router, ActivatedRoute }										from '@angular/router';
 import * as d3 															from 'd3';
 
 // Import Application Classes:
-import { ScoreFunctionRenderer }										from '../../renderers/ScoreFunction.renderer';
-import { DiscreteScoreFunctionRenderer }								from '../../renderers/DiscreteScoreFunction.renderer';
-import { ContinuousScoreFunctionRenderer }								from '../../renderers/ContinuousScoreFunction.renderer';
-import { ScoreDistributionChartRenderer }								from '../../renderers/ScoreDistributionChart.renderer';
+import { ScoreFunctionRenderer }										from '../../../ValueChart/renderers/ScoreFunction.renderer';
+import { DiscreteScoreFunctionRenderer }								from '../../../ValueChart/renderers/DiscreteScoreFunction.renderer';
+import { ContinuousScoreFunctionRenderer }								from '../../../ValueChart/renderers/ContinuousScoreFunction.renderer';
+import { ScoreDistributionChartRenderer }								from '../../../ValueChart/renderers/ScoreDistributionChart.renderer';
 
-import { RendererScoreFunctionUtility }									from '../../utilities/RendererScoreFunction.utility';
+import { RendererScoreFunctionUtility }									from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
-import { ChartUndoRedoService }											from '../../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
 
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 
@@ -30,7 +30,7 @@ import { ValueChart }													from '../../../../model/ValueChart';
 import { ScoreFunction }												from '../../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { User }															from '../../../../model/User';
-import { ScoreFunctionData, DomainElement }							from '../../../../types/RendererData.types';
+import { ScoreFunctionData, DomainElement }								from '../../../../types/RendererData.types';
 
 /*
 	This component implements the expanded score function plot page. The expanded score function plot page is a pop-up window that opens when a

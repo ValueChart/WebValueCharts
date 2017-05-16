@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:32:56
+* @Last Modified time: 2017-05-16 10:16:46
 */
 
 // Import Angular Classes
@@ -14,7 +14,7 @@ import * as d3 														from 'd3';
 // Import Application Classes:
 import { RendererService } 											from '../services/Renderer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
-import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
+import { SummaryChartDefinitions }									from '../definitions/SummaryChart.definitions';
 import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
 
 // Import Model Classes:
@@ -83,8 +83,7 @@ export class SummaryChartRenderer {
 	constructor(
 		private renderConfigService: RendererService,
 		private renderEventsService: RenderEventsService,
-		private sortAlternativesInteraction: SortAlternativesInteraction, 
-		private defs: SummaryChartDefinitions) { }
+		private sortAlternativesInteraction: SortAlternativesInteraction) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -139,31 +138,31 @@ export class SummaryChartRenderer {
 		this.renderEventsService.summaryChartDispatcher.next(0);
 		// Create the base container for the chart.
 		this.chart = u.el.append('g')
-			.classed(this.defs.CHART, true);
+			.classed(SummaryChartDefinitions.CHART, true);
 
 		// Create the rectangle which acts as an outline for the chart.
 		this.outline = this.chart.append('g')
-			.classed(this.defs.OUTLINE_CONTAINER, true)
+			.classed(SummaryChartDefinitions.OUTLINE_CONTAINER, true)
 			.append('rect')
-			.classed(this.defs.OUTLINE, true)
+			.classed(SummaryChartDefinitions.OUTLINE, true)
 			.classed('valuechart-outline', true)
 
 		// Create the container that holds all the row containers.
 		this.rowsContainer = this.chart.append('g')
-			.classed(this.defs.ROWS_CONTAINER, true);
+			.classed(SummaryChartDefinitions.ROWS_CONTAINER, true);
 
 		this.averageLinesContainer = this.chart.append('g')
-			.classed(this.defs.AVERAGE_LINES_CONTAINER, true);
+			.classed(SummaryChartDefinitions.AVERAGE_LINES_CONTAINER, true);
 
 		this.scoreTotalsContainer = this.chart.append('g')
-			.classed(this.defs.SCORE_TOTAL_CONTAINER, true);
+			.classed(SummaryChartDefinitions.SCORE_TOTAL_CONTAINER, true);
 
 		this.utilityAxisContainer = this.chart.append('g')
-			.classed(this.defs.UTILITY_AXIS_CONTAINER, true)
+			.classed(SummaryChartDefinitions.UTILITY_AXIS_CONTAINER, true)
 			.classed('utility-axis', true);
 
 		this.alternativeBoxesContainer = this.chart.append('g')
-			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
+			.classed(SummaryChartDefinitions.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createSummaryChartRows(u, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 	}
@@ -182,60 +181,60 @@ export class SummaryChartRenderer {
 	*/
 	createSummaryChartRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
-		var updateRows = rowsContainer.selectAll('.' + this.defs.ROW)
+		var updateRows = rowsContainer.selectAll('.' + SummaryChartDefinitions.ROW)
 			.data(u.rowData);
 
 		// Update rows to conform to the data.
 		updateRows.exit().remove();				// Remove row containers that do not have a matching data element.
 		updateRows.enter().append('g')			// Add row containers for data elements that have no matching container.
-			.classed(this.defs.ROW, true);
+			.classed(SummaryChartDefinitions.ROW, true);
 
 		// Note that it is important that we re-select all rows before assigning them to the class field. This is because
 		// the selections used for adding and removing elements are only the added or removed elements, not ALL of the elements.
 		// This is true for any situation where we need to remove and then add new elements to an existing selection.
-		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);	// Update the row field.
+		this.rows = rowsContainer.selectAll('.' + SummaryChartDefinitions.ROW);	// Update the row field.
 
 		var alternatives: Alternative[] = u.valueChart.getAlternatives();
 
-		var updateSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER)
+		var updateSubContainers = scoreTotalsContainer.selectAll('.' + SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER)
 			.data((u.rowData[0].cells));
 
 		// Update score total sub-containers to conform to the data.
 		updateSubContainers.exit().remove();	// Remove score total sub-containers that do not have a matching alternative.
 		updateSubContainers.enter().append('g')	// Add score total sub-containers for alternatives that have no matching sub-container.
-			.classed(this.defs.SCORE_TOTAL_SUBCONTAINER, true);
+			.classed(SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER, true);
 
-		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.' + this.defs.SCORE_TOTAL_SUBCONTAINER); // Update the sub-container field.
+		this.scoreTotalsSubContainers = scoreTotalsContainer.selectAll('.' + SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER); // Update the sub-container field.
 
-		var updateScoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL)
+		var updateScoreTotals = this.scoreTotalsSubContainers.selectAll('.' + SummaryChartDefinitions.SCORE_TOTAL)
 			.data((d: CellData) => { return d.userScores; });
 
 		// Update score totals to conform to the data.
 		updateScoreTotals.exit().remove();	// Remove score totals that do not have a matching user.
 		updateScoreTotals.enter().append('text') // Add score totals for users that do not have matching score totals.
-			.classed(this.defs.SCORE_TOTAL, true);
+			.classed(SummaryChartDefinitions.SCORE_TOTAL, true);
 
-		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.' + this.defs.SCORE_TOTAL);	// Update the score totals field.
+		this.scoreTotals = this.scoreTotalsSubContainers.selectAll('.' + SummaryChartDefinitions.SCORE_TOTAL);	// Update the score totals field.
 
-		var updateAverageLines = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE)
+		var updateAverageLines = this.averageLinesContainer.selectAll('.' + SummaryChartDefinitions.AVERAGE_LINE)
 			.data((u.rowData[0].cells));
 
 		updateAverageLines.exit().remove();
 		updateAverageLines.enter().append('line')
-			.classed(this.defs.AVERAGE_LINE, true);
+			.classed(SummaryChartDefinitions.AVERAGE_LINE, true);
 
-		this.averageLines = this.averageLinesContainer.selectAll('.' + this.defs.AVERAGE_LINE);
+		this.averageLines = this.averageLinesContainer.selectAll('.' + SummaryChartDefinitions.AVERAGE_LINE);
 
-		var updateAlternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+		var updateAlternativeBoxes = boxesContainer.selectAll('.' + SummaryChartDefinitions.ALTERNATIVE_BOX)
 			.data(u.valueChart.getAlternatives());
 
 		// Update alternative boxes to conform to the data.
 		updateAlternativeBoxes.exit().remove();				// Remove alternative boxes that do not have a matching alternative.
 		updateAlternativeBoxes.enter().append('rect')		// Add alternative boxes for alternatives that do not have a box.
-			.classed(this.defs.ALTERNATIVE_BOX, true)
-			.classed(this.defs.CHART_ALTERNATIVE, true);
+			.classed(SummaryChartDefinitions.ALTERNATIVE_BOX, true)
+			.classed(SummaryChartDefinitions.CHART_ALTERNATIVE, true);
 
-		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);	// Update alternative boxes field.
+		this.alternativeBoxes = boxesContainer.selectAll('.' + SummaryChartDefinitions.ALTERNATIVE_BOX);	// Update alternative boxes field.
 
 		this.createSummaryChartCells(this.rows);
 	}
@@ -250,27 +249,27 @@ export class SummaryChartRenderer {
 	*/
 	createSummaryChartCells(stackedBarRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
-		var updateCells = stackedBarRows.selectAll('.' + this.defs.CELL)
+		var updateCells = stackedBarRows.selectAll('.' + SummaryChartDefinitions.CELL)
 			.data((d: RowData) => { return d.cells; });
 
 		updateCells.exit().remove();
 		updateCells.enter().append('g')
-			.classed(this.defs.CELL, true)
-			.classed(this.defs.CHART_CELL, true);
+			.classed(SummaryChartDefinitions.CELL, true)
+			.classed(SummaryChartDefinitions.CHART_CELL, true);
 
 		// Save all the cells as a field of the class.
-		this.cells = stackedBarRows.selectAll('.' + this.defs.CELL);
+		this.cells = stackedBarRows.selectAll('.' + SummaryChartDefinitions.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		var updateUserScores = this.cells.selectAll('.' + this.defs.USER_SCORE)
+		var updateUserScores = this.cells.selectAll('.' + SummaryChartDefinitions.USER_SCORE)
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 		updateUserScores.exit().remove();
 		updateUserScores.enter().append('rect')
-			.classed(this.defs.USER_SCORE, true);
+			.classed(SummaryChartDefinitions.USER_SCORE, true);
 
 		// Save all the user scores bars as a field of the class.
-		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
+		this.userScores = this.cells.selectAll('.' + SummaryChartDefinitions.USER_SCORE);
 	}
 
 	// TODO <@aaron>: Update this method description.
@@ -462,7 +461,7 @@ export class SummaryChartRenderer {
 						be exactly one highlighted score total label per user.
 	*/
 	highlightBestUserScores(u: RendererUpdate) {
-		this.scoreTotals.classed(this.defs.BEST_SCORE, false);
+		this.scoreTotals.classed(SummaryChartDefinitions.BEST_SCORE, false);
 
 		var maxUserScores: any = {};
 		u.valueChart.getUsers().forEach((user: User) => {
@@ -483,7 +482,7 @@ export class SummaryChartRenderer {
 		});
 
 		u.valueChart.getUsers().forEach((user: User) => {
-			bestTotalScoreSelections[user.getUsername()].classed(this.defs.BEST_SCORE, true);
+			bestTotalScoreSelections[user.getUsername()].classed(SummaryChartDefinitions.BEST_SCORE, true);
 		});
 	}
 

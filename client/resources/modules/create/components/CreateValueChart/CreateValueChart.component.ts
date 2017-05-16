@@ -15,7 +15,6 @@ import { CreateWeightsComponent }										from '../CreateWeights/CreateWeights.
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
-import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
@@ -73,7 +72,6 @@ export class CreateValueChartComponent implements OnInit {
 		private valueChartHttpService: ValueChartHttpService,
 		private creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
-		private chartUndoRedoService: ChartUndoRedoService,
 		private validationService: ValidationService,
 		private updateObjectiveReferencesService: UpdateObjectiveReferencesService) { }
 

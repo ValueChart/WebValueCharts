@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:15:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 10:30:00
+* @Last Modified time: 2017-05-16 12:22:21
 */
 
 
@@ -27,13 +27,10 @@ import { AccountComponent }						from './components/Account/Account.component';
 import { MyValueChartsComponent }				from './components/MyValueCharts/MyValueCharts.component';
 import { ScoreFunctionViewerComponent }			from './components/ScoreFunctionViewer/ScoreFunctionViewer.component';
 import { ExportValueChartComponent }			from './components/ExportValueChart/ExportValueChart.component';
-// Directives:
-import { ValueChartDirective }					from './directives/ValueChart.directive';
-import { ScoreFunctionDirective }				from '../utilities/directives/ScoreFunction.directive';
 // Modules:
 import { CreateModule }							from '../create/create.module';
 import { UtilitiesModule }						from '../utilities/utilities.module';
-
+import { ValueChartModule }						from '../ValueChart/ValueChart.module';
 
 /*
 	This is the AppModule declaration. It creates the AppModule, imports whatever modules it depends on, registers
@@ -49,8 +46,9 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 		FormsModule,
 		HttpModule,
 		ROUTER,			// Import the main application router defined in app.routes.ts
-		CreateModule,	// Import the create 
-		UtilitiesModule
+		CreateModule,	// Import the create workflow.
+		UtilitiesModule,
+		ValueChartModule
 	],
 	// All Components and Directives that belong to this module MUST be declared here. Any modules that are shared between AppModule and another module
 	// must be declared in the UtilitiesModule instead and imported via that module.
@@ -65,12 +63,11 @@ import { UtilitiesModule }						from '../utilities/utilities.module';
 		AccountComponent,
 		MyValueChartsComponent,
 		ScoreFunctionViewerComponent,
-		ExportValueChartComponent,
-		ValueChartDirective
+		ExportValueChartComponent
 	],
 	// Register any required providers. This is just the Router providers.
 	providers: [
-		APP_ROUTER_PROVIDERS
+		APP_ROUTER_PROVIDERS,
 	],
 	// Set the RootComponent to be the AppModules' base component.
 	bootstrap: [ 

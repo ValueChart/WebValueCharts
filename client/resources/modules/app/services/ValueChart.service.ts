@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 14:55:30
+* @Last Modified time: 2017-05-16 10:49:54
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { Injectable } 										from '@angular/core';
 
 // Import Application Classes:
 import { CurrentUserService }								from './CurrentUser.service';
-import { ChartUndoRedoService }								from './ChartUndoRedo.service';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
@@ -69,12 +68,7 @@ export class ValueChartService implements ValueChartStateContainer {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private currentUserService: CurrentUserService,
-		private chartUndoRedoService: ChartUndoRedoService) {
-
-		// Assign handlers to update the active ValueChart when the ChartUndoRedoService fires undo/redo events.
-		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
-		this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
+		private currentUserService: CurrentUserService) {
 
 		this.weightMapReset = {};
 	}
@@ -209,17 +203,17 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart.getDefaultWeightMap();
 	}
 
+	setWeightMap(user: User, weightMap: WeightMap) {
+		user.setWeightMap(weightMap);
+		this.weightMapReset[user.getUsername()] = false;
+	}
+
 	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
 		this.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
 	}
 
 	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
 		this.getCurrentUser().setWeightMap(weightMapRecord);
-	}
-
-	setWeightMap(user: User, weightMap: WeightMap) {
-		user.setWeightMap(weightMap);
-		this.weightMapReset[user.getUsername()] = false;
 	}
 
 	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:31:55
+* @Last Modified time: 2017-05-16 10:12:13
 */
 
 // Import Angular Classes
@@ -14,7 +14,7 @@ import * as d3 														from 'd3';
 // Import Application Classes:
 import { RendererService } 											from '../services/Renderer.service';
 import { RenderEventsService }										from '../services/RenderEvents.service';
-import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
+import { ObjectiveChartDefinitions }								from '../definitions/ObjectiveChart.definitions';
 import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
 
 // Import Model Classes:
@@ -80,8 +80,7 @@ export class ObjectiveChartRenderer {
 	constructor(
 		private rendererService: RendererService,
 		private renderEventsService: RenderEventsService,
-		private sortAlternativesInteraction: SortAlternativesInteraction,
-		private defs: ObjectiveChartDefinitions) { }
+		private sortAlternativesInteraction: SortAlternativesInteraction) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -133,19 +132,19 @@ export class ObjectiveChartRenderer {
 		this.renderEventsService.objectiveChartDispatcher.next(0);
 		// Create the root container for the objective chart.
 		this.chart = u.el.append('g')
-			.classed(this.defs.CHART, true);
+			.classed(ObjectiveChartDefinitions.CHART, true);
 		// Create the container for the row outlines.
 		this.rowOutlinesContainer = this.chart.append('g')
-			.classed(this.defs.ROW_OUTLINES_CONTAINER, true);
+			.classed(ObjectiveChartDefinitions.ROW_OUTLINES_CONTAINER, true);
 		// Create the container to hold the rows.
 		this.rowsContainer = this.chart.append('g')
-			.classed(this.defs.ROWS_CONTAINER, true);
+			.classed(ObjectiveChartDefinitions.ROWS_CONTAINER, true);
 		// Create the container to hold the labels for the alternatives
 		this.alternativeLabelsContainer = this.chart.append('g')
-			.classed(this.defs.ALTERNATIVE_LABELS_CONTAINER, true);
+			.classed(ObjectiveChartDefinitions.ALTERNATIVE_LABELS_CONTAINER, true);
 		// Create the container to hold the alternative boxes.
 		this.alternativeBoxesContainer = this.chart.append('g')
-			.classed(this.defs.ALTERNATIVE_BOXES_CONTAINER, true);
+			.classed(ObjectiveChartDefinitions.ALTERNATIVE_BOXES_CONTAINER, true);
 
 		this.createObjectiveRows(u, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 	}
@@ -165,54 +164,54 @@ export class ObjectiveChartRenderer {
 	*/
 	createObjectiveRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, rowOutlinesContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, alternativeLabelsContainer: d3.Selection<any, any, any, any>): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
-		var updateRowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE)
+		var updateRowOutlines = rowOutlinesContainer.selectAll('.' + ObjectiveChartDefinitions.ROW_OUTLINE)
 			.data(u.rowData);
 
 		// Update row outlines to conform to the data.
 		updateRowOutlines.exit().remove();			// Remove row outlines that do not have a matching row in the data.
 		updateRowOutlines.enter().append('rect')	// Add row outlines for rows elements that have no matching outline.
-			.classed(this.defs.ROW_OUTLINE, true)
+			.classed(ObjectiveChartDefinitions.ROW_OUTLINE, true)
 			.classed('valuechart-outline', true);
 
 		// Note that it is important that we re-select all row outlines before assigning them to the class field. This is because 
 		// the selections used for adding and removing elements are only the added or removed elements, not ALL of the elements.
 		// This is true for any situation where we need to remove and then add new elements to an existing selection.
-		this.rowOutlines = rowOutlinesContainer.selectAll('.' + this.defs.ROW_OUTLINE);	// Update the row outlines field.
+		this.rowOutlines = rowOutlinesContainer.selectAll('.' + ObjectiveChartDefinitions.ROW_OUTLINE);	// Update the row outlines field.
 
 
 
-		var updateRowContainers = rowsContainer.selectAll('.' + this.defs.ROW)
+		var updateRowContainers = rowsContainer.selectAll('.' + ObjectiveChartDefinitions.ROW)
 			.data(u.rowData);
 
 		// Update rows to conform to the data.
 		updateRowContainers.exit().remove();			// Remove rows that do not have a matching row in he data.
 		updateRowContainers.enter().append('g')			// Add rows for rows in the data which do not have elements.
-			.classed(this.defs.ROW, true);
+			.classed(ObjectiveChartDefinitions.ROW, true);
 
-		this.rows = rowsContainer.selectAll('.' + this.defs.ROW);	// Update the row field.
+		this.rows = rowsContainer.selectAll('.' + ObjectiveChartDefinitions.ROW);	// Update the row field.
 
 
-		var updateAlternativeLabels = alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL)
+		var updateAlternativeLabels = alternativeLabelsContainer.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 			.data(u.valueChart.getAlternatives());
 
 		// Update the alternative labels to conform to the data.
 		updateAlternativeLabels.exit().remove();				// Remove alternative labels that no longer have a matching alternative in the data.
 		updateAlternativeLabels.enter().append('text')			// Add alternative labels for new alternatives.
-			.classed(this.defs.ALTERNATIVE_LABEL, true);
+			.classed(ObjectiveChartDefinitions.ALTERNATIVE_LABEL, true);
 
-		this.alternativeLabels = alternativeLabelsContainer.selectAll('.' + this.defs.ALTERNATIVE_LABEL);	// Update the alternative outlines field.
+		this.alternativeLabels = alternativeLabelsContainer.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL);	// Update the alternative outlines field.
 
 
-		var updateBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX)
+		var updateBoxes = boxesContainer.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_BOX)
 			.data(u.valueChart.getAlternatives());
 
 		// Update the alternative boxes to conform to the data.
 		updateBoxes.exit().remove();
 		updateBoxes.enter().append('rect')
-			.classed(this.defs.ALTERNATIVE_BOX, true)		// Remove alternative boxes that no longer have a matching alternative.
-			.classed(this.defs.CHART_ALTERNATIVE, true);	// Add boxes for new alternatives.
+			.classed(ObjectiveChartDefinitions.ALTERNATIVE_BOX, true)		// Remove alternative boxes that no longer have a matching alternative.
+			.classed(ObjectiveChartDefinitions.CHART_ALTERNATIVE, true);	// Add boxes for new alternatives.
 
-		this.alternativeBoxes = boxesContainer.selectAll('.' + this.defs.ALTERNATIVE_BOX);
+		this.alternativeBoxes = boxesContainer.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_BOX);
 
 		this.createObjectiveCells(this.rows)
 	}
@@ -226,51 +225,51 @@ export class ObjectiveChartRenderer {
 	*/
 	createObjectiveCells(objectiveRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
-		var updateCells = objectiveRows.selectAll('.' + this.defs.CELL)
+		var updateCells = objectiveRows.selectAll('.' + ObjectiveChartDefinitions.CELL)
 			.data((d: RowData) => { return d.cells; });
 
 		// Update cells to conform to the data.
 		updateCells.exit().remove();
 		updateCells.enter().append('g')
-			.classed(this.defs.CELL, true)
-			.classed(this.defs.CHART_CELL, true);
+			.classed(ObjectiveChartDefinitions.CELL, true)
+			.classed(ObjectiveChartDefinitions.CHART_CELL, true);
 
 
-		this.cells = objectiveRows.selectAll('.' + this.defs.CELL);
+		this.cells = objectiveRows.selectAll('.' + ObjectiveChartDefinitions.CELL);
 
 		// Create the bars for each new user score. Note that if this is a Individual ValueChart, there is only on bar in each cell, as there is only one user score for each objective value. 
-		var updateUserScores = this.cells.selectAll('.' + this.defs.USER_SCORE)
+		var updateUserScores = this.cells.selectAll('.' + ObjectiveChartDefinitions.USER_SCORE)
 			.data((d: CellData) => { return d.userScores; });
 
 		// Update user score bars to conform to the data. This is where user's are effectively added and deleted to/from the objective chart.
 		updateUserScores.exit().remove();
 		updateUserScores.enter().append('rect')
-			.classed(this.defs.USER_SCORE, true);
+			.classed(ObjectiveChartDefinitions.USER_SCORE, true);
 
-		this.userScores = this.cells.selectAll('.' + this.defs.USER_SCORE);
+		this.userScores = this.cells.selectAll('.' + ObjectiveChartDefinitions.USER_SCORE);
 
 
-		var updateWeightColumns = this.cells.selectAll('.' + this.defs.WEIGHT_OUTLINE)
+		var updateWeightColumns = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE)
 			.data((d: CellData) => { return d.userScores; });
 
 		// Update weight columns to conform to the data. Note that weight columns are only displayed for group ValueCharts.
 		updateWeightColumns.exit().remove();
 		updateWeightColumns.enter().append('rect')
-			.classed(this.defs.WEIGHT_OUTLINE, true);
+			.classed(ObjectiveChartDefinitions.WEIGHT_OUTLINE, true);
 
-		this.weightColumns = this.cells.selectAll('.' + this.defs.WEIGHT_OUTLINE);
+		this.weightColumns = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE);
 
-		var updateDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL)
+		var updateDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; });
 
-		this.domainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL);
+		this.domainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);
 
 		// Update domain labels to conform to the data.
 		updateDomainLabels.exit().remove();
 		updateDomainLabels.enter().append('text')
-			.classed(this.defs.DOMAIN_LABEL, true);
+			.classed(ObjectiveChartDefinitions.DOMAIN_LABEL, true);
 
-		this.objectiveDomainLabels = this.cells.selectAll('.' + this.defs.DOMAIN_LABEL);
+		this.objectiveDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);
 	}
 
 

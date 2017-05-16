@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-12 16:30:54
+* @Last Modified time: 2017-05-16 10:14:09
 */
 
 // Import Angular Classes:
@@ -19,7 +19,7 @@ import { RendererService } 											from '../services/Renderer.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
-import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+import { LabelDefinitions }											from '../definitions/Label.definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../../model/Objective';
@@ -83,8 +83,7 @@ export class ReorderObjectivesInteraction {
 	constructor(
 		private rendererService: RendererService,
 		private changeDetectionService: ChangeDetectionService,
-		private chartUndoRedoService: ChartUndoRedoService,
-		private labelDefinitions: LabelDefinitions) { 
+		private chartUndoRedoService: ChartUndoRedoService) { 
 			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);
 	}
 
@@ -109,8 +108,8 @@ export class ReorderObjectivesInteraction {
 		
 		this.labelRootContainer = labelRootContainer;
 
-		var labelOutlines: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
-		var labelTexts: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
+		var labelOutlines: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
+		var labelTexts: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);
 
 		var dragToReorder: d3.DragBehavior<any, any, any> = d3.drag();
 
@@ -140,7 +139,7 @@ export class ReorderObjectivesInteraction {
 		this.parentObjectiveName = (<Element>this.containerToReorder.node()).getAttribute('parent');	// The name of the parent objective for the label being reordered.
 
 		// If the selected label is the root label, then it is not possible to reorder, and all further drag events for this selection should be ignored.
-		if (this.parentObjectiveName === this.labelDefinitions.ROOT_CONTAINER_NAME) {
+		if (this.parentObjectiveName === LabelDefinitions.ROOT_CONTAINER_NAME) {
 			this.ignoreReorder = true;
 			return;
 		}
@@ -262,7 +261,7 @@ export class ReorderObjectivesInteraction {
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.
-		var labelData: LabelData[] = <any> d3.select('g[parent=' + this.labelDefinitions.ROOT_CONTAINER_NAME + ']').data();
+		var labelData: LabelData[] = <any> d3.select('g[parent=' + LabelDefinitions.ROOT_CONTAINER_NAME + ']').data();
 
 
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 

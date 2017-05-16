@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 14:52:00
+* @Last Modified time: 2017-05-16 10:11:32
 */
 
 // Import Angular Classes:
@@ -20,9 +20,9 @@ import { RendererService } 											from '../services/Renderer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 
-import { SummaryChartDefinitions }									from '../services/SummaryChartDefinitions.service';
-import { ObjectiveChartDefinitions }								from '../services/ObjectiveChartDefinitions.service';
-import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+import { SummaryChartDefinitions }									from '../definitions/SummaryChart.definitions';
+import { ObjectiveChartDefinitions }								from '../definitions/ObjectiveChart.definitions';
+import { LabelDefinitions }											from '../definitions/Label.definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../../model/Objective';
@@ -107,10 +107,7 @@ export class SortAlternativesInteraction {
 	constructor(
 		private rendererService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService,
-		private changeDetectionService: ChangeDetectionService,
-		private summaryChartDefinitions: SummaryChartDefinitions,
-		private objectiveChartDefinitions: ObjectiveChartDefinitions,
-		private labelDefinitions: LabelDefinitions) { 
+		private changeDetectionService: ChangeDetectionService) { 
 			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
  	}	
 
@@ -168,8 +165,8 @@ export class SortAlternativesInteraction {
 	public sortAlternativesByObjective(enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate): void {
 		this.initialize(lastRendererUpdate);
 
-		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + this.labelDefinitions.SUBCONTAINER_OUTLINE);
-		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + this.labelDefinitions.SUBCONTAINER_TEXT);
+		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
+		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);
 
 		var clicksLabels = Observable.fromEvent(objectiveLabels, 'click');
 		var clicksText =  Observable.fromEvent(objectiveText, 'click');
@@ -233,13 +230,13 @@ export class SortAlternativesInteraction {
 		this.alternativeBox = d3.select((<any>d3.event).sourceEvent.target)
 		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.lastRendererUpdate.rendererConfig.dimensionOne);
 
-		this.siblingBoxes = d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE);
+		this.siblingBoxes = d3.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE);
 
-		this.cellsToMove = d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getId() + '"]');
-		this.alternativeLabelToMove = d3.select('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getId() + '"]');
-		this.totalScoreLabelToMove = d3.select('.' + this.summaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getId() + '"]');
+		this.cellsToMove = d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getId() + '"]');
+		this.alternativeLabelToMove = d3.select('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getId() + '"]');
+		this.totalScoreLabelToMove = d3.select('.' + SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getId() + '"]');
 
-		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
+		d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
 
 		for (var i = 0; i < this.lastRendererUpdate.valueChart.getAlternatives().length; i++) {
@@ -289,7 +286,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + this.summaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.lastRendererUpdate.rendererConfig.coordinateOne, currentCoordOne + deltaCoordOne);
+		d3.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.lastRendererUpdate.rendererConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any, any, any, any> = d3.select(cell);
@@ -319,7 +316,7 @@ export class SortAlternativesInteraction {
 			this.chartUndoRedoService.deleteNewestRecord();
 		}
 
-		d3.selectAll('.' + this.objectiveChartDefinitions.CHART_CELL).style('opacity', 1);
+		d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 1);
 		this.changeDetectionService.alternativeOrderChanged = true;
 	}
 

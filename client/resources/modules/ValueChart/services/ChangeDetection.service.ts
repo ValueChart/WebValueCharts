@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 13:34:13
+* @Last Modified time: 2017-05-16 09:50:30
 */
 
 // Import Angular Classes:
@@ -35,7 +35,7 @@ export class ChangeDetectionService {
 	// Public flags that can be set to notify the ValueChartDirective about changes.
 	public objectiveOrderChanged: boolean;							// whether the objective order been changed or not. Set this to be true when you do something that changes the objective order.
 	public alternativeOrderChanged: boolean ;						// Whether the alternative order been changed or not. Set this to be true when you do something that changes the alternative order.
-	public colorsHaveChanged: boolean;								// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
+	// public colorsHaveChanged: boolean;								// Whether the objective colors have been changed or not. Set this to be true when you do something that changes the objective colors.
 
 	// Old input values to the ValueChartDirective. Used for comparison purposes.
 	public viewConfigRecord: ViewConfig = <any>{};					// Old values of the view config. Its fields should equal those of the viewConfig object in RendererConfigUtility unless a change has taken place.
@@ -91,12 +91,11 @@ export class ChangeDetectionService {
 	*/
 	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig): boolean {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
-		var renderDataChanged: boolean = this.alternativeOrderChanged || this.objectiveOrderChanged || this.colorsHaveChanged;
+		var renderDataChanged: boolean = this.alternativeOrderChanged || this.objectiveOrderChanged;
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
 
 		this.valueChartRecord = _.cloneDeep(valueChart);
-		this.colorsHaveChanged = false;
 		this.alternativeOrderChanged = false;
 		this.objectiveOrderChanged = false;
 		this.viewConfigRecord.viewOrientation = viewConfig.viewOrientation;
