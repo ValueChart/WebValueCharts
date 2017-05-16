@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 13:00:32
+* @Last Modified time: 2017-05-16 14:13:11
 */
 
 // Import Angular Classes:
@@ -101,6 +101,8 @@ export class DetailBoxComponent implements OnInit {
 			this.alternativeObjectives[index] = objective.getName();
 			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
 		});
+
+		$('#alternative-header-container').click();
 	}
 
 	collapseAlternative(): void {
