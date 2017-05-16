@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 17:44:12
+* @Last Modified time: 2017-05-16 16:16:13
 */
 
 // Import gulp packages:
@@ -32,6 +32,9 @@ var tsServer = ts.createProject("tsconfig.json");
 var tsWebValueCharts = ts.createProject("tsconfig.json");
 var tsTests = ts.createProject("tsconfig.json");
 
+var server;
+var compileTask;
+
 // Compile the project source code. This does NOT include the project tests.
 compileSource = function() {
 	var clientOutput = gulp.src(['client/**/*.ts']).pipe(sourcemaps.init()).pipe(tsClient());
@@ -39,10 +42,12 @@ compileSource = function() {
 	var WVCOutput = gulp.src(['WebValueCharts.ts']).pipe(sourcemaps.init()).pipe(tsWebValueCharts());
 
 	// Merge the streams from the three compilations so that the process terminates when the last compilation is finished.
-	return merge([
+	compileTask =  merge([
 				clientOutput.js.pipe(sourcemaps.write()).pipe(gulp.dest('client')), 
 				serverOutput.js.pipe(sourcemaps.write()).pipe(gulp.dest('server')), 
 				WVCOutput.js.pipe(sourcemaps.write()).pipe(gulp.dest('.'))]);
+
+	return compileTask;
 }
 
 // Compile the test source code. This does NOT include the project tests.
@@ -53,11 +58,12 @@ compileTests = function() {
 
 // Start a local server in watch mode.
 startServer = function() {
-    return nodemon({
+    server = nodemon({
         script: 'WebValueCharts.js',
-        tasks: ['compile'],
-        watch: ['client/**/*.ts', 'server/**/*.ts', 'WebValueCharts.ts']
+        watch: ['WebValueCharts.js']
     });
+
+    return server;
 }
 
 // Execute Mocha unit tests.
@@ -95,6 +101,7 @@ serverTests = function() {
   }
 
 
+
 // runTests is a wrapper that starts up a local server before executing
 // the passed-in function and then shuts the server down afterwards.
 runTests = function(tests) {
@@ -110,7 +117,6 @@ runTests = function(tests) {
 // Definition of gulp tasks:
 // Start a standalone instance of webdriver.
 gulp.task('webdriver_standalone', webdriver_standalone);
-
 
 // ====== Testing Tasks ======
 
@@ -131,11 +137,21 @@ gulp.task('test', ['test:unit'], () => { return runTests(() => { return merge([e
 
 
 // ====== Compilation Tasks ======
-
 // Compile the project tests.
 gulp.task('compile:tests', compileTests);
 // Compile the project source code. Does NOT include tests.
 gulp.task('compile:source', compileSource);
+// Compile the project source and then watch for changes. Recompile when changes are detected.
+gulp.task('watch', function() {
+    gulp.watch(['client/**/*.ts', 'server/**/*.ts', 'WebValueCharts.ts'], (event) => {
+    		if (compileTask._readableState.ended) {
+    			console.log('Recompiling source due to changes.');
+    			compileTask = compileSource().once('end', () => { server.emit('restart'); });
+    		}
+
+    		return compileTask;
+    	});
+});
 // Compile the entire project - both source code and tests.
 gulp.task('compile', ['compile:source', 'compile:tests'])
 
@@ -143,7 +159,7 @@ gulp.task('compile', ['compile:source', 'compile:tests'])
 // ====== Local Server Tasks ======
 
 // Start a local server in watch mode after compiling the project source code.
-gulp.task('start', ['compile:source'], startServer);
+gulp.task('start', ['watch', 'compile:source'], startServer);
 // ^^ as above, just with the default 'gulp' command.
 gulp.task('default', ['start']);
 
