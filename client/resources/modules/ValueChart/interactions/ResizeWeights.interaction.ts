@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 10:39:41
+* @Last Modified time: 2017-05-16 10:14:36
 */
 
 // Import Angular Classes:
@@ -18,7 +18,7 @@ import '../../utilities/rxjs-operators';
 // Import Application Classes
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
-import { LabelDefinitions }											from '../services/LabelDefinitions.service';
+import { LabelDefinitions }											from '../definitions/Label.definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../../model/Objective';
@@ -71,8 +71,7 @@ export class ResizeWeightsInteraction {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private chartUndoRedoService: ChartUndoRedoService,
-		private labelDefinitions: LabelDefinitions) { 
+		private chartUndoRedoService: ChartUndoRedoService) { 
 	}
 
 	// ========================================================================================
@@ -149,7 +148,7 @@ export class ResizeWeightsInteraction {
 		}
 
 		if (rootContainer) {
-			var labelSpaces = rootContainer.selectAll('g[parent="' + this.labelDefinitions.ROOT_CONTAINER_NAME + '"]');
+			var labelSpaces = rootContainer.selectAll('g[parent="' + LabelDefinitions.ROOT_CONTAINER_NAME + '"]');
 			this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
 		}
 	}
@@ -163,7 +162,7 @@ export class ResizeWeightsInteraction {
 						desired type of dragging to resize weights for all labels in the label area.
 	*/
 	private toggleResizingForSublabels(labelSpaces: d3.Selection<any, any, any, any>, dragToResizeWeights: d3.DragBehavior<any, any, any>, resizeType: string) {
-		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + this.labelDefinitions.SUBCONTAINER_DIVIDER);
+		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + LabelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
 			return (resizeType !== 'none') ? (this.lastRendererUpdate.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
@@ -175,7 +174,7 @@ export class ResizeWeightsInteraction {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
 
-			let subLabelSpaces: d3.Selection<any, any, any, any> = d3.select('.' + this.labelDefinitions.ROOT_CONTAINER)
+			let subLabelSpaces: d3.Selection<any, any, any, any> = d3.select('.' + LabelDefinitions.ROOT_CONTAINER)
 				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, resizeType);	// Toggle dragging for the sub labels.

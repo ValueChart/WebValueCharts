@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:17:52
+* @Last Modified time: 2017-05-15 16:49:09
 */
 
 // Import Angular Classes:
@@ -67,14 +67,6 @@ export abstract class ScoreFunctionRenderer {
 	protected viewOrientation: string;
 
 	protected adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
-
-	// TODO: <@aaron> : Clear up these comments.
-
-	// View Configuration Fields:
-//	protected rendererConfig.utilityAxisCoordinateOne: number;				// The x coordinate of the y-axis in the plot.
-//	protected rendererConfig.domainAxisCoordinateTwo: number;				// The y coordinate of the x-axis in the plot
-//	protected rendererConfig.utilityAxisMaxCoordinateTwo: number;			// The y coordinate of the top of the y-axis
-//	protected rendererConfig.domainAxisMaxCoordinateOne: number;			// The x coordinate of the rightmost end of the x-axis.
 
 
 	// class name definitions for SVG elements that are created by this renderer.

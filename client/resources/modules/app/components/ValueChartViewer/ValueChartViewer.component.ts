@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:16:09
+* @Last Modified time: 2017-05-16 12:56:14
 */
 
 // Import Angular Classes:
@@ -17,34 +17,14 @@ import * as d3 																	from 'd3';
 import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
 import { InteractionOptionsComponent }											from '../widgets/InteractionOptions/InteractionOptions.component'
 
-import { ValueChartDirective }													from '../../directives/ValueChart.directive';
+import { ValueChartDirective }													from '../../../ValueChart/directives/ValueChart.directive';
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
 import { ValueChartService }													from '../../services/ValueChart.service';
-import { ChartUndoRedoService }													from '../../services/ChartUndoRedo.service';
-import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
-import { RenderEventsService }													from '../../services/RenderEvents.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
-import { RendererService }														from '../../services/Renderer.service';
-
-import { RendererScoreFunctionUtility }											from '../../utilities/RendererScoreFunction.utility';
-import { RendererConfigUtility }												from '../../utilities/RendererConfig.utility';
-import { RendererDataUtility }													from '../../utilities/RendererData.utility';
-
-import { ObjectiveChartRenderer }												from '../../renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer }													from '../../renderers/SummaryChart.renderer';
-import { LabelRenderer }														from '../../renderers/Label.renderer';
-
-import { ReorderObjectivesInteraction }											from '../../interactions/ReorderObjectives.interaction';
-import { ResizeWeightsInteraction }												from '../../interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction }											from '../../interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction }										from '../../interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction }										from '../../interactions/ExpandScoreFunction.interaction';
-
-import { SummaryChartDefinitions }												from '../../services/SummaryChartDefinitions.service';
-import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
-import { LabelDefinitions }														from '../../services/LabelDefinitions.service';
+import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
+import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 // Import Model Classes:
 import { User }																	from '../../../../model/User';
@@ -54,7 +34,8 @@ import { PrimitiveObjective } 													from '../../../../model/PrimitiveObje
 
 // Import Types:
 import { ViewConfig, InteractionConfig }										from '../../../../types/Config.types';
-					
+import { ValueChartStateContainer }												from '../../../../types/StateContainer.types';
+import { ScoreFunctionRecord }													from '../../../../types/Record.types';
 
 /*
 	This class is responsible for displaying a ValueChart visualization. It uses the ValueChartDirective to create and render a ValueChart, and
@@ -70,30 +51,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 @Component({
 	selector: 'ValueChartViewer',
 	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
-	providers: [
-		// Services:
-		RendererService,
-		ChangeDetectionService,
-		RenderEventsService,
-		HostService,
-		// Renderers:
-		ObjectiveChartRenderer,
-		SummaryChartRenderer,
-		LabelRenderer,
-		// Interactions:
-		ReorderObjectivesInteraction,
-		ResizeWeightsInteraction,
-		SortAlternativesInteraction,
-		SetObjectiveColorsInteraction,
-		ExpandScoreFunctionInteraction,
-		// Utilities:
-		RendererScoreFunctionUtility,
-		RendererDataUtility,
-		RendererConfigUtility,
-		// Definitions:
-		SummaryChartDefinitions,
-		ObjectiveChartDefinitions,
-		LabelDefinitions]
+	providers: [ ]
 })
 export class ValueChartViewerComponent implements OnInit {
 
@@ -104,10 +62,8 @@ export class ValueChartViewerComponent implements OnInit {
 	private valueChartWidth: number;
 	private valueChartHeight: number;
 
-	// Attach the window variable to the component so that it is available in the template.
-	private window = window;
-
-	sub: any;
+	private undoRedoService: ChartUndoRedoService;
+	private renderEvents: RenderEventsService;
 
 	valueChart: ValueChart;
 
@@ -136,10 +92,6 @@ export class ValueChartViewerComponent implements OnInit {
 		private route: ActivatedRoute,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
-		private renderConfigService: RendererService,
-		private chartUndoRedoService: ChartUndoRedoService,
-		private changeDetectionService: ChangeDetectionService,
-		private renderEventsService: RenderEventsService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 
@@ -181,6 +133,17 @@ export class ValueChartViewerComponent implements OnInit {
 
 	updateInteractions(interactionConfig: InteractionConfig) {
 		this.interactionConfig = interactionConfig;
+	}
+
+	updateUndoRedo(undoRedoService: ChartUndoRedoService) {
+		this.undoRedoService = undoRedoService;
+
+		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.valueChartService.currentUserScoreFunctionChange);
+		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.valueChartService.currentUserWeightMapChange);
+	}
+
+	updateRenderEvents(renderEvents: RenderEventsService) {
+		this.renderEvents = renderEvents;
 	}
 
 	/* 	
@@ -336,10 +299,10 @@ export class ValueChartViewerComponent implements OnInit {
 	// ================================ Undo/Redo ====================================
 
 	undoChartChange(): void {
-		this.chartUndoRedoService.undo(this.valueChartService);
+		this.undoRedoService.undo(this.valueChartService);
 	}
 
 	redoChartChange(): void {
-		this.chartUndoRedoService.redo(this.valueChartService);
+		this.undoRedoService.redo(this.valueChartService);
 	}
 }

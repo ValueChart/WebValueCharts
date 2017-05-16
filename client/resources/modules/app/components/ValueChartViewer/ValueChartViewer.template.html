@@ -42,12 +42,12 @@
 				</div>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canRedo()" (click)="redoChartChange()">
+				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
 				Redo
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [class.disabled]="!chartUndoRedoService.canUndo()" (click)="undoChartChange()">
+				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
 				Undo
 				</button>
 			</div>
@@ -56,14 +56,23 @@
 			<InteractionOptions [chartType]="(this.enableInteraction() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
-	<DetailBox [valueChart]="valueChart" [enableManagement]="enableManagement()" [viewConfig]="viewConfig" [height]="valueChartHeight / 4" [width]="valueChartWidth / 3"></DetailBox>
-	<div >
+	<DetailBox 
+	[valueChart]="valueChart" 
+	[enableManagement]="enableManagement()" 
+	[viewConfig]="viewConfig" 
+	[height]="valueChartHeight / 4" 
+	[width]="valueChartWidth / 3"
+	[renderEventsService]="renderEvents">
+	</DetailBox>
+	<div>
 		<ValueChart
 		[valueChart]="valueChart"
 		[width]="valueChartWidth"
 		[height]="valueChartHeight"
 		[viewConfig]="viewConfig"
-		[interactionConfig]="interactionConfig">
+		[interactionConfig]="interactionConfig"
+		(undoRedo)="updateUndoRedo($event)"
+		(renderEvents)="updateRenderEvents($event)">
 		</ValueChart>
 	</div>
 </div>

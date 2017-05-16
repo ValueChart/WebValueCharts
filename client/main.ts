@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 16:02:05
+* @Last Modified time: 2017-05-16 09:47:50
 */
 
-import { platformBrowserDynamic } 		from '@angular/platform-browser-dynamic';
-import { AppModule }				 	from './resources/modules/app/app.module';
+import { platformBrowserDynamic } 				from '@angular/platform-browser-dynamic';
+import { AppModule }				 			from './resources/modules/app/app.module';
 
 
 /*

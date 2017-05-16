@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:16:22
+* @Last Modified time: 2017-05-16 10:44:59
 */
 
 // Import Angular Classes:
@@ -11,7 +11,6 @@ import { Router }										from '@angular/router';
 
 // Import Application Classes:
 import { XMLValueChartParserService } 					from '../../services/XMLValueChartParser.service';
-import { ValueChartDirective }							from '../../directives/ValueChart.directive';
 import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';

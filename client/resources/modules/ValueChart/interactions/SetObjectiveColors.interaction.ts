@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 10:03:54
+* @Last Modified time: 2017-05-16 10:14:57
 */
 
 // Import Angular Classes:
@@ -16,7 +16,7 @@ import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ChangeDetectionService }												from '../services/ChangeDetection.service';
-import { LabelDefinitions }														from '../services/LabelDefinitions.service';
+import { LabelDefinitions }														from '../definitions/Label.definitions';
 
 // Import Model Classes: 
 import { PrimitiveObjective }													from '../../../model/PrimitiveObjective';
@@ -43,8 +43,7 @@ export class SetObjectiveColorsInteraction {
 	// ========================================================================================
 
 	constructor(
-		private changeDetectionService: ChangeDetectionService,
-		private labelDefinitions: LabelDefinitions) { }
+		private changeDetectionService: ChangeDetectionService) { }
 
 
 	// ========================================================================================
@@ -60,7 +59,7 @@ export class SetObjectiveColorsInteraction {
 	*/
 	public toggleSettingObjectiveColors(setObjectiveColors: boolean, rootContainer: Element): void {
 		// Initialize the observable that is used to detect clicks and notifies handlers.
-		let primitiveObjectiveLabels = rootContainer.querySelectorAll('.' + this.labelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
+		let primitiveObjectiveLabels = rootContainer.querySelectorAll('.' + LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL);
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
 
 		if (this.onClick != undefined)
@@ -91,7 +90,6 @@ export class SetObjectiveColorsInteraction {
 		colorPicker.change((e: Event) => {
 			var color: string = (<any>e.target).value;
 			targetObjective.setColor(color);
-			this.changeDetectionService.colorsHaveChanged = true;
 		});
 
 		colorPicker.click(); // Open the color picker by programmatically clicking on it.

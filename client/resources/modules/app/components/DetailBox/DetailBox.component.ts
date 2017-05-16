@@ -2,24 +2,24 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 13:36:46
+* @Last Modified time: 2017-05-16 13:00:32
 */
 
 // Import Angular Classes:
 import { Component, Input }														from '@angular/core';
-import { OnInit, DoCheck }														from '@angular/core';
+import { OnInit }																from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
 import { Subscription }															from 'rxjs/Subscription';
 
 // Import Application Classes:
-import { ChangeDetectionService }												from '../../services/ChangeDetection.service';
-import { RenderEventsService }													from '../../services/RenderEvents.service';
+import { ObjectiveChartDefinitions }											from '../../../ValueChart/definitions/ObjectiveChart.definitions';
+
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { HostService }															from '../../services/Host.service';
+import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
-import { ObjectiveChartDefinitions }											from '../../services/ObjectiveChartDefinitions.service';
 
 // Import Model Classes:
 import { ValueChart } 															from '../../../../model/ValueChart';
@@ -36,7 +36,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 	templateUrl: 'client/resources/modules/app/components/DetailBox/DetailBox.template.html',
 	providers: []
 })
-export class DetailBoxComponent implements OnInit, DoCheck {
+export class DetailBoxComponent implements OnInit {
 
 
 	// ========================================================================================
@@ -70,11 +70,8 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 
 
 	constructor(
-		private changeDetectionService: ChangeDetectionService,
-		private renderEventsService: RenderEventsService,
 		private valueChartHttpService: ValueChartHttpService,
-		private hostService: HostService,
-		private objectiveChartDefinitions: ObjectiveChartDefinitions) { }
+		private hostService: HostService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -85,16 +82,17 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
-
-		// Set Alternative labels to link to the Alternative detail box. 
-		this.subscription = this.renderEventsService.objectiveChartDispatcher.subscribe((done: number) => { done ? this.linkAlternativeLabelsToDetailBox() : null });
 	}
 
-	ngDoCheck(): void {
-		
+
+	@Input() 
+	set renderEventsService(renderEventsService: RenderEventsService) {
+		console.log(renderEventsService);
+
+		if (renderEventsService)
+			this.linkAlternativeLabelsToDetailBox();
 	}
 
-	// ================================ Detail Box Methods ====================================
 
 	expandAlternative(alternative: Alternative): void {
 		this.detailBoxAlternativeTab = alternative.getName();
@@ -111,7 +109,6 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 
 	setUserColor(user: User, color: string): void {
 		user.color = color;
-		this.changeDetectionService.colorsHaveChanged = true;
 	}
 
 	/* 	
@@ -140,12 +137,10 @@ export class DetailBoxComponent implements OnInit, DoCheck {
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
 	linkAlternativeLabelsToDetailBox = () => {
-		this.subscription.unsubscribe();
-
-		d3.selectAll('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL)
+		d3.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 			.classed('alternative-link', true);
 
-		$('.' + this.objectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
+		$('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
 			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);
 			this.expandAlternative(selection.datum());
 		});

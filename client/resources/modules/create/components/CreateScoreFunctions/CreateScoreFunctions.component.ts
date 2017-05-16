@@ -8,9 +8,9 @@ import '../../../utilities/rxjs-operators';
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
-import { ChartUndoRedoService }											from '../../../app/services/ChartUndoRedo.service';
+import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
 
-import { RendererScoreFunctionUtility }							from '../../../app/utilities/RendererScoreFunction.utility';
+import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
 import { ValueChart } 													    from '../../../../model/ValueChart';
@@ -73,7 +73,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
   constructor(
     private valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
-    private chartUndoRedoService: ChartUndoRedoService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
   // ========================================================================================
@@ -92,7 +91,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
       subscriber.next(this.validate());
       subscriber.complete();
     });
-    this.services.chartUndoRedoService = this.chartUndoRedoService;
+    this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
 
     if (!this.valueChartService.currentUserIsDefined()) {
