@@ -13,7 +13,7 @@
 
   "files": [
     "client/resources/modules/app/app.module.ts",
-    "client/main.ts"
+    "client/main.production.ts"
   ],  
   "angularCompilerOptions": {
    "genDir": "aot",

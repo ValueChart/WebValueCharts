@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-16 17:10:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 22:54:33
+* @Last Modified time: 2017-05-17 11:08:29
 */
 
 
@@ -11,7 +11,7 @@ import commonjs    from 'rollup-plugin-commonjs';
 import uglify      from 'rollup-plugin-uglify'
 
 export default {
-  entry: 'client/main.js',
+  entry: 'client/main.production.js',
   dest: 'client/build.js', // output a single application bundle
   sourceMap: false,
   format: 'iife',

@@ -6,7 +6,8 @@
   "author": "aaronpmishkin",
   "scripts": {
     "start": "gulp start",
-    "test": "gulp test"
+    "test": "gulp test",
+    "build": "ngc -p tsconfig-aot.json && rollup -c rollup-config.js"
   },
   "dependencies": {
     "@angular/animations": "^4.1.0",

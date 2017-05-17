@@ -17,6 +17,7 @@ coverage
 
 test/reports
 aot
+client/build.js
 
 # nyc test coverage
 .nyc_output
@@ -56,6 +57,7 @@ typings
 ### Generated JS Files ###
 
 client/resources/**/*.js
+client/**/*.js
 client/main.js
 client/rxjs-operators.js
 client/app.routes.js
