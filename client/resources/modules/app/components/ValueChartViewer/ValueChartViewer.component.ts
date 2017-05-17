@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 22:19:08
+* @Last Modified time: 2017-05-17 12:44:39
 */
 
 // Import Angular Classes:
@@ -261,6 +261,7 @@ export class ValueChartViewerComponent implements OnInit {
 	submitPreferences(): void {
 		var currentUser: User = this.valueChartService.getCurrentUser();
 		this.rescaleScoreFunctions();
+		currentUser.getWeightMap().normalize();
 
 		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 		// that has been retrieved from the server.
