@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:49:54
+* @Last Modified time: 2017-05-17 16:06:54
 */
 
 // Import Angular Classes:
@@ -88,7 +88,7 @@ export class ValueChartService implements ValueChartStateContainer {
 	}
 
 	addUser(user: User) {
-		this.valueChart.addUser(user);	
+		this.valueChart.setUser(user);	
 		this.weightMapReset[user.getUsername()] = false;
 	}
 
@@ -102,10 +102,6 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	getUsers(): User[] {
 		return this.valueChart.getUsers();
-	}
-
-	getGroupValueChartUsers(): User[] {
-		return this.getUsers();	
 	}
 
 	getNumUsers(): number {

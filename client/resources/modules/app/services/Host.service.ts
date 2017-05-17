@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 14:32:13
+* @Last Modified time: 2017-05-17 16:08:06
 */
 
 import { Injectable } 												from '@angular/core';
@@ -136,25 +136,10 @@ export class HostService {
 			// An existing user has resubmitted their preferences.
 			case MessageType.UserChanged:
 				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				var userIndex: number = this.valueChartService.getGroupValueChartUsers().findIndex((user: User) => {
-					return user.getUsername() === updatedUser.getUsername();
-				});
 
-				if (userIndex === -1 ) {
-					this.valueChartService.addUser(updatedUser);
-					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
-				} else {
-					// Update the user's preferences by reference. This lets us avoid recomputing the renderer data for the ValueChart directive.
-					var oldUser: User = this.valueChartService.getGroupValueChartUsers()[userIndex];
-					oldUser.getWeightMap().setInternalWeightMap(updatedUser.getWeightMap().getInternalWeightMap());
-					oldUser.getScoreFunctionMap().getAllKeyScoreFunctionPairs().forEach((pair: { key: string, scoreFunction: ScoreFunction}) => {
-						let newScores = updatedUser.getScoreFunctionMap().getObjectiveScoreFunction(pair.key).getElementScoreMap();
-						pair.scoreFunction.setElementScoreMap(newScores);
-					});
+				this.valueChartService.getValueChart().setUser(updatedUser);
 
-					this.valueChartService.getValueChart().updateMaximumWeightMap();
-					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
-				}
+				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 
 				break;
 
@@ -162,11 +147,11 @@ export class HostService {
 			case MessageType.UserRemoved:
 				var userToDelete: string = hostMessage.data;
 
-				var userIndex: number = this.valueChartService.getGroupValueChartUsers().findIndex((user: User) => {
+				var userIndex: number = this.valueChartService.getValueChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
 				// Delete the user from the ValueChart
-				this.valueChartService.getGroupValueChartUsers().splice(userIndex, 1);
+				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 23:11:32
+* @Last Modified time: 2017-05-17 16:28:41
 */
 
 // Import Angular Classes:
@@ -271,6 +271,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
 			this.calculateDefaultComponentSize();
 			this.valueChartSubject.next(this.valueChart);
+			this.interactionSubject.next(this.interactionConfig);
 		}
 	}
 }

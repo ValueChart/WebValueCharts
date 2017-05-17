@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:14:36
+* @Last Modified time: 2017-05-17 16:25:57
 */
 
 // Import Angular Classes:
@@ -55,7 +55,7 @@ export class ResizeWeightsInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;
 
 	private resizeType: string;	// The type of Weight Resizing that is currently enabled. Must be one of the strings: 'neighbor', 'siblings', or 'none'.
 

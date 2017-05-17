@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 14:36:55
+* @Last Modified time: 2017-05-17 16:16:44
 */
 
 // Import Angular Classes:
@@ -49,6 +49,8 @@ export class RendererDataUtility {
 	// 									Fields
 	// ========================================================================================
 
+	private usersRecord: User[];
+
 	private rowData: RowData[];				// Data from the active ValueChart formatted to work with the ObjectiveChartRenderer and the SummaryChartRenderer classes.
 	private labelData: LabelData[];			// Data from the active ValueChart formatted to work with the LabelRenderer classes.
 
@@ -68,12 +70,14 @@ export class RendererDataUtility {
 	// 									Methods
 	// ========================================================================================
 
-
+	sameRefs = (x: any[], y: any[]) => { return _.reduce(_.zip(x, y), (acc, n) => { return (n[0] == n[1]) && acc; }, true); };
 
 		// TODO <@aaron>: update this output type of this method.
 
 	produceRowData = (u: RendererUpdate) => {
-		if (!this.rowData || u.valueChart.getUsers().length != this.rowData.length ) {
+
+		if (!this.usersRecord || !this.sameRefs(this.usersRecord, u.valueChart.getUsers()) || !this.rowData ) {
+			this.usersRecord = _.clone(u.valueChart.getUsers());
 			this.generateRowData(u.valueChart);
 		}
 

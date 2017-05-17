@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 23:01:39
+* @Last Modified time: 2017-05-17 16:01:16
 */
 
 // Import Angular Classes:
@@ -92,13 +92,13 @@ export class DetailBoxComponent implements OnInit {
 
 	expandAlternative(alternative: Alternative): void {
 		this.detailBoxAlternativeTab = alternative.getName();
+		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.alternativeObjectives[index] = objective.getName();
 			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
 		});
 
-		$('#alternative-header-container').click();
 	}
 
 	collapseAlternative(): void {
@@ -135,7 +135,6 @@ export class DetailBoxComponent implements OnInit {
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
 	linkAlternativeLabelsToDetailBox = () => {
-		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 		d3.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 					.classed('alternative-link', true);
 

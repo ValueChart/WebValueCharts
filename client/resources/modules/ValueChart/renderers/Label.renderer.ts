@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:15:41
+* @Last Modified time: 2017-05-17 16:38:45
 */
 
 // Import Angular Classes:
@@ -114,12 +114,12 @@ export class LabelRenderer {
 
 		if (this.reordered) {
 			this.createLabels(update, update.labelData, this.labelContainer);
-			this.applyStyles(update)
 		}
 
 		this.renderLabelSpace(update, update.labelData);
 
 		if (this.reordered) {
+			this.applyStyles(update)
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
 		}
@@ -282,6 +282,8 @@ export class LabelRenderer {
 			}
 
 		});
+
+		this.toggleDisplayScoreFunctions(this.lastRendererUpdate.viewConfig.displayScoreFunctions);
 	}
 
 

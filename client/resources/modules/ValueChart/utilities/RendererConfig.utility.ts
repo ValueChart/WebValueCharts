@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 12:10:34
+* @Last Modified time: 2017-05-17 16:17:02
 */
 
 // Import Angular Classes:
@@ -89,6 +89,8 @@ export class RendererConfigUtility {
 		u.rendererConfig.dimensionTwoScale = d3.scaleLinear()
 			.domain([0, u.valueChart.getMaximumWeightMap().getWeightTotal()])
 			.range([0, u.rendererConfig.dimensionTwoSize]);
+
+		console.log('Fixing Dimension Two Scale');
 
 		return u;
 	}
