@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 09:50:30
+* @Last Modified time: 2017-05-16 22:44:47
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { Injectable } 															from '@angular/core';
 
 // Import libraries:
 import * as _ 																	from 'lodash';
-
 
 // Import Application Classes:
 import { ChartUndoRedoService }													from './ChartUndoRedo.service';

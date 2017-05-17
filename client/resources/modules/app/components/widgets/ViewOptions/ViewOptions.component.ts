@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-01-06 21:24:45
+* @Last Modified time: 2017-05-16 21:37:38
 */
 
 // Import Angular Classes:
@@ -16,14 +16,14 @@ import { ViewConfig }															from '../../../../../types/Config.types';
 
 @Component({
 	selector: 'ViewOptions',
-	templateUrl: 'client/resources/modules/app/components/widgets/ViewOptions/ViewOptions.template.html',
+	templateUrl: './ViewOptions.template.html',
 	providers: []
 })
 export class ViewOptionsComponent implements OnInit {
 
 
 	@Output() viewConfig = new EventEmitter<ViewConfig>();
-	private config: ViewConfig;
+	public config: ViewConfig;
 
 	@Input() chartType: string;
 

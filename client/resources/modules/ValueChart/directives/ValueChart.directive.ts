@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 12:33:00
+* @Last Modified time: 2017-05-16 23:11:32
 */
 
 // Import Angular Classes:
@@ -13,7 +13,6 @@ import { EventEmitter }															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
-import * as _ 																	from 'lodash';
 import { Observable }															from 'rxjs/Observable';
 import { Subscription } 														from 'rxjs/Subscription';
 import { Subject }																from 'rxjs/Subject';
@@ -33,6 +32,7 @@ import { LabelRenderer }														from '../renderers/Label.renderer';
 // Utilities
 import { RendererDataUtility }													from '../utilities/RendererData.utility';
 import { RendererConfigUtility }												from '../utilities/RendererConfig.utility';
+import { RendererScoreFunctionUtility }											from '../utilities/RendererScoreFunction.utility';
 // Interactions
 import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
@@ -59,6 +59,11 @@ import { ViewConfig, InteractionConfig }										from '../../../types/Config.ty
 		ChangeDetectionService,
 		RenderEventsService,
 		ChartUndoRedoService,
+		RendererService,
+		// Utilities:
+		RendererScoreFunctionUtility,
+		RendererDataUtility,
+		RendererConfigUtility,
 		// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,

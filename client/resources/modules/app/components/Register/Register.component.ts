@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-01 14:15:14
+* @Last Modified time: 2017-05-16 21:35:43
 */
 
 // Import Angular Classes:
@@ -27,7 +27,7 @@ import { UserHttpService }									from '../../services/UserHttp.service';
 
 @Component({
 	selector: 'register',
-	templateUrl: 'client/resources/modules/app/components/Register/Register.template.html',
+	templateUrl: './Register.template.html',
 })
 export class RegisterComponent {
 
@@ -40,9 +40,9 @@ export class RegisterComponent {
 	private rePassword: string;
 	private email: string;
 
-	private tempUserName: string;
+	public tempUserName: string;
 
-	private state: string;
+	public state: string;
 	private invalidCredentials: boolean;
 	private invalidMessage: string;
 

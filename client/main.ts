@@ -2,9 +2,10 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 09:47:50
+* @Last Modified time: 2017-05-16 23:07:57
 */
 
+import { enableProdMode } 						from '@angular/core';
 import { platformBrowserDynamic } 				from '@angular/platform-browser-dynamic';
 import { AppModule }				 			from './resources/modules/app/app.module';
 
@@ -17,4 +18,16 @@ import { AppModule }				 			from './resources/modules/app/app.module';
 	application.
 */
 
+
+// Enable production mode unless running locally
+if (!/localhost/.test(document.location.host)) {
+  enableProdMode();
+}
+
 platformBrowserDynamic().bootstrapModule(AppModule);
+
+
+// import { platformBrowser }    from '@angular/platform-browser';
+// import { AppModuleNgFactory } from '../aot/client/resources/modules/app/app.module.ngfactory';
+
+// platformBrowser().bootstrapModuleFactory(AppModuleNgFactory);

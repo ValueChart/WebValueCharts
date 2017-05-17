@@ -22,7 +22,7 @@ import { ContinuousDomain }												from '../../../../model/ContinuousDomain'
 
 @Component({
 	selector: 'CreateAlternatives',
-	templateUrl: 'client/resources/modules/create/components/CreateAlternatives/CreateAlternatives.template.html',
+	templateUrl: './CreateAlternatives.template.html',
 })
 export class CreateAlternativesComponent implements OnInit {
 
@@ -47,7 +47,7 @@ export class CreateAlternativesComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
+	constructor(public valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
 
 	// ========================================================================================
 	// 									Methods

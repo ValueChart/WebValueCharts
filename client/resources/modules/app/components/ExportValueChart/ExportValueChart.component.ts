@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-01 11:26:07
+* @Last Modified time: 2017-05-16 21:36:21
 */
 
 // Import Angular Classes:
@@ -56,7 +56,7 @@ export class ExportValueChartComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService) { }
+	constructor(public valueChartService: ValueChartService) { }
 
 	// ========================================================================================
 	// 									Methods

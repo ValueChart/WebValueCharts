@@ -26,7 +26,7 @@ import { Alternative }													from '../../../../model/Alternative';
 
 @Component({
 	selector: 'CreateWeights',
-	templateUrl: 'client/resources/modules/create/components/CreateWeights/CreateWeights.template.html',
+	templateUrl: './CreateWeights.template.html',
 })
 export class CreateWeightsComponent implements OnInit {
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:44:59
+* @Last Modified time: 2017-05-16 21:35:59
 */
 
 // Import Angular Classes:
@@ -31,7 +31,7 @@ import { singleHotel, groupHotel, waterManagement}		from '../../../../data/DemoV
 
 @Component({
 	selector: 'home',
-	templateUrl: 'client/resources/modules/app/components/Home/Home.template.html',
+	templateUrl: './Home.template.html',
 })
 export class HomeComponent {
 
@@ -41,11 +41,11 @@ export class HomeComponent {
 
 	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Runoff Management', type: 'Individual' }]
 
-	private valueChartName: string;
-	private valueChartPassword: string;
-	private invalidCredentials: boolean;
-	private validationMessage: string;
-	private isJoining: boolean = false; // boolean toggle indicating whether user clicked to join or view an existing chart 
+	public valueChartName: string;
+	public valueChartPassword: string;
+	public invalidCredentials: boolean;
+	public validationMessage: string;
+	public isJoining: boolean = false; // boolean toggle indicating whether user clicked to join or view an existing chart 
 										// this is needed so we can use the same credentials modal in both cases
 
 	// ========================================================================================

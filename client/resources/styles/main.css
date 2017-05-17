@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 09:55:03
+* @Last Modified time: 2017-05-16 21:45:11
 */
 
 /* Global Styles */
@@ -182,13 +182,6 @@ a.upload {
     position: absolute !important;
     top: 8rem;
     z-index: 10;
-}
-
-.detail-box-vertical {
-    left: 5% !important;
-}
-
-.detail-box-horizontal {
 }
 
 #alternative-detail-box {

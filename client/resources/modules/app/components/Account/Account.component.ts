@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 16:30:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:16:26
+* @Last Modified time: 2017-05-16 21:37:16
 */
 
 import { Component } 												from '@angular/core';
@@ -21,7 +21,7 @@ import { UserHttpService }											from '../../services/UserHttp.service';
 
 @Component({
 	selector: 'account',
-	templateUrl: 'client/resources/modules/app/components/Account/Account.template.html',
+	templateUrl: './Account.template.html',
 })
 export class AccountComponent implements OnInit {
 
@@ -29,15 +29,15 @@ export class AccountComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private username: string = this.currentUserService.getUsername();
-	private password: string;
-	private rePassword: string;
-	private email: string;
+	public username: string = this.currentUserService.getUsername();
+	public password: string;
+	public rePassword: string;
+	public email: string;
 
 
-	private invalidCredentials: boolean;
-	private invalidMessage: string;
-	private credentialsUpdated: boolean;
+	public invalidCredentials: boolean;
+	public invalidMessage: string;
+	public credentialsUpdated: boolean;
 
 	// ========================================================================================
 	// 									Constructor

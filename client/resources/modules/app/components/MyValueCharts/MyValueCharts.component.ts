@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:16:40
+* @Last Modified time: 2017-05-16 21:36:53
 */
 
 // Import Angular Classes:
@@ -35,7 +35,7 @@ import { ValueChart }									from '../../../../model/ValueChart';
 
 @Component({
 	selector: 'myValueCharts',
-	templateUrl: 'client/resources/modules/app/components/MyValueCharts/MyValueCharts.template.html',
+	templateUrl: './MyValueCharts.template.html',
 })
 export class MyValueChartsComponent implements OnInit {
 
@@ -43,10 +43,10 @@ export class MyValueChartsComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartOwnerships: any[];	// The array of ValueChart summary objects belonging to the current user. These are retrieved from the server
+	public valueChartOwnerships: any[];	// The array of ValueChart summary objects belonging to the current user. These are retrieved from the server
 										// Belonging is defined as having the creator field of the ValueChart match the user's username.
 
-	private valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
+	public valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
 										// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
 	
 	private downloadLink: any;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
@@ -66,7 +66,7 @@ export class MyValueChartsComponent implements OnInit {
 		private router: Router,
 		private valueChartXMLEncoder: ValueChartXMLEncoder,
 		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService,
+		public valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
 		private valueChartHttpService: ValueChartHttpService) { }
 

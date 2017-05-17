@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 12:56:14
+* @Last Modified time: 2017-05-16 22:19:08
 */
 
 // Import Angular Classes:
@@ -50,7 +50,7 @@ import { ScoreFunctionRecord }													from '../../../../types/Record.types'
 
 @Component({
 	selector: 'ValueChartViewer',
-	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
+	templateUrl: './ValueChartViewer.template.html',
 	providers: [ ]
 })
 export class ValueChartViewerComponent implements OnInit {
@@ -59,11 +59,11 @@ export class ValueChartViewerComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartWidth: number;
-	private valueChartHeight: number;
+	public valueChartWidth: number;
+	public valueChartHeight: number;
 
-	private undoRedoService: ChartUndoRedoService;
-	private renderEvents: RenderEventsService;
+	public undoRedoService: ChartUndoRedoService;
+	public renderEvents: RenderEventsService;
 
 	valueChart: ValueChart;
 
@@ -90,8 +90,8 @@ export class ValueChartViewerComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
-		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService,
+		public currentUserService: CurrentUserService,
+		public valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 

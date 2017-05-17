@@ -34,7 +34,7 @@ import { User }															from '../../../../model/User';
 
 @Component({
 	selector: 'createValueChart',
-	templateUrl: 'client/resources/modules/create/components/CreateValueChart/CreateValueChart.template.html',
+	templateUrl: './CreateValueChart.template.html',
 	providers: [UpdateObjectiveReferencesService]
 })
 export class CreateValueChartComponent implements OnInit {
@@ -48,7 +48,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	// Navigation Control:
 	sub: any;
-	private window = window;
+	public window: any = window;
 	private saveOnDestroy: boolean = false;
 	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
@@ -68,9 +68,9 @@ export class CreateValueChartComponent implements OnInit {
 	constructor(
 		public router: Router,
 		private route: ActivatedRoute,
-		private currentUserService: CurrentUserService,
+		public currentUserService: CurrentUserService,
 		private valueChartHttpService: ValueChartHttpService,
-		private creationStepsService: CreationStepsService,
+		public creationStepsService: CreationStepsService,
 		private valueChartService: ValueChartService,
 		private validationService: ValidationService,
 		private updateObjectiveReferencesService: UpdateObjectiveReferencesService) { }

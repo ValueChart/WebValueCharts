@@ -18,7 +18,7 @@ import { ValueChart } 														from '../../../../model/ValueChart';
 
 @Component({
 	selector: 'CreateBasicInfo',
-	templateUrl: 'client/resources/modules/create/components/CreateBasicInfo/CreateBasicInfo.template.html',
+	templateUrl: './CreateBasicInfo.template.html',
 })
 export class CreateBasicInfoComponent implements OnInit {
 
@@ -42,7 +42,7 @@ export class CreateBasicInfoComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService,
+	constructor(public valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private valueChartHttpService: ValueChartHttpService) { }
 

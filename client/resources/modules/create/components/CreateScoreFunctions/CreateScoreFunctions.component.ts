@@ -33,7 +33,7 @@ import { ContinuousScoreFunction }								  from '../../../../model/ContinuousSc
 
 @Component({
   selector: 'CreateScoreFunctions',
-  templateUrl: 'client/resources/modules/create/components/CreateScoreFunctions/CreateScoreFunctions.template.html',
+  templateUrl: './CreateScoreFunctions.template.html',
   providers: [RendererScoreFunctionUtility]
 })
 export class CreateScoreFunctionsComponent implements OnInit {
@@ -49,7 +49,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   initialWorstOutcomes: { [objName: string]: string | number }; // Track initial best outcomes for each Objective
                                                                 // so we can reset weights if it changes
   latestDefaults: { [objName: string]: string }; // Track latest default function so we can set dropdown accordingly
-  private services: any = {}; // Services container to pass to ScoreFunctionDirective
+  public services: any = {}; // Services container to pass to ScoreFunctionDirective
 
 
   // Validation fields:
@@ -71,7 +71,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
             This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
   */
   constructor(
-    private valueChartService: ValueChartService,
+    public valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
