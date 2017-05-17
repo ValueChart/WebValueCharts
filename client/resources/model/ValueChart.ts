@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 23:23:11
+* @Last Modified time: 2017-05-17 14:25:43
 */
 	
 // Import Model Classes:
@@ -298,7 +298,9 @@ export class ValueChart {
 	updateMaximumWeightMap(): void {
 		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
 		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
-		var maximumWeightMap = new WeightMap();
+		
+		if (this.maximumWeightMap == undefined)
+			this.maximumWeightMap = new WeightMap();
 
 		if (this.users) {
 			this.users.forEach((user: User) => {
@@ -313,11 +315,10 @@ export class ValueChart {
 			});
 
 			for (var i = 0; i < primitiveObjectives.length; i++) {
-				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+				this.maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
 			}
 		}
 
-		this.maximumWeightMap = maximumWeightMap;
 	}
 
 	/*

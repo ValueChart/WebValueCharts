@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:12:13
+* @Last Modified time: 2017-05-17 14:18:31
 */
 
 // Import Angular Classes
@@ -92,19 +92,16 @@ export class ObjectiveChartRenderer {
 		
 		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
-			this.applyStyles(update);
 		}
 
 		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
-			this.applyStyles(update);
 		}
 
 		this.numUsers = update.valueChart.getUsers().length;
 
 		this.renderObjectiveChart(update);
 		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.applyStyles(update);
 			this.interactionsChanged(update.interactionConfig);
 			this.viewOrientation = update.viewConfig.viewOrientation;
 		}	
@@ -461,6 +458,16 @@ export class ObjectiveChartRenderer {
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1), 0); })
 			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return this.calculateWeightColumnDimensionTwo(d, i); })
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + ((this.USER_SCORE_SPACING + 1) / 2); })
+			.style('stroke-dasharray', (d: UserScoreData, i: number) => {
+				let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
+				let dimensionTwo: number = this.calculateWeightColumnDimensionTwo(d, i);
+
+				return (u.viewConfig.viewOrientation === 'vertical') ?
+					(dimensionOne + dimensionTwo) + ', ' + dimensionOne
+					:
+					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
+			});
+
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			weightColumns
@@ -475,23 +482,6 @@ export class ObjectiveChartRenderer {
 		this.toggleWeightColumns(u);
 	}
 
-
-	applyStyles(u: RendererUpdate): void {
-		this.alternativeLabels.style('font-size', '20px');
-
-		this.weightColumns.style('stroke-dasharray', (d: UserScoreData, i: number) => {
-			let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
-			let dimensionTwo: number = this.calculateWeightColumnDimensionTwo(d, i);
-
-			return (u.viewConfig.viewOrientation === 'vertical') ?
-				(dimensionOne + dimensionTwo) + ', ' + dimensionOne
-				:
-				(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
-		});
-
-
-
-	}
 
 	/*
 		@returns {void}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 10:13:35
+* @Last Modified time: 2017-05-17 14:32:13
 */
 
 import { Injectable } 												from '@angular/core';
@@ -152,6 +152,7 @@ export class HostService {
 						pair.scoreFunction.setElementScoreMap(newScores);
 					});
 
+					this.valueChartService.getValueChart().updateMaximumWeightMap();
 					toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 				}
 

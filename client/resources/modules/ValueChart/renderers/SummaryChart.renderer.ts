@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:16:46
+* @Last Modified time: 2017-05-17 14:14:54
 */
 
 // Import Angular Classes
@@ -66,7 +66,6 @@ export class SummaryChartRenderer {
 
 	// Misc. Fields:
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
-	private scoreTotalFontSize: number = 22;
 
 	private numUsers: number;
 	private viewOrientation: string;
@@ -94,12 +93,10 @@ export class SummaryChartRenderer {
 
 		if (this.chart == undefined) {
 			this.createSummaryChart(update);
-			this.applyStyles(update);
 		}
 
 		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
-			this.applyStyles(update);
 		}
 
 		this.numUsers = update.valueChart.getUsers().length;
@@ -107,7 +104,6 @@ export class SummaryChartRenderer {
 		this.renderSummaryChart(update);
 
 		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.applyStyles(update);
 			this.interactionsChanged(update.interactionConfig);
 			this.viewOrientation = update.viewConfig.viewOrientation;
 		}	
@@ -526,12 +522,6 @@ export class SummaryChartRenderer {
 			else
 				return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
 		});
-	}
-
-	public applyStyles(u: RendererUpdate): void {
-
-		this.scoreTotals
-			.style('font-size', this.scoreTotalFontSize)
 	}
 
 	/*
