@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 16:12:48
+* @Last Modified time: 2017-05-18 16:40:35
 */
 	
 // Import Model Classes:
@@ -290,13 +290,7 @@ export class ValueChart {
 						The maximum weight map is to determine label heights by the LabelRenderer, and row heights by the objective chart renderer.
 	*/
 	getMaximumWeightMap(): WeightMap {
-		if (this.users.length === 0)
-			return this.getDefaultWeightMap();
-
-		if (this.users.length === 1)
-			return this.users[0].getWeightMap();
-
-		if (this.maximumWeightMap == undefined)
+		if (!this.maximumWeightMap)
 			this.updateMaximumWeightMap();
 
 		return this.maximumWeightMap;
@@ -305,29 +299,36 @@ export class ValueChart {
 
 
 	private updateMaximumWeightMap(): void {
-		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
-		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
-		
-		if (this.maximumWeightMap == undefined)
-			this.maximumWeightMap = new WeightMap();
+		if (this.users.length === 0) {
+			this.maximumWeightMap = this.getDefaultWeightMap();
+		} else if (this.users.length === 1) {
+			this.maximumWeightMap = this.users[0].getWeightMap();
+		} else {
 
-		if (this.users) {
-			this.users.forEach((user: User) => {
-				if (user.getWeightMap()) {
-				let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-					for (var i = 0; i < objectiveWeights.length; i++) {
-						if (combinedWeights[i] < objectiveWeights[i]) {
-							combinedWeights[i] = objectiveWeights[i];
+			var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
+
+			var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
+			
+			if (!this.maximumWeightMap)
+				this.maximumWeightMap = new WeightMap();
+
+			if (this.users) {
+				this.users.forEach((user: User) => {
+					if (user.getWeightMap()) {
+					let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
+						for (var i = 0; i < objectiveWeights.length; i++) {
+							if (combinedWeights[i] < objectiveWeights[i]) {
+								combinedWeights[i] = objectiveWeights[i];
+							}
 						}
 					}
-				}
-			});
+				});
 
-			for (var i = 0; i < primitiveObjectives.length; i++) {
-				this.maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+				for (var i = 0; i < primitiveObjectives.length; i++) {
+					this.maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+				}
 			}
 		}
-
 	}
 
 	/*

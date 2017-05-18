@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 16:49:43
+* @Last Modified time: 2017-05-18 16:05:53
 */
 
 // Import Angular Classes:
@@ -72,7 +72,6 @@ export class ValueChartHttpService {
 						from the _id field of the observable ValueChart that is returned by this method.
 	*/
 	createValueChart(valueChart: ValueChart): Observable<ValueChart> {
-
 		if (!valueChart._id)
 			valueChart._id = undefined;
 
