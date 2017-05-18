@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 16:16:13
+* @Last Modified time: 2017-05-18 13:28:35
 */
 
 // Import gulp packages:
@@ -68,10 +68,7 @@ startServer = function() {
 
 // Execute Mocha unit tests.
 unit = function(done) {
-	var server = new Server({
-		configFile: __dirname + '/karma.conf.js',
-		singleRun: true
-	}, done);
+	var server = new Server({ configFile: __dirname + '/karma.conf.js' }, done);
 	server.start();
 
 	var stream = emitStream(server);

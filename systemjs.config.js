@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-05 12:48:38
+* @Last Modified time: 2017-05-18 11:07:20
 */
 
 // =========================================================================================================================================
@@ -37,7 +37,8 @@
 		'@angular/forms': 							'node_modules/@angular/forms/bundles/forms.umd.js',
 		'chai': 									'node_modules/chai/chai.js',
 		'chai-as-promised': 						'node_modules/chai-as-promised/lib/chai-as-promised.js',
-		'superagent': 								'node_modules/superagent/superagent.js'
+		'superagent': 								'node_modules/superagent/superagent.js',
+		'traceur': 									'node_modules/traceur/bin/traceur.js'
 	};
 
 	// Defines default extensions and files.
