@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:39:32
+* @Last Modified time: 2017-05-19 12:06:40
 */
 
 // Import Angular Classes:
@@ -137,7 +137,7 @@ export class LabelRenderer {
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
-		this.sortAlternativesInteraction.sortAlternativesByObjective(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleSortAlternativesByObjectiveScore(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
 
 		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}

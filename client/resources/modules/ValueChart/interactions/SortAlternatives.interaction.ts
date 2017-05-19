@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:39:14
+* @Last Modified time: 2017-05-19 14:32:54
 */
 
 // Import Angular Classes:
@@ -10,6 +10,8 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import * as _ 														from 'lodash';
+
 import { Subject }													from 'rxjs/Subject';
 import { Observable }												from 'rxjs/Observable';
 import { Subscription }												from 'rxjs/Subscription';
@@ -18,7 +20,6 @@ import '../../utilities/rxjs-operators';
 // Import Application Classes
 import { RendererService } 											from '../services/Renderer.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
-import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 
 import { SummaryChartDefinitions }									from '../definitions/SummaryChart.definitions';
 import { ObjectiveChartDefinitions }								from '../definitions/ObjectiveChart.definitions';
@@ -32,7 +33,7 @@ import { Alternative }												from '../../../model/Alternative';
 
 import { RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
-import { AlternativeOrderRecord }									from '../../../types/Record.types';
+import { AlternativesRecord }										from '../../../types/Record.types';
 
 
 
@@ -71,7 +72,7 @@ export class SortAlternativesInteraction {
 	SORT_OFF: string = 'none';							// No form of Alternative sorting is enabled.
 
 	private lastRendererUpdate: RendererUpdate;
-	private originalAlternativeOrder: AlternativeOrderRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
+	private originalAlternativeOrder: AlternativesRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
 																// class to reset the alternative order.
 
 	private clicks: Observable<Event>;
@@ -106,8 +107,7 @@ export class SortAlternativesInteraction {
 	*/
 	constructor(
 		private rendererService: RendererService,
-		private chartUndoRedoService: ChartUndoRedoService,
-		private changeDetectionService: ChangeDetectionService) { 
+		private chartUndoRedoService: ChartUndoRedoService) { 
 			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
  	}	
 
@@ -118,7 +118,7 @@ export class SortAlternativesInteraction {
 
 	public initialize(u: RendererUpdate) {
 		if (!this.originalAlternativeOrder && u)
-			this.originalAlternativeOrder = new AlternativeOrderRecord(u.valueChart.getAlternatives());
+			this.originalAlternativeOrder = new AlternativesRecord(u.valueChart.getAlternatives());
 
 		this.lastRendererUpdate = u;
 	}
@@ -133,27 +133,23 @@ export class SortAlternativesInteraction {
 	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
 		this.initialize(lastRendererUpdate);
 
-		if (this.changeDetectionService.alternativeOrderChanged)
-			return;
-
 		if (sortingType === this.SORT_ALPHABETICALLY) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
+			this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
-			this.reorderAllCells(this.generateCellOrderAlphabetically());
-			this.changeDetectionService.alternativeOrderChanged = true;
+			this.lastRendererUpdate.valueChart.setAlternatives(this.sortAlternativesAlphabetically(this.lastRendererUpdate.valueChart.getAlternatives()));
 
 		} else if (sortingType === this.SORT_MANUALLY) {
 			this.sortAlternativesManually(true, alternativeBoxes);
 
 		} else if (sortingType === this.RESET_SORT) {
-			this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
-
-			this.resetCellOrder();
-			this.changeDetectionService.alternativeOrderChanged = true;
+			this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
+			this.lastRendererUpdate.valueChart.setAlternatives(this.originalAlternativeOrder.alternatives);
 
 		} else if (sortingType === this.SORT_OFF) {
 			this.sortAlternativesManually(false, alternativeBoxes);
 		}
+
+		this.removeUnnecessaryRecords()
 	}
 
 	/*
@@ -162,16 +158,18 @@ export class SortAlternativesInteraction {
 		@description 	Toggles the clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective. This method
 						uses the sortByObjective anonymous function defined below to handle the actual sorting. Sorting by objectives is managed by the LabelRenderer.
 	*/
-	public sortAlternativesByObjective(enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate): void {
+	public toggleSortAlternativesByObjectiveScore(enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate): void {
 		this.initialize(lastRendererUpdate);
 
 		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
 		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);
 
-		var clicksLabels = Observable.fromEvent(objectiveLabels, 'click');
-		var clicksText =  Observable.fromEvent(objectiveText, 'click');
-
-		this.clicks = Observable.merge(clicksLabels, clicksText);
+		if (!this.clicks) {	
+			var clicksLabels = Observable.fromEvent(objectiveLabels, 'click');
+			var clicksText =  Observable.fromEvent(objectiveText, 'click');
+		
+			this.clicks = Observable.merge(clicksLabels, clicksText);
+		}
 
 		if (this.onClick != undefined)
 			this.onClick.unsubscribe();
@@ -205,7 +203,8 @@ export class SortAlternativesInteraction {
 
 	// This function handles user clicks on objective labels by sorting the alternatives by their score for that objective.
 	private sortByObjective = (eventObject: Event) => {
-		this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
+		console.log(eventObject);
+		this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
 		var objective: Objective = (<any> d3.select(<any> eventObject.target).datum()).objective;
 		var objectivesToReorderBy: PrimitiveObjective[];
@@ -214,14 +213,14 @@ export class SortAlternativesInteraction {
 		} else {
 			objectivesToReorderBy = [<PrimitiveObjective>objective];
 		}
-		var cellIndices: number[] = this.generateCellOrderByObjectiveScore(this.lastRendererUpdate.rowData, objectivesToReorderBy)
-		this.reorderAllCells(cellIndices);
-		this.changeDetectionService.alternativeOrderChanged = true;
+		
+		this.lastRendererUpdate.valueChart.setAlternatives(this.sortAlternativesByObjective(this.lastRendererUpdate.valueChart.getAlternatives(), objectivesToReorderBy));
+		this.removeUnnecessaryRecords()
 	}
 
 	// This function is called when a user first begins to drag an alternative to alter its position in the alternative order.
 	private startSortAlternatives = (d: Alternative, i: number) => {
-		this.chartUndoRedoService.saveAlternativeOrderRecord(this.lastRendererUpdate.valueChart.getAlternatives());
+		this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
 		this.minCoordOne = 0;
 		this.maxCoordOne = this.lastRendererUpdate.rendererConfig.dimensionOneSize;
@@ -311,55 +310,35 @@ export class SortAlternativesInteraction {
 			alternatives.splice(this.newAlternativeIndex, 0, temp);
 
 		} else {
-			// No changes were made, so delete the undo/redo record that was created when dragging started. State should not be 
-			// saved when no changes are made.
 			this.chartUndoRedoService.deleteNewestRecord();
+			this.lastRendererUpdate.renderRequired.value = true;
 		}
 
 		d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 1);
-		this.changeDetectionService.alternativeOrderChanged = true;
 	}
+
 
 	// ================================ Public Methods for Reordering Rows and Columns ====================================
 
-	public reorderAllCells(cellIndices: number[]): void {
-		this.lastRendererUpdate.rowData.forEach((row: RowData, index: number) => {
-			row.cells = d3.permute(row.cells, cellIndices);
-		});
-
-		this.lastRendererUpdate.valueChart.setAlternatives(d3.permute(this.lastRendererUpdate.valueChart.getAlternatives(), cellIndices));
-	}
-
-	public resetCellOrder(): void {
-		var cellIndices: number[] = [];
-
-		this.lastRendererUpdate.valueChart.getAlternatives().forEach((alternative: Alternative, index: number) => {
-			cellIndices[this.originalAlternativeOrder.alternativeIndexMap[alternative.getName()]] = index;
-		});
-
-		this.reorderAllCells(cellIndices);
-	}
-
-	// ================================ Public Methods Generating Row Orders ====================================
-
-	public generateCellOrderByObjectiveScore(rowsToReorder: RowData[], objectivesToReorderBy: PrimitiveObjective[]): number[] {
+	public sortAlternativesByObjective(alternatives: Alternative[], objectivesToReorderBy: PrimitiveObjective[]): Alternative[] {
 		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(rowsToReorder[0].cells.length);
-		var alternativeScores: number[] = Array(rowsToReorder[0].cells.length).fill(0);
+		var alternativeScores: any = {};
 
-		for (var i = 0; i < rowsToReorder.length; i++) {
-			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
-				var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
-				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
-					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
-				});
-			}
-		}
+		objectivesToReorderBy.forEach((objective: Objective) => {
+			var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+			var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(objective.getName());
+			
+			alternatives.forEach((alternative: Alternative) => {
+				if (alternativeScores[alternative.getName()] == undefined) 
+					alternativeScores[alternative.getName()] = 0;
 
-		cellIndices.sort((a: number, b: number) => {
-			var aScore: number = alternativeScores[a];		// This is the sum of a's score for each of the objectivesToReorderBy. 
-			var bScore: number = alternativeScores[b];		// This is the sum of b's score for each of the objectivesToReorderBy.
+				alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getName())) * weight);
+			});
+		});
+
+		return alternatives.sort((a: Alternative, b: Alternative) => {
+			var aScore: number = alternativeScores[a.getName()];		// This is the sum of a's score for each of the objectivesToReorderBy. 
+			var bScore: number = alternativeScores[b.getName()];		// This is the sum of b's score for each of the objectivesToReorderBy.
 
 			if (aScore === bScore) {
 				return 0;						// Do not change the ordering of a and b.
@@ -369,18 +348,14 @@ export class SortAlternativesInteraction {
 				return 1;						// b should come before a in the ordering.
 			}
 		});
-
-		return cellIndices;
 	}
 
-	public generateCellOrderAlphabetically(): number[] {
+	public sortAlternativesAlphabetically(alternatives: Alternative[]): Alternative[] {
 		// Generate an array of indexes according to the number of cells in each row.
-		var cellIndices: number[] = d3.range(this.lastRendererUpdate.valueChart.getAlternatives().length);
+		return alternatives.sort((a: Alternative, b: Alternative) => {
 
-		cellIndices.sort((a: number, b: number) => {
-
-			var aName: string = this.lastRendererUpdate.valueChart.getAlternatives()[a].getName().toLowerCase();
-			var bName: string = this.lastRendererUpdate.valueChart.getAlternatives()[b].getName().toLowerCase();
+			var aName: string = a.getName().toLowerCase();
+			var bName: string = b.getName().toLowerCase();
 
 			if (aName === bName) {
 				return 0;						// Do not change the ordering of a and b.
@@ -390,11 +365,17 @@ export class SortAlternativesInteraction {
 				return 1;						// b should come before a in the ordering.
 			}
 		});
-
-		return cellIndices;
 	}
 
-	changeAlternativesOrder = (cellIndices: number[]) => {
-		this.reorderAllCells(cellIndices);
+	removeUnnecessaryRecords = () => {
+		var lastRecord = (<AlternativesRecord> this.chartUndoRedoService.getNewestRecord());
+
+		if (lastRecord && lastRecord.alternatives && _.isEqual(lastRecord.alternatives, this.lastRendererUpdate.valueChart.getAlternatives())) {
+			this.chartUndoRedoService.deleteNewestRecord();
+		}
+	}
+
+	changeAlternativesOrder = (alternativesRecord: AlternativesRecord) => {
+		this.lastRendererUpdate.valueChart.setAlternatives(alternativesRecord.alternatives);
 	}
 }

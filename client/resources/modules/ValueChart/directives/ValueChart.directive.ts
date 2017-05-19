@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:45:58
+* @Last Modified time: 2017-05-19 12:37:35
 */
 
 // Import Angular Classes:
@@ -118,6 +118,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
 	private waitForRenderers: Subscription;
 
+
+	public renderRequired: { value: boolean } = { value: false };
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -197,12 +200,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
-
-
 		var renderInformation = new Subject();
 
 		this.valueChartSubject.map((valueChart: ValueChart) => {
-			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
+			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig, renderRequired: this.renderRequired };
 		}).map(this.rendererDataUtility.produceMaximumWeightMap)
 			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
@@ -257,7 +258,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig)) {
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.renderRequired.value)) {
+			this.renderRequired.value = false;
 			this.rendererService.initUserColors(this.valueChart);
 			this.valueChartSubject.next(this.valueChart);
 		}

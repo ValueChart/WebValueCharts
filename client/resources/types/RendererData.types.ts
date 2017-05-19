@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:41:12
+* @Last Modified time: 2017-05-19 12:36:56
 */
 
 import * as d3								from 'd3';
@@ -71,16 +71,17 @@ export interface ScoreFunctionDataSummary {
 	type of message sent to these renderer classes to render to trigger initial construction and rendering, and then re-rendering given changes.
 */
 export interface RendererUpdate {
-	el: d3.Selection<any, any, any, any>,
-	valueChart: ValueChart,
-	maximumWeightMap: WeightMap,
-	rowData: RowData[],
-	labelData: LabelData[],
-	width: number,
-	height: number,
-	viewConfig: ViewConfig,
-	interactionConfig: InteractionConfig,
-	rendererConfig: RendererConfig,
+	el: d3.Selection<any, any, any, any>;
+	valueChart: ValueChart;
+	maximumWeightMap: WeightMap;
+	rowData: RowData[];
+	labelData: LabelData[];
+	width: number;
+	height: number;
+	viewConfig: ViewConfig;
+	interactionConfig: InteractionConfig;
+	rendererConfig: RendererConfig;
+	renderRequired: { value: boolean; };
 }
 
 /*
