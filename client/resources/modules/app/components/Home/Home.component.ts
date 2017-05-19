@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:35:59
+* @Last Modified time: 2017-05-18 22:47:27
 */
 
 // Import Angular Classes:
@@ -124,7 +124,7 @@ export class HomeComponent {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
-				var parameters = this.valueChartService.getValueChartName();
+				var parameters = this.valueChartService.getValueChart().getName();
 				this.router.navigate(['/view/', parameters]);
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -143,7 +143,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.valueChartService.getValueChartName();
+		var parameters = this.valueChartService.getValueChart().getName();
 		this.router.navigate(['/view/', parameters]);
 	}
 
@@ -172,7 +172,7 @@ export class HomeComponent {
 				let validationErrors = this.validationService.validate(this.valueChartService.getValueChart());
 				if (validationErrors.length === 0) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
-					this.router.navigate(['/view/', this.valueChartService.getValueChartName()]);
+					this.router.navigate(['/view/', this.valueChartService.getValueChart().getName()]);
 				}
 				else {
 					this.validationMessage = "There were problems with this chart: \n- " + validationErrors.join('\n- ') + "\n\nWould you like to fix them now?";

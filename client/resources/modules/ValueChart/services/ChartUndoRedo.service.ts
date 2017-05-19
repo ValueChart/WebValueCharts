@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 18:11:19
+* @Last Modified time: 2017-05-18 22:42:16
 */
 
 // Import Application Classes:
@@ -22,7 +22,6 @@ import { ScoreFunction }													from '../../../model/ScoreFunction';
 import { Memento }															from '../../../model/Memento';
 
 // Import Type Definitions:
-import { ValueChartStateContainer }											from '../../../types/StateContainer.types';
 import { AlternativeOrderRecord }											from '../../../types/Record.types';
 import { ScoreFunctionRecord }												from '../../../types/Record.types';
 import { ObjectivesRecord }													from '../../../types/Record.types';
@@ -168,53 +167,53 @@ export class ChartUndoRedoService {
 		return this.redoChangeTypes.length !== 0;
 	}
 
-	public undo(currentStateContainer: ValueChartStateContainer): void {
+	public undo(valueChart: ValueChart): void {
 		if (!this.canUndo())
 			return;
 
 		var changeType: string = this.undoChangeTypes.pop();
 		this.redoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.undoStateRecords.pop();
-		(<any>this)[changeType](stateRecord, currentStateContainer, this.redoStateRecords);
+		(<any>this)[changeType](stateRecord, valueChart, this.redoStateRecords);
 		if ((<any>window).childWindows.scoreFunctionViewer)
 			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	public redo(currentStateContainer: ValueChartStateContainer): void {
+	public redo(valueChart: ValueChart): void {
 		if (!this.canRedo())
 			return;
 
 		var changeType = this.redoChangeTypes.pop();
 		this.undoChangeTypes.push(changeType);
 		var stateRecord: Memento = this.redoStateRecords.pop();
-		(<any>this)[changeType](stateRecord, currentStateContainer, this.undoStateRecords);
+		(<any>this)[changeType](stateRecord, valueChart, this.undoStateRecords);
 		if ((<any>window).childWindows.scoreFunctionViewer)
 			(<any>window).childWindows.scoreFunctionViewer.angularAppRef.tick();
 	}
 
-	private scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
-		if (!currentStateContainer.currentUserIsDefined())
+	private scoreFunctionChange(scoreFunctionRecord: ScoreFunctionRecord, valueChart: ValueChart, stateRecords: Memento[]): void {
+		if (!valueChart.getUsers()[0])
 			return;
 
-		var currentScoreFunction: ScoreFunction = currentStateContainer.getCurrentUserScoreFunction(scoreFunctionRecord.objectiveName);
+		var currentScoreFunction: ScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
 		// Dispatch the ScoreFunctionChange event, notifying any listeners and passing the scoreFunctionRecord as a parameter.
 		(<any>this.undoRedoDispatcher).call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
 	}
 
-	private weightMapChange(weightMapRecord: WeightMap, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
-		if (!currentStateContainer.currentUserIsDefined())
+	private weightMapChange(weightMapRecord: WeightMap, valueChart: ValueChart, stateRecords: Memento[]): void {
+		if (!valueChart.getUsers()[0])
 			return;
 
-		var currentWeightMap: WeightMap = currentStateContainer.getCurrentUserWeightMap();
+		var currentWeightMap: WeightMap = valueChart.getUsers()[0].getWeightMap();
 		stateRecords.push(currentWeightMap);
 
 		(<any>this.undoRedoDispatcher).call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
 	}
 
-	private alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
-		var alternatives: Alternative[] = currentStateContainer.getAlternatives();
+	private alternativeOrderChange(alternativeOrderRecord: AlternativeOrderRecord, valueChart: ValueChart, stateRecords: Memento[]): void {
+		var alternatives: Alternative[] = valueChart.getAlternatives();
 		stateRecords.push(new AlternativeOrderRecord(alternatives));
 
 		var cellIndices: number[] = [];
@@ -227,8 +226,8 @@ export class ChartUndoRedoService {
 		(<any>this.undoRedoDispatcher).call(this.SET_ALTERNATIVE_ORDER_CHANGED);
 	}
 
-	private objectivesChange(objectivesRecord: ObjectivesRecord, currentStateContainer: ValueChartStateContainer, stateRecords: Memento[]): void {
-		var currentObjectives: Objective[] = currentStateContainer.getRootObjectives();
+	private objectivesChange(objectivesRecord: ObjectivesRecord, valueChart: ValueChart, stateRecords: Memento[]): void {
+		var currentObjectives: Objective[] = valueChart.getRootObjectives();
 
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 

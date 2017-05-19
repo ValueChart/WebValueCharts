@@ -6,6 +6,7 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
+import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
 import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
@@ -73,7 +74,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
   constructor(
     public valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
-    private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
+    private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
+    private currentUserService: CurrentUserService) { }
 
   // ========================================================================================
   //                   Methods
@@ -95,7 +97,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
 
     if (!this.valueChartService.currentUserIsDefined()) {
-      this.valueChartService.addCurrentUser();
+      this.valueChartService.getValueChart().setUser(new User(this.currentUserService.getUsername()));
     }
     this.user = this.valueChartService.getCurrentUser();
     this.initialBestOutcomes = {};

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:09:34
+* @Last Modified time: 2017-05-18 22:54:55
 */
 	
 // Import Model Classes:
@@ -181,6 +181,16 @@ export class ValueChart {
 			}
 		}
 		return primitiveObjectives;
+	}
+
+	getAllAbstractObjectives(): AbstractObjective[] {
+		let abstractObjectives: AbstractObjective[] = [];
+		for (let objective of this.getAllObjectives()) {
+			if (objective.objectiveType === "abstract") {
+				abstractObjectives.push(<AbstractObjective> objective);
+			}
+		}
+		return abstractObjectives;
 	}
 
 	/*

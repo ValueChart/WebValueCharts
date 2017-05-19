@@ -69,9 +69,9 @@ export class CreateAlternativesComponent implements OnInit {
 		this.isSelected = {};
 		this.alternativesCount = 0;
 
-		if (this.valueChartService.getAlternatives().length > 0) {
+		if (this.valueChartService.getValueChart().getAlternatives().length > 0) {
 			this.validationTriggered = true;
-			for (let alt of this.valueChartService.getAlternatives()) {
+			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;
 			}
@@ -88,7 +88,7 @@ export class CreateAlternativesComponent implements OnInit {
 		for (let altID of this.altKeys()) {
 			alternatives.push((this.alternatives[altID]));
 		}
-		this.valueChartService.setAlternatives(alternatives);
+		this.valueChartService.getValueChart().setAlternatives(alternatives);
 	}
 
 	// ================================ Alternatives Table Methods ====================================
