@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:11:32
+* @Last Modified time: 2017-05-18 21:39:14
 */
 
 // Import Angular Classes:
@@ -350,7 +350,7 @@ export class SortAlternativesInteraction {
 		for (var i = 0; i < rowsToReorder.length; i++) {
 			if (objectivesToReorderBy.indexOf(rowsToReorder[i].objective) !== -1) {
 				var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(rowsToReorder[i].objective.getName());
-				var weight: number = this.lastRendererUpdate.valueChart.getMaximumWeightMap().getObjectiveWeight(rowsToReorder[i].objective.getName());
+				var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(rowsToReorder[i].objective.getName());
 				rowsToReorder[i].cells.forEach((cell: CellData, index: number) => {
 					alternativeScores[index] += (scoreFunction.getScore(cell.value) * weight);
 				});

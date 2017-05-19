@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 16:38:45
+* @Last Modified time: 2017-05-18 21:39:32
 */
 
 // Import Angular Classes:
@@ -411,7 +411,7 @@ export class LabelRenderer {
 		this.labelSelections[parentName].nameText
 			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
-				return d.objective.getName() + ' (' + (Math.round((d.weight / u.valueChart.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
+				return d.objective.getName() + ' (' + (Math.round((d.weight / u.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)';
 			});
 
 		this.labelSelections[parentName].bestWorstText
@@ -515,7 +515,7 @@ export class LabelRenderer {
 		var dimensionOneTransform: number;
 		var dimensionTwoTransform: number;
 
-		objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
+		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			width = this.labelWidth;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 18:10:53
+* @Last Modified time: 2017-05-18 22:02:40
 */
 
 // Import Angular Classes:
@@ -49,7 +49,6 @@ export class RendererDataUtility {
 	// 									Fields
 	// ========================================================================================
 
-	private rowData: RowData[];				// Data from the active ValueChart formatted to work with the ObjectiveChartRenderer and the SummaryChartRenderer classes.
 	private labelData: LabelData[];			// Data from the active ValueChart formatted to work with the LabelRenderer classes.
 
 	// ========================================================================================
@@ -68,26 +67,37 @@ export class RendererDataUtility {
 	// 									Methods
 	// ========================================================================================
 
+	// TODO <@aaron>: update this output type of this method.
 
-		// TODO <@aaron>: update this output type of this method.
+	produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
+		// Return the default WeightMap if there are no users.
+		if (u.valueChart.getUsers().length == 0)
+			u.maximumWeightMap = u.valueChart.getDefaultWeightMap();
+		// If there is only one user then the maximum WeightMap is that user's WeightMap
+		else if (u.valueChart.getUsers().length == 1) {
+			u.maximumWeightMap = u.valueChart.getUsers()[0].getWeightMap();
+		}
+		else 
+		// There is more than one user and the maximum weight must be calculated.
+			u.maximumWeightMap = this.generateMaximumWeightMap(u);
+
+		return u;
+	}
 
 	produceRowData = (u: RendererUpdate) => {
-
-		this.generateRowData(u.valueChart);
-		this.updateWeightOffsets(u.valueChart);
-		this.updateStackedBarOffsets(u.viewConfig.viewOrientation);
-
-		u.rowData = this.rowData;
+		u.rowData = this.generateRowData(u);;
+		this.computeStackedBarOffsets(u);
 		return u;
 	}
 
 	produceLabelData = (u: RendererUpdate) => {
+		// Re-generate the label data if it is undefined, or if the root labelDatum is undefined.
 		if (!this.labelData || !this.labelData[0]) {
-			this.generateLabelData(u.valueChart);
+			this.generateLabelData(u);
 		}
 
 		this.labelData.forEach((labelDatum: LabelData) => {
-			this.updateLabelDataWeights(u.valueChart, labelDatum);
+			this.updateLabelDataWeights(u, labelDatum);
 		});
 
 		u.labelData = this.labelData;
@@ -96,6 +106,40 @@ export class RendererDataUtility {
 	
 
 	// ================================ Data Creation and Update Methods  ====================================
+	/*
+		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
+		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
+						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
+						one user the in ValueChart, that user's weight map is simply returned. If there are no users, the default weight map is returned.
+						The maximum weight map is to determine label heights by the LabelRenderer, and row heights by the objective chart renderer.
+	*/
+	private generateMaximumWeightMap(u: RendererUpdate): WeightMap {
+		var maximumWeightMap: WeightMap = new WeightMap();
+
+		var primitiveObjectives: PrimitiveObjective[] = u.valueChart.getAllPrimitiveObjectives();
+		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
+
+		if (u.valueChart.getUsers()) {
+			u.valueChart.getUsers().forEach((user: User) => {
+				if (user.getWeightMap()) {
+				let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
+					for (var i = 0; i < objectiveWeights.length; i++) {
+						if (combinedWeights[i] < objectiveWeights[i]) {
+							combinedWeights[i] = objectiveWeights[i];
+						}
+					}
+				}
+			});
+
+
+			for (var i = 0; i < primitiveObjectives.length; i++) {
+				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+			}
+		}
+
+		return maximumWeightMap;
+	}
+
 
 	/*
 		@returns {void} 
@@ -103,11 +147,11 @@ export class RendererDataUtility {
 						to either generate the LabelData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateLabelData(valueChart: ValueChart): void {
+	public generateLabelData(u: RendererUpdate): void {
 		this.labelData = [];
 
-		valueChart.getRootObjectives().forEach((objective: Objective) => {
-			this.labelData.push(this.getLabelDatum(valueChart, objective, 0));
+		u.valueChart.getRootObjectives().forEach((objective: Objective) => {
+			this.labelData.push(this.getLabelDatum(u, objective, 0));
 		});
 	}
 
@@ -117,51 +161,89 @@ export class RendererDataUtility {
 						to either generate the RowData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateRowData(valueChart: ValueChart): void {
-		this.rowData = [];
-
-		valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
-			this.rowData.push({
-				objective: objective,
-				weightOffset: 0,
-				cells: this.getCellData(valueChart, objective)
-			});
-		});
-	}
-
-	/*
-		@returns {void} 
-		@description	Updates the weight offsets assigned to each row in the rowData field. These offsets are required to position
-						the rows in the correct order in the objective chart as each rows position is dependent on weight assigned 
-						row above it. Recall that these weights are converted into heights by the ObjectiveChartRenderer.
-						This method should usually be called via the updateAllValueChartData instead of being used directly.
-	*/
-	public updateWeightOffsets(valueChart: ValueChart): void {
+	public generateRowData(u: RendererUpdate): RowData[] {
 		var weightOffset: number = 0;
+		var rowData: RowData[] = [];
 
-		for (var i = 0; i < this.rowData.length; i++) {
-			this.rowData[i].weightOffset = weightOffset;
-			weightOffset += valueChart.getMaximumWeightMap().getObjectiveWeight(this.rowData[i].objective.getName());
-		}
+		u.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
+			rowData.push({
+				objective: objective,
+				weightOffset: weightOffset,
+				cells: this.generateCellData(u, objective)
+			});
+			weightOffset += u.maximumWeightMap.getObjectiveWeight(objective.getName());
+		});
+
+		return rowData;
 	}
 
+	private generateCellData(u: RendererUpdate, objective: PrimitiveObjective): CellData[] {
+		var users: User[] = u.valueChart.getUsers();
+
+		var cellData: CellData[] = <any[]> u.valueChart.getAlternativeValuesforObjective(objective);
+
+		cellData.forEach((objectiveValue: CellData) => {
+			objectiveValue.userScores = [];
+			for (var i: number = 0; i < users.length; i++) {
+
+				var userScore: UserScoreData = {
+					objective: objective,
+					user: users[i],
+					value: objectiveValue.value
+				}
+
+				objectiveValue.userScores.push(userScore);
+			}
+		});
+
+		return cellData;
+	}
+
+	private getLabelDatum(u: RendererUpdate, objective: Objective, depth: number): LabelData {
+		var labelData: LabelData;
+
+		if (objective.objectiveType === 'abstract') {
+			var weight = 0;
+			var children: LabelData[] = [];
+			var maxDepthOfChildren: number = 0;
+
+			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
+				let labelDatum: LabelData = this.getLabelDatum(u, subObjective, depth + 1);
+				weight += labelDatum.weight;
+				if (labelDatum.depthOfChildren > maxDepthOfChildren)
+					maxDepthOfChildren = labelDatum.depthOfChildren;
+				children.push(labelDatum);
+			});
+
+			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
+		} else if (objective.objectiveType === 'primitive') {
+			labelData = { 'objective': objective, 'weight': u.maximumWeightMap.getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
+		}
+
+		return labelData;
+	}
+
+// ================================ Private Helpers for Updating Data ====================================
+
+	// Note that the following methods perform IN-PLACE updates.
+
+
 	/*
-		@param viewOrientation - The view orientation that the ValueChart is going to be displayed in.
 		@returns {void} 
 		@description	Updates the weight score offset assigned to each cell in each row of the rowData field. These offsets are required to position
 						the cells each column of the summary chart so that they appear to be stacked upon each other. This method should usually be called
 						via the updateAllValueChartData instead of being used directly.
 	*/
-	public updateStackedBarOffsets(viewOrientation: string) {
+	public computeStackedBarOffsets(u: RendererUpdate) {
 
-		var rowDataCopy: RowData[] = this.rowData.slice(0, this.rowData.length);
+		var rowDataCopy: RowData[] = u.rowData.slice(0, u.rowData.length);
 
 		// In the vertical orientation rows are rendered going to down; rows with smaller indices are rendered above those with larger indices. 
 		// This means that rows with smaller indices must be stacked above rows with larger indices in the stacked bar chart. So in the vertical
 		// orientation we must reverse the order in which we calculate offsets. Otherwise, the earlier rows will have smaller offsets and the
 		// stacked bar chart will be rendered in reverse. This is not a problem in the horizontal orientation since rows are rendered left to right
 		// in that configuration, meaning that the default row order can be used to calculate offsets.
-		if (viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === 'vertical') {
 			rowDataCopy.reverse();
 		}
 
@@ -191,72 +273,16 @@ export class RendererDataUtility {
 		}
 	}
 
-	// ================================ Private Helpers Creating/Updating Data ====================================
-
-	private getLabelDatum(valueChart: ValueChart, objective: Objective, depth: number): LabelData {
-		var labelData: LabelData;
-
-		if (objective.objectiveType === 'abstract') {
-			var weight = 0;
-			var children: LabelData[] = [];
-			var maxDepthOfChildren: number = 0;
-
-			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				let labelDatum: LabelData = this.getLabelDatum(valueChart, subObjective, depth + 1);
-				weight += labelDatum.weight;
-				if (labelDatum.depthOfChildren > maxDepthOfChildren)
-					maxDepthOfChildren = labelDatum.depthOfChildren;
-				children.push(labelDatum);
-			});
-
-			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
-		} else if (objective.objectiveType === 'primitive') {
-			labelData = { 'objective': objective, 'weight': valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
-		}
-
-		return labelData;
-	}
-
-	private updateLabelDataWeights(valueChart: ValueChart, labelDatum: LabelData): void {
+	private updateLabelDataWeights(u: RendererUpdate, labelDatum: LabelData): void {
 		if (labelDatum.depthOfChildren !== 0) {
 			labelDatum.weight = 0;
 			labelDatum.subLabelData.forEach((subLabelDatum: LabelData) => {
-				this.updateLabelDataWeights(valueChart, subLabelDatum);
+				this.updateLabelDataWeights(u, subLabelDatum);
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = valueChart.getMaximumWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = u.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getName());
 		}
-	}
-
-	private updateLabelData(valueChart: ValueChart): void {
-		// Use splice so as to avoid changing the array reference.
-		valueChart.getRootObjectives().forEach((objective: Objective, index: number) => {
-			this.labelData[index] = this.getLabelDatum(valueChart, objective, 0);
-		});
-	}
-
-	private getCellData(valueChart: ValueChart, objective: PrimitiveObjective): CellData[] {
-		var users: User[];
-		users = valueChart.getUsers();
-
-		var objectiveValues: any[] = valueChart.getAlternativeValuesforObjective(objective);
-
-		objectiveValues.forEach((objectiveValue: any) => {
-			objectiveValue.userScores = [];
-			for (var i: number = 0; i < users.length; i++) {
-
-				var userScore: UserScoreData = {
-					objective: objective,
-					user: users[i],
-					value: objectiveValue.value
-				}
-
-				objectiveValue.userScores.push(userScore);
-			}
-		});
-
-		return objectiveValues;
 	}
 }
 

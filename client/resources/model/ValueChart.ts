@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 16:40:35
+* @Last Modified time: 2017-05-18 21:09:34
 */
 	
 // Import Model Classes:
@@ -49,7 +49,6 @@ export class ValueChart {
 	public _id: string;						// The id of the ValueChart in the database. This field should ONLY be set if the ValueChart has been added to the database. 
 	public password: string;				// The password to access this ValueChart.
 
-	private maximumWeightMap: WeightMap;
 
 	// ========================================================================================
 	// 									Constructor
@@ -257,7 +256,6 @@ export class ValueChart {
 
 	setUsers(users: User[]): void {
 		this.users = users;
-		this.updateMaximumWeightMap();
 	}
 
 	setUser(newUser: User): void {
@@ -270,64 +268,12 @@ export class ValueChart {
 		} else {
 			this.users[userIndex] = newUser;
 		}
-
-		this.updateMaximumWeightMap();
 	}
 
 	removeUser(user: User): void {
 		var index: number = this.users.indexOf(user);
 		if (index !== -1) {
 			this.users.splice(index, 1);
-			this.updateMaximumWeightMap();
-		}
-	}
-
-	/*
-		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
-		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
-						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
-						one user the in ValueChart, that user's weight map is simply returned. If there are no users, the default weight map is returned.
-						The maximum weight map is to determine label heights by the LabelRenderer, and row heights by the objective chart renderer.
-	*/
-	getMaximumWeightMap(): WeightMap {
-		if (!this.maximumWeightMap)
-			this.updateMaximumWeightMap();
-
-		return this.maximumWeightMap;
-	}
-
-
-
-	private updateMaximumWeightMap(): void {
-		if (this.users.length === 0) {
-			this.maximumWeightMap = this.getDefaultWeightMap();
-		} else if (this.users.length === 1) {
-			this.maximumWeightMap = this.users[0].getWeightMap();
-		} else {
-
-			var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
-
-			var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
-			
-			if (!this.maximumWeightMap)
-				this.maximumWeightMap = new WeightMap();
-
-			if (this.users) {
-				this.users.forEach((user: User) => {
-					if (user.getWeightMap()) {
-					let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-						for (var i = 0; i < objectiveWeights.length; i++) {
-							if (combinedWeights[i] < objectiveWeights[i]) {
-								combinedWeights[i] = objectiveWeights[i];
-							}
-						}
-					}
-				});
-
-				for (var i = 0; i < primitiveObjectives.length; i++) {
-					this.maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
-				}
-			}
 		}
 	}
 

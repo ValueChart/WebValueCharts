@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 22:44:42
+* @Last Modified time: 2017-05-18 22:15:52
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -138,13 +138,14 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	ngDoCheck() {
 
-		if (this.previousObjectiveToDisplay !== this.objective) {
+		if (!_.isEqual(this.previousObjectiveToDisplay,this.objective)) {
 			this.rendererSubscription.unsubscribe();
 			this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
 			this.initScoreFunctionPlot();
 		}
 
-		if (this.enableInteraction != this.previousEnableInteraction) {
+		if (!_.isEqual(this.enableInteraction,this.previousEnableInteraction)) {
+			console.log('this has been called');
 			this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
 			this.previousEnableInteraction = _.clone(this.enableInteraction);
 		}

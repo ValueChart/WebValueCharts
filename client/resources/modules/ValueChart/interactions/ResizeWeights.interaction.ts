@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 16:25:57
+* @Last Modified time: 2017-05-18 21:55:54
 */
 
 // Import Angular Classes:
@@ -193,7 +193,7 @@ export class ResizeWeightsInteraction {
 	// in response to these data changes. 
 	private resizeWeights = (d: LabelData, i: number) => {
 		var weightMap: WeightMap = this.lastRendererUpdate.valueChart.getUsers()[0].getWeightMap();
-
+		
 		// Use the dimensionTwo scale to convert the drag distance to a change in weight.
 		var deltaWeight: number = this.lastRendererUpdate.rendererConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.lastRendererUpdate.rendererConfig.coordinateTwo]);
 

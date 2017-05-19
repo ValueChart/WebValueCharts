@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 16:06:54
+* @Last Modified time: 2017-05-18 21:06:56
 */
 
 // Import Angular Classes:
@@ -46,12 +46,6 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
-
-	private maximumWeightMap: WeightMap;				// The WeightMap composed of maximum user assigned weights. This means that each
-														// objective weight is the largest weight assigned by any user in the active ValueChart
-														// to that objective. If ValueChart has only one user, the maximum WeightMap is equal to 
-														// that user's WeightMap. The main use of this WeightMap is to determine label heights in the 
-														// ValueChart visualization for group charts.
 
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
 															 // has been reset since they last did SMARTER

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 14:18:31
+* @Last Modified time: 2017-05-18 21:39:31
 */
 
 // Import Angular Classes
@@ -346,7 +346,7 @@ export class ObjectiveChartRenderer {
 			})
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize)
 			.attr(u.rendererConfig.dimensionTwo, (d: RowData) => {
-				let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+				let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 				return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
@@ -404,7 +404,7 @@ export class ObjectiveChartRenderer {
 			.attr(u.rendererConfig.coordinateTwo, (d: CellData, i: number) => {
 				let maxObjectiveWeight: number = 0;
 				if (d.userScores.length > 0) {
-					u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());				
+					u.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());				
 				}
 				return (u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
@@ -435,7 +435,7 @@ export class ObjectiveChartRenderer {
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			userScores
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 					let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 					let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - u.rendererConfig.dimensionTwoScale(score * userObjectiveWeight);
@@ -472,7 +472,7 @@ export class ObjectiveChartRenderer {
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			weightColumns
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - this.calculateWeightColumnDimensionTwo(d, i);
 				});
 		} else {

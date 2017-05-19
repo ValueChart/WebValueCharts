@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 16:28:41
+* @Last Modified time: 2017-05-18 21:45:58
 */
 
 // Import Angular Classes:
@@ -203,7 +203,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.valueChartSubject.map((valueChart: ValueChart) => {
 			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
-		}).map(this.rendererDataUtility.produceRowData)
+		}).map(this.rendererDataUtility.produceMaximumWeightMap)
+			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
 			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(renderInformation);
