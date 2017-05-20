@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:29:42
+* @Last Modified time: 2017-05-19 15:10:03
 */
 
 // Import Angular Classes:
@@ -10,9 +10,6 @@ import { Injectable } 															from '@angular/core';
 
 // Import libraries:
 import * as _ 																	from 'lodash';
-
-// Import Application Classes:
-import { ChartUndoRedoService }													from './ChartUndoRedo.service';
 
 // Import Model Classes: 
 import { ValueChart } 															from '../../../model/ValueChart';
@@ -42,11 +39,9 @@ export class ChangeDetectionService {
 
 	/*
 		@returns {void}
-		@description	Used for Angular's dependency injection and initializing event listeners for the chartUndoRedoService.
-						This constructor should NOT be called manually. Angular will automatically handle the construction of this service when it is injected.
+		@description	Used for Angular's dependency injection. This constructor should NOT be called manually. Angular will automatically handle the construction of this service when it is injected.
 	*/
-	constructor(
-		private chartUndoRedoService: ChartUndoRedoService) { }
+	constructor() { }
 
 	// ========================================================================================
 	// 									Methods
@@ -90,9 +85,6 @@ export class ChangeDetectionService {
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
 
 		this.valueChartRecord = _.cloneDeep(valueChart);
-		this.viewConfigRecord.viewOrientation = viewConfig.viewOrientation;
-
-		console.log(valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged);
 
 		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
 	}

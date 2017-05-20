@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 22:02:40
+* @Last Modified time: 2017-05-19 17:42:56
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { Injectable } 										from '@angular/core';
 
 // Import Libraries:
 import * as d3 												from 'd3';
-import * as _												from 'lodash';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
@@ -26,7 +25,6 @@ import { ScoreFunction }									from '../../../model/ScoreFunction';
 // Import Type Definitions:
 import { RowData, CellData, UserScoreData, LabelData }		from '../../../types/RendererData.types';
 import { RendererUpdate }									from '../../../types/RendererData.types';
-import { ObjectivesRecord }									from '../../../types/Record.types';
 
 
 /*
@@ -69,6 +67,11 @@ export class RendererDataUtility {
 
 	// TODO <@aaron>: update this output type of this method.
 
+	
+	/*
+		@returns {RendererUpdate} 
+		@description	
+	*/
 	produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
 		// Return the default WeightMap if there are no users.
 		if (u.valueChart.getUsers().length == 0)
@@ -147,7 +150,7 @@ export class RendererDataUtility {
 						to either generate the LabelData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateLabelData(u: RendererUpdate): void {
+	private generateLabelData(u: RendererUpdate): void {
 		this.labelData = [];
 
 		u.valueChart.getRootObjectives().forEach((objective: Objective) => {
@@ -161,7 +164,7 @@ export class RendererDataUtility {
 						to either generate the RowData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
 						by regenerating the data.
 	*/
-	public generateRowData(u: RendererUpdate): RowData[] {
+	private generateRowData(u: RendererUpdate): RowData[] {
 		var weightOffset: number = 0;
 		var rowData: RowData[] = [];
 
