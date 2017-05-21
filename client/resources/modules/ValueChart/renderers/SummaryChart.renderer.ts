@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:39:31
+* @Last Modified time: 2017-05-20 20:56:10
 */
 
 // Import Angular Classes
@@ -80,7 +80,7 @@ export class SummaryChartRenderer {
 						This constructor should NOT be called manually. Angular will automatically handle the construction of this directive when it is used.
 	*/
 	constructor(
-		private renderConfigService: RendererService,
+		private rendererService: RendererService,
 		private renderEventsService: RenderEventsService,
 		private sortAlternativesInteraction: SortAlternativesInteraction) { }
 
@@ -129,7 +129,7 @@ export class SummaryChartRenderer {
 						creating a summary chart for the first time, but not when updating as the basic framework of the chart never needs to be
 						constructed again.
 	*/
-	createSummaryChart(u: RendererUpdate): void {
+	private createSummaryChart(u: RendererUpdate): void {
 		// Indicate that rendering of the summary chart is just starting.
 		this.renderEventsService.summaryChartDispatcher.next(0);
 		// Create the base container for the chart.
@@ -175,7 +175,7 @@ export class SummaryChartRenderer {
 						chart rows by removing and adding rows to conform to the structure of the rows parameter. It also updates summary chart cells through a call to createSummaryChartCells.
 						Updating cells should ALWAYS be done through a call to this method, rather than by directly calling createSummaryChartCells.
 	*/
-	createSummaryChartRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>): void {
+	private createSummaryChartRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, scoreTotalsContainer: d3.Selection<any, any, any, any>): void {
 		// Create rows for every new PrimitiveObjective. If the rows are being created for this first time, this is all of the PrimitiveObjectives in the ValueChart.
 		var updateRows = rowsContainer.selectAll('.' + SummaryChartDefinitions.ROW)
 			.data(u.rowData);
@@ -243,7 +243,7 @@ export class SummaryChartRenderer {
 						of users assigned to each cell in the row data. Row data cannot be assigned in this method, which is why cells and user scores should ALWAYS be updated by calling createSummaryChartRows,
 						 rather than this method.
 	*/
-	createSummaryChartCells(stackedBarRows: d3.Selection<any, any, any, any>): void {
+	private createSummaryChartCells(stackedBarRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for each new Alternative in every old or new row. If the cells are being created for this first time, this is done for all Alternatives and all rows.
 		var updateCells = stackedBarRows.selectAll('.' + SummaryChartDefinitions.CELL)
 			.data((d: RowData) => { return d.cells; });
@@ -281,7 +281,7 @@ export class SummaryChartRenderer {
 						this change. It should NOT be used to initially render the summary chart, or change the view orientation of the summary chart. Use renderSummaryChart for this purpose.
 
 	*/
-	renderSummaryChart(u: RendererUpdate): void {
+	private renderSummaryChart(u: RendererUpdate): void {
 		// Position the chart in the viewport. All the chart's children will inherit this position.
 		this.summaryChartScale = d3.scaleLinear()
 			.range([0, u.rendererConfig.dimensionTwoSize]);
@@ -290,9 +290,9 @@ export class SummaryChartRenderer {
 		this.chart
 			.attr('transform', () => {
 				if (u.viewConfig.viewOrientation == 'vertical')
-					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);
 				else
-					return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
 			});
 
 		// Give the proper width and height to the chart outline. 
@@ -341,7 +341,7 @@ export class SummaryChartRenderer {
 						be used to change the visibility of the utility axis. 
 
 	*/
-	renderUtilityAxis(u: RendererUpdate): void {
+	private renderUtilityAxis(u: RendererUpdate): void {
 		// Create the linear scale that the utility axis will represent.
 		var uilityScale: d3.ScaleLinear<number, number> = d3.scaleLinear()
 			.domain([0, 100])	// The domain of the utility axis is from 0 to 100.
@@ -359,7 +359,7 @@ export class SummaryChartRenderer {
 		}
 
 		this.utilityAxisContainer
-			.attr('transform', this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, -20, 0))
+			.attr('transform', this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, -20, 0))
 			.call(utilityAxis);
 	}
 
@@ -374,7 +374,7 @@ export class SummaryChartRenderer {
 						containers because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
 						Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should called to re-render objective rows.
 	*/
-	renderSummaryChartRows(u: RendererUpdate, alternativeBoxes: d3.Selection<any, any, any, any>, scoreSubContainers: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>): void {
+	private renderSummaryChartRows(u: RendererUpdate, alternativeBoxes: d3.Selection<any, any, any, any>, scoreSubContainers: d3.Selection<any, any, any, any>, scoreTotals: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, averageLines: d3.Selection<any,any,any,any>): void {
 		// Give dimensions to the alternative boxes so that each one completely covers on alternative column. Position them exactly above those columns. This is so that they can be the targets of any user clicks on top of those columns.
 		alternativeBoxes
 			.attr(u.rendererConfig.dimensionOne, (d: CellData, i: number) => { return u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length })
@@ -387,12 +387,12 @@ export class SummaryChartRenderer {
 		// Position the score total containers.
 		scoreSubContainers
 			.attr('transform', (d: CellData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
+				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 			})
 			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 
 		averageLines.attr('transform', (d: CellData, i: number) => {
-			return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
+			return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 		});
 
 
@@ -428,7 +428,7 @@ export class SummaryChartRenderer {
 						for each alternative. Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should 
 						called to re-render objective rows.
 	*/
-	renderScoreTotalLabels(u: RendererUpdate, scoreTotals: d3.Selection<any, any, any, any>): void {
+	private renderScoreTotalLabels(u: RendererUpdate, scoreTotals: d3.Selection<any, any, any, any>): void {
 
 		var verticalOffset: number = 15;
 		var horizontalOffset: number = 10;
@@ -456,7 +456,7 @@ export class SummaryChartRenderer {
 		@description	Changes the color of the score total label for the best alternative for each user to be red. This should 
 						be exactly one highlighted score total label per user.
 	*/
-	highlightBestUserScores(u: RendererUpdate) {
+	private highlightBestUserScores(u: RendererUpdate) {
 		this.scoreTotals.classed(SummaryChartDefinitions.BEST_SCORE, false);
 
 		var maxUserScores: any = {};
@@ -492,11 +492,11 @@ export class SummaryChartRenderer {
 						called to re-render objective rows.
 
 	*/
-	renderSummaryChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>): void {
+	private renderSummaryChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>): void {
 		// Position each row's cells next to each other in the row.  
 		cells
 			.attr('transform', (d: CellData, i: number) => {
-				return this.renderConfigService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
+				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.calculateCellCoordinateOne(d, i, u), 0);
 			})
 			.attr('alternative', (d: CellData) => { return d.alternative.getId(); });
 

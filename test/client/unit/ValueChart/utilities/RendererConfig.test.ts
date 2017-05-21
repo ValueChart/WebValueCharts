@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 13:05:22
+* @Last Modified time: 2017-05-20 13:14:47
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -20,7 +20,7 @@ import { WeightMap }									from '../../../../../client/resources/model/WeightM
 import { ViewConfig }									from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate, RendererConfig }				from '../../../../../client/resources/types/RendererData.types';
 
-describe('RendererDataUtility', () => {
+describe('RendererConfigUtility', () => {
 
 	var rendererConfigUtility: RendererConfigUtility;
 	var viewConfig: ViewConfig

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 17:40:22
+* @Last Modified time: 2017-05-20 21:05:35
 */
 
 // Import Testing Resources:
@@ -73,8 +73,8 @@ describe('RendererDataUtility', () => {
 			adjustScoreFunctions: false
 		};
 
-		height = 10;
-		width = 10;
+		height = 100;
+		width = 100;
 
 		u = {
 			el: null,

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 17:42:56
+* @Last Modified time: 2017-05-20 21:08:03
 */
 
 // Import Angular Classes:
@@ -72,7 +72,7 @@ export class RendererDataUtility {
 		@returns {RendererUpdate} 
 		@description	
 	*/
-	produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
+	public produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
 		// Return the default WeightMap if there are no users.
 		if (u.valueChart.getUsers().length == 0)
 			u.maximumWeightMap = u.valueChart.getDefaultWeightMap();
@@ -87,13 +87,13 @@ export class RendererDataUtility {
 		return u;
 	}
 
-	produceRowData = (u: RendererUpdate) => {
+	public produceRowData = (u: RendererUpdate) => {
 		u.rowData = this.generateRowData(u);;
 		this.computeStackedBarOffsets(u);
 		return u;
 	}
 
-	produceLabelData = (u: RendererUpdate) => {
+	public produceLabelData = (u: RendererUpdate) => {
 		// Re-generate the label data if it is undefined, or if the root labelDatum is undefined.
 		if (!this.labelData || !this.labelData[0]) {
 			this.generateLabelData(u);
@@ -237,7 +237,7 @@ export class RendererDataUtility {
 						the cells each column of the summary chart so that they appear to be stacked upon each other. This method should usually be called
 						via the updateAllValueChartData instead of being used directly.
 	*/
-	public computeStackedBarOffsets(u: RendererUpdate) {
+	private computeStackedBarOffsets(u: RendererUpdate) {
 
 		var rowDataCopy: RowData[] = u.rowData.slice(0, u.rowData.length);
 
