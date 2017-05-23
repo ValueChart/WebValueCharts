@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
-* @Date:   2017-05-20 13:14:15
+* @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 14:51:57
+* @Last Modified time: 2017-05-23 14:53:52
 */
 
 // Import Testing Resources:
@@ -21,7 +21,7 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { SummaryChartRenderer }							from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
+import { ObjectiveChartRenderer }							from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
 import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
 import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
 import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
@@ -29,9 +29,9 @@ import { RenderEventsService }							from '../../../../../client/resources/modul
 import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
 
 import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
-
+8
 // Import Definitions Classes:
-import { SummaryChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/SummaryChart.definitions';
+import { ObjectiveChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
 
 // Import Model Classes
 import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
@@ -57,7 +57,7 @@ class TestingStub {
 }
 
 
-describe('SummaryChartRenderer', () => {
+describe('ObjectiveChartRenderer', () => {
 
 var sortAlternativesStub = {
 
@@ -71,7 +71,7 @@ var sortAlternativesStub = {
 
 var renderEventsServiceStub = {
 
-	summaryChartDispatcher: { next: (value: number) => { } }
+	objectiveChartDispatcher: { next: (value: number) => { } }
 };
 
 	var fixture;
@@ -79,7 +79,7 @@ var renderEventsServiceStub = {
 
 	var rendererConfigUtility: RendererConfigUtility;
 	var rendererDataUtility: RendererDataUtility;
-	var summaryChartRenderer: SummaryChartRenderer;
+	var objectiveChartRenderer: ObjectiveChartRenderer;
 
 	var hotelChart: ValueChart;
 	var parser: WebValueChartsParser;
@@ -121,7 +121,7 @@ var renderEventsServiceStub = {
 				RendererService, 
 				RendererConfigUtility, 
 				RendererDataUtility, 
-				SummaryChartRenderer, 
+				ObjectiveChartRenderer, 
 				{ provide: RenderEventsService, useValue: renderEventsServiceStub },
 				{ provide: SortAlternativesInteraction, useValue: sortAlternativesStub} ],
 			declarations: [ TestingStub ]
@@ -131,7 +131,7 @@ var renderEventsServiceStub = {
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
-		summaryChartRenderer = TestBed.get(SummaryChartRenderer);
+		objectiveChartRenderer = TestBed.get(ObjectiveChartRenderer);
 
 
 		el = d3.select(fixture.debugElement.nativeElement.firstChild);
@@ -167,16 +167,16 @@ var renderEventsServiceStub = {
 
 		context('when the view orientation is set to be vertical', () => {
 
-			context('when the summary chart has not been initialized yet and the number of users is one', () => {
+			context('when the objective chart has not been initialized yet and the number of users is one', () => {
 
 				before(function() {
-					summaryChartRenderer.valueChartChanged(u);
+					objectiveChartRenderer.valueChartChanged(u);
 				});
 
-				it('should initialize the summary chart by creating the necessary hierarchy of SVG containers', () => {
-					expect(summaryChartRenderer.chart).to.not.be.undefined;
-					expect(summaryChartRenderer.outline).to.not.be.undefined;
-					expect(summaryChartRenderer.rowsContainer).to.not.be.undefined;
+				it('should initialize the objective chart by creating the necessary hierarchy of SVG containers', () => {
+					expect(objectiveChartRenderer.chart).to.not.be.undefined;
+					expect(objectiveChartRenderer.alternativeBoxesContainer).to.not.be.undefined;
+					expect(objectiveChartRenderer.rowsContainer).to.not.be.undefined;
 				});
 
 				it('should have created exactly as many rows as there are primitive objectives in the ValueChart', () => {
@@ -191,12 +191,16 @@ var renderEventsServiceStub = {
 					checkNumberOfUserScores(u.valueChart.getUsers().length);
 				});
 
-				it('should position and style the SVG elements making up the summary chart', () => {
+				it('should position and style the SVG elements making up the objective chart', () => {
 					checkRenderedUserScores(u);
 				});	
+
+				it('should not display weight outlines since there is only one user', () => {
+					expect(objectiveChartRenderer.weightOutlines.style('display')).to.equal('none');
+				});
 			});
 
-			context('when the number of users in the ValueChart is increased to two', () => {
+			context('when the number of users in the ValueChart is increased to be two', () => {
 				before(function() {
 					bob = new User('Bob');
 
@@ -215,19 +219,35 @@ var renderEventsServiceStub = {
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
 					u = rendererConfigUtility.produceRendererConfig(u);
-					summaryChartRenderer.valueChartChanged(u);
+					objectiveChartRenderer.valueChartChanged(u);
 				});
 
-				it('should update the SVG elements of the summary chart to include the new users', () => {
+				it('should update the SVG elements of the objective chart to include the new users', () => {
 					checkNumberOfUserScores(u.valueChart.getUsers().length);
 				});
 
-				it('should re-render the summary chart and correctly position and style the SVG elements', () => {
+				it('should re-render the objective chart and correctly position and style the SVG elements', () => {
 					checkRenderedUserScores(u);
+				});
+
+				it('should display the weight outlines for each user since there is more than one user', () => {
+					expect(objectiveChartRenderer.weightOutlines.style('display')).to.equal('block');
+				});
+
+				it('should give each user\'s weight outline for each objective a height proportional to the user\'s objective weight', () => {
+					objectiveChartRenderer.weightOutlines.nodes().forEach((weightOutline: Element) => {
+						let selection = d3.select(weightOutline);
+						let datum = (<UserScoreData> selection.datum());
+						let weight = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+
+						let height: number = u.rendererConfig.dimensionTwoScale(weight);
+
+						expect(+selection.attr('height')).to.be.approximately(height, 2);		// Use approximately here to account for the offset of 2 applied to weight outline heights during rendering. 
+					});
 				});
 			});
 
-			context('when the number of users in the ValueChart is decreased to one', () => {
+			context('when the number of users in the ValueChart is decreased to be one', () => {
 				before(function() {
 					u.valueChart.removeUser(aaron);
 
@@ -235,16 +255,20 @@ var renderEventsServiceStub = {
 					u = rendererDataUtility.produceRowData(u);
 					u = rendererConfigUtility.produceRendererConfig(u);
 
-					summaryChartRenderer.valueChartChanged(u);
+					objectiveChartRenderer.valueChartChanged(u);
 				});
 
 
-				it('should update the SVG elements of the summary chart to include the new users', () => {
+				it('should update the SVG elements of the objective chart to include the new users', () => {
 					checkNumberOfUserScores(u.valueChart.getUsers().length);
 				});
 
-				it('should re-render the summary chart and correctly position and style the SVG elements', () => {
+				it('should re-render the objective chart and correctly position and style the SVG elements', () => {
 					checkRenderedUserScores(u);
+				});
+
+				it('should hide the weight outlines again since there is only one user', () => {
+					expect(objectiveChartRenderer.weightOutlines.style('display')).to.equal('none');
 				});
 			});
 
@@ -260,10 +284,10 @@ var renderEventsServiceStub = {
 					u = rendererDataUtility.produceRowData(u);
 					u = rendererConfigUtility.produceRendererConfig(u);
 
-					summaryChartRenderer.valueChartChanged(u);
+					objectiveChartRenderer.valueChartChanged(u);
 				});
 
-				it('should re-render to the summary chart to reflect the new weights', () => {
+				it('should re-render to the objective chart to reflect the new weights', () => {
 					checkRenderedUserScores(u);
 				});
 			});
@@ -278,10 +302,10 @@ var renderEventsServiceStub = {
 				u = rendererDataUtility.produceRowData(u);
 				u = rendererConfigUtility.produceRendererConfig(u);
 
-				summaryChartRenderer.valueChartChanged(u);
+				objectiveChartRenderer.valueChartChanged(u);
 			});
 
-			it('should re-render the summary chart to be in the horizontal orientation', () => {
+			it('should re-render the objective chart to be in the horizontal orientation', () => {
 				checkRenderedUserScores(u);
 			});
 		});
@@ -291,7 +315,7 @@ var renderEventsServiceStub = {
 
 		context('when all of the view options are disabled in the viewConfig object', () => {
 			it('should hide all optional SVG elements for those view options', () => {
-				summaryChartRenderer.viewConfigChanged(viewConfig);
+				objectiveChartRenderer.viewConfigChanged(viewConfig);
 
 				checkViewToggles();
 			});
@@ -305,7 +329,7 @@ var renderEventsServiceStub = {
 			});
 
 			it('should display the SVG elements for the enabled view options', () => {
-				summaryChartRenderer.viewConfigChanged(viewConfig);
+				objectiveChartRenderer.viewConfigChanged(viewConfig);
 
 				checkViewToggles();
 			});
@@ -316,7 +340,7 @@ var renderEventsServiceStub = {
 
 		context('when all of the interaction options are disabled in the interactionConfig objective', () => {
 			it('should change the sort alternatives interaction to "none"', () => {
-				summaryChartRenderer.interactionsChanged(interactionConfig);
+				objectiveChartRenderer.interactionsChanged(interactionConfig);
 				expect(sortAlternativesStub.sortStatus).to.equal('none');
 			});
 		});
@@ -327,7 +351,7 @@ var renderEventsServiceStub = {
 			});
 
 			it('should change the sort alternatives interaction to "alphabet"', () => {
-				summaryChartRenderer.interactionsChanged(interactionConfig);
+				objectiveChartRenderer.interactionsChanged(interactionConfig);
 				expect(sortAlternativesStub.sortStatus).to.equal('alphabet');
 			});
 		});
@@ -338,7 +362,7 @@ var renderEventsServiceStub = {
 			});
 
 			it('should change the sort alternatives interaction to "manual"', () => {
-				summaryChartRenderer.interactionsChanged(interactionConfig);
+				objectiveChartRenderer.interactionsChanged(interactionConfig);
 				expect(sortAlternativesStub.sortStatus).to.equal('manual');
 			});
 		});
@@ -346,47 +370,48 @@ var renderEventsServiceStub = {
 
 
 	var checkNumberOfRows = (n: number) => {
-		expect(summaryChartRenderer.rows.nodes()).to.have.length(n);
+		expect(objectiveChartRenderer.rows.nodes()).to.have.length(n);
 	}
 
 	var checkNumberOfCells = (n: number) => {
-		summaryChartRenderer.rows.nodes().forEach((row: SVGElement) => {
-			let cells = row.querySelectorAll('.' + SummaryChartDefinitions.CELL);
+		objectiveChartRenderer.rows.nodes().forEach((row: SVGElement) => {
+			let cells = row.querySelectorAll('.' + ObjectiveChartDefinitions.CELL);
 			expect(cells).to.have.length(n);
 		});
 	}
 
 	var checkNumberOfUserScores = (n: number) => {
-		summaryChartRenderer.rows.nodes().forEach((row: SVGElement) => {
-			(<any> row.querySelectorAll('.' + SummaryChartDefinitions.CELL)).forEach((cell: SVGElement) => {
-				let usersScores = d3.select(cell).selectAll('.' + SummaryChartDefinitions.USER_SCORE).nodes();
+		objectiveChartRenderer.rows.nodes().forEach((row: SVGElement) => {
+			(<any> row.querySelectorAll('.' + ObjectiveChartDefinitions.CELL)).forEach((cell: SVGElement) => {
+				let usersScores = d3.select(cell).selectAll('.' + ObjectiveChartDefinitions.USER_SCORE).nodes();
 				expect(usersScores).to.have.length(n);
 			});
 		});
 	}
 
 	var checkRenderedUserScores = (u: RendererUpdate) => {
-		let scale = d3.scaleLinear();
-		scale.range([0, u.rendererConfig.dimensionTwoSize]);
 
-		summaryChartRenderer.rows.nodes().forEach((row: SVGElement) => {
-			(<any> row.querySelectorAll('.' + SummaryChartDefinitions.CELL)).forEach((cell: SVGElement) => {
-				(<any> cell.querySelectorAll('.' + SummaryChartDefinitions.USER_SCORE)).forEach((userScore: SVGElement) => {
+		objectiveChartRenderer.rows.nodes().forEach((row: SVGElement) => {
+			let rowSelection = d3.select(row);
+			let rowData: RowData = <any> rowSelection.datum();
+			let rowOffset = u.rendererConfig.dimensionTwoScale(rowData.weightOffset);
+
+			if (u.viewConfig.viewOrientation == 'vertical')
+				expect(rowSelection.attr('transform')).to.equal('translate(0,' + rowOffset + ')');
+			else 
+				expect(rowSelection.attr('transform')).to.equal('translate(' + rowOffset + ',0)');
+
+			(<any> row.querySelectorAll('.' + ObjectiveChartDefinitions.CELL)).forEach((cell: SVGElement) => {
+				(<any> cell.querySelectorAll('.' + ObjectiveChartDefinitions.USER_SCORE)).forEach((userScore: SVGElement) => {
 					let selection = d3.select(userScore);
 					let datum: UserScoreData = <any> selection.datum();
 					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getName()).getScore(datum.value);
 					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
 
-					scale.domain([0, datum.user.getWeightMap().getWeightTotal()]);
-
-
 					if (u.viewConfig.viewOrientation == 'vertical') {
-						let y = (u.rendererConfig.dimensionTwoSize - scale(datum.offset)) - scale(score * weight)
-						expect(selection.attr('height')).to.equal(scale(score * weight).toString());
-						expect(selection.attr('y')).to.equal(y.toString());
+						expect(selection.attr('height')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());
 					} else {
-						expect(selection.attr('width')).to.equal(scale(score * weight).toString());
-						expect(selection.attr('x')).to.equal(scale(datum.offset).toString());
+						expect(selection.attr('width')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());
 					}
 				});	
 			});
@@ -394,22 +419,12 @@ var renderEventsServiceStub = {
 	}
 
 	var checkViewToggles = () => {
-		if (viewConfig.displayAverageScoreLines)
-			expect(summaryChartRenderer.averageLinesContainer.style('display')).to.equal('block');
-		else 
-			expect(summaryChartRenderer.averageLinesContainer.style('display')).to.equal('none');
-
-		if (viewConfig.displayTotalScores)
-			expect(summaryChartRenderer.scoreTotalsContainer.style('display')).to.equal('block');
-		else 
-			expect(summaryChartRenderer.scoreTotalsContainer.style('display')).to.equal('none');	
-		
-		if (viewConfig.displayScales)
-			expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('block');
-		else 
-			expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('none');	
-	};
-
+		if (viewConfig.displayDomainValues) {
+			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('block');
+		} else {
+			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');			
+		}
+	}
 });
 
 
