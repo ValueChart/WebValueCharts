@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 11:45:02
+* @Last Modified time: 2017-05-23 15:11:26
 */
 
 // Import Angular Classes
@@ -587,7 +587,9 @@ export class SummaryChartRenderer {
 		d.userScores.forEach((userScore: UserScoreData) => {
 			totalScore += (this.calculateNormalizedTotalScore(userScore));
 		});
-
-		return (totalScore / d.userScores.length);
+		if (d.userScores.length > 0)
+			return (totalScore / d.userScores.length);
+		else 
+			return 0;
 	}
 }

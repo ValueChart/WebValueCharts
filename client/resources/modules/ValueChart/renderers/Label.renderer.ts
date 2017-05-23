@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:06:40
+* @Last Modified time: 2017-05-23 15:26:08
 */
 
 // Import Angular Classes:
@@ -77,6 +77,7 @@ export class LabelRenderer {
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
+	private numUsers: number;
 	private viewOrientation: string;
 
 	// ========================================================================================
@@ -109,7 +110,6 @@ export class LabelRenderer {
 
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
-			this.applyStyles(update)
 		}
 
 		if (this.reordered) {
@@ -117,6 +117,12 @@ export class LabelRenderer {
 		}
 
 		this.renderLabelSpace(update, update.labelData);
+
+		if (this.numUsers != update.valueChart.getUsers().length) {
+			this.applyStyles(update);
+		}
+
+		this.numUsers = update.valueChart.getUsers().length;
 
 		if (this.reordered) {
 			this.applyStyles(update)
