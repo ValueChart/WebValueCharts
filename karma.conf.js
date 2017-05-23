@@ -68,9 +68,10 @@ module.exports = function(config) {
       'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
 
       // transpiled application & spec code paths loaded via module imports
-      { pattern: appBase + '**/*.js', included: false, watched: false },
+      { pattern: appBase + '**/*.js', included: false, watched: false },      
       { pattern: testingBase + '**/*.js', included: false, watched: false },
       { pattern: 'test/testData/**.js', included: false, watched: false },
+      'client/resources/styles/main.css',
 
       // Asset (HTML & CSS) paths loaded via Angular's component compiler
       // (these paths need to be rewritten, see proxies section)

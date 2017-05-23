@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 14:53:52
+* @Last Modified time: 2017-05-23 16:57:59
 */
 
 // Import Testing Resources:
@@ -198,6 +198,13 @@ var renderEventsServiceStub = {
 				it('should not display weight outlines since there is only one user', () => {
 					expect(objectiveChartRenderer.weightOutlines.style('display')).to.equal('none');
 				});
+
+				it('should use the color of user scores to indicate the corresponding objective', () => {
+					objectiveChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
+						let objectiveColor = (<UserScoreData> d3.select(userScore).datum()).objective.getColor();
+						expect(rgb2hex(userScore.style.fill)).to.equal(_.toLower(objectiveColor));
+					});
+				});
 			});
 
 			context('when the number of users in the ValueChart is increased to be two', () => {
@@ -245,6 +252,13 @@ var renderEventsServiceStub = {
 						expect(+selection.attr('height')).to.be.approximately(height, 2);		// Use approximately here to account for the offset of 2 applied to weight outline heights during rendering. 
 					});
 				});
+
+				it('should change the colors of user scores to indicate users instead objectives', () => {
+					objectiveChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
+						let userColor = (<UserScoreData> d3.select(userScore).datum()).user.color;
+						expect(rgb2hex(userScore.style.fill)).to.equal(_.toLower(userColor));
+					});
+				});	
 			});
 
 			context('when the number of users in the ValueChart is decreased to be one', () => {
@@ -291,11 +305,28 @@ var renderEventsServiceStub = {
 					checkRenderedUserScores(u);
 				});
 			});
+
+			context('when the number of users in the ValueChart is decreased to be zero', () => {
+				before(function() {
+					u.valueChart.removeUser(bob);
+
+					u = rendererDataUtility.produceMaximumWeightMap(u);
+					u = rendererDataUtility.produceRowData(u);
+					u = rendererConfigUtility.produceRendererConfig(u);
+
+					objectiveChartRenderer.valueChartChanged(u);		
+				});
+
+				it('should update the SVG elements of the objective chart to have zero user scores per cell', () => {
+					expect(objectiveChartRenderer.userScores.nodes()).to.have.length(0);
+				});
+			});
 		});
 
 		context('when the view orientation is set to be horizontal', () => {
-
 			before(function() {
+				u.valueChart.setUser(aaron);
+
 				viewConfig.viewOrientation = 'horizontal';
 
 				u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -424,6 +455,14 @@ var renderEventsServiceStub = {
 		} else {
 			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');			
 		}
+	}
+
+	var rgb2hex = (rgb: any) => {
+	 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+	 	return (rgb && rgb.length === 4) ? "#" +
+	  		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+	  		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+	  		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 	}
 });
 

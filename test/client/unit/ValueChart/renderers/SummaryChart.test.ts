@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 14:51:57
+* @Last Modified time: 2017-05-23 16:57:56
 */
 
 // Import Testing Resources:
@@ -155,6 +155,7 @@ var renderEventsServiceStub = {
 		}
 
 		aaron = hotelChart.getUsers()[0];
+		aaron.color = "#0000FF";
 	});
 
 	describe('public valueChartChanged = (update: RendererUpdate)', () => {
@@ -194,12 +195,20 @@ var renderEventsServiceStub = {
 				it('should position and style the SVG elements making up the summary chart', () => {
 					checkRenderedUserScores(u);
 				});	
+
+				it('should use the color of user scores to indicate the corresponding objective', () => {
+					summaryChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
+						let objectiveColor = (<UserScoreData> d3.select(userScore).datum()).objective.getColor();
+						expect(rgb2hex(userScore.style.fill)).to.equal(_.toLower(objectiveColor));
+					});
+				});
 			});
 
 			context('when the number of users in the ValueChart is increased to two', () => {
 				before(function() {
 					bob = new User('Bob');
 
+					bob.color = "#FF0000";
 					let bobsWeights = new WeightMap();
 					let bobsScoreFunctions = u.valueChart.getUsers()[0].getScoreFunctionMap();
 
@@ -225,6 +234,13 @@ var renderEventsServiceStub = {
 				it('should re-render the summary chart and correctly position and style the SVG elements', () => {
 					checkRenderedUserScores(u);
 				});
+
+				it('should change the colors of user scores to indicate users instead objectives', () => {
+					summaryChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
+						let userColor = (<UserScoreData> d3.select(userScore).datum()).user.color;
+						expect(rgb2hex(userScore.style.fill)).to.equal(_.toLower(userColor));
+					});
+				});	
 			});
 
 			context('when the number of users in the ValueChart is decreased to one', () => {
@@ -267,11 +283,28 @@ var renderEventsServiceStub = {
 					checkRenderedUserScores(u);
 				});
 			});
+
+			context('when the number of users in the ValueChart is decreased to be zero', () => {
+				before(function() {
+					u.valueChart.removeUser(bob);
+
+					u = rendererDataUtility.produceMaximumWeightMap(u);
+					u = rendererDataUtility.produceRowData(u);
+					u = rendererConfigUtility.produceRendererConfig(u);
+
+					summaryChartRenderer.valueChartChanged(u);		
+				});
+
+				it('should update the SVG elements of the objective chart to have zero user scores per cell', () => {
+					expect(summaryChartRenderer.userScores.nodes()).to.have.length(0);
+				});
+			});
 		});
 
 		context('when the view orientation is set to be horizontal', () => {
 
 			before(function() {
+				u.valueChart.setUser(aaron);
 				viewConfig.viewOrientation = 'horizontal';
 
 				u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -409,6 +442,15 @@ var renderEventsServiceStub = {
 		else 
 			expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('none');	
 	};
+
+	var rgb2hex = (rgb: any) => {
+	 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+	 	return (rgb && rgb.length === 4) ? "#" +
+	  		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+	  		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+	  		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+	}
+
 
 });
 
