@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 20:56:10
+* @Last Modified time: 2017-05-23 11:45:02
 */
 
 // Import Angular Classes
@@ -88,7 +88,7 @@ export class SummaryChartRenderer {
 	// 									Methods
 	// ========================================================================================
 
-	valueChartChanged = (update: RendererUpdate) => {
+	public valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 
 		if (this.chart == undefined) {
@@ -109,15 +109,14 @@ export class SummaryChartRenderer {
 		}	
 	}
 
-	interactionsChanged = (interactionConfig: InteractionConfig) => {
+	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes, this.lastRendererUpdate);
 	}
 
-	viewConfigChanged = (viewConfig: ViewConfig) => {
+	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleUtilityAxis(viewConfig.displayScales);
 		this.toggleScoreTotals(viewConfig.displayTotalScores);
 		this.toggleAverageLines(viewConfig.displayAverageScoreLines);
-
 	}
 
 
@@ -517,7 +516,7 @@ export class SummaryChartRenderer {
 			var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 			this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
 			if (u.viewConfig.viewOrientation == 'vertical')
-				// If the orientation is vertical, then increasing height is to the down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
+				// If the orientation is vertical, then increasing height is down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
 				return (u.rendererConfig.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
 			else
 				return this.summaryChartScale(d.offset); // If the orientation is horizontal, then increasing height is to the right, and the only offset is the combined (score * weight) of the previous bars.
@@ -528,7 +527,7 @@ export class SummaryChartRenderer {
 		@returns {void}
 		@description	Display or hide the utility axis depending on the value of the displayScales attribute on the ValueChartDirective.
 	*/
-	toggleUtilityAxis(displayScales: boolean): void {
+	private toggleUtilityAxis(displayScales: boolean): void {
 		if (displayScales) {
 			this.utilityAxisContainer.style('display', 'block');
 		} else {
@@ -540,7 +539,7 @@ export class SummaryChartRenderer {
 		@returns {void}
 		@description	Display or hide the score totals depending on the value of the displayTotalScores attribute on the ValueChartDirective.
 	*/
-	toggleScoreTotals(displayTotalScores: boolean): void {
+	private toggleScoreTotals(displayTotalScores: boolean): void {
 		if (displayTotalScores) {
 			this.scoreTotalsContainer.style('display', 'block');
 		} else {
@@ -548,7 +547,7 @@ export class SummaryChartRenderer {
 		}
 	}
 
-	toggleAverageLines(displayAverageScoreLines: boolean): void {
+	private toggleAverageLines(displayAverageScoreLines: boolean): void {
 		if (displayAverageScoreLines) {
 			this.averageLinesContainer.style('display', 'block');
 		} else {
@@ -562,11 +561,11 @@ export class SummaryChartRenderer {
 
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
-	calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };
+	private calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };
 	// The width (or height) should be such that the user scores for one cell fill that cell.
-	calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.valueChart.getUsers().length };
+	private calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.valueChart.getUsers().length };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
-	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
+	private calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 		var score: number = (<User>d.user).getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 		this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
@@ -577,13 +576,13 @@ export class SummaryChartRenderer {
 
 	// ================================ Methods for Parsing Scores From Data  ====================================
 
-	calculateNormalizedTotalScore = (d: UserScoreData) => {
+	private calculateNormalizedTotalScore = (d: UserScoreData) => {
 		var scoreFunction: ScoreFunction = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
 		var score = scoreFunction.getScore(d.value) * (d.user.getWeightMap().getObjectiveWeight(d.objective.getName()));
 		return (score + d.offset) / d.user.getWeightMap().getWeightTotal();
 	};
 
-	calculateAverageScore = (d: CellData) => {
+	private calculateAverageScore = (d: CellData) => {
 		var totalScore: number = 0;
 		d.userScores.forEach((userScore: UserScoreData) => {
 			totalScore += (this.calculateNormalizedTotalScore(userScore));
