@@ -58,14 +58,20 @@ module.exports = function(config) {
       // Angular itself
       { pattern: 'node_modules/@angular/**/*.js', included: false, watched: false },
       { pattern: 'node_modules/@angular/**/*.js.map', included: false, watched: false },
+      { pattern: 'node_modules/traceur/bin/traceur.js', included:false, watched: false },
+      { pattern: 'node_modules/lodash/lodash.js', included:false, watched: false },
+      { pattern: 'node_modules/d3/build/d3.js', included:false, watched: false },
+
       
       { pattern: 'systemjs.config.js', included: false, watched: false },
       { pattern: 'systemjs-angular-loader.js', included: false, watched: false },
       'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
 
       // transpiled application & spec code paths loaded via module imports
-      { pattern: appBase + '**/*.js', included: false, watched: false },
+      { pattern: appBase + '**/*.js', included: false, watched: false },      
       { pattern: testingBase + '**/*.js', included: false, watched: false },
+      { pattern: 'test/testData/**.js', included: false, watched: false },
+      'client/resources/styles/main.css',
 
       // Asset (HTML & CSS) paths loaded via Angular's component compiler
       // (these paths need to be rewritten, see proxies section)

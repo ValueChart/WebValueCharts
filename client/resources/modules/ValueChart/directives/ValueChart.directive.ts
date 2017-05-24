@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 12:33:00
+* @Last Modified time: 2017-05-19 12:37:35
 */
 
 // Import Angular Classes:
@@ -13,7 +13,6 @@ import { EventEmitter }															from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
-import * as _ 																	from 'lodash';
 import { Observable }															from 'rxjs/Observable';
 import { Subscription } 														from 'rxjs/Subscription';
 import { Subject }																from 'rxjs/Subject';
@@ -33,6 +32,7 @@ import { LabelRenderer }														from '../renderers/Label.renderer';
 // Utilities
 import { RendererDataUtility }													from '../utilities/RendererData.utility';
 import { RendererConfigUtility }												from '../utilities/RendererConfig.utility';
+import { RendererScoreFunctionUtility }											from '../utilities/RendererScoreFunction.utility';
 // Interactions
 import { ReorderObjectivesInteraction }											from '../interactions/ReorderObjectives.interaction';
 import { ResizeWeightsInteraction }												from '../interactions/ResizeWeights.interaction';
@@ -59,6 +59,11 @@ import { ViewConfig, InteractionConfig }										from '../../../types/Config.ty
 		ChangeDetectionService,
 		RenderEventsService,
 		ChartUndoRedoService,
+		RendererService,
+		// Utilities:
+		RendererScoreFunctionUtility,
+		RendererDataUtility,
+		RendererConfigUtility,
 		// Renderers:
 		ObjectiveChartRenderer,
 		SummaryChartRenderer,
@@ -112,6 +117,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
 	private waitForRenderers: Subscription;
+
+
+	public renderRequired: { value: boolean } = { value: false };
 
 	// ========================================================================================
 	// 									Constructor
@@ -192,13 +200,12 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
-
-
 		var renderInformation = new Subject();
 
 		this.valueChartSubject.map((valueChart: ValueChart) => {
-			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig };
-		}).map(this.rendererDataUtility.produceRowData)
+			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig, renderRequired: this.renderRequired };
+		}).map(this.rendererDataUtility.produceMaximumWeightMap)
+			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
 			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(renderInformation);
@@ -251,7 +258,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig)) {
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.renderRequired.value)) {
+			this.renderRequired.value = false;
 			this.rendererService.initUserColors(this.valueChart);
 			this.valueChartSubject.next(this.valueChart);
 		}
@@ -266,6 +274,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
 			this.calculateDefaultComponentSize();
 			this.valueChartSubject.next(this.valueChart);
+			this.interactionSubject.next(this.interactionConfig);
 		}
 	}
 }

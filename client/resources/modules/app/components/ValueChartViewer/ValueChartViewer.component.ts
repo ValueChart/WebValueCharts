@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 12:56:14
+* @Last Modified time: 2017-05-18 23:02:43
 */
 
 // Import Angular Classes:
@@ -27,14 +27,14 @@ import { ChartUndoRedoService }													from '../../../ValueChart/services/C
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 // Import Model Classes:
-import { User }																	from '../../../../model/User';
 import { ValueChart } 															from '../../../../model/ValueChart';
+import { User }																	from '../../../../model/User';
+import { WeightMap } 															from '../../../../model/WeightMap';
 import { Alternative } 															from '../../../../model/Alternative';
 import { PrimitiveObjective } 													from '../../../../model/PrimitiveObjective';
 
 // Import Types:
 import { ViewConfig, InteractionConfig }										from '../../../../types/Config.types';
-import { ValueChartStateContainer }												from '../../../../types/StateContainer.types';
 import { ScoreFunctionRecord }													from '../../../../types/Record.types';
 
 /*
@@ -50,7 +50,7 @@ import { ScoreFunctionRecord }													from '../../../../types/Record.types'
 
 @Component({
 	selector: 'ValueChartViewer',
-	templateUrl: 'client/resources/modules/app/components/ValueChartViewer/ValueChartViewer.template.html',
+	templateUrl: './ValueChartViewer.template.html',
 	providers: [ ]
 })
 export class ValueChartViewerComponent implements OnInit {
@@ -59,11 +59,11 @@ export class ValueChartViewerComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartWidth: number;
-	private valueChartHeight: number;
+	public valueChartWidth: number;
+	public valueChartHeight: number;
 
-	private undoRedoService: ChartUndoRedoService;
-	private renderEvents: RenderEventsService;
+	public undoRedoService: ChartUndoRedoService;
+	public renderEvents: RenderEventsService;
 
 	valueChart: ValueChart;
 
@@ -90,8 +90,8 @@ export class ValueChartViewerComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
-		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService,
+		public currentUserService: CurrentUserService,
+		public valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 
@@ -138,8 +138,8 @@ export class ValueChartViewerComponent implements OnInit {
 	updateUndoRedo(undoRedoService: ChartUndoRedoService) {
 		this.undoRedoService = undoRedoService;
 
-		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.valueChartService.currentUserScoreFunctionChange);
-		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.valueChartService.currentUserWeightMapChange);
+		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
+		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
 	}
 
 	updateRenderEvents(renderEvents: RenderEventsService) {
@@ -202,7 +202,7 @@ export class ValueChartViewerComponent implements OnInit {
   */
   rescaleScoreFunctions(): void {
 	    let rescaled: boolean = false;
-	    for (let user of this.valueChartService.getUsers()) {
+	    for (let user of this.valueChartService.getValueChart().getUsers()) {
 			for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
       			if (scoreFunction.rescale()) {
@@ -261,6 +261,7 @@ export class ValueChartViewerComponent implements OnInit {
 	submitPreferences(): void {
 		var currentUser: User = this.valueChartService.getCurrentUser();
 		this.rescaleScoreFunctions();
+		currentUser.getWeightMap().normalize();
 
 		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 		// that has been retrieved from the server.
@@ -299,10 +300,18 @@ export class ValueChartViewerComponent implements OnInit {
 	// ================================ Undo/Redo ====================================
 
 	undoChartChange(): void {
-		this.undoRedoService.undo(this.valueChartService);
+		this.undoRedoService.undo(this.valueChartService.getValueChart());
 	}
 
 	redoChartChange(): void {
-		this.undoRedoService.redo(this.valueChartService);
+		this.undoRedoService.redo(this.valueChartService.getValueChart());
+	}
+
+	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
+		this.valueChartService.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+	}
+
+	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
+		this.valueChartService.getCurrentUser().setWeightMap(weightMapRecord);
 	}
 }

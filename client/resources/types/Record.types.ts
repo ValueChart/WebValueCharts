@@ -2,8 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 13:24:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-06-28 14:28:39
+* @Last Modified time: 2017-05-19 11:41:23
 */
+
+// Import Libraries:
+import * as _ 							from 'lodash';
 
 // Import Model Classes:
 import { Alternative }					from '../model/Alternative';
@@ -14,20 +17,16 @@ import { ScoreFunction }				from '../model/ScoreFunction';
 
 import { Memento }						from '../model/Memento';
 
-export class AlternativeOrderRecord implements Memento {
+export class AlternativesRecord implements Memento {
 
-	public alternativeIndexMap: any;
+	public alternatives: Alternative[];
 
 	constructor(alternatives: Alternative[]) {
-		this.alternativeIndexMap = {};
-
-		alternatives.forEach((alternative: Alternative, index: number) => {
-			this.alternativeIndexMap[alternative.getName()] = index;
-		});
+		this.alternatives = _.cloneDeep(alternatives);
 	}
 
 	getMemento(): Memento {
-		return this;
+		return new AlternativesRecord(this.alternatives);
 	}
 }
 

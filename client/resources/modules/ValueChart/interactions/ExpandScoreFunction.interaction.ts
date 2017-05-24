@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:08:54
+* @Last Modified time: 2017-05-23 17:54:01
 */
 
 // Import Angular Classes:
@@ -10,6 +10,9 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import { Observable }												from 'rxjs/Observable';
+import { Subscription } 											from 'rxjs/Subscription';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -51,7 +54,8 @@ export class ExpandScoreFunctionInteraction {
 
 	public popUpRef: any;		// A class field used to reference the active pop-up window.
 	
-
+	private clicks: Observable<Event>;
+	private onClick: Subscription;
 
 	// ========================================================================================
 	// 									Constructor
@@ -77,13 +81,16 @@ export class ExpandScoreFunctionInteraction {
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: JQuery, lastRendererUpdate: ScoreFunctionUpdate): void {
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, lastRendererUpdate: ScoreFunctionUpdate): void {
 		this.lastRendererUpdate = lastRendererUpdate;
+		// Initialize the observable that is used to detect clicks and notifies handlers.
+		this.clicks = Observable.fromEvent(scoreFunctionPlots, 'dblclick');
 
-		scoreFunctionPlots.off('dblclick');
+		if (this.onClick != undefined)
+			this.onClick.unsubscribe();
 
 		if (enableExpanding) {
-			scoreFunctionPlots.dblclick(this.expandScoreFunction);
+			this.onClick = this.clicks.subscribe(this.expandScoreFunction)
 		}
 
 	}

@@ -26,7 +26,7 @@ import { Alternative }													from '../../../../model/Alternative';
 
 @Component({
 	selector: 'CreateWeights',
-	templateUrl: 'client/resources/modules/create/components/CreateWeights/CreateWeights.template.html',
+	templateUrl: './CreateWeights.template.html',
 })
 export class CreateWeightsComponent implements OnInit {
 
@@ -156,7 +156,7 @@ export class CreateWeightsComponent implements OnInit {
 		let bestOutcome;
 		let bestOutcomeScore = 0;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let alt of this.valueChartService.getAlternatives()) {
+		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 			let outcome = alt.getObjectiveValue(objName);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore > bestOutcomeScore) {
@@ -178,7 +178,7 @@ export class CreateWeightsComponent implements OnInit {
 		let worstOutcome;
 		let worstOutcomeScore = 1;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let alt of this.valueChartService.getAlternatives()) {
+		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 			let outcome = alt.getObjectiveValue(objName);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore < worstOutcomeScore) {

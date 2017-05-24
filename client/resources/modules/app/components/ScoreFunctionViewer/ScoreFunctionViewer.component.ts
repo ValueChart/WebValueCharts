@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:44:20
+* @Last Modified time: 2017-05-16 21:41:42
 */
 
 // Import Angular Classes:
@@ -47,7 +47,7 @@ import { ScoreFunctionData, DomainElement }								from '../../../../types/Rende
 
 @Component({
 	selector: 'ScoreFunctionViewer',
-	templateUrl: 'client/resources/modules/app/components/ScoreFunctionViewer/ScoreFunctionViewer.template.html',
+	templateUrl: './ScoreFunctionViewer.template.html',
 })
 export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck {
 
@@ -61,21 +61,21 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	private rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	private chartUndoRedoService: ChartUndoRedoService;
 
-	private services: any = {};
 
 	private scoreFunctionPlotContainer: d3.Selection<any, any, any, any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
 	private scoreDistributionChartContainer: d3.Selection<any, any, any, any>;
 	private scoreDistributionChartRenderer: ScoreDistributionChartRenderer;
 
-	protected scoreFunctions: ScoreFunction[];
-	protected colors: string[];
-	private objectiveToDisplay: PrimitiveObjective;
-	private enableInteraction: boolean;
-	private previousScoreFunctions: ScoreFunction[];
-
-
+	public services: any = {};
+	public scoreFunctions: ScoreFunction[];
+	public colors: string[];
+	public objectiveToDisplay: PrimitiveObjective;
+	public enableInteraction: boolean;
+	
 	private viewType: string;
+
+	private previousScoreFunctions: ScoreFunction[];
 	private previousViewType: string;
 
 	// ========================================================================================

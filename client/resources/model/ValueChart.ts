@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-09 23:23:11
+* @Last Modified time: 2017-05-18 22:54:55
 */
 	
 // Import Model Classes:
@@ -49,7 +49,6 @@ export class ValueChart {
 	public _id: string;						// The id of the ValueChart in the database. This field should ONLY be set if the ValueChart has been added to the database. 
 	public password: string;				// The password to access this ValueChart.
 
-	private maximumWeightMap: WeightMap;
 
 	// ========================================================================================
 	// 									Constructor
@@ -184,6 +183,16 @@ export class ValueChart {
 		return primitiveObjectives;
 	}
 
+	getAllAbstractObjectives(): AbstractObjective[] {
+		let abstractObjectives: AbstractObjective[] = [];
+		for (let objective of this.getAllObjectives()) {
+			if (objective.objectiveType === "abstract") {
+				abstractObjectives.push(<AbstractObjective> objective);
+			}
+		}
+		return abstractObjectives;
+	}
+
 	/*
 		@returns {string[]} - An array of the names of all objectives in the ValueChart. This array is NOT ordered.	
 		@description	Parses the ValueChart's hierarchical objective structure to find every objective's name.
@@ -257,13 +266,17 @@ export class ValueChart {
 
 	setUsers(users: User[]): void {
 		this.users = users;
-		this.updateMaximumWeightMap();
 	}
 
-	addUser(user: User): void {
-		if (this.users.indexOf(user) === -1) {
-			this.users.push(user);
-			this.updateMaximumWeightMap();
+	setUser(newUser: User): void {
+		var userIndex: number = this.users.findIndex((user: User) => {
+			return newUser.getUsername() === user.getUsername();
+		});
+
+		if (userIndex === -1) {
+			this.users.push(newUser);
+		} else {
+			this.users[userIndex] = newUser;
 		}
 	}
 
@@ -271,53 +284,7 @@ export class ValueChart {
 		var index: number = this.users.indexOf(user);
 		if (index !== -1) {
 			this.users.splice(index, 1);
-			this.updateMaximumWeightMap();
 		}
-	}
-
-	/*
-		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
-		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
-						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
-						one user the in ValueChart, that user's weight map is simply returned. If there are no users, the default weight map is returned.
-						The maximum weight map is to determine label heights by the LabelRenderer, and row heights by the objective chart renderer.
-	*/
-	getMaximumWeightMap(): WeightMap {
-		if (this.users.length === 0)
-			return this.getDefaultWeightMap();
-
-		if (this.users.length === 1)
-			return this.users[0].getWeightMap();
-
-		if (this.maximumWeightMap == undefined)
-			this.updateMaximumWeightMap();
-
-		return this.maximumWeightMap;
-	}
-
-	updateMaximumWeightMap(): void {
-		var primitiveObjectives: PrimitiveObjective[] = this.getAllPrimitiveObjectives();
-		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
-		var maximumWeightMap = new WeightMap();
-
-		if (this.users) {
-			this.users.forEach((user: User) => {
-				if (user.getWeightMap()) {
-				let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
-					for (var i = 0; i < objectiveWeights.length; i++) {
-						if (combinedWeights[i] < objectiveWeights[i]) {
-							combinedWeights[i] = objectiveWeights[i];
-						}
-					}
-				}
-			});
-
-			for (var i = 0; i < primitiveObjectives.length; i++) {
-				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
-			}
-		}
-
-		this.maximumWeightMap = maximumWeightMap;
 	}
 
 	/*

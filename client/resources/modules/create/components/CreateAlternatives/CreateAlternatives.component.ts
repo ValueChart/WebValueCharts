@@ -7,6 +7,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
+import { ValidationService }											from '../../../app/services/Validation.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
@@ -22,7 +23,7 @@ import { ContinuousDomain }												from '../../../../model/ContinuousDomain'
 
 @Component({
 	selector: 'CreateAlternatives',
-	templateUrl: 'client/resources/modules/create/components/CreateAlternatives/CreateAlternatives.template.html',
+	templateUrl: './CreateAlternatives.template.html',
 })
 export class CreateAlternativesComponent implements OnInit {
 
@@ -30,6 +31,10 @@ export class CreateAlternativesComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
+    // The ValueChart:
+	valueChart: ValueChart;
+
+	// Alternative row fields:
     alternatives: { [altID: string]: Alternative; }; // It is necessary to track Alternatives by ID since their names may not be unique
     isSelected: { [altID: string]: boolean; }; // Specifies whether the row corresponding to each Alternative is currently selected
     alternativesCount: number; // Incremented every time an Alternative is added, but never decremented; used to generate unique IDs for Alternatives
@@ -37,6 +42,7 @@ export class CreateAlternativesComponent implements OnInit {
     // Validation fields:
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
 										  // If true, validation messages will be shown whenever conditions fail
+	errorMessages: string[]; // Validation error messages
 
 	// ========================================================================================
 	// 									Constructor
@@ -47,7 +53,10 @@ export class CreateAlternativesComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
+	constructor(
+		private valueChartService: ValueChartService, 
+		private creationStepsService: CreationStepsService, 
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -65,30 +74,19 @@ export class CreateAlternativesComponent implements OnInit {
             subscriber.next(this.validate());
             subscriber.complete();
         });
+        this.valueChart = this.valueChartService.getValueChart();
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;
+		this.errorMessages = [];
 
-		if (this.valueChartService.getAlternatives().length > 0) {
+		if (this.valueChart.getAlternatives().length > 0) {
 			this.validationTriggered = true;
-			for (let alt of this.valueChartService.getAlternatives()) {
+			for (let alt of this.valueChart.getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;
 			}
 		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Destroys CreateAlternatives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
-						requires that a different component is displayed in the router-outlet.
-	*/
-	ngOnDestroy() {
-		let alternatives: Alternative[] = [];
-		for (let altID of this.altKeys()) {
-			alternatives.push((this.alternatives[altID]));
-		}
-		this.valueChartService.setAlternatives(alternatives);
 	}
 
 	// ================================ Alternatives Table Methods ====================================
@@ -144,6 +142,7 @@ export class CreateAlternativesComponent implements OnInit {
 		this.alternatives[this.alternativesCount] = new Alternative("", "");
 		this.isSelected[this.alternativesCount] = false;
 		this.alternativesCount++;
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -157,6 +156,7 @@ export class CreateAlternativesComponent implements OnInit {
 				delete this.isSelected[key];
 			}
 		}
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -196,87 +196,42 @@ export class CreateAlternativesComponent implements OnInit {
 
 	// ================================ Validation Methods ====================================
 
+
 	/* 	
 		@returns {boolean}
-		@description 	Validates Alternatives.
-						This should be done prior to updating the ValueChart model and saving to the database.
+		@description 	Checks validity of alternatives structure in the chart.
+						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.hasAlternatives() && this.allHaveNames() && this.allNamesValid()
-			&& this.allNamesUnique() && this.allObjectivesHaveValues() && this.allValuesWithinRange();
+		this.setErrorMessages();
+		return this.errorMessages.length === 0;
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff there is at least one Alternative.
+		@description 	Converts ObjectiveRow structure into ValueChart objective, then validates the objective structure of the ValueChart.
 	*/
-	hasAlternatives(): boolean {
-		return this.altKeys().length > 0;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every Alternative has a name that isn't the empty string.
-	*/
-	allHaveNames(): boolean {
-		return this.getNames().indexOf("") === -1;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every Alternative has a name that contains at least one character
-						and only alphanumeric characters, spaces, hyphens, and underscores.
-	*/
-	allNamesValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-,.]+$");
-		for (let name of this.getNames()) {
-			if (name.search(regex) === -1) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff all Alternatives names are unique after converting to ID format.
-	*/
-	allNamesUnique(): boolean {
-		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff a value has been set/selected in every Objective column for every Alternative.
-	*/
-	allObjectivesHaveValues(): boolean {
+	setErrorMessages(): void {
+		// Convert temporary structures to ValueChart structures
+		let alternatives: Alternative[] = [];
 		for (let altID of this.altKeys()) {
-			for (let objname of this.valueChartService.getPrimitiveObjectivesByName()) {
-				if (this.alternatives[altID].getObjectiveValue(objname) === undefined) {
-					return false;
-				}
-			}
+			alternatives.push((this.alternatives[altID]));
 		}
-		return true;
+		this.valueChart.setAlternatives(alternatives);
+
+		// Validate
+		this.errorMessages = this.validationService.validateAlternatives(this.valueChart);
 	}
 
 	/* 	
-		@returns {boolean}
-		@description 	Returns true iff the values entered for every continuous Objective for every Alternative are within the set range.
+		@returns {void}
+		@description 	Resets error messages if validation has already been triggered.
+						(This is done whenever the user makes a change to the chart. This way, they get feedback while repairing errors.)
 	*/
-	allValuesWithinRange(): boolean {
-		for (let altID of this.altKeys()) {
-			for (let obj of this.valueChartService.getPrimitiveObjectives()) {
-				if (obj.getDomainType() === 'continuous') {
-					let dom: ContinuousDomain = <ContinuousDomain>obj.getDomain();
-					let objValue = this.alternatives[altID].getObjectiveValue(obj.getName());
-					if (objValue > dom.getMaxValue() || objValue < dom.getMinValue()) {
-						return false;
-					}
-				}
-			}
+	resetErrorMessages(): void {
+		if (this.validationTriggered) {
+			this.setErrorMessages();
 		}
-		return true;
 	}
 }

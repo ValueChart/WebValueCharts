@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-04 09:55:03
+* @Last Modified time: 2017-05-17 14:21:30
 */
 
 /* Global Styles */
@@ -184,13 +184,6 @@ a.upload {
     z-index: 10;
 }
 
-.detail-box-vertical {
-    left: 5% !important;
-}
-
-.detail-box-horizontal {
-}
-
 #alternative-detail-box {
     overflow-y: scroll;
 }
@@ -281,6 +274,14 @@ a.upload {
     fill: transparent;
     stroke: #23b708;
     stroke-width: 3px;
+}
+
+.summary-scoretotal {
+    font-size: 22px;
+}
+
+.objective-alternative-label {
+    font-size: 20px;
 }
 
 /* Override bootstrap default styles*/

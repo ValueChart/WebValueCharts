@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-27 10:20:44
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-22 20:33:41
+* @Last Modified time: 2017-05-17 12:44:28
 */
 
 // Import Model Classes:
@@ -66,31 +66,31 @@ export class WeightMap implements Memento {
 		this.weights = newMap;
 	}
 
-	getObjectiveWeight(objectiveName: string): number {
-		return this.weights.get(objectiveName);
+	getObjectiveWeight(objectiveId: string): number {
+		return this.weights.get(objectiveId);
 	}
 
-	getNormalizedObjectiveWeight(objectiveName: string): number {
-		return this.weights.get(objectiveName) / this.weightTotal;
+	getNormalizedObjectiveWeight(objectiveId: string): number {
+		return this.weights.get(objectiveId) / this.weightTotal;
 	}
 
-	setObjectiveWeight(objectiveName: string, weight: number): void {
-		var priorWeight: number = this.weights.get(objectiveName);
+	setObjectiveWeight(objectiveId: string, weight: number): void {
+		var priorWeight: number = this.weights.get(objectiveId);
 		if (priorWeight !== undefined) {
 			this.weightTotal -= priorWeight;
 		}
 
-		this.weights.set(objectiveName, weight);
+		this.weights.set(objectiveId, weight);
 		this.weightTotal += weight;
 	}
 
-	removeObjectiveWeight(objectiveName: string): void {
-		var priorWeight: number = this.weights.get(objectiveName);
+	removeObjectiveWeight(objectiveId: string): void {
+		var priorWeight: number = this.weights.get(objectiveId);
 		if (priorWeight !== undefined) {
 			this.weightTotal -= priorWeight;
 		}
 
-		this.weights.delete(objectiveName);
+		this.weights.delete(objectiveId);
 	}
 
 
@@ -151,6 +151,23 @@ export class WeightMap implements Memento {
 		}
 
 		return normalizedWeights;
+	}
+
+
+	/*
+		@returns void- 
+		@description	Normalize all objective weights in the WeightMap so that they sum to 1. Update the internal 'weightTotal' field accordingly.
+	*/
+	normalize(): void {
+		var objectiveIterator: Iterator<string> = this.weights.keys();
+		var key: IteratorResult<string> = objectiveIterator.next();
+
+		while (key.done === false) {
+			this.weights.set(key.value, this.getNormalizedObjectiveWeight(key.value));
+			key = objectiveIterator.next();
+		}
+
+		this.weightTotal = 1;
 	}
 
 	/*

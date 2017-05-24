@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 16:49:09
+* @Last Modified time: 2017-05-23 17:56:06
 */
 
 // Import Angular Classes:
@@ -140,7 +140,7 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	interactionConfigChanged = (interactionConfig: any) => {
-		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, $(this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE)), this.lastRendererUpdate);
+		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 	}
 
 	/*

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-12-30 18:28:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-07 22:09:07
+* @Last Modified time: 2017-05-16 21:37:59
 */
 
 // Import Angular Classes:
@@ -16,32 +16,32 @@ import { InteractionConfig }													from '../../../../../types/Config.types
 
 @Component({
 	selector: 'InteractionOptions',
-	templateUrl: 'client/resources/modules/app/components/widgets/InteractionOptions/InteractionOptions.template.html',
+	templateUrl: './InteractionOptions.template.html',
 	providers: []
 })
 export class InteractionOptionsComponent implements OnInit {
 
 	// Pump Sorting Values:
-	private PUMP_OFF: string = 'none';
-	private PUMP_DECREASE: string = 'decrease';
-	private PUMP_INCREASE: string = 'increase';
+	public PUMP_OFF: string = 'none';
+	public PUMP_DECREASE: string = 'decrease';
+	public PUMP_INCREASE: string = 'increase';
 
 	// Alternative Sorting Values:
-	private ALTERNATIVE_SORT_MANUAL: string = 'manual';
-	private ALTERNATIVE_SORT_OBJECTIVE: string = 'objective';
-	private ALTERNATIVE_SORT_ALPHABET: string = 'alphabet';
-	private ALTERNATIVE_SORT_RESET: string = 'reset';
-	private ALTERNATIVE_SORT_OFF: string = 'none';
+	public ALTERNATIVE_SORT_MANUAL: string = 'manual';
+	public ALTERNATIVE_SORT_OBJECTIVE: string = 'objective';
+	public ALTERNATIVE_SORT_ALPHABET: string = 'alphabet';
+	public ALTERNATIVE_SORT_RESET: string = 'reset';
+	public ALTERNATIVE_SORT_OFF: string = 'none';
 
 	// Weight Resizing Values:
-	private RESIZE_NEIGHBOR: string = 'neighbor';
-	private RESIZE_SIBLINGS: string = 'siblings';
-	private NO_RESIZING: string = 'none';
+	public RESIZE_NEIGHBOR: string = 'neighbor';
+	public RESIZE_SIBLINGS: string = 'siblings';
+	public NO_RESIZING: string = 'none';
 
 	@Input() chartType: string;
 
 	@Output() interactionConfig = new EventEmitter<InteractionConfig>();
-	private config: InteractionConfig;
+	public config: InteractionConfig;
 
 
 	ngOnInit() {

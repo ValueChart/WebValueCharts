@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:15:41
+* @Last Modified time: 2017-05-23 17:17:03
 */
 
 // Import Angular Classes:
@@ -77,6 +77,7 @@ export class LabelRenderer {
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
+	private numUsers: number;
 	private viewOrientation: string;
 
 	// ========================================================================================
@@ -109,17 +110,22 @@ export class LabelRenderer {
 
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
-			this.applyStyles(update)
 		}
 
 		if (this.reordered) {
 			this.createLabels(update, update.labelData, this.labelContainer);
-			this.applyStyles(update)
 		}
 
 		this.renderLabelSpace(update, update.labelData);
 
+		if (this.numUsers != update.valueChart.getUsers().length) {
+			this.applyStyles(update);
+		}
+
+		this.numUsers = update.valueChart.getUsers().length;
+
 		if (this.reordered) {
+			this.applyStyles(update)
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
 		}
@@ -132,12 +138,12 @@ export class LabelRenderer {
 	}
 
 	interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, document.querySelectorAll('.' + LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
+		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, this.rootContainer.node().querySelectorAll('.' + LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
-		this.sortAlternativesInteraction.sortAlternativesByObjective(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleSortAlternativesByObjectiveScore(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
 
 		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}
@@ -282,6 +288,8 @@ export class LabelRenderer {
 			}
 
 		});
+
+		this.toggleDisplayScoreFunctions(this.lastRendererUpdate.viewConfig.displayScoreFunctions);
 	}
 
 
@@ -409,7 +417,7 @@ export class LabelRenderer {
 		this.labelSelections[parentName].nameText
 			.text((d: LabelData) => {
 				// Round the weight number to have 2 decimal places only.
-				return d.objective.getName() + ' (' + (Math.round((d.weight / u.valueChart.getMaximumWeightMap().getWeightTotal()) * 1000) / 10) + '%)';
+				return d.objective.getName() + ' (' + (Math.round((d.weight / u.maximumWeightMap.getWeightTotal()) * 1000) / 10) + '%)';
 			});
 
 		this.labelSelections[parentName].bestWorstText
@@ -513,7 +521,7 @@ export class LabelRenderer {
 		var dimensionOneTransform: number;
 		var dimensionTwoTransform: number;
 
-		objectiveWeight = u.valueChart.getMaximumWeightMap().getObjectiveWeight(objective.getName());
+		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			width = this.labelWidth;

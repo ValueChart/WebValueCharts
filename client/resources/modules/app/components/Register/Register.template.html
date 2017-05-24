@@ -22,7 +22,7 @@
 			</div>
 			<div class="form-group text-center">
 				<a class="btn btn-success btn-lg" (click)="login(username, password)" id="login-button">Login</a>
-				<a class="btn btn-success btn-lg" (click)="state = 'createAccount'" id="login-button">Create an Account</a>
+				<a class="btn btn-success btn-lg" (click)="state = 'createAccount'" id="create-account-button">Create an Account</a>
 			</div>
 			<div class="form-group text-center">
 				<h3>Or</h3>
@@ -75,7 +75,7 @@
 						<div class="row">
 							<label for="temporary-username-input" class="col-sm-3 col-sm-offset-2 control-label">Username</label>
 							<div class="col-sm-6">
-								<input type="text" class="form-control" id="temporary-name-input" placeholder="Name" [(ngModel)]="tempUsername" name="tempUsername">
+								<input type="text" class="form-control" id="temporary-name-input" placeholder="Name" [(ngModel)]="tempUserName" name="tempUserName">
 							</div>
 						</div>
 						<div class="row">

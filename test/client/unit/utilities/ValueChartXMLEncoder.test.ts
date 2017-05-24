@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-01 13:52:16
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:10:45
+* @Last Modified time: 2017-05-18 12:58:23
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
 
 // Import Utilities:
-import { XmlValueChartParser }									from '../../../../client/resources/modules/utilities/classes/XmlValueChartParser';
+import { WebValueChartsParser }									from '../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
 import { ValueChartXMLEncoder }									from '../../../../client/resources/modules/utilities/classes/ValueChartXMLEncoder';
 // Import Model Classes:
 import { ValueChart }											from '../../../../client/resources/model/ValueChart';
@@ -29,7 +29,7 @@ import { DiscreteScoreFunction } 								from '../../../../client/resources/mode
 
 describe('ValueChartXMlEncoder', () => {
 
-	var valueChartParser: XmlValueChartParser;
+	var valueChartParser: WebValueChartsParser;
 	var xmlDocParser: DOMParser;
 	var xmlSerializer: XMLSerializer;
 
@@ -39,7 +39,7 @@ describe('ValueChartXMlEncoder', () => {
 	var valueChartXMLEncoder: ValueChartXMLEncoder;
 
 	before(function() {
-		valueChartParser = new XmlValueChartParser();
+		valueChartParser = new WebValueChartsParser();
 		xmlDocParser = new DOMParser();
 		xmlSerializer = new XMLSerializer();
 

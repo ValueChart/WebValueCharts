@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 13:00:32
+* @Last Modified time: 2017-05-17 16:01:16
 */
 
 // Import Angular Classes:
@@ -33,7 +33,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 
 @Component({
 	selector: 'DetailBox',
-	templateUrl: 'client/resources/modules/app/components/DetailBox/DetailBox.template.html',
+	templateUrl: './DetailBox.template.html',
 	providers: []
 })
 export class DetailBoxComponent implements OnInit {
@@ -51,18 +51,16 @@ export class DetailBoxComponent implements OnInit {
 
 	private subscription: Subscription;
 
-	private detailBoxAlternativeTab: string;
+	public detailBoxAlternativeTab: string;
 	private alternativeObjectives: string[];
 	private alternativeObjectiveValues: (string | number)[];
 
-	private DETAIL_BOX_WIDTH_OFFSET: number = -50;
-	private DETAIL_BOX_HEIGHT_OFFSET: number = -55;
-	private DETAIL_BOX_HORIZONTAL_SCALE: number = 1.15;
+	public userToRemove: User;
 
-	private detailBoxCurrentTab: string;
-	private DETAIL_BOX_CHART_TAB: string = 'chart';
-	private DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
-	private DETAIL_BOX_USERS_TAB: string = 'users';
+	public detailBoxCurrentTab: string;
+	public DETAIL_BOX_CHART_TAB: string = 'chart';
+	public DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
+	public DETAIL_BOX_USERS_TAB: string = 'users';
 
 	// ========================================================================================
 	// 									Constructor
@@ -87,8 +85,6 @@ export class DetailBoxComponent implements OnInit {
 
 	@Input() 
 	set renderEventsService(renderEventsService: RenderEventsService) {
-		console.log(renderEventsService);
-
 		if (renderEventsService)
 			this.linkAlternativeLabelsToDetailBox();
 	}
@@ -96,11 +92,13 @@ export class DetailBoxComponent implements OnInit {
 
 	expandAlternative(alternative: Alternative): void {
 		this.detailBoxAlternativeTab = alternative.getName();
+		this.detailBoxCurrentTab = this.DETAIL_BOX_ALTERNATIVES_TAB;
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.alternativeObjectives[index] = objective.getName();
 			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
 		});
+
 	}
 
 	collapseAlternative(): void {
@@ -138,7 +136,7 @@ export class DetailBoxComponent implements OnInit {
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
 	linkAlternativeLabelsToDetailBox = () => {
 		d3.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
-			.classed('alternative-link', true);
+					.classed('alternative-link', true);
 
 		$('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
 			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);

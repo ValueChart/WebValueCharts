@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:25:52
+* @Last Modified time: 2017-05-16 22:20:27
 */
 
 // Import Angular Classes:
@@ -37,7 +37,7 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 
 @Component({
 	selector: 'root',
-	templateUrl: 'client/resources/modules/app/components/Root/Root.template.html',
+	templateUrl: './Root.template.html',
 	providers: [
 		XMLValueChartParserService,
 		ValueChartXMLEncoder,
@@ -58,7 +58,7 @@ export class RootComponent implements OnInit {
 	private switchScoreFunctionViewText: string = 'Score Distributions';
 
 
-	private window = window;
+	public window: any = window;
 
 
 	// ========================================================================================
@@ -75,9 +75,9 @@ export class RootComponent implements OnInit {
 						initialized. Angular will automatically handle the construction of this class whenever it's selector is used.
 	*/
 	constructor(
-		private router: Router,
+		public router: Router,
+		public currentUserService: CurrentUserService,
 		private userHttpService: UserHttpService,
-		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private applicationRef: ApplicationRef) { }
 

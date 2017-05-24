@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:14:09
+* @Last Modified time: 2017-05-19 12:38:02
 */
 
 // Import Angular Classes:
@@ -16,7 +16,6 @@ import '../../utilities/rxjs-operators';
 
 // Import Application Classes
 import { RendererService } 											from '../services/Renderer.service';
-import { ChangeDetectionService}									from '../services/ChangeDetection.service';
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
 
 import { LabelDefinitions }											from '../definitions/Label.definitions';
@@ -82,7 +81,6 @@ export class ReorderObjectivesInteraction {
 	*/
 	constructor(
 		private rendererService: RendererService,
-		private changeDetectionService: ChangeDetectionService,
 		private chartUndoRedoService: ChartUndoRedoService) { 
 			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);
 	}
@@ -258,6 +256,7 @@ export class ReorderObjectivesInteraction {
 		} else {
 			// No changes were made, so delete the change record that was created in startReorderObjectives.
 			this.chartUndoRedoService.deleteNewestRecord();
+			this.lastRendererUpdate.renderRequired.value = true;
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.
@@ -271,7 +270,6 @@ export class ReorderObjectivesInteraction {
 		this.siblingContainers.style('opacity', 1);
 		this.containerToReorder.style('opacity', 1);
 
-		this.changeDetectionService.objectiveOrderChanged = true;
 		this.reorderSubject.next(true);
 	}
 
@@ -295,7 +293,6 @@ export class ReorderObjectivesInteraction {
 		this.lastRendererUpdate.labelData[0] = undefined;
 
 		this.reorderSubject.next(true);
-		this.changeDetectionService.objectiveOrderChanged = true;
 	}
 
 }

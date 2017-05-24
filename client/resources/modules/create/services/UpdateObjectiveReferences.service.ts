@@ -40,7 +40,7 @@ export class UpdateObjectiveReferencesService {
 	*/
 	resetWeightMaps() {
 		let weightMap = this.valueChartService.getDefaultWeightMap();
-		for (let user of this.valueChartService.getUsers()) {
+		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			this.valueChartService.resetWeightMap(user, weightMap);
 		}
 	}
@@ -50,7 +50,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	Resets Users' ScoreFunctions for obj to default.
 	*/
 	resetScoreFunctions(obj: PrimitiveObjective) {
-		for (let user of this.valueChartService.getUsers()) {
+		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction().getMemento());
@@ -65,7 +65,7 @@ export class UpdateObjectiveReferencesService {
 	addScoreFunctions(objNames: string[]) {
 		for (let objname of objNames) {
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objname);
-			for (let user of this.valueChartService.getUsers()) {
+			for (let user of this.valueChartService.getValueChart().getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
 					scoreFunctionMap.setObjectiveScoreFunction(objname, obj.getDefaultScoreFunction().getMemento());
@@ -80,7 +80,7 @@ export class UpdateObjectiveReferencesService {
 						(For now, the score of this element is initialized to 0.5.)
 	*/
 	addElementToScoreFunctions(objName: string, element: string) {
-		for (let user of this.valueChartService.getUsers()) {
+		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
@@ -96,7 +96,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	Removes element from users' DiscreteScoreFunctions for specified Objective.
 	*/
 	removeElementFromScoreFunctions(objName: string, element: string) {
-		for (let user of this.valueChartService.getUsers()) {
+		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
@@ -112,7 +112,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	 Transforms users' ScoreFunctions so that the best outcome has score of 1 and worst outcome has score of 0.
 	*/
 	rescaleScoreFunctions(objName: string) {
-		for (let user of this.valueChartService.getUsers()) {
+		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
@@ -129,7 +129,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	 Check each Alternative's value for obj. Clear if no longer valid.
 	*/
 	clearAlternativeValues(obj: PrimitiveObjective) {
-		for (let alt of this.valueChartService.getAlternatives()) {
+		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 			if (obj.getDomainType() === "continuous") {
 				let dom = <ContinuousDomain>obj.getDomain();
 				let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
@@ -152,10 +152,10 @@ export class UpdateObjectiveReferencesService {
 	*/
 	removeReferences(objNames: string[]) {
 		for (let objname of objNames) {
-			for (let alt of this.valueChartService.getAlternatives()) {
+			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 				alt.removeObjective(objname);
 			}
-			for (let user of this.valueChartService.getUsers()) {
+			for (let user of this.valueChartService.getValueChart().getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
 					scoreFunctionMap.removeObjectiveScoreFunction(objname);
@@ -176,14 +176,14 @@ export class UpdateObjectiveReferencesService {
 
 			// Update references if name has changed
 			if (oldName !== newName) {
-				for (let alt of this.valueChartService.getAlternatives()) {
+				for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 					let objVal = alt.getObjectiveValue(oldName);
 					if (objVal) {
 						alt.removeObjective(oldName);
 						alt.setObjectiveValue(newName, objVal);
 					}
 				}
-				for (let user of this.valueChartService.getUsers()) {
+				for (let user of this.valueChartService.getValueChart().getUsers()) {
 					let scoreFunctionMap = user.getScoreFunctionMap();
 					if (scoreFunctionMap) {
 						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(oldName);

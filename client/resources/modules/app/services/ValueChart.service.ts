@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:49:54
+* @Last Modified time: 2017-05-18 23:03:03
 */
 
 // Import Angular Classes:
@@ -26,17 +26,13 @@ import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFun
 import { CategoricalDomain }								from '../../../model/CategoricalDomain';
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 
-// Import Type Definitions:
-import { ValueChartStateContainer }							from '../../../types/StateContainer.types';
-import { ScoreFunctionRecord }								from '../../../types/Record.types';
-
 /*
 	This class stores the state of the active ValueChart and exposes this state to any component, directive, or service in the application
 	that requires it. It also provides utility methods for retrieving specific data from a ValueChart object.
 */
 
 @Injectable()
-export class ValueChartService implements ValueChartStateContainer {
+export class ValueChartService {
 
 	// ========================================================================================
 	// 									Fields
@@ -46,12 +42,6 @@ export class ValueChartService implements ValueChartStateContainer {
 
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
-
-	private maximumWeightMap: WeightMap;				// The WeightMap composed of maximum user assigned weights. This means that each
-														// objective weight is the largest weight assigned by any user in the active ValueChart
-														// to that objective. If ValueChart has only one user, the maximum WeightMap is equal to 
-														// that user's WeightMap. The main use of this WeightMap is to determine label heights in the 
-														// ValueChart visualization for group charts.
 
 	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
 															 // has been reset since they last did SMARTER
@@ -87,57 +77,6 @@ export class ValueChartService implements ValueChartStateContainer {
 		return this.valueChart;
 	}
 
-	addUser(user: User) {
-		this.valueChart.addUser(user);	
-		this.weightMapReset[user.getUsername()] = false;
-	}
-
-	addCurrentUser() {
-		this.addUser(new User(this.currentUserService.getUsername()));
-	}
-
-	getValueChartName() {
-		return this.valueChart.getName();
-	}
-
-	getUsers(): User[] {
-		return this.valueChart.getUsers();
-	}
-
-	getGroupValueChartUsers(): User[] {
-		return this.getUsers();	
-	}
-
-	getNumUsers(): number {
-		return this.valueChart.getUsers().length;
-	}
-
-	getAlternatives(): Alternative[] {
-		return this.valueChart.getAlternatives();
-	}
-
-	setAlternatives(alts: Alternative[]): void {
-		this.valueChart.setAlternatives(alts);
-	}
-
-	getNumAlternatives(): number {
-		return this.valueChart.getAlternatives().length;
-	}
-
-	getRootObjectives(): Objective[] {
-		return this.valueChart.getRootObjectives();
-	}
-
-	getAbstractObjectives(): AbstractObjective[] {
-		let abstractObjs: AbstractObjective[] = [];
-		for (let obj of this.valueChart.getAllObjectives()) {
-			if (obj.objectiveType === "abstract") {
-				abstractObjs.push(<AbstractObjective>obj);
-			}
-		}
-		return abstractObjs;
-	}
-
 	getPrimitiveObjectives(): PrimitiveObjective[] {
 		return this.primitiveObjectives;
 	}
@@ -157,10 +96,6 @@ export class ValueChartService implements ValueChartStateContainer {
 			}
 		}
 		throw "Objective not found";
-	}
-
-	getAlternativeValuesforObjective(obj: PrimitiveObjective): { value: (string | number), alternative: Alternative }[] {
-		return this.valueChart.getAlternativeValuesforObjective(obj);
 	}
 
 	isIndividual(): boolean {
@@ -189,16 +124,6 @@ export class ValueChartService implements ValueChartStateContainer {
 		return user;
 	}
 
-	getCurrentUserScoreFunction(objectiveName: string): ScoreFunction {
-		if (this.currentUserIsDefined())
-			return this.getCurrentUser().getScoreFunctionMap().getObjectiveScoreFunction(objectiveName);
-	}
-
-	getCurrentUserWeightMap(): WeightMap {
-		if (this.currentUserIsDefined())
-			return this.getCurrentUser().getWeightMap();
-	}
-
 	getDefaultWeightMap(): WeightMap {
 		return this.valueChart.getDefaultWeightMap();
 	}
@@ -206,14 +131,6 @@ export class ValueChartService implements ValueChartStateContainer {
 	setWeightMap(user: User, weightMap: WeightMap) {
 		user.setWeightMap(weightMap);
 		this.weightMapReset[user.getUsername()] = false;
-	}
-
-	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
-		this.getCurrentUser().getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
-	}
-
-	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
-		this.getCurrentUser().setWeightMap(weightMapRecord);
 	}
 
 	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.

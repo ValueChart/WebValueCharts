@@ -1,22 +1,14 @@
 <label class="control-label">Chart name.</label>
-<input class="form-control required" type="text" #a [ngModel]="valueChartService.getValueChart().getName()" (ngModelChange)="valueChartService.getValueChart().setName(a.value)" maxlength="100" required #name="ngModel"/>
+<input class="form-control required" type="text" #a [ngModel]="valueChart.getName()" (ngModelChange)="valueChart.setName(a.value); resetErrorMessages()" maxlength="100" required />
 <label class="control-label">Chart description.</label>
-<input  class="form-control" type="text" [(ngModel)]="valueChartDescription" maxlength="100" />
+<input  class="form-control" type="text" #b [ngModel]="valueChart.getDescription()" (ngModelChange)="valueChart.setDescription(b.value)" maxlength="100" />
 <label class="control-label">Password.</label>
-<input class="form-control required" type="text" [(ngModel)]="valueChartPassword" maxlength="100" required #password="ngModel"/>
-<div *ngIf="(validationTriggered || name.dirty) && !name.valid" 
-             class="alert alert-danger">
-          You must provide a name.
-</div>
-<div *ngIf="(validationTriggered || name.dirty) && name.valid && !nameValid()" 
-             class="alert alert-danger">
-          Name contains disallowed characters. (Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)
-</div>
-<div *ngIf="(validationTriggered || password.dirty) && !password.valid" 
-             class="alert alert-danger">
-          You must provide a password.
-</div>
-<div *ngIf="(validationTriggered || password.dirty) && password.valid && !passwordValid()"
-             class="alert alert-danger">
-          Password must not contain spaces.
+<input class="form-control required" type="text" #c [ngModel]="valueChart.password" (ngModelChange)="valueChart.password = c.value; resetErrorMessages()"maxlength="100" required />
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
 </div>

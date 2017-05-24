@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 15:37:50
+* @Last Modified time: 2017-05-18 21:59:20
 */
 
 // Import Model Classes:
@@ -55,36 +55,34 @@ export class JsonValueChartParser {
 						application.
 	*/
 	public parseValueChart(JsonValueChart: any): ValueChart {
-
 		var valueChart: ValueChart = new ValueChart(JsonValueChart.name, JsonValueChart.description, JsonValueChart.creator);
+
 		// Copy over all the properties from the WeightMap that is being saved.
 		valueChart._id = JsonValueChart._id;
-		// Parse Users if they are defined.
-		if (JsonValueChart.users !== undefined) {
-			for (var i = 0; i < JsonValueChart.users.length; i++) {
-				JsonValueChart.users[i] = this.parseUser(JsonValueChart.users[i]);
-			}
-		} else {
-			JsonValueChart.users = [];
-		}
+		valueChart.password = JsonValueChart.password;
+		valueChart.setId(JsonValueChart.id);
 
 		if (JsonValueChart.rootObjectives !== undefined) {
 			// Parse Root Objectives
 			for (var i = 0; i < JsonValueChart.rootObjectives.length; i++) {
-				JsonValueChart.rootObjectives[i] = this.parseObjective(JsonValueChart.rootObjectives[i]);
+				valueChart.addRootObjective(this.parseObjective(JsonValueChart.rootObjectives[i]));
 			}
 		}
 		if (JsonValueChart.alternatives !== undefined) {
 			// Parse Alternatives
 			for (var i = 0; i < JsonValueChart.alternatives.length; i++) {
-				JsonValueChart.alternatives[i] = this.parseAlternative(JsonValueChart.alternatives[i]);
+				valueChart.addAlternative(this.parseAlternative(JsonValueChart.alternatives[i]));
 			}	
 		}
 
-		// Copy over all properties from the json object the new ValueChart. This includes all the 
-		// users, objectives, and alternatives that are parsed above.
-		Object.assign(valueChart, JsonValueChart);
-
+		// Parse Users if they are defined.
+		if (JsonValueChart.users !== undefined) {
+			for (var i = 0; i < JsonValueChart.users.length; i++) {
+				valueChart.setUser(this.parseUser(JsonValueChart.users[i]));
+			}
+		} else {
+			JsonValueChart.users = [];
+		}
 
 		return valueChart;
 	}
@@ -104,7 +102,7 @@ export class JsonValueChartParser {
 			jsonObjective.domain = this.parseDomain(jsonObjective.domain);
 
 			if (jsonObjective.defaultScoreFunction !== undefined) {
-				jsonObjective.scoreFunction = this.parseScoreFunction(jsonObjective.scoreFunction);
+				jsonObjective.defaultScoreFunction = this.parseScoreFunction(jsonObjective.defaultScoreFunction);
 			}		
 
 			Object.assign(objective, jsonObjective);

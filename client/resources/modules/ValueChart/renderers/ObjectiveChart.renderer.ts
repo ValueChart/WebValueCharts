@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:12:13
+* @Last Modified time: 2017-05-23 14:29:48
 */
 
 // Import Angular Classes
@@ -59,7 +59,7 @@ export class ObjectiveChartRenderer {
 	public alternativeLabels: d3.Selection<any, any, any, any>;				// The selection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
 	public cells: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
 	public userScores: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public weightColumns: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
+	public weightOutlines: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
 	public objectiveDomainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
 	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
@@ -92,19 +92,16 @@ export class ObjectiveChartRenderer {
 		
 		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
-			this.applyStyles(update);
 		}
 
 		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
-			this.applyStyles(update);
 		}
 
 		this.numUsers = update.valueChart.getUsers().length;
 
 		this.renderObjectiveChart(update);
 		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.applyStyles(update);
 			this.interactionsChanged(update.interactionConfig);
 			this.viewOrientation = update.viewConfig.viewOrientation;
 		}	
@@ -249,15 +246,15 @@ export class ObjectiveChartRenderer {
 		this.userScores = this.cells.selectAll('.' + ObjectiveChartDefinitions.USER_SCORE);
 
 
-		var updateWeightColumns = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE)
+		var updateWeightOutlines = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE)
 			.data((d: CellData) => { return d.userScores; });
 
-		// Update weight columns to conform to the data. Note that weight columns are only displayed for group ValueCharts.
-		updateWeightColumns.exit().remove();
-		updateWeightColumns.enter().append('rect')
+		// Update weight outlines to conform to the data. Note that weight outlines are only displayed for group ValueCharts.
+		updateWeightOutlines.exit().remove();
+		updateWeightOutlines.enter().append('rect')
 			.classed(ObjectiveChartDefinitions.WEIGHT_OUTLINE, true);
 
-		this.weightColumns = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE);
+		this.weightOutlines = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE);
 
 		var updateDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; });
@@ -318,11 +315,11 @@ export class ObjectiveChartRenderer {
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 		// Update the data behind the weight outlines. Recall that these are only displayed for group ValueCharts.
-		var weightColumnsToUpdate = this.weightColumns
+		var weightOutlinesToUpdate = this.weightOutlines
 			.data((d: CellData, i: number) => { return d.userScores; });
 
 
-		this.renderObjectiveChartRows(u, rowOutlinesToUpdate, rowsToUpdate, alternativeLabelsToUpdate, alternativeBoxesToUpdate, cellsToUpdate, userScoresToUpdate, weightColumnsToUpdate);
+		this.renderObjectiveChartRows(u, rowOutlinesToUpdate, rowsToUpdate, alternativeLabelsToUpdate, alternativeBoxesToUpdate, cellsToUpdate, userScoresToUpdate, weightOutlinesToUpdate);
 	
 		// Indicate that the objective chart is finished rendering.
 		this.renderEventsService.objectiveChartDispatcher.next(1);	
@@ -335,21 +332,21 @@ export class ObjectiveChartRenderer {
 		@param alternativeBoxes - The selection of 'rect' elements to be positioned over each alternative's column in the objective chart.
 		@param cells - The selection of 'g' elements that contain the user score 'rect' elements. There should be one 'g' element for each alternative in the ValueChart.
 		@param userScores - The selection of 'rect' elements that are the user scores to be rendered.	
-		@param weightColumns - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
+		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
 		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements created by createObjectiveRows. Unlike in the summary chart we directly 
 						position the row containers here because the positions of the scores (and therefore row containers) are are absolute. (no stacking).
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartRows(u: RendererUpdate, rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightColumns: d3.Selection<any, any, any, any>): void {
+	renderObjectiveChartRows(u: RendererUpdate, rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
 		rowOutlines
 			.attr('transform', (d: RowData, i: number) => {
 				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
 			})
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize)
 			.attr(u.rendererConfig.dimensionTwo, (d: RowData) => {
-				let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+				let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 				return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight);																				// Set the height of the row to be proportional to its weight.
 			});
 
@@ -378,19 +375,19 @@ export class ObjectiveChartRenderer {
 			.attr('id', (d: Alternative) => { return 'objective-' + d.getId() + '-box' });
 
 
-		this.renderObjectiveChartCells(u, cells, userScores, weightColumns);
+		this.renderObjectiveChartCells(u, cells, userScores, weightOutlines);
 	}
 
 	/*
 		@param cells - The selection of 'g' elements that contain the user score 'rect' elements. There should be one 'g' element for each alternative in the ValueChart.
 		@param userScores - The selection of 'rect' elements that are the user scores to be rendered.	
-		@param weightColumns - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
+		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
 		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements created by createObjectiveCells.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightColumns: d3.Selection<any, any, any, any>): void {
+	renderObjectiveChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
 		cells
 			.attr('transform', (d: CellData, i: number) => {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i, u);
@@ -407,13 +404,13 @@ export class ObjectiveChartRenderer {
 			.attr(u.rendererConfig.coordinateTwo, (d: CellData, i: number) => {
 				let maxObjectiveWeight: number = 0;
 				if (d.userScores.length > 0) {
-					u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.userScores[0].objective.getName());				
+					u.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());				
 				}
 				return (u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
 
 		this.renderUserScores(u, userScores);
-		this.renderWeightColumns(u, weightColumns);
+		this.renderWeightOutlines(u, weightOutlines);
 	}
 
 	/*
@@ -438,7 +435,7 @@ export class ObjectiveChartRenderer {
 		if (u.viewConfig.viewOrientation === 'vertical') {
 			userScores
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
+					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
 					let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 					let score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - u.rendererConfig.dimensionTwoScale(score * userObjectiveWeight);
@@ -449,59 +446,52 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
-		@param weightColumns - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
+		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
 		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements to 'rect' elements used to user weight outlines in the objective chart. These outlines are only
 						displayed for group ValueCharts.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderWeightColumns(u: RendererUpdate, weightColumns: d3.Selection<any, any, any, any>): void {
-		weightColumns
+	renderWeightOutlines(u: RendererUpdate, weightOutlines: d3.Selection<any, any, any, any>): void {
+		weightOutlines
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1), 0); })
-			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return this.calculateWeightColumnDimensionTwo(d, i); })
+			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return this.calculateWeightOutlineDimensionTwo(d, i); })
 			.attr(u.rendererConfig.coordinateOne, (d: UserScoreData, i: number) => { return (this.calculateUserScoreDimensionOne(d, i, u) * i) + ((this.USER_SCORE_SPACING + 1) / 2); })
+			.style('stroke-dasharray', (d: UserScoreData, i: number) => {
+				let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
+				let dimensionTwo: number = this.calculateWeightOutlineDimensionTwo(d, i);
+
+				return (u.viewConfig.viewOrientation === 'vertical') ?
+					(dimensionOne + dimensionTwo) + ', ' + dimensionOne
+					:
+					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
+			});
+
 
 		if (u.viewConfig.viewOrientation === 'vertical') {
-			weightColumns
+			weightOutlines
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
-					let maxObjectiveWeight: number = u.valueChart.getMaximumWeightMap().getObjectiveWeight(d.objective.getName());
-					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - this.calculateWeightColumnDimensionTwo(d, i);
+					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
+					return u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - this.calculateWeightOutlineDimensionTwo(d, i);
 				});
 		} else {
-			weightColumns.attr(u.rendererConfig.coordinateTwo, 0);
+			weightOutlines.attr(u.rendererConfig.coordinateTwo, 0);
 		}
 
-		this.toggleWeightColumns(u);
+		this.toggleWeightOutlines(u);
 	}
 
-
-	applyStyles(u: RendererUpdate): void {
-		this.alternativeLabels.style('font-size', '20px');
-
-		this.weightColumns.style('stroke-dasharray', (d: UserScoreData, i: number) => {
-			let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
-			let dimensionTwo: number = this.calculateWeightColumnDimensionTwo(d, i);
-
-			return (u.viewConfig.viewOrientation === 'vertical') ?
-				(dimensionOne + dimensionTwo) + ', ' + dimensionOne
-				:
-				(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
-		});
-
-
-
-	}
 
 	/*
 		@returns {void}
 		@description	Display or hide the weight outlines depending on the whether the ValueChart is a group or individual chart.
 	*/
-	toggleWeightColumns(u: RendererUpdate): void {
+	toggleWeightOutlines(u: RendererUpdate): void {
 		if (u.valueChart.isIndividual()) {
-			this.weightColumns.style('display', 'none');
+			this.weightOutlines.style('display', 'none');
 		} else {
-			this.weightColumns.style('display', 'block');
+			this.weightOutlines.style('display', 'block');
 		}
 	}
 
@@ -520,7 +510,7 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 	// 		Anonymous functions that are used often enough to be made class fields
 	// ========================================================================================
-	calculateWeightColumnDimensionTwo = (d: UserScoreData, i: number) => {
+	calculateWeightOutlineDimensionTwo = (d: UserScoreData, i: number) => {
 		let weightDimensionTwoOffset: number = 2;
 		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 		return Math.max(this.lastRendererUpdate.rendererConfig.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);

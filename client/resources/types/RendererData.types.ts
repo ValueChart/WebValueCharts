@@ -2,17 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 17:03:04
+* @Last Modified time: 2017-05-20 12:54:21
 */
 
 import * as d3								from 'd3';
 
+import { ValueChart }						from '../model/ValueChart';
+import { User }								from '../model/User';
+import { WeightMap }						from '../model/WeightMap';
+import { ScoreFunction }					from '../model/ScoreFunction';
 import { Objective }						from '../model/Objective';
 import { PrimitiveObjective }				from '../model/PrimitiveObjective';
 import { Alternative }						from '../model/Alternative';
-import { User }								from '../model/User';
-import { ValueChart }						from '../model/ValueChart';
-import { ScoreFunction }					from '../model/ScoreFunction';
 
 
 import { ViewConfig, InteractionConfig }	from './Config.types';
@@ -70,15 +71,17 @@ export interface ScoreFunctionDataSummary {
 	type of message sent to these renderer classes to render to trigger initial construction and rendering, and then re-rendering given changes.
 */
 export interface RendererUpdate {
-	el: d3.Selection<any, any, any, any>,
-	valueChart: ValueChart,
-	rowData: RowData[],
-	labelData: LabelData[],
-	width: number,
-	height: number,
-	viewConfig: ViewConfig,
-	interactionConfig: InteractionConfig,
-	rendererConfig: RendererConfig
+	el: d3.Selection<any, any, any, any>;
+	valueChart: ValueChart;
+	maximumWeightMap: WeightMap;
+	rowData: RowData[];
+	labelData: LabelData[];
+	width: number;
+	height: number;
+	viewConfig: ViewConfig;
+	interactionConfig: InteractionConfig;
+	rendererConfig: RendererConfig;
+	renderRequired: { value: boolean; };
 }
 
 /*
@@ -95,7 +98,7 @@ export interface RendererConfig {
 	coordinateTwo: string;
 	dimensionOneSize: number;
 	dimensionTwoSize: number;
-	dimensionTwoScale: any;
+	dimensionTwoScale: d3.ScaleLinear<any, any>;
 }
 
 /*
