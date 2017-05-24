@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 16:57:59
+* @Last Modified time: 2017-05-23 17:39:54
 */
 
 // Import Testing Resources:
@@ -49,10 +49,10 @@ import { RowData, UserScoreData }						from '../../../../../client/resources/typ
 
 
 @Component({
-	selector: 'testing-stub',
+	selector: 'objective-stub',
 	template: `<svg></svg>`
 })
-class TestingStub {
+class ObjectiveStub {
 	constructor() { }
 }
 
@@ -124,10 +124,10 @@ var renderEventsServiceStub = {
 				ObjectiveChartRenderer, 
 				{ provide: RenderEventsService, useValue: renderEventsServiceStub },
 				{ provide: SortAlternativesInteraction, useValue: sortAlternativesStub} ],
-			declarations: [ TestingStub ]
+			declarations: [ ObjectiveStub ]
 		});
 
-		var fixture = TestBed.createComponent(TestingStub);
+		var fixture = TestBed.createComponent(ObjectiveStub);
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
