@@ -102,7 +102,7 @@ export class JsonValueChartParser {
 			jsonObjective.domain = this.parseDomain(jsonObjective.domain);
 
 			if (jsonObjective.defaultScoreFunction !== undefined) {
-				jsonObjective.scoreFunction = this.parseScoreFunction(jsonObjective.scoreFunction);
+				jsonObjective.defaultScoreFunction = this.parseScoreFunction(jsonObjective.defaultScoreFunction);
 			}		
 
 			Object.assign(objective, jsonObjective);
