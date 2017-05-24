@@ -36,7 +36,7 @@ export class ValidationService {
 
 	// Move these?
 	NAME_MISSING: string = "Chart must have a name.";
-	NAME_INVALID: string = "Chart name contains disallowed characters";
+	NAME_INVALID: string = "Chart name contains disallowed characters.";
 	PASSWORD_MISSING: string = "Chart must have a password.";
 	PASSWORD_INVALID: string = "Chart password may not contain spaces."
 	NO_PRIMITIVE_OBJECTIVES: string = "The chart must have at least one base Objective.";

@@ -16,14 +16,14 @@
         <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{tablerowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
             <th>
                 <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control objectives-table-input" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name"/>
+                <input class="form-control objectives-table-input" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
                 </div>
             </th>
             <th>
                 <input class="form-control objectives-table-input" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
             </th>
             <th>
-                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0">
+                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="resetErrorMessages()">
                     <option [value]="'abstract'">parent objective</option>
                     <option [value]="'primitive'">base objective</option>
                 </select>
@@ -43,7 +43,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control"[(ngModel)]="objectiveRows[objID].dom.type">
+                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
                         <option [value]="'interval'">interval</option>
@@ -80,17 +80,17 @@
                     </div>
                     <div class="objectives-table-row">
                         <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value)" maxlength="100" />
+                            <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value); resetErrorMessages()" maxlength="100" />
                         </div>
                         <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value)" maxlength="100" />
+                            <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); resetErrorMessages()" maxlength="100" />
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
                             <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />
                             
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value)" maxlength="100" />
+                            <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); resetErrorMessages()" maxlength="100" />
                         </div>
                     </div>
                 </div>
@@ -98,54 +98,15 @@
         </tr>                             
     </tbody>
 </table>
-<div *ngIf="validationTriggered && !allHaveNames()" 
-             class="alert alert-danger">
-          Every Objective must have a name.
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
 </div>
-<div *ngIf="validationTriggered && allHaveNames() && !allNamesValid()" 
-             class="alert alert-danger">
-          Objective name contains disallowed characters. (Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)
-</div>
-<div *ngIf="validationTriggered && allHaveNames() && !allNamesUnique()" 
-             class="alert alert-danger">
-          All Objective names must be unique.
-</div>
-<div *ngIf="validationTriggered && !hasPrimitive()" 
-             class="alert alert-danger">
-          There must be at least one base Objective.
-</div>
-<div *ngIf="validationTriggered && hasPrimitive && !allAbstractHaveChildren()" 
-             class="alert alert-danger">
-          Every parent Objective must have at least one child.
-</div>
-<div *ngIf="validationTriggered && !categoryNamesValid()" 
-             class="alert alert-danger">
-          Category name contains disallowed characters. (Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)
-</div>
-<div *ngIf="validationTriggered && !categoryNamesUnique()" 
-             class="alert alert-danger">
-          Categorical domain elements must be unique.
-</div>
-<div *ngIf="validationTriggered && !atLeastTwoCategories()" 
-             class="alert alert-danger">
-          Categorical domains must have at least two categories.
-</div>
-<div *ngIf="validationTriggered && !continuousComplete()" 
-             class="alert alert-danger">
-          Continuous domains must have a min and a max.
-</div>
-<div *ngIf="validationTriggered && !intervalComplete()" 
-             class="alert alert-danger">
-          Interval domains must have a min, max, and interval.
-</div>
-<div *ngIf="validationTriggered && !minLessThanMax()" 
-             class="alert alert-danger">
-          Min must be less than max.
-</div>
-<div *ngIf="validationTriggered && intervalComplete() && !intervalOk()" 
-             class="alert alert-danger">
-          Interval must be greater than 0 and less than max - min.
-</div>
+
 <!-- Modal -->
 <div class="modal fade" id="myCategoryModal" tabindex="-1" role="dialog" 
      aria-labelledby="myModalLabel" aria-hidden="true">

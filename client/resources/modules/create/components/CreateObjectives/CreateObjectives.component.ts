@@ -9,6 +9,7 @@ import '../../../utilities/rxjs-operators';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
+import { ValidationService }											from '../../../app/services/Validation.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
@@ -39,6 +40,9 @@ export class CreateObjectivesComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
+	// The ValueChart:
+	valueChart: ValueChart;
+
 	// Component state fields:
     editing: boolean; // true if the user is editing a pre-existing Objective structure, 
 					  // false if this is the first time they are defining Objectives for the ValueChart
@@ -59,6 +63,7 @@ export class CreateObjectivesComponent implements OnInit {
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
 										  // If true, validation messages will be shown whenever conditions fail
 	alternativesInvalidated: boolean = false; // Set to true if changes to objective domains renders current values for Alternatives invalid.
+	errorMessages: string[]; // Validation error messages
 
 	// ========================================================================================
 	// 									Constructor
@@ -72,7 +77,8 @@ export class CreateObjectivesComponent implements OnInit {
 	constructor(
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
-		private updateObjRefService: UpdateObjectiveReferencesService) { }
+		private updateObjRefService: UpdateObjectiveReferencesService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -99,16 +105,18 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoryToAdd = "";
 		this.categoriesToAdd = [];
 		this.editing = false;
+		this.errorMessages = [];
+		this.valueChart = this.valueChartService.getValueChart();
 
-		if (this.valueChartService.getValueChart().getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChartService.getValueChart().getName(), "", "", 0);
+		if (this.valueChart.getAllObjectives().length === 0) {
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), "", "", 0);
 			this.objectivesCount++;
 		}
 		else {
 			this.editing = true;
 			this.validationTriggered = true;
-			let rootObjective: Objective = this.valueChartService.getValueChart().getRootObjectives()[0];
-			rootObjective.setName(this.valueChartService.getValueChart().getName());
+			let rootObjective: Objective = this.valueChart.getRootObjectives()[0];
+			rootObjective.setName(this.valueChart.getName());
 			this.objectiveToObjRow(rootObjective, "", 0);
 
 			// Store record of each ObjectiveRow of type 'primitive'
@@ -119,19 +127,6 @@ export class CreateObjectivesComponent implements OnInit {
 					this.initialPrimObjRows[objID] = objrow.copy();
 				}
 			}
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Destroys CreateObjectives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
-						requires that a different component is displayed in the router-outlet.
-	*/
-	ngOnDestroy() {
-		this.valueChartService.getValueChart().setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-		this.valueChartService.resetPrimitiveObjectives();
-		if (this.editing) {
-			this.updateReferences();
 		}
 	}
 
@@ -252,6 +247,7 @@ export class CreateObjectivesComponent implements OnInit {
 	*/
 	addNewChildObjRow(parentID: string) {
 		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), "", "", parentID, this.objectiveRows[parentID].depth + 1));
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -281,6 +277,7 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 		delete this.objectiveRows[objID];
 		this.selectedObjRow = "";
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -417,6 +414,7 @@ export class CreateObjectivesComponent implements OnInit {
 			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
 		}
 		this.categoriesToAdd = [];
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -450,6 +448,7 @@ export class CreateObjectivesComponent implements OnInit {
 		for (let cat of selected) {
 			this.objectiveRows[objID].dom.removeCategory(cat);
 		}
+		this.resetErrorMessages();
 	}
 
 	/* 	
@@ -493,185 +492,40 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Validates ObjectiveRow structure.
-						This should be done prior to updating the ValueChart model and saving to the database.
+		@description 	Checks validity of objectives structure in the chart.
+						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.allHaveNames() && this.allNamesValid() && this.allNamesUnique() && this.hasPrimitive()
-			&& this.allAbstractHaveChildren() && this.categoryNamesValid() && this.categoryNamesUnique()
-			&& this.atLeastTwoCategories() && this.continuousComplete() && this.intervalComplete()
-			&& this.minLessThanMax() && this.intervalOk();
+		this.setErrorMessages();
+		return this.errorMessages.length === 0;
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff every ObjectiveRow has a name that isn't the empty string.
+		@description 	Converts ObjectiveRow structure into ValueChart objective, then validates the objective structure of the ValueChart.
 	*/
-	allHaveNames(): boolean {
-		return this.getNames().indexOf("") === -1;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every ObjectiveRow has a name that contains at least one character
-						and only alphanumeric characters, spaces, hyphens, and underscores.
-	*/
-	allNamesValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-,.]+$");
-		for (let name of this.getNames()) {
-			if (name.search(regex) === -1) {
-				return false;
-			}
+	setErrorMessages(): void {
+		// Convert temporary structures to ValueChart structures
+		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
+		this.valueChartService.resetPrimitiveObjectives();
+		if (this.editing) {
+			this.updateReferences();
 		}
-		return true;
+
+		// Validate
+		this.errorMessages = this.validationService.validateObjectives(this.valueChart);
 	}
 
 	/* 	
-		@returns {boolean}
-		@description 	Returns true iff all ObjectiveRow names are unique after converting to ID format.
+		@returns {void}
+		@description 	Resets error messages if validation has already been triggered.
+						(This is done whenever the user makes a change to the chart. This way, they get feedback while repairing errors.)
 	*/
-	allNamesUnique(): boolean {
-		return this.getFormattedNames().length === (new Set(this.getFormattedNames())).size;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff there is at least one primitive Objective.
-	*/
-	hasPrimitive(): boolean {
-		for (let key of this.objKeys()) {
-			if (this.objectiveRows[key].type === 'primitive') {
-				return true;
-			}
+	resetErrorMessages(): void {
+		if (this.validationTriggered) {
+			this.setErrorMessages();
 		}
-		return false;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every abstract Objective has at least one child.
-	*/
-	allAbstractHaveChildren(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'abstract' && objrow.children.length === 0) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every category name is valid (i.e., contains only alphanumeric characters).
-	*/
-	categoryNamesValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-,.]+$");
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {
-				for (let category of objrow.dom.categories) {
-					if (category.search(regex) === -1) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff every category name within each categorical domain is unique.
-	*/
-	categoryNamesUnique(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical') {
-				if (objrow.dom.categories.length !== (new Set(objrow.dom.categories)).size) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff each categorical domain has at least two categories.
-	*/
-	atLeastTwoCategories(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'categorical'
-				&& objrow.dom.categories.length < 2) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff each continuous domain has a min and max value.
-	*/
-	continuousComplete(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'continuous'
-				&& (objrow.dom.min === undefined || objrow.dom.max === undefined
-					|| isNaN(objrow.dom.min) || isNaN(objrow.dom.max))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff each interval domain has a min, max, and interval value.
-	*/
-	intervalComplete(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'interval'
-				&& (objrow.dom.min === undefined || objrow.dom.max === undefined || objrow.dom.interval === undefined
-					|| isNaN(objrow.dom.min) || isNaN(objrow.dom.max) || isNaN(objrow.dom.interval))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff for each continuous and interval domain, the min is less than the max.
-	*/
-	minLessThanMax(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && (objrow.dom.type === 'continuous' || objrow.dom.type === 'interval')
-				&& (objrow.dom.min >= objrow.dom.max)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff for each interval domain, the interval is less than the range (max - min).
-	*/
-	intervalOk(): boolean {
-		for (let key of this.objKeys()) {
-			let objrow: ObjectiveRow = this.objectiveRows[key];
-			if (objrow.type === 'primitive' && objrow.dom.type === 'interval'
-				&& (objrow.dom.interval >= (objrow.dom.max - objrow.dom.min) || (objrow.dom.interval <= 0))) {
-				return false;
-			}
-		}
-		return true;
 	}
 }
 

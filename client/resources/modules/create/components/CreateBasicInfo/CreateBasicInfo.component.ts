@@ -8,6 +8,7 @@ import '../../../utilities/rxjs-operators';
 import { ValueChartService }												from '../../../app/services/ValueChart.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
+import { ValidationService }											from '../../../app/services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart } 														from '../../../../model/ValueChart';
@@ -26,13 +27,13 @@ export class CreateBasicInfoComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	// ValueChart info fields:
-	valueChartDescription: string;
-	valueChartPassword: string = '';
+	// The ValueChart:
+	valueChart: ValueChart;
 
 	// Validation fields:
-	validationTriggered: boolean = false;
-	originalName: string = '';
+	validationTriggered: boolean;
+	originalName: string;
+	errorMessages: string[]; // Validation error messages
 
 	// ========================================================================================
 	// 									Constructor
@@ -44,7 +45,8 @@ export class CreateBasicInfoComponent implements OnInit {
 	*/
 	constructor(public valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
-		private valueChartHttpService: ValueChartHttpService) { }
+		private valueChartHttpService: ValueChartHttpService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -66,50 +68,46 @@ export class CreateBasicInfoComponent implements OnInit {
             subscriber.next(this.nameChanged());
             subscriber.complete();
         });
-		this.valueChartDescription = this.valueChartService.getValueChart().getDescription();
-		this.valueChartPassword = this.valueChartService.getValueChart().password ? this.valueChartService.getValueChart().password : "";
-		this.originalName = this.valueChartService.getValueChart().getName();
-	}
+        this.valueChart = this.valueChartService.getValueChart();
+        this.validationTriggered = false;
+		this.originalName = this.valueChart.getName();
+		this.errorMessages = [];
 
-	/* 	
-		@returns {void}
-		@description 	Destroys CreateBasicInfo. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
-						requires that a different component is displayed in the router-outlet.
-	*/
-	ngOnDestroy() {
-		this.valueChartService.getValueChart().setDescription(this.valueChartDescription);
-		this.valueChartService.getValueChart().password = this.valueChartPassword;
+		if (this.valueChart.password === undefined) {
+			this.valueChart.password = '';
+		}
 	}
 
 	// ================================ Validation Methods ====================================
 
 	/* 	
 		@returns {boolean}
-		@description 	Validates input values.
-						This should be done prior to updating the ValueChart model and saving to the database.
+		@description 	Checks validity of basic info of the chart.
+						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.nameValid() && this.passwordValid();
+		this.setErrorMessages();
+		return this.errorMessages.length === 0;
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true iff the name contains at least one character 
-						and only alphanumeric characters, spaces, hyphens, and underscores.
+		@description 	Converts ObjectiveRow structure into ValueChart objective, then validates the objective structure of the ValueChart.
 	*/
-	nameValid(): boolean {
-		let regex = new RegExp("^[\\s\\w-,.]+$");
-		return (this.valueChartService.getValueChart().getName().search(regex) !== -1);
+	setErrorMessages(): void {
+		this.errorMessages = this.validationService.validateBasicInfo(this.valueChart);
 	}
 
 	/* 	
-		@returns {boolean}
-		@description 	Returns true iff the password contains at least one character and no spaces.
+		@returns {void}
+		@description 	Resets error messages if validation has already been triggered.
+						(This is done whenever the user makes a change to the chart. This way, they get feedback while repairing errors.)
 	*/
-	passwordValid() {
-		let regex = new RegExp("^[^\\s]+$");
-		return (this.valueChartPassword.search(regex) !== -1);
+	resetErrorMessages(): void {
+		if (this.validationTriggered) {
+			this.setErrorMessages();
+		}
 	}
 
 	nameChanged(): boolean {
