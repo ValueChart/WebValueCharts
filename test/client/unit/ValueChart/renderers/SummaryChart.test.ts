@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 16:57:56
+* @Last Modified time: 2017-05-23 17:40:01
 */
 
 // Import Testing Resources:
@@ -49,10 +49,10 @@ import { RowData, UserScoreData }						from '../../../../../client/resources/typ
 
 
 @Component({
-	selector: 'testing-stub',
+	selector: 'summary-stub',
 	template: `<svg></svg>`
 })
-class TestingStub {
+class LabelStub {
 	constructor() { }
 }
 
@@ -124,10 +124,10 @@ var renderEventsServiceStub = {
 				SummaryChartRenderer, 
 				{ provide: RenderEventsService, useValue: renderEventsServiceStub },
 				{ provide: SortAlternativesInteraction, useValue: sortAlternativesStub} ],
-			declarations: [ TestingStub ]
+			declarations: [ LabelStub ]
 		});
 
-		var fixture = TestBed.createComponent(TestingStub);
+		var fixture = TestBed.createComponent(LabelStub);
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
