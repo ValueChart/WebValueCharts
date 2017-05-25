@@ -54,7 +54,7 @@ export class CreateAlternativesComponent implements OnInit {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private valueChartService: ValueChartService, 
+		public valueChartService: ValueChartService, 
 		private creationStepsService: CreationStepsService, 
 		private validationService: ValidationService) { }
 
