@@ -22,7 +22,6 @@ import { CategoricalDomain }											from '../../../../model/CategoricalDomain
 import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
 import { IntervalDomain }												from '../../../../model/IntervalDomain';
 import { Alternative }													from '../../../../model/Alternative';
-import { RescaleError }													from '../../../../model/ScoreFunction';
 
 /*
 	This component defines the UI controls for creating and editing the Objective structure of a ValueChart.
@@ -186,18 +185,7 @@ export class CreateObjectivesComponent implements OnInit {
 				for (let cat of addedCats) {
 					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
 				}
-				try {
-					this.updateObjRefService.rescaleScoreFunctions(objName);
-				}
-				// If all scores are the same, simply reinitialize the ScoreFunctions
-				catch (e) {
-					if (e instanceof RescaleError) {
-						this.updateObjRefService.resetScoreFunctions(obj);
-					}
-					else {
-						throw e;
-					}
-				}		
+				this.updateObjRefService.rescaleScoreFunctions(objName);	
 			}
 			this.updateObjRefService.clearAlternativeValues(obj);
 		}

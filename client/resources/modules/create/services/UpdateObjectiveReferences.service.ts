@@ -12,6 +12,7 @@ import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 import { ScoreFunction }									from '../../../model/ScoreFunction';
 import { DiscreteScoreFunction }							from '../../../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFunction';
+import { RescaleError }										from '../../../model/ScoreFunction';
 
 /*
 	This class provides methods to update the ValueChart model when the Objective structure changes.
@@ -116,10 +117,22 @@ export class UpdateObjectiveReferencesService {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				let rescaled = scoreFunction.rescale();
-				if (rescaled) {
-					this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+				try {
+					let rescaled = scoreFunction.rescale();
+					if (rescaled) {
+						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+					}
 				}
+				catch (e) {
+					if (e instanceof RescaleError) {
+						// For now, just reset the weightmap. 
+						// Later, we will want to notify user that preferences are now invalid.
+						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+					}
+					else {
+						throw e;
+					}
+				}		
 			}
 		}
 	}
