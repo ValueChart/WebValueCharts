@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-24 17:23:01
+* @Last Modified time: 2017-05-25 14:15:49
 */
 
 // Import Testing Resources:
@@ -19,11 +19,11 @@ import * as _											from 'lodash';
 
 // Import Test Utilities: 
 import { HotelChartData }								from '../../../../testData/HotelChartData';
-import { randomizeUserWeights }							from '../../../../utilities/Testing.utilities';
+import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from '../../../../utilities/Testing.utilities';
 
 
 // Import Application Classes:
-import { ObjectiveChartRenderer }							from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
+import { ObjectiveChartRenderer }						from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
 import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
 import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
 import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
@@ -33,7 +33,7 @@ import { SortAlternativesInteraction }					from '../../../../../client/resources
 import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
 8
 // Import Definitions Classes:
-import { ObjectiveChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
+import { ObjectiveChartDefinitions }					from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
 
 // Import Model Classes
 import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
@@ -204,7 +204,7 @@ var renderEventsServiceStub = {
 				it('should use the color of user scores to indicate the corresponding objective', () => {
 					objectiveChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
 						let objectiveColor = (<UserScoreData> d3.select(userScore).datum()).objective.getColor();
-						expect(rgb2hex((<any>userScore).style.fill)).to.equal(_.toLower(objectiveColor));
+						expect(rgbaToHex((<any>userScore).style.fill)).to.equal(_.toLower(objectiveColor));
 					});
 				});
 			});
@@ -216,7 +216,8 @@ var renderEventsServiceStub = {
 					bob.setWeightMap(new WeightMap());
 					bob.setScoreFunctionMap(u.valueChart.getUsers()[0].getScoreFunctionMap());
 
-					bob = randomizeUserWeights(bob, u.valueChart.getAllPrimitiveObjectives());
+					bob = randomizeUserWeights(bob, u.valueChart);
+					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
 					
 					u.valueChart.setUser(bob);
 
@@ -253,7 +254,7 @@ var renderEventsServiceStub = {
 				it('should change the colors of user scores to indicate users instead objectives', () => {
 					objectiveChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
 						let userColor = (<UserScoreData> d3.select(userScore).datum()).user.color;
-						expect(rgb2hex((<any>userScore).style.fill)).to.equal(_.toLower(userColor));
+						expect(rgbaToHex((<any>userScore).style.fill)).to.equal(_.toLower(userColor));
 					});
 				});	
 			});
@@ -285,7 +286,9 @@ var renderEventsServiceStub = {
 
 			context('when the weights of the users in the ValueChart are changed', () => {
 				before(function() {					
-					bob = randomizeUserWeights(bob, u.valueChart.getAllPrimitiveObjectives());
+					
+					bob = randomizeUserWeights(bob, u.valueChart);
+					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -448,14 +451,6 @@ var renderEventsServiceStub = {
 		} else {
 			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');			
 		}
-	}
-
-	var rgb2hex = (rgb: any) => {
-	 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	 	return (rgb && rgb.length === 4) ? "#" +
-	  		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 	}
 });
 

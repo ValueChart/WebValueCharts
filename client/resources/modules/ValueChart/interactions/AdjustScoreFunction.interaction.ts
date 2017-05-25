@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-11 15:57:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:08:39
+* @Last Modified time: 2017-05-25 16:16:15
 */
 
 // Import Angular Classes:
@@ -28,7 +28,7 @@ export class AdjustScoreFunctionInteraction {
 	// ========================================================================================
 
 	public lastRendererUpdate: ScoreFunctionUpdate;
-
+	public adjustScoreFunctions: boolean;
 
 	// ========================================================================================
 	// 									Constructor
@@ -54,6 +54,8 @@ export class AdjustScoreFunctionInteraction {
 		@description	This method toggles the interaction that allows clicking and dragging on scatter plot points to alter a user's score function.
 	*/
 	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, lastRendererUpdate: ScoreFunctionUpdate): void {
+		this.adjustScoreFunctions = adjustScoreFunctions;
+
 		this.lastRendererUpdate = lastRendererUpdate;
 
 		var dragToResizeScores = d3.drag();

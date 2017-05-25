@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-24 18:20:13
+* @Last Modified time: 2017-05-25 14:48:34
 */
 
 // Import Testing Resources:
@@ -20,7 +20,7 @@ import { Subject }										from 'rxjs/Subject';
 
 // Import Test Utilities 
 import { HotelChartData }								from '../../../../testData/HotelChartData';
-import { randomizeUserWeights }							from '../../../../utilities/Testing.utilities';
+import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
 import { LabelRenderer }								from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
@@ -254,7 +254,7 @@ var chartUndoRedoStub = {
 						var datum: LabelData = <any> d3.select(label).datum();
 
 						if (label.tagName != "text")
-							expect(rgb2hex((<any>label).style.stroke)).to.equal(_.toLower((<PrimitiveObjective> datum.objective).getColor()));
+							expect(rgbaToHex((<any>label).style.stroke)).to.equal(_.toLower((<PrimitiveObjective> datum.objective).getColor()));
 					});
 				});
 			});
@@ -262,7 +262,8 @@ var chartUndoRedoStub = {
 			context('when the weights of the user in the ValueChart are changed', () => {
 				before(function() {
 
-					aaron = randomizeUserWeights(aaron, u.valueChart.getAllPrimitiveObjectives());
+					aaron = randomizeUserWeights(aaron, u.valueChart);
+
 					u.valueChart.setUser(aaron);
 
 					viewConfig.displayScoreFunctions = false;
@@ -297,7 +298,7 @@ var chartUndoRedoStub = {
 
 					context('when the weights of a user in the ValueChart are changed', () => {
 						before(function() {
-							aaron = randomizeUserWeights(aaron, u.valueChart.getAllPrimitiveObjectives());
+							aaron = randomizeUserWeights(aaron, u.valueChart);
 
 							u = rendererDataUtility.produceMaximumWeightMap(u);
 							u = rendererDataUtility.produceLabelData(u);
@@ -318,7 +319,7 @@ var chartUndoRedoStub = {
 				before(function() {
 					bob = new User();
 					bob.setWeightMap(new WeightMap());
-					bob = randomizeUserWeights(bob, u.valueChart.getAllPrimitiveObjectives());
+					bob = randomizeUserWeights(bob, u.valueChart);
 					bob.setScoreFunctionMap(aaron.getScoreFunctionMap());
 					u.valueChart.setUser(bob);
 
@@ -526,12 +527,12 @@ var chartUndoRedoStub = {
 			let outline = selection.select('.' + LabelDefinitions.SUBCONTAINER_OUTLINE)
 
 			if (objectives[i].objectiveType == 'abstract') {
-				expect(+outline.attr(dimension)).to.be.approximately(u.rendererConfig.dimensionTwoScale(datum.weight), 2);
+				expect(+outline.attr(dimension)).to.equal(Math.max(u.rendererConfig.dimensionTwoScale(datum.weight) - 2, 0));
 
 				checkRenderedLabels(u, selection, objectives[i].getId(), (<AbstractObjective> objectives[i]).getDirectSubObjectives(), dimension); 
 			} else {
 				let weight = u.maximumWeightMap.getObjectiveWeight(objectives[i].getName());
-				expect(+outline.attr(dimension)).to.be.approximately(u.rendererConfig.dimensionTwoScale(weight), 2);
+				expect(+outline.attr(dimension)).to.equal(Math.max(u.rendererConfig.dimensionTwoScale(weight) - 2, 0));
 			}
 		});
 	}
@@ -546,21 +547,11 @@ var chartUndoRedoStub = {
 			let objective: PrimitiveObjective = <any> selection.datum();
 			let weight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
 			if (expectEqual)
-				expect(+selection.attr(dimension)).to.be.approximately(u.rendererConfig.dimensionTwoScale(weight), 2);	
+				expect(+selection.attr(dimension)).to.equal(u.rendererConfig.dimensionTwoScale(weight));	
 			else 
-				expect(+selection.attr(dimension)).to.not.be.approximately(u.rendererConfig.dimensionTwoScale(weight), 2);
+				expect(+selection.attr(dimension)).to.not.equal(u.rendererConfig.dimensionTwoScale(weight));
 		});
 	}
-
-	var rgb2hex = (rgb: any) => {
-	 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	 	return (rgb && rgb.length === 4) ? "#" +
-	  		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
-	}
-
-
 });
 
 

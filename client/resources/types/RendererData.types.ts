@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 12:54:21
+* @Last Modified time: 2017-05-25 10:42:55
 */
 
 import * as d3								from 'd3';
@@ -112,12 +112,12 @@ export interface ScoreFunctionUpdate {
 	width: number;
 	height: number;
 	scoreFunctions: ScoreFunction[];
-	colors: string[];
 	objective: PrimitiveObjective;
-	styleUpdate: boolean;
+	colors: string[];
 	rendererConfig: ScoreFunctionConfig; 
 	heightScale: d3.ScaleLinear<any, any>;
 	scoreFunctionData: ScoreFunctionData[];
+	styleUpdate: boolean;
 }
 
 /*

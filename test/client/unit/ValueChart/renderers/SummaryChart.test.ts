@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-24 17:22:46
+* @Last Modified time: 2017-05-25 16:00:37
 */
 
 // Import Testing Resources:
@@ -19,7 +19,7 @@ import * as _											from 'lodash';
 
 // Import Test Utilities: 
 import { HotelChartData }								from '../../../../testData/HotelChartData';
-import { randomizeUserWeights }							from '../../../../utilities/Testing.utilities';
+import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from '../../../../utilities/Testing.utilities';
 
 
 // Import Application Classes:
@@ -201,7 +201,7 @@ var renderEventsServiceStub = {
 				it('should use the color of user scores to indicate the corresponding objective', () => {
 					summaryChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
 						let objectiveColor = (<UserScoreData> d3.select(userScore).datum()).objective.getColor();
-						expect(rgb2hex((<any>userScore).style.fill)).to.equal(_.toLower(objectiveColor));
+						expect(rgbaToHex((<any>userScore).style.fill)).to.equal(_.toLower(objectiveColor));
 					});
 				});
 			});
@@ -215,7 +215,9 @@ var renderEventsServiceStub = {
 					bob.setWeightMap(new WeightMap());
 					bob.setScoreFunctionMap(u.valueChart.getUsers()[0].getScoreFunctionMap());
 
-					bob = randomizeUserWeights(bob, u.valueChart.getAllPrimitiveObjectives());
+					bob = randomizeUserWeights(bob, u.valueChart);
+					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
+
 
 					u.valueChart.setUser(bob);
 
@@ -236,7 +238,7 @@ var renderEventsServiceStub = {
 				it('should change the colors of user scores to indicate users instead objectives', () => {
 					summaryChartRenderer.userScores.nodes().forEach((userScore: SVGElement) => {
 						let userColor = (<UserScoreData> d3.select(userScore).datum()).user.color;
-						expect(rgb2hex((<any>userScore).style.fill)).to.equal(_.toLower(userColor));
+						expect(rgbaToHex((<any>userScore).style.fill)).to.equal(_.toLower(userColor));
 					});
 				});	
 			});
@@ -264,7 +266,9 @@ var renderEventsServiceStub = {
 
 			context('when the weights of the users in the ValueChart are changed', () => {
 				before(function() {					
-					bob = randomizeUserWeights(bob, u.valueChart.getAllPrimitiveObjectives());
+					bob = randomizeUserWeights(bob, u.valueChart);
+					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
+
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
 					u = rendererConfigUtility.produceRendererConfig(u);
@@ -338,7 +342,7 @@ var renderEventsServiceStub = {
 		});
 	});
 
-	describe('public viewConfigChanged = (viewConfig: ViewConfig)', () => {
+	describe('public interactionConfig = (interactionConfig: InteractionConfig)', () => {
 
 		context('when all of the interaction options are disabled in the interactionConfig object', () => {
 			it('should change the sort alternatives interaction to "none"', () => {
@@ -435,16 +439,6 @@ var renderEventsServiceStub = {
 		else 
 			expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('none');	
 	};
-
-	var rgb2hex = (rgb: any) => {
-	 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	 	return (rgb && rgb.length === 4) ? "#" +
-	  		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-	  		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
-	}
-
-
 });
 
 

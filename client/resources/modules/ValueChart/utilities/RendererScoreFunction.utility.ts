@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:06:20
+* @Last Modified time: 2017-05-25 14:05:50
 */
 
 // Import Angular Classes:
@@ -58,7 +58,7 @@ export class RendererScoreFunctionUtility {
 	// 									Methods
 	// ========================================================================================
 
-	produceScoreFunctionData = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
+	public produceScoreFunctionData = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
 
 		if (!this.scoreFunctionData[u.objective.getId()] || this.scoreFunctionData[u.objective.getId()].length != u.scoreFunctions.length || !_.isEqual(this.colors, u.colors)) {
 			this.scoreFunctionData = {};
@@ -72,65 +72,6 @@ export class RendererScoreFunctionUtility {
 		u.scoreFunctionData = this.scoreFunctionData[u.objective.getId()];
 
 		return u;
-	}
-
-
-	getAllScoreFunctionData(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): ScoreFunctionData[] {
-		var allScoreFunctionData: ScoreFunctionData[] = [];
-		var domainElements: (string | number)[] = [];
-
-		for (var i = 0; i < scoreFunctions.length; i++) {
-			if (!colors[i])
-				colors[i] = "#000000";
-
-			var scoreFunctionData: ScoreFunctionData = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
-			domainElements = scoreFunctions[i].getAllElements();
-
-			domainElements.forEach((domainElement: string | number) => {
-				scoreFunctionData.elements.push({ scoreFunction: scoreFunctions[i], color: colors[i],  element: domainElement });
-			});
-			
-			allScoreFunctionData.push(scoreFunctionData);
-		}
-
-		return allScoreFunctionData;
-	}
-
-	getScoreFunctionDataSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ScoreFunctionDataSummary {
-		var userScores: number[] = [];
-
-		scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
-			userScores.push(scoreFunction.getScore(element));
-		});
-
-		userScores.sort((a: number, b: number) => {
-			if (a < b)
-				return -1;
-			else
-				return 1;
-		});
-
-		var elementScoresSummary: ScoreFunctionDataSummary = {
-			element: element,
-
-			min: d3.min(userScores),
-			firstQuartile: d3.quantile(userScores, 0.25),
-			median: d3.median(userScores),
-			thirdQuartile: d3.quantile(userScores, 0.75),
-			max: d3.max(userScores),
-		};
-
-		return elementScoresSummary;
-	}
-
-	getAllScoreFunctionDataSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ScoreFunctionDataSummary[] {
-		var elementUserScoresSummaries: ScoreFunctionDataSummary[] = [];
-
-		scoreFunctions[0].getAllElements().forEach((element: (number | string)) => {
-			elementUserScoresSummaries.push(this.getScoreFunctionDataSummary(objective.getName(), scoreFunctions, element));
-		});
-
-		return elementUserScoresSummaries;
 	}
 
 	// TODO <@aaron> : Add type annotations 
@@ -184,5 +125,66 @@ export class RendererScoreFunctionUtility {
 		}
 
 		return u;
+	}
+
+	public getAllScoreFunctionDataSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ScoreFunctionDataSummary[] {
+		var elementUserScoresSummaries: ScoreFunctionDataSummary[] = [];
+
+		scoreFunctions[0].getAllElements().forEach((element: (number | string)) => {
+			elementUserScoresSummaries.push(this.getScoreFunctionDataSummary(objective.getName(), scoreFunctions, element));
+		});
+
+		return elementUserScoresSummaries;
+	}
+
+
+	
+
+	private getAllScoreFunctionData(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[], colors: string[]): ScoreFunctionData[] {
+		var allScoreFunctionData: ScoreFunctionData[] = [];
+		var domainElements: (string | number)[] = [];
+
+		for (var i = 0; i < scoreFunctions.length; i++) {
+			if (!colors[i])
+				colors[i] = "#000000";
+
+			var scoreFunctionData: ScoreFunctionData = { scoreFunction: scoreFunctions[i], color: colors[i], elements: [] };
+			domainElements = scoreFunctions[i].getAllElements();
+
+			domainElements.forEach((domainElement: string | number) => {
+				scoreFunctionData.elements.push({ scoreFunction: scoreFunctions[i], color: colors[i],  element: domainElement });
+			});
+			
+			allScoreFunctionData.push(scoreFunctionData);
+		}
+
+		return allScoreFunctionData;
+	}
+
+	private getScoreFunctionDataSummary(objectiveName: string, scoreFunctions: ScoreFunction[], element: (number | string)): ScoreFunctionDataSummary {
+		var userScores: number[] = [];
+
+		scoreFunctions.forEach((scoreFunction: ScoreFunction) => {
+			userScores.push(scoreFunction.getScore(element));
+		});
+
+		userScores.sort((a: number, b: number) => {
+			if (a < b)
+				return -1;
+			else
+				return 1;
+		});
+
+		var elementScoresSummary: ScoreFunctionDataSummary = {
+			element: element,
+
+			min: d3.min(userScores),
+			firstQuartile: d3.quantile(userScores, 0.25),
+			median: d3.median(userScores),
+			thirdQuartile: d3.quantile(userScores, 0.75),
+			max: d3.max(userScores),
+		};
+
+		return elementScoresSummary;
 	}
 }
