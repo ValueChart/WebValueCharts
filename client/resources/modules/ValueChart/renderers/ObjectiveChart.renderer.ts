@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 14:29:48
+* @Last Modified time: 2017-05-24 18:21:38
 */
 
 // Import Angular Classes
@@ -87,7 +87,7 @@ export class ObjectiveChartRenderer {
 	// ========================================================================================
 
 
-	valueChartChanged = (update: RendererUpdate) => {
+	public valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 		
 		if (this.chart == undefined) {
@@ -107,11 +107,11 @@ export class ObjectiveChartRenderer {
 		}	
 	}
 
-	interactionsChanged = (interactionConfig: InteractionConfig) => {
+	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes,  this.lastRendererUpdate);
 	}
 
-	viewConfigChanged = (viewConfig: ViewConfig) => {
+	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleDomainLabels(viewConfig.displayDomainValues);
 	}
 
@@ -124,7 +124,7 @@ export class ObjectiveChartRenderer {
 						constructed again. Instead, call the createObjectiveRows method to add or remove rows, and user columns from the 
 						objective chart.
 	*/
-	createObjectiveChart(u: RendererUpdate): void {
+	private createObjectiveChart(u: RendererUpdate): void {
 		// Indicate that rendering of the objective chart is just starting.
 		this.renderEventsService.objectiveChartDispatcher.next(0);
 		// Create the root container for the objective chart.
@@ -159,7 +159,7 @@ export class ObjectiveChartRenderer {
 						cells and user score bars via createObjectiveCell. ONLY this method should be used to add/remove rows, cells, and user score bars to objective chart
 						when objectives, alternatives, or user are added/removed from the ValueChart. createObjectiveRows should NOT be manually called.
 	*/
-	createObjectiveRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, rowOutlinesContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, alternativeLabelsContainer: d3.Selection<any, any, any, any>): void {
+	private createObjectiveRows(u: RendererUpdate, rowsContainer: d3.Selection<any, any, any, any>, rowOutlinesContainer: d3.Selection<any, any, any, any>, boxesContainer: d3.Selection<any, any, any, any>, alternativeLabelsContainer: d3.Selection<any, any, any, any>): void {
 		// Create the row outlines for every new PrimitiveObjective. When the graph is being created for the first time, this is every PrimitiveObjective.
 		var updateRowOutlines = rowOutlinesContainer.selectAll('.' + ObjectiveChartDefinitions.ROW_OUTLINE)
 			.data(u.rowData);
@@ -220,7 +220,7 @@ export class ObjectiveChartRenderer {
 						It will add and delete cells and user score bars so that the objective chart is properly configured to its background data. Note that his method should NEVER be called directly
 						to updated to objective chart cells and user scores bars as it provides no way of setting the background data. createObjectiveRows should ALWAYS be used instead.
 	*/
-	createObjectiveCells(objectiveRows: d3.Selection<any, any, any, any>): void {
+	private createObjectiveCells(objectiveRows: d3.Selection<any, any, any, any>): void {
 		// Create cells for any new objectives, or for new rows. Once again, if the graph is being create for the first time then this is all rows.
 		var updateCells = objectiveRows.selectAll('.' + ObjectiveChartDefinitions.CELL)
 			.data((d: RowData) => { return d.cells; });
@@ -282,7 +282,7 @@ export class ObjectiveChartRenderer {
 						It should be used to update the objective chart when the data underlying the it (rows) has changed, and the appearance of the objective chart needs to be updated to reflect
 						this change. It should NOT be used to initially render the objective chart, or change the view orientation of the objective chart. Use renderObjectiveChart for this purpose.
 	*/
-	renderObjectiveChart(u: RendererUpdate): void {
+	private renderObjectiveChart(u: RendererUpdate): void {
 		// Position the objective chart.
 		this.chart
 			.attr('transform', () => {
@@ -339,7 +339,7 @@ export class ObjectiveChartRenderer {
 						position the row containers here because the positions of the scores (and therefore row containers) are are absolute. (no stacking).
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartRows(u: RendererUpdate, rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
+	private renderObjectiveChartRows(u: RendererUpdate, rowOutlines: d3.Selection<any, any, any, any>, rows: d3.Selection<any, any, any, any>, alternativeLabels: d3.Selection<any, any, any, any>, alternativeBoxes: d3.Selection<any, any, any, any>, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
 		rowOutlines
 			.attr('transform', (d: RowData, i: number) => {
 				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset))); // Position each of the rows based on the combined weights of the previous rows.
@@ -387,7 +387,7 @@ export class ObjectiveChartRenderer {
 		@description	Positions and gives widths + heights to the elements created by createObjectiveCells.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderObjectiveChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
+	private renderObjectiveChartCells(u: RendererUpdate, cells: d3.Selection<any, any, any, any>, userScores: d3.Selection<any, any, any, any>, weightOutlines: d3.Selection<any, any, any, any>): void {
 		cells
 			.attr('transform', (d: CellData, i: number) => {
 				let coordinateOne: number = this.calculateCellCoordinateOne(d, i, u);
@@ -420,7 +420,7 @@ export class ObjectiveChartRenderer {
 		@description	Positions and gives widths + heights to the elements to 'rect' elements used to display user score bars in the objective chart.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderUserScores(u: RendererUpdate, userScores: d3.Selection<any, any, any, any>): void {
+	private renderUserScores(u: RendererUpdate, userScores: d3.Selection<any, any, any, any>): void {
 		userScores
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0); })
 			.attr(u.rendererConfig.dimensionTwo, this.calculateUserScoreDimensionTwo)
@@ -453,7 +453,7 @@ export class ObjectiveChartRenderer {
 						displayed for group ValueCharts.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
 	*/
-	renderWeightOutlines(u: RendererUpdate, weightOutlines: d3.Selection<any, any, any, any>): void {
+	private renderWeightOutlines(u: RendererUpdate, weightOutlines: d3.Selection<any, any, any, any>): void {
 		weightOutlines
 			.attr(u.rendererConfig.dimensionOne, (d: UserScoreData, i: number) => { return Math.max(this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1), 0); })
 			.attr(u.rendererConfig.dimensionTwo, (d: UserScoreData, i: number) => { return this.calculateWeightOutlineDimensionTwo(d, i); })
@@ -487,7 +487,7 @@ export class ObjectiveChartRenderer {
 		@returns {void}
 		@description	Display or hide the weight outlines depending on the whether the ValueChart is a group or individual chart.
 	*/
-	toggleWeightOutlines(u: RendererUpdate): void {
+	private toggleWeightOutlines(u: RendererUpdate): void {
 		if (u.valueChart.isIndividual()) {
 			this.weightOutlines.style('display', 'none');
 		} else {
@@ -499,7 +499,7 @@ export class ObjectiveChartRenderer {
 		@returns {void}
 		@description	Display or hide the domain labels for cells depending on the value of the displayDomainValues attribute on the ValueChartDirective.
 	*/
-	toggleDomainLabels(displayDomainValues: boolean): void {
+	private toggleDomainLabels(displayDomainValues: boolean): void {
 		if (displayDomainValues) {
 			this.objectiveDomainLabels.style('display', 'block');
 		} else {
