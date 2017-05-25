@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:17:03
+* @Last Modified time: 2017-05-24 17:21:15
 */
 
 // Import Angular Classes:
@@ -105,7 +105,7 @@ export class LabelRenderer {
 	// ========================================================================================
 
 
-	valueChartChanged = (update: RendererUpdate) => {		
+	public valueChartChanged = (update: RendererUpdate) => {		
 		this.lastRendererUpdate = update;
 
 		if (this.rootContainer == undefined) {
@@ -137,7 +137,7 @@ export class LabelRenderer {
 		}	
 	}
 
-	interactionsChanged = (interactionConfig: InteractionConfig) => {
+	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, this.rootContainer.node().querySelectorAll('.' + LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
@@ -148,12 +148,13 @@ export class LabelRenderer {
 		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}
 
-	viewConfigChanged = (viewConfig: ViewConfig) => {
+	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.scoreFunctionViewSubject.next(viewConfig.displayScoreFunctionValueLabels);
 		this.toggleDisplayScoreFunctions(viewConfig.displayScoreFunctions);
+		this.renderLabelSpace(this.lastRendererUpdate, this.lastRendererUpdate.labelData);
 	}
 
-	handleObjectivesReordered = (reordered: boolean) => {
+	public handleObjectivesReordered = (reordered: boolean) => {
 		this.reordered = reordered;
 	}
 
@@ -168,7 +169,7 @@ export class LabelRenderer {
 						the label area must be destroyed and reconstructed. This is partly because assigning different data to a label may change the number of children it has,
 						which requires a complete change in the structure of SVG elements.
 	*/
-	createLabelSpace(u: RendererUpdate): void {
+	private createLabelSpace(u: RendererUpdate): void {
 		// Indicate that rendering of the label area is just starting.
 		this.renderEventsService.labelsDispatcher.next(0);
 		// Create the root container which will hold all label related SVG elements.
@@ -202,7 +203,7 @@ export class LabelRenderer {
 						be used to update the existing label area to have a different structure. Instead, the label area must be deleted and rebuilt using createLabelSpace.
 						This method should NOT be called manually.
 	*/
-	createLabels(u: RendererUpdate, labelData: LabelData[], labelContainer: d3.Selection<any, any, any, any>, parentName: string = LabelDefinitions.ROOT_CONTAINER_NAME): void {
+	private createLabels(u: RendererUpdate, labelData: LabelData[], labelContainer: d3.Selection<any, any, any, any>, parentName: string = LabelDefinitions.ROOT_CONTAINER_NAME): void {
 		this.labelSelections[parentName] = {};
 
 		// Create a new container for each element in labelData.
@@ -336,7 +337,7 @@ export class LabelRenderer {
 						labels as well, allowing it to either update, or simply render the a label and its children. Note that this method should generally NOT
 						be called manually. Use updateLabelSpace if the goal is to update all labels, or renderLabelSpace if the label space must be rendered.
 	*/
-	renderLabels(u: RendererUpdate, labelData: LabelData[], parentName: string): void {
+	private renderLabels(u: RendererUpdate, labelData: LabelData[], parentName: string): void {
 		this.labelSelections[parentName].labelContainers.data(labelData);
 		// Calculate the weight offsets for this level of the Objective hierarchy, NOT counting children of other Abstract objectives at the same level.
 		var weightOffsets: number[] = [];
@@ -381,7 +382,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the outlines of a set of sibling labels. 
 	*/
-	renderLabelOutline(u: RendererUpdate, labelOutlines: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
+	private renderLabelOutline(u: RendererUpdate, labelOutlines: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
 		labelOutlines
 			.attr(u.rendererConfig.dimensionOne, (d, i) => { return this.determineLabelWidth(d, u); })
 			.attr(u.rendererConfig.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
@@ -400,7 +401,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the label text of a set of sibling labels. This includes rendering the name, weight (in percentage points), and best and worst elements.
 	*/
-	renderLabelText(u: RendererUpdate, labelTexts: d3.Selection<any, any, any, any>, weightOffsets: number[], parentName: string): void {
+	private renderLabelText(u: RendererUpdate, labelTexts: d3.Selection<any, any, any, any>, weightOffsets: number[], parentName: string): void {
 
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
@@ -440,7 +441,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Positions and styles the dividers between a set of sibling labels. These dividers are used to implement clicking and dragging to change objective weights, and are the click targets.
 	*/
-	renderLabelDividers(u: RendererUpdate, labelDividers: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
+	private renderLabelDividers(u: RendererUpdate, labelDividers: d3.Selection<any, any, any, any>, weightOffsets: number[]): void {
 
 		var calculateDimensionTwoOffset = (d: LabelData, i: number) => {
 			return u.rendererConfig.dimensionTwoScale(weightOffsets[i]) - 2;					// Determine the height (or width) as a function of the weight
@@ -463,7 +464,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
 	*/
-	createScoreFunction(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
+	private createScoreFunction(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
 		this.labelSelections[objective.getId()] = {};
 		
 		labelContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).remove();
@@ -509,7 +510,7 @@ export class LabelRenderer {
 		@returns {void}
 		@description 	Uses the ScoreFunctionRenderer and its subclasses to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	*/
-	renderScoreFunction(u: RendererUpdate, objective: PrimitiveObjective, scoreFunctionSubject: Subject<any>, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
+	private renderScoreFunction(u: RendererUpdate, objective: PrimitiveObjective, scoreFunctionSubject: Subject<any>, scoreFunctionContainer: d3.Selection<any, any, any, any>): void {
 		var data = u.valueChart.getAllPrimitiveObjectives();
 
 		var width: number
@@ -553,7 +554,7 @@ export class LabelRenderer {
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
 	}
 
-	applyStyles(u: RendererUpdate): void {
+	private applyStyles(u: RendererUpdate): void {
 		this.rootContainer.selectAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE)
 			.style('fill', 'white')
 			.style('stroke', (d: LabelData) => {
@@ -572,10 +573,9 @@ export class LabelRenderer {
 		}
 	}
 
-	toggleDisplayScoreFunctions(displayScoreFunctions: boolean): void {
+	private toggleDisplayScoreFunctions(displayScoreFunctions: boolean): void {
 		if (displayScoreFunctions) {
 			this.rootContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).style('display', 'block');
-			this.renderLabelSpace(this.lastRendererUpdate, this.lastRendererUpdate.labelData);
 		} else {
 			this.rootContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).style('display', 'none');
 		}

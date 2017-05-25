@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:56:06
+* @Last Modified time: 2017-05-24 14:50:43
 */
 
 // Import Angular Classes:
@@ -70,7 +70,7 @@ export abstract class ScoreFunctionRenderer {
 
 
 	// class name definitions for SVG elements that are created by this renderer.
-	public static defs: any = {
+	public static defs = {
 		OUTLINE_CONTAINER: 'scorefunction-outline-container',
 		PLOT_OUTLINE: 'scorefunction-plot-outline',
 
