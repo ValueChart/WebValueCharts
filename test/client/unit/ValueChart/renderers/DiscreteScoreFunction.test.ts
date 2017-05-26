@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 17:20:15
+* @Last Modified time: 2017-05-26 14:53:17
 */
 
 // Import Testing Resources:
@@ -42,10 +42,7 @@ import { PrimitiveObjective }							from '../../../../../client/resources/model/
 import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
-
 
 
 @Component({

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 14:05:50
+* @Last Modified time: 2017-05-26 16:14:12
 */
 
 // Import Angular Classes:
@@ -76,7 +76,7 @@ export class RendererScoreFunctionUtility {
 
 	// TODO <@aaron> : Add type annotations 
 
-	produceViewConfig = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
+	public produceViewConfig = (u: ScoreFunctionUpdate): ScoreFunctionUpdate => {
 		u.rendererConfig = <any>{};
 		u.rendererConfig.labelOffset = 25;
 
@@ -128,13 +128,16 @@ export class RendererScoreFunctionUtility {
 	}
 
 	public getAllScoreFunctionDataSummaries(objective: PrimitiveObjective, scoreFunctions: ScoreFunction[]): ScoreFunctionDataSummary[] {
-		var elementUserScoresSummaries: ScoreFunctionDataSummary[] = [];
+		var scoreFunctionDataSummaries: ScoreFunctionDataSummary[] = [];
+
+		if (scoreFunctions.length == 0)
+			return scoreFunctionDataSummaries;
 
 		scoreFunctions[0].getAllElements().forEach((element: (number | string)) => {
-			elementUserScoresSummaries.push(this.getScoreFunctionDataSummary(objective.getName(), scoreFunctions, element));
+			scoreFunctionDataSummaries.push(this.getScoreFunctionDataSummary(objective.getName(), scoreFunctions, element));
 		});
 
-		return elementUserScoresSummaries;
+		return scoreFunctionDataSummaries;
 	}
 
 
