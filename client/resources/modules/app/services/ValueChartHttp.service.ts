@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 16:05:53
+* @Last Modified time: 2017-05-26 12:43:07
 */
 
 // Import Angular Classes:
@@ -100,7 +100,7 @@ export class ValueChartHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 		return this.http.put(this.valueChartsUrl + valueChart._id, body, options)
-			.map(this.extractValueChartData)
+			.map(((this.extractValueChartData)))
 			.catch(this.handleError);
 	}
 
@@ -111,9 +111,11 @@ export class ValueChartHttpService {
 						if a ValueChart resource with that name already exists. Note that duplicate names are not permitted for ValueCharts.
 	*/
 	isNameAvailable(chartName: string): Observable<boolean> {
-		return this.http.get(this.valueChartsUrl + chartName + '/available')
-			.map(this.extractData)
-			.catch(this.handleError);
+		return this.http.get(this.valueChartsUrl + chartName + '/id')
+			.map((body) => { return !body } )
+			.catch((error: any, caught: Observable<any>): Observable<boolean> => {
+				return Observable.of(true);
+			});
 	}		
 
 	/*
@@ -137,7 +139,7 @@ export class ValueChartHttpService {
 						to return the desired ValueChart if the name and password are not correct. 
 	*/
 	getValueChartByName(chartName: string, password: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + chartName + '/byname?password=' + password)
+		return this.http.get(this.valueChartsUrl + chartName + '?password=' + password)
 			.map(this.extractValueChartData)
 			.catch(this.handleError);
 	}

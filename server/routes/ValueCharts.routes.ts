@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-27 15:31:24
+* @Last Modified time: 2017-05-26 13:11:45
 */
 
 // Import Libraries and Express Middleware:
@@ -22,7 +22,7 @@ export var valueChartRoutes: express.Router = express.Router();
 // were listed in this file, rather than the ValueChartUsers.routes.ts file.
 valueChartRoutes.all('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	if (req.params.chart) {
-		(<any> req).chartId = req.params.chart;
+		(<any> req).identifier = req.params.chart;
 	}
 	next();
 });
@@ -30,7 +30,7 @@ valueChartRoutes.all('/:chart', function(req: express.Request, res: express.Resp
 // Parse the chart ID so that it is available on the request object. This differs from the above because it affects all sub-routes of /:chart
 valueChartRoutes.all('/:chart/*', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	if (req.params.chart) {
-		(<any> req).chartId = req.params.chart;
+		(<any> req).identifier = req.params.chart;
 	}
 	next();
 });
@@ -54,7 +54,7 @@ valueChartRoutes.post('/', function(req: express.Request, res: express.Response,
 						.status(201)
 						.json({ data: doc });
 				} else {
-					res.sendStatus(404);				
+					res.status(404).send('Not Found');				
 				}
 			});
 		}
@@ -64,43 +64,48 @@ valueChartRoutes.post('/', function(req: express.Request, res: express.Response,
 // Get an existing ValueChart by id. Note that the chart id (which comes from the db) and the password must both be correct.
 valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 	
 	var password: string = req.query.password;
 
-	valueChartsCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
-		if (err) {
-			res.status(400)
-				.json({ data: err });
+	if (MongoDB.ObjectID.isValid(identifier)) {
+		valueChartsCollection.findOne({ _id: identifier, password: password }, function(err: Error, doc: any) {
+			if (err) {
+				res.status(400)
+					.json({ data: err });
 
-		} else if (doc) {
-			res.location('/ValueCharts/' + chartId)
-				.status(200)
-				.json({ data: doc });
-		} else {	// No ValueChart with that id + password combination was found. Return 404: Not Found.
-			res.sendStatus(404)
-		}
-	});
+			} else if (doc) {
+				res.location('/ValueCharts/' + identifier)
+					.status(200)
+					.json({ data: doc });
+			} else {	// No ValueChart with that id + password combination was found. Return 404: Not Found.
+				res.status(404).send('Not Found');
+			}
+		});
+	} else 
+		next();
 });
 
 // Get an existing ValueChart by name. Note that the chart id (which comes from the db) and the password must both be correct.
-valueChartRoutes.get('/:chart/byname', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartName: string = (<any> req).chartId; // ChartId is misleading here. It is the name, not id.
+	var identifier: string = (<any> req).identifier; // ChartId is misleading here. It is the name, not id.
 	
 	var password: string = req.query.password;
+	console.log('we got here', identifier, password);
 
-	valueChartsCollection.findOne({ name: chartName, password: password }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ name: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
 
 		} else if (doc) {
-			res.location('/ValueCharts/' + chartName + '/byname')
+			res.location('/ValueCharts/' + identifier)
 				.status(200)
 				.json({ data: doc });
 		} else {	// No ValueChart with that name + password combination was found. Return 404: Not Found.
-			res.sendStatus(404)
+			res.status(404).send('Not Found');
 		}
 	});
 });
@@ -108,11 +113,11 @@ valueChartRoutes.get('/:chart/byname', function(req: express.Request, res: expre
 // Get an existing ValueChart by id. Only include the preferences for the user with the specified username.
 valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 	var password: string = req.query.password;
 	var username: string = req.query.username;
 
-	valueChartsCollection.findOne({ _id: chartId, password: password }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ _id: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -120,32 +125,11 @@ valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: e
 		} else if (doc) {
 			// Remove all users except the one with the specified username.
 			doc.users = (<any[]>doc.users).filter(function(e) { return e.username === username });
-			res.location('/ValueCharts/' + chartId)
+			res.location('/ValueCharts/' + identifier)
 				.status(200)
 				.json({ data: doc });
 		} else {	// No ValueChart with that id + password combination was found. Return 404: Not Found.
-			res.sendStatus(404)
-		}
-	});
-});
-
-// Check to see if a ValueChart name is available. Returns true in response body if it is, false if taken.
-valueChartRoutes.get('/:chart/available', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartName: string = (<any> req).chartId;	// ChartId is misleading here. It is the name, not id.
-
-	valueChartsCollection.count({ name: chartName }, function(err: Error, count: any) {
-		if (err) {
-			res.status(400)
-				.json({ data: err });
-
-		} else if (count !== 0) {
-			res.location('/ValueCharts/' + chartName)
-				.status(200)
-				.json({ data: false });
-		} else {
-			res.status(200)
-				.json({ data: true });
+			res.status(404).send('Not Found')
 		}
 	});
 });
@@ -154,22 +138,22 @@ valueChartRoutes.get('/:chart/available', function(req: express.Request, res: ex
 // as it will fail if the provided id is not a valid id for the database. Use the post method to the ValueCharts collection instead.
 valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 
-	valueChartsCollection.findOne({ _id: chartId }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ _id: identifier }, function(err: Error, doc: any) {
 		if (doc) {
-			valueChartsCollection.update({ _id: chartId }, (req.body), [] ,function(err: Error, doc: any) {
+			valueChartsCollection.update({ _id: identifier }, (req.body), [] ,function(err: Error, doc: any) {
 				if (err) {
 					res.status(400)
 						.json({ data: err });
 
 				} else if (doc) {
-					req.body._id = chartId;
-					res.location('/ValueCharts/' + chartId)
+					req.body._id = identifier;
+					res.location('/ValueCharts/' + identifier)
 						.status(200)
 						.json({ data: req.body });
 				} else {
-					res.sendStatus(404);
+					res.status(404).send('Not Found');
 				}
 			});
 		} else {
@@ -184,7 +168,7 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 						.status(201)
 						.json({ data: doc });
 				} else {
-					res.sendStatus(404);				
+					res.status(404).send('Not Found');				
 				}
 			});
 		}
@@ -195,16 +179,39 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 // Delete the ValueChart with the id provided in the request url.
 valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 
-	(<any> valueChartsCollection).findOneAndDelete({ _id: chartId }, function(err: Error, doc: any) {
+	if (!identifier)
+		res.status(400).send('Not Found');
+
+	(<any> valueChartsCollection).findOneAndDelete({ _id: identifier }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
 		} else {		
-			res.sendStatus(200);	// The REST documentation for the delete method is a bit unclear on whether delete should 
+			res.status(200).send('Not Found');	// The REST documentation for the delete method is a bit unclear on whether delete should 
 									// return the delete resource. I have chosen not to do so, as doc in this case is not actually
 									// the resource at all. Rather, it is a message notifying of successful deletion.
+		}
+	});
+});
+
+// Get the id of the ValueChart with the given name. Returns status 404 if no ValueChart with the given name exists.
+valueChartRoutes.get('/:chart/id', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
+
+	valueChartsCollection.findOne({ name: identifier }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+
+		} else if (doc) {
+			res.location('/ValueCharts/' + identifier)
+				.status(200)
+				.send(doc._id);
+		} else {
+			res.status(404).send('Not Found');
 		}
 	});
 });
@@ -216,11 +223,11 @@ valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.R
 valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	
-	var chartName: string = (<any> req).chartId;	// ChartId is misleading here. It is the name, not id.
+	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
 	var password: string = req.query.password;
 
 
-	valueChartsCollection.findOne({ name: chartName, password: password }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ name: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -228,11 +235,11 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 		} else if (doc) {
 			// Remove the users from the ValueChart so that it only contains the objectives and alternatives.
 			doc.users = undefined;
-			res.location('/ValueCharts/' + chartName + '/structure')
+			res.location('/ValueCharts/' + identifier + '/structure')
 				.status(200)
 				.json({ data: doc });
 		} else {
-			return res.sendStatus(404);
+			return res.status(404).send('Not Found');
 		}
 	});
 });
@@ -240,9 +247,9 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 // Update the structure of an existing ValueChart.
 valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartName: string = (<any> req).chartId;	// ChartId is misleading here. It is the name, not id.
+	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
 
-	valueChartsCollection.findOne({ name: chartName }, function (err: Error, foundDocument: any) {
+	valueChartsCollection.findOne({ name: identifier }, function (err: Error, foundDocument: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -261,13 +268,13 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 					req.body.users = undefined;
 					req.body._id = foundDocument._id;
 
-					res.location('/ValueCharts/' + chartName + '/structure')
+					res.location('/ValueCharts/' + identifier + '/structure')
 						.status(200)
 						.json({ data: req.body });
 				}
 			});
 		} else {
-			res.sendStatus(404);
+			res.status(404).send('Not Found');
 		}
 	});
 });

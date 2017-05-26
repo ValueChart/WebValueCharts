@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 18:17:57
+* @Last Modified time: 2017-05-26 12:20:56
 */
 
 // Import Libraries and Express Middleware:
@@ -49,7 +49,7 @@ usersRoutes.get('/:user', function(req: express.Request, res: express.Response, 
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || username !== req.user[0].username) {
-		res.sendStatus(401);
+		res.status(401).send('Unauthorized');
 	} else {
 		usersCollection.findOne({ username: username }, function(err: Error, doc: any) {
 			if (err) {
@@ -60,7 +60,7 @@ usersRoutes.get('/:user', function(req: express.Request, res: express.Response, 
 					.location('/Users/' + username)
 					.json({ data: doc });
 			} else {
-				res.sendStatus(404);
+				res.status(404).send('Not Found');
 			}
 		});
 	}
@@ -73,7 +73,7 @@ usersRoutes.put('/:user', function(req: express.Request, res: express.Response, 
 	
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || username !== req.user[0].username) {
-		res.sendStatus(401);
+		res.status(401).send('Unauthorized');
 	} else {
 		usersCollection.update({ username: username }, (req.body), [], function(err: Error, doc: any) {
 			if (err) {
@@ -86,7 +86,7 @@ usersRoutes.put('/:user', function(req: express.Request, res: express.Response, 
 					.location('/Users/' + username)
 					.json({ data: req.body });
 			} else {
-				res.sendStatus(404);
+				res.status(404).send('Not Found');
 			}
 		});
 	}
@@ -102,7 +102,7 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 			res.status(400)
 				.json({ data: err });
 		} else {
-			res.sendStatus(200);
+			res.status(200).send('OK');
 		}
 	});
 });
@@ -115,11 +115,11 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
-		res.sendStatus(401);	
+		res.status(401).send('Unauthorized');	
 	} else {
 		valueChartCollection.find({ creator: username }, function(err: Error, docs: any[]) {
 			if (err) {
-				res.sendStatus(400)
+				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
 				var vcSummaries: any[] = [];
@@ -131,7 +131,7 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 					.location('/Users/' + username + '/ValueCharts')
 					.json({ data: vcSummaries });
 			} else {
-				res.sendStatus(404);
+				res.status(404).send('Not Found');
 			}
 		});
 	}
@@ -145,11 +145,11 @@ usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, r
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
-		res.sendStatus(401);	
+		res.status(401).send('Unauthorized');	
 	} else {
 		valueChartCollection.find({ "users.username": username }, function(err: Error, docs: any[]) {
 			if (err) {
-				res.sendStatus(400)
+				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
 				var vcSummaries: any[] = [];
@@ -163,7 +163,7 @@ usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, r
 					.location('/Users/' + username + '/ValueChartMemberships')
 					.json({ data: vcSummaries });
 			} else {
-				res.sendStatus(404);
+				res.status(404).send('Not Found');
 			}
 		});
 	}

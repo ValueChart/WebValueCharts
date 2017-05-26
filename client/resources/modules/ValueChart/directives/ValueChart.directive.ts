@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:37:35
+* @Last Modified time: 2017-05-26 13:28:33
 */
 
 // Import Angular Classes:
@@ -234,10 +234,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	rendersCompleted = (rendersCompleted: number) => {
 		if (rendersCompleted >= 3) {
+			this.waitForRenderers.unsubscribe();
 			this.interactionSubject.next(this.interactionConfig);
 			this.viewConfigSubject.next(this.viewConfig);
 			// Unsubscribe and set initialization to be complete.
-			this.waitForRenderers.unsubscribe();
 			this.isInitialized = true;
 		}
 	}

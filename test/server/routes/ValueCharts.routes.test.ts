@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:23:33
+* @Last Modified time: 2017-05-26 13:06:01
 */
 
 // Require Node Libraries:
@@ -33,12 +33,32 @@ describe('ValueCharts Routes', () => {
 
 	var alternative: Alternative;
 
-	before(function() {
+	before(function(done: MochaDone) {
+
+
 		valueChartParser = new JsonValueChartParser();
 
 		JsonGroupHotel.name = 'TestHotel';
 
 		user = request.agent('http://localhost:3000/');
+
+
+		// Clean any test charts that have been left it the database from previous executions.
+		user.get('ValueCharts/' + JsonGroupHotel.name + '/id')
+			.set('Accept', 'text')
+			.end(function(err, res) {
+				if (err) return done(err);
+
+				if (res.status !== 404)
+					user.delete('ValueCharts/' + res.body)
+						.expect(200)
+						.end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+				else 
+					done();
+			});
 	});
 
 	describe('Route: /ValueCharts', () => {
@@ -86,23 +106,22 @@ describe('ValueCharts Routes', () => {
 		});
 	});
 
-	describe('Route: /ValueCharts/name/:Chart', () => {
+	describe('Route: /ValueCharts/name/:Chart/id', () => {
 
 		describe('Method: Get', () => {
 
-			context('when the ValueChart name is taken', () => {
+			context('when a ValueChart with the given name exists', () => {
 
-				it('should return false to indicate that the name is taken, along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/' + JsonGroupHotel.name + '/available')
-							.set('Accept', 'application/json')
-							.expect('Content-Type', /json/)
+				it('should return the ID of the ValueChart along with status code 200', (done: MochaDone) => {
+					user.get('ValueCharts/' + JsonGroupHotel.name + '/id')
+							.set('Accept', 'text')
 							.expect(200)
 						    .expect((res: request.Response) => {
 
-						    	console.log(res.body.data);
-								var valueChartResponse = res.body.data;
+								var valueChartResponse = res.body;
 
-								expect(valueChartResponse).to.be.false;
+								expect(valueChartResponse).to.be.a('string');
+								expect(valueChartResponse).to.equal(chartId);
 
 							}).end(function(err, res) {
 						        if (err) return done(err);
@@ -111,16 +130,15 @@ describe('ValueCharts Routes', () => {
 				});
 			});
 
-			context('when the ValueChart name is not taken', () => {
-				it('shold return true to indicate that the name is free, along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/AFreeName/available')
-							.set('Accept', 'application/json')
-							.expect('Content-Type', /json/)
-							.expect(200)
+			context('when no ValueChart with the given name exists', () => {
+				it('shold return a status code 404 to indicate that no resource exists', (done: MochaDone) => {
+					user.get('ValueCharts/AFreeName/id')
+							.set('Accept', 'text')
+							.expect(404)
 						    .expect((res: request.Response) => {
-								var valueChartResponse = res.body.data;
 
-								expect(valueChartResponse).to.be.true;
+								expect(res.text).to.be.a('string');
+								expect(res.text).to.equal('Not Found')
 
 							}).end(function(err, res) {
 						        if (err) return done(err);
@@ -134,9 +152,31 @@ describe('ValueCharts Routes', () => {
 	describe('Route: /ValueCharts/:Chart', () => {
 
 		describe('Method: Get', () => {
-			context('when the ValueChart exists', () => {
+			context('when a ValueChart with the given ID exists', () => {
 				it('should retrieve the ValueChart along with status code 200', (done: MochaDone) => {
 					user.get('ValueCharts/' + chartId + '?password=' + password)
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(200)
+					    .expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
+
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse.name).to.equal('TestHotel')
+							expect(valueChartResponse.users).to.have.length(1);
+							expect(valueChartResponse.alternatives).to.have.length(6);
+							expect(valueChartResponse._id).to.equal(chartId);
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+				});
+			});
+
+			context('when a ValueChart with the given name exists', () => {
+				it('should retrieve the ValueChart along with status code 200', (done: MochaDone) => {
+					user.get('ValueCharts/' + JsonGroupHotel.name + '?password=' + password)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
