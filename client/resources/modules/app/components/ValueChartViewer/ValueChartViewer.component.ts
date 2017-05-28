@@ -196,24 +196,38 @@ export class ValueChartViewerComponent implements OnInit {
 			&& this.valueChart.getCreator() === this.currentUserService.getUsername());
 	}
 
-	  /*   
+  /*   
+    @returns {void}
+    @description   Check that no score function has a range of 0 (i.e. best and worst outcomes have the same score)
+  */
+	checkScoreFunctionRanges(): boolean {
+  		let currentUser: User = this.valueChartService.getCurrentUser();
+		for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+  			let scoreFunction = currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+  			if (scoreFunction.getRange() === 0) {
+  				return false;
+  			}
+    	}
+    	return true;
+  	}
+
+  /*   
     @returns {void}
     @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
   */
-  rescaleScoreFunctions(): void {
-	    let rescaled: boolean = false;
-	    for (let user of this.valueChartService.getValueChart().getUsers()) {
-			for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-      			if (scoreFunction.rescale()) {
-        			rescaled = true;
-      			}
-	    	}
-	    }
-	    if (rescaled) {
-	    	toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
-	    }
-  }
+	rescaleScoreFunctions(): void {
+		let currentUser: User = this.valueChartService.getCurrentUser();
+		let rescaled: boolean = false;
+		for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+			let scoreFunction = currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+			if (scoreFunction.rescale()) {
+				rescaled = true;
+			}
+		}
+		if (rescaled) {
+			toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
+		}
+	}
 
 	// ================================ Hosting/Joining/Saving a ValueChart ====================================
 
@@ -259,27 +273,32 @@ export class ValueChartViewerComponent implements OnInit {
 						ValueChart.
 	*/
 	submitPreferences(): void {
-		var currentUser: User = this.valueChartService.getCurrentUser();
-		this.rescaleScoreFunctions();
-		currentUser.getWeightMap().normalize();
+		if (this.checkScoreFunctionRanges()) {
+			var currentUser: User = this.valueChartService.getCurrentUser();
+			this.rescaleScoreFunctions();
+			currentUser.getWeightMap().normalize();
 
-		// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
-		// that has been retrieved from the server.
-		this.valueChartHttpService.updateUser(this.valueChart._id, currentUser)
-			.subscribe(
-			// User added/updated!
-			(user: User) => {
-				toastr.success('Preferences successfully submitted');
-			},
-			// Handle Server Errors
-			(error) => {
-				// Add something to handle when the host has disabled user changes
-				console.log(error);
-				if (error === '403 - Forbidden')
-					toastr.warning('Preference submission failed. The Host has disabled new submissions');
-				else 
-					toastr.error('Preference submission failed. There was an error submitting your preferences');
-			});
+			// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
+			// that has been retrieved from the server.
+			this.valueChartHttpService.updateUser(this.valueChart._id, currentUser)
+				.subscribe(
+				// User added/updated!
+				(user: User) => {
+					toastr.success('Preferences successfully submitted');
+				},
+				// Handle Server Errors
+				(error) => {
+					// Add something to handle when the host has disabled user changes
+					console.log(error);
+					if (error === '403 - Forbidden')
+						toastr.warning('Preference submission failed. The Host has disabled new submissions');
+					else 
+						toastr.error('Preference submission failed. There was an error submitting your preferences');
+				});			
+		}
+		else {
+			toastr.error("Saving failed - score function outcomes can't all have the same value.")
+		}			
 	}
 
 	/* 	
@@ -287,14 +306,21 @@ export class ValueChartViewerComponent implements OnInit {
 		@description 	Updates the chart on the database.
 	*/
 	saveChart(): void {
-		this.rescaleScoreFunctions();
-		this.valueChartHttpService.updateValueChart(this.valueChart)
-			.subscribe(
-			(valuechart) => { toastr.success('ValueChart saved'); },
-			(error) => {
-				// Handle any errors here.
-				toastr.warning('Saving failed');
-			});
+		if (this.checkScoreFunctionRanges()) {
+			this.rescaleScoreFunctions();
+			this.valueChartService.getCurrentUser().getWeightMap().normalize();
+			
+			this.valueChartHttpService.updateValueChart(this.valueChart)
+				.subscribe(
+				(valuechart) => { toastr.success('ValueChart saved'); },
+				(error) => {
+					// Handle any errors here.
+					toastr.warning('Saving failed');
+				});
+		}
+		else {
+			toastr.error("Saving failed - score function outcomes can't all have the same value.")
+		}			
 	}
 
 	// ================================ Undo/Redo ====================================

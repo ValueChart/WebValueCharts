@@ -170,13 +170,12 @@ export abstract class ScoreFunction implements Memento {
 		@description	Rescale ScoreFunction so that the best outcome has score of 1 and worst outcome has score of 0.
 	*/
 	rescale(): boolean {
-		var bestOutcomeScore = this.getScore(this.bestElement);
-		var worstOutcomeScore = this.getScore(this.worstElement);
-		if (bestOutcomeScore !== 1 || worstOutcomeScore !== 0) {
-			var range = bestOutcomeScore - worstOutcomeScore;
-			if (range === 0) {
-				throw new RescaleError("Objective outcome scores are all the same. (This should not be allowed.)");
-			}
+		var range = this.getRange();
+		if (range === 0) {
+			throw new Error("Objective outcome scores are all the same. (This should not be allowed.)");
+		}
+		if (range < 1) {
+			var worstOutcomeScore = this.getScore(this.worstElement);
 			for (var element of this.getAllElements()) {
 				var newScore = (this.getScore(element) - worstOutcomeScore) / range;
 				this.setElementScore(element, newScore);
@@ -184,6 +183,13 @@ export abstract class ScoreFunction implements Memento {
 			return true;
 		}
 		return false;
+	}
+
+	/*
+		@returns {number} - Difference between best outcome score and worst outcome score.
+	*/
+	getRange(): number {
+		return this.getScore(this.bestElement) - this.getScore(this.worstElement);
 	}
 
 	abstract initialize(obj: PrimitiveObjective, type: string): void;
@@ -194,10 +200,4 @@ export abstract class ScoreFunction implements Memento {
 
 	// This method allows the class to satisfy the Memento interface.
 	abstract getMemento(): ScoreFunction;
-}
-
-export class RescaleError extends Error {
-    constructor (public message: string) {
-        super();    
-    }
 }

@@ -116,9 +116,11 @@ export class UpdateObjectiveReferencesService {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				let rescaled = scoreFunction.rescale();
-				if (rescaled) {
-					this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+				if (scoreFunction.getRange() > 0) {
+					let rescaled = scoreFunction.rescale();
+					if (rescaled) {
+						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+					}
 				}
 			}
 		}

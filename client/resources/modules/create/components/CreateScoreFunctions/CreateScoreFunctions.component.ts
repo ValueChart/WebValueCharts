@@ -185,11 +185,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
   setBadScoreFunctions(): void {
     let badScoreFunctions: string[] = [];
     for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      let bestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
-      let worstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
-      let bestOutcomeScore = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).getScore(bestOutcome);
-      let worstOutcomeScore = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).getScore(worstOutcome);
-      if (bestOutcomeScore === worstOutcomeScore) {
+      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+      if (scoreFunction.getRange() === 0) {
         badScoreFunctions.push(objName);
       }
       this.badScoreFunctions = badScoreFunctions;
