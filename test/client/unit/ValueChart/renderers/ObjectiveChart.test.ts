@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 14:15:49
+* @Last Modified time: 2017-05-28 15:26:09
 */
 
 // Import Testing Resources:
@@ -31,7 +31,7 @@ import { RenderEventsService }							from '../../../../../client/resources/modul
 import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
 
 import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
-8
+
 // Import Definitions Classes:
 import { ObjectiveChartDefinitions }					from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
 

@@ -98,6 +98,7 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.2",
+    "sinon": "^2.3.2",
     "superagent": "^3.5.2",
     "supertest": "^3.0.0",
     "traceur": "0.0.111",
