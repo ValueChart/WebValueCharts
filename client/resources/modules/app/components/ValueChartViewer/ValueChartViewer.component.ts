@@ -238,31 +238,7 @@ export class ValueChartViewerComponent implements OnInit {
 						This method should NEVER be called by a user that is joining an existing ValueChart. 
 	*/
 	hostValueChart(): void {
-		// If the ID is not defined (indicating it has not been submitted to the server), submit the ValueChart.
-		if (!this.valueChart._id) {
-			this.valueChartHttpService.createValueChart(this.valueChart)
-				.subscribe(
-				(valueChart: ValueChart) => {
-					// Set the id of the ValueChart.
-					this.valueChart._id = valueChart._id;
-					// Host the ValueChart.
-					this.hostService.hostGroupValueChart(valueChart._id);
-					toastr.success('ValueChart auto-saved');
-				},
-				// Handle Server Errors
-				(error) => {
-					toastr.warning('Auto-saving failed');
-				});
-		} else {
-			this.valueChartHttpService.updateValueChart(this.valueChart)
-				.subscribe(
-				(valueChart: ValueChart) => { 
-					this.hostService.hostGroupValueChart(this.valueChart._id);
-					toastr.success('ValueChart auto-saved');
-				},
-				(error) => { 
-				});
-		}
+		this.hostService.hostGroupValueChart(this.valueChart._id);
 	}
 
 	/* 	

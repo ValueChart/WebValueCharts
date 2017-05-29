@@ -44,9 +44,13 @@ export class HomeComponent {
 	public valueChartName: string;
 	public valueChartPassword: string;
 	public invalidCredentials: boolean;
-	public validationMessage: string;
 	public isJoining: boolean = false; // boolean toggle indicating whether user clicked to join or view an existing chart 
-										// this is needed so we can use the same credentials modal in both cases
+									   // this is needed so we can use the same credentials modal in both cases
+
+	// Upload validation fields:
+	public validationMessage: string;
+	public correctiveAction: string; // what the user may do to fix the chart
+									 // one of 'editChart', 'saveChart', or 'noEdit'
 
 	// ========================================================================================
 	// 									Constructor
@@ -83,6 +87,19 @@ export class HomeComponent {
 		}
 		else {
 			this.viewValueChart(chartName, chartPassword);
+		}
+	}
+
+	/*
+		@returns {string}
+		@description 	Title for the credentials modal.
+	*/
+	getModalTitle(): string {
+		if (this.isJoining) {
+			return "Join Existing Chart";
+		}
+		else {
+			return "View Existing Chart";
 		}
 	}
 
@@ -167,17 +184,12 @@ export class HomeComponent {
 				
 				// The user uploaded a ValueChart so they aren't joining an existing one.
 				this.currentUserService.setJoiningChart(false);
-				
-				// Validate the chart.
-				let validationErrors = this.validationService.validate(this.valueChartService.getValueChart());
-				if (validationErrors.length === 0) {
+
+				if (this.validateUpload(this.valueChartService.getValueChart())) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
+					this.saveValueChartToDatabase(this.valueChartService.getValueChart());
 					this.router.navigate(['/view/', this.valueChartService.getValueChart().getName()]);
-				}
-				else {
-					this.validationMessage = "There were problems with this chart: \n- " + validationErrors.join('\n- ') + "\n\nWould you like to fix them now?";
-					$('#validate-modal').modal('show');
-				}			
+				}		
 			}
 		};
 		// Read the file as a text string. This should be fine because ONLY XML files should be uploaded.
@@ -187,24 +199,80 @@ export class HomeComponent {
 	}
 
 	/*
-		@returns {void}
-		@description 	Called in response to validation error modal.
-						Redirects user to create workflow to edit an invalid chart.
+		@returns {boolean}
+		@description 	Validates an uploaded chart and gives the user an opportunity to fix errors that they have control over.
+						Returns true iff there were no validation errors.
 	*/
-	fixChart() {
-		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
+	validateUpload(valueChart: ValueChart): boolean {
+
+		let structuralErrors = this.validationService.validateStructure(valueChart);
+		let userErrors = this.validationService.validateUsers(valueChart);	
+
+		if (structuralErrors.length > 0 || userErrors.length > 0) {
+			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
+				this.correctiveAction = 'none';
+				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
+				$('#validate-modal').modal('show');
+			}
+			// Handle errors in chart structure
+			else if (structuralErrors.length > 0) {
+				this.correctiveAction = 'editChart';
+				this.validationMessage = "There are problems with this chart: \n\n - " + structuralErrors.join('\n - ') + "\n\nWould you like to fix them now?";
+				$('#validate-modal').modal('show');
+			}
+			// Handle errors in the users' preferences
+			// (If these exist IN ADDITION to the above, the user will be informed of them after fixing the other problems)
+			else {
+				this.correctiveAction = 'saveChart';
+				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + userErrors.join('\n') + "\n\nWould you like to save the chart so that these users can fix their preferences?";
+				$('#validate-modal').modal('show');
+			}
+			return false;
+		}
+		return true;
 	}
 
 	/*
-		@returns {string}
-		@description 	Title for the credentials modal.
+		@returns {void}
+		@description 	Called in response to click of "Yes" button in validation error modal.
 	*/
-	getModalTitle(): string {
-		if (this.isJoining) {
-			return "Join Existing Chart";
+	performCorrectiveAction() {
+		if (this.correctiveAction === 'editChart') {
+			this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 		}
-		else {
-			return "View Existing Chart";
+		else if (this.correctiveAction === 'saveChart') {
+			(<any>this.valueChartService.getValueChart()).incomplete = true;
+			this.saveValueChartToDatabase(this.valueChartService.getValueChart());
+		}
+	}
+
+	/* 	
+		@returns {void}
+		@description	Save valueChart to database. valueChart_.id is the id assigned by the database.
+	*/
+	saveValueChartToDatabase(valueChart: ValueChart): void {
+		if (!valueChart._id) {
+			// Save the ValueChart for the first time.
+			this.valueChartHttpService.createValueChart(valueChart)
+				.subscribe(
+				(valuechart: ValueChart) => {
+					// Set the id of the ValueChart.
+					valueChart._id = valuechart._id;
+					toastr.success('ValueChart saved');
+				},
+				// Handle Server Errors
+				(error) => {
+					toastr.warning('Saving failed');
+				});
+		} else {
+			// Update the ValueChart.
+			this.valueChartHttpService.updateValueChart(valueChart)
+				.subscribe(
+				(valuechart) => { toastr.success('ValueChart saved'); },
+				(error) => {
+					// Handle any errors here.
+					toastr.warning('Saving failed');
+				});
 		}
 	}
 }

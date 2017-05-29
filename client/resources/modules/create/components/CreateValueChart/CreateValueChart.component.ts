@@ -125,7 +125,7 @@ export class CreateValueChartComponent implements OnInit {
 		(<any>this.valueChart).incomplete = this.validationService.validate(this.valueChart).length > 0 ? true : false; 
 		
 		if (this.saveOnDestroy) {
-			this.autoSaveValueChart(this.valueChart);
+			this.autoSaveValueChart();
 		}
 	}
 
@@ -140,7 +140,7 @@ export class CreateValueChartComponent implements OnInit {
 						(Parameter currently unused in this method.)			
 	*/
 	back(browserTriggered = false) {
-		this.autoSaveValueChart(this.valueChart);
+		this.autoSaveValueChart();
 		this.creationStepsService.allowedToNavigateInternally = true;
 		this.creationStepsService.previous(this.purpose);				
 	}
@@ -164,7 +164,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.nextIfNameAvailable(browserTriggered);
 			}
 			else {
-				this.autoSaveValueChart(this.valueChart);
+				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.purpose);
 			}
@@ -205,7 +205,7 @@ export class CreateValueChartComponent implements OnInit {
 	nextIfNameAvailable(browserTriggered = false) {
 		this.valueChartHttpService.isNameAvailable(this.valueChart.getName()).subscribe(isUnique => {
 			if (isUnique === true) {
-				this.autoSaveValueChart(this.valueChart);
+				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.purpose);
 			}
@@ -347,14 +347,13 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
-	autoSaveValueChart(valueChart: ValueChart): void {
+	autoSaveValueChart(): void {
 		if (this.currentUserService.isJoiningChart()) {
 			return;	// Don't autosave. The user is joining an existing ValueChart.
 		}
-
-		if (!valueChart._id) {
+		if (!this.valueChart._id) {
 			// Save the ValueChart for the first time.
-			this.saveValueChartToDatabase(valueChart);
+			this.saveValueChartToDatabase();
 		} else {
 			// Update the ValueChart.
 			this.valueChartHttpService.updateValueChart(this.valueChart)
@@ -371,8 +370,8 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Create a new ValueChart in the database. Set valueChart._id to the id assigned by the database.
 	*/
-	saveValueChartToDatabase(valueChart: ValueChart): void {
-		this.valueChartHttpService.createValueChart(valueChart)
+	saveValueChartToDatabase(): void {
+		this.valueChartHttpService.createValueChart(this.valueChart)
 			.subscribe(
 			(valueChart: ValueChart) => {
 				// Set the id of the ValueChart.
