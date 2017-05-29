@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-24 18:21:38
+* @Last Modified time: 2017-05-28 22:27:43
 */
 
 // Import Angular Classes
@@ -44,7 +44,7 @@ export class ObjectiveChartRenderer {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;
 
 	// Constants for use in rendering the summary chart.
 	private USER_SCORE_SPACING: number = 10; // The spacing between user score bars, in pixels.

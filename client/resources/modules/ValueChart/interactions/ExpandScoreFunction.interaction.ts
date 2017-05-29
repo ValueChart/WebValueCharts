@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:54:01
+* @Last Modified time: 2017-05-28 22:58:52
 */
 
 // Import Angular Classes:
@@ -45,7 +45,7 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: ScoreFunctionUpdate;
+	public lastRendererUpdate: ScoreFunctionUpdate;
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
 																					// route that the pop-up window will navigate to when it is opened.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:38:02
+* @Last Modified time: 2017-05-28 22:57:51
 */
 
 // Import Angular Classes:
@@ -44,7 +44,7 @@ export class ReorderObjectivesInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: RendererUpdate;	
+	public lastRendererUpdate: RendererUpdate;	
 
 	private labelRootContainer: d3.Selection<any,any,any,any>;
 

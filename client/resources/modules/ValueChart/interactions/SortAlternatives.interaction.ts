@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 14:32:54
+* @Last Modified time: 2017-05-28 22:58:02
 */
 
 // Import Angular Classes:
@@ -71,7 +71,7 @@ export class SortAlternativesInteraction {
 	RESET_SORT: string = 'reset';						// Reset the Alternative order to be the original, default order (based on creation order).
 	SORT_OFF: string = 'none';							// No form of Alternative sorting is enabled.
 
-	private lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;
 	private originalAlternativeOrder: AlternativesRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
 																// class to reset the alternative order.
 

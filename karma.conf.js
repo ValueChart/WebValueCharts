@@ -61,7 +61,7 @@ module.exports = function(config) {
       { pattern: 'node_modules/traceur/bin/traceur.js', included:false, watched: false },
       { pattern: 'node_modules/lodash/lodash.js', included:false, watched: false },
       { pattern: 'node_modules/d3/build/d3.js', included:false, watched: false },
-      { pattern: 'node_modules/sinon/lib/**.js', included:false, watched: false },
+      { pattern: 'node_modules/sinon/pkg/sinon.js', included:false, watched: false },
       
       { pattern: 'systemjs.config.js', included: false, watched: false },
       { pattern: 'systemjs-angular-loader.js', included: false, watched: false },
