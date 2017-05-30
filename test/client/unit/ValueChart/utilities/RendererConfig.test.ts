@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 13:14:47
+* @Last Modified time: 2017-05-29 22:47:04
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -27,7 +27,7 @@ describe('RendererConfigUtility', () => {
 	var width: number, height: number;
 	var u: RendererUpdate;
 
-	before(function() {
+	beforeEach(function() {
 		TestBed.configureTestingModule({
 			providers: [ RendererConfigUtility ]
 		});
@@ -69,11 +69,9 @@ describe('RendererConfigUtility', () => {
 		var rendererConfig: RendererConfig;
 
 		context('when the viewOrientation is "vertical"', () => {
-			before(function() {
-				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
-			});
 
 			it('should should set the first dimension to be width/x and the second dimension to be height/y', () => {
+				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
 
 				expect(rendererConfig.dimensionOne).to.equal('width');
 				expect(rendererConfig.dimensionTwo).to.equal('height');
@@ -84,18 +82,18 @@ describe('RendererConfigUtility', () => {
 			});
 
 			it('should should configure the "dimensionTwoScale" property correctly', () => {
+				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
+
 				expect(rendererConfig.dimensionTwoScale.domain()).to.deep.equal([0, 1]);
 				expect(rendererConfig.dimensionTwoScale.range()).to.deep.equal([0, height]);
 			});	
 		});	
 
 		context('when the viewOrientation is "horizontal"', () => {
-			before(function() {
-				u.viewConfig.viewOrientation = 'horizontal';
-				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
-			});
 
 			it('should should set the first dimension to be height/y and the second dimension to be width/x', () => {
+				u.viewConfig.viewOrientation = 'horizontal';
+				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
 
 				expect(rendererConfig.dimensionOne).to.equal('height');
 				expect(rendererConfig.dimensionTwo).to.equal('width');
@@ -106,6 +104,9 @@ describe('RendererConfigUtility', () => {
 			});
 
 			it('should should configure the "dimensionTwoScale" property correctly', () => {
+				u.viewConfig.viewOrientation = 'horizontal';
+				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
+				
 				expect(rendererConfig.dimensionTwoScale.domain()).to.deep.equal([0, 1]);
 				expect(rendererConfig.dimensionTwoScale.range()).to.deep.equal([0, width]);
 			});	
