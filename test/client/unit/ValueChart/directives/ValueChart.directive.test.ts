@@ -2,61 +2,65 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 18:08:15
+* @Last Modified time: 2017-05-29 21:54:56
 */
 
 // Import Testing Resources:
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
-import { ElementRef } from '@angular/core';
+import { Component } 														from '@angular/core';
+import { ComponentFixture, TestBed, } 										from '@angular/core/testing';
+import { By } 																from '@angular/platform-browser';
+import { DebugElement } 													from '@angular/core';
+import { ElementRef } 														from '@angular/core';
 
-import { expect } from 'chai';
-import * as sinon from 'sinon';
+import { expect } 															from 'chai';
+import * as sinon 															from 'sinon';
 
 // Import Libraries:
-import * as d3 from 'd3';
-import * as _ from 'lodash';
+import * as d3 																from 'd3';
+import * as _ 																from 'lodash';
 
 // Import Test Utilities: 
-import { HotelChartData } from '../../../../testData/HotelChartData';
-import { randomizeUserWeights, randomizeAllUserScoreFunctions } from '../../../../utilities/Testing.utilities';
+import { HotelChartData } 													from '../../../../testData/HotelChartData';
+import { BestPaperChartData }												from '../../../../testData/BestPaper';
+import { randomizeUserWeights, randomizeAllUserScoreFunctions } 			from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { ValueChartDirective } from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
+import { ValueChartDirective } 												from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
 
 // Services:
-import { RenderEventsService } from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { RendererService } from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService } from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ChangeDetectionService } from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
+import { RenderEventsService } 												from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
+import { RendererService } 													from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
+import { ChartUndoRedoService } 											from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { ChangeDetectionService } 											from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
 // Renderers:
-import { ObjectiveChartRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
-import { LabelRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
-import { ScoreFunctionRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
+import { ObjectiveChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
+import { SummaryChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
+import { LabelRenderer } 													from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
+import { ScoreFunctionRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
 // Utilities
-import { RendererDataUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererConfigUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererScoreFunctionUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
+import { RendererDataUtility } 												from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
+import { RendererConfigUtility } 											from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
+import { RendererScoreFunctionUtility } 									from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
 // Interactions
-import { ReorderObjectivesInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
-import { ResizeWeightsInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
+import { ReorderObjectivesInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
+import { ResizeWeightsInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
+import { SortAlternativesInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
+import { SetObjectiveColorsInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
+import { ExpandScoreFunctionInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
 
-import { WebValueChartsParser } from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { WebValueChartsParser } 											from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
 
 // Import Model Classes
-import { ValueChart } from '../../../../../client/resources/model/ValueChart';
-import { User } from '../../../../../client/resources/model/User';
+import { ValueChart } 														from '../../../../../client/resources/model/ValueChart';
+import { User } 															from '../../../../../client/resources/model/User';
+
+// Import Definitions
+import { LabelDefinitions } 												from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
 
 // Import Types
-import { ViewConfig, InteractionConfig } from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate } from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData } from '../../../../../client/resources/types/RendererData.types';
+import { ViewConfig, InteractionConfig } 									from '../../../../../client/resources/types/Config.types';
+import { RendererUpdate } 													from '../../../../../client/resources/types/RendererData.types';
+import { RowData, UserScoreData } 											from '../../../../../client/resources/types/RendererData.types';
 
 @Component({
 	selector: 'viewer-stub',
@@ -587,24 +591,113 @@ describe('ValueChartDirective', () => {
 
 		});
 
-		context('when the input ValueChart set to be a different ValueChart', () => {
-			
-		});
-
 		context('when the view orientation of the ValueChart is changed', () => {
+			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				height = 400;
+				width = 400;
+			});
+
+			it('should re-render the valueChart in the new view orientation', () => {
+				viewConfig.viewOrientation = 'horizontal';
+				fixture.detectChanges();
+
+				// Determine if the ValueChart sent renderer messages as a result of the changed viewOrientation.
+				expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+				expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+				expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
+
+				expect(valueChartDirective['viewConfig'].viewOrientation).to.equal('horizontal');
+
+				let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+				checkCachedRendererUpdates(u);
+			});	
 		});
 
 		context('when the view configuration is changed', () => {
+			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				height = 400;
+				width = 400;
+			});
+
+			it('should re-render the valueChart in the new view orientation', () => {
+				viewerStub.viewConfig = {
+					viewOrientation: 'vertical',
+					displayScoreFunctions: true,
+					displayTotalScores: false,
+					displayScales: true,
+					displayDomainValues: false,
+					displayScoreFunctionValueLabels: true,
+					displayAverageScoreLines: false
+				};
+				fixture.detectChanges();
+
+				// Determine if the ValueChart sent renderer messages as a result of the changed viewOrientation.
+				expect((<sinon.SinonSpy>summaryChartRenderer.viewConfigChanged).calledTwice).to.be.true;
+				expect((<sinon.SinonSpy>objectiveChartRenderer.viewConfigChanged).calledTwice).to.be.true;
+				expect((<sinon.SinonSpy>labelRenderer.viewConfigChanged).calledTwice).to.be.true;
+
+				expect(labelRenderer.rootContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).style('display')).to.equal('block');
+				expect(summaryChartRenderer.scoreTotalsContainer.style('display')).to.equal('none');
+				expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('block');
+				expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');
+				expect(summaryChartRenderer.averageLinesContainer.style('display')).to.equal('none');
+			});	
 		});
 
 		context('when the interaction configuration is changed', () => {
+			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				height = 400;
+				width = 400;
+			});
+
+			it('should re-render the valueChart in the new view orientation', () => {
+				viewerStub.interactionConfig = {
+					weightResizeType: 'neighbor',
+					reorderObjectives: true,
+					sortAlternatives: 'manual',
+					pumpWeights: 'increase',
+					setObjectiveColors: true,
+					adjustScoreFunctions: true
+				};
+
+				fixture.detectChanges();
+
+				// TODO <@aaron>: Improve testability of interactions. As of now, there is no good way to determine if the interactions have been toggled on.
+			});	
 		});
 
 		context('when the width and/or height of the ValueChart is changed', () => {
+			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				height = 400;
+				width = 400;
+			});
+
+			it('should re-render the valueChart in the new view orientation', () => {
+				viewerStub.valueChartWidth = 500;
+				viewerStub.valueChartHeight = 500;
+
+				fixture.detectChanges();
+
+				expect(valueChartDirective['el'].attr('viewBox')).to.equal('0 -10' + ' ' + viewerStub.valueChartWidth + ' ' + viewerStub.valueChartHeight);
+				expect(valueChartDirective['defaultChartComponentWidth']).to.equal(valueChartDirective.CHART_COMPONENT_RATIO * viewerStub.valueChartWidth);
+				expect(valueChartDirective['defaultChartComponentHeight']).to.equal(valueChartDirective.CHART_COMPONENT_RATIO * viewerStub.valueChartHeight);
+			});	
 		});
 
 	});

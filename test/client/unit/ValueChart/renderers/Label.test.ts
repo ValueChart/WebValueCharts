@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:24:01
+* @Last Modified time: 2017-05-29 21:50:48
 */
 
 // Import Testing Resources:
@@ -124,7 +124,7 @@ var chartUndoRedoStub = {
 	}
 };
 
-	var fixture;
+	var fixture: ComponentFixture<LabelStub>;
 	var el: d3.Selection<any, any, any, any>;
 
 	var rendererConfigUtility: RendererConfigUtility;
@@ -184,7 +184,7 @@ var chartUndoRedoStub = {
 			declarations: [ LabelStub ]
 		});
 
-		var fixture = TestBed.createComponent(LabelStub);
+		fixture = TestBed.createComponent(LabelStub);
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
@@ -471,6 +471,12 @@ var chartUndoRedoStub = {
 			});
 		});
 
+	});
+
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
 	});
 
 	describe('public viewConfigChanged = (viewConfig: ViewConfig)', () => {

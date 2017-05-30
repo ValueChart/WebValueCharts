@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:27:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 14:04:00
+* @Last Modified time: 2017-05-29 21:54:26
 */
 
 // Import Testing Resources:
@@ -53,7 +53,7 @@ import { RowData, UserScoreData }						from '../../../../../client/resources/typ
 	selector: 'continuous-score-function-stub',
 	template: `<svg></svg>`
 })
-class LabelStub {
+class ContinuousStub {
 	constructor() { }
 }
 
@@ -69,7 +69,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	};
 
 
-	var fixture;
+	var fixture: ComponentFixture<ContinuousStub>;
 	var el: d3.Selection<any, any, any, any>;
 
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
@@ -100,10 +100,10 @@ describe('ContinuousScoreFunctionRenderer', () => {
 				RendererScoreFunctionUtility,
 				ContinuousScoreFunctionRenderer, 
 				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub } ],
-			declarations: [ LabelStub ]
+			declarations: [ ContinuousStub ]
 		});
 
-		var fixture = TestBed.createComponent(LabelStub);
+		fixture = TestBed.createComponent(ContinuousStub);
 
 		rendererScoreFunctionUtility = TestBed.get(RendererScoreFunctionUtility);
 		scoreFunctionRenderer = TestBed.get(ContinuousScoreFunctionRenderer);
@@ -385,6 +385,13 @@ describe('ContinuousScoreFunctionRenderer', () => {
 			});
 		});
 	});
+
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
+	});
+
 
 
 	var checkNumberOfPointSets = (u: ScoreFunctionUpdate) => {

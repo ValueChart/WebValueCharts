@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:24:22
+* @Last Modified time: 2017-05-29 21:51:17
 */
 
 // Import Testing Resources:
@@ -76,7 +76,7 @@ var renderEventsServiceStub = {
 	objectiveChartDispatcher: { next: (value: number) => { } }
 };
 
-	var fixture;
+	var fixture: ComponentFixture<ObjectiveStub>;
 	var el: d3.Selection<any, any, any, any>;
 
 	var rendererConfigUtility: RendererConfigUtility;
@@ -129,7 +129,7 @@ var renderEventsServiceStub = {
 			declarations: [ ObjectiveStub ]
 		});
 
-		var fixture = TestBed.createComponent(ObjectiveStub);
+		fixture = TestBed.createComponent(ObjectiveStub);
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
@@ -393,6 +393,12 @@ var renderEventsServiceStub = {
 				expect(sortAlternativesStub.sortStatus).to.equal('manual');
 			});
 		});
+	});
+
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
 	});
 
 

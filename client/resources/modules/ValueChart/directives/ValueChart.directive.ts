@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 22:42:50
+* @Last Modified time: 2017-05-29 21:48:49
 */
 
 // Import Angular Classes:
@@ -117,7 +117,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Misc. Fields
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
 	private waitForRenderers: Subscription;
-
 
 	public renderRequired: { value: boolean } = { value: false };
 

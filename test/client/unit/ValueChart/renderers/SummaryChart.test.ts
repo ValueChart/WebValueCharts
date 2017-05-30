@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:24:33
+* @Last Modified time: 2017-05-29 21:51:51
 */
 
 // Import Testing Resources:
@@ -76,7 +76,7 @@ var renderEventsServiceStub = {
 	summaryChartDispatcher: { next: (value: number) => { } }
 };
 
-	var fixture;
+	var fixture: ComponentFixture<LabelStub>;
 	var el: d3.Selection<any, any, any, any>;
 
 	var rendererConfigUtility: RendererConfigUtility;
@@ -129,7 +129,7 @@ var renderEventsServiceStub = {
 			declarations: [ LabelStub ]
 		});
 
-		var fixture = TestBed.createComponent(LabelStub);
+		fixture = TestBed.createComponent(LabelStub);
 
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		rendererDataUtility = TestBed.get(RendererDataUtility);
@@ -374,6 +374,11 @@ var renderEventsServiceStub = {
 		});
 	});
 
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
+	});
 
 	var checkNumberOfRows = (n: number) => {
 		expect(summaryChartRenderer.rows.nodes()).to.have.length(n);

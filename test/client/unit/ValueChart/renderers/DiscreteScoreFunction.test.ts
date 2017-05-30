@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 14:08:44
+* @Last Modified time: 2017-05-29 21:54:16
 */
 
 // Import Testing Resources:
@@ -49,7 +49,7 @@ import { ScoreFunctionUpdate }							from '../../../../../client/resources/types
 	selector: 'discrete-score-function-stub',
 	template: `<svg></svg>`
 })
-class LabelStub {
+class DiscreteStub {
 	constructor() { }
 }
 
@@ -65,7 +65,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 	};
 
 
-	var fixture;
+	var fixture: ComponentFixture<DiscreteStub>;
 	var el: d3.Selection<any, any, any, any>;
 
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
@@ -96,10 +96,10 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				RendererScoreFunctionUtility,
 				DiscreteScoreFunctionRenderer,
 				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub } ],
-			declarations: [ LabelStub ]
+			declarations: [ DiscreteStub ]
 		});
 
-		var fixture = TestBed.createComponent(LabelStub);
+		fixture = TestBed.createComponent(DiscreteStub);
 
 		rendererScoreFunctionUtility = TestBed.get(RendererScoreFunctionUtility);
 		scoreFunctionRenderer = TestBed.get(DiscreteScoreFunctionRenderer);
@@ -386,6 +386,13 @@ describe('DiscreteScoreFunctionRenderer', () => {
 			});
 		});
 	});
+
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
+	});
+
 
 
 	var checkNumberOfBarSets = (u: ScoreFunctionUpdate) => {
