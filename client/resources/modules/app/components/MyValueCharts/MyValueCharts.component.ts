@@ -17,6 +17,7 @@ import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
 import { ValueChartXMLEncoder }							from '../../../utilities/classes/ValueChartXMLEncoder';
+import { ValidationService }							from '../../services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
@@ -52,6 +53,8 @@ export class MyValueChartsComponent implements OnInit {
 	private downloadLink: any;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
 										// on the client side using object URLs.	
 
+	public validationMessage: string;
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -68,7 +71,8 @@ export class MyValueChartsComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		public valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
-		private valueChartHttpService: ValueChartHttpService) { }
+		private valueChartHttpService: ValueChartHttpService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -105,7 +109,19 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
-				this.router.navigate(['/view/', valueChart.getName()]);
+
+				// Verify that the chart is valid before proceeding.
+				// (Finding errors at this point should be rare because invalid charts get marked as incomplete,
+				//  and View Chart is not clickable for incomplete charts. However, we might encounter errors in 
+				//  older charts that pre-date validation, or if we change the validation standards later.)
+				let errorMessages = this.validationService.validate(valueChart);
+				if (errorMessages.length > 0) {
+					this.validationMessage = "There are problems with this chart that must be fixed before it can be viewed.\n\n" + errorMessages.join('\n');
+					$('#validate-modal').modal('show');
+				}
+				else {
+					this.router.navigate(['/view/', valueChart.getName()]);
+				}	
 			});
 	}
 
