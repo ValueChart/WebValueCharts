@@ -9,7 +9,7 @@ import { expect } 								from 'chai';
 chai.use(chaiAsPromised);
 
 // Users need to first log in before managing their accounts
-describe('Register Page', () => {
+describe('My Account Page', () => {
 
 	it('should be located at the /register resource', (done: MochaDone) => {
 		p.browser.get('http://localhost:3000');
@@ -56,7 +56,7 @@ describe('Register Page', () => {
 	// 		- Click 'Update Account Details'
 	// 		- Red notification field should appear
 	
-	it('shouldnt update account details because password does not match', function(){
+	it('shouldn\'t update account details because passwords does not match', function(){
 		
 		// find page elements
 		var passwordField = p.browser.element(p.By.id('password-input'));
@@ -90,7 +90,7 @@ describe('Register Page', () => {
 	// 		- Change email (without changing the password)
 	// 		- Click 'Update Account Details'
 	// 		- Green notification field should appear
-	it('should successfully change account details', function(){
+	it('should successfully change the account\'s email address', function(){
 		
 		// Find page elements
 		var emailField = p.browser.element(p.By.id('email-input'));
@@ -120,7 +120,7 @@ describe('Register Page', () => {
 	// 		- Click 'Update Account Details'
 	// 		- Green notification field should appear
 	//    (note that right now the email field should be vickytry002@gmail.com)
-	it('should successfully change account details', function(){
+	it('should successfully change the account\'s password', function(){
 		
 		// Find page elements
 		var passwordField = p.browser.element(p.By.id('password-input'));
@@ -186,6 +186,28 @@ describe('Register Page', () => {
 		//   - Email; vickytry001@gmail.com
 		//   - Password: 001
 	
+	});
+
+	after(function() {
+		var myAccBtn = p.browser.element(p.By.id('my-account'));
+
+		myAccBtn.click().then(() => {
+
+				var passwordField = p.browser.element(p.By.id('password-input'));
+				var reEtrPwField = p.browser.element(p.By.id('re-password-input'));
+				var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
+				var emailField = p.browser.element(p.By.id('email-input'));
+
+
+				passwordField.clear();
+				passwordField.sendKeys('001');
+				reEtrPwField.clear();
+				reEtrPwField.sendKeys('001');
+				emailField.clear();
+				emailField.sendKeys('vickytry002@gmail.com');
+
+				updAccDtlBtn.click()
+		});
 	});
 
 
