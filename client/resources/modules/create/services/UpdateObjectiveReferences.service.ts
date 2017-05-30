@@ -116,7 +116,7 @@ export class UpdateObjectiveReferencesService {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				if (scoreFunction.getRange() > 0) {
+				if (scoreFunction && scoreFunction.getRange() > 0) {
 					let rescaled = scoreFunction.rescale();
 					if (rescaled) {
 						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());

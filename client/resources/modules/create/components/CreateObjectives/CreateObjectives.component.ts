@@ -481,7 +481,6 @@ export class CreateObjectivesComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Checks validity of objectives structure in the chart.
-						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;

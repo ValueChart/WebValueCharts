@@ -41,7 +41,11 @@
         </div> 
     </div>
 </div>
-<div *ngIf="validationTriggered && badScoreFunctions.length > 0" 
-             class="alert alert-danger">
-          {{badScoreFunctionsText()}}
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
 </div>

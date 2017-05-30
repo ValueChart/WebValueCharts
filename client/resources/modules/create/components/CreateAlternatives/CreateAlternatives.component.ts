@@ -200,7 +200,6 @@ export class CreateAlternativesComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Checks validity of alternatives structure in the chart.
-						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;

@@ -83,7 +83,6 @@ export class CreateBasicInfoComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Checks validity of basic info of the chart.
-						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;

@@ -10,6 +10,7 @@ import { CurrentUserService }                       from '../../../app/services/
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
 import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
+import { ValidationService }                        from '../../../app/services/Validation.service';
 
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
@@ -55,7 +56,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   // Validation fields:
   validationTriggered: boolean = false;
-  badScoreFunctions: string[] = []; // Score functions that failed validation
+  errorMessages: string[]; // Validation error messages
 
   // Default initial function types
   flat: string = ScoreFunction.FLAT;
@@ -75,7 +76,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     public valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
-    private currentUserService: CurrentUserService) { }
+    private currentUserService: CurrentUserService,
+    private validationService: ValidationService) { }
 
   // ========================================================================================
   //                   Methods
@@ -104,13 +106,27 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.initialWorstOutcomes = {};
     this.latestDefaults = {};
 
+    // Make sure score functions are all initialized and complete
     if (!this.user.getScoreFunctionMap()) {
       this.user.setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
     }
-    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      this.validationTriggered = true;
-      this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
-      this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
+    for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+      // Make sure there is a score function for every Objective
+      if (!this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
+        this.user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction());
+      }
+      // Make sure the score function is complete
+      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
+      if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+        let elements = [] ;
+        for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
+          if (scoreFunction.getScore(elt) === undefined) {
+            scoreFunction.setElementScore(elt, 0.5); // If score for element is missing for whatever reason, set it to 0.5
+          }
+        } 
+      } 
+      this.initialBestOutcomes[obj.getName()] = scoreFunction.bestElement;
+      this.initialWorstOutcomes[obj.getName()] = scoreFunction.worstElement; 
     }
     this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
   }
@@ -162,60 +178,13 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
   // ================================ Validation Methods ====================================
 
-  /*   
+    /*   
     @returns {boolean}
-    @description   Validates ScoreFunctions.
-                   This should be done prior to updating the ValueChart model and saving to the database.
+    @description   Checks validity of score functions.
   */
   validate(): boolean {
     this.validationTriggered = true;
-    this.setBadScoreFunctions();
-    if (this.badScoreFunctions.length === 0) {
-      this.rescaleScoreFunctions();
-      return true;
-    }
-    return false;
-  }
-
-  /*   
-   @returns {void}
-   @description   Sets badScoreFunctions to contain names of all Objectives whose ScoreFunctions are invalid.
-                  Currently, it simply checks where each ScoreFunctions has distinct best and worst outcome scores.
- */
-  setBadScoreFunctions(): void {
-    let badScoreFunctions: string[] = [];
-    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-      if (scoreFunction.getRange() === 0) {
-        badScoreFunctions.push(objName);
-      }
-      this.badScoreFunctions = badScoreFunctions;
-    }
-  }
-
-  /*   
-    @returns {void}
-    @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
-  */
-  rescaleScoreFunctions(): void {
-    let rescaled: boolean = false;
-    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-      if (scoreFunction.rescale()) {
-        rescaled = true;
-      }
-    }
-    if (rescaled) {
-      toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
-    }
-  }
-
-  /*   
-    @returns {string}
-    @description   Returns text for bad score function validation message.
-  */
-  badScoreFunctionsText(): string {
-    return "An Objective's outcomes can't all have the same score. Please adjust the score functions for: " +
-      this.badScoreFunctions.map(objname => objname).join(', ');
+    this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
+    return this.errorMessages.length === 0;
   }
 }
