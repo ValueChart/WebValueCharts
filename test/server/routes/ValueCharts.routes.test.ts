@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 13:06:01
+* @Last Modified time: 2017-05-29 14:15:55
 */
 
 // Require Node Libraries:
@@ -241,7 +241,8 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Delete', () => {
 
 			context('when the ValueChart exists', () => {
-				it('should return status code 200', (done: MochaDone) => {					user.delete('ValueCharts/' + chartId)
+				it('should return status code 200', (done: MochaDone) => {					
+					user.delete('ValueCharts/' + chartId)
 						.expect(200)
 						.end(function(err, res) {
 					        if (err) return done(err);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 14:08:48
+* @Last Modified time: 2017-05-29 15:20:06
 */
 
 // Import Angular Classes:
@@ -71,9 +71,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService, 
-		expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
-		super(chartUndoRedoService, expandScoreFunctionInteraction);
+	constructor(chartUndoRedoService: ChartUndoRedoService) {
+		super(chartUndoRedoService);
 	}
 
 	// ========================================================================================

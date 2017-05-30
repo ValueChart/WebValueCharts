@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 22:58:02
+* @Last Modified time: 2017-05-29 15:22:06
 */
 
 // Import Angular Classes:
@@ -115,7 +115,6 @@ export class SortAlternativesInteraction {
 	// 									Methods
 	// ========================================================================================
 
-
 	public initialize(u: RendererUpdate) {
 		if (!this.originalAlternativeOrder && u)
 			this.originalAlternativeOrder = new AlternativesRecord(u.valueChart.getAlternatives());
@@ -130,8 +129,8 @@ export class SortAlternativesInteraction {
 						alternative order while 'objective', and 'manual' are user drive. Type 'none' simply turns off all sorting.
 						Alternative sorting (with the exception of by objective score) is managed by the ObjectiveChart and SummaryChart renderers.
 	*/
-	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
-		this.initialize(lastRendererUpdate);
+	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {
+		this.initialize(rendererUpdate);
 
 		if (sortingType === this.SORT_ALPHABETICALLY) {
 			this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
@@ -158,8 +157,8 @@ export class SortAlternativesInteraction {
 		@description 	Toggles the clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective. This method
 						uses the sortByObjective anonymous function defined below to handle the actual sorting. Sorting by objectives is managed by the LabelRenderer.
 	*/
-	public toggleSortAlternativesByObjectiveScore(enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate): void {
-		this.initialize(lastRendererUpdate);
+	public toggleSortAlternativesByObjectiveScore(enableSorting: boolean, rootContainer: Element, rendererUpdate: RendererUpdate): void {
+		this.initialize(rendererUpdate);
 
 		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
 		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);

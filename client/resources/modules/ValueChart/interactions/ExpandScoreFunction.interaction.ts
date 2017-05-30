@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 22:58:52
+* @Last Modified time: 2017-05-29 15:23:17
 */
 
 // Import Angular Classes:
@@ -46,6 +46,7 @@ export class ExpandScoreFunctionInteraction {
 	// ========================================================================================
 
 	public lastRendererUpdate: ScoreFunctionUpdate;
+	public enableExpanding: boolean;
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
 																					// route that the pop-up window will navigate to when it is opened.
@@ -75,14 +76,14 @@ export class ExpandScoreFunctionInteraction {
 	// 									Methods
 	// ========================================================================================
 
-
 	/*
 		@param enableExpanding - Whether or not to enable double clicking on a ScoreFunction plot to expand it into a pop-up window.
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, lastRendererUpdate: ScoreFunctionUpdate): void {
-		this.lastRendererUpdate = lastRendererUpdate;
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, rendererUpdate: ScoreFunctionUpdate): void {
+		this.lastRendererUpdate = rendererUpdate;
+		this.enableExpanding = enableExpanding;
 		// Initialize the observable that is used to detect clicks and notifies handlers.
 		this.clicks = Observable.fromEvent(scoreFunctionPlots, 'dblclick');
 

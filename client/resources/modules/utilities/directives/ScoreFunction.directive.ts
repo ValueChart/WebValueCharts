@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 22:15:52
+* @Last Modified time: 2017-05-29 13:51:07
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -104,9 +104,9 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	initScoreFunctionPlot(): void {
 
 		if (this.objective.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 		}
 		
 		this.scoreFunctionSubject = new Subject();

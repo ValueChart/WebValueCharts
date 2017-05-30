@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 15:11:26
+* @Last Modified time: 2017-05-29 15:20:26
 */
 
 // Import Angular Classes
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // d3
 import * as d3 														from 'd3';
+import { Subject }													from 'rxjs/Subject';
 
 // Import Application Classes:
 import { RendererService } 											from '../services/Renderer.service';
@@ -68,7 +69,6 @@ export class SummaryChartRenderer {
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
 
 	private numUsers: number;
-	private viewOrientation: string;
 
 	// ========================================================================================
 	// 									Constructor
@@ -95,18 +95,15 @@ export class SummaryChartRenderer {
 			this.createSummaryChart(update);
 		}
 
+
 		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 		}
 
 		this.numUsers = update.valueChart.getUsers().length;
 
+		this.updateInteractions(update);
 		this.renderSummaryChart(update);
-
-		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.interactionsChanged(update.interactionConfig);
-			this.viewOrientation = update.viewConfig.viewOrientation;
-		}	
 	}
 
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {
@@ -118,6 +115,11 @@ export class SummaryChartRenderer {
 		this.toggleScoreTotals(viewConfig.displayTotalScores);
 		this.toggleAverageLines(viewConfig.displayAverageScoreLines);
 	}
+
+	public updateInteractions = (u: RendererUpdate) => {
+		this.sortAlternativesInteraction.lastRendererUpdate = u;
+	}
+
 
 
 	/*

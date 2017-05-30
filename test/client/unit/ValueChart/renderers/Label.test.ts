@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 14:48:34
+* @Last Modified time: 2017-05-29 15:24:01
 */
 
 // Import Testing Resources:
@@ -75,7 +75,7 @@ var sortAlternativesStub = {
 	sortStatus: false,
 	SORT_BY_OBJECTIVE: 'objective',
 
-	toggleSortAlternativesByObjectiveScore: (enableSorting: boolean, rootContainer: Element, lastRendererUpdate: RendererUpdate) => {
+	toggleSortAlternativesByObjectiveScore: (enableSorting: boolean, rootContainer: Element, rendererUpdate: RendererUpdate) => {
 		sortAlternativesStub.sortStatus = enableSorting;
 	}
 };
@@ -84,11 +84,11 @@ var resizeWeightsInteractionStub = {
 	pumpType: '',
 	resizeType: '',
 
-	togglePump: (pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>, lastRendererUpdate: RendererUpdate) => {
+	togglePump: (pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>) => {
 		resizeWeightsInteractionStub.pumpType = pumpType;
 	},
 
-	toggleDragToResizeWeights: (resizeType: string, rootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate) => {
+	toggleDragToResizeWeights: (resizeType: string, rootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate) => {
 		resizeWeightsInteractionStub.resizeType = resizeType;
 	}
 }
@@ -106,7 +106,7 @@ var reorderObjectivesInteractionStub = {
 	objectivesReorderedSubject: new Subject(),
 	enableReordering: false,
 
-	toggleObjectiveReordering: (enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate) => {
+	toggleObjectiveReordering: (enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate) => {
 		reorderObjectivesInteractionStub.enableReordering = enableReordering;
 		return reorderObjectivesInteractionStub.objectivesReorderedSubject;
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-24 17:21:15
+* @Last Modified time: 2017-05-29 17:14:20
 */
 
 // Import Angular Classes:
@@ -80,6 +80,7 @@ export class LabelRenderer {
 	private numUsers: number;
 	private viewOrientation: string;
 
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -116,6 +117,7 @@ export class LabelRenderer {
 			this.createLabels(update, update.labelData, this.labelContainer);
 		}
 
+		this.updateInteractions(update);
 		this.renderLabelSpace(update, update.labelData);
 
 		if (this.numUsers != update.valueChart.getUsers().length) {
@@ -156,6 +158,12 @@ export class LabelRenderer {
 
 	public handleObjectivesReordered = (reordered: boolean) => {
 		this.reordered = reordered;
+	}
+
+	public updateInteractions = (u: RendererUpdate) => {
+		this.resizeWeightsInteraction.lastRendererUpdate = u;
+		this.reorderObjectivesInteraction.lastRendererUpdate = u;
+		this.sortAlternativesInteraction.lastRendererUpdate = u;
 	}
 
 	/*
@@ -479,9 +487,11 @@ export class LabelRenderer {
 		var renderer: ScoreFunctionRenderer
 
 		if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
-			renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
+			renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 		else
-			renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(this.chartUndoRedoService));
+			renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
+
+		this.labelSelections[objective.getId()].renderer = renderer;
 
 		var scoreFunctionSubject = new Subject();
 

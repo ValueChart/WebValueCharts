@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 22:27:43
+* @Last Modified time: 2017-05-29 15:20:16
 */
 
 // Import Angular Classes
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import { Subject }													from 'rxjs/Subject';
 
 // Import Application Classes:
 import { RendererService } 											from '../services/Renderer.service';
@@ -66,7 +67,6 @@ export class ObjectiveChartRenderer {
 	public domainLabels: d3.Selection<any, any, any, any>;
 
 	private numUsers: number;
-	private viewOrientation: string;
 
 	// ========================================================================================
 	// 									Constructor
@@ -86,7 +86,6 @@ export class ObjectiveChartRenderer {
 	// 									Methods
 	// ========================================================================================
 
-
 	public valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 		
@@ -94,25 +93,26 @@ export class ObjectiveChartRenderer {
 			this.createObjectiveChart(update);
 		}
 
+
 		if (this.numUsers != update.valueChart.getUsers().length) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 		}
 
 		this.numUsers = update.valueChart.getUsers().length;
-
+		this.updateInteractions(update);
 		this.renderObjectiveChart(update);
-		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.interactionsChanged(update.interactionConfig);
-			this.viewOrientation = update.viewConfig.viewOrientation;
-		}	
 	}
 
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {
-		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes,  this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes, this.lastRendererUpdate);
 	}
 
 	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleDomainLabels(viewConfig.displayDomainValues);
+	}
+
+	public updateInteractions = (u: RendererUpdate) => {
+		this.sortAlternativesInteraction.lastRendererUpdate = u;
 	}
 
 	/*

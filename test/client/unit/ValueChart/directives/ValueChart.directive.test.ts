@@ -2,60 +2,61 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 23:31:12
+* @Last Modified time: 2017-05-29 18:08:15
 */
 
 // Import Testing Resources:
-import { Component }									from '@angular/core';
-import { ComponentFixture, TestBed }					from '@angular/core/testing';
-import { By }              								from '@angular/platform-browser';
-import { DebugElement }    								from '@angular/core';
-import { ElementRef }									from '@angular/core';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed, } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { ElementRef } from '@angular/core';
 
-import { expect }										from 'chai';
-import * as sinon										from 'sinon';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 // Import Libraries:
-import  * as d3											from 'd3';
-import * as _											from 'lodash';
+import * as d3 from 'd3';
+import * as _ from 'lodash';
 
 // Import Test Utilities: 
-import { HotelChartData }								from '../../../../testData/HotelChartData';
-import { randomizeUserWeights, randomizeAllUserScoreFunctions }	from '../../../../utilities/Testing.utilities';
+import { HotelChartData } from '../../../../testData/HotelChartData';
+import { randomizeUserWeights, randomizeAllUserScoreFunctions } from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { ValueChartDirective }							from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
+import { ValueChartDirective } from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
 
 // Services:
-import { RenderEventsService }							from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ChangeDetectionService }						from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
+import { RenderEventsService } from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
+import { RendererService } from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
+import { ChartUndoRedoService } from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { ChangeDetectionService } from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
 // Renderers:
-import { ObjectiveChartRenderer }						from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer }							from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
-import { LabelRenderer }								from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
+import { ObjectiveChartRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
+import { SummaryChartRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
+import { LabelRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
+import { ScoreFunctionRenderer } from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
 // Utilities
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
+import { RendererDataUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
+import { RendererConfigUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
+import { RendererScoreFunctionUtility } from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
 // Interactions
-import { ReorderObjectivesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
-import { ResizeWeightsInteraction }						from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
+import { ReorderObjectivesInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
+import { ResizeWeightsInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
+import { SortAlternativesInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
+import { SetObjectiveColorsInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
+import { ExpandScoreFunctionInteraction } from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { WebValueChartsParser } from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { User }											from '../../../../../client/resources/model/User';
+import { ValueChart } from '../../../../../client/resources/model/ValueChart';
+import { User } from '../../../../../client/resources/model/User';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
+import { ViewConfig, InteractionConfig } from '../../../../../client/resources/types/Config.types';
+import { RendererUpdate } from '../../../../../client/resources/types/RendererData.types';
+import { RowData, UserScoreData } from '../../../../../client/resources/types/RendererData.types';
 
 @Component({
 	selector: 'viewer-stub',
@@ -70,7 +71,7 @@ import { RowData, UserScoreData }						from '../../../../../client/resources/typ
 				</ValueChart>`
 })
 class ViewerStub {
-	
+
 	public valueChart: ValueChart;
 	public valueChartWidth: number;
 	public valueChartHeight: number;
@@ -88,7 +89,7 @@ class ViewerStub {
 	}
 }
 
-class MockElementRef extends ElementRef {}
+class MockElementRef extends ElementRef { }
 
 describe('ValueChartDirective', () => {
 
@@ -121,11 +122,7 @@ describe('ValueChartDirective', () => {
 
 	var fixture: ComponentFixture<ViewerStub>;
 
-	before(function() {
-
-		parser = new WebValueChartsParser();
-		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
-		hotelChart = parser.parseValueChart(valueChartDocument);
+	beforeEach(() => {
 
 		viewConfig = {
 			viewOrientation: 'vertical',
@@ -146,12 +143,9 @@ describe('ValueChartDirective', () => {
 			adjustScoreFunctions: false
 		};
 
-		height = 400;
-		width = 400;
-
 		TestBed.configureTestingModule({
-			providers: [ 
-				ValueChartDirective, 
+			providers: [
+				ValueChartDirective,
 				{ provide: ElementRef, useClass: MockElementRef },
 				// Services:
 				ChangeDetectionService,
@@ -173,7 +167,7 @@ describe('ValueChartDirective', () => {
 				SetObjectiveColorsInteraction,
 				ExpandScoreFunctionInteraction,
 			],
-			declarations: [ ViewerStub, ValueChartDirective ]
+			declarations: [ViewerStub, ValueChartDirective]
 		});
 
 		fixture = TestBed.createComponent(ViewerStub);
@@ -222,16 +216,41 @@ describe('ValueChartDirective', () => {
 		viewerStub.viewConfig = viewConfig;
 		viewerStub.valueChartWidth = width;
 		viewerStub.valueChartHeight = height;
+
+		fixture.detectChanges();
 	});
 
 	describe('createValueChart(): void', () => {
 
-		context('when the ValueChartDirective is first initialized', () => {
+		before(function() {
+			parser = new WebValueChartsParser();
+			var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+			hotelChart = parser.parseValueChart(valueChartDocument);
 
-			before(function() {
-				fixture.detectChanges();
-				console.log(fixture.isStable());
-			});
+			viewConfig = {
+				viewOrientation: 'vertical',
+				displayScoreFunctions: false,
+				displayTotalScores: false,
+				displayScales: false,
+				displayDomainValues: false,
+				displayScoreFunctionValueLabels: false,
+				displayAverageScoreLines: false
+			};
+
+			interactionConfig = {
+				weightResizeType: 'none',
+				reorderObjectives: false,
+				sortAlternatives: 'none',
+				pumpWeights: 'none',
+				setObjectiveColors: false,
+				adjustScoreFunctions: false
+			};
+
+			height = 400;
+			width = 400;
+		});
+
+		context('when the ValueChartDirective is first initialized', () => {
 
 			it('should call createValueChart exactly once to initialize the ValueChart', () => {
 				expect((<sinon.SinonSpy>valueChartDirective.createValueChart).calledOnce).to.be.true;
@@ -263,8 +282,6 @@ describe('ValueChartDirective', () => {
 			});
 
 			it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
-				// TODO: Add logic to check synchronization for Score Function Renderers.
-
 				let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 				checkCachedRendererUpdates(u);
 			});
@@ -276,88 +293,302 @@ describe('ValueChartDirective', () => {
 		context('when all of the directive\'s input parameters are held constant (ie. no changes are made to the inputs)', () => {
 
 			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				viewConfig = {
+					viewOrientation: 'vertical',
+					displayScoreFunctions: false,
+					displayTotalScores: false,
+					displayScales: false,
+					displayDomainValues: false,
+					displayScoreFunctionValueLabels: false,
+					displayAverageScoreLines: false
+				};
+
+				interactionConfig = {
+					weightResizeType: 'none',
+					reorderObjectives: false,
+					sortAlternatives: 'none',
+					pumpWeights: 'none',
+					setObjectiveColors: false,
+					adjustScoreFunctions: false
+				};
+
+				height = 400;
+				width = 400;
 			});
 
-			it('should NOT send a RendererUpdate message to the renderers', () => {
+			it('ngDoCheck should NOT send new update messages to the renderers when change detection is triggered', () => {
 
-			});
+				expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledOnce).to.be.true;
+				expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledOnce).to.be.true;
+				expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledOnce).to.be.true;
 
-			it('should NOT send a message to the renderers to update the view configuration', () => {
-
-			});
-
-			it('should NOT send a message to the renderers to update the interaction configuration', () => {
-
+				// Trigger second round of change detection.
+				fixture.detectChanges();
+				expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.false;
+				expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.false;
+				expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.false;
 			});
 
 			it('should still have synchronized cached RendererUpdate fields in the renderer and interaction classes', () => {
 
+				fixture.detectChanges();
+				let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+				checkCachedRendererUpdates(u);
 			});
 		});
 
 		context('when the input ValueChart is modified', () => {
 
-			context('when an existing user\'s weights are changed', () => {
-				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+			before(function() {
+				parser = new WebValueChartsParser();
+				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+				hotelChart = parser.parseValueChart(valueChartDocument);
 
+				viewConfig = {
+					viewOrientation: 'vertical',
+					displayScoreFunctions: false,
+					displayTotalScores: false,
+					displayScales: false,
+					displayDomainValues: false,
+					displayScoreFunctionValueLabels: false,
+					displayAverageScoreLines: false
+				};
+
+				interactionConfig = {
+					weightResizeType: 'none',
+					reorderObjectives: false,
+					sortAlternatives: 'none',
+					pumpWeights: 'none',
+					setObjectiveColors: false,
+					adjustScoreFunctions: false
+				};
+
+				height = 400;
+				width = 400;
+
+				aaron = hotelChart.getUsers()[0];
+			});
+
+			context('when an existing user\'s weights are changed', () => {
+				it('should synchronize the changed User to the ValueChartDirective', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+					expect(valueChartDirective['valueChart'].getUsers()).to.have.length(1);
+					expect(valueChartDirective['valueChart'].getUsers()[0]).to.deep.equal(aaron);
+				});
+
+				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+					aaron = randomizeUserWeights(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
 				});
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
+					aaron = randomizeUserWeights(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
 
+					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+					checkCachedRendererUpdates(u);
 				});
 
-				it('should not change the view options or interaction options that are enabled/disabled', () => {
-
-				});
 			});
 
 			context('when an existing user\'s score functions are changed', () => {
-				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 
+				before(function() {
+					parser = new WebValueChartsParser();
+					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+					hotelChart = parser.parseValueChart(valueChartDocument);
+
+					height = 400;
+					width = 400;
+
+					aaron = hotelChart.getUsers()[0];
+				});
+
+				it('should synchronize the changed User to the ValueChartDirective', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+
+					expect(valueChartDirective['valueChart'].getUsers()).to.have.length(1);
+					expect(valueChartDirective['valueChart'].getUsers()[0]).to.deep.equal(aaron);
+				});
+
+				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
 				});
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
 
+					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+					checkCachedRendererUpdates(u);
 				});
 
-				it('should not change the view options or interaction options that are enabled/disabled', () => {
-
-				});
 			});
 
 			context('when a new user is added to the ValueChart', () => {
+
+				before(function() {
+					parser = new WebValueChartsParser();
+					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+					hotelChart = parser.parseValueChart(valueChartDocument);
+
+					height = 400;
+					width = 400;
+
+					aaron = hotelChart.getUsers()[0];
+				});
+
+				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
+				});
+
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+					bob = createRandomTestUser(viewerStub.valueChart, 'bob');
+					viewerStub.valueChart.setUser(bob);
+					fixture.detectChanges();
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledThrice).to.be.false;
 
 				});
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
+					bob = createRandomTestUser(viewerStub.valueChart, 'bob');
+					viewerStub.valueChart.setUser(bob);
+					fixture.detectChanges();
 
+					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+					checkCachedRendererUpdates(u);
 				});
 
-				it('should not change the view options or interaction options that are enabled/disabled', () => {
-
-				});
 			});
 
-			context('when a user is deleted from the ValueChart', () => {
-				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+			context('when a user is deleted from the ValueChart (leaving it with no users)', () => {
+				before(function() {
+					parser = new WebValueChartsParser();
+					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+					hotelChart = parser.parseValueChart(valueChartDocument);
 
+					height = 400;
+					width = 400;
+
+					aaron = hotelChart.getUsers()[0];
+				});
+
+
+				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
+
+					fixture.detectChanges();
+					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
+				});
+
+				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+					viewerStub.valueChart.setUsers([]);
+					fixture.detectChanges();
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledThrice).to.be.false;
 				});
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
+					viewerStub.valueChart.setUsers([]);
+					fixture.detectChanges();
+
+					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+					checkCachedRendererUpdates(u);
+				});
+
+			});
+
+			context('when a user is deleted from the ValueChart (when it has many users)', () => {
+
+				before(function() {
+					parser = new WebValueChartsParser();
+					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
+					hotelChart = parser.parseValueChart(valueChartDocument);
+
+					height = 400;
+					width = 400;
+
+					aaron = hotelChart.getUsers()[0];
+					hotelChart.setUser(createRandomTestUser(hotelChart, 'bob'));
+					hotelChart.setUser(createRandomTestUser(hotelChart, 'james'));
 
 				});
 
-				it('should not change the view options or interaction options that are enabled/disabled', () => {
+				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
+					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
+					viewerStub.valueChart.setUser(aaron);
 
+					fixture.detectChanges();
+					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
 				});
+
+				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
+					viewerStub.valueChart.removeUser(aaron);
+					fixture.detectChanges();
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
+
+					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledThrice).to.be.false;
+					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledThrice).to.be.false;
+				});
+
+				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
+					viewerStub.valueChart.removeUser(aaron);
+					fixture.detectChanges();
+
+					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
+					checkCachedRendererUpdates(u);
+				});
+
 			});
 
 		});
 
 		context('when the input ValueChart set to be a different ValueChart', () => {
-
+			
 		});
 
 		context('when the view orientation of the ValueChart is changed', () => {
@@ -374,11 +605,28 @@ describe('ValueChartDirective', () => {
 
 		context('when the width and/or height of the ValueChart is changed', () => {
 
-		}); 
+		});
 
 	});
 
-	var checkCachedRendererUpdates = (u : RendererUpdate) => {
+	after(function() {
+		fixture.destroy();
+
+		TestBed.resetTestingModule();
+	});
+
+	var createRandomTestUser = (valueChart: ValueChart, name: string) => {
+		var user = new User(name);
+		user.setScoreFunctionMap(valueChart.getUsers()[0].getScoreFunctionMap());
+		user.setWeightMap(valueChart.getUsers()[0].getWeightMap());
+
+		user = randomizeAllUserScoreFunctions(user, valueChart);
+		user = randomizeUserWeights(user, valueChart);
+
+		return user;
+	}
+
+	var checkCachedRendererUpdates = (u: RendererUpdate) => {
 
 		// They should have the same attributes:
 		expect(summaryChartRenderer.lastRendererUpdate).to.deep.equal(u);
@@ -395,9 +643,18 @@ describe('ValueChartDirective', () => {
 		expect(reorderObjectivesInteraction.lastRendererUpdate).to.equal(u);
 		expect(resizeWeightsInteraction.lastRendererUpdate).to.equal(u);
 		expect(sortAlternativesInteraction.lastRendererUpdate).to.equal(u);
-	}
-	
 
+		// Check score function updates:
+		u.valueChart.getAllPrimitiveObjectives().forEach((objective) => {
+			let scoreFunctionRenderer: ScoreFunctionRenderer = labelRenderer.labelSelections[objective.getId()].renderer;
+
+			expect(scoreFunctionRenderer.lastRendererUpdate).to.deep.equal(scoreFunctionRenderer.adjustScoreFunctionInteraction.lastRendererUpdate);
+			expect(scoreFunctionRenderer.lastRendererUpdate).to.deep.equal(scoreFunctionRenderer.expandScoreFunctionInteraction.lastRendererUpdate);
+
+			expect(scoreFunctionRenderer.lastRendererUpdate).to.equal(scoreFunctionRenderer.adjustScoreFunctionInteraction.lastRendererUpdate);
+			expect(scoreFunctionRenderer.lastRendererUpdate).to.equal(scoreFunctionRenderer.expandScoreFunctionInteraction.lastRendererUpdate);
+		});
+	}
 });
 
 

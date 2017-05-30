@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:27:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 17:22:16
+* @Last Modified time: 2017-05-29 14:04:00
 */
 
 // Import Testing Resources:
@@ -68,13 +68,6 @@ describe('ContinuousScoreFunctionRenderer', () => {
 		}
 	};
 
-	var expandScoreFunctionStub = {
-		enableExpanding: false,
-
-		toggleExpandScoreFunction: (enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, lastRendererUpdate: ScoreFunctionUpdate) => {
-			expandScoreFunctionStub.enableExpanding = enableExpanding;
-		}
-	}
 
 	var fixture;
 	var el: d3.Selection<any, any, any, any>;
@@ -82,6 +75,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	var scoreFunctionRenderer: ContinuousScoreFunctionRenderer;
 	var adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
+	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
 	var parser: WebValueChartsParser;
@@ -105,8 +99,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 			providers: [ 
 				RendererScoreFunctionUtility,
 				ContinuousScoreFunctionRenderer, 
-				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub },
-				{ provide: ExpandScoreFunctionInteraction, useValue: expandScoreFunctionStub } ],
+				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub } ],
 			declarations: [ LabelStub ]
 		});
 
@@ -115,6 +108,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 		rendererScoreFunctionUtility = TestBed.get(RendererScoreFunctionUtility);
 		scoreFunctionRenderer = TestBed.get(ContinuousScoreFunctionRenderer);
 		adjustScoreFunctionInteraction = scoreFunctionRenderer['adjustScoreFunctionInteraction'];
+		expandScoreFunctionInteraction = scoreFunctionRenderer['expandScoreFunctionInteraction'];
 
 
 		el = d3.select(fixture.debugElement.nativeElement.firstChild);
@@ -374,7 +368,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 
 		context('when all of the interaction options are disabled in the interactionConfig object', () => {
 			it('should set the score interaction functions to be disabled', () => {
-				expect(expandScoreFunctionStub.enableExpanding).to.be.false;
+				expect(expandScoreFunctionInteraction.enableExpanding).to.be.false;
 				expect(adjustScoreFunctionInteraction.adjustScoreFunctions).to.be.false;
 			});
 		});
@@ -385,8 +379,8 @@ describe('ContinuousScoreFunctionRenderer', () => {
 				scoreFunctionRenderer.interactionConfigChanged(u.interactionConfig);
 			});
 
-			it('should set the score interaction functions to be enabled', () => {
-				expect(expandScoreFunctionStub.enableExpanding).to.be.true;
+			it('should set the score function interactions to be enabled', () => {
+				expect(expandScoreFunctionInteraction.enableExpanding).to.be.true;
 				expect(adjustScoreFunctionInteraction.adjustScoreFunctions).to.be.true;
 			});
 		});

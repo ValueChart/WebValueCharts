@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 15:26:09
+* @Last Modified time: 2017-05-29 15:24:22
 */
 
 // Import Testing Resources:
@@ -65,7 +65,7 @@ var sortAlternativesStub = {
 
 	sortStatus: '',
 
-	toggleAlternativeSorting: (sortAlternatives: string, alternativeBoxes: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate) => {
+	toggleAlternativeSorting: (sortAlternatives: string, alternativeBoxes: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate) => {
 		sortAlternativesStub.sortStatus = sortAlternatives;
 		return;
 	}

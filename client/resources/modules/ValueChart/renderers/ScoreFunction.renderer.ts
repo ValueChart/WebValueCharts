@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 14:07:56
+* @Last Modified time: 2017-05-29 15:19:42
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import { Subject }													from 'rxjs/Subject';
 
 // Import Application Classes:
 import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
@@ -62,12 +63,12 @@ export abstract class ScoreFunctionRenderer {
 	public unitsLabel: d3.Selection<any, any, any, any>;
 	public utilityAxisContainer: d3.Selection<any, any, any, any>;
 
-	protected lastRendererUpdate: ScoreFunctionUpdate;
+	public lastRendererUpdate: ScoreFunctionUpdate;
 	protected numUsers: number;
 	protected viewOrientation: string;
 
-	protected adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
-
+	public adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
+	public expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs = {
@@ -99,9 +100,9 @@ export abstract class ScoreFunctionRenderer {
 						This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
 	constructor(
-		protected chartUndoRedoService: ChartUndoRedoService,
-		protected expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
+		public chartUndoRedoService: ChartUndoRedoService) {
 		this.adjustScoreFunctionInteraction = new AdjustScoreFunctionInteraction(this.chartUndoRedoService);
+		this.expandScoreFunctionInteraction = new ExpandScoreFunctionInteraction(this.chartUndoRedoService);
 	}
 
 	// ========================================================================================
@@ -124,13 +125,13 @@ export abstract class ScoreFunctionRenderer {
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
 		}
 
+		this.updateInteractions(update);
 		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
-		
+
 		if (update.styleUpdate) {
 			this.applyStyles(update);
 		}
 
-		this.adjustScoreFunctionInteraction.lastRendererUpdate = this.lastRendererUpdate;
 		this.numUsers = update.scoreFunctions.length;
 		this.viewOrientation = update.viewOrientation;
 	}
@@ -141,6 +142,11 @@ export abstract class ScoreFunctionRenderer {
 
 	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
+	}
+
+	public updateInteractions = (u: ScoreFunctionUpdate) => {
+		this.expandScoreFunctionInteraction.lastRendererUpdate = u;
+		this.adjustScoreFunctionInteraction.lastRendererUpdate = u;
 	}
 
 	/*

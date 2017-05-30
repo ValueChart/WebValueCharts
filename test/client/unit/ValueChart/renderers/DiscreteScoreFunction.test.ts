@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 14:53:17
+* @Last Modified time: 2017-05-29 14:08:44
 */
 
 // Import Testing Resources:
@@ -64,13 +64,6 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		}
 	};
 
-	var expandScoreFunctionStub = {
-		enableExpanding: false,
-
-		toggleExpandScoreFunction: (enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, lastRendererUpdate: ScoreFunctionUpdate) => {
-			expandScoreFunctionStub.enableExpanding = enableExpanding;
-		}
-	}
 
 	var fixture;
 	var el: d3.Selection<any, any, any, any>;
@@ -78,6 +71,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	var scoreFunctionRenderer: DiscreteScoreFunctionRenderer;
 	var adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
+	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
 	var parser: WebValueChartsParser;
@@ -101,8 +95,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 			providers: [ 
 				RendererScoreFunctionUtility,
 				DiscreteScoreFunctionRenderer,
-				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub },
-				{ provide: ExpandScoreFunctionInteraction, useValue: expandScoreFunctionStub } ],
+				{ provide: ChartUndoRedoService, useValue: chartUndoRedoStub } ],
 			declarations: [ LabelStub ]
 		});
 
@@ -112,6 +105,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		scoreFunctionRenderer = TestBed.get(DiscreteScoreFunctionRenderer);
 
 		adjustScoreFunctionInteraction = scoreFunctionRenderer['adjustScoreFunctionInteraction'];
+		expandScoreFunctionInteraction = scoreFunctionRenderer['expandScoreFunctionInteraction'];
 
 		el = d3.select(fixture.debugElement.nativeElement.firstChild);
 
@@ -375,7 +369,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 		context('when all of the interaction options are disabled in the interactionConfig object', () => {
 			it('should set the score interaction functions to be disabled', () => {
-				expect(expandScoreFunctionStub.enableExpanding).to.be.false;
+				expect(expandScoreFunctionInteraction.enableExpanding).to.be.false;
 				expect(adjustScoreFunctionInteraction.adjustScoreFunctions).to.be.false;
 			});
 		});
@@ -386,8 +380,8 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				scoreFunctionRenderer.interactionConfigChanged(u.interactionConfig);
 			});
 
-			it('should set the score interaction functions to be enabled', () => {
-				expect(expandScoreFunctionStub.enableExpanding).to.be.true;
+			it('should set the score function interactions to be enabled', () => {
+				expect(expandScoreFunctionInteraction.enableExpanding).to.be.true;
 				expect(adjustScoreFunctionInteraction.adjustScoreFunctions).to.be.true;
 			});
 		});
