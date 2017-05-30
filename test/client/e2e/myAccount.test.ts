@@ -39,9 +39,8 @@ describe('Register Page', () => {
 
 
 
-	// -------------- Above is going to the website and login. Change account starts below --------------
 
-	// Click 'myAccount' button to modify account details
+	// Once loggin, click 'myAccount' button to modify account details
 	it('should allow users to go to account managment page', function(){
 		
 		var myAccBtn = p.browser.element(p.By.id('my-account'));
@@ -52,7 +51,7 @@ describe('Register Page', () => {
 
 
 	// Case 1: Fail because reenter password doesn't match
-	// 		Still at the 'myAccount' page:
+	// 		At the 'myAccount' page:
 	//		- Change password (reenter does not match)
 	// 		- Click 'Update Account Details'
 	// 		- Red notification field should appear
@@ -79,15 +78,15 @@ describe('Register Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('col-sm-offset-4','The entered password do not match'));
-			// expect(succUpdSpan.isPresent()).to.be.true;
+			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','The entered passwords do not match'));
+			expect(succUpdSpan.isDisplayed()).to.eventually.be.true;
 		});
 
 	});
 
 
 	// Case 2: succesfully change the email.
-	// 		At 'myAccount' page:
+	// 		Still at 'myAccount' page:
 	// 		- Change email (without changing the password)
 	// 		- Click 'Update Account Details'
 	// 		- Green notification field should appear
@@ -109,14 +108,14 @@ describe('Register Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('col-sm-offset-4','Account Details Succesfully Updated'));
-			// expect(succUpdSpan.isDisplayed()).to.be.true; // .to.be.true; & .to.equal(true);
+			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
+			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
 		});
 
 	});
 
 	// Case 3: succesfully change the password.
-	// 		At 'myAccount' page:
+	// 		Still at 'myAccount' page:
 	// 		- Change email and password (reenter matches)
 	// 		- Click 'Update Account Details'
 	// 		- Green notification field should appear
@@ -142,13 +141,13 @@ describe('Register Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('col-sm-offset-4','Account Details Succesfully Updated'));
-			// expect(succUpdSpan.isDisplayed()).to.be.true; // .to.be.true; & .to.equal(true);
+			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
+			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
 		});
 
 	});
 
-	// Log out and login to the modified account. Account imfo:
+	// Log out and login to the modified account. Account imfo at this point:
 	//	 - Username: vickytry001
 	//   - Email: vickytry002@gmail.com
 	//   - Password: 002
