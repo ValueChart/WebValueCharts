@@ -204,7 +204,6 @@ export class HomeComponent {
 						Returns true iff there were no validation errors.
 	*/
 	validateUpload(valueChart: ValueChart): boolean {
-
 		let structuralErrors = this.validationService.validateStructure(valueChart);
 		let userErrors = this.validationService.validateUsers(valueChart);	
 

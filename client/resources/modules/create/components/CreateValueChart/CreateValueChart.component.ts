@@ -103,7 +103,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 
 		// Initialize according to purpose
-		if (this.purpose == "newChart") {
+		if (this.purpose === "newChart") {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			(<any>valueChart).incomplete = true; // Initialize ValueChart to incomplete
@@ -238,14 +238,12 @@ export class CreateValueChartComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Disable the View Chart button if:
-						(1) The step is not Alternatives or Priorities
-						(2) The chart structure is invalid
-						(3) The current user's preferences are invalid
+						(1) the chart structure is invalid
+						(2) the current user's preferences are invalid
 	*/
 	disableViewChartButton(): boolean {
 		this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser());
-		return ((this.creationStepsService.step !== this.creationStepsService.ALTERNATIVES && this.creationStepsService.step !== this.creationStepsService.PRIORITIES)
-			|| (this.validationService.validateStructure(this.valueChart).length > 0)
+		return (this.validationService.validateStructure(this.valueChart).length > 0
 			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 	}
 
@@ -295,12 +293,12 @@ export class CreateValueChartComponent implements OnInit {
 	/* 	
 		@returns {void}
 		@description	This method handles the user's response to the navigation confirmation modal.
-						Navigation proceeds if the user elected to discard the chart or save the chart (and validation succeeds).
+						Navigation proceeds if the user elected to discard the chart or save the chart.
 						If this.saveOnDestroy is set to true, the chart will be saved when ngDestroy is called.
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate && keepValueChart && this.creationStepsService.step === this.creationStepsService.BASICS && 
-			this.creationStepsService.checkNameChanged() && this.creationStepsService.validate()) {
+			this.creationStepsService.checkNameChanged()) {
 			this.navigateAndSaveIfNameAvailable();
 		}
 		else {

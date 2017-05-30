@@ -30,8 +30,8 @@
                     <div class="row">
                         <div class="col-sm-offset-3 col-sm-9">
                             <button type="submit" class="btn btn-lg btn-success" (click)="handleNavigationReponse(true, true)">{{ ((currentUserService.isJoiningChart()) ? "Leave" : "Keep") }}</button>
-                            <button type="submit" class="btn btn-lg btn-danger" *ngIf="!currentUserService.isJoiningChart()" (click)="handleNavigationReponse(false, true)">Discard</button>
-                            <button type="submit" class="btn btn-lg btn-primary col-sm-offset-1" (click)="handleNavigationReponse(true, false)">Cancel Navigation</button>
+                            <button type="submit" class="btn btn-lg btn-primary" *ngIf="!currentUserService.isJoiningChart()" (click)="handleNavigationReponse(false, true)">Discard</button>
+                            <button type="submit" class="btn btn-lg btn-danger col-sm-offset-1" (click)="handleNavigationReponse(true, false)">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -49,11 +49,6 @@
                     <div class="row">
                         <div class="col-sm-11 col-sm-offset-1">
                             <h5 id="validate-message">{{validationMessage}}</h5>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button type="submit" class="btn btn-lg btn-success" data-dismiss="modal">OK</button>       
                         </div>
                     </div>
                 </div>
