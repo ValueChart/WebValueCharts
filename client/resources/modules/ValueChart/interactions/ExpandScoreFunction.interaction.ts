@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:23:17
+* @Last Modified time: 2017-05-31 16:04:10
 */
 
 // Import Angular Classes:
@@ -111,8 +111,7 @@ export class ExpandScoreFunctionInteraction {
 		(<any>window).colors = this.lastRendererUpdate.colors;
 		(<any>window).objectiveToPlot = objective;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
-		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily
-														// Need to find a clean way to pass parameter in from ValueChartViewer										
+		(<any>window).enableInteraction = this.lastRendererUpdate.interactionConfig.adjustScoreFunctions;
 
 		// Open the pop-up. Note that this.popUpRef is a reference to the child window.
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
