@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:59:20
+* @Last Modified time: 2017-05-30 21:57:34
 */
 
 // Import Model Classes:
@@ -60,7 +60,6 @@ export class JsonValueChartParser {
 		// Copy over all the properties from the WeightMap that is being saved.
 		valueChart._id = JsonValueChart._id;
 		valueChart.password = JsonValueChart.password;
-		valueChart.setId(JsonValueChart.id);
 
 		if (JsonValueChart.rootObjectives !== undefined) {
 			// Parse Root Objectives

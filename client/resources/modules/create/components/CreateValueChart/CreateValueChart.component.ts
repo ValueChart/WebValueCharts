@@ -207,7 +207,7 @@ export class CreateValueChartComponent implements OnInit {
 						
 	*/
 	nextIfNameAvailable(browserTriggered = false) {
-		this.valueChartHttpService.isNameAvailable(this.valueChart.getName()).subscribe(isUnique => {
+		this.valueChartHttpService.isNameAvailable(this.valueChart.getId()).subscribe(isUnique => {
 			if (isUnique === true) {
 				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;

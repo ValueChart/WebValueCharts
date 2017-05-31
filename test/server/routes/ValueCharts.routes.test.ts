@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 14:15:55
+* @Last Modified time: 2017-05-30 22:28:42
 */
 
 // Require Node Libraries:
@@ -38,13 +38,14 @@ describe('ValueCharts Routes', () => {
 
 		valueChartParser = new JsonValueChartParser();
 
-		JsonGroupHotel.name = 'TestHotel';
+		JsonGroupHotel.name = 'Test Hotel';
+		JsonGroupHotel.id = 'TestHotel';
 
 		user = request.agent('http://localhost:3000/');
 
 
 		// Clean any test charts that have been left it the database from previous executions.
-		user.get('ValueCharts/' + JsonGroupHotel.name + '/id')
+		user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
 			.set('Accept', 'text')
 			.end(function(err, res) {
 				if (err) return done(err);
@@ -78,7 +79,7 @@ describe('ValueCharts Routes', () => {
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse._id).to.not.be.undefined;
-							expect(valueChartResponse.name).to.equal('TestHotel')
+							expect(valueChartResponse.name).to.equal('Test Hotel')
 							expect(valueChartResponse.users).to.have.length(1);
 							expect(valueChartResponse.alternatives).to.have.length(6);
 
@@ -113,7 +114,7 @@ describe('ValueCharts Routes', () => {
 			context('when a ValueChart with the given name exists', () => {
 
 				it('should return the ID of the ValueChart along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/' + JsonGroupHotel.name + '/id')
+					user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
 							.set('Accept', 'text')
 							.expect(200)
 						    .expect((res: request.Response) => {
@@ -162,7 +163,7 @@ describe('ValueCharts Routes', () => {
 							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
-							expect(valueChartResponse.name).to.equal('TestHotel')
+							expect(valueChartResponse.name).to.equal('Test Hotel')
 							expect(valueChartResponse.users).to.have.length(1);
 							expect(valueChartResponse.alternatives).to.have.length(6);
 							expect(valueChartResponse._id).to.equal(chartId);
@@ -176,7 +177,7 @@ describe('ValueCharts Routes', () => {
 
 			context('when a ValueChart with the given name exists', () => {
 				it('should retrieve the ValueChart along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/' + JsonGroupHotel.name + '?password=' + password)
+					user.get('ValueCharts/' + JsonGroupHotel.id + '?password=' + password)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
@@ -184,7 +185,7 @@ describe('ValueCharts Routes', () => {
 							var valueChartResponse = res.body.data;
 
 							expect(valueChartResponse).to.not.be.undefined;
-							expect(valueChartResponse.name).to.equal('TestHotel')
+							expect(valueChartResponse.name).to.equal('Test Hotel')
 							expect(valueChartResponse.users).to.have.length(1);
 							expect(valueChartResponse.alternatives).to.have.length(6);
 							expect(valueChartResponse._id).to.equal(chartId);
@@ -212,7 +213,8 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Put', () => {
 
 			before(function() {
-				JsonGroupHotel.name = 'TestHotelSelectionProblem';
+				JsonGroupHotel.name = 'Test Hotel Selection Problem';
+				JsonGroupHotel.id = 'TestHotelSelectionProblem';
 				JsonGroupHotel.users = [JsonGroupHotel.users[0], JsonGroupHotel.users[0]];
 				alternative = JsonGroupHotel.alternatives.pop();
 			})
@@ -227,7 +229,7 @@ describe('ValueCharts Routes', () => {
 
 						expect(valueChartResponse).to.not.be.undefined;
 						expect(valueChartResponse._id).to.equal(chartId);
-						expect(valueChartResponse.name).to.equal('TestHotelSelectionProblem')
+						expect(valueChartResponse.name).to.equal('Test Hotel Selection Problem')
 						expect(valueChartResponse.users).to.have.length(2);
 						expect(valueChartResponse.alternatives).to.have.length(5);
 
@@ -289,7 +291,7 @@ describe('ValueCharts Routes', () => {
 						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
-						expect(valueChartResponse.name).to.equal('TestHotelSelectionProblem')
+						expect(valueChartResponse.name).to.equal('Test Hotel Selection Problem')
 						expect(valueChartResponse.users).to.be.undefined;
 						expect(valueChartResponse.alternatives).to.have.length(5);
 						expect(valueChartResponse.rootObjectives).to.have.length(1);
@@ -305,7 +307,8 @@ describe('ValueCharts Routes', () => {
 		describe('Method: Put', () => {
 			before(function() {
 				JsonGroupHotel.alternatives.push(alternative);
-				JsonGroupHotel.name = 'TestHotel';
+				JsonGroupHotel.name = 'Test Hotel';
+				JsonGroupHotel.id = 'TestHotel';
 				JsonGroupHotel.rootObjectives.push(JsonGroupHotel.rootObjectives[0].subObjectives[0]);
 			});
 
@@ -318,7 +321,7 @@ describe('ValueCharts Routes', () => {
 						var valueChartResponse = res.body.data;
 
 						expect(valueChartResponse).to.not.be.undefined;
-						expect(valueChartResponse.name).to.equal('TestHotel')
+						expect(valueChartResponse.name).to.equal('Test Hotel')
 						expect(valueChartResponse.users).to.be.undefined;
 						expect(valueChartResponse.alternatives).to.have.length(6);
 						expect(valueChartResponse.rootObjectives).to.have.length(2);

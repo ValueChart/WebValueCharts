@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:36:53
+* @Last Modified time: 2017-05-30 22:35:26
 */
 
 // Import Angular Classes:
@@ -109,7 +109,6 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
-
 				// Verify that the chart is valid before proceeding.
 				// (Finding errors at this point should be rare because invalid charts get marked as incomplete,
 				//  and View Chart is not clickable for incomplete charts. However, we might encounter errors in 
@@ -120,7 +119,7 @@ export class MyValueChartsComponent implements OnInit {
 					$('#validate-modal').modal('show');
 				}
 				else {
-					this.router.navigate(['/view/', valueChart.getName()]);
+					this.router.navigate(['/view/', valueChart.getId()]);
 				}	
 			});
 	}

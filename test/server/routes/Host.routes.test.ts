@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 12:28:13
+* @Last Modified time: 2017-05-30 22:13:22
 */
 
 // Require Node Libraries:
@@ -40,10 +40,11 @@ describe('WebSocket: /Host', () => {
 	before(function(done: MochaDone) {
 		user = request.agent('http://localhost:3000/');
 
-		JsonGroupHotel.name = 'TestHotel';
+		JsonGroupHotel.name = 'Test Hotel';
+		JsonGroupHotel.id = 'TestHotel';
 
 		// Clean any test charts that have been left it the database from previous executions.
-		user.get('ValueCharts/' + JsonGroupHotel.name + '/id')
+		user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
 			.set('Accept', 'text')
 			.end(function(err, res) {
 

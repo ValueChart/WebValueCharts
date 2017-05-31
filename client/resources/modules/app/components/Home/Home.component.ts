@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 22:47:27
+* @Last Modified time: 2017-05-30 22:16:47
 */
 
 // Import Angular Classes:
@@ -18,6 +18,9 @@ import { ValidationService }							from '../../services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
+
+// Import Utility Classes:
+import * as Formatter									from '../../../utilities/classes/Formatter';
 
 // Import Sample Data:
 import { singleHotel, groupHotel, waterManagement}		from '../../../../data/DemoValueCharts';
@@ -112,7 +115,7 @@ export class HomeComponent {
 						name and password.
 	*/
 	joinValueChart(chartName: string, chartPassword: string): void {
-		this.valueChartHttpService.getValueChartStructure(chartName, chartPassword)
+		this.valueChartHttpService.getValueChartStructure(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
@@ -135,13 +138,13 @@ export class HomeComponent {
 						Notifies the user using a banner warning if no ValueChart exists with the given name and password.
 	*/
 	viewValueChart(chartName: string, chartPassword: string): void {
-		this.valueChartHttpService.getValueChartByName(chartName, chartPassword)
+		this.valueChartHttpService.getValueChartByName(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
-				var parameters = this.valueChartService.getValueChart().getName();
+				var parameters = this.valueChartService.getValueChart().getId();
 				this.router.navigate(['/view/', parameters]);
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -160,7 +163,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.valueChartService.getValueChart().getName();
+		var parameters = this.valueChartService.getValueChart().getId();
 		this.router.navigate(['/view/', parameters]);
 	}
 

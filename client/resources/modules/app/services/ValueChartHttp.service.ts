@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 12:43:07
+* @Last Modified time: 2017-05-30 22:02:32
 */
 
 // Import Angular Classes:
@@ -105,7 +105,7 @@ export class ValueChartHttpService {
 	}
 
 	/*
-		@param chartName - The ValueChart name whose availability is to be checked.
+		@param chartName - The ValueChart name (formatted) whose availability is to be checked.
 		@returns {Observable<boolean>} - An observable of a boolean value. If the boolean is true, the name is available; 
 		@description 	Determines whether or not the give ValueChart name is available by querying the server to see
 						if a ValueChart resource with that name already exists. Note that duplicate names are not permitted for ValueCharts.
@@ -132,7 +132,7 @@ export class ValueChartHttpService {
 	}
 
 	/*
-		@param chartName - The name of the ValueChart whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
+		@param chartName - The name of the ValueChart (formatted) whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
 		@param password - The password for the ValueChart whose structure is to be retrieved.
 		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
 		@description 	Queries the server to retrieve a copy of the ValueChart resource with the given name and password. This will fail
@@ -170,7 +170,7 @@ export class ValueChartHttpService {
 	}
 
 	/*
-		@param chartName - The name of the ValueChart whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
+		@param chartName - The name of the ValueChart (formatted) whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
 		@param password - The password for the ValueChart whose structure is to be retrieved.
 		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
 		@description 	Queries the server to retrieve the structure of the ValueChart resource with the given name and password.

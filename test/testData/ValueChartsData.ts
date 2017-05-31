@@ -2,11 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-28 13:01:49
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-28 17:07:02
+* @Last Modified time: 2017-05-30 22:09:58
 */
 
 export var JsonGroupHotel: any = {
     "name": "Hotel",
+    "id": "Hotel",
     "description": "Description Information Goes Here\n\t                    ",
     "creator": "Aaron Mishkin",
     "rootObjectives": [
