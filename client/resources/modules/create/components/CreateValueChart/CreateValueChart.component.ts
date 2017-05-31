@@ -252,9 +252,11 @@ export class CreateValueChartComponent implements OnInit {
 						(4) on the Preferences step (because the WeightMap might get reset on destroy)
 	*/
 	disableViewChartButton(): boolean {
-		return (this.validationService.validateStructure(this.valueChart).length > 0
-			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 )
-			|| this.creationStepsService.step === this.creationStepsService.BASICS 
+		// return (this.validationService.validateStructure(this.valueChart).length > 0
+		// 	|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 )
+		// 	|| this.creationStepsService.step === this.creationStepsService.BASICS 
+		// 	|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
+		return (this.creationStepsService.step === this.creationStepsService.BASICS
 			|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
 	}
 

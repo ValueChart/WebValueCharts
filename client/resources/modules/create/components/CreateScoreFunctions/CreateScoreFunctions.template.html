@@ -23,7 +23,7 @@
             </div>
             <body id="objective-description">{{valueChartService.getObjectiveByName(selectedObjective).getDescription()}}</body>
         </div> 
-        <div class="col-xs-offset-3" tabindex="100" (blur)="resetErrorMessages()">
+        <div class="col-xs-offset-3">
             <ScoreFunction 
                 [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(selectedObjective)]"
                 [colors]="[user.color]"
