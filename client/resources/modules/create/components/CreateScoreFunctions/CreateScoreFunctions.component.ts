@@ -27,6 +27,7 @@ import { IntervalDomain }												    from '../../../../model/IntervalDomain'
 import { ScoreFunction }												    from '../../../../model/ScoreFunction';
 import { DiscreteScoreFunction }										from '../../../../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }								  from '../../../../model/ContinuousScoreFunction';
+import { WeightMap }                                from '../../../../model/WeightMap';
 
 /*
   This component defines the UI controls for defining the ScoreFunctions for a ValueChart.
@@ -98,20 +99,21 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
 
+    let newUser = false;
     if (!this.valueChartService.currentUserIsDefined()) {
-      this.valueChartService.getValueChart().setUser(new User(this.currentUserService.getUsername()));
+      let user = new User(this.currentUserService.getUsername());
+      user.setScoreFunctionMap(new ScoreFunctionMap());
+      user.setWeightMap(new WeightMap());
+      this.valueChartService.getValueChart().setUser(user);
+      newUser = true;
     }
     this.user = this.valueChartService.getCurrentUser();
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
     this.latestDefaults = {};
 
-    // Make sure score functions are all initialized and complete
-    if (!this.user.getScoreFunctionMap()) {
-      this.user.setScoreFunctionMap(this.valueChartService.getInitialScoreFunctionMap());
-    }
+    // Make sure there is a score function for every Objective
     for (let obj of this.valueChartService.getPrimitiveObjectives()) {
-      // Make sure there is a score function for every Objective
       if (!this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
         this.user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction());
       }
@@ -129,6 +131,9 @@ export class CreateScoreFunctionsComponent implements OnInit {
       this.initialWorstOutcomes[obj.getName()] = scoreFunction.worstElement; 
     }
     this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
+    if (!newUser) {
+      this.validate()   
+    }
   }
 
   /*   
@@ -137,12 +142,16 @@ export class CreateScoreFunctionsComponent implements OnInit {
             requires that a different component is displayed in the router-outlet.
   */
   ngOnDestroy() {
-    // Reset weight map if best or worst outcome has changed
-    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
-      let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
-      let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
-      if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
-        this.valueChartService.resetWeightMap(this.user, this.valueChartService.getDefaultWeightMap());
+    // Clear weight map if best or worst outcome has changed
+    if (this.user.getWeightMap().getWeightTotal() > 0) {
+      for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+        let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
+        let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
+        if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
+          this.user.setWeightMap(new WeightMap());
+          toastr.warning("Your weights have been reset because the best/worst outcome on some Objective has changed.");
+          break;
+        }
       }
     }
   }
@@ -186,5 +195,16 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.validationTriggered = true;
     this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
     return this.errorMessages.length === 0;
+  }
+
+   /*   
+    @returns {void}
+    @description   Resets error messages if validation has already been triggered.
+            (This is done whenever the user makes a change to the chart. This way, they get feedback while repairing errors.)
+  */
+  resetErrorMessages(): void {
+    if (this.validationTriggered) {
+      this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
+    }
   }
 }

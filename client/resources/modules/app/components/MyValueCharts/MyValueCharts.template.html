@@ -20,7 +20,7 @@
 							<td>{{getStatusText(chartSummary)}}</td>
 							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="editValueChart(chartSummary._id, chartSummary.password)">Edit</button></td>
-							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="setValueChart(chartSummary._id, chartSummary.password)" data-toggle="modal" data-target="#export-modal">Export</button></td>
+							<td><button class="btn btn-sm btn-default" (click)="setValueChart(chartSummary._id, chartSummary.password)" data-toggle="modal" data-target="#export-modal">Export</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="setValueChart(chartSummary._id, chartSummary.password)" data-toggle="modal" data-target="#delete-modal">Delete</button></td>
 						</tr>
 					</tbody>

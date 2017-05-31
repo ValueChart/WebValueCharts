@@ -219,14 +219,14 @@ export class HomeComponent {
 			// Handle errors in chart structure
 			else if (structuralErrors.length > 0) {
 				this.correctiveAction = 'editChart';
-				this.validationMessage = "There are problems with this chart: \n\n - " + structuralErrors.join('\n - ') + "\n\nWould you like to fix them now?";
+				this.validationMessage = "There are problems with this chart: \n\n - " + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
 				$('#validate-modal').modal('show');
 			}
 			// Handle errors in the users' preferences
 			// (If these exist IN ADDITION to the above, the user will be informed of them after fixing the other problems)
 			else {
 				this.correctiveAction = 'saveChart';
-				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + userErrors.join('\n') + "\n\nWould you like to save the chart so that these users can fix their preferences?";
+				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + userErrors.join('\n\n') + "\n\nWould you like to save the chart so that these users can fix their preferences?";
 				$('#validate-modal').modal('show');
 			}
 			return false;
@@ -243,7 +243,6 @@ export class HomeComponent {
 			this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 		}
 		else if (this.correctiveAction === 'saveChart') {
-			(<any>this.valueChartService.getValueChart()).incomplete = true;
 			this.saveValueChartToDatabase(this.valueChartService.getValueChart());
 		}
 	}

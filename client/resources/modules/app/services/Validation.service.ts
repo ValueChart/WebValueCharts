@@ -102,13 +102,13 @@ export class ValidationService {
 		if (!this.hasName(valueChart)) {
 			errorMessages.push(this.NAME_MISSING);
 		}
-		if (!this.nameValid(valueChart)) {
+		else if (!this.nameValid(valueChart)) {
 			errorMessages.push(this.NAME_INVALID);
 		}
 		if (!this.hasPassword(valueChart)) {
 			errorMessages.push(this.PASSWORD_MISSING);
 		}
-		if (!this.passwordValid(valueChart)) {
+		else if (!this.passwordValid(valueChart)) {
 			errorMessages.push(this.PASSWORD_INVALID);
 		}
 		return errorMessages;
@@ -509,10 +509,7 @@ export class ValidationService {
 		for (let user of valueChart.getUsers()) {
 			userErrorMessages = this.validateUser(valueChart, user);
 			if (userErrorMessages.length > 0) {
-				errorMessages.push(user.getUsername() + ":");
-				for (let error of userErrorMessages) {
-					errorMessages.push(" - " + error);
-				}
+				errorMessages.push(user.getUsername() + ":\n - " + userErrorMessages.join("\n - "));
 			}
 		}
 		return errorMessages;

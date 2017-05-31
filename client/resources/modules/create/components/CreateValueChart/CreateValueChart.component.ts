@@ -121,8 +121,9 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();	
 
-		// Check whole chart for validity. Set to incomplete if not valid.
-		(<any>this.valueChart).incomplete = this.validationService.validate(this.valueChart).length > 0 ? true : false; 
+		// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
+		(<any>this.valueChart).incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
+			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 		
 		if (this.saveOnDestroy) {
 			this.autoSaveValueChart();
@@ -183,16 +184,23 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	viewChart() {
 		// The View Chart button is only active if the structure and current user's preferences are valid.
-		// However, there may be problems with other users' preferences, which we inform the user about here.
-		let errorMessages = this.validationService.validate(this.valueChart);
-		if (errorMessages.length > 0) {
-			this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + errorMessages.join('\n');
-				$('#validate-modal').modal('show');
+		// However, we still need to perform step-specific validation (temporary data structures may still need to be converted).
+		if (this.creationStepsService.validate()) {	
+			// Furthermore, there may be problems with other users' preferences, which we inform the user about here.
+			let errorMessages = this.validationService.validate(this.valueChart);
+			if (errorMessages.length > 0) {
+				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + errorMessages.join('\n\n');
+					$('#validate-modal').modal('show');
+			}
+			else {
+				this.saveOnDestroy = true;
+				window.onpopstate = () => { };
+				(<any>window).destination = '/view/ValueChart';
+				this.router.navigate(['/view/ValueChart']);
+			}
 		}
 		else {
-			window.onpopstate = () => { };
-			(<any>window).destination = '/view/ValueChart';
-			this.router.navigate(['/view/ValueChart']);
+			toastr.error('There were problems with your submission. Please fix them to proceed.');
 		}
 	}
 
@@ -240,11 +248,14 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	Disable the View Chart button if:
 						(1) the chart structure is invalid
 						(2) the current user's preferences are invalid
+						(3) on BasicInfo step (because I don't wanna deal with checking for name uniqueness)
+						(4) on the Preferences step (because the WeightMap might get reset on destroy)
 	*/
 	disableViewChartButton(): boolean {
-		this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser());
 		return (this.validationService.validateStructure(this.valueChart).length > 0
-			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
+			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 )
+			|| this.creationStepsService.step === this.creationStepsService.BASICS 
+			|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
 	}
 
 	/* 	

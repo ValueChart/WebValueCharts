@@ -110,12 +110,11 @@ export class MyValueChartsComponent implements OnInit {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				// Verify that the chart is valid before proceeding.
-				// (Finding errors at this point should be rare because invalid charts get marked as incomplete,
-				//  and View Chart is not clickable for incomplete charts. However, we might encounter errors in 
-				//  older charts that pre-date validation, or if we change the validation standards later.)
+				// (This will inform the creator of errors in other users' preferences, as well as 
+				//  any errors brought on by changes in validation since saving to the database.)
 				let errorMessages = this.validationService.validate(valueChart);
 				if (errorMessages.length > 0) {
-					this.validationMessage = "There are problems with this chart that must be fixed before it can be viewed.\n\n" + errorMessages.join('\n');
+					this.validationMessage = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
 					$('#validate-modal').modal('show');
 				}
 				else {

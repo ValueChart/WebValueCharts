@@ -14,7 +14,7 @@
             </div>
             <label class="control-label select-objective-control">Select Default:</label>
             <div class="input-group">
-                <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction()">
+                <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
                     <option [value]="flat">Flat</option>
                     <option [value]="poslin">Positive Linear</option>
                     <option [value]="neglin">Negative Linear</option>
@@ -23,7 +23,7 @@
             </div>
             <body id="objective-description">{{valueChartService.getObjectiveByName(selectedObjective).getDescription()}}</body>
         </div> 
-        <div class="col-xs-offset-3">
+        <div class="col-xs-offset-3" tabindex="100" (blur)="resetErrorMessages()">
             <ScoreFunction 
                 [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(selectedObjective)]"
                 [colors]="[user.color]"
