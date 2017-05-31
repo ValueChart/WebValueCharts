@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:35:43
+* @Last Modified time: 2017-05-31 14:55:33
 */
 
 // Import Angular Classes:
@@ -43,8 +43,9 @@ export class RegisterComponent {
 	public tempUserName: string;
 
 	public state: string;
-	private invalidCredentials: boolean;
-	private invalidMessage: string;
+	public invalidUsername: boolean;
+	public invalidPasswords: boolean;
+	public invalidMessage: string;
 
 
 	// ========================================================================================
@@ -68,6 +69,10 @@ export class RegisterComponent {
 	// ========================================================================================
 
 	createNewUser(username: string, password: string, email: string): void {
+
+		if (this.invalidPasswords || this.invalidUsername)
+			return;
+
 		this.userHttpService.createNewUser(username, password, email)
 			.subscribe(
 			(user) => {
@@ -76,7 +81,7 @@ export class RegisterComponent {
 			},
 			(error) => {
 				this.invalidMessage = 'That username is already taken.';
-				this.invalidCredentials = true;
+				this.invalidUsername = true;
 			}
 			);
 	}
@@ -90,7 +95,7 @@ export class RegisterComponent {
 			},
 			(error) => {
 				this.invalidMessage = 'That username and password combination is not correct.';
-				this.invalidCredentials = true;
+				this.invalidPasswords = true;
 			}
 			);
 	}
@@ -98,9 +103,9 @@ export class RegisterComponent {
 	validatePasswords(passwordOne: string, passwordTwo: string): void {
 		if (passwordOne !== passwordTwo) {
 			this.invalidMessage = 'The entered passwords do not match.';
-			this.invalidCredentials = true;
+			this.invalidPasswords = true;
 		} else {
-			this.invalidCredentials = false;
+			this.invalidPasswords = false;
 			this.invalidMessage = '';
 
 		}
