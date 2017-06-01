@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 14:59:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:15:38
+* @Last Modified time: 2017-06-01 16:18:11
 */
 
 exports.config = {
@@ -10,6 +10,7 @@ exports.config = {
   	framework: 'mocha',
   	specs: ['./test/client/e2e/**/*.js'],
   	getPageTimeout: 20000,
+  	allScriptsTimeout: 60000,
   	mochaOpts: {
 	 	reporter: "mochawesome",
 	 	timeout: 15000,
