@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:08:03
+* @Last Modified time: 2017-05-31 17:48:48
 */
 
 // Import Angular Classes:
@@ -138,7 +138,7 @@ export class DetailBoxComponent implements OnInit {
 		d3.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 					.classed('alternative-link', true);
 
-		$('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).click((eventObject: Event) => {
+		document.querySelector('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).addEventListener('click', (eventObject: Event) => {
 			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);
 			this.expandAlternative(selection.datum());
 		});

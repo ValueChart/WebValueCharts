@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:35:26
+* @Last Modified time: 2017-05-31 17:53:10
 */
 
 // Import Angular Classes:
@@ -50,7 +50,7 @@ export class MyValueChartsComponent implements OnInit {
 	public valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
 										// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
 	
-	private downloadLink: any;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
+	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
 										// on the client side using object URLs.	
 
 	public validationMessage: string;
@@ -99,7 +99,7 @@ export class MyValueChartsComponent implements OnInit {
 				this.valueChartMemberships = valueChartMemberships;
 			});
 
-		this.downloadLink = $('#download-user-weights');
+		this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
 	}
 
 	openValueChart(chartId: string, password: string): void {
@@ -186,8 +186,8 @@ export class MyValueChartsComponent implements OnInit {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
 
-		this.downloadLink.attr('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
-		this.downloadLink.click();							// Click the <a> element to programmatically begin the download.
+		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
+		this.downloadLink.click();									// Click the <a> element to programmatically begin the download.
 	}
 
 	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {

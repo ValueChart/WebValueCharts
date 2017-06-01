@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 23:02:43
+* @Last Modified time: 2017-05-31 17:55:41
 */
 
 // Import Angular Classes:
@@ -71,9 +71,6 @@ export class ValueChartViewerComponent implements OnInit {
 	viewConfig: ViewConfig = <any> {};
 	interactionConfig: InteractionConfig = <any> {};
 
-	// Save Jquery as a field of the class so that it is exposed to the template.
-	$: JQueryStatic;
-
 	// This gets set each time the "Remove" button for a user is clicked
 	// The user will be removed from chart upon confirmation
 	userToRemove: User;
@@ -111,9 +108,6 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
-		// Attach Jquery to the component so that it can be accessed inside the template.
-		this.$ = $;
-
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();
@@ -167,8 +161,8 @@ export class ValueChartViewerComponent implements OnInit {
 						triggers re-rendering of the ValueChart via the ValueChartDirective.
 	*/
 	resizeValueChart(): void {
-		this.valueChartWidth = ($(window).width() * 0.95) * 1.5;
-		this.valueChartHeight = ($(window).height() * 0.75) * 1.5;
+		this.valueChartWidth = (window.innerWidth * 0.95) * 1.5;
+		this.valueChartHeight = (window.innerHeight * 0.75) * 1.5;
 	}
 
 	/* 	

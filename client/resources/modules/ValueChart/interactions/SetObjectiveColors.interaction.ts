@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 17:36:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:14:57
+* @Last Modified time: 2017-05-31 18:02:32
 */
 
 // Import Angular Classes:
@@ -80,17 +80,17 @@ export class SetObjectiveColorsInteraction {
 	*/
 	private handleColorChange = (eventObject: Event) => {
 		var targetObjective: PrimitiveObjective = (<any> d3.select(<any> eventObject.target).datum()).objective;
-		var colorPicker = $('#primitiveObjective-color-picker');
+		var colorPicker = <HTMLElement> document.querySelector('#primitiveObjective-color-picker');
 		
-		colorPicker.off('change');	// Remove any old listeners from the color picker.
+		colorPicker.removeEventListener('change');	// Remove any old listeners from the color picker.
 
 		// Attach a listener to the change event that fires when the value of the color picker changes. Note that this event fires
 		// whenever the value of the color picker changes, NOT when the user makes a decision and closes the color picker.
 		// The body of this listener is where the objective's color is set.
-		colorPicker.change((e: Event) => {
+		colorPicker.onchange = (e: Event) => {
 			var color: string = (<any>e.target).value;
 			targetObjective.setColor(color);
-		});
+		};
 
 		colorPicker.click(); // Open the color picker by programmatically clicking on it.
 	}	

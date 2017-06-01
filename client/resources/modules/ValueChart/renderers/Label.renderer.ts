@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 17:14:20
+* @Last Modified time: 2017-05-31 18:06:26
 */
 
 // Import Angular Classes:
@@ -119,24 +119,14 @@ export class LabelRenderer {
 
 		this.updateInteractions(update);
 		this.renderLabelSpace(update, update.labelData);
+		this.applyStyles(update);
 
-		if (this.numUsers != update.valueChart.getUsers().length) {
-			this.applyStyles(update);
-		}
-
-		this.numUsers = update.valueChart.getUsers().length;
-
-		if (this.reordered) {
-			this.applyStyles(update)
+		if (this.reordered || this.viewOrientation != update.viewConfig.viewOrientation) {
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
-		}
-
-		if (this.viewOrientation != update.viewConfig.viewOrientation) {
-			this.applyStyles(update);
-			this.interactionsChanged(update.interactionConfig);
 			this.viewOrientation = update.viewConfig.viewOrientation;
-		}	
+
+		}
 	}
 
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {

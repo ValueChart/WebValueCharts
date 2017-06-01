@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:06:30
+* @Last Modified time: 2017-05-31 17:51:54
 */
 
 // Import Angular Classes:
@@ -45,7 +45,7 @@ export class ExportValueChartComponent implements OnInit {
 	private valueChartXMLEncoder: ValueChartXMLEncoder;
 	private valueChartStringURL: string;
 
-	private downloadLink: JQuery;
+	private downloadLink: HTMLElement;
 
 	// ========================================================================================
 	// 									Constructor
@@ -70,7 +70,7 @@ export class ExportValueChartComponent implements OnInit {
 	*/
 	ngOnInit() {
 		this.valueChartXMLEncoder = new ValueChartXMLEncoder();
-		this.downloadLink = $('#download-value-chart');
+		this.downloadLink = <HTMLElement> document.querySelector('#download-value-chart');
 	}
 
 	getValueChartName(): string {
@@ -88,7 +88,7 @@ export class ExportValueChartComponent implements OnInit {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
 
-		this.downloadLink.attr('href', valueChartObjectURL);		// Set the download link on the <a> element to be the URL created for the XML string.
+		this.downloadLink.setAttribute('href', valueChartObjectURL);		// Set the download link on the <a> element to be the URL created for the XML string.
 		this.downloadLink.click();									// Click the <a> element to programmatically begin the download.
 	}
 
