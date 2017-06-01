@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:37:38
+* @Last Modified time: 2017-06-01 14:53:38
 */
 
 // Import Angular Classes:
@@ -12,7 +12,7 @@ import { EventEmitter }															from '@angular/core';
 
 
 // Import Types:
-import { ViewConfig }															from '../../../../../types/Config.types';
+import { ViewConfig, ChartOrientation }											from '../../../../../types/Config.types';
 
 @Component({
 	selector: 'ViewOptions',
@@ -27,11 +27,13 @@ export class ViewOptionsComponent implements OnInit {
 
 	@Input() chartType: string;
 
+	public ChartOrientation = ChartOrientation;
+
 	constructor() { }
 
 	ngOnInit() {
 		this.config = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: true,
 			displayScales: false,
@@ -46,7 +48,7 @@ export class ViewOptionsComponent implements OnInit {
 		this.viewConfig.emit(configObject);
 	}
 
-	setOrientation(viewOrientation: string): void {
+	setOrientation(viewOrientation: ChartOrientation): void {
 		this.config.viewOrientation = viewOrientation;
 		this.updateViewConfig(this.config);
 	}

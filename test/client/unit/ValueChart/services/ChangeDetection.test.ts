@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 10:21:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 22:43:12
+* @Last Modified time: 2017-06-01 14:27:30
 */
 
 // Import Testing Resources:
@@ -26,6 +26,7 @@ import { AbstractObjective }				from '../../../../../client/resources/model/Abst
 
 // Import Types
 import { ViewConfig, InteractionConfig }	from '../../../../../client/resources/types/Config.types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
 
 describe('ChangeDetectionService', () => {
 
@@ -46,7 +47,7 @@ describe('ChangeDetectionService', () => {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -56,10 +57,10 @@ describe('ChangeDetectionService', () => {
 		};
 
 		interactionConfig = {
-			weightResizeType: 'none',
+			weightResizeType: WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: 'none',
-			pumpWeights: 'none',
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: false
 		};
@@ -163,7 +164,7 @@ describe('ChangeDetectionService', () => {
 
 		context('when the view orientation and or score function display settings have been changed', () => {
 			it('should detect the changes in view orientation', () => {
-				viewConfig.viewOrientation = 'horizontal';
+				viewConfig.viewOrientation = ChartOrientation.Horizontal;
 				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
 			});
 
@@ -207,14 +208,14 @@ describe('ChangeDetectionService', () => {
 			viewConfig.displayAverageScoreLines = true;
 			expect(changeDetectionService.detectViewConfigChanges(viewConfig)).to.be.true;
 			
-			viewConfig.viewOrientation = 'horizontal';
+			viewConfig.viewOrientation = ChartOrientation.Horizontal;
 			expect(changeDetectionService.detectViewConfigChanges(viewConfig)).to.be.true;
 		});
 
 		it('should create an updated record of the viewConfig after detecting changes', () => {
 			viewConfig.displayScales = true;
 			viewConfig.displayAverageScoreLines = true;
-			viewConfig.viewOrientation = 'vertical';
+			viewConfig.viewOrientation = ChartOrientation.Vertical
 
 			expect(changeDetectionService.viewConfigRecord).to.not.deep.equal(viewConfig);
 
@@ -231,17 +232,17 @@ describe('ChangeDetectionService', () => {
 
 	describe('detectInteractionConfigChanges(interactionConfig: InteractionConfig): boolean', () => {
 		it('should detect that the interactionConfig is different when it is modified from the recorded values', () => {
-			interactionConfig.pumpWeights = 'increase'
+			interactionConfig.pumpWeights = PumpType.Increase
 			expect(changeDetectionService.detectInteractionConfigChanges(interactionConfig)).to.be.true;
 			interactionConfig.reorderObjectives = true;
-			interactionConfig.weightResizeType = 'neighbor'
+			interactionConfig.weightResizeType = WeightResizeType.Neighbors
 			expect(changeDetectionService.detectInteractionConfigChanges(interactionConfig)).to.be.true;
 		});
 
 		it('should create an updated record of the interactionConfig after detecting changes', () => {
-			interactionConfig.pumpWeights = 'increase'
+			interactionConfig.pumpWeights = PumpType.Increase
 			interactionConfig.reorderObjectives = true;
-			interactionConfig.weightResizeType = 'neighbor'
+			interactionConfig.weightResizeType = WeightResizeType.Neighbors
 
 			expect(changeDetectionService.interactionConfigRecord).to.not.deep.equal(interactionConfig);
 
@@ -252,7 +253,7 @@ describe('ChangeDetectionService', () => {
 		});
 
 		it('should not detect changes when the interactionConfig is the same as the recorded value', () => {
-			interactionConfig.weightResizeType = 'none'
+			interactionConfig.weightResizeType = WeightResizeType.None;
 			expect(changeDetectionService.detectInteractionConfigChanges(interactionConfig)).to.be.false;
 		});
 	});

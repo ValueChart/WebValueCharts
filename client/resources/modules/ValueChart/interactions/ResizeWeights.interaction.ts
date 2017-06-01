@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:21:19
+* @Last Modified time: 2017-06-01 12:58:13
 */
 
 // Import Angular Classes:
@@ -29,9 +29,9 @@ import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { WeightMap }												from '../../../model/WeightMap';
 
-import {RowData, CellData, LabelData, RendererConfig}				from '../../../types/RendererData.types';
+import { RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
-
+import { WeightResizeType, PumpType, ChartOrientation }				from '../../../types/Config.types';
 
 /*
 	This class implements the two different user interactions which allow user weights assigned to PrimitiveObjectives to be resized.
@@ -58,7 +58,7 @@ export class ResizeWeightsInteraction {
 
 	public lastRendererUpdate: RendererUpdate;
 
-	private resizeType: string;	// The type of Weight Resizing that is currently enabled. Must be one of the strings: 'neighbor', 'siblings', or 'none'.
+	private resizeType: WeightResizeType; // The type of Weight Resizing that is currently enabled. 
 
 	private clicks: Observable<Event>;
 	private onClick: Subscription;
@@ -87,7 +87,7 @@ export class ResizeWeightsInteraction {
 						'decrease' turns on clicking PrimitiveObjective labels to increase the objective's weight by one percent.
 						A pumpType of 'none' turns off the pump interaction.
 	*/
-	public togglePump(pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>, rendererUpdate: RendererUpdate): void {
+	public togglePump(pumpType: PumpType, primitiveObjectiveLabels: NodeListOf<Element>, rendererUpdate: RendererUpdate): void {
 		this.lastRendererUpdate = rendererUpdate;
 		// Initialize the observable that is used to detect clicks and notifies handlers.
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
@@ -95,7 +95,7 @@ export class ResizeWeightsInteraction {
 		if (this.onClick != undefined)
 			this.onClick.unsubscribe();
 
-		if (pumpType !== 'none') {
+		if (pumpType !== PumpType.None) {
 			this.onClick = this.clicks
 				.map((eventObject: Event) => { (<any> eventObject).pumpType = pumpType; return eventObject; })		// Attach the pumpType to the event.
 				.subscribe(this.onPump);
@@ -118,7 +118,7 @@ export class ResizeWeightsInteraction {
 		var totalWeight: number = currentUser.getWeightMap().getWeightTotal();
 		var labelDatum: LabelData = <any> d3.select(<any> eventObject.target).datum();
 		var previousWeight: number = currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
-		var percentChange: number = (((<any>eventObject).pumpType === 'increase') ? 0.01 : -0.01);
+		var percentChange: number = (((<any>eventObject).pumpType === PumpType.Increase) ? 0.01 : -0.01);
 		var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
 
 		if (previousWeight + pumpAmount < 0) {
@@ -136,12 +136,12 @@ export class ResizeWeightsInteraction {
 						resizeType of 'siblings' turns on dragging the divider between two objective labels to modify the weights of ALL
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
-	public toggleDragToResizeWeights(resizeType: string, rootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {		
+	public toggleDragToResizeWeights(resizeType: WeightResizeType, rootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {		
 		this.lastRendererUpdate = rendererUpdate;
 
 		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
 		this.resizeType = resizeType;
-		if (resizeType !== 'none') {
+		if (resizeType !== WeightResizeType.None) {
 			dragToResizeWeights
 				.on('start', this.resizeWeightsStart)
 				.on('drag', this.resizeWeights);
@@ -161,11 +161,11 @@ export class ResizeWeightsInteraction {
 		@description 	Helper function for toggleDragToResizeWeights that uses a recursive strategy to turn on the 
 						desired type of dragging to resize weights for all labels in the label area.
 	*/
-	private toggleResizingForSublabels(labelSpaces: d3.Selection<any, any, any, any>, dragToResizeWeights: d3.DragBehavior<any, any, any>, resizeType: string) {
+	private toggleResizingForSublabels(labelSpaces: d3.Selection<any, any, any, any>, dragToResizeWeights: d3.DragBehavior<any, any, any>, resizeType: WeightResizeType) {
 		var labelDividers: d3.Selection<any, any, any, any> = labelSpaces.select('.' + LabelDefinitions.SUBCONTAINER_DIVIDER);
 
 		labelDividers.style('cursor', () => {
-			return (resizeType !== 'none') ? (this.lastRendererUpdate.viewConfig.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize' : '';
+			return (resizeType !== WeightResizeType.None) ? (this.lastRendererUpdate.viewConfig.viewOrientation === ChartOrientation.Vertical) ? 'ns-resize' : 'ew-resize' : '';
 		});
 
 		labelDividers.call(dragToResizeWeights);
@@ -204,7 +204,7 @@ export class ResizeWeightsInteraction {
 		var combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
 
 		// Run inside the angular zone so that change detection is triggered.
-		if (this.resizeType === 'neighbor') {	// Neighbor resizing:
+		if (this.resizeType === WeightResizeType.Neighbors) {	// Neighbor resizing:
 			this.resizeNeighbors(d, i, deltaWeight, weightMap, siblings);
 		} else {	// Sibling resizing:
 			this.resizeSiblings(d, i, deltaWeight, combinedWeight, weightMap, siblings);

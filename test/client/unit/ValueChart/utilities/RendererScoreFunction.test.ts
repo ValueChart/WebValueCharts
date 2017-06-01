@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 16:38:21
+* @Last Modified time: 2017-06-01 14:33:33
 */
 
 // Import Testing Resources:
@@ -38,6 +38,7 @@ import { AbstractObjective }							from '../../../../../client/resources/model/A
 import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
 import { DomainElement, ScoreFunctionData }				from '../../../../../client/resources/types/RendererData.types'; 
 import { ScoreFunctionDataSummary }						from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
 
 
 describe('RendererScoreFunctionUtility', () => {
@@ -77,7 +78,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 
 		u = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			height: height,
 			width: width,
 			scoreFunctions: [],
@@ -215,7 +216,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 		context('when the view orientation is "vertical"', () => {
 			before(function() {
-				u.viewOrientation = 'vertical';
+				u.viewOrientation = ChartOrientation.Vertical;
 
 				u = rendererScoreFunctionUtility.produceViewConfig(u);
 			});
@@ -241,7 +242,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 		context('when the view orientation is "horizontal"', () => {
 			before(function() {
-				u.viewOrientation = 'horizontal';
+				u.viewOrientation = ChartOrientation.Horizontal;
 
 				u = rendererScoreFunctionUtility.produceViewConfig(u);
 			});

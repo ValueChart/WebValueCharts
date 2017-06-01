@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 22:47:04
+* @Last Modified time: 2017-06-01 14:26:45
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -19,6 +19,8 @@ import { WeightMap }									from '../../../../../client/resources/model/WeightM
 // Import Types:
 import { ViewConfig }									from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate, RendererConfig }				from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+
 
 describe('RendererConfigUtility', () => {
 
@@ -35,7 +37,7 @@ describe('RendererConfigUtility', () => {
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -92,7 +94,7 @@ describe('RendererConfigUtility', () => {
 		context('when the viewOrientation is "horizontal"', () => {
 
 			it('should should set the first dimension to be height/y and the second dimension to be width/x', () => {
-				u.viewConfig.viewOrientation = 'horizontal';
+				u.viewConfig.viewOrientation = ChartOrientation.Horizontal
 				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
 
 				expect(rendererConfig.dimensionOne).to.equal('height');
@@ -104,7 +106,7 @@ describe('RendererConfigUtility', () => {
 			});
 
 			it('should should configure the "dimensionTwoScale" property correctly', () => {
-				u.viewConfig.viewOrientation = 'horizontal';
+				u.viewConfig.viewOrientation = ChartOrientation.Horizontal
 				rendererConfig = rendererConfigUtility.produceRendererConfig(u).rendererConfig;
 				
 				expect(rendererConfig.dimensionTwoScale.domain()).to.deep.equal([0, 1]);

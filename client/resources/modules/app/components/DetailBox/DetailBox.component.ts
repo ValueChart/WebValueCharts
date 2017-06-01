@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 17:48:48
+* @Last Modified time: 2017-06-01 14:31:10
 */
 
 // Import Angular Classes:
@@ -28,7 +28,7 @@ import { User } 																from '../../../../model/User';
 import { Alternative } 															from '../../../../model/Alternative';
 
 // Import Types:
-import { ViewConfig, InteractionConfig }										from '../../../../types/Config.types';
+import { ViewConfig, InteractionConfig, ChartOrientation }						from '../../../../types/Config.types';
 
 
 @Component({
@@ -61,6 +61,8 @@ export class DetailBoxComponent implements OnInit {
 	public DETAIL_BOX_CHART_TAB: string = 'chart';
 	public DETAIL_BOX_ALTERNATIVES_TAB: string = 'alternatives';
 	public DETAIL_BOX_USERS_TAB: string = 'users';
+
+	public ChartOrientation = ChartOrientation;
 
 	// ========================================================================================
 	// 									Constructor

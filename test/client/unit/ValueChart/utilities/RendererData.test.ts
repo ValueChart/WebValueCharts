@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 23:12:35
+* @Last Modified time: 2017-06-01 14:26:44
 */
 
 // Import Testing Resources:
@@ -31,6 +31,7 @@ import { AbstractObjective }							from '../../../../../client/resources/model/A
 import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
 import { RowData, LabelData, CellData, UserScoreData }	from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
 
 
 describe('RendererDataUtility', () => {
@@ -55,7 +56,7 @@ describe('RendererDataUtility', () => {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -65,10 +66,10 @@ describe('RendererDataUtility', () => {
 		};
 
 		interactionConfig = {
-			weightResizeType: 'none',
+			weightResizeType: WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: 'none',
-			pumpWeights: 'none',
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: false
 		};
@@ -245,7 +246,7 @@ describe('RendererDataUtility', () => {
 
 				it('should produce an array of RowData with computed offsets', () => {
 					u.valueChart.setUsers([aaron, bob]);
-					u.viewConfig.viewOrientation = 'horizontal';
+					u.viewConfig.viewOrientation = ChartOrientation.Horizontal
 
 					numAlternatives = u.valueChart.getAlternatives().length;
 					u = rendererDataUtility.produceMaximumWeightMap(u);

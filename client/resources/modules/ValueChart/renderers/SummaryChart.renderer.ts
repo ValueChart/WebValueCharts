@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:20:26
+* @Last Modified time: 2017-06-01 14:01:32
 */
 
 // Import Angular Classes
@@ -27,6 +27,7 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { RowData, CellData, UserScoreData, RendererConfig }			from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 // This class renders a ValueChart's Alternatives into a stacked bar chart that summarizes the utilities users 
@@ -290,7 +291,7 @@ export class SummaryChartRenderer {
 		// Position the entire chart in the view box.
 		this.chart
 			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation == 'vertical')
+				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
 					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);
 				else
 					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
@@ -316,13 +317,13 @@ export class SummaryChartRenderer {
 
 		// Update the data behind the score totals.
 		var scoreSubContainersToUpdate = this.scoreTotalsSubContainers
-			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
+			.data(() => { return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
 
 		var scoreTotalsToUpdate = this.scoreTotals
 			.data((d: CellData) => { return d.userScores; });
 
 		var averageLinesToUpdate = this.averageLines
-			.data(() => { return (u.viewConfig.viewOrientation === 'vertical') ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
+			.data(() => { return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rowData[0].cells : u.rowData[u.rowData.length - 1].cells; });
 
 		this.renderUtilityAxis(u);
 
@@ -351,7 +352,7 @@ export class SummaryChartRenderer {
 		var utilityAxis: any;
 
 		// Position the utility axis properly depending on the current view orientation. 
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			uilityScale.range([u.rendererConfig.dimensionTwoSize, 0]);
 			utilityAxis = d3.axisLeft(uilityScale);
 		} else {
@@ -403,14 +404,14 @@ export class SummaryChartRenderer {
 			.attr(u.rendererConfig.coordinateTwo + '1', (d: CellData, i: number) => { 
 				var weightTotal: number = u.maximumWeightMap.getWeightTotal();
 				var yVal = u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
-				return (yVal * ((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize : 0);
+				return (yVal * ((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.dimensionTwoSize : 0);
 			})
 			.attr(u.rendererConfig.coordinateTwo + '2', (d: CellData, i: number) => { 
 				var weightTotal: number = u.maximumWeightMap.getWeightTotal();
 				var yVal = u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateAverageScore(d));
-				return (yVal * ((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize : 0);
+				return (yVal * ((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.dimensionTwoSize : 0);
 			});
 
 		this.renderScoreTotalLabels(u, scoreTotals);
@@ -444,8 +445,8 @@ export class SummaryChartRenderer {
 				var weightTotal: number = u.maximumWeightMap.getWeightTotal();
 
 				return (u.rendererConfig.dimensionTwoScale(weightTotal * this.calculateNormalizedTotalScore(d)) * 
-					((u.viewConfig.viewOrientation === 'vertical') ? -1 : 1)) + 
-					((u.viewConfig.viewOrientation === 'vertical') ? (u.rendererConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
+					((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? -1 : 1)) + 
+					((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.dimensionTwoSize - verticalOffset) : verticalOffset);
 			})
 			.attr(u.rendererConfig.coordinateTwo + '1', this.calculateNormalizedTotalScore)
 
@@ -517,7 +518,7 @@ export class SummaryChartRenderer {
 			var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
 			var score: number = d.user.getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName()).getScore(d.value);
 			this.summaryChartScale.domain([0, d.user.getWeightMap().getWeightTotal()]);
-			if (u.viewConfig.viewOrientation == 'vertical')
+			if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
 				// If the orientation is vertical, then increasing height is down (NOT up), and we need to set an offset for this coordinate so that the bars are aligned at the cell bottom, not top.
 				return (u.rendererConfig.dimensionTwoSize - this.summaryChartScale(d.offset)) - this.summaryChartScale(score * userObjectiveWeight);
 			else

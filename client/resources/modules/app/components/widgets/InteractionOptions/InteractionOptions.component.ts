@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-12-30 18:28:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:37:59
+* @Last Modified time: 2017-06-01 12:47:11
 */
 
 // Import Angular Classes:
@@ -10,9 +10,9 @@ import { Component, Output, Input }												from '@angular/core';
 import { OnInit }																from '@angular/core';
 import { EventEmitter }															from '@angular/core';
 
-
 // Import Types:
-import { InteractionConfig }													from '../../../../../types/Config.types';
+import { InteractionConfig, WeightResizeType, PumpType, SortAlternativesType }	from '../../../../../types/Config.types';
+
 
 @Component({
 	selector: 'InteractionOptions',
@@ -21,35 +21,22 @@ import { InteractionConfig }													from '../../../../../types/Config.types
 })
 export class InteractionOptionsComponent implements OnInit {
 
-	// Pump Sorting Values:
-	public PUMP_OFF: string = 'none';
-	public PUMP_DECREASE: string = 'decrease';
-	public PUMP_INCREASE: string = 'increase';
-
-	// Alternative Sorting Values:
-	public ALTERNATIVE_SORT_MANUAL: string = 'manual';
-	public ALTERNATIVE_SORT_OBJECTIVE: string = 'objective';
-	public ALTERNATIVE_SORT_ALPHABET: string = 'alphabet';
-	public ALTERNATIVE_SORT_RESET: string = 'reset';
-	public ALTERNATIVE_SORT_OFF: string = 'none';
-
-	// Weight Resizing Values:
-	public RESIZE_NEIGHBOR: string = 'neighbor';
-	public RESIZE_SIBLINGS: string = 'siblings';
-	public NO_RESIZING: string = 'none';
-
 	@Input() chartType: string;
 
 	@Output() interactionConfig = new EventEmitter<InteractionConfig>();
+	
 	public config: InteractionConfig;
+	public WeightResizeType = WeightResizeType;
+	public PumpType = PumpType;
+	public SortAlternativesType = SortAlternativesType;
 
 
 	ngOnInit() {
 		this.config = {
-			weightResizeType: (this.chartType === 'interactive') ? this.RESIZE_NEIGHBOR : this.NO_RESIZING,
+			weightResizeType: (this.chartType === 'interactive') ? WeightResizeType.Neighbors : WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: this.ALTERNATIVE_SORT_OFF,
-			pumpWeights: this.PUMP_OFF,
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: (this.chartType === 'interactive')
 		}
@@ -63,7 +50,7 @@ export class InteractionOptionsComponent implements OnInit {
 
 	// ================================ Handlers for User Interaction Controls ====================================
 
-	setWeightResizeType(resizeType: string): void {
+	setWeightResizeType(resizeType: WeightResizeType): void {
 		this.config.weightResizeType = resizeType;
 		this.updateInteractionConfig(this.config);
 	}
@@ -73,33 +60,33 @@ export class InteractionOptionsComponent implements OnInit {
 		this.config.reorderObjectives = newVal;
 
 		// Turn off all other interactions.
-		this.config.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
-		this.config.pumpWeights = this.PUMP_OFF;
+		this.config.sortAlternatives = SortAlternativesType.None;
+		this.config.pumpWeights = PumpType.None;
 		this.config.setObjectiveColors = false;
 		this.updateInteractionConfig(this.config);
 	}
 
-	toggleSortAlternatives(sortType: string): void {
-		this.config.sortAlternatives = (this.config.sortAlternatives === sortType && (sortType === this.ALTERNATIVE_SORT_OBJECTIVE || sortType === this.ALTERNATIVE_SORT_MANUAL)) ? this.ALTERNATIVE_SORT_OFF : sortType;
+	toggleSortAlternatives(sortType: SortAlternativesType): void {
+		this.config.sortAlternatives = (this.config.sortAlternatives === sortType && (sortType === SortAlternativesType.ByObjectiveScore || sortType === SortAlternativesType.Manually )) ? SortAlternativesType.None : sortType;
 
-		if (sortType === this.ALTERNATIVE_SORT_ALPHABET || sortType === this.ALTERNATIVE_SORT_RESET) {
+		if (sortType === SortAlternativesType.Alphabetically || sortType === SortAlternativesType.Default) {
 			window.setTimeout(() => {
-				this.config.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
+				this.config.sortAlternatives = SortAlternativesType.None;
 			}, 10);
 		}
 
 		// Turn off all other interactions.
+		this.config.pumpWeights = PumpType.None;
 		this.config.reorderObjectives = false;
-		this.config.pumpWeights = this.PUMP_OFF;
 		this.config.setObjectiveColors = false;
 		this.updateInteractionConfig(this.config);
 	}
 
-	setPumpType(pumpType: string): void {
-		this.config.pumpWeights = (this.config.pumpWeights === pumpType) ? this.PUMP_OFF : pumpType;
+	setPumpType(pumpType: PumpType): void {
+		this.config.pumpWeights = (this.config.pumpWeights === pumpType) ? PumpType.None : pumpType;
 
 		// Turn off all other interactions.
-		this.config.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
+		this.config.sortAlternatives = SortAlternativesType.None;
 		this.config.reorderObjectives = false;
 		this.config.setObjectiveColors = false;
 		this.updateInteractionConfig(this.config);
@@ -109,9 +96,9 @@ export class InteractionOptionsComponent implements OnInit {
 		this.config.setObjectiveColors = newVal;
 
 		// Turn off all other interactions.
-		this.config.sortAlternatives = this.ALTERNATIVE_SORT_OFF;
+		this.config.sortAlternatives = SortAlternativesType.None;
+		this.config.pumpWeights = PumpType.None;
 		this.config.reorderObjectives = false;
-		this.config.pumpWeights = this.PUMP_OFF;
 		this.updateInteractionConfig(this.config);
 	}
 

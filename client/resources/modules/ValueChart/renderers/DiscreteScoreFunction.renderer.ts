@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:26:22
+* @Last Modified time: 2017-06-01 14:03:58
 */
 
 // Import Angular Classes:
@@ -31,6 +31,7 @@ import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction
 // Import Types:
 import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }		from '../../../types/RendererData.types';
+import { ChartOrientation }								from '../../../types/Config.types';
 
 
 // This class contains the logic for creating and rendering multiple users' DiscreteScoreFunctions for a single objective with a discrete 
@@ -190,7 +191,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 		// Fix domain labels positions specifically for the discrete plot.
 		var labelCoordinateOneOffset: number;
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			labelCoordinateOneOffset = u.rendererConfig.labelOffset + 5;
 		} else {
 			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset) + 5;
@@ -228,7 +229,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		// Position each users' container so theirs bars are properly offset from each other.
 		this.userContainers
 			.attr('transform', (d: ScoreFunctionData, i: number) => {
-				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
+				return 'translate(' + ((u.viewOrientation === ChartOrientation.Vertical) ? ((barWidth * i) + ',0)') : ('0,' + (barWidth * i) + ')'))
 			});
 
 		// Render the utility bars.
@@ -254,20 +255,20 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.utilityBars
 			.attr(u.rendererConfig.dimensionTwo, calculateBarDimensionTwo)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
 			});
 
 		this.barLabels
 			.text((d: any, i: number) => {
 				return Math.round(100 * d.scoreFunction.getScore(d.element)) / 100;
 			}).attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			});
 
 		this.barTops
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.labelOffset)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === 'vertical') ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
 			});
 
 	}

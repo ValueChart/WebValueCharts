@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:19:42
+* @Last Modified time: 2017-06-01 14:05:32
 */
 
 // Import Angular Classes:
@@ -30,6 +30,7 @@ import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererD
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 // This class is the base class for DiscreteScoreFuntionRenderer, and ContinuousScoreFunctionRenderer. It contains the logic for creating and rendering the 
@@ -65,7 +66,7 @@ export abstract class ScoreFunctionRenderer {
 
 	public lastRendererUpdate: ScoreFunctionUpdate;
 	protected numUsers: number;
-	protected viewOrientation: string;
+	protected viewOrientation: ChartOrientation;
 
 	public adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
 	public expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
@@ -305,7 +306,7 @@ export abstract class ScoreFunctionRenderer {
 
 		var labelCoordinateOneOffset: number;
 
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			labelCoordinateOneOffset = u.rendererConfig.labelOffset;
 		} else {
 			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset);
@@ -335,7 +336,7 @@ export abstract class ScoreFunctionRenderer {
 
 		var labelCoordinateTwo: number;
 
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 12;
 		} else {
 			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo - (u.rendererConfig.labelOffset);
@@ -355,12 +356,12 @@ export abstract class ScoreFunctionRenderer {
 			.domain([0, 1])
 
 		// Calculate the correct height of the utility axis.
-		var utilityScaleHeight: number = (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo) : (u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo);
+		var utilityScaleHeight: number = (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo) : (u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo);
 
 		var utilityAxis: any;
 
 		// The range of the scale must be inverted for the vertical axis because pixels coordinates set y to increase downwards, rather than upwards as normal.
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			uilityScale.range([utilityScaleHeight, 0]);
 			utilityAxis = d3.axisLeft(uilityScale);
 		} else {
@@ -374,7 +375,7 @@ export abstract class ScoreFunctionRenderer {
 		// Position the axis by positioning the axis container and then create it.
 		this.utilityAxisContainer
 			.attr('transform', () => {
-				return 'translate(' + ((u.viewOrientation === 'vertical') ? ((u.rendererConfig.utilityAxisCoordinateOne + 4) + ',' + (u.rendererConfig.utilityAxisMaxCoordinateTwo - .5) + ')') : ((u.rendererConfig.domainAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.utilityAxisCoordinateOne + 4) + ')'));
+				return 'translate(' + ((u.viewOrientation === ChartOrientation.Vertical) ? ((u.rendererConfig.utilityAxisCoordinateOne + 4) + ',' + (u.rendererConfig.utilityAxisMaxCoordinateTwo - .5) + ')') : ((u.rendererConfig.domainAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.utilityAxisCoordinateOne + 4) + ')'));
 			})
 			.call(utilityAxis);
 	}

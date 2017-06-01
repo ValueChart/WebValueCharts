@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:20:16
+* @Last Modified time: 2017-06-01 14:06:15
 */
 
 // Import Angular Classes
@@ -29,6 +29,7 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { RowData, CellData, UserScoreData, RendererConfig }			from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 // This class renders a ValueChart's Alternatives into a series of bar charts, one for each primitive objective in the ValueChart. 
@@ -286,7 +287,7 @@ export class ObjectiveChartRenderer {
 		// Position the objective chart.
 		this.chart
 			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation == 'vertical')
+				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
 					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
 				else
 					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);	// TODO: Fix this.
@@ -355,14 +356,14 @@ export class ObjectiveChartRenderer {
 				return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, 0, (u.rendererConfig.dimensionTwoScale(d.weightOffset)));	// Transform each row container to have the correct y (or x) position based on the combined weights of the previous rows.
 			});
 
-		var alternativeLabelCoordOneOffset: number = ((u.viewConfig.viewOrientation === 'vertical') ? 20 : 40);
+		var alternativeLabelCoordOneOffset: number = ((u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? 20 : 40);
 		var alternativeLabelCoordTwoOffset: number = 20;
 
 		alternativeLabels
 			.text((d: Alternative) => { return d.getName(); })
 			.attr(u.rendererConfig.coordinateOne, (d: any, i: number) => { return this.calculateCellCoordinateOne(d, i, u) + alternativeLabelCoordOneOffset; })
 			.attr(u.rendererConfig.coordinateTwo, () => {
-				return (u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoSize + alternativeLabelCoordTwoOffset : alternativeLabelCoordTwoOffset;
+				return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.dimensionTwoSize + alternativeLabelCoordTwoOffset : alternativeLabelCoordTwoOffset;
 			})
 			.attr('alternative', (d: Alternative) => { return d.getId(); });
 
@@ -406,7 +407,7 @@ export class ObjectiveChartRenderer {
 				if (d.userScores.length > 0) {
 					u.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());				
 				}
-				return (u.viewConfig.viewOrientation === 'vertical') ? u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
+				return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
 
 		this.renderUserScores(u, userScores);
@@ -432,7 +433,7 @@ export class ObjectiveChartRenderer {
 					return d.user.color;
 			});
 
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			userScores
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());
@@ -462,14 +463,14 @@ export class ObjectiveChartRenderer {
 				let dimensionOne: number = (this.calculateUserScoreDimensionOne(d, i, u) - (this.USER_SCORE_SPACING + 1));
 				let dimensionTwo: number = this.calculateWeightOutlineDimensionTwo(d, i);
 
-				return (u.viewConfig.viewOrientation === 'vertical') ?
+				return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ?
 					(dimensionOne + dimensionTwo) + ', ' + dimensionOne
 					:
 					(dimensionTwo + dimensionOne + dimensionTwo) + ', ' + dimensionOne;
 			});
 
 
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			weightOutlines
 				.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
 					let maxObjectiveWeight: number = u.maximumWeightMap.getObjectiveWeight(d.objective.getName());

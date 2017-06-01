@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 18:06:26
+* @Last Modified time: 2017-06-01 14:06:53
 */
 
 // Import Angular Classes:
@@ -47,7 +47,7 @@ import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererD
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
 
-
+import { SortAlternativesType, ChartOrientation }					from '../../../types/Config.types';
 
 // This class renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
 // rectangle whose width (or height depending on the orientation) is proportional to its weight. The rectangles are positioned in such a
@@ -78,7 +78,7 @@ export class LabelRenderer {
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
 	private numUsers: number;
-	private viewOrientation: string;
+	private viewOrientation: ChartOrientation;
 
 
 	// ========================================================================================
@@ -135,7 +135,7 @@ export class LabelRenderer {
 		this.setObjectiveColorsInteraction.toggleSettingObjectiveColors(interactionConfig.setObjectiveColors, this.rootContainer.node());
 		this.reorderObjectivesInteraction.toggleObjectiveReordering(interactionConfig.reorderObjectives, this.rootContainer, this.lastRendererUpdate)
 			.subscribe(this.handleObjectivesReordered)
-		this.sortAlternativesInteraction.toggleSortAlternativesByObjectiveScore(interactionConfig.sortAlternatives == this.sortAlternativesInteraction.SORT_BY_OBJECTIVE, this.rootContainer.node(), this.lastRendererUpdate);
+		this.sortAlternativesInteraction.toggleSortAlternativesByObjectiveScore(interactionConfig.sortAlternatives == SortAlternativesType.ByObjectiveScore, this.rootContainer.node(), this.lastRendererUpdate);
 
 		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}
@@ -312,7 +312,7 @@ export class LabelRenderer {
 		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
 			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation === 'vertical')
+				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
 					return 'translate(0,' + (u.rendererConfig.dimensionTwoSize + 10) + ')';
 				else
 					return 'translate(0,0)';
@@ -404,10 +404,10 @@ export class LabelRenderer {
 		var textOffset: number = 5;
 		// Determine the position of the text within the box depending on the orientation
 		labelTexts.attr(u.rendererConfig.coordinateOne, () => {
-			return (u.viewConfig.viewOrientation === 'vertical') ? 10 : (this.labelWidth / 2);
+			return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? 10 : (this.labelWidth / 2);
 		})
 			.attr(u.rendererConfig.coordinateTwo, (d: LabelData, i: number) => {
-				return (u.viewConfig.viewOrientation === "vertical") ?
+				return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ?
 					u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 2) + textOffset
 					:
 					u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 5) + textOffset;
@@ -420,7 +420,7 @@ export class LabelRenderer {
 			});
 
 		this.labelSelections[parentName].bestWorstText
-			.attr('x', (d: LabelData, i: number) => { return (u.viewConfig.viewOrientation === 'vertical') ? 10 : u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 5) + textOffset })
+			.attr('x', (d: LabelData, i: number) => { return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? 10 : u.rendererConfig.dimensionTwoScale(weightOffsets[i]) + (u.rendererConfig.dimensionTwoScale(d.weight) / 5) + textOffset })
 			.attr('dy', '1.2em')
 			.text((d: LabelData) => {
 				var bestWorstText = '';
@@ -524,7 +524,7 @@ export class LabelRenderer {
 
 		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
 
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			width = this.labelWidth;
 			height = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
 		} else {

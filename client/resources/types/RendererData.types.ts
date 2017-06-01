@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-25 10:42:55
+* @Last Modified time: 2017-06-01 14:03:25
 */
 
 import * as d3								from 'd3';
@@ -17,6 +17,8 @@ import { Alternative }						from '../model/Alternative';
 
 
 import { ViewConfig, InteractionConfig }	from './Config.types';
+import { ChartOrientation }					from './Config.types';
+
 
 export interface RowData {
 	objective: PrimitiveObjective;
@@ -89,7 +91,7 @@ export interface RendererUpdate {
 	rendererConfig class.
 */
 export interface RendererConfig {
-	viewOrientation: string;
+	viewOrientation: ChartOrientation;
 	chartComponentWidth: number;
 	chartComponentHeight: number;
 	dimensionOne: string;
@@ -107,7 +109,7 @@ export interface RendererConfig {
 */
 export interface ScoreFunctionUpdate {
 	el: d3.Selection<any, any, any, any>,
-	viewOrientation: string;
+	viewOrientation: ChartOrientation;
 	interactionConfig: { adjustScoreFunctions: boolean, expandScoreFunctions: boolean };
 	width: number;
 	height: number;

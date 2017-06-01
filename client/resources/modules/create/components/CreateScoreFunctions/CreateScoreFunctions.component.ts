@@ -30,6 +30,10 @@ import { DiscreteScoreFunction }										from '../../../../model/DiscreteScoreF
 import { ContinuousScoreFunction }								  from '../../../../model/ContinuousScoreFunction';
 import { WeightMap }                                from '../../../../model/WeightMap';
 
+// Import Types:
+import { ChartOrientation }                         from '../../../../types/config.types';
+
+
 /*
   This component defines the UI controls for defining the ScoreFunctions for a ValueChart.
   It uses the ScoreFunctionDirective to render the plots.
@@ -45,6 +49,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
   // ========================================================================================
   //                   Fields
   // ========================================================================================
+
+  public ChartOrientation = ChartOrientation;
 
   user: User;
   selectedObjective: string; // Objective selected in the dropdown menu

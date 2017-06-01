@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-10 22:24:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-11 17:20:59
+* @Last Modified time: 2017-06-01 14:05:58
 */
 
 // Import Angular Classes:
@@ -15,6 +15,7 @@ import { ValueChart }												from '../../../model/ValueChart';
 
 // Import Types
 import { ViewConfig }												from '../../../types/Config.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 
@@ -74,8 +75,8 @@ export class RendererService {
 						This method allows transformations to be generated properly while using the coordinateOne and coordinateTwo fields instead of 
 						directly using x and y.
 	*/
-	generateTransformTranslation(viewOrientation: string, coordinateOneAmount: number, coordinateTwoAmount: number): string {
-		if (viewOrientation === 'vertical') {
+	generateTransformTranslation(viewOrientation: ChartOrientation, coordinateOneAmount: number, coordinateTwoAmount: number): string {
+		if (viewOrientation === ChartOrientation.Vertical) {
 			return 'translate(' + coordinateOneAmount + ',' + coordinateTwoAmount + ')';
 		} else {
 			return 'translate(' + coordinateTwoAmount + ',' + coordinateOneAmount + ')';
@@ -105,7 +106,7 @@ export class RendererService {
 		}
 
 
-		if (viewConfig.viewOrientation === 'vertical') {
+		if (viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			return 'translate(' + (xTransform + deltaCoordinateOne) + ',' + (yTransform + deltaCoordinateTwo) + ')';
 		} else {
 			return 'translate(' + (xTransform + deltaCoordinateTwo) + ',' + (yTransform + deltaCoordinateOne) + ')';

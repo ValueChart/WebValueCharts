@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-21 13:40:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 14:00:11
+* @Last Modified time: 2017-06-01 15:13:32
 */
 
 // Import Application Classes:
@@ -147,8 +147,6 @@ export class ChartUndoRedoService {
 		var alternativesRecord: AlternativesRecord = new AlternativesRecord(alternatives);
 
 		// The change is exactly the same as the last recorded state, so do nothing.
-		console.log(this.undoStateRecords, alternativesRecord);
-
 		if (_.isEqual(this.undoStateRecords[this.undoStateRecords.length - 1], alternativesRecord))
 			return; 
 

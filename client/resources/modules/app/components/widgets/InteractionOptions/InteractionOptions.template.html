@@ -13,24 +13,24 @@
 							</a>
 							<ul class="dropdown-menu " aria-labelledby="alternative-sort-dropdown">
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_OBJECTIVE)">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(SortAlternativesType.ByObjectiveScore)">
 										Objective Score
-										<span *ngIf="config.sortAlternatives === ALTERNATIVE_SORT_OBJECTIVE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.sortAlternatives === SortAlternativesType.ByObjectiveScore" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_ALPHABET)">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(SortAlternativesType.Alphabetically)">
 										Alphabetically
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_MANUAL)">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(SortAlternativesType.Manually)">
 										Manually
-										<span *ngIf="config.sortAlternatives === ALTERNATIVE_SORT_MANUAL" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.sortAlternatives === SortAlternativesType.Manually" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="toggleSortAlternatives(ALTERNATIVE_SORT_RESET)">
+									<a href="javascript:void(0)" (click)="toggleSortAlternatives(SortAlternativesType.Default)">
 										Reset Order
 									</a>
 								</li>
@@ -54,15 +54,15 @@
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="pump-dropdown">
 								<li>
-									<a href="javascript:void(0)" (click)="setPumpType(PUMP_INCREASE)">
+									<a href="javascript:void(0)" (click)="setPumpType(PumpType.Increase)">
 										Inflate
-										<span *ngIf="config.pumpWeights === PUMP_INCREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.pumpWeights === PumpType.Increase" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 								<li>
-									<a href="javascript:void(0)" (click)="setPumpType(PUMP_DECREASE)">
+									<a href="javascript:void(0)" (click)="setPumpType(PumpType.Decrease)">
 										Deflate
-										<span *ngIf="config.pumpWeights === PUMP_DECREASE" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.pumpWeights === PumpType.Decrease" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 							</ul>
@@ -73,16 +73,16 @@
 								Weight Resize Strategy
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="weightResizeType-dropdown">
-								<li [class.disabled]="config.weightResizeType === RESIZE_NEIGHBOR">
-									<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_NEIGHBOR)">
+								<li [class.disabled]="config.weightResizeType === WeightResizeType.Neighbors">
+									<a href="javascript:void(0)" (click)="setWeightResizeType(WeightResizeType.Neighbors)">
 										Adjacent Only
-										<span *ngIf="config.weightResizeType === RESIZE_NEIGHBOR" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.weightResizeType === WeightResizeType.Neighbors" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
-								<li [class.disabled]="config.weightResizeType === RESIZE_SIBLINGS">
-									<a href="javascript:void(0)" (click)="setWeightResizeType(RESIZE_SIBLINGS)">
+								<li [class.disabled]="config.weightResizeType === SortAlternativesType.Siblings">
+									<a href="javascript:void(0)" (click)="setWeightResizeType(SortAlternativesType.Siblings)">
 										All
-										<span *ngIf="config.weightResizeType === RESIZE_SIBLINGS" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.weightResizeType === SortAlternativesType.Siblings" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 							</ul>

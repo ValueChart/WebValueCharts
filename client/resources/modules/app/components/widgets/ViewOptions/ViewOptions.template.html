@@ -12,16 +12,16 @@
 								Chart Orientation
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="orientation-dropdown">
-								<li [class.disabled]="config.viewOrientation === 'vertical'">
-									<a href="javascript:void(0)" (click)="setOrientation('vertical')">
+								<li [class.disabled]="config.viewOrientation === ChartOrientation.Vertical">
+									<a href="javascript:void(0)" (click)="setOrientation(ChartOrientation.Vertical)">
 										Vertical
-										<span *ngIf="config.viewOrientation === 'vertical'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.viewOrientation === ChartOrientation.Vertical" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
-								<li [class.disabled]="config.viewOrientation === 'horizontal'">
-									<a href="javascript:void(0)" (click)="setOrientation('horizontal')">
+								<li [class.disabled]="config.viewOrientation === ChartOrientation.Horizontal">
+									<a href="javascript:void(0)" (click)="setOrientation(ChartOrientation.Horizontal)">
 										Horizontal
-										<span *ngIf="config.viewOrientation === 'horizontal'" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+										<span *ngIf="config.viewOrientation === ChartOrientation.Horizontal" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 									</a>
 								</li>
 							</ul>

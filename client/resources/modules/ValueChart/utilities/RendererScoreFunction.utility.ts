@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 16:14:12
+* @Last Modified time: 2017-06-01 14:02:50
 */
 
 // Import Angular Classes:
@@ -23,6 +23,7 @@ import { ScoreFunction }														from '../../../model/ScoreFunction';
 import { DomainElement, ScoreFunctionData, ScoreFunctionDataSummary }			from '../../../types/RendererData.types';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }								from '../../../types/RendererData.types';
 
+import { ChartOrientation }														from '../../../types/Config.types';
 
 /*
 	This class contains methods for formatting data from the active ValueChart object in the ValueChartService
@@ -81,7 +82,7 @@ export class RendererScoreFunctionUtility {
 		u.rendererConfig.labelOffset = 25;
 
 				// Initialize the view configuration. This code is very similar to that in RendererService, but is duplicated here to avoid a dependency on that class.
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			u.rendererConfig.dimensionOne = 'width';
 			u.rendererConfig.dimensionTwo = 'height';
 			u.rendererConfig.coordinateOne = 'x';
@@ -118,7 +119,7 @@ export class RendererScoreFunctionUtility {
 		u.heightScale = d3.scaleLinear()
 			.domain([0, 1])
 
-		if (u.viewOrientation === 'vertical') {
+		if (u.viewOrientation === ChartOrientation.Vertical) {
 			u.heightScale.range([0, (u.rendererConfig.domainAxisCoordinateTwo) - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
 		} else {
 			u.heightScale.range([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);

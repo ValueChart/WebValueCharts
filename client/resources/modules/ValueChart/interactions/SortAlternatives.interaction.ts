@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:22:06
+* @Last Modified time: 2017-06-01 13:56:43
 */
 
 // Import Angular Classes:
@@ -35,7 +35,7 @@ import { RowData, CellData, LabelData, RendererConfig }				from '../../../types/
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { AlternativesRecord }										from '../../../types/Record.types';
 
-
+import { SortAlternativesType, ChartOrientation }					from '../../../types/Config.types';
 
 /*
 	This class implements the User interaction for sorting a ValueChart's alternatives. It allows users to sort Alternatives 
@@ -63,13 +63,6 @@ export class SortAlternativesInteraction {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
-
-	// Constants for the types of alternative sorting.
-	SORT_BY_OBJECTIVE: string = 'objective';			// Sort Alternatives by objective score.
-	SORT_ALPHABETICALLY: string = 'alphabet';			// Sort Alternatives alphabetically by name.
-	SORT_MANUALLY: string = 'manual';					// Sort Alternatives manually by clicking and dragging.
-	RESET_SORT: string = 'reset';						// Reset the Alternative order to be the original, default order (based on creation order).
-	SORT_OFF: string = 'none';							// No form of Alternative sorting is enabled.
 
 	public lastRendererUpdate: RendererUpdate;
 	private originalAlternativeOrder: AlternativesRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
@@ -129,22 +122,22 @@ export class SortAlternativesInteraction {
 						alternative order while 'objective', and 'manual' are user drive. Type 'none' simply turns off all sorting.
 						Alternative sorting (with the exception of by objective score) is managed by the ObjectiveChart and SummaryChart renderers.
 	*/
-	public toggleAlternativeSorting(sortingType: string, alternativeBoxes: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {
+	public toggleAlternativeSorting(sortingType: SortAlternativesType, alternativeBoxes: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {
 		this.initialize(rendererUpdate);
 
-		if (sortingType === this.SORT_ALPHABETICALLY) {
+		if (sortingType === SortAlternativesType.Alphabetically) {
 			this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
 			this.lastRendererUpdate.valueChart.setAlternatives(this.sortAlternativesAlphabetically(this.lastRendererUpdate.valueChart.getAlternatives()));
 
-		} else if (sortingType === this.SORT_MANUALLY) {
+		} else if (sortingType === SortAlternativesType.Manually) {
 			this.sortAlternativesManually(true, alternativeBoxes);
 
-		} else if (sortingType === this.RESET_SORT) {
+		} else if (sortingType === SortAlternativesType.Default) {
 			this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 			this.lastRendererUpdate.valueChart.setAlternatives(this.originalAlternativeOrder.alternatives);
 
-		} else if (sortingType === this.SORT_OFF) {
+		} else if (sortingType === SortAlternativesType.None) {
 			this.sortAlternativesManually(false, alternativeBoxes);
 		}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:20:06
+* @Last Modified time: 2017-06-01 14:04:07
 */
 
 // Import Angular Classes:
@@ -29,6 +29,7 @@ import { DiscreteScoreFunction }						from '../../../model/DiscreteScoreFunction
 // Import Types:
 import { DomainElement, ScoreFunctionData } 			from '../../../types/RendererData.types';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }		from '../../../types/RendererData.types';
+import { ChartOrientation }								from '../../../types/Config.types';
 
 // This class contains the logic for creating and rendering multiple users' ContinuousScoreFunctions for a single objective with a continuous 
 // (either categorical or interval) domain. The score functions are rendered as scatter plots where the points are the elements in the objective's 
@@ -261,7 +262,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	protected renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
+			return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
 		};
 
 		this.plottedPoints

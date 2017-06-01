@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 12:47:52
+* @Last Modified time: 2017-06-01 14:07:56
 */
 
 // Import Angular Classes:
@@ -19,6 +19,7 @@ import { ValueChart }												from '../../../model/ValueChart';
 import { ViewConfig }												from '../../../types/Config.types';
 import { RendererConfig, RendererUpdate }							from '../../../types/RendererData.types';
 
+import { ChartOrientation }									from '../../../types/Config.types';
 
 
 
@@ -66,7 +67,7 @@ export class RendererConfigUtility {
 		u.rendererConfig.chartComponentWidth = u.width;
 		u.rendererConfig.chartComponentHeight = u.height;
 
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			// We want to render the ValueChart horizontally
 			u.rendererConfig.dimensionOne = 'width';	// Set dimensionOne to be the width of the graph
 			u.rendererConfig.dimensionTwo = 'height';	// Set dimensionTwo to the height of the graph
@@ -76,7 +77,7 @@ export class RendererConfigUtility {
 			u.rendererConfig.dimensionOneSize = u.rendererConfig.chartComponentWidth;	// This is the width of the graph
 			u.rendererConfig.dimensionTwoSize = u.rendererConfig.chartComponentHeight;	// This is the height of the graph
 
-		} else if (u.viewConfig.viewOrientation === 'horizontal') {
+		} else if (u.viewConfig.viewOrientation === ChartOrientation.Horizontal) {
 			u.rendererConfig.dimensionOne = 'height'; 	// Set dimensionOne to be the height of the graph
 			u.rendererConfig.dimensionTwo = 'width';	// Set dimensionTwo to be the width of the graph
 			u.rendererConfig.coordinateOne = 'y';		// Set coordinateOne to the y coordinate

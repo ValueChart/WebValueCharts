@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 21:08:03
+* @Last Modified time: 2017-06-01 13:59:15
 */
 
 // Import Angular Classes:
@@ -26,7 +26,7 @@ import { ScoreFunction }									from '../../../model/ScoreFunction';
 import { RowData, CellData, UserScoreData, LabelData }		from '../../../types/RendererData.types';
 import { RendererUpdate }									from '../../../types/RendererData.types';
 
-
+import { ChartOrientation }									from '../../../types/Config.types';
 /*
 	This class contains and exposes ValueChart data formatted to work with the ValueChartDirective's 
 	renderer classes. It contains methods for converting the active ValueChart into a format suitable for d3, 
@@ -246,7 +246,7 @@ export class RendererDataUtility {
 		// orientation we must reverse the order in which we calculate offsets. Otherwise, the earlier rows will have smaller offsets and the
 		// stacked bar chart will be rendered in reverse. This is not a problem in the horizontal orientation since rows are rendered left to right
 		// in that configuration, meaning that the default row order can be used to calculate offsets.
-		if (u.viewConfig.viewOrientation === 'vertical') {
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			rowDataCopy.reverse();
 		}
 

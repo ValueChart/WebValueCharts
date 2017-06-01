@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 16:20:56
+* @Last Modified time: 2017-06-01 15:15:09
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -29,6 +29,7 @@ import { RendererScoreFunctionUtility }									from '../../ValueChart/utilities
 import { ScoreFunction }												from '../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../model/PrimitiveObjective';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }						from '../../../types/RendererData.types';
+import { ChartOrientation }												from '../../../types/Config.types';
 
 
 @Directive({
@@ -46,7 +47,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	@Input() objective: PrimitiveObjective;
 	@Input() width: number;
 	@Input() height: number;
-	@Input() viewOrientation: string;
+	@Input() viewOrientation: ChartOrientation;
 	@Input() individualOnly: boolean;
 	@Input() enableInteraction: boolean;
 
@@ -103,7 +104,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initScoreFunctionPlot(): void {
 
-		console.log('initiating plot')
 
 		if (this.objective.getDomainType() === 'continuous') {
 			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
@@ -141,14 +141,12 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	ngDoCheck() {
 
 		if (this.previousObjectiveToDisplay.getName() !== this.objective.getName()) {
-			console.log('not equal', this.previousObjectiveToDisplay, this.objective);
 			this.rendererSubscription.unsubscribe();
 			this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
 			this.initScoreFunctionPlot();
 		}
 
 		if (this.enableInteraction !== this.previousEnableInteraction) {
-			console.log('this has been called');
 			this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
 			this.previousEnableInteraction = _.clone(this.enableInteraction);
 		}

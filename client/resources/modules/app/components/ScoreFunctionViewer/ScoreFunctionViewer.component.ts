@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:41:42
+* @Last Modified time: 2017-06-01 14:30:08
 */
 
 // Import Angular Classes:
@@ -31,6 +31,7 @@ import { ScoreFunction }												from '../../../../model/ScoreFunction';
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { User }															from '../../../../model/User';
 import { ScoreFunctionData, DomainElement }								from '../../../../types/RendererData.types';
+import { ChartOrientation }												from '../../../../types/Config.types';
 
 /*
 	This component implements the expanded score function plot page. The expanded score function plot page is a pop-up window that opens when a
@@ -77,6 +78,8 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 
 	private previousScoreFunctions: ScoreFunction[];
 	private previousViewType: string;
+
+	public ChartOrientation = ChartOrientation;
 
 	// ========================================================================================
 	// 									Constructor
@@ -148,7 +151,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	initDistributionPlot(): void {
 		this.scoreDistributionChartRenderer = new ScoreDistributionChartRenderer(this.rendererScoreFunctionUtility);
 		this.scoreDistributionChartRenderer.createScoreDistributionChart(this.scoreDistributionChartContainer, this.objectiveToDisplay, this.scoreFunctions);
-		this.scoreDistributionChartRenderer.renderScoreDistributionChart(375, 300, 'vertical');
+		this.scoreDistributionChartRenderer.renderScoreDistributionChart(375, 300, ChartOrientation.Vertical);
 	}
 
 	configureDisplay(): void {

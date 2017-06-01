@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-19 19:57:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 22:59:22
+* @Last Modified time: 2017-06-01 14:05:39
 */
 
 // Import Angular Classes:
@@ -23,6 +23,7 @@ import { DiscreteScoreFunction }									from '../../../model/DiscreteScoreFunct
 
 // Import Types:
 import { ScoreFunctionDataSummary } 								from '../../../types/RendererData.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 // This class renders multiple users' ScoreFunctions for the same PrimitiveObjective into a series of box plots. These box plots visualize the 
 // distribution of users' scores for the domain elements of the PrimitiveObjective and facilitate identification of disagreements concerning score assignments.
@@ -260,10 +261,10 @@ export class ScoreDistributionChartRenderer {
 						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
 						helper methods method to render the different parts of the score distribution plot.
 	*/
-	renderScoreDistributionChart(width: number, height: number, viewOrientation: string): void {
+	renderScoreDistributionChart(width: number, height: number, viewOrientation: ChartOrientation): void {
 
 		// Initialize view configuration. This code is very similar to that is renderConfigService, and it is here because we are intentionally avoiding a dependency on renderConfigService.
-		if (viewOrientation === 'vertical') {
+		if (viewOrientation === ChartOrientation.Vertical) {
 			this.viewConfig.dimensionOne = 'width';
 			this.viewConfig.dimensionTwo = 'height';
 			this.viewConfig.coordinateOne = 'x';
@@ -298,7 +299,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Position and styles the domain and score axes of the chart. This method should NOT be called manually.
 	*/
-	renderAxes(axesContainer: d3.Selection<any, any, any, any>, viewOrientation: string): void {
+	renderAxes(axesContainer: d3.Selection<any, any, any, any>, viewOrientation: ChartOrientation): void {
 		// Delete the elements of the previous scale:
 
 		this.renderDomainAxis(this.domainAxis, this.domainLabels, viewOrientation);
@@ -313,11 +314,11 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Positions and styles the domain axis of the chart. This method should NOT be called manually.
 	*/
-	renderDomainAxis(domainAxis: d3.Selection<any, any, any, any>, domainLabels: d3.Selection<any, any, any, any>, viewOrientation: string): void {
+	renderDomainAxis(domainAxis: d3.Selection<any, any, any, any>, domainLabels: d3.Selection<any, any, any, any>, viewOrientation: ChartOrientation): void {
 
 		// This function is used to determine the coordinate two position of the domain axis.
 		var calculateDomainAxisCoordinateTwo = () => {
-			return (viewOrientation === 'vertical') ?
+			return (viewOrientation === ChartOrientation.Vertical) ?
 				(this.viewConfig.dimensionTwoSize - this.coordinateTwoOffset) + 0.5
 				:
 				this.coordinateTwoOffset;
@@ -339,7 +340,7 @@ export class ScoreDistributionChartRenderer {
 		domainLabels
 			.text((d: ScoreFunctionDataSummary) => { return d.element })
 			.attr(this.viewConfig.coordinateOne, (d: ScoreFunctionDataSummary, i: number) => { return this.calculateBoxPlotCoordinateOne(i) + labelOffset; })
-			.attr(this.viewConfig.coordinateTwo, () => { return calculateDomainAxisCoordinateTwo() + ((viewOrientation === 'vertical') ? (this.coordinateTwoOffset / 2) : -(this.coordinateTwoOffset / 2)); })
+			.attr(this.viewConfig.coordinateTwo, () => { return calculateDomainAxisCoordinateTwo() + ((viewOrientation === ChartOrientation.Vertical) ? (this.coordinateTwoOffset / 2) : -(this.coordinateTwoOffset / 2)); })
 			.style('font-size', 8);
 
 	}
@@ -350,7 +351,7 @@ export class ScoreDistributionChartRenderer {
 		@returns {void}
 		@description	Positions and styles the score axis of the chart. This method should NOT be called manually.
 	*/
-	renderScoreAxis(scoreAxisContainer: d3.Selection<any, any, any, any>, viewOrientation: string): void {
+	renderScoreAxis(scoreAxisContainer: d3.Selection<any, any, any, any>, viewOrientation: ChartOrientation): void {
 
 		// Delete elements from a previous rendering of the score axis. This must be done because we are using d3's axis generating methods.
 		var elements: any = (<any>scoreAxisContainer.node()).children;
@@ -368,7 +369,7 @@ export class ScoreDistributionChartRenderer {
 		var scoreAxis: any;
 
 		// Position the score axis correctly depending on the view orientation of the chart.
-		if (viewOrientation === 'vertical') {
+		if (viewOrientation === ChartOrientation.Vertical) {
 			scoreAxisScale.range([scoreAxisHeight, 0]);
 			scoreAxis = d3.axisLeft(scoreAxisScale);
 			scoreAxisContainer.attr('transform', 'translate(' + this.coordinateOneOffset + ',' + (this.coordinateTwoOffset / 2) + ')');
@@ -393,12 +394,12 @@ export class ScoreDistributionChartRenderer {
 						and then it calls renderBoxPlotElements to render their elements. This method should NOT be called manually. Instead, call renderScoreDistributionChart 
 						to render the entire chart at once.
 	*/
-	renderBoxPlots(boxplotContainers: d3.Selection<any, any, any, any>, elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: string) {
+	renderBoxPlots(boxplotContainers: d3.Selection<any, any, any, any>, elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: ChartOrientation) {
 
 		// Position each of the box plots by positioning their containers. 
 		boxplotContainers.attr('transform', (d: ScoreFunctionDataSummary, i: number) => {
 			let offset: number = this.calculateBoxPlotCoordinateOne(i);
-			return 'translate(' + ((viewOrientation === 'vertical') ? offset : 0) + ',' + ((viewOrientation === 'vertical') ? 0 : offset) + ')';
+			return 'translate(' + ((viewOrientation === ChartOrientation.Vertical) ? offset : 0) + ',' + ((viewOrientation === ChartOrientation.Vertical) ? 0 : offset) + ')';
 		});
 
 		this.renderBoxPlotElements(elementUserScoresSummaries, viewOrientation);
@@ -411,7 +412,7 @@ export class ScoreDistributionChartRenderer {
 		@description	Positions and styles the elements making up the score distribution chart's box plots. This method should NOT be called manually. Instead, call renderScoreDistributionChart 
 						to render the entire chart at once.
 	*/
-	renderBoxPlotElements(elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: string) {
+	renderBoxPlotElements(elementUserScoresSummaries: ScoreFunctionDataSummary[], viewOrientation: ChartOrientation) {
 		var boxplotWidth: number = ((this.viewConfig.dimensionOneSize / elementUserScoresSummaries.length) / 2);
 
 		// Configure the scale that is used to translate between score values and pixel coordinates.

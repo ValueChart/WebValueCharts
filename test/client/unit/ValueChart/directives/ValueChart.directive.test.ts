@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:54:56
+* @Last Modified time: 2017-06-01 15:04:03
 */
 
 // Import Testing Resources:
@@ -61,6 +61,8 @@ import { LabelDefinitions } 												from '../../../../../client/resources/mo
 import { ViewConfig, InteractionConfig } 									from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate } 													from '../../../../../client/resources/types/RendererData.types';
 import { RowData, UserScoreData } 											from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+
 
 @Component({
 	selector: 'viewer-stub',
@@ -129,7 +131,7 @@ describe('ValueChartDirective', () => {
 	beforeEach(() => {
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -139,10 +141,10 @@ describe('ValueChartDirective', () => {
 		};
 
 		interactionConfig = {
-			weightResizeType: 'none',
+			weightResizeType: WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: 'none',
-			pumpWeights: 'none',
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: false
 		};
@@ -232,7 +234,7 @@ describe('ValueChartDirective', () => {
 			hotelChart = parser.parseValueChart(valueChartDocument);
 
 			viewConfig = {
-				viewOrientation: 'vertical',
+				viewOrientation: ChartOrientation.Vertical,
 				displayScoreFunctions: false,
 				displayTotalScores: false,
 				displayScales: false,
@@ -242,10 +244,10 @@ describe('ValueChartDirective', () => {
 			};
 
 			interactionConfig = {
-				weightResizeType: 'none',
+				weightResizeType: WeightResizeType.None,
 				reorderObjectives: false,
-				sortAlternatives: 'none',
-				pumpWeights: 'none',
+				sortAlternatives: SortAlternativesType.None,
+				pumpWeights: PumpType.None,
 				setObjectiveColors: false,
 				adjustScoreFunctions: false
 			};
@@ -302,7 +304,7 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
-					viewOrientation: 'vertical',
+					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
 					displayScales: false,
@@ -312,10 +314,10 @@ describe('ValueChartDirective', () => {
 				};
 
 				interactionConfig = {
-					weightResizeType: 'none',
+					weightResizeType: WeightResizeType.None,
 					reorderObjectives: false,
-					sortAlternatives: 'none',
-					pumpWeights: 'none',
+					sortAlternatives: SortAlternativesType.None,
+					pumpWeights: PumpType.None,
 					setObjectiveColors: false,
 					adjustScoreFunctions: false
 				};
@@ -353,7 +355,7 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
-					viewOrientation: 'vertical',
+					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
 					displayScales: false,
@@ -363,10 +365,10 @@ describe('ValueChartDirective', () => {
 				};
 
 				interactionConfig = {
-					weightResizeType: 'none',
+					weightResizeType: WeightResizeType.None,
 					reorderObjectives: false,
-					sortAlternatives: 'none',
-					pumpWeights: 'none',
+					sortAlternatives: SortAlternativesType.None,
+					pumpWeights: PumpType.None,
 					setObjectiveColors: false,
 					adjustScoreFunctions: false
 				};
@@ -602,7 +604,7 @@ describe('ValueChartDirective', () => {
 			});
 
 			it('should re-render the valueChart in the new view orientation', () => {
-				viewConfig.viewOrientation = 'horizontal';
+				viewConfig.viewOrientation = ChartOrientation.Horizontal
 				fixture.detectChanges();
 
 				// Determine if the ValueChart sent renderer messages as a result of the changed viewOrientation.
@@ -610,7 +612,7 @@ describe('ValueChartDirective', () => {
 				expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
 				expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
 
-				expect(valueChartDirective['viewConfig'].viewOrientation).to.equal('horizontal');
+				expect(valueChartDirective['viewConfig'].viewOrientation).to.equal(ChartOrientation.Horizontal);
 
 				let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 				checkCachedRendererUpdates(u);
@@ -629,7 +631,7 @@ describe('ValueChartDirective', () => {
 
 			it('should re-render the valueChart in the new view orientation', () => {
 				viewerStub.viewConfig = {
-					viewOrientation: 'vertical',
+					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: true,
 					displayTotalScores: false,
 					displayScales: true,
@@ -664,10 +666,10 @@ describe('ValueChartDirective', () => {
 
 			it('should re-render the valueChart in the new view orientation', () => {
 				viewerStub.interactionConfig = {
-					weightResizeType: 'neighbor',
+					weightResizeType: WeightResizeType.Neighbors,
 					reorderObjectives: true,
-					sortAlternatives: 'manual',
-					pumpWeights: 'increase',
+					sortAlternatives: SortAlternativesType.Manually,
+					pumpWeights: PumpType.Increase,
 					setObjectiveColors: true,
 					adjustScoreFunctions: true
 				};

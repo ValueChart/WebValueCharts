@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:54:16
+* @Last Modified time: 2017-06-01 15:04:37
 */
 
 // Import Testing Resources:
@@ -43,6 +43,7 @@ import { AbstractObjective }							from '../../../../../client/resources/model/A
 
 // Import Types
 import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
 
 
 @Component({
@@ -124,7 +125,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 		u = {
 			el: el,
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			interactionConfig: { adjustScoreFunctions: false, expandScoreFunctions: false },
 			height: height,
 			width: width,
@@ -323,7 +324,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
 				u.colors = [aaron.color];
 
-				u.viewOrientation = 'horizontal';
+				u.viewOrientation = ChartOrientation.Horizontal;
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 				u = rendererScoreFunctionUtility.produceViewConfig(u);	

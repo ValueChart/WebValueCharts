@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:27:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:54:26
+* @Last Modified time: 2017-06-01 14:34:18
 */
 
 // Import Testing Resources:
@@ -46,7 +46,7 @@ import { ContinuousDomain }								from '../../../../../client/resources/model/C
 import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
 import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
-
+import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
 
 
 @Component({
@@ -128,7 +128,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 
 		u = {
 			el: el,
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			interactionConfig: { adjustScoreFunctions: false, expandScoreFunctions: false },
 			height: height,
 			width: width,
@@ -323,7 +323,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
 				u.colors = [aaron.color];
 
-				u.viewOrientation = 'horizontal';
+				u.viewOrientation = ChartOrientation.Horizontal;
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 				u = rendererScoreFunctionUtility.produceViewConfig(u);	

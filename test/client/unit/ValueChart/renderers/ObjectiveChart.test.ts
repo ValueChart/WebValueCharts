@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:51:17
+* @Last Modified time: 2017-06-01 14:26:48
 */
 
 // Import Testing Resources:
@@ -47,6 +47,7 @@ import { PrimitiveObjective }							from '../../../../../client/resources/model/
 import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
 import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
 
 
 
@@ -97,7 +98,7 @@ var renderEventsServiceStub = {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -107,10 +108,10 @@ var renderEventsServiceStub = {
 		};
 
 		interactionConfig = {
-			weightResizeType: 'none',
+			weightResizeType: WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: 'none',
-			pumpWeights: 'none',
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: false
 		};
@@ -323,7 +324,7 @@ var renderEventsServiceStub = {
 			before(function() {
 				u.valueChart.setUser(aaron);
 
-				viewConfig.viewOrientation = 'horizontal';
+				viewConfig.viewOrientation = ChartOrientation.Horizontal
 
 				u = rendererDataUtility.produceMaximumWeightMap(u);
 				u = rendererDataUtility.produceRowData(u);
@@ -368,29 +369,29 @@ var renderEventsServiceStub = {
 		context('when all of the interaction options are disabled in the interactionConfig object', () => {
 			it('should change the sort alternatives interaction to "none"', () => {
 				objectiveChartRenderer.interactionsChanged(interactionConfig);
-				expect(sortAlternativesStub.sortStatus).to.equal('none');
+				expect(sortAlternativesStub.sortStatus).to.equal(SortAlternativesType.None);
 			});
 		});
 
 		context('when the interactionConfig option sortAlternatives is set to "alphabet"', () => {
 			before(function() {
-				interactionConfig.sortAlternatives = 'alphabet';
+				interactionConfig.sortAlternatives = SortAlternativesType.Alphabetically;
 			});
 
 			it('should change the sort alternatives interaction to "alphabet"', () => {
 				objectiveChartRenderer.interactionsChanged(interactionConfig);
-				expect(sortAlternativesStub.sortStatus).to.equal('alphabet');
+				expect(sortAlternativesStub.sortStatus).to.equal(SortAlternativesType.Alphabetically);
 			});
 		});
 
 		context('when the interactionConfig option sortAlternatives is set to "manual"', () => {
 			before(function() {
-				interactionConfig.sortAlternatives = 'manual';
+				interactionConfig.sortAlternatives = SortAlternativesType.Manually;
 			});
 
 			it('should change the sort alternatives interaction to "manual"', () => {
 				objectiveChartRenderer.interactionsChanged(interactionConfig);
-				expect(sortAlternativesStub.sortStatus).to.equal('manual');
+				expect(sortAlternativesStub.sortStatus).to.equal(SortAlternativesType.Manually);
 			});
 		});
 	});
@@ -429,7 +430,7 @@ var renderEventsServiceStub = {
 			let rowData: RowData = <any> rowSelection.datum();
 			let rowOffset = u.rendererConfig.dimensionTwoScale(rowData.weightOffset);
 
-			if (u.viewConfig.viewOrientation == 'vertical')
+			if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
 				expect(rowSelection.attr('transform')).to.equal('translate(0,' + rowOffset + ')');
 			else 
 				expect(rowSelection.attr('transform')).to.equal('translate(' + rowOffset + ',0)');
@@ -441,7 +442,7 @@ var renderEventsServiceStub = {
 					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getName()).getScore(datum.value);
 					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
 
-					if (u.viewConfig.viewOrientation == 'vertical') {
+					if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 						expect(selection.attr('height')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());
 					} else {
 						expect(selection.attr('width')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());

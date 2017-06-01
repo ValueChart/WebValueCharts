@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-11 15:57:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:22:53
+* @Last Modified time: 2017-06-01 14:04:16
 */
 
 // Import Angular Classes:
@@ -17,6 +17,7 @@ import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service
 // Import Types
 import { DomainElement }											from '../../../types/RendererData.types';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 
@@ -76,7 +77,7 @@ export class AdjustScoreFunctionInteraction {
 			if (!adjustScoreFunctions) {
 				return 'auto';
 			} else {
-				return (this.lastRendererUpdate.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+				return (this.lastRendererUpdate.viewOrientation === ChartOrientation.Vertical) ? 'ns-resize' : 'ew-resize';
 			}
 		});
 	}
@@ -85,7 +86,7 @@ export class AdjustScoreFunctionInteraction {
 	handleDrag = (d: DomainElement, i: number) => {
 		var score: number;
 		// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
-		if (this.lastRendererUpdate.viewOrientation === 'vertical') {
+		if (this.lastRendererUpdate.viewOrientation === ChartOrientation.Vertical) {
 			// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
 			score = this.lastRendererUpdate.heightScale.invert(this.lastRendererUpdate.rendererConfig.domainAxisCoordinateTwo - (<any>d3.event)[this.lastRendererUpdate.rendererConfig.coordinateTwo]);
 		} else {

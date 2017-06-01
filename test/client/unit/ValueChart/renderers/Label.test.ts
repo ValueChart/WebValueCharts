@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:50:48
+* @Last Modified time: 2017-06-01 15:09:21
 */
 
 // Import Testing Resources:
@@ -57,6 +57,7 @@ import { AbstractObjective }							from '../../../../../client/resources/model/A
 import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
 import { LabelData }									from '../../../../../client/resources/types/RendererData.types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
 
 
 
@@ -145,7 +146,7 @@ var chartUndoRedoStub = {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-			viewOrientation: 'vertical',
+			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -155,10 +156,10 @@ var chartUndoRedoStub = {
 		};
 
 		interactionConfig = {
-			weightResizeType: 'none',
+			weightResizeType: WeightResizeType.None,
 			reorderObjectives: false,
-			sortAlternatives: 'none',
-			pumpWeights: 'none',
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
 			adjustScoreFunctions: false
 		};
@@ -364,7 +365,7 @@ var chartUndoRedoStub = {
 
 				u.valueChart.setUser(aaron);
 
-				viewConfig.viewOrientation = 'horizontal';
+				viewConfig.viewOrientation = ChartOrientation.Horizontal
 				u = rendererDataUtility.produceMaximumWeightMap(u);
 				u = rendererDataUtility.produceLabelData(u);
 				u = rendererConfigUtility.produceRendererConfig(u);
@@ -423,8 +424,8 @@ var chartUndoRedoStub = {
 
 			it('should toggle all interactions to be off/none', () => {
 				expect(sortAlternativesStub.sortStatus).to.be.false;
-				expect(resizeWeightsInteractionStub.pumpType).to.equal('none');
-				expect(resizeWeightsInteractionStub.resizeType).to.equal('none');
+				expect(resizeWeightsInteractionStub.pumpType).to.equal(PumpType.None);
+				expect(resizeWeightsInteractionStub.resizeType).to.equal(WeightResizeType.None);
 				expect(setObjectiveColorsInteractionStub.setObjectiveColors).to.be.false;
 				expect(reorderObjectivesInteractionStub.enableReordering).to.be.false;
 			});
@@ -434,11 +435,11 @@ var chartUndoRedoStub = {
 		context('when the interaction options are enabled in the interaction configuration object', () => {
 			
 			before(function() {
-				interactionConfig.pumpWeights = 'increase';
-				interactionConfig.weightResizeType = 'neighbor';
+				interactionConfig.pumpWeights = PumpType.Increase;
+				interactionConfig.weightResizeType = WeightResizeType.Neighbors;
 				interactionConfig.reorderObjectives = true;
 				interactionConfig.setObjectiveColors = true;
-				interactionConfig.sortAlternatives = 'manual';
+				interactionConfig.sortAlternatives = SortAlternativesType.Manually;
 
 				labelRenderer.interactionsChanged(interactionConfig);
 			});
@@ -446,26 +447,26 @@ var chartUndoRedoStub = {
 			it('should enable the appropriate interactions', () => {
 				expect(sortAlternativesStub.sortStatus).to.be.false;
 
-				expect(resizeWeightsInteractionStub.pumpType).to.equal('increase');
-				expect(resizeWeightsInteractionStub.resizeType).to.equal('neighbor');
+				expect(resizeWeightsInteractionStub.pumpType).to.equal(PumpType.Increase);
+				expect(resizeWeightsInteractionStub.resizeType).to.equal(WeightResizeType.Neighbors);
 				expect(setObjectiveColorsInteractionStub.setObjectiveColors).to.be.true;
 				expect(reorderObjectivesInteractionStub.enableReordering).to.be.true;
 			});
 
 			it('should toggle sorting alternatives by objective score ONLY when sortAlternatives is set to "objective"', () => {
-				interactionConfig.sortAlternatives = 'reset';
+				interactionConfig.sortAlternatives = SortAlternativesType.Default;
 				labelRenderer.interactionsChanged(interactionConfig);
 				expect(sortAlternativesStub.sortStatus).to.be.false;
 
-				interactionConfig.sortAlternatives = 'alphabet';
+				interactionConfig.sortAlternatives = SortAlternativesType.Alphabetically;
 				labelRenderer.interactionsChanged(interactionConfig);		
 				expect(sortAlternativesStub.sortStatus).to.be.false;
 
-				interactionConfig.sortAlternatives = 'none';
+				interactionConfig.sortAlternatives = SortAlternativesType.None;
 				labelRenderer.interactionsChanged(interactionConfig);		
 				expect(sortAlternativesStub.sortStatus).to.be.false;
 
-				interactionConfig.sortAlternatives = 'objective';
+				interactionConfig.sortAlternatives = SortAlternativesType.ByObjectiveScore;
 				labelRenderer.interactionsChanged(interactionConfig);		
 				expect(sortAlternativesStub.sortStatus).to.be.true;
 			});
