@@ -2,10 +2,9 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 12:59:38
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 13:06:15
+* @Last Modified time: 2017-05-29 20:49:27
 */
 
-// Import Test Resources:
 export var HotelChartData: string = 
 `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0">

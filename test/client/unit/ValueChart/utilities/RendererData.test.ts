@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-20 21:05:35
+* @Last Modified time: 2017-05-29 23:12:35
 */
 
 // Import Testing Resources:
@@ -43,7 +43,7 @@ describe('RendererDataUtility', () => {
 	var aaron: User;
 	var bob: User;
 
-	before(function() {
+	beforeEach(function() {
 		TestBed.configureTestingModule({
 			providers: [ RendererDataUtility ]
 		});
@@ -102,6 +102,14 @@ describe('RendererDataUtility', () => {
 		bobsWeights.setObjectiveWeight('rate', 0.3);
 
 		bob.setWeightMap(bobsWeights);
+
+		var bobsScoreFunctions = u.valueChart.getUsers()[0].getScoreFunctionMap();
+		bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('nightlife', 1);
+		bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('airport', 0);
+		bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('none', 1);
+		bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('highspeed', 0);
+
+		bob.setScoreFunctionMap(bobsScoreFunctions);
 	});
 
 	describe('private generateMaximumWeightMap(u: RendererUpdate): WeightMap', () => {
@@ -128,7 +136,10 @@ describe('RendererDataUtility', () => {
 
 		context('when there are three users in the ValueChart', () => {
 			var max: User;
-			before(function() {
+
+			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the three users to that objective', () => {
+				u.valueChart.setUser(bob);
+
 				max = new User('Max');
 				var maxsWeights = new WeightMap();
 
@@ -139,9 +150,7 @@ describe('RendererDataUtility', () => {
 				maxsWeights.setObjectiveWeight('rate', 0.05);
 
 				max.setWeightMap(maxsWeights);
-			});
 
-			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the three users to that objective', () => {
 				u.valueChart.setUser(max);
 
 				var maximumWeightMap = rendererDataUtility['generateMaximumWeightMap'](u);
@@ -157,31 +166,22 @@ describe('RendererDataUtility', () => {
 
 	describe('produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate', () => {
 		context('when the ValueChart has no users', () => {
-			before(function() {
-				u.valueChart.setUsers([]);
-			});
-
 			it('should return the renderer update with the default weight map attached', () => {
+				u.valueChart.setUsers([]);
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(u.valueChart.getDefaultWeightMap());
 			});
 		});
 
 		context('when the ValueChart has exactly one user', () => {
-			before(function() {
-				u.valueChart.setUser(aaron);
-			});
-
 			it('should return the renderer update with that user\'s weight map attached', () => {
+				u.valueChart.setUser(aaron);
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(aaron.getWeightMap());
 			});
 		});
 
 		context('when the chart has more than one user', () => {
-			before(function() {
-				u.valueChart.setUser(bob);
-			});
-
 			it('should return the renderer update with the maximumWeightMap as created by generateMaximumWeightMap()',() => {
+				u.valueChart.setUsers([aaron, bob]);
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(rendererDataUtility['generateMaximumWeightMap'](u));
 			});	
 		});
@@ -192,24 +192,13 @@ describe('RendererDataUtility', () => {
 			var rowData: RowData[];
 			var numAlternatives: number;
 
-			before(function() {
+			it('should produce an array of RowData with one row per primitive objective, one cell for each alternative per row, and with two user scores per cell', () => {
 				u.valueChart.setUsers([aaron, bob]);
 
-				var bobsScoreFunctions = u.valueChart.getUsers()[0].getScoreFunctionMap();
-
-				bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('nightlife', 1);
-				bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('airport', 0);
-
-				bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('none', 1);
-				bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('highspeed', 0);
-
-				bob.setScoreFunctionMap(bobsScoreFunctions);
+				u = rendererDataUtility.produceMaximumWeightMap(u);
 				rowData = rendererDataUtility.produceRowData(u).rowData;
-
 				numAlternatives = u.valueChart.getAlternatives().length;
-			});
 
-			it('should produce an array of RowData with one row per primitive objective, one cell for each alternative per row, and with two user scores per cell', () => {
 				var objectives = u.valueChart.getAllPrimitiveObjectives();
 
 				expect(rowData).to.have.length(objectives.length);
@@ -226,6 +215,12 @@ describe('RendererDataUtility', () => {
 
 			context('when the viewOrientation is vertical', () => {
 				it('should produce an array of RowData with properly computed offsets reversed compared to the order of the rowData', () => {
+					u.valueChart.setUsers([aaron, bob]);
+
+					numAlternatives = u.valueChart.getAlternatives().length;
+					u = rendererDataUtility.produceMaximumWeightMap(u);
+					rowData = rendererDataUtility.produceRowData(u).rowData;
+
 					var objectives = u.valueChart.getAllPrimitiveObjectives();
 					var offsets = [new Array(numAlternatives).fill(0, 0, numAlternatives), new Array(numAlternatives).fill(0, 0, numAlternatives)];
 
@@ -248,12 +243,14 @@ describe('RendererDataUtility', () => {
 
 			context('when the ViewOrientation is horizontal', () => {
 
-			before(function() {
-				u.viewConfig.viewOrientation = 'horizontal';
-				rowData = rendererDataUtility.produceRowData(u).rowData;
-			});
+				it('should produce an array of RowData with computed offsets', () => {
+					u.valueChart.setUsers([aaron, bob]);
+					u.viewConfig.viewOrientation = 'horizontal';
 
-			it('should produce an array of RowData with computed offsets', () => {
+					numAlternatives = u.valueChart.getAlternatives().length;
+					u = rendererDataUtility.produceMaximumWeightMap(u);
+					rowData = rendererDataUtility.produceRowData(u).rowData;
+
 					var objectives = u.valueChart.getAllPrimitiveObjectives();
 					var offsets = [new Array(numAlternatives).fill(0, 0, numAlternatives), new Array(numAlternatives).fill(0, 0, numAlternatives)];
 
@@ -278,13 +275,10 @@ describe('RendererDataUtility', () => {
 		var labelData: LabelData[]
 		context('when there is one user in the ValueChart', () => {
 
-			before(function() {
+			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the user to the objective', () => {
 				u.valueChart.setUsers([aaron]);
 				rendererDataUtility.produceMaximumWeightMap(u);
 				labelData = rendererDataUtility.produceLabelData(u).labelData;
-			});	
-
-			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the user to the objective', () => {
 
 				var checkLabelData = (labelDatum: LabelData, objective: Objective): number => {
 					expect(labelDatum.objective).to.deep.equal(objective);
@@ -312,13 +306,10 @@ describe('RendererDataUtility', () => {
 
 		context('when there are two users in the ValueChart', () => {
 
-			before(function() {
-				u.valueChart.setUser(bob);
+			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the maximumWeightMap to the objective', () => {
+				u.valueChart.setUsers([aaron, bob]);
 				rendererDataUtility.produceMaximumWeightMap(u);
 				labelData = rendererDataUtility.produceLabelData(u).labelData;
-			});	
-
-			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the maximumWeightMap to the objective', () => {
 
 				var checkLabelData = (labelDatum: LabelData, objective: Objective): number => {
 					expect(labelDatum.objective).to.deep.equal(objective);
@@ -344,6 +335,11 @@ describe('RendererDataUtility', () => {
 			});
 		});
 	});
+
+	after(function() {
+		TestBed.resetTestingModule();
+	})
+
 });
 
 

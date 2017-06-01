@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:54:01
+* @Last Modified time: 2017-05-31 16:04:10
 */
 
 // Import Angular Classes:
@@ -45,7 +45,8 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: ScoreFunctionUpdate;
+	public lastRendererUpdate: ScoreFunctionUpdate;
+	public enableExpanding: boolean;
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
 																					// route that the pop-up window will navigate to when it is opened.
@@ -75,14 +76,14 @@ export class ExpandScoreFunctionInteraction {
 	// 									Methods
 	// ========================================================================================
 
-
 	/*
 		@param enableExpanding - Whether or not to enable double clicking on a ScoreFunction plot to expand it into a pop-up window.
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/
-	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, lastRendererUpdate: ScoreFunctionUpdate): void {
-		this.lastRendererUpdate = lastRendererUpdate;
+	toggleExpandScoreFunction(enableExpanding: boolean, scoreFunctionPlots: NodeListOf<Element>, rendererUpdate: ScoreFunctionUpdate): void {
+		this.lastRendererUpdate = rendererUpdate;
+		this.enableExpanding = enableExpanding;
 		// Initialize the observable that is used to detect clicks and notifies handlers.
 		this.clicks = Observable.fromEvent(scoreFunctionPlots, 'dblclick');
 
@@ -110,8 +111,7 @@ export class ExpandScoreFunctionInteraction {
 		(<any>window).colors = this.lastRendererUpdate.colors;
 		(<any>window).objectiveToPlot = objective;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
-		(<any>window).enableInteraction = false; // Setting interaction to false wholesale temporarily
-														// Need to find a clean way to pass parameter in from ValueChartViewer										
+		(<any>window).enableInteraction = this.lastRendererUpdate.interactionConfig.adjustScoreFunctions;
 
 		// Open the pop-up. Note that this.popUpRef is a reference to the child window.
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,

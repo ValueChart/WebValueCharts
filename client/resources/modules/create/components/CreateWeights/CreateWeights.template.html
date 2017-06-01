@@ -1,6 +1,6 @@
 <h4>Set Priorities</h4>
 <label class="control-label">{{getPrioritiesText()}}</label>
-<input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks()" />
+<input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks(); resetErrorMessages()" />
 <table class="table table-bordered table-hover">
     <thead>
       <tr>
@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName,true)">
+        <tr *ngFor="let objName of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(objName,true); resetErrorMessages()">
             <th>{{objName}}</th>
             <th class="worst-outcome">{{getWorstOutcome(objName)}}</th>
             <th class="best-outcome">{{getBestOutcome(objName)}}</th>
@@ -31,7 +31,11 @@
         </tr>
     </tbody>
 </table>
-<div *ngIf="validationTriggered && !allRanked()" 
-             class="alert alert-danger">
-          You must rank all the Objectives.
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
 </div>

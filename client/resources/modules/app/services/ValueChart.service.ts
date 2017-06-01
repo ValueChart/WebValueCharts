@@ -43,10 +43,6 @@ export class ValueChartService {
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
 
-	private weightMapReset: { [userName: string]: boolean }; // Indicates whether or not a User's WeightMap
-															 // has been reset since they last did SMARTER
-
-
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -59,8 +55,6 @@ export class ValueChartService {
 	*/
 	constructor(
 		private currentUserService: CurrentUserService) {
-
-		this.weightMapReset = {};
 	}
 
 	// ========================================================================================
@@ -130,29 +124,5 @@ export class ValueChartService {
 
 	setWeightMap(user: User, weightMap: WeightMap) {
 		user.setWeightMap(weightMap);
-		this.weightMapReset[user.getUsername()] = false;
-	}
-
-	// TODO: All of these methods should be moved. This class is NOT for containing ValueChart creation code.
-	// Keeping these here until we decide how to adjust users' preferences in response to structural changes.
-
-	wasWeightMapReset(user: User) {
-		return this.weightMapReset[user.getUsername()];
-	}
-
-	// Set User's WeightMap to default
-	resetWeightMap(user: User, weightMap: WeightMap) {
-		user.setWeightMap(weightMap);
-		this.weightMapReset[user.getUsername()] = true;
-	}
-
-	// Set up initial ScoreFunctions
-	// Scores for categorical variables are evenly spaced between 0 and 1
-	getInitialScoreFunctionMap(): ScoreFunctionMap {
-		let scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
-		for (let obj of this.getPrimitiveObjectives()) {
-			scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction().getMemento());
-		}
-		return scoreFunctionMap;
 	}
 }

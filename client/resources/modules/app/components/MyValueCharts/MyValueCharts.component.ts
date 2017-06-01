@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:36:53
+* @Last Modified time: 2017-05-30 22:35:26
 */
 
 // Import Angular Classes:
@@ -17,6 +17,7 @@ import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
 import { ValueChartXMLEncoder }							from '../../../utilities/classes/ValueChartXMLEncoder';
+import { ValidationService }							from '../../services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
@@ -52,6 +53,8 @@ export class MyValueChartsComponent implements OnInit {
 	private downloadLink: any;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
 										// on the client side using object URLs.	
 
+	public validationMessage: string;
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -68,7 +71,8 @@ export class MyValueChartsComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		public valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
-		private valueChartHttpService: ValueChartHttpService) { }
+		private valueChartHttpService: ValueChartHttpService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -105,7 +109,17 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
-				this.router.navigate(['/view/', valueChart.getName()]);
+				// Verify that the chart is valid before proceeding.
+				// (This will inform the creator of errors in other users' preferences, as well as 
+				//  any errors brought on by changes in validation since saving to the database.)
+				let errorMessages = this.validationService.validate(valueChart);
+				if (errorMessages.length > 0) {
+					this.validationMessage = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
+					$('#validate-modal').modal('show');
+				}
+				else {
+					this.router.navigate(['/view/', valueChart.getId()]);
+				}	
 			});
 	}
 

@@ -113,7 +113,6 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 		else {
 			this.editing = true;
-			this.validationTriggered = true;
 			let rootObjective: Objective = this.valueChart.getRootObjectives()[0];
 			rootObjective.setName(this.valueChart.getName());
 			this.objectiveToObjRow(rootObjective, "", 0);
@@ -126,6 +125,21 @@ export class CreateObjectivesComponent implements OnInit {
 					this.initialPrimObjRows[objID] = objrow.copy();
 				}
 			}
+			this.validate();
+		}
+	}
+
+	/*   
+		@returns {void}
+		@description   Destroys CreateObjectives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+		        requires that a different component is displayed in the router-outlet.
+	*/
+	ngOnDestroy() {
+		// Convert temporary structures to ValueChart structures
+		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
+		this.valueChartService.resetPrimitiveObjectives();
+		if (this.editing) {
+			this.updateReferences();
 		}
 	}
 
@@ -143,12 +157,6 @@ export class CreateObjectivesComponent implements OnInit {
 		let removed = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) === -1);
 		let kept = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) > -1);
 
-		// If any Objectives were added or removed, we must reset all the WeightMaps
-		// For now, reset to evenly-distributed weights instead of deleting WeightMap altogether so that Group ValueCharts doesn't break
-		// TODO: alert all Users that their WeightMap has been reset and they must do SMARTER again
-		if (removed.length > 0 || added.length > 0) {
-			this.updateObjRefService.resetWeightMaps();
-		}
 		this.updateObjRefService.addScoreFunctions(added.map(x => this.objectiveRows[x].name));
 		this.updateObjRefService.removeReferences(removed.map(x => this.initialPrimObjRows[x].name));
 		this.updateObjRefService.updateObjectiveNames(kept.map(x => this.initialPrimObjRows[x].name), kept.map(x => this.objectiveRows[x].name));
@@ -166,11 +174,11 @@ export class CreateObjectivesComponent implements OnInit {
 			let objName = this.objectiveRows[objID].name;
 			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objName);
 
-			// Reset all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
+			// Clear all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
 			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
 			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
-				this.updateObjRefService.resetScoreFunctions(obj);
-				this.updateObjRefService.resetWeightMaps(); // must be done because best/worst outcomes may have changed
+				this.updateObjRefService.clearScoreFunctions(obj);
+				this.updateObjRefService.clearWeightMaps(); // must be done because best/worst outcomes may have changed
 			}
 
 			// Check for changes to categorical domain options
@@ -481,7 +489,6 @@ export class CreateObjectivesComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Checks validity of objectives structure in the chart.
-						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;

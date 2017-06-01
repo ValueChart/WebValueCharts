@@ -43,26 +43,26 @@ export class ValidationService {
 	OBJECTIVE_NAMES_MISSING: string = "Every Objective must have a name.";
 	OBJECTIVE_NAMES_NOT_UNIQUE: string = "Objective names must be unique.";
 	OBJECTIVE_NAMES_INVALID: string = "The following Objective names contain disallowed characters: ";
-	CHILDLESS_ABSTRACT_OBJECTIVE: string = "Every parent Objective must have at least one child. Please fix the following Objectives: ";
-	CATEGORY_NAMES_INVALID: string = "Category names contain disallowed characters. Please change the following: ";
-	TOO_FEW_CATEGORIES: string = "Categorical domains must have at least two categories. Please fix the following Objectives: ";
-	CONT_DOMAIN_INCOMPLETE: string ="Continuous domains must have a min and a max. Please fix the following Objectives: ";
-	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix the following Objectives: ";
-	RANGE_INVALID: string = "Min must be less than max. Please fix the following Objectives: ";
-	INTERVAL_INVALID: string = "Interval must be greater than 0 and less than max - min. Please fix the following Objectives: ";
+	CHILDLESS_ABSTRACT_OBJECTIVE: string = "Every parent Objective must have at least one child. Please fix: ";
+	CATEGORY_NAMES_INVALID: string = "Category names contain disallowed characters. Please change: ";
+	TOO_FEW_CATEGORIES: string = "Categorical domains must have at least two categories. Please fix: ";
+	CONT_DOMAIN_INCOMPLETE: string ="Continuous domains must have a min and a max. Please fix ";
+	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix: ";
+	RANGE_INVALID: string = "Min must be less than max. Please fix: ";
+	INTERVAL_INVALID: string = "Interval must be greater than 0 and less than max - min. Please fix: ";
 	NO_ALTERNATIVES: string = "Chart must have at least one Alternative.";
 	ALTERNATIVE_NAMES_MISSING: string = "Every Alternative must have a name.";
 	ALTERNATIVE_NAMES_NOT_UNIQUE: string = "Alternative names must be unique.";
 	ALTERNATIVE_NAMES_INVALID: string = "The following Alternative names contain disallowed characters: ";
-	OBJECTIVE_OUTCOMES_MISSING: string = "You must select an outcome for every Objective on every Alternative. Please supply the following: ";
-	OBJECTIVE_OUTCOMES_INVALID: string = "Objective outcomes must fall within the specified range. Please fix the following: ";
-	SCORE_FUNCTIONS_MISSING: string = "Every user must define a score function for every Objective. The following pairs are missing: ";
-	SCORE_FUNCTIONS_INCOMPLETE: string = "Every user must assign a score to every Objective outcome. The following pairs are incomplete: ";
-	SCORE_FUNCTION_VALUE_INVALID: string = "Score function values must be between 0 and 1. The following Users need to fix their score functions for the specified Objectives: ";
-	SCORE_FUNCTION_RANGE_INVALID: string = "The score function must assign a score of 0 and 1 to the worst and best outcomes, respectively.  The following Users need to fix their score functions for the specified Objectives: ";
-	WEIGHTS_MISSING: string = "Every user must assign a weight to every Objective. The following pairs are missing: ";
-	WEIGHTS_SUM_INVALID: string = "A user's weights must sum to 1. The following users need to fix their weights: ";
-	WEIGHTS_RANGE_INVALID: string = "A user's weights must range from 0 to 1. The following users need to fix their weights: ";
+	OBJECTIVE_OUTCOMES_MISSING: string = "Every Alternative must have an outcome on every Objective. Please supply: ";
+	OBJECTIVE_OUTCOMES_INVALID: string = "Objective outcomes must fall within the specified range. Please fix: ";
+	SCORE_FUNCTIONS_MISSING: string = "Please define a score function for: ";
+	SCORE_FUNCTIONS_INCOMPLETE: string = "Please complete score function for: ";
+	SCORE_FUNCTION_VALUE_INVALID: string = "Score function values must be between 0 and 1. Please fix score functions for: ";
+	SCORE_FUNCTION_RANGE_INVALID: string = "Score functions must range from 0 to 1.  Please fix score functions for: ";
+	WEIGHTS_MISSING: string = "Please supply weights for: ";
+	WEIGHTS_SUM_INVALID: string = "Weights must sum to 1.";
+	WEIGHTS_RANGE_INVALID: string = "Weights must be between 0 and 1. Please fix weights for: ";
 	ALLOWED_CHARACTERS: string = "(Allowed: alphanumeric, spaces, underscores, hyphens, commas, and periods.)";
 
 
@@ -88,12 +88,11 @@ export class ValidationService {
 		return this.validateStructure(valueChart).concat(this.validateUsers(valueChart));
 	}
 
+
+	// ================================ VALIDATE CHART STRUCTURE ====================================
+
 	validateStructure(valueChart: ValueChart): string[] {
 		return this.validateBasicInfo(valueChart).concat(this.validateObjectives(valueChart), this.validateAlternatives(valueChart));
-	}
-
-	validateUsers(valueChart: ValueChart): string[] {
-		return this.validateScoreFunctions(valueChart).concat(this.validateWeights(valueChart));
 	}
 
 	// ================================ Validate Basic Info ====================================
@@ -103,13 +102,13 @@ export class ValidationService {
 		if (!this.hasName(valueChart)) {
 			errorMessages.push(this.NAME_MISSING);
 		}
-		if (!this.nameValid(valueChart)) {
+		else if (!this.nameValid(valueChart)) {
 			errorMessages.push(this.NAME_INVALID);
 		}
 		if (!this.hasPassword(valueChart)) {
 			errorMessages.push(this.PASSWORD_MISSING);
 		}
-		if (!this.passwordValid(valueChart)) {
+		else if (!this.passwordValid(valueChart)) {
 			errorMessages.push(this.PASSWORD_INVALID);
 		}
 		return errorMessages;
@@ -151,7 +150,6 @@ export class ValidationService {
 		let regex = new RegExp("^[^\\s]*$");
 		return (valueChart.password.search(regex) !== -1);
 	}
-
 
 	// ================================ Validate Objectives ====================================
 
@@ -503,195 +501,170 @@ export class ValidationService {
 	}
 
 
-	// ================================ Validate ScoreFunctions ====================================
+	// ================================ VALIDATE CHART USERS ====================================
 
-	validateScoreFunctions(valueChart: ValueChart): string[] {
+	validateUsers(valueChart: ValueChart): string[] {
 		let errorMessages = [];
-		let missingScoreFunctions = this.missingScoreFunctions(valueChart);
-		if (missingScoreFunctions.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTIONS_MISSING.concat(missingScoreFunctions.join('; ')));
-		}
-		let incompleteScoreFunctions = this.incompleteScoreFunctions(valueChart);
-		if (incompleteScoreFunctions.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join('; ')));
-		}
-		let invalidScoreFunctionValues = this.invalidScoreFunctionValues(valueChart);
-		if (invalidScoreFunctionValues.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join('; ')));
-		}
-		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart);
-		if (invalidScoreFunctionRange.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join('; ')));
+		let userErrorMessages = [];
+		for (let user of valueChart.getUsers()) {
+			userErrorMessages = this.validateUser(valueChart, user);
+			if (userErrorMessages.length > 0) {
+				errorMessages.push(user.getUsername() + ":\n - " + userErrorMessages.join("\n - "));
+			}
 		}
 		return errorMessages;
 	}
 
-	missingScoreFunctions(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let objectives = [];
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				if (scoreFunctionMap === undefined || scoreFunctionMap.getObjectiveScoreFunction(objName) === undefined) {
-					objectives.push(objName);
-				}
-			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
-			}
-		}
-		return users;
+	validateUser(valueChart: ValueChart, user: User): string[] {
+		return this.validateScoreFunctions(valueChart, user).concat(this.validateWeights(valueChart,user));
 	}
 
-	incompleteScoreFunctions(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let objectives = [];
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			if (scoreFunctionMap) {
-				for (let obj of valueChart.getAllPrimitiveObjectives()) {
-					if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
-						let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
-						if (scoreFunction) {
-							let elements = [] ;
-							for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
-			      				if (scoreFunction.getScore(elt) === undefined) {
-			      					elements.push(elt);
-			      				}
-			      			}
-			      			if (elements.length > 0) {
-			      				objectives.push(obj.getName());
-			      			}
-						}	
-					}	
-				}
-			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
-			}
+	// ================================ Validate ScoreFunctions ====================================
+
+	validateScoreFunctions(valueChart: ValueChart, user: User): string[] {
+		let errorMessages = [];
+		let missingScoreFunctions = this.missingScoreFunctions(valueChart, user);
+		if (missingScoreFunctions.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTIONS_MISSING.concat(missingScoreFunctions.join(', ')));
 		}
-		return users;
+		let incompleteScoreFunctions = this.incompleteScoreFunctions(valueChart, user);
+		if (incompleteScoreFunctions.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join(', ')));
+		}
+		let invalidScoreFunctionValues = this.invalidScoreFunctionValues(valueChart,user);
+		if (invalidScoreFunctionValues.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join(', ')));
+		}
+		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart, user);
+		if (invalidScoreFunctionRange.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join(', ')));
+		}
+		return errorMessages;
 	}
 
-	invalidScoreFunctionValues(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			if (scoreFunctionMap) {
-				let objectives = [];
-				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
+	missingScoreFunctions(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let scoreFunctionMap = user.getScoreFunctionMap();
+		for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+			if (scoreFunctionMap === undefined || scoreFunctionMap.getObjectiveScoreFunction(objName) === undefined) {
+				objectives.push(objName);
+			}
+		}
+		return objectives;
+	}
+
+	incompleteScoreFunctions(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let scoreFunctionMap = user.getScoreFunctionMap();
+		if (scoreFunctionMap) {
+			for (let obj of valueChart.getAllPrimitiveObjectives()) {
+				if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
 					if (scoreFunction) {
 						let elements = [] ;
-						for (let elt of scoreFunction.getAllElements()) {
-			      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
-			      				elements.push(elt);
-			      			}
+						for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
+		      				if (scoreFunction.getScore(elt) === undefined) {
+		      					elements.push(elt);
+		      				}
 		      			}
 		      			if (elements.length > 0) {
-			      			objectives.push(objName);
-			      		}
-		      		}	
-				}
-				if (objectives.length > 0) {
-					users.push(user.getUsername() + ": " + objectives.join(', '));
-				}
+		      				objectives.push(obj.getName());
+		      			}
+					}	
+				}	
 			}
 		}
-		return users;
+		return objectives;
 	}
 
-	invalidScoreFunctionRange(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			if (scoreFunctionMap) {
-				let objectives = [];
-				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-					if (scoreFunction) {	
-						if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
-		      				objectives.push(objName);
+	invalidScoreFunctionValues(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let scoreFunctionMap = user.getScoreFunctionMap();
+		if (scoreFunctionMap) {
+			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
+				if (scoreFunction) {
+					let elements = [] ;
+					for (let elt of scoreFunction.getAllElements()) {
+		      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
+		      				elements.push(elt);
 		      			}
 	      			}
-				}
-				if (objectives.length > 0) {
-					users.push(user.getUsername() + ": " + objectives.join(', '));
-				}
+	      			if (elements.length > 0) {
+		      			objectives.push(objName);
+		      		}
+	      		}	
 			}
 		}
-		return users;
+		return objectives;
+	}
+
+	invalidScoreFunctionRange(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let scoreFunctionMap = user.getScoreFunctionMap();
+		if (scoreFunctionMap) {
+			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
+				if (scoreFunction) {	
+					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+	      				objectives.push(objName);
+	      			}
+      			}
+			}
+		}
+		return objectives;
 	}
 
  	// ================================ Validate Weights ====================================
 
-
-	validateWeights(valueChart: ValueChart): string[] {
+	validateWeights(valueChart: ValueChart, user: User): string[] {
 		let errorMessages = [];
-		let missingWeights = this.missingWeights(valueChart);
+		let missingWeights = this.missingWeights(valueChart, user);
 		if (missingWeights.length > 0) {
 			errorMessages.push(this.WEIGHTS_MISSING.concat(missingWeights.join('; ')));
 		}
-		let invalidWeightSum = this.invalidWeightSum(valueChart);
-		if (invalidWeightSum.length > 0) {
-			errorMessages.push(this.WEIGHTS_SUM_INVALID.concat(invalidWeightSum.join(', ')));
+		let invalidWeightSum = this.invalidWeightSum(valueChart, user);
+		if (invalidWeightSum) {
+			errorMessages.push(this.WEIGHTS_SUM_INVALID);
 		}
-		let invalidWeightRange = this.invalidWeightSum(valueChart);
+		let invalidWeightRange = this.invalidWeightRange(valueChart, user);
 		if (invalidWeightRange.length > 0) {
 			errorMessages.push(this.WEIGHTS_RANGE_INVALID.concat(invalidWeightRange.join('; ')));
 		}
 		return errorMessages;
 	}
 
-	missingWeights(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let weightMap = user.getWeightMap();
-			let objectives = [];
+	missingWeights(valueChart: ValueChart, user: User): string[] {
+		let weightMap = user.getWeightMap();
+		let objectives = [];
+		for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
+			if (weightMap === undefined || weightMap.getObjectiveWeight(objName) === undefined) {
+				objectives.push(objName);
+			}
+		}
+		return objectives;
+	}
+
+	invalidWeightSum(valueChart: ValueChart, user: User): boolean {
+		let error = 1e-3 * valueChart.getAllPrimitiveObjectivesByName().length;
+		let weightMap = user.getWeightMap();
+		if (weightMap && (weightMap.getWeightTotal() < 1 - error || weightMap.getWeightTotal() > 1 + error)) {
+			return true;
+		}
+		return false;
+	}
+
+	invalidWeightRange(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let weightMap = user.getWeightMap();
+		if (weightMap) {
 			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				if (weightMap === undefined || weightMap.getObjectiveWeight(objName) === undefined) {
+				if (weightMap.getObjectiveWeight(objName) < 0 || weightMap.getObjectiveWeight(objName) > 1) {
 					objectives.push(objName);
 				}
 			}
-			if (objectives.length > 0) {
-				users.push(user.getUsername() + ": " + objectives.join(', '));
-			}	
 		}
-		return users;
-	}
-
-	invalidWeightSum(valueChart: ValueChart): string[] {
-		let users = [];
-		let objs = valueChart.getAllPrimitiveObjectivesByName();
-		let error = 1e-3 * objs.length;
-		for (let user of valueChart.getUsers()) {
-			let weightMap = user.getWeightMap();
-			if (weightMap) {
-				if (weightMap.getWeightTotal() < 1 - error || weightMap.getWeightTotal() > 1 + error) {
-					users.push(user.getUsername());
-				}
-			}
-		}
-		return users;
-	}
-
-	invalidWeightRange(valueChart: ValueChart): string[] {
-		let users = [];
-		for (let user of valueChart.getUsers()) {
-			let weightMap = user.getWeightMap();
-			if (weightMap) {
-				let objectives = [];
-				for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-					if (weightMap.getObjectiveWeight(objName) < 0 || weightMap.getObjectiveWeight(objName) > 1) {
-						objectives.push(objName);
-					}
-				}
-				if (objectives.length > 0) {
-					users.push(user.getUsername() + ": " + objectives.join(', '));
-				}
-			}
-		}
-		return users;
+		return objectives;
 	}
 }
 

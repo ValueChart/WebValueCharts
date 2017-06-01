@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:23:34
+* @Last Modified time: 2017-05-30 22:13:22
 */
 
 // Require Node Libraries:
@@ -40,24 +40,38 @@ describe('WebSocket: /Host', () => {
 	before(function(done: MochaDone) {
 		user = request.agent('http://localhost:3000/');
 
-		JsonGroupHotel.name = 'TestHotel';
+		JsonGroupHotel.name = 'Test Hotel';
+		JsonGroupHotel.id = 'TestHotel';
 
-		user.post('ValueCharts').send(JsonGroupHotel)
-			.set('Accept', 'application/json')
-			.expect('Content-Type', /json/)
-			.expect(201)
-			.expect((res: request.Response) => {
-				var valueChartResponse = res.body.data;
-				chartId = valueChartResponse._id;
-			}).end(function(err, res) {
-		        if (err) return done(err);
-		        done();
-		    });
+		// Clean any test charts that have been left it the database from previous executions.
+		user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
+			.set('Accept', 'text')
+			.end(function(err, res) {
+
+				if (err) return done(err);
+
+				if (res.status !== 404 ) {
+					chartId = res.body;
+					done();
+				} else 
+					user.post('ValueCharts').send(JsonGroupHotel)
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+						.expect((res: request.Response) => {
+							chartId = res.body.data._id;
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
 	});
 
 	describe('Opening the host connection', () => {
 
 		it('should send a message to the client confirming successful connection with the correct chart ID', (done: MochaDone) => {
+			
+
 			hostWebSocket = new WebSocket(hostUrl + chartId);
 			
 			hostWebSocket.onmessage = (msg: MessageEvent) => {

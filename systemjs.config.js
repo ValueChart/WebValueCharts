@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 11:07:20
+* @Last Modified time: 2017-05-28 17:15:27
 */
 
 // =========================================================================================================================================
@@ -38,7 +38,8 @@
 		'chai': 									'node_modules/chai/chai.js',
 		'chai-as-promised': 						'node_modules/chai-as-promised/lib/chai-as-promised.js',
 		'superagent': 								'node_modules/superagent/superagent.js',
-		'traceur': 									'node_modules/traceur/bin/traceur.js'
+		'traceur': 									'node_modules/traceur/bin/traceur.js',
+		'sinon': 									'node_modules/sinon/pkg/sinon.js'
 	};
 
 	// Defines default extensions and files.

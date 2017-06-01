@@ -103,7 +103,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 
 		// Initialize according to purpose
-		if (this.purpose == "newChart") {
+		if (this.purpose === "newChart") {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			(<any>valueChart).incomplete = true; // Initialize ValueChart to incomplete
@@ -121,11 +121,12 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();	
 
-		// Check whole chart for validity. Set to incomplete if not valid.
-		(<any>this.valueChart).incomplete = this.validationService.validate(this.valueChart).length > 0 ? true : false; 
+		// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
+		(<any>this.valueChart).incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
+			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 		
 		if (this.saveOnDestroy) {
-			this.autoSaveValueChart(this.valueChart);
+			this.autoSaveValueChart();
 		}
 	}
 
@@ -140,7 +141,7 @@ export class CreateValueChartComponent implements OnInit {
 						(Parameter currently unused in this method.)			
 	*/
 	back(browserTriggered = false) {
-		this.autoSaveValueChart(this.valueChart);
+		this.autoSaveValueChart();
 		this.creationStepsService.allowedToNavigateInternally = true;
 		this.creationStepsService.previous(this.purpose);				
 	}
@@ -164,7 +165,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.nextIfNameAvailable(browserTriggered);
 			}
 			else {
-				this.autoSaveValueChart(this.valueChart);
+				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.purpose);
 			}
@@ -179,13 +180,24 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {void}
-		@description 	Navigates to ValueChartViewer if validation of current step succeeds.
+		@description 	Navigates to ValueChartViewer if validation succeeds.
 	*/
 	viewChart() {
-		if (this.creationStepsService.validate()) {
-			window.onpopstate = () => { };
-			(<any>window).destination = '/view/ValueChart';
-			this.router.navigate(['/view/ValueChart']);
+		// The View Chart button is only active if the structure and current user's preferences are valid.
+		// However, we still need to perform step-specific validation (temporary data structures may still need to be converted).
+		if (this.creationStepsService.validate()) {	
+			// Furthermore, there may be problems with other users' preferences, which we inform the user about here.
+			let errorMessages = this.validationService.validate(this.valueChart);
+			if (errorMessages.length > 0) {
+				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + errorMessages.join('\n\n');
+					$('#validate-modal').modal('show');
+			}
+			else {
+				this.saveOnDestroy = true;
+				window.onpopstate = () => { };
+				(<any>window).destination = '/view/ValueChart';
+				this.router.navigate(['/view/ValueChart']);
+			}
 		}
 		else {
 			toastr.error('There were problems with your submission. Please fix them to proceed.');
@@ -203,9 +215,9 @@ export class CreateValueChartComponent implements OnInit {
 						
 	*/
 	nextIfNameAvailable(browserTriggered = false) {
-		this.valueChartHttpService.isNameAvailable(this.valueChart.getName()).subscribe(isUnique => {
+		this.valueChartHttpService.isNameAvailable(this.valueChart.getId()).subscribe(isUnique => {
 			if (isUnique === true) {
-				this.autoSaveValueChart(this.valueChart);
+				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.purpose);
 			}
@@ -226,30 +238,26 @@ export class CreateValueChartComponent implements OnInit {
 						(3) on Preferences step and a new user is joining a group chart (only the chart creator should be able to edit the structure)
 	*/
 	disableBackButton(): boolean {
-		return (this.creationStepsService.step === this.creationStepsService.BASICS ||
-			(this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser") ||
-			(this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "editPreferences"));
+		return (this.creationStepsService.step === this.creationStepsService.BASICS
+			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser")
+			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "editPreferences"));
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Show View Chart button if on Alternatives or Priorities step
-						We can consider showing this at every step once global validation is integrated into create workflow.
-	*/
-	showViewChartButton(): boolean {
-		return (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES
-			|| this.creationStepsService.step === this.creationStepsService.PRIORITIES);
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Disable View Chart button if the step is Alternatives and current user is already a member of the chart.
-						This is to prevent users from invalidating their preferences and then viewing chart through the Alternatives step.
-						We will improve this once global validation is integrated into create workflow.
+		@description 	Disable the View Chart button if:
+						(1) the chart structure is invalid
+						(2) the current user's preferences are invalid
+						(3) on BasicInfo step (because I don't wanna deal with checking for name uniqueness)
+						(4) on the Preferences step (because the WeightMap might get reset on destroy)
 	*/
 	disableViewChartButton(): boolean {
-		return (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES 
-				&& this.valueChartService.currentUserIsDefined());
+		// return (this.validationService.validateStructure(this.valueChart).length > 0
+		// 	|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 )
+		// 	|| this.creationStepsService.step === this.creationStepsService.BASICS 
+		// 	|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
+		return (this.creationStepsService.step === this.creationStepsService.BASICS
+			|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
 	}
 
 	/* 	
@@ -298,12 +306,12 @@ export class CreateValueChartComponent implements OnInit {
 	/* 	
 		@returns {void}
 		@description	This method handles the user's response to the navigation confirmation modal.
-						Navigation proceeds if the user elected to discard the chart or save the chart (and validation succeeds).
+						Navigation proceeds if the user elected to discard the chart or save the chart.
 						If this.saveOnDestroy is set to true, the chart will be saved when ngDestroy is called.
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate && keepValueChart && this.creationStepsService.step === this.creationStepsService.BASICS && 
-			this.creationStepsService.checkNameChanged() && this.creationStepsService.validate()) {
+			this.creationStepsService.checkNameChanged()) {
 			this.navigateAndSaveIfNameAvailable();
 		}
 		else {
@@ -347,14 +355,13 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
-	autoSaveValueChart(valueChart: ValueChart): void {
+	autoSaveValueChart(): void {
 		if (this.currentUserService.isJoiningChart()) {
 			return;	// Don't autosave. The user is joining an existing ValueChart.
 		}
-
-		if (!valueChart._id) {
+		if (!this.valueChart._id) {
 			// Save the ValueChart for the first time.
-			this.saveValueChartToDatabase(valueChart);
+			this.saveValueChartToDatabase();
 		} else {
 			// Update the ValueChart.
 			this.valueChartHttpService.updateValueChart(this.valueChart)
@@ -371,8 +378,8 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Create a new ValueChart in the database. Set valueChart._id to the id assigned by the database.
 	*/
-	saveValueChartToDatabase(valueChart: ValueChart): void {
-		this.valueChartHttpService.createValueChart(valueChart)
+	saveValueChartToDatabase(): void {
+		this.valueChartHttpService.createValueChart(this.valueChart)
 			.subscribe(
 			(valueChart: ValueChart) => {
 				// Set the id of the ValueChart.

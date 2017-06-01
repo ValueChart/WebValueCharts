@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:37:35
+* @Last Modified time: 2017-05-29 21:48:49
 */
 
 // Import Angular Classes:
@@ -118,7 +118,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private isInitialized: boolean;								// Is the directive initialized. Used to prevent change detection from activating before initialization is complete.
 	private waitForRenderers: Subscription;
 
-
 	public renderRequired: { value: boolean } = { value: false };
 
 	// ========================================================================================
@@ -200,7 +199,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 
-		var renderInformation = new Subject();
+		var rendererUpdates = new Subject();
 
 		this.valueChartSubject.map((valueChart: ValueChart) => {
 			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig, renderRequired: this.renderRequired };
@@ -208,15 +207,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
 			.map(this.rendererConfigUtility.produceRendererConfig)
-			.subscribe(renderInformation);
+			.subscribe(rendererUpdates);
 
-		renderInformation
+		rendererUpdates
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
 
-		renderInformation
+		rendererUpdates
 			.subscribe(this.objectiveChartRenderer.valueChartChanged);
 
-		renderInformation
+		rendererUpdates
 			.subscribe(this.labelRenderer.valueChartChanged)
 
 		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);
@@ -234,10 +233,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	rendersCompleted = (rendersCompleted: number) => {
 		if (rendersCompleted >= 3) {
+			this.waitForRenderers.unsubscribe();
 			this.interactionSubject.next(this.interactionConfig);
 			this.viewConfigSubject.next(this.viewConfig);
 			// Unsubscribe and set initialization to be complete.
-			this.waitForRenderers.unsubscribe();
 			this.isInitialized = true;
 		}
 	}

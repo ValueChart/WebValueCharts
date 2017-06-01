@@ -14,7 +14,7 @@
             </div>
             <label class="control-label select-objective-control">Select Default:</label>
             <div class="input-group">
-                <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction()">
+                <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
                     <option [value]="flat">Flat</option>
                     <option [value]="poslin">Positive Linear</option>
                     <option [value]="neglin">Negative Linear</option>
@@ -41,7 +41,11 @@
         </div> 
     </div>
 </div>
-<div *ngIf="validationTriggered && badScoreFunctions.length > 0" 
-             class="alert alert-danger">
-          {{badScoreFunctionsText()}}
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
 </div>

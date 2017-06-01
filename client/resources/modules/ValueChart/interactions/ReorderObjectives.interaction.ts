@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 12:38:02
+* @Last Modified time: 2017-05-29 15:22:27
 */
 
 // Import Angular Classes:
@@ -44,7 +44,7 @@ export class ReorderObjectivesInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	private lastRendererUpdate: RendererUpdate;	
+	public lastRendererUpdate: RendererUpdate;	
 
 	private labelRootContainer: d3.Selection<any,any,any,any>;
 
@@ -90,7 +90,6 @@ export class ReorderObjectivesInteraction {
 	// 									Methods
 	// ========================================================================================
 
-
 	/*
 		@param enableReordering - Whether or not to enable dragging to reorder objectives.
 		@returns {void}
@@ -101,9 +100,8 @@ export class ReorderObjectivesInteraction {
 						the handler for these events, reorderObjectives, only updates the visual display of the objective area. 'end' is used to
 						actually reorder the objectives within the objective hierarchy, and then re-render the ValueChart via the ValueChartDirective.
 	*/
-	public toggleObjectiveReordering(enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): Subject<boolean> {
-		this.lastRendererUpdate = lastRendererUpdate;
-		
+	public toggleObjectiveReordering(enableReordering: boolean, labelRootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): Subject<boolean> {
+		this.lastRendererUpdate = rendererUpdate;
 		this.labelRootContainer = labelRootContainer;
 
 		var labelOutlines: d3.Selection<any, any, any, any> = labelRootContainer.selectAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);

@@ -12,7 +12,8 @@ import { ContinuousDomain }									from '../../../model/ContinuousDomain';
 import { ScoreFunction }									from '../../../model/ScoreFunction';
 import { DiscreteScoreFunction }							from '../../../model/DiscreteScoreFunction';
 import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFunction';
-import { RescaleError }										from '../../../model/ScoreFunction';
+import { WeightMap }										from '../../../model/WeightMap';
+import { ScoreFunctionMap }									from '../../../model/ScoreFunctionMap';
 
 /*
 	This class provides methods to update the ValueChart model when the Objective structure changes.
@@ -39,23 +40,19 @@ export class UpdateObjectiveReferencesService {
 		@returns {void}
 		@description 	Resets the Objective weights to their default values.
 	*/
-	resetWeightMaps() {
-		let weightMap = this.valueChartService.getDefaultWeightMap();
+	clearWeightMaps() {
 		for (let user of this.valueChartService.getValueChart().getUsers()) {
-			this.valueChartService.resetWeightMap(user, weightMap);
+			user.setWeightMap(new WeightMap());
 		}
 	}
 
 	/*
 		@returns {void}
-		@description 	Resets Users' ScoreFunctions for obj to default.
+		@description 	Clears Users' ScoreFunctions for obj.
 	*/
-	resetScoreFunctions(obj: PrimitiveObjective) {
+	clearScoreFunctions(obj: PrimitiveObjective) {
 		for (let user of this.valueChartService.getValueChart().getUsers()) {
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			if (scoreFunctionMap) {
-				scoreFunctionMap.setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction().getMemento());
-			}
+			user.setScoreFunctionMap(new ScoreFunctionMap());
 		}
 	}
 
@@ -117,24 +114,14 @@ export class UpdateObjectiveReferencesService {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				try {
+				if (scoreFunction && scoreFunction.getRange() > 0) {
 					let rescaled = scoreFunction.rescale();
 					if (rescaled) {
-						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
+						user.setWeightMap(new WeightMap());
 					}
-				}
-				catch (e) {
-					if (e instanceof RescaleError) {
-						// For now, just reset the weightmap. 
-						// Later, we will want to notify user that preferences are now invalid.
-						this.valueChartService.resetWeightMap(user, this.valueChartService.getDefaultWeightMap());
-					}
-					else {
-						throw e;
-					}
-				}		
+				}	
 			}
-		}
+		}	
 	}
 
 	/*

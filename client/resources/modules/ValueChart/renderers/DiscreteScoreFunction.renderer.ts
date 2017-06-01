@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:44:15
+* @Last Modified time: 2017-05-29 15:26:22
 */
 
 // Import Angular Classes:
@@ -53,15 +53,14 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 
 	// class name definitions for SVG elements that are created by this renderer.
-	public static defs: any = {
+	public static defs = Object.assign({ 
 		BARS_CONTAINER: 'scorefunction-bars-container',
 		BAR: 'scorefunction-bar',
 		BAR_TOP: 'scorefunction-bartop',
 
 		BAR_LABELS_CONTAINER: 'scorefunction-bar-labels-container',
-		BAR_LABEL: 'scorefunction-bar-label',
-	}
-
+		BAR_LABEL: 'scorefunction-bar-label'
+	}, ScoreFunctionRenderer.defs);
 
 	// ========================================================================================
 	// 									Constructor
@@ -72,13 +71,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService, 
-		expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
-		super(chartUndoRedoService, expandScoreFunctionInteraction);
+	constructor(chartUndoRedoService: ChartUndoRedoService) {
+		super(chartUndoRedoService);
 	}
 
 
-	interactionConfigChanged = (interactionConfig: any) => {
+	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.barTops, this.lastRendererUpdate)
 	}
@@ -99,7 +97,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
+	protected createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		// Call the create plot method in ScoreFunctionRenderer. This will create the user containers and create the domain labels.
 		super.createPlot(u, plotElementsContainer, domainLabelContainer);
 
@@ -187,7 +185,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
 	}
 
-	renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
+	protected renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		super.renderAxesDimensionOne(u);
 
 		// Fix domain labels positions specifically for the discrete plot.
@@ -210,7 +208,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 						of the bar chart. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
 						the entire score function plot.
 	*/
-	renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
+	protected renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.userContainers.data(u.scoreFunctionData);
 
 		this.barContainer.data((d,i) =>{ return [d]; });
@@ -224,7 +222,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
-	renderDiscretePlotDimensionOne(u: ScoreFunctionUpdate): void {
+	protected renderDiscretePlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.scoreFunctionData.length) / 2;
 
 		// Position each users' container so theirs bars are properly offset from each other.
@@ -247,7 +245,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne);
 	}
 
-	renderDiscretePlotDimensionTwo(u: ScoreFunctionUpdate): void {
+	protected renderDiscretePlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
 			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
@@ -274,7 +272,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
-	applyStyles(u: ScoreFunctionUpdate): void {
+	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
 		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
@@ -287,7 +285,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@returns {void}
 		@description	This method toggles the visibility of score labels next to the bars in the bar chart.
 	*/
-	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+	protected toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
 		if (!this.barLabelContainer)
 			return;
 		if (displayScoreFunctionValueLabels) {

@@ -7,6 +7,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
+import { ValidationService }                        					from '../../../app/services/Validation.service';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -37,13 +38,14 @@ export class CreateWeightsComponent implements OnInit {
 	user: User;
 	rankedObjectives: string[]; // Objectives that have already been ranked
     isRanked: { [objName: string]: boolean; }; // Indicates whether each Objective has been ranked
-    updateOnDestroy: boolean = false; // Indicates whether or not the weights should be computed and set on destroy.
+    updateWeights: boolean = false; // Indicates whether or not the weights should be computed and set on validate or destroy.
     						  		  // True if user changes weights in any way (clicking on a row or clicking "Reset Weights").
-    						  		  // This is to ensure that previosly-made adjustments to weights are preserved.
+    						  		  // This is to ensure that previously-made adjustments to weights are preserved.
 
 
     // Validation fields:
     validationTriggered: boolean = false;
+    errorMessages: string[]; // Validation error messages
 
 	// ========================================================================================
 	//                   Constructor
@@ -55,7 +57,9 @@ export class CreateWeightsComponent implements OnInit {
 	        This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private valueChartService: ValueChartService, private creationStepsService: CreationStepsService) { }
+		private valueChartService: ValueChartService, 
+		private creationStepsService: CreationStepsService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -77,15 +81,14 @@ export class CreateWeightsComponent implements OnInit {
 		this.isRanked = {};
 		this.user = this.valueChartService.getCurrentUser();
 
-		// If weight map is uninitialized or has been reset, set all Objectives to unranked
-		if (!this.user.getWeightMap() || this.valueChartService.wasWeightMapReset(this.user)) {
+		// If weight map is empty, set all Objectives to unranked
+		if (this.user.getWeightMap().getWeightTotal() === 0) {
 			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
 		}
 		// Weights have already been set by the user
 		else {
-			this.validationTriggered = true;
 			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
 			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
@@ -98,16 +101,18 @@ export class CreateWeightsComponent implements OnInit {
 					this.rankObjective(<string>pair[0], false);
 				}
 			}
+			this.validate();
 		}
 	}
 
-	/* 	
+	/*   
 		@returns {void}
-		@description 	Destroys CreateWeights. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
-						requires that a different component is displayed in the router-outlet.
+		@description   Destroys CreateWeights. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+		        requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-		if (this.updateOnDestroy) {	
+		// Update weight map
+		if (this.updateWeights) {	
 			this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
 		}
 	}
@@ -216,7 +221,7 @@ export class CreateWeightsComponent implements OnInit {
 		this.rankedObjectives.push(primObj);
 		this.isRanked[primObj] = true;
 		if (clicked) {
-			this.updateOnDestroy = true;
+			this.updateWeights = true;
 		}
 	}
 
@@ -229,7 +234,7 @@ export class CreateWeightsComponent implements OnInit {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];
-		this.updateOnDestroy = true;
+		this.updateWeights = true;
 	}
 
 	// ================================ Ranks-to-Weights Methods ====================================
@@ -268,24 +273,35 @@ export class CreateWeightsComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Validate Weights.
-						This should be done prior to updating the ValueChart model and saving to the database.
+		@description 	Checks validity of the weights.
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;
-		return this.allRanked();
+		this.setErrorMessages();
+		return this.errorMessages.length === 0;
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Returns true if all Objectives have been ranked, false otherwise.
+		@description 	Recomputes the weights based on the rankings, then validates the weights.
 	*/
-	allRanked(): boolean {
-		for (let objName of Object.keys(this.isRanked)) {
-			if (!this.isRanked[objName]) {
-				return false;
-			}
+	setErrorMessages(): void {
+		// Update weight map
+		if (this.updateWeights) {	
+			this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
 		}
-		return true;
+		// Validate
+		this.errorMessages = this.validationService.validateWeights(this.valueChartService.getValueChart(), this.user);
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Resets error messages if validation has already been triggered.
+						(This is done whenever the user makes a change to the chart. This way, they get feedback while repairing errors.)
+	*/
+	resetErrorMessages(): void {
+		if (this.validationTriggered) {
+			this.setErrorMessages();
+		}
 	}
 }

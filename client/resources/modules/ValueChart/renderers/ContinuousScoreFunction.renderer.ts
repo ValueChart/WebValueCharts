@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 17:44:43
+* @Last Modified time: 2017-05-29 15:20:06
 */
 
 // Import Angular Classes:
@@ -49,18 +49,17 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public pointLabels: d3.Selection<any, any, any, any>;					// The 'text' elements used to labels points in the scatter plot with their scores.
 
 
-	// class name definitions for SVG elements that are created by this renderer.
-	public static defs: any = {
-		FITLINES_CONTAINER: 'scorefunction-fitlines-container',
-		FITLINE: 'scorefunction-fitline',
+	// class name definitions for SVG elements that are created by this renderer.	
+	public static defs = Object.assign({
+		FITLINES_CONTAINER:  'scorefunction-fitlines-container',
+		FITLINE:  'scorefunction-fitline',
 
-		POINTS_CONTAINER: 'scorefunction-points-container',
-		POINT: 'scorefunction-point',
+		POINTS_CONTAINER:  'scorefunction-points-container',
+		POINT:  'scorefunction-point',
 
-		POINT_LABELS_CONTAINER: 'scorefunction-point-labels-container',
-		POINT_LABEL: 'scorefunction-point-label',
-
-	}
+		POINT_LABELS_CONTAINER:  'scorefunction-point-labels-container',
+		POINT_LABEL:  'scorefunction-point-label'
+	}, ScoreFunctionRenderer.defs);
 
 
 	// ========================================================================================
@@ -72,9 +71,8 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Used for Angular's dependency injection. However, this class is frequently constructed manually unlike the other renderer classes. It calls the constructor in ScoreFunctionRenderer as 
 						all subclasses in TypeScript must do. This constructor should not be used to do any initialization of the class. Note that the dependencies of the class are intentionally being kept to a minimum.
 	*/
-	constructor(chartUndoRedoService: ChartUndoRedoService, 
-		expandScoreFunctionInteraction: ExpandScoreFunctionInteraction) {
-		super(chartUndoRedoService, expandScoreFunctionInteraction);
+	constructor(chartUndoRedoService: ChartUndoRedoService) {
+		super(chartUndoRedoService);
 	}
 
 	// ========================================================================================
@@ -82,7 +80,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// ========================================================================================
 
 
-	interactionConfigChanged = (interactionConfig: any) => {
+	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.plottedPoints, this.lastRendererUpdate)
 	}
@@ -98,7 +96,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 						the createScoreFunction method that this class inherits from ScoreFunctionRenderer should be used. That method will call createPlot method after
 						doing the necessary construction of base containers and elements. 
 	*/
-	createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
+	protected createPlot(u: ScoreFunctionUpdate, plotElementsContainer: d3.Selection<any, any, any, any>, domainLabelContainer: d3.Selection<any, any, any, any>): void {
 		// Call the create plot method in ScoreFunctionRenderer.
 		super.createPlot(u, plotElementsContainer, domainLabelContainer);
 
@@ -156,7 +154,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
 	*/
-	createContinuousPlotElements(u: ScoreFunctionUpdate, pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>): void {
+	protected createContinuousPlotElements(u: ScoreFunctionUpdate, pointsContainer: d3.Selection<any, any, any, any>, linesContainer: d3.Selection<any, any, any, any>, labelsContainer: d3.Selection<any, any, any, any>): void {
 		// Create a point for each new element in the Objective's domain. Note that this is all elements when the plot is first created.
 		var updatePlottedPoints = pointsContainer.selectAll('.' + ContinuousScoreFunctionRenderer.defs.POINT)
 			.data((d: ScoreFunctionData) => { return d.elements; });
@@ -217,7 +215,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@description	This method positions and styles the ContinuousScoreFunction specific elements of the score function plot. Specifically, it renders the points, fitlines, and point labels
 						of the scatter plot.nThis method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
 	*/
-	renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
+	protected renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.userContainers.data(u.scoreFunctionData);
 
 		this.linesContainer.data((d, i) => { return [d]; });
@@ -241,7 +239,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
-	renderContinuousPlotDimensionOne(u: ScoreFunctionUpdate): void {
+	protected renderContinuousPlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var pointRadius = u.rendererConfig.labelOffset / 2.5;
 		var pointOffset = 3;
 
@@ -260,7 +258,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; });
 	}
 
-	renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
+	protected renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
 			return (u.viewOrientation === 'vertical') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
@@ -285,7 +283,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			});
 	}
 
-	applyStyles(u: ScoreFunctionUpdate): void {
+	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
 		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
@@ -301,7 +299,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		@returns {void}
 		@description	This method toggles the visibility of score labels next to the bars in the bar chart.
 	*/
-	toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
+	protected toggleValueLabels(displayScoreFunctionValueLabels: boolean): void {
 		if (!this.pointLabelContainer)
 			return;
 

@@ -54,7 +54,7 @@ export class CreateAlternativesComponent implements OnInit {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
-		private valueChartService: ValueChartService, 
+		public valueChartService: ValueChartService, 
 		private creationStepsService: CreationStepsService, 
 		private validationService: ValidationService) { }
 
@@ -81,12 +81,26 @@ export class CreateAlternativesComponent implements OnInit {
 		this.errorMessages = [];
 
 		if (this.valueChart.getAlternatives().length > 0) {
-			this.validationTriggered = true;
 			for (let alt of this.valueChart.getAlternatives()) {
 				this.alternatives[this.alternativesCount] = alt;
 				this.alternativesCount++;
 			}
+			this.validationTriggered = this.validate();
 		}
+	}
+
+	/*   
+		@returns {void}
+		@description   Destroys CreateAlternatives. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+		        requires that a different component is displayed in the router-outlet.
+	*/
+	ngOnDestroy() {
+		// Convert temporary structures to ValueChart structures
+		let alternatives: Alternative[] = [];
+		for (let altID of this.altKeys()) {
+			alternatives.push((this.alternatives[altID]));
+		}
+		this.valueChart.setAlternatives(alternatives);
 	}
 
 	// ================================ Alternatives Table Methods ====================================
@@ -200,7 +214,6 @@ export class CreateAlternativesComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Checks validity of alternatives structure in the chart.
-						SIDE EFFECT: sets this.errorMessages
 	*/
 	validate(): boolean {
 		this.validationTriggered = true;

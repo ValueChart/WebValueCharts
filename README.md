@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/ValueChart/WebValueCharts.svg?style=svg)](https://circleci.com/gh/ValueChart/WebValueCharts)
+
 # Web ValueCharts
 
 Web ValueCharts is a web implementation of ValueCharts. ValueCharts is a set of visualizations and interactive techniques intended to support decision-makers in preferential choice. More information about ValueCharts can be found at the [project website](http://www.cs.ubc.ca/group/iui/VALUECHARTS/).

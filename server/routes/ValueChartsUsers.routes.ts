@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 12:55:03
+* @Last Modified time: 2017-05-26 11:19:42
 */
 
 // Import Libraries and Express Middleware:
@@ -23,8 +23,8 @@ export var valueChartUsersRoutes: express.Router = express.Router();
 // continue on to the next middleware function in the stack. Note that this middleware function will execute before all others in this router
 // because it is defined before them in the stack.
 valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var chartId: string = (<any> req).chartId;
-	var hostConnection: HostConnectionStatus = hostConnections.get(chartId);
+	var identifier: string = (<any> req).identifier
+	var hostConnection: HostConnectionStatus = hostConnections.get(identifier);
 
 	// If the host connection is active, and user changes are not being accepted.
 	if (hostConnection && !hostConnection.userChangesAccepted) {
@@ -39,10 +39,10 @@ valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Respo
 // Create new ValueChart user by posting to a ValueChart's list of users.
 valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;	// Retrieve the chart Id. Recall that it is attached to the request object the middleware
+	var identifier: string = (<any> req).identifier	// Retrieve the chart Id. Recall that it is attached to the request object the middleware
 												// function in ValueCharts.routes.ts.
 	// Locate the ValueChart to which the user should be added.											
-	valueChartCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -50,16 +50,16 @@ valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Resp
 			doc.users.push(req.body);	// Add the user to the ValueChart.
 
 			// Update the ValueChart in the database.
-			valueChartCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+			valueChartCollection.update({ _id: identifier }, (doc), [], function(err: Error, doc: any) {
 				if (err) {
 					res.status(400)
 						.json({ data: err });
 
 				} else {
 					// Notify any clients hosting this ValueChart that a user has been added.
-					hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
+					hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + identifier, req.body);
 
-					res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
+					res.location('/ValueCharts/' + identifier + '/users' + req.body.username)
 						.status(201)
 						.json({ data: req.body });
 				}
@@ -73,11 +73,11 @@ valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Resp
 // Retrieve a specific user from a ValueChart's list of users using their username as the identifier. 
 valueChartUsersRoutes.get('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 	var username: string = req.params.username;
 
 	// Locate the ValueChart that the desired user belongs to.
-	valueChartCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -94,7 +94,7 @@ valueChartUsersRoutes.get('/:username', function(req: express.Request, res: expr
 			}
 
 			// Return the located user.
-			res.location('/ValueCharts/' + chartId + '/users' + user.username)
+			res.location('/ValueCharts/' + identifier + '/users' + user.username)
 						.status(200)
 						.json({ data: user });
 
@@ -107,13 +107,13 @@ valueChartUsersRoutes.get('/:username', function(req: express.Request, res: expr
 // Update an existing ValueChart user with a new resource, or create a new user if it does not exist. This action is idempotent as required by REST.
 valueChartUsersRoutes.put('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 	var username: string = req.params.username;
 
 	var userExists: boolean;	// Whether the user already exists or not.
 
 	// Locate the ValueChart to which the user to update belongs.
-	valueChartCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -134,20 +134,20 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 			}
 
 			// Update the ValueChart resource in the database.
-			valueChartCollection.update({ _id: chartId }, (doc), [], function(err: Error, savedDoc: any) {
+			valueChartCollection.update({ _id: identifier }, (doc), [], function(err: Error, savedDoc: any) {
 				if (err) {
 					res.status(400)
 						.json({ data: err });
 				} else {
 					if (userExists) {
 						// Notify any clients hosting this ValueChart that a user has been changed.
-						hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, req.body);
+						hostEventEmitter.emit(HostEventEmitter.USER_CHANGED_EVENT + '-' + identifier, req.body);
 					} else {
 						// Notify any clients hosting this ValueChart that a user has been added.
-						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, req.body);
+						hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + identifier, req.body);
 					}
 
-					res.location('/ValueCharts/' + chartId + '/users' + req.body.username)
+					res.location('/ValueCharts/' + identifier + '/users' + req.body.username)
 						.status(200)
 						.json({ data: req.body });
 				}
@@ -161,11 +161,11 @@ valueChartUsersRoutes.put('/:username', function(req: express.Request, res: expr
 // Delete a ValueChart user with the given username. This action is idempotent as required by REST.
 valueChartUsersRoutes.delete('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var chartId: string = (<any> req).chartId;
+	var identifier: string = (<any> req).identifier
 	var username: string = req.params.username;
 
 	// Find the ValueChart the user to delete belongs to.
-	valueChartCollection.findOne({ _id: chartId }, function (err: Error, doc: any) {
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -185,14 +185,14 @@ valueChartUsersRoutes.delete('/:username', function(req: express.Request, res: e
 			doc.users.splice(userIndex, 1);
 
 			// Update the ValueChart resource in the database.
-			valueChartCollection.update({ _id: chartId }, (doc), [], function(err: Error, doc: any) {
+			valueChartCollection.update({ _id: identifier }, (doc), [], function(err: Error, doc: any) {
 				if (err) {
 					res.status(400)
 						.json({ data: err });
 
 				} else {
 					// Notify any clients hosting this ValueChart that a user has been deleted.
-					hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId, username);
+					hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + identifier, username);
 
 					res.sendStatus(200);
 				}

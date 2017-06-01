@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-11 15:57:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-15 15:08:39
+* @Last Modified time: 2017-05-29 15:22:53
 */
 
 // Import Angular Classes:
@@ -28,7 +28,7 @@ export class AdjustScoreFunctionInteraction {
 	// ========================================================================================
 
 	public lastRendererUpdate: ScoreFunctionUpdate;
-
+	public adjustScoreFunctions: boolean;
 
 	// ========================================================================================
 	// 									Constructor
@@ -53,15 +53,16 @@ export class AdjustScoreFunctionInteraction {
 		@returns {void}
 		@description	This method toggles the interaction that allows clicking and dragging on scatter plot points to alter a user's score function.
 	*/
-	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, lastRendererUpdate: ScoreFunctionUpdate): void {
-		this.lastRendererUpdate = lastRendererUpdate;
+	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, rendererUpdate: ScoreFunctionUpdate): void {
+		this.lastRendererUpdate = rendererUpdate;
+		this.adjustScoreFunctions = adjustScoreFunctions;
 
 		var dragToResizeScores = d3.drag();
 
 		if (adjustScoreFunctions) {
 			dragToResizeScores.on('start', (d: DomainElement, i: number) => {
 				// Save the current state of the ScoreFunction.
-				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, lastRendererUpdate.objective);
+				this.chartUndoRedoService.saveScoreFunctionRecord(d.scoreFunction, this.lastRendererUpdate.objective);
 			});
 
 			dragToResizeScores.on('drag', this.handleDrag);
@@ -75,7 +76,7 @@ export class AdjustScoreFunctionInteraction {
 			if (!adjustScoreFunctions) {
 				return 'auto';
 			} else {
-				return (lastRendererUpdate.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
+				return (this.lastRendererUpdate.viewOrientation === 'vertical') ? 'ns-resize' : 'ew-resize';
 			}
 		});
 	}

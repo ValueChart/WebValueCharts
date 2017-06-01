@@ -61,7 +61,7 @@ module.exports = function(config) {
       { pattern: 'node_modules/traceur/bin/traceur.js', included:false, watched: false },
       { pattern: 'node_modules/lodash/lodash.js', included:false, watched: false },
       { pattern: 'node_modules/d3/build/d3.js', included:false, watched: false },
-
+      { pattern: 'node_modules/sinon/pkg/sinon.js', included:false, watched: false },
       
       { pattern: 'systemjs.config.js', included: false, watched: false },
       { pattern: 'systemjs-angular-loader.js', included: false, watched: false },
@@ -71,6 +71,7 @@ module.exports = function(config) {
       { pattern: appBase + '**/*.js', included: false, watched: false },      
       { pattern: testingBase + '**/*.js', included: false, watched: false },
       { pattern: 'test/testData/**.js', included: false, watched: false },
+      { pattern: 'test/utilities/**.js', included: false, watched: false },
       'client/resources/styles/main.css',
 
       // Asset (HTML & CSS) paths loaded via Angular's component compiler

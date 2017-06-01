@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 21:55:54
+* @Last Modified time: 2017-05-29 15:21:19
 */
 
 // Import Angular Classes:
@@ -11,6 +11,7 @@ import { Injectable } 												from '@angular/core';
 // Import Libraries:
 import * as d3 														from 'd3';
 import * as _														from 'lodash';
+import { Subject }													from 'rxjs/Subject';
 import { Observable }												from 'rxjs/Observable';
 import { Subscription } 											from 'rxjs/Subscription';
 import '../../utilities/rxjs-operators';
@@ -86,9 +87,8 @@ export class ResizeWeightsInteraction {
 						'decrease' turns on clicking PrimitiveObjective labels to increase the objective's weight by one percent.
 						A pumpType of 'none' turns off the pump interaction.
 	*/
-	public togglePump(pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>, lastRendererUpdate: RendererUpdate): void {
-		this.lastRendererUpdate = lastRendererUpdate;
-
+	public togglePump(pumpType: string, primitiveObjectiveLabels: NodeListOf<Element>, rendererUpdate: RendererUpdate): void {
+		this.lastRendererUpdate = rendererUpdate;
 		// Initialize the observable that is used to detect clicks and notifies handlers.
 		this.clicks = Observable.fromEvent(primitiveObjectiveLabels, 'click');
 
@@ -136,8 +136,8 @@ export class ResizeWeightsInteraction {
 						resizeType of 'siblings' turns on dragging the divider between two objective labels to modify the weights of ALL
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
-	public toggleDragToResizeWeights(resizeType: string, rootContainer: d3.Selection<any, any, any, any>, lastRendererUpdate: RendererUpdate): void {
-		this.lastRendererUpdate = lastRendererUpdate;
+	public toggleDragToResizeWeights(resizeType: string, rootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {		
+		this.lastRendererUpdate = rendererUpdate;
 
 		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
 		this.resizeType = resizeType;

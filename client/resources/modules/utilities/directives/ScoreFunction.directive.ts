@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 22:15:52
+* @Last Modified time: 2017-05-31 16:20:56
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -103,10 +103,12 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initScoreFunctionPlot(): void {
 
+		console.log('initiating plot')
+
 		if (this.objective.getDomainType() === 'continuous') {
-			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
+			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 		} else {
-			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService, new ExpandScoreFunctionInteraction(null));
+			this.scoreFunctionRenderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 		}
 		
 		this.scoreFunctionSubject = new Subject();
@@ -138,13 +140,14 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	ngDoCheck() {
 
-		if (!_.isEqual(this.previousObjectiveToDisplay,this.objective)) {
+		if (this.previousObjectiveToDisplay.getName() !== this.objective.getName()) {
+			console.log('not equal', this.previousObjectiveToDisplay, this.objective);
 			this.rendererSubscription.unsubscribe();
 			this.previousObjectiveToDisplay = _.cloneDeep(this.objective);
 			this.initScoreFunctionPlot();
 		}
 
-		if (!_.isEqual(this.enableInteraction,this.previousEnableInteraction)) {
+		if (this.enableInteraction !== this.previousEnableInteraction) {
 			console.log('this has been called');
 			this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
 			this.previousEnableInteraction = _.clone(this.enableInteraction);
