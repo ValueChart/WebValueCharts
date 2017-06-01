@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 17:53:10
+* @Last Modified time: 2017-06-01 10:22:02
 */
 
 // Import Angular Classes:
@@ -187,7 +187,7 @@ export class MyValueChartsComponent implements OnInit {
 		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
-		this.downloadLink.click();									// Click the <a> element to programmatically begin the download.
+		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
 	}
 
 	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {
