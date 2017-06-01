@@ -1,5 +1,6 @@
-// Import Angular Classes:
+
 import { Injectable } 										from '@angular/core';
+import * as _												from 'lodash';
 
 // Import Application Classes:
 import { ValueChartService }								from '../../app/services/ValueChart.service';
@@ -48,11 +49,11 @@ export class UpdateObjectiveReferencesService {
 
 	/*
 		@returns {void}
-		@description 	Clears Users' ScoreFunctions for obj.
+		@description 	Resets Users' ScoreFunction for obj.
 	*/
-	clearScoreFunctions(obj: PrimitiveObjective) {
+	resetScoreFunction(obj: PrimitiveObjective) {
 		for (let user of this.valueChartService.getValueChart().getUsers()) {
-			user.setScoreFunctionMap(new ScoreFunctionMap());
+			user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
 		}
 	}
 
@@ -66,7 +67,7 @@ export class UpdateObjectiveReferencesService {
 			for (let user of this.valueChartService.getValueChart().getUsers()) {
 				let scoreFunctionMap = user.getScoreFunctionMap();
 				if (scoreFunctionMap) {
-					scoreFunctionMap.setObjectiveScoreFunction(objname, obj.getDefaultScoreFunction().getMemento());
+					scoreFunctionMap.setObjectiveScoreFunction(objname, _.cloneDeep(obj.getDefaultScoreFunction()));
 				}
 			}
 		}
@@ -106,10 +107,12 @@ export class UpdateObjectiveReferencesService {
 	}
 
 	/*
-		@returns {void}
+		@returns {string[]}
 		@description 	 Transforms users' ScoreFunctions so that the best outcome has score of 1 and worst outcome has score of 0.
+						 Returns names of users whose ScoreFunctions for objName needed rescaling
 	*/
-	rescaleScoreFunctions(objName: string) {
+	rescaleScoreFunctions(objName: string): string[] {
+		let rescaledUsers: string[] = [];
 		for (let user of this.valueChartService.getValueChart().getUsers()) {
 			let scoreFunctionMap = user.getScoreFunctionMap();
 			if (scoreFunctionMap) {
@@ -118,10 +121,12 @@ export class UpdateObjectiveReferencesService {
 					let rescaled = scoreFunction.rescale();
 					if (rescaled) {
 						user.setWeightMap(new WeightMap());
+						rescaledUsers.push(user.getUsername());
 					}
-				}	
+				}
 			}
-		}	
+		}
+		return rescaledUsers;	
 	}
 
 	/*

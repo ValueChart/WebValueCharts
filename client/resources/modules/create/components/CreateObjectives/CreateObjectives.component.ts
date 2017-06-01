@@ -168,6 +168,9 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Updates ScoreFunctions and Weights in response to changes to Objective domains.
 	*/
 	handleDomainChanges(objIDs: string[]) {
+		let allWeightsReset = false;
+		let resetScoreFunctions: string[] = [];
+		let resetUsers: string[] = [];
 		for (let objID of objIDs) {
 			let oldDom = this.initialPrimObjRows[objID].dom;
 			let newDom = this.objectiveRows[objID].dom;
@@ -177,8 +180,10 @@ export class CreateObjectivesComponent implements OnInit {
 			// Clear all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
 			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
 			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
-				this.updateObjRefService.clearScoreFunctions(obj);
+				this.updateObjRefService.resetScoreFunction(obj);
 				this.updateObjRefService.clearWeightMaps(); // must be done because best/worst outcomes may have changed
+				allWeightsReset = true;
+				resetScoreFunctions.push(obj.getName());
 			}
 
 			// Check for changes to categorical domain options
@@ -193,10 +198,26 @@ export class CreateObjectivesComponent implements OnInit {
 				for (let cat of addedCats) {
 					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
 				}
-				this.updateObjRefService.rescaleScoreFunctions(objName);	
+				let resetUsersForObj = this.updateObjRefService.rescaleScoreFunctions(objName);
+				for (let userName of resetUsersForObj) {
+					if (resetUsers.indexOf(userName) === -1) {
+						resetUsers.push(userName);
+					}
+				}	
 			}
 			this.updateObjRefService.clearAlternativeValues(obj);
 		}
+		if (allWeightsReset) {
+			toastr.warning("All users' weights were reset.");
+			for (let objName of resetScoreFunctions) {
+				toastr.warning("All users' score functions for " + objName + " were reset to default.");
+			}
+		}
+		else {
+			for (let userName of resetUsers) {
+				toastr.warning(userName + "'s weights were reset.");
+			}
+		}						
 	}
 
 	// ================================ Objective Row Methods ====================================
@@ -503,10 +524,6 @@ export class CreateObjectivesComponent implements OnInit {
 	setErrorMessages(): void {
 		// Convert temporary structures to ValueChart structures
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-		this.valueChartService.resetPrimitiveObjectives();
-		if (this.editing) {
-			this.updateReferences();
-		}
 
 		// Validate
 		this.errorMessages = this.validationService.validateObjectives(this.valueChart);

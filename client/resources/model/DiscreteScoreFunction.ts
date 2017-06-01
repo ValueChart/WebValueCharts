@@ -59,6 +59,10 @@ export class DiscreteScoreFunction extends ScoreFunction {
 				this.setElementScore(item, currentScore);
 				currentScore += increment;
 			}
+			// Set score of last item to exactly 1 
+			// (This is necessary because the arithmetic method is not precise -
+			//	the value must be exactly 1 for validation to pass.)
+			this.setElementScore(dom[dom.length - 1], 1); 											 
 		}
 		else if (type === ScoreFunction.NEGLIN) {
 			let increment = 1.0 / (dom.length - 1);
@@ -67,6 +71,8 @@ export class DiscreteScoreFunction extends ScoreFunction {
 				this.setElementScore(item, currentScore);
 				currentScore -= increment;
 			}
+			// Set score of last item to exactly 0 (see above)
+			this.setElementScore(dom[dom.length - 1], 0); 	
 		}
 		else {
 			throw ("Unknown initial score function type");

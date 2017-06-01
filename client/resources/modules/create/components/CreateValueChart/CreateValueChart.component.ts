@@ -245,19 +245,11 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Disable the View Chart button if:
-						(1) the chart structure is invalid
-						(2) the current user's preferences are invalid
-						(3) on BasicInfo step (because I don't wanna deal with checking for name uniqueness)
-						(4) on the Preferences step (because the WeightMap might get reset on destroy)
+		@description 	Disable the View Chart button if not on Alternatives or Priorities step.
 	*/
 	disableViewChartButton(): boolean {
-		// return (this.validationService.validateStructure(this.valueChart).length > 0
-		// 	|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 )
-		// 	|| this.creationStepsService.step === this.creationStepsService.BASICS 
-		// 	|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
-		return (this.creationStepsService.step === this.creationStepsService.BASICS
-			|| this.creationStepsService.step === this.creationStepsService.PREFERENCES);
+		return (this.creationStepsService.step !== this.creationStepsService.ALTERNATIVES
+			&& this.creationStepsService.step !== this.creationStepsService.PRIORITIES);
 	}
 
 	/* 	

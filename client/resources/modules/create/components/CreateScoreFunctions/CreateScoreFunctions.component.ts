@@ -1,5 +1,6 @@
-// Import Angular Classes:
+
 import { Component, OnInit }										    from '@angular/core';
+import * as _                                       from 'lodash';
 import { Observable }                               from 'rxjs/Observable';
 import { Subscriber }                               from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
@@ -115,7 +116,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     // Make sure there is a score function for every Objective
     for (let obj of this.valueChartService.getPrimitiveObjectives()) {
       if (!this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
-        this.user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), obj.getDefaultScoreFunction());
+        this.user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
       }
       // Make sure the score function is complete
       let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
