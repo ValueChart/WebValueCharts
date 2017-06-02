@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 13:56:43
+* @Last Modified time: 2017-06-02 11:21:22
 */
 
 // Import Angular Classes:
@@ -108,7 +108,7 @@ export class SortAlternativesInteraction {
 	// 									Methods
 	// ========================================================================================
 
-	public initialize(u: RendererUpdate) {
+	public initialize(u: RendererUpdate): void {
 		if (!this.originalAlternativeOrder && u)
 			this.originalAlternativeOrder = new AlternativesRecord(u.valueChart.getAlternatives());
 
@@ -150,11 +150,11 @@ export class SortAlternativesInteraction {
 		@description 	Toggles the clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective. This method
 						uses the sortByObjective anonymous function defined below to handle the actual sorting. Sorting by objectives is managed by the LabelRenderer.
 	*/
-	public toggleSortAlternativesByObjectiveScore(enableSorting: boolean, rootContainer: Element, rendererUpdate: RendererUpdate): void {
+	public toggleSortAlternativesByObjectiveScore(enableSorting: boolean, labelRootContainer: Element, rendererUpdate: RendererUpdate): void {
 		this.initialize(rendererUpdate);
 
-		var objectiveLabels: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
-		var objectiveText: NodeListOf<Element> = rootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);
+		var objectiveLabels: NodeListOf<Element> = labelRootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE);
+		var objectiveText: NodeListOf<Element> = labelRootContainer.querySelectorAll('.' + LabelDefinitions.SUBCONTAINER_TEXT);
 
 		if (!this.clicks) {	
 			var clicksLabels = Observable.fromEvent(objectiveLabels, 'click');
@@ -312,7 +312,7 @@ export class SortAlternativesInteraction {
 
 	// ================================ Public Methods for Reordering Rows and Columns ====================================
 
-	public sortAlternativesByObjective(alternatives: Alternative[], objectivesToReorderBy: PrimitiveObjective[]): Alternative[] {
+	private sortAlternativesByObjective(alternatives: Alternative[], objectivesToReorderBy: PrimitiveObjective[]): Alternative[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		var alternativeScores: any = {};
 
@@ -342,7 +342,7 @@ export class SortAlternativesInteraction {
 		});
 	}
 
-	public sortAlternativesAlphabetically(alternatives: Alternative[]): Alternative[] {
+	private sortAlternativesAlphabetically(alternatives: Alternative[]): Alternative[] {
 		// Generate an array of indexes according to the number of cells in each row.
 		return alternatives.sort((a: Alternative, b: Alternative) => {
 

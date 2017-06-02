@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 17:05:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 17:37:23
+* @Last Modified time: 2017-06-02 12:51:48
 */
 
 // Require Node Libraries:
@@ -84,6 +84,7 @@ describe('Register Page', () => {
 
 		tempUser.click().then(function() {
 
+			p.browser.sleep(500);
 			expect(tempModal.isDisplayed());
 		});
 
