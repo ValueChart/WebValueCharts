@@ -31,7 +31,7 @@ import { ContinuousScoreFunction }								  from '../../../../model/ContinuousSc
 import { WeightMap }                                from '../../../../model/WeightMap';
 
 // Import Types:
-import { ChartOrientation }                         from '../../../../types/config.types';
+import { ChartOrientation }                         from '../../../../types/Config.types';
 
 
 /*
