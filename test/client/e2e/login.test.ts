@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 17:05:12
-* @Last Modified by:   alexp
-* @Last Modified time: 2017-05-24 13:29
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2017-06-01 17:37:23
 */
 
 // Require Node Libraries:
@@ -17,6 +17,7 @@ describe('Register Page', () => {
 
 	it('should be located at the /register resource', (done: MochaDone) => {
 		p.browser.get('http://localhost:3000');
+		p.browser.waitForAngular();
 		expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/register').notify(done);
 	});
 

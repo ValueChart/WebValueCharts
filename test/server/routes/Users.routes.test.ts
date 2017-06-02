@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:25:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-02 16:48:28
+* @Last Modified time: 2017-06-01 17:02:11
 */
 
 // Require Node Libraries:
@@ -320,7 +320,7 @@ describe('Users Routes', () => {
 						.expect((res: request.Response) => {
 							var response = res.body.data;
 							expect(response).to.not.be.undefined;
-							expect(response.length).not.not.equal(0);
+							expect(response.length).not.equal(0);
 
 						}).end(function(err, res) {
 							if (err) return done(err);
