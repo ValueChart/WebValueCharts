@@ -147,7 +147,7 @@ describe('My Account Page', () => {
 
 	});
 
-	// Log out and login to the modified account. Account imfo at this point:
+	// Log out and login to the modified account. Account info at this point:
 	//	 - Username: vickytry001
 	//   - Email: vickytry002@gmail.com
 	//   - Password: 002
@@ -181,13 +181,14 @@ describe('My Account Page', () => {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 
-		// Note: to run the test again, change the account info to the original:
-		//   - Username: vickytry001
-		//   - Email; vickytry001@gmail.com
-		//   - Password: 001
 	
 	});
 
+
+	// Change the account info to the original:
+	//   - Username: vickytry001
+	//   - Email; vickytry001@gmail.com
+	//   - Password: 001
 	after(function() {
 		var myAccBtn = p.browser.element(p.By.id('my-account'));
 
@@ -204,7 +205,7 @@ describe('My Account Page', () => {
 				reEtrPwField.clear();
 				reEtrPwField.sendKeys('001');
 				emailField.clear();
-				emailField.sendKeys('vickytry002@gmail.com');
+				emailField.sendKeys('vickytry001@gmail.com');
 
 				updAccDtlBtn.click()
 		});
