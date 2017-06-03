@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 12:48:17
+* @Last Modified time: 2017-06-02 15:04:23
 */
 
 // Import Testing Resources:
@@ -42,7 +42,6 @@ import { AlternativesRecord }							from '../../../../../client/resources/types/
 // Import Types
 import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
 import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
 import { ChartOrientation, SortAlternativesType }		from '../../../../../client/resources/types/Config.types';
 
 
@@ -50,12 +49,11 @@ describe('SortAlternativesInteraction', () => {
 
 	var rendererConfigUtility: RendererConfigUtility;
 	var rendererDataUtility: RendererDataUtility;
-	var sortAlternativesInteraction: SortAlternativesInteraction;
 	var chartUndoRedoService: ChartUndoRedoService;
+	var sortAlternativesInteraction: SortAlternativesInteraction;
 
 	var hotelChart: ValueChart;
 	var parser: WebValueChartsParser;
-	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 
 
@@ -74,36 +72,14 @@ describe('SortAlternativesInteraction', () => {
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
-		viewConfig = {
-			viewOrientation: ChartOrientation.Vertical,
-			displayScoreFunctions: false,
-			displayTotalScores: false,
-			displayScales: false,
-			displayDomainValues: false,
-			displayScoreFunctionValueLabels: false,
-			displayAverageScoreLines: false
-		};
-
-		interactionConfig = {
-			weightResizeType: null,
-			reorderObjectives: false,
-			sortAlternatives: SortAlternativesType.None,
-			pumpWeights: null,
-			setObjectiveColors: false,
-			adjustScoreFunctions: false
-		};
-
-		height = 100;
-		width = 100;
-
 		u = {
 			el: null,
 			valueChart: hotelChart,
-			viewConfig: viewConfig,
-			interactionConfig: interactionConfig,
+			viewConfig: null,
+			interactionConfig: null,
 			renderRequired: { value: false },
-			height: height,
-			width: width,
+			height: null,
+			width: null,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
@@ -292,6 +268,6 @@ describe('SortAlternativesInteraction', () => {
 
 	after(function() {
 		TestBed.resetTestingModule();
-	})
+	});
 
 });

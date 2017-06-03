@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 12:58:13
+* @Last Modified time: 2017-06-02 17:18:14
 */
 
 // Import Angular Classes:
@@ -211,7 +211,7 @@ export class ResizeWeightsInteraction {
 		}
 	};
 
-	resizeNeighbors = (d: LabelData, i: number, deltaWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
+	private resizeNeighbors = (d: LabelData, i: number, deltaWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
 		let combinedWeight: number = d.weight + siblings[i - 1].weight;
 
 		// Determine the weights of the two siblings based on the weight change, and the total prior weight. Note that neither objective can have a weight greater than the total prior weight.
@@ -227,7 +227,7 @@ export class ResizeWeightsInteraction {
 
 	}
 
-	resizeSiblings = (d: LabelData, i: number, deltaWeight: number, combinedWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
+	private resizeSiblings = (d: LabelData, i: number, deltaWeight: number, combinedWeight: number, weightMap: WeightMap, siblings: LabelData[]) => {
 		let siblingsToIncrease: LabelData[] = [];
 		let siblingsToDecrease: LabelData[] = [];
 
@@ -238,8 +238,8 @@ export class ResizeWeightsInteraction {
 		var siblingsAbove = siblings.slice(0, i);	// All the siblings above the divider.
 		var siblingsBelow = siblings.slice(i);		// The label containing the divider and all siblings those below it.
 
-			this.incrementChildrenWeights(siblingsAbove, weightMap, -deltaWeight, combinedWeight);
-			this.incrementChildrenWeights(siblingsBelow, weightMap, deltaWeight, combinedWeight);
+		this.incrementChildrenWeights(siblingsAbove, weightMap, -deltaWeight, combinedWeight);
+		this.incrementChildrenWeights(siblingsBelow, weightMap, deltaWeight, combinedWeight);
 	}
 
 
@@ -254,7 +254,7 @@ export class ResizeWeightsInteraction {
 		@description	Updates the weight of an Objective by weightIncrement to be newWeight. PrimitiveObjective's are updated directly.
 						If the Objective is Abstract, then IncrementChildWeights is used to update the sub-objectives.
 	*/
-	public incrementObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, newWeight: number, weightIncrement: number, maxWeight: number): void {
+	private incrementObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, newWeight: number, weightIncrement: number, maxWeight: number): void {
 		if (labelDatum.objective.objectiveType === 'primitive') {
 			weightMap.setObjectiveWeight(labelDatum.objective.getName(), newWeight);		
 		} else {
@@ -271,7 +271,7 @@ export class ResizeWeightsInteraction {
 		@returns {void} 
 		@description	Updates the weight of a set of objectives by distributing a weightIncrement amongst them. 
 	*/
-	public incrementChildrenWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number) {
+	private incrementChildrenWeights(labelData: LabelData[], weightMap: WeightMap, weightIncrement: number, maxWeight: number) {
 		var weightTotal: number = 0;
 		var nonZeroWeights: number = 0;
 
