@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 15:22:27
+* @Last Modified time: 2017-06-02 17:48:12
 */
 
 // Import Angular Classes:
@@ -271,10 +271,8 @@ export class ReorderObjectivesInteraction {
 		this.reorderSubject.next(true);
 	}
 
-
-
-		// This function extracts the ordering of objectives from the ordering of labels.
-	public getOrderedRootObjectives(labelData: LabelData[]): Objective[] {
+	// This function extracts the ordering of objectives from the ordering of labels.
+	private getOrderedRootObjectives(labelData: LabelData[]): Objective[] {
 		var rootObjectives: Objective[] = [];
 		labelData.forEach((labelDatum: LabelData) => {
 			var objective: Objective = labelDatum.objective;

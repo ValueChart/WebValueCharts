@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 15:04:23
+* @Last Modified time: 2017-06-02 17:44:37
 */
 
 // Import Testing Resources:
@@ -21,7 +21,6 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
 import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
 import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
 import { ChartUndoRedoService }								from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
@@ -47,7 +46,6 @@ import { ChartOrientation, SortAlternativesType }		from '../../../../../client/r
 
 describe('SortAlternativesInteraction', () => {
 
-	var rendererConfigUtility: RendererConfigUtility;
 	var rendererDataUtility: RendererDataUtility;
 	var chartUndoRedoService: ChartUndoRedoService;
 	var sortAlternativesInteraction: SortAlternativesInteraction;
@@ -59,11 +57,10 @@ describe('SortAlternativesInteraction', () => {
 
 	beforeEach(function() {
 		TestBed.configureTestingModule({
-			providers: [ RendererDataUtility, RendererConfigUtility, ChartUndoRedoService, RendererService, SortAlternativesInteraction ]
+			providers: [ RendererDataUtility, ChartUndoRedoService, RendererService, SortAlternativesInteraction ]
 		});
 
 		rendererDataUtility = TestBed.get(RendererDataUtility);
-		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		chartUndoRedoService = TestBed.get(ChartUndoRedoService);
 		sortAlternativesInteraction = TestBed.get(SortAlternativesInteraction);
 

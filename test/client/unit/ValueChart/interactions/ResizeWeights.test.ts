@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 13:53:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:34:32
+* @Last Modified time: 2017-06-02 17:44:51
 */
 
 // Import Testing Resources:
@@ -21,7 +21,6 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
 import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
 import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
 import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
@@ -48,7 +47,6 @@ import { ChartOrientation, WeightResizeType, PumpType }	from '../../../../../cli
 
 describe('ResizeWeightsInteraction', () => {
 
-	var rendererConfigUtility: RendererConfigUtility;
 	var rendererDataUtility: RendererDataUtility;
 	var chartUndoRedoService: ChartUndoRedoService;
 	var resizeWeightsInteraction: ResizeWeightsInteraction;
@@ -62,11 +60,10 @@ describe('ResizeWeightsInteraction', () => {
 
 	beforeEach(function() {
 		TestBed.configureTestingModule({
-			providers: [ RendererDataUtility, RendererConfigUtility, ChartUndoRedoService, RendererService, ResizeWeightsInteraction ]
+			providers: [ RendererDataUtility, ChartUndoRedoService, RendererService, ResizeWeightsInteraction ]
 		});
 
 		rendererDataUtility = TestBed.get(RendererDataUtility);
-		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 		chartUndoRedoService = TestBed.get(ChartUndoRedoService);
 		resizeWeightsInteraction = TestBed.get(ResizeWeightsInteraction);
 
