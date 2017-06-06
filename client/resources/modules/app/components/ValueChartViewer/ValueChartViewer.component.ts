@@ -173,7 +173,7 @@ export class ValueChartViewerComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Whether or not the current user may interactively change the scores and weights.
-						True iff the current user is joining the chart OR the chart contains exactly ONE user who is:
+						True if the current user is joining the chart OR the chart contains exactly ONE user who is:
 							(a) the current user AND
 							(b) the chart creator
 						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
@@ -181,7 +181,7 @@ export class ValueChartViewerComponent implements OnInit {
 	enableInteraction(): boolean {
 		return (this.currentUserService.isJoiningChart() 
 			|| (this.valueChartService.isIndividual()
-				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()
+				&& this.valueChartService.currentUserIsDefined()
 				&& this.valueChart.getCreator() === this.currentUserService.getUsername()));
 	}
 
@@ -193,6 +193,17 @@ export class ValueChartViewerComponent implements OnInit {
 	enableManagement(): boolean {
 		return (!this.currentUserService.isJoiningChart() 
 			&& this.valueChart.getCreator() === this.currentUserService.getUsername());
+	}
+
+	/* 	
+		@returns {boolean}
+		@description 	Whether or not to show the Edit Preferences button.
+						True if current user is joining a chart, or the current user is the chart's creator and already a member of the chart.
+	*/
+	enableEditPreferences(): boolean {
+		return (this.currentUserService.isJoiningChart() 
+			|| (this.valueChart.getCreator() === this.currentUserService.getUsername()
+				&& this.valueChartService.currentUserIsDefined()));
 	}
 
   /*   
