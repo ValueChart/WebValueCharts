@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 11:19:42
+* @Last Modified time: 2017-06-06 13:03:23
 */
 
 // Import Libraries and Express Middleware:
@@ -18,6 +18,39 @@ import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnecti
 
 export var valueChartUsersRoutes: express.Router = express.Router();
 
+// Retrieve a specific user from a ValueChart's list of users using their username as the identifier. 
+valueChartUsersRoutes.get('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var identifier: string = (<any> req).identifier
+	var username: string = req.params.username;
+
+	// Locate the ValueChart that the desired user belongs to.
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+		} else if (doc) {
+			
+			// Locate the user.
+			var user = doc.users.find((user: any) => {
+				return user.username === username;
+			});
+
+			if (!user) {
+				res.sendStatus(404);	// The user does not exists. Return status 404: Not Found.
+				return;
+			}
+
+			// Return the located user.
+			res.location('/ValueCharts/' + identifier + '/users' + user.username)
+						.status(200)
+						.json({ data: user });
+
+		} else {
+			res.sendStatus(404);	// The ValueChart the user is supposed to belong to does not exist. Return status 404: Not Found.
+		}
+	});
+});
 
 // Check to see if user changes are being refused by the chart for all requests to /ValueCharts/:chart/users. If they are, return status 403: Forbidden. Otherwise,
 // continue on to the next middleware function in the stack. Note that this middleware function will execute before all others in this router
@@ -66,40 +99,6 @@ valueChartUsersRoutes.post('/', function(req: express.Request, res: express.Resp
 			});
 		} else {
 			res.sendStatus(404);
-		}
-	});
-});
-
-// Retrieve a specific user from a ValueChart's list of users using their username as the identifier. 
-valueChartUsersRoutes.get('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var identifier: string = (<any> req).identifier
-	var username: string = req.params.username;
-
-	// Locate the ValueChart that the desired user belongs to.
-	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
-		if (err) {
-			res.status(400)
-				.json({ data: err });
-		} else if (doc) {
-			
-			// Locate the user.
-			var user = doc.users.find((user: any) => {
-				return user.username === username;
-			});
-
-			if (!user) {
-				res.sendStatus(404);	// The user does not exists. Return status 404: Not Found.
-				return;
-			}
-
-			// Return the located user.
-			res.location('/ValueCharts/' + identifier + '/users' + user.username)
-						.status(200)
-						.json({ data: user });
-
-		} else {
-			res.sendStatus(404);	// The ValueChart the user is supposed to belong to does not exist. Return status 404: Not Found.
 		}
 	});
 });

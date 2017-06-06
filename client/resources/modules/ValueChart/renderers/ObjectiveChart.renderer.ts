@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:06:15
+* @Last Modified time: 2017-06-06 14:49:52
 */
 
 // Import Angular Classes
@@ -95,11 +95,11 @@ export class ObjectiveChartRenderer {
 		}
 
 
-		if (this.numUsers != update.valueChart.getUsers().length) {
+		if (this.numUsers != update.usersToDisplay.length) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 		}
 
-		this.numUsers = update.valueChart.getUsers().length;
+		this.numUsers = update.usersToDisplay.length;
 		this.updateInteractions(update);
 		this.renderObjectiveChart(update);
 	}
@@ -520,7 +520,7 @@ export class ObjectiveChartRenderer {
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
 	calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };
 	// Calculate the CoordinateOne of a userScore given the userScore object and its index. userScores are just further subdivisions of cells based on the number of userScores in each cell.
-	calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.valueChart.getUsers().length };
+	calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.usersToDisplay.length };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());

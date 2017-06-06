@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:24:36
+* @Last Modified time: 2017-06-06 15:27:00
 */
 
 // Import Libraries and Express Middleware:
@@ -93,7 +93,6 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	var identifier: string = (<any> req).identifier; // ChartId is misleading here. It is the name, not id.
 	
 	var password: string = req.query.password;
-	console.log('we got here', identifier, password);
 
 	valueChartsCollection.findOne({ id: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {

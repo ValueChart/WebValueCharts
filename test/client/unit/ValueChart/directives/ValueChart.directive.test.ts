@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 15:04:03
+* @Last Modified time: 2017-06-06 15:45:30
 */
 
 // Import Testing Resources:
@@ -72,6 +72,7 @@ import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	fr
 					[height]="valueChartHeight"
 					[viewConfig]="viewConfig"
 					[interactionConfig]="interactionConfig"
+					[usersToDisplay]="usersToDisplay"
 					(undoRedo)="updateUndoRedo($event)"
 					(renderEvents)="updateRenderEvents($event)">
 				</ValueChart>`
@@ -79,6 +80,7 @@ import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	fr
 class ViewerStub {
 
 	public valueChart: ValueChart;
+	public usersToDisplay: User[]
 	public valueChartWidth: number;
 	public valueChartHeight: number;
 	public viewConfig: ViewConfig;
@@ -218,6 +220,7 @@ describe('ValueChartDirective', () => {
 		// Pass parameters to the stub component.
 
 		viewerStub.valueChart = hotelChart;
+		viewerStub.usersToDisplay = hotelChart.getUsers();
 		viewerStub.interactionConfig = interactionConfig;
 		viewerStub.viewConfig = viewConfig;
 		viewerStub.valueChartWidth = width;
@@ -383,6 +386,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize the changed User to the ValueChartDirective', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 					expect(valueChartDirective['valueChart'].getUsers()).to.have.length(1);
@@ -392,6 +396,7 @@ describe('ValueChartDirective', () => {
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 					aaron = randomizeUserWeights(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
@@ -402,6 +407,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
 					aaron = randomizeUserWeights(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 					checkCachedRendererUpdates(u);
@@ -425,6 +431,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize the changed User to the ValueChartDirective', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 
@@ -435,6 +442,7 @@ describe('ValueChartDirective', () => {
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 
@@ -446,6 +454,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 					checkCachedRendererUpdates(u);
@@ -469,7 +478,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
-
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 					fixture.detectChanges();
 					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
 				});
@@ -477,8 +486,9 @@ describe('ValueChartDirective', () => {
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 					bob = createRandomTestUser(viewerStub.valueChart, 'bob');
 					viewerStub.valueChart.setUser(bob);
-					fixture.detectChanges();
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
+					fixture.detectChanges();
 					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
@@ -492,8 +502,9 @@ describe('ValueChartDirective', () => {
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
 					bob = createRandomTestUser(viewerStub.valueChart, 'bob');
 					viewerStub.valueChart.setUser(bob);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
+					
 					fixture.detectChanges();
-
 					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 					checkCachedRendererUpdates(u);
 				});
@@ -516,6 +527,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
@@ -523,8 +535,9 @@ describe('ValueChartDirective', () => {
 
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 					viewerStub.valueChart.setUsers([]);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
+					
 					fixture.detectChanges();
-
 					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
@@ -536,8 +549,9 @@ describe('ValueChartDirective', () => {
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
 					viewerStub.valueChart.setUsers([]);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
+					
 					fixture.detectChanges();
-
 					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 					checkCachedRendererUpdates(u);
 				});
@@ -563,6 +577,7 @@ describe('ValueChartDirective', () => {
 				it('should synchronize the changed ValueChart to the ValueChartDirective', () => {
 					aaron = randomizeAllUserScoreFunctions(aaron, viewerStub.valueChart);
 					viewerStub.valueChart.setUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
 					fixture.detectChanges();
 					expect(valueChartDirective['valueChart']).to.deep.equal(viewerStub.valueChart);
@@ -570,8 +585,9 @@ describe('ValueChartDirective', () => {
 
 				it('should detect changes to the ValueChart send a RendererUpdate to the renderer classes', () => {
 					viewerStub.valueChart.removeUser(aaron);
-					fixture.detectChanges();
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
 
+					fixture.detectChanges();
 					expect((<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>objectiveChartRenderer.valueChartChanged).calledTwice).to.be.true;
 					expect((<sinon.SinonSpy>labelRenderer.valueChartChanged).calledTwice).to.be.true;
@@ -583,8 +599,9 @@ describe('ValueChartDirective', () => {
 
 				it('should synchronize cached RendererUpdate fields in the renderer and interaction classes with the most recent RendererUpdate', () => {
 					viewerStub.valueChart.removeUser(aaron);
+					viewerStub.usersToDisplay = viewerStub.valueChart.getUsers();
+					
 					fixture.detectChanges();
-
 					let u: RendererUpdate = (<sinon.SinonSpy>summaryChartRenderer.valueChartChanged).lastCall.args[0];
 					checkCachedRendererUpdates(u);
 				});

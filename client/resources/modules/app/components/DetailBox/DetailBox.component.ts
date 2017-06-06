@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:31:05
+* @Last Modified time: 2017-06-06 15:25:00
 */
 
 // Import Angular Classes:
-import { Component, Input }														from '@angular/core';
-import { OnInit }																from '@angular/core';
+import { Component, Input, Output }												from '@angular/core';
+import { OnInit, EventEmitter }													from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
@@ -43,6 +43,7 @@ export class DetailBoxComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
+	// Inputs
 	@Input() valueChart: ValueChart;
 	@Input() chartElement: d3.Selection<any, any, any, any>;
 	@Input() enableManagement: boolean
@@ -50,12 +51,16 @@ export class DetailBoxComponent implements OnInit {
 	@Input() width: number;
 	@Input() height: number;
 
+	// Outputs
+	@Output() usersToDisplay: EventEmitter<User[]> = new EventEmitter();
+
 	private subscription: Subscription;
 
 	public detailBoxAlternativeTab: string;
 	private alternativeObjectives: string[];
 	private alternativeObjectiveValues: (string | number)[];
 
+	public displayedUsers: User[];
 	public userToRemove: User;
 
 	public detailBoxCurrentTab: string;
@@ -79,10 +84,13 @@ export class DetailBoxComponent implements OnInit {
 	// ========================================================================================
 
 	ngOnInit(): void {
+		this.displayedUsers = this.valueChart.getUsers();
 		this.detailBoxCurrentTab = this.DETAIL_BOX_CHART_TAB;
 		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
+
+		this.usersToDisplay.emit(this.displayedUsers);
 	}
 
 
@@ -110,6 +118,23 @@ export class DetailBoxComponent implements OnInit {
 
 	setUserColor(user: User, color: string): void {
 		user.color = color;
+	}
+
+	changeDisplayedUsers(user: User, eventObject: Event): void {
+		if ((<HTMLInputElement> eventObject.target).checked) {
+			this.displayedUsers.push(user);
+			let indices: any = {};
+			this.valueChart.getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
+
+			this.displayedUsers.sort((a: User, b: User) => {
+				return indices[a.getUsername()] < indices[b.getUsername()] ? -1 : 1;
+			});
+		} else {
+			this.displayedUsers = this.displayedUsers.filter((displayedUser: User) => {
+				return displayedUser.getUsername() !== user.getUsername();
+			});
+		}
+		this.usersToDisplay.emit(this.displayedUsers);
 	}
 
 	/* 	

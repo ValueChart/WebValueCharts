@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:26:48
+* @Last Modified time: 2017-06-06 15:47:10
 */
 
 // Import Testing Resources:
@@ -146,6 +146,7 @@ var renderEventsServiceStub = {
 		u = {
 			el: el,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,
 			interactionConfig: interactionConfig,
 			renderRequired: { value: false },
@@ -221,6 +222,7 @@ var renderEventsServiceStub = {
 					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
 					
 					u.valueChart.setUser(bob);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -263,6 +265,7 @@ var renderEventsServiceStub = {
 			context('when the number of users in the ValueChart is decreased to be one', () => {
 				before(function() {
 					u.valueChart.removeUser(aaron);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -306,6 +309,7 @@ var renderEventsServiceStub = {
 			context('when the number of users in the ValueChart is decreased to be zero', () => {
 				before(function() {
 					u.valueChart.removeUser(bob);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -323,6 +327,7 @@ var renderEventsServiceStub = {
 		context('when the view orientation is set to be horizontal', () => {
 			before(function() {
 				u.valueChart.setUser(aaron);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				viewConfig.viewOrientation = ChartOrientation.Horizontal
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 10:21:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:27:30
+* @Last Modified time: 2017-06-06 15:52:17
 */
 
 // Import Testing Resources:
@@ -34,6 +34,7 @@ describe('ChangeDetectionService', () => {
 	var parser: WebValueChartsParser;
 	var changeDetectionService: ChangeDetectionService;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
+	var usersToDisplay: User[];
 
 	beforeEach(function() {
 		TestBed.configureTestingModule({
@@ -45,6 +46,8 @@ describe('ChangeDetectionService', () => {
 		parser = new WebValueChartsParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
+
+		usersToDisplay = hotelChart.getUsers();
 
 		viewConfig = {
 			viewOrientation: ChartOrientation.Vertical,
@@ -68,7 +71,7 @@ describe('ChangeDetectionService', () => {
 		height = 10;
 		width = 10;
 
-		changeDetectionService.startChangeDetection(hotelChart, width, height, viewConfig, interactionConfig);
+		changeDetectionService.startChangeDetection(hotelChart, width, height, viewConfig, interactionConfig, usersToDisplay);
 	});
 
 
@@ -93,7 +96,7 @@ describe('ChangeDetectionService', () => {
 
 		context('when the input values are not different from the saved records', () => {
 			it('should detect no changes', () => {
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.false;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.false;
 			});	
 		});
 
@@ -101,13 +104,13 @@ describe('ChangeDetectionService', () => {
 			it('should detect that the ValueChart is different when a small, deep change is made', () => {
 				hotelChart.getAllPrimitiveObjectives()[0].setDescription('A new description');
 
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});
 
 			it('should create an updated record of the ValueChart', () => {
 				hotelChart.getAllPrimitiveObjectives()[0].setDescription('A new description');
 
-				changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false);				
+				changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false);				
 
 				expect(changeDetectionService.valueChartRecord).to.be.deep.equal(hotelChart);
 				expect(changeDetectionService.valueChartRecord).to.not.equal(hotelChart);
@@ -117,7 +120,7 @@ describe('ChangeDetectionService', () => {
 				var bill = new User('Bill');
 				hotelChart.setUser(bill);
 
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});
 
 			it('should detect that the ValueChart is different when a user\'s WeightMap is changed', () => {
@@ -127,7 +130,7 @@ describe('ChangeDetectionService', () => {
 				var area = hotelChart.getAllPrimitiveObjectives()[0].getName();
 				expect(hotelChart.getUsers()[0].getWeightMap().getObjectiveWeight(area)).to.equal(0.2);
 				hotelChart.getUsers()[0].getWeightMap().setObjectiveWeight(area, 0.3);
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});
 		});
 
@@ -138,7 +141,7 @@ describe('ChangeDetectionService', () => {
 				alternatives[0] = alternatives[2];
 				alternatives[2] = temp;
 
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});	
 
 
@@ -153,24 +156,24 @@ describe('ChangeDetectionService', () => {
 				rootObjective.setDirectSubObjectives(children);
 				hotelChart.setRootObjectives([rootObjective]);
 
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});
 		});
 
 		it('should return true when the "renderRequired" parameter is true', () => {
-			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.false;
-			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, true)).to.be.true;
+			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.false;
+			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, true)).to.be.true;
 		});
 
 		context('when the view orientation and or score function display settings have been changed', () => {
 			it('should detect the changes in view orientation', () => {
 				viewConfig.viewOrientation = ChartOrientation.Horizontal;
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});
 
 			it('should detect the changes in score function display', () => {
 				viewConfig.displayScoreFunctions = true;
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, usersToDisplay, false)).to.be.true;
 			});		
 		});
 	});

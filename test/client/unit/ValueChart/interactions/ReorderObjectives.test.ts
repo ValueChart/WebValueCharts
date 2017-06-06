@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 17:39:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:57:25
+* @Last Modified time: 2017-06-06 15:39:33
 */
 
 // Import Testing Resources:
@@ -86,6 +86,7 @@ describe('ReorderObjectivesInteraction', () => {
 		u = {
 			el: null,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,
 			interactionConfig: null,
 			renderRequired: { value: false },

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 13:59:15
+* @Last Modified time: 2017-06-06 14:46:08
 */
 
 // Import Angular Classes:
@@ -10,7 +10,7 @@ import { Injectable } 										from '@angular/core';
 
 // Import Libraries:
 import * as d3 												from 'd3';
-
+import * as _												from 'lodash';
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
 import { Objective }										from '../../../model/Objective';
@@ -74,11 +74,11 @@ export class RendererDataUtility {
 	*/
 	public produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
 		// Return the default WeightMap if there are no users.
-		if (u.valueChart.getUsers().length == 0)
+		if (u.usersToDisplay.length == 0)
 			u.maximumWeightMap = u.valueChart.getDefaultWeightMap();
 		// If there is only one user then the maximum WeightMap is that user's WeightMap
-		else if (u.valueChart.getUsers().length == 1) {
-			u.maximumWeightMap = u.valueChart.getUsers()[0].getWeightMap();
+		else if (u.usersToDisplay.length == 1) {
+			u.maximumWeightMap = u.usersToDisplay[0].getWeightMap();
 		}
 		else 
 		// There is more than one user and the maximum weight must be calculated.
@@ -122,8 +122,8 @@ export class RendererDataUtility {
 		var primitiveObjectives: PrimitiveObjective[] = u.valueChart.getAllPrimitiveObjectives();
 		var combinedWeights: number[] = Array(primitiveObjectives.length).fill(0);
 
-		if (u.valueChart.getUsers()) {
-			u.valueChart.getUsers().forEach((user: User) => {
+		if (u.usersToDisplay) {
+			u.usersToDisplay.forEach((user: User) => {
 				if (user.getWeightMap()) {
 				let objectiveWeights = user.getWeightMap().getObjectiveWeights(primitiveObjectives);
 					for (var i = 0; i < objectiveWeights.length; i++) {
@@ -181,7 +181,7 @@ export class RendererDataUtility {
 	}
 
 	private generateCellData(u: RendererUpdate, objective: PrimitiveObjective): CellData[] {
-		var users: User[] = u.valueChart.getUsers();
+		var users: User[] = u.usersToDisplay;
 
 		var cellData: CellData[] = <any[]> u.valueChart.getAlternativeValuesforObjective(objective);
 

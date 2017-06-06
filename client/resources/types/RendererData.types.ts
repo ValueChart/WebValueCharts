@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:03:25
+* @Last Modified time: 2017-06-06 14:35:56
 */
 
 import * as d3								from 'd3';
@@ -75,6 +75,7 @@ export interface ScoreFunctionDataSummary {
 export interface RendererUpdate {
 	el: d3.Selection<any, any, any, any>;
 	valueChart: ValueChart;
+	usersToDisplay: User[];
 	maximumWeightMap: WeightMap;
 	rowData: RowData[];
 	labelData: LabelData[];

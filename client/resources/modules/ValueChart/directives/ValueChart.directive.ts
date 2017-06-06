@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:25:31
+* @Last Modified time: 2017-06-06 15:12:56
 */
 
 // Import Angular Classes:
@@ -49,7 +49,7 @@ import { User }																	from '../../../model/User';
 import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Types:
-import { RowData, CellData, LabelData }											from '../../../types/RendererData.types';
+import { RowData, CellData, LabelData, RendererUpdate }							from '../../../types/RendererData.types';
 import { ViewConfig, InteractionConfig }										from '../../../types/Config.types';
 
 @Directive({
@@ -92,6 +92,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 	// Chart Inputs:
 	@Input() private valueChart: ValueChart;								// The main data input to the directive.
+	@Input() private usersToDisplay: User[];
 	@Input() private width: number;											// The width of the ValueChart.
 	@Input() private height: number;										// The Height of the ValueChart.
 	@Input() private viewConfig: ViewConfig = <any>{};						// Configuration options for view settings;
@@ -111,7 +112,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	private defaultChartComponentWidth: number;
 	private defaultChartComponentHeight: number;
 
-	public valueChartSubject: Subject<ValueChart>;
+	public valueChartSubject: Subject<RendererUpdate>;
 	public interactionSubject: Subject<InteractionConfig>;
 	public viewConfigSubject: Subject<ViewConfig>;
 
@@ -167,7 +168,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.rendererService.initUserColors(this.valueChart);
 
 		// Initialize Change Detection:
-		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig);
+		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig, this.usersToDisplay);
 
 		this.valueChartSubject 	= new Subject();
 		this.interactionSubject = new Subject();
@@ -204,8 +205,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		var rendererUpdates = new Subject();
 
-		this.valueChartSubject.map((valueChart: ValueChart) => {
-			return { el: this.el, valueChart: valueChart, height: this.defaultChartComponentHeight, width: this.defaultChartComponentWidth, viewConfig: this.viewConfig, interactionConfig: this.interactionConfig, renderRequired: this.renderRequired };
+		this.valueChartSubject.map((u: RendererUpdate) => {
+			 u.el = this.el;
+			 u.height = this.defaultChartComponentHeight;
+			 u.width = this.defaultChartComponentWidth;
+			 u.viewConfig = this.viewConfig;
+			 u.interactionConfig = this.interactionConfig;
+			 u.renderRequired = this.renderRequired 
+
+			 return u;
 		}).map(this.rendererDataUtility.produceMaximumWeightMap)
 			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
@@ -231,7 +239,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		this.waitForRenderers = this.renderEventsService.rendersCompleted.subscribe(this.rendersCompleted);
 
-		this.valueChartSubject.next(this.valueChart);
+		this.valueChartSubject.next(<any> { valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });
 	}
 
 	rendersCompleted = (rendersCompleted: number) => {
@@ -260,10 +268,10 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.isInitialized === undefined)
 			return;
 
-		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.renderRequired.value)) {
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.usersToDisplay, this.renderRequired.value)) {
 			this.renderRequired.value = false;
 			this.rendererService.initUserColors(this.valueChart);
-			this.valueChartSubject.next(this.valueChart);
+			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });
 		}
 
 		if (this.changeDetectionService.detectViewConfigChanges(this.viewConfig))
@@ -275,7 +283,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		if (this.changeDetectionService.detectWidthHeightChanges(this.width, this.height)) {
 			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
 			this.calculateDefaultComponentSize();
-			this.valueChartSubject.next(this.valueChart);
+			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });
 			this.interactionSubject.next(this.interactionConfig);
 		}
 	}

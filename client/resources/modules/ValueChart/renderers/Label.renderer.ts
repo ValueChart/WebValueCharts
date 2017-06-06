@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:06:53
+* @Last Modified time: 2017-06-06 14:46:55
 */
 
 // Import Angular Classes:
@@ -535,7 +535,7 @@ export class LabelRenderer {
 		var scoreFunctions: ScoreFunction[] = [];
 		var colors: string[] = [];
 
-		u.valueChart.getUsers().forEach((user: User) => {
+		u.usersToDisplay.forEach((user: User) => {
 			scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
 			colors.push(user.color);
 		});

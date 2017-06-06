@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:01:32
+* @Last Modified time: 2017-06-06 15:05:19
 */
 
 // Import Angular Classes
@@ -97,11 +97,11 @@ export class SummaryChartRenderer {
 		}
 
 
-		if (this.numUsers != update.valueChart.getUsers().length) {
+		if (this.numUsers != update.usersToDisplay.length) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 		}
 
-		this.numUsers = update.valueChart.getUsers().length;
+		this.numUsers = update.usersToDisplay.length;
 
 		this.updateInteractions(update);
 		this.renderSummaryChart(update);
@@ -462,7 +462,7 @@ export class SummaryChartRenderer {
 		this.scoreTotals.classed(SummaryChartDefinitions.BEST_SCORE, false);
 
 		var maxUserScores: any = {};
-		u.valueChart.getUsers().forEach((user: User) => {
+		u.usersToDisplay.forEach((user: User) => {
 			maxUserScores[user.getUsername()] = -1;
 		});
 
@@ -479,7 +479,7 @@ export class SummaryChartRenderer {
 			}
 		});
 
-		u.valueChart.getUsers().forEach((user: User) => {
+		u.usersToDisplay.forEach((user: User) => {
 			bestTotalScoreSelections[user.getUsername()].classed(SummaryChartDefinitions.BEST_SCORE, true);
 		});
 	}
@@ -566,7 +566,7 @@ export class SummaryChartRenderer {
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.
 	private calculateCellCoordinateOne = (d: CellData, i: number, u: RendererUpdate) => { return i * (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length); };
 	// The width (or height) should be such that the user scores for one cell fill that cell.
-	private calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.valueChart.getUsers().length };
+	private calculateUserScoreDimensionOne = (d: UserScoreData, i: number, u: RendererUpdate) => { return (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / u.usersToDisplay.length };
 	// User score heights (or widths) are proportional to the weight of the objective the score is for, times the score (score * weight).
 	private calculateUserScoreDimensionTwo = (d: UserScoreData, i: number) => {
 		var userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:44:37
+* @Last Modified time: 2017-06-06 15:40:11
 */
 
 // Import Testing Resources:
@@ -72,6 +72,7 @@ describe('SortAlternativesInteraction', () => {
 		u = {
 			el: null,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: null,
 			interactionConfig: null,
 			renderRequired: { value: false },

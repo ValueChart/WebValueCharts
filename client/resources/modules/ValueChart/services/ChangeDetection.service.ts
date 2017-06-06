@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-19 15:10:03
+* @Last Modified time: 2017-06-06 15:04:53
 */
 
 // Import Angular Classes:
@@ -32,7 +32,7 @@ export class ChangeDetectionService {
 	public interactionConfigRecord: InteractionConfig = <any>{};	// Copy of the previous interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
 	public widthRecord: number;										// Copy of the previous width. It should equal the width in ValueChartDirective unless a change has taken place.
 	public heightRecord: number;									// Copy of the previous height. It should equal the height in ValueChartDirective unless a change has taken place.
-
+	public usersToDisplayRecord: User[];							// Copy of the previous list of users (by username) to be hidden.
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -57,13 +57,15 @@ export class ChangeDetectionService {
 		@description	Creates deep copies of the inputs to the ValueChartDirective and saves them into class fields. It should be used to initiate
 						change detection and must be called before the change detection methods in this class. 
 	*/
-	startChangeDetection(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig): void {
+	startChangeDetection(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig, usersToDisplay: User[]): void {
 		this.valueChartRecord = _.cloneDeep(valueChart);
 		this.widthRecord = _.clone(width);
 		this.heightRecord = _.clone(height);
 
 		this.viewConfigRecord = _.cloneDeep(viewConfig);
 		this.interactionConfigRecord = _.cloneDeep(interactionConfig);
+	
+		this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
 	}
 
 	
@@ -79,14 +81,16 @@ export class ChangeDetectionService {
 						if detectChanges has not yet been called. startChangeDetection should be used to initialize change detection before using this method.
 						detectChanges should be used to detect changes that require an entire re-rendering of the ValueChart. 
 	*/
-	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, renderRequired: boolean): boolean {
+	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, usersToDisplay: User[], renderRequired: boolean): boolean {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
+		var usersToDisplayChanged: boolean = usersToDisplay.length !== this.usersToDisplayRecord.length;
 
 		this.valueChartRecord = _.cloneDeep(valueChart);
+		this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
 
-		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
+		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || usersToDisplayChanged || renderRequired;
 	}
 
 	/*

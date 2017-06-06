@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:22:20
+* @Last Modified time: 2017-06-06 15:12:48
 */
 
 // Import Angular Classes:
@@ -12,6 +12,7 @@ import { Router, ActivatedRoute }												from '@angular/router';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
+import * as _																	from 'lodash';
 
 // Import Application Classes:
 import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
@@ -66,15 +67,13 @@ export class ValueChartViewerComponent implements OnInit {
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
-	valueChart: ValueChart;
+	public valueChart: ValueChart;
+	public usersToDisplay: User[];
 
 	// ValueChart Configuration:
-	viewConfig: ViewConfig = <any> {};
-	interactionConfig: InteractionConfig = <any> {};
+	public viewConfig: ViewConfig = <any> {};
+	public interactionConfig: InteractionConfig = <any> {};
 
-	// This gets set each time the "Remove" button for a user is clicked
-	// The user will be removed from chart upon confirmation
-	userToRemove: User;
 
 	// ========================================================================================
 	// 									Constructor
@@ -105,13 +104,14 @@ export class ValueChartViewerComponent implements OnInit {
 		@returns {void}
 		@description 	Initializes the ValueChartViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
 						Calling ngOnInit should be left to Angular. Do not call it manually. All initialization logic for this component should be put in this
-						method rather than in the constructor. Be aware that Angular will NOT call ngOnInit again if the a user navigates to the ValueChartViewer
+					method rather than in the constructor. Be aware that Angular will NOT call ngOnInit again if the a user navigates to the ValueChartViewer
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();
+		this.usersToDisplay = this.valueChart.getUsers();
 
 		if (!this.currentUserService.isJoiningChart()) {
 			this.hostValueChart();
@@ -143,6 +143,10 @@ export class ValueChartViewerComponent implements OnInit {
 
 	updateRenderEvents(renderEvents: RenderEventsService) {
 		this.renderEvents = renderEvents;
+	}
+
+	updateUsersToDisplay(usersToDisplay: User[]): void {
+		this.usersToDisplay = usersToDisplay;
 	}
 
 	/* 	

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:26:44
+* @Last Modified time: 2017-06-06 15:48:54
 */
 
 // Import Testing Resources:
@@ -80,6 +80,7 @@ describe('RendererDataUtility', () => {
 		u = {
 			el: null,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,
 			interactionConfig: interactionConfig,
 			renderRequired: { value: false },
@@ -124,6 +125,7 @@ describe('RendererDataUtility', () => {
 		context('when there are two users in the ValueChart', () => {
 			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the two users to that objective', () => {
 				u.valueChart.setUser(bob);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				var maximumWeightMap = rendererDataUtility['generateMaximumWeightMap'](u);
 
@@ -140,6 +142,7 @@ describe('RendererDataUtility', () => {
 
 			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the three users to that objective', () => {
 				u.valueChart.setUser(bob);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				max = new User('Max');
 				var maxsWeights = new WeightMap();
@@ -153,6 +156,7 @@ describe('RendererDataUtility', () => {
 				max.setWeightMap(maxsWeights);
 
 				u.valueChart.setUser(max);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				var maximumWeightMap = rendererDataUtility['generateMaximumWeightMap'](u);
 
@@ -169,6 +173,7 @@ describe('RendererDataUtility', () => {
 		context('when the ValueChart has no users', () => {
 			it('should return the renderer update with the default weight map attached', () => {
 				u.valueChart.setUsers([]);
+				u.usersToDisplay = u.valueChart.getUsers();
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(u.valueChart.getDefaultWeightMap());
 			});
 		});
@@ -176,6 +181,8 @@ describe('RendererDataUtility', () => {
 		context('when the ValueChart has exactly one user', () => {
 			it('should return the renderer update with that user\'s weight map attached', () => {
 				u.valueChart.setUser(aaron);
+				u.usersToDisplay = u.valueChart.getUsers();
+
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(aaron.getWeightMap());
 			});
 		});
@@ -183,6 +190,8 @@ describe('RendererDataUtility', () => {
 		context('when the chart has more than one user', () => {
 			it('should return the renderer update with the maximumWeightMap as created by generateMaximumWeightMap()',() => {
 				u.valueChart.setUsers([aaron, bob]);
+				u.usersToDisplay = u.valueChart.getUsers();
+
 				expect(rendererDataUtility.produceMaximumWeightMap(u).maximumWeightMap).to.deep.equal(rendererDataUtility['generateMaximumWeightMap'](u));
 			});	
 		});
@@ -195,6 +204,7 @@ describe('RendererDataUtility', () => {
 
 			it('should produce an array of RowData with one row per primitive objective, one cell for each alternative per row, and with two user scores per cell', () => {
 				u.valueChart.setUsers([aaron, bob]);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				u = rendererDataUtility.produceMaximumWeightMap(u);
 				rowData = rendererDataUtility.produceRowData(u).rowData;
@@ -217,6 +227,7 @@ describe('RendererDataUtility', () => {
 			context('when the viewOrientation is vertical', () => {
 				it('should produce an array of RowData with properly computed offsets reversed compared to the order of the rowData', () => {
 					u.valueChart.setUsers([aaron, bob]);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					numAlternatives = u.valueChart.getAlternatives().length;
 					u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -246,6 +257,8 @@ describe('RendererDataUtility', () => {
 
 				it('should produce an array of RowData with computed offsets', () => {
 					u.valueChart.setUsers([aaron, bob]);
+					u.usersToDisplay = u.valueChart.getUsers();
+
 					u.viewConfig.viewOrientation = ChartOrientation.Horizontal
 
 					numAlternatives = u.valueChart.getAlternatives().length;
@@ -278,6 +291,8 @@ describe('RendererDataUtility', () => {
 
 			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the user to the objective', () => {
 				u.valueChart.setUsers([aaron]);
+				u.usersToDisplay = u.valueChart.getUsers();
+
 				rendererDataUtility.produceMaximumWeightMap(u);
 				labelData = rendererDataUtility.produceLabelData(u).labelData;
 
@@ -309,6 +324,8 @@ describe('RendererDataUtility', () => {
 
 			it('should produce label data with one label per objective; each labelDatum\'s weight should be: 1) the sum of the weights of its children; or 2) the weight assigned by the maximumWeightMap to the objective', () => {
 				u.valueChart.setUsers([aaron, bob]);
+				u.usersToDisplay = u.valueChart.getUsers();
+				
 				rendererDataUtility.produceMaximumWeightMap(u);
 				labelData = rendererDataUtility.produceLabelData(u).labelData;
 

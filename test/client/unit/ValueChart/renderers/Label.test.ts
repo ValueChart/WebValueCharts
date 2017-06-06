@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 15:09:21
+* @Last Modified time: 2017-06-06 15:47:40
 */
 
 // Import Testing Resources:
@@ -201,6 +201,7 @@ var chartUndoRedoStub = {
 		u = {
 			el: el,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,
 			interactionConfig: interactionConfig,
 			renderRequired: { value: false },
@@ -266,6 +267,7 @@ var chartUndoRedoStub = {
 					aaron = randomizeUserWeights(aaron, u.valueChart);
 
 					u.valueChart.setUser(aaron);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					viewConfig.displayScoreFunctions = false;
 
@@ -323,6 +325,7 @@ var chartUndoRedoStub = {
 					bob = randomizeUserWeights(bob, u.valueChart);
 					bob.setScoreFunctionMap(aaron.getScoreFunctionMap());
 					u.valueChart.setUser(bob);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceLabelData(u);
@@ -344,6 +347,7 @@ var chartUndoRedoStub = {
 			context('when the number of users in the ValueCHart is decreased to be zero', () => {
 				before(function() {
 					u.valueChart.setUsers([]);
+					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceLabelData(u);
@@ -364,6 +368,7 @@ var chartUndoRedoStub = {
 			before(function() {
 
 				u.valueChart.setUser(aaron);
+				u.usersToDisplay = u.valueChart.getUsers();
 
 				viewConfig.viewOrientation = ChartOrientation.Horizontal
 				u = rendererDataUtility.produceMaximumWeightMap(u);

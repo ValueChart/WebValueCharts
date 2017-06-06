@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 13:53:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:44:51
+* @Last Modified time: 2017-06-06 15:40:12
 */
 
 // Import Testing Resources:
@@ -97,6 +97,7 @@ describe('ResizeWeightsInteraction', () => {
 		u = {
 			el: null,
 			valueChart: hotelChart,
+			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,
 			interactionConfig: interactionConfig,
 			renderRequired: { value: false },
