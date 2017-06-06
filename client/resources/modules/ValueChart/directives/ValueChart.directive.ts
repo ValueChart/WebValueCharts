@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:25:31
+* @Last Modified time: 2017-06-05 18:13:09
 */
 
 // Import Angular Classes:
@@ -17,7 +17,6 @@ import { Observable }															from 'rxjs/Observable';
 import { Subscription } 														from 'rxjs/Subscription';
 import { Subject }																from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
-
 
 // Import Application Classes:
 // Services:
@@ -49,7 +48,7 @@ import { User }																	from '../../../model/User';
 import { ScoreFunction }														from '../../../model/ScoreFunction';
 
 // Import Types:
-import { RowData, CellData, LabelData }											from '../../../types/RendererData.types';
+import { RowData, CellData, LabelData, RendererUpdate }							from '../../../types/RendererData.types';
 import { ViewConfig, InteractionConfig }										from '../../../types/Config.types';
 
 @Directive({
@@ -209,16 +208,19 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}).map(this.rendererDataUtility.produceMaximumWeightMap)
 			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
-			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(rendererUpdates);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceSummaryChartConfig)
+			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.objectiveChartRenderer.valueChartChanged);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.labelRenderer.valueChartChanged)
 
 		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:01:32
+* @Last Modified time: 2017-06-05 18:24:01
 */
 
 // Import Angular Classes
@@ -292,9 +292,9 @@ export class SummaryChartRenderer {
 		this.chart
 			.attr('transform', () => {
 				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.offset);
 				else
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
+					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10 + u.offset);
 			});
 
 		// Give the proper width and height to the chart outline. 

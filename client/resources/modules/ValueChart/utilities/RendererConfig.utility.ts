@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:07:56
+* @Last Modified time: 2017-06-05 18:20:19
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import * as _														from 'lodash';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
@@ -19,7 +20,7 @@ import { ValueChart }												from '../../../model/ValueChart';
 import { ViewConfig }												from '../../../types/Config.types';
 import { RendererConfig, RendererUpdate }							from '../../../types/RendererData.types';
 
-import { ChartOrientation }									from '../../../types/Config.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 
@@ -95,4 +96,27 @@ export class RendererConfigUtility {
 		return u;
 	}
 
+	produceSummaryChartConfig(u: RendererUpdate): RendererUpdate {
+		u = _.clone(u); 
+		u.offset = {};
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			let maxHeight = u.height;
+			let height = u.height / u.maximumWeightMap.getWeightTotal(); 
+			u.offset = maxHeight - height; 
+			u.height = height;
+		} else {
+			let maxWidth = u.width;
+			let width = u.width / u.maximumWeightMap.getWeightTotal(); 
+			u.offset = maxWidth - width; 
+			u.width = width;
+		}
+
+		 return u;
+	}
 }
+
+
+
+
+
