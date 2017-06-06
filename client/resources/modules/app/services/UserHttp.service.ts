@@ -125,24 +125,24 @@ export class UserHttpService {
 
 	/*
 		@param username - The username of the user whose ValueCharts should be retrieved. 
-		@returns {Observable<any[]>} - An observable of an array of summaries of the ValueCharts belonging to the given username.
+		@returns {Observable<any[]>} - An observable of an array of summaries of the ValueCharts created by the given username.
 		@description 	Sends a request to the server to retrieve summaries of the given user's ValueCharts. Note that this method does NOT
 						return the entire ValueCharts, just summaries of them.
 	*/
-	getUserValueCharts(username: string): Observable<any[]> {
-		return this.http.get(this.usersUrl + username + '/ValueCharts')
+	getOwnedValueCharts(username: string): Observable<any[]> {
+		return this.http.get(this.usersUrl + username + '/OwnedValueCharts')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}
 
 		/*
 		@param username - The username of the user whose ValueChart memberships should be retrieved. 
-		@returns {Observable<any[]>} - An observable of an array of summaries of the ValueCharts that the specified user belongs to.
+		@returns {Observable<any[]>} - An observable of an array of summaries of the ValueCharts that the specified user is a member of.
 		@description 	Sends a request to the server to retrieve summaries of the given user's ValueChart memberships. Note that this method does NOT
 						return the entire ValueCharts, just summaries of them.
 	*/
-	getUserValueChartMemberships(username: string): Observable<any[]> {
-		return this.http.get(this.usersUrl + username + '/ValueChartMemberships')
+	getJoinedValueCharts(username: string): Observable<any[]> {
+		return this.http.get(this.usersUrl + username + '/JoinedValueCharts')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

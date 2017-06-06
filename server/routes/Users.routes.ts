@@ -107,9 +107,9 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 	});
 });
 
-// Get summaries of all of a user's ValueCharts. These are just summaries, rather than full ValueCharts.
-// This endpoint will return summaries of all ValueChart's whose creator field equals the user parameter in the route.
-usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+// Get summaries of all ValueCharts the user created. These are just summaries, rather than full ValueCharts.
+// This endpoint will return summaries of all ValueCharts whose creator field equals the user parameter in the route.
+usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var username = req.params.user;	
 
@@ -128,7 +128,7 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
 				});
 				res.status(200)
-					.location('/Users/' + username + '/ValueCharts')
+					.location('/Users/' + username + '/OwnedValueCharts')
 					.json({ data: vcSummaries });
 			} else {
 				res.status(404).send('Not Found');
@@ -138,8 +138,8 @@ usersRoutes.get('/:user/ValueCharts', function(req: express.Request, res: expres
 });
 
 // Get summaries of all ValueCharts the user is a member of. These are just summaries, rather than full ValueCharts.
-// This endpoint will return summaries of all ValueChart's whose members contain the user parameter in the route.
-usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+// This endpoint will return summaries of all ValueCharts whose members contain the user parameter in the route.
+usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var username = req.params.user;	
 
@@ -154,13 +154,11 @@ usersRoutes.get('/:user/ValueChartMemberships', function(req: express.Request, r
 			} else if (docs) {
 				var vcSummaries: any[] = [];
 				docs.forEach((doc: any) => {
-					// Exclude charts that the user owns
-					if (doc.creator !== username) {
-						vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
-					}		
+					// Create a summary object from the ValueChart.
+					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });	
 				});
 				res.status(200)
-					.location('/Users/' + username + '/ValueChartMemberships')
+					.location('/Users/' + username + '/JoinedValueCharts')
 					.json({ data: vcSummaries });
 			} else {
 				res.status(404).send('Not Found');

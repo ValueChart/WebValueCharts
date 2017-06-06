@@ -86,14 +86,14 @@ export class MyValueChartsComponent implements OnInit {
 	*/
 	ngOnInit() {
 		//	Retrieve summary objects for all of the ValueCharts created by the current user.
-		this.userHttpService.getUserValueCharts(this.currentUserService.getUsername())
+		this.userHttpService.getOwnedValueCharts(this.currentUserService.getUsername())
 			.subscribe(
 			valueChartOwnerships => {
 				this.valueChartOwnerships = valueChartOwnerships;
 			});
 
 		//	Retrieve summary objects for all of the ValueCharts the current user is a member of.
-		this.userHttpService.getUserValueChartMemberships(this.currentUserService.getUsername())
+		this.userHttpService.getJoinedValueCharts(this.currentUserService.getUsername())
 			.subscribe(
 			valueChartMemberships => {
 				this.valueChartMemberships = valueChartMemberships;
