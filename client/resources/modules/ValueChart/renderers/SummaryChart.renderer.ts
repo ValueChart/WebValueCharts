@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 18:24:01
+* @Last Modified time: 2017-06-06 12:26:54
 */
 
 // Import Angular Classes
@@ -512,6 +512,14 @@ export class SummaryChartRenderer {
 					return d.objective.getColor();
 				else
 					return d.user.color;
+			})
+			.style('stroke-dasharray', (d: UserScoreData, i: number) => { 
+				let dimensionOne = Math.max(this.calculateUserScoreDimensionOne(d, i, u) - this.USER_SCORE_SPACING, 0);
+				let dimensionTwo = this.calculateUserScoreDimensionTwo(d, i);
+				if (u.viewConfig.viewOrientation == ChartOrientation.Vertical)
+					return 0 + ', ' + (dimensionOne + dimensionTwo) + ', ' + dimensionOne + ', ' + 0;
+				else 
+					return 0 + ', ' + (2 * dimensionTwo + dimensionOne) + ', ' + dimensionOne + ', ' + 0;
 			});
 
 		userScores.attr(u.rendererConfig.coordinateTwo, (d: UserScoreData, i: number) => {
