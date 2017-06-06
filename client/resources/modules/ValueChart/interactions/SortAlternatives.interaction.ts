@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 11:21:22
+* @Last Modified time: 2017-06-05 17:15:17
 */
 
 // Import Angular Classes:
@@ -221,13 +221,13 @@ export class SortAlternativesInteraction {
 		this.alternativeBox = d3.select((<any>d3.event).sourceEvent.target)
 		this.alternativeDimensionOneSize = +this.alternativeBox.attr(this.lastRendererUpdate.rendererConfig.dimensionOne);
 
-		this.siblingBoxes = d3.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE);
+		this.siblingBoxes = this.lastRendererUpdate.el.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE);
 
-		this.cellsToMove = d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getId() + '"]');
-		this.alternativeLabelToMove = d3.select('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getId() + '"]');
-		this.totalScoreLabelToMove = d3.select('.' + SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getId() + '"]');
+		this.cellsToMove = this.lastRendererUpdate.el.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL + '[alternative="' + d.getId() + '"]');
+		this.alternativeLabelToMove = this.lastRendererUpdate.el.select('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL + '[alternative="' + d.getId() + '"]');
+		this.totalScoreLabelToMove = this.lastRendererUpdate.el.select('.' + SummaryChartDefinitions.SCORE_TOTAL_SUBCONTAINER + '[alternative="' + d.getId() + '"]');
 
-		d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
+		this.lastRendererUpdate.el.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 0.25);
 		this.cellsToMove.style('opacity', 1);
 
 		for (var i = 0; i < this.lastRendererUpdate.valueChart.getAlternatives().length; i++) {
@@ -277,7 +277,7 @@ export class SortAlternativesInteraction {
 		if (this.totalCoordOneChange > 0)
 			this.newAlternativeIndex--;
 
-		d3.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.lastRendererUpdate.rendererConfig.coordinateOne, currentCoordOne + deltaCoordOne);
+		this.lastRendererUpdate.el.selectAll('.' + SummaryChartDefinitions.CHART_ALTERNATIVE + '[alternative="' + d.getId() + '"]').attr(this.lastRendererUpdate.rendererConfig.coordinateOne, currentCoordOne + deltaCoordOne);
 
 		this.cellsToMove.nodes().forEach((cell: Element) => {
 			var cellSelection: d3.Selection<any, any, any, any> = d3.select(cell);
@@ -306,7 +306,7 @@ export class SortAlternativesInteraction {
 			this.lastRendererUpdate.renderRequired.value = true;
 		}
 
-		d3.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 1);
+		this.lastRendererUpdate.el.selectAll('.' + ObjectiveChartDefinitions.CHART_CELL).style('opacity', 1);
 	}
 
 

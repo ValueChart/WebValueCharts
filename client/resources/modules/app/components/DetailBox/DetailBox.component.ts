@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:31:10
+* @Last Modified time: 2017-06-05 17:31:05
 */
 
 // Import Angular Classes:
@@ -44,6 +44,7 @@ export class DetailBoxComponent implements OnInit {
 	// ========================================================================================
 
 	@Input() valueChart: ValueChart;
+	@Input() chartElement: d3.Selection<any, any, any, any>;
 	@Input() enableManagement: boolean
 	@Input() viewConfig: ViewConfig;
 	@Input() width: number;
@@ -137,12 +138,11 @@ export class DetailBoxComponent implements OnInit {
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
 	linkAlternativeLabelsToDetailBox = () => {
-		d3.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
+		this.chartElement.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 					.classed('alternative-link', true);
 
-		document.querySelector('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).addEventListener('click', (eventObject: Event) => {
-			var selection: d3.Selection<any, any, any, any> = d3.select(<any> eventObject.target);
-			this.expandAlternative(selection.datum());
+		this.chartElement.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL).on('click', (d: Alternative) => {
+			this.expandAlternative(d);
 		});
 	};
 

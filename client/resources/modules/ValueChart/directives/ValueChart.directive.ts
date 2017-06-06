@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 21:48:49
+* @Last Modified time: 2017-06-05 17:25:31
 */
 
 // Import Angular Classes:
@@ -98,6 +98,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() private interactionConfig: InteractionConfig = <any>{};		// Configuration options for user interactions.
 
 	// Chart Outputs:
+	@Output() chartElement: EventEmitter<d3.Selection<any, any, any, any>> = new EventEmitter();
 	@Output() undoRedo: EventEmitter<ChartUndoRedoService> = new EventEmitter();		// Output the ChartUndoRedoService so that external modules may interface with it.
 	@Output() renderEvents: EventEmitter<RenderEventsService> = new EventEmitter();			// Output the renderEventsService so that external modules may listen to render events.
 
@@ -198,6 +199,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.classed('ValueChart svg-content-valuechart', true)
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
+
+		this.chartElement.emit(this.el);
 
 		var rendererUpdates = new Subject();
 

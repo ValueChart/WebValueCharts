@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:18:14
+* @Last Modified time: 2017-06-05 17:12:21
 */
 
 // Import Angular Classes:
@@ -55,11 +55,11 @@ export class ResizeWeightsInteraction {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
-
 	public lastRendererUpdate: RendererUpdate;
 
 	private resizeType: WeightResizeType; // The type of Weight Resizing that is currently enabled. 
 
+	private labelRootContainer: d3.Selection<any,any,any,any>;
 	private clicks: Observable<Event>;
 	private onClick: Subscription;
 	// ========================================================================================
@@ -136,7 +136,8 @@ export class ResizeWeightsInteraction {
 						resizeType of 'siblings' turns on dragging the divider between two objective labels to modify the weights of ALL
 						siblings of the two objectives (ie, labels at the same level of the hierarchy with the same parents).
 	*/
-	public toggleDragToResizeWeights(resizeType: WeightResizeType, rootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {		
+	public toggleDragToResizeWeights(resizeType: WeightResizeType, labelRootContainer: d3.Selection<any, any, any, any>, rendererUpdate: RendererUpdate): void {		
+		this.labelRootContainer = labelRootContainer;
 		this.lastRendererUpdate = rendererUpdate;
 
 		var dragToResizeWeights: d3.DragBehavior<any, any, any> = d3.drag();
@@ -147,8 +148,8 @@ export class ResizeWeightsInteraction {
 				.on('drag', this.resizeWeights);
 		}
 
-		if (rootContainer) {
-			var labelSpaces = rootContainer.selectAll('g[parent="' + LabelDefinitions.ROOT_CONTAINER_NAME + '"]');
+		if (labelRootContainer) {
+			var labelSpaces = labelRootContainer.selectAll('g[parent="' + LabelDefinitions.ROOT_CONTAINER_NAME + '"]');
 			this.toggleResizingForSublabels(labelSpaces, dragToResizeWeights, resizeType);
 		}
 	}
@@ -174,7 +175,7 @@ export class ResizeWeightsInteraction {
 			if (labelDatum.depthOfChildren === 0)	// This label has no child labels.
 				return;
 
-			let subLabelSpaces: d3.Selection<any, any, any, any> = d3.select('.' + LabelDefinitions.ROOT_CONTAINER)
+			let subLabelSpaces: d3.Selection<any, any, any, any> = labelSpaces
 				.selectAll('g[parent="' + labelDatum.objective.getId() + '"]');	// Get all sub label containers whose parent is the current label
 
 			this.toggleResizingForSublabels(subLabelSpaces, dragToResizeWeights, resizeType);	// Toggle dragging for the sub labels.
@@ -197,9 +198,9 @@ export class ResizeWeightsInteraction {
 		// Use the dimensionTwo scale to convert the drag distance to a change in weight.
 		var deltaWeight: number = this.lastRendererUpdate.rendererConfig.dimensionTwoScale.invert(-1 * (<any>d3.event)['d' + this.lastRendererUpdate.rendererConfig.coordinateTwo]);
 
-		var container: d3.Selection<any, any, any, any> = d3.select('#label-' + d.objective.getId() + '-container');
+		var container: d3.Selection<any, any, any, any> = this.labelRootContainer.select('#label-' + d.objective.getId() + '-container');
 		var parentName = (<Element>container.node()).getAttribute('parent');
-		var parentContainer: d3.Selection<any, any, any, any> = d3.select('#label-' + parentName + '-container');
+		var parentContainer: d3.Selection<any, any, any, any> = this.labelRootContainer.select('#label-' + parentName + '-container');
 		var siblings: LabelData[] = (<LabelData>parentContainer.datum()).subLabelData;
 		var combinedWeight: number = (<LabelData>parentContainer.datum()).weight;
 

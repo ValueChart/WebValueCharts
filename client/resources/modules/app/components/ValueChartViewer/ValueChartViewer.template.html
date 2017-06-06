@@ -62,7 +62,8 @@
 	[viewConfig]="viewConfig" 
 	[height]="valueChartHeight / 4" 
 	[width]="valueChartWidth / 3"
-	[renderEventsService]="renderEvents">
+	[renderEventsService]="renderEvents"
+	[chartElement]="chartElement">
 	</DetailBox>
 	<div>
 		<ValueChart
@@ -71,6 +72,7 @@
 		[height]="valueChartHeight"
 		[viewConfig]="viewConfig"
 		[interactionConfig]="interactionConfig"
+		(chartElement)="updateChartElement($event)"
 		(undoRedo)="updateUndoRedo($event)"
 		(renderEvents)="updateRenderEvents($event)">
 		</ValueChart>

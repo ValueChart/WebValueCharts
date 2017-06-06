@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 17:55:41
+* @Last Modified time: 2017-06-05 17:22:20
 */
 
 // Import Angular Classes:
@@ -62,6 +62,7 @@ export class ValueChartViewerComponent implements OnInit {
 	public valueChartWidth: number;
 	public valueChartHeight: number;
 
+	public chartElement: d3.Selection<any, any, any, any>;
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
@@ -134,6 +135,10 @@ export class ValueChartViewerComponent implements OnInit {
 
 		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
 		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
+	}
+
+	updateChartElement(chartElement: d3.Selection<any, any, any, any>) {
+		this.chartElement = chartElement;
 	}
 
 	updateRenderEvents(renderEvents: RenderEventsService) {

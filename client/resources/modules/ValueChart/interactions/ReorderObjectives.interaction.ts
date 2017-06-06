@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-17 09:05:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 17:48:12
+* @Last Modified time: 2017-06-05 17:07:53
 */
 
 // Import Angular Classes:
@@ -131,7 +131,7 @@ export class ReorderObjectivesInteraction {
 		this.reorderObjectiveMouseOffset = undefined;		// Offset of the mouse from the Coordinate Two position of the label that is to be dragged. 
 		this.totalCoordTwoChange = 0;						// The Coordinate Two distance that the label has been moved so far.
 
-		this.containerToReorder = d3.select('#label-' + d.objective.getId() + '-container');			// The container that holds the label being reordered.
+		this.containerToReorder = this.labelRootContainer.select('#label-' + d.objective.getId() + '-container');			// The container that holds the label being reordered.
 		this.parentObjectiveName = (<Element>this.containerToReorder.node()).getAttribute('parent');	// The name of the parent objective for the label being reordered.
 
 		// If the selected label is the root label, then it is not possible to reorder, and all further drag events for this selection should be ignored.
@@ -142,7 +142,7 @@ export class ReorderObjectivesInteraction {
 
 		this.chartUndoRedoService.saveObjectivesRecord(this.lastRendererUpdate.valueChart.getRootObjectives());
 
-		this.parentContainer = d3.select('#label-' + this.parentObjectiveName + '-container');							// The container that holds the container for the label being reordered.
+		this.parentContainer = this.labelRootContainer.select('#label-' + this.parentObjectiveName + '-container');							// The container that holds the container for the label being reordered.
 		this.siblingContainers = this.parentContainer.selectAll('g[parent="' + this.parentObjectiveName + '"]');		// The selection of label containers s.t. every label container is at the same level as containerToReorder, with the same parent.
 		// Note: siblingsConatiners includes containerToReorder.
 		// Set all the siblings that are NOT being moved to be partially transparent.
@@ -258,7 +258,7 @@ export class ReorderObjectivesInteraction {
 		}
 
 		// Select all the label data, not just the siblings of the label we moved.
-		var labelData: LabelData[] = <any> d3.select('g[parent=' + LabelDefinitions.ROOT_CONTAINER_NAME + ']').data();
+		var labelData: LabelData[] = <any> this.labelRootContainer.select('g[parent=' + LabelDefinitions.ROOT_CONTAINER_NAME + ']').data();
 
 
 		// Re-arrange the rows of the objective and summary charts according to the new objective ordering. Note this triggers change detection in ValueChartDirective that 
