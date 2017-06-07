@@ -83,8 +83,12 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		// Determine the destination based on whether (<any> window).destination is set.
 		var destination: string = (<any> window).destination ? (<any> window).destination : window.location.pathname;
 
-		// Allow navigation away from component if allowedToNavigate is true, or if the destination is one of the allowed routes.
-		if (component.allowedToNavigate || destination.indexOf('/view/') !== -1 ) {
+		// Allow navigation away from component if:
+		//	(1) allowedToNavigate is true
+		//	(2) the destination is ValueChartViewer
+		//	(3) 'purpose' is anything other than newChart (no need to prompt if user is editing or joining)
+		if (component.allowedToNavigate || destination.indexOf('/view/') !== -1 
+			|| window.location.pathname.indexOf('/createValueChart/newChart') === -1) {
 			return true;
 		}		
 		else {
