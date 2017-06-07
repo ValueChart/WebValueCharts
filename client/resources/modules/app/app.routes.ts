@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 10:57:30
+* @Last Modified time: 2017-06-07 14:39:45
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -24,6 +24,7 @@ import { JoinGuardService }											from './services/JoinGuard.service';
 import { CreationStepsService }										from '../create/services/CreationSteps.service';
 import { ValidationService }										from './services/Validation.service';
 import { HostService }												from './services/Host.service';
+import { DisplayedUsersService }									from './services/DisplayedUsers.service';
 
 
 /*
@@ -59,7 +60,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService, ValueChartService, CreationStepsService, ValidationService, HostService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, ValueChartHttpService, ValueChartService, DisplayedUsersService, CreationStepsService, ValidationService, HostService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.

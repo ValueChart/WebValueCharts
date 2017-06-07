@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:02:50
+* @Last Modified time: 2017-06-07 14:30:19
 */
 	
 // Import Model Classes:
@@ -280,8 +280,11 @@ export class ValueChart {
 		}
 	}
 
-	removeUser(user: User): void {
-		var index: number = this.users.indexOf(user);
+	removeUser(userToDelete: User): void {
+		var index: number = this.users.findIndex((currentUser: User) => {
+				return userToDelete.getUsername() === currentUser.getUsername();
+			});
+
 		if (index !== -1) {
 			this.users.splice(index, 1);
 		}

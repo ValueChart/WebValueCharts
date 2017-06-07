@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:25:00
+* @Last Modified time: 2017-06-07 14:34:52
 */
 
 // Import Angular Classes:
@@ -18,6 +18,7 @@ import { ObjectiveChartDefinitions }											from '../../../ValueChart/definit
 
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { HostService }															from '../../services/Host.service';
+import { DisplayedUsersService }													from '../../services/DisplayedUsers.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 
@@ -51,16 +52,12 @@ export class DetailBoxComponent implements OnInit {
 	@Input() width: number;
 	@Input() height: number;
 
-	// Outputs
-	@Output() usersToDisplay: EventEmitter<User[]> = new EventEmitter();
-
 	private subscription: Subscription;
 
 	public detailBoxAlternativeTab: string;
 	private alternativeObjectives: string[];
 	private alternativeObjectiveValues: (string | number)[];
 
-	public displayedUsers: User[];
 	public userToRemove: User;
 
 	public detailBoxCurrentTab: string;
@@ -77,20 +74,18 @@ export class DetailBoxComponent implements OnInit {
 
 	constructor(
 		private valueChartHttpService: ValueChartHttpService,
-		private hostService: HostService) { }
+		private hostService: HostService,
+		private displayedUsersService: DisplayedUsersService) { }
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
 
 	ngOnInit(): void {
-		this.displayedUsers = this.valueChart.getUsers();
 		this.detailBoxCurrentTab = this.DETAIL_BOX_CHART_TAB;
 		this.detailBoxAlternativeTab = 'Alternatives';
 		this.alternativeObjectives = [];
 		this.alternativeObjectiveValues = [];
-
-		this.usersToDisplay.emit(this.displayedUsers);
 	}
 
 
@@ -122,19 +117,10 @@ export class DetailBoxComponent implements OnInit {
 
 	changeDisplayedUsers(user: User, eventObject: Event): void {
 		if ((<HTMLInputElement> eventObject.target).checked) {
-			this.displayedUsers.push(user);
-			let indices: any = {};
-			this.valueChart.getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
-
-			this.displayedUsers.sort((a: User, b: User) => {
-				return indices[a.getUsername()] < indices[b.getUsername()] ? -1 : 1;
-			});
+			this.displayedUsersService.addUserToDisplay(user);
 		} else {
-			this.displayedUsers = this.displayedUsers.filter((displayedUser: User) => {
-				return displayedUser.getUsername() !== user.getUsername();
-			});
+			this.displayedUsersService.removeUserToDisplay(user.getUsername());
 		}
-		this.usersToDisplay.emit(this.displayedUsers);
 	}
 
 	/* 	

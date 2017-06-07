@@ -2,13 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 22:45:01
+* @Last Modified time: 2017-06-07 14:48:55
 */
 
 import { Injectable } 												from '@angular/core';
 
 // Import Application Classes:
 import { ValueChartService }										from './ValueChart.service';
+import { DisplayedUsersService }									from './DisplayedUsers.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:
@@ -55,7 +56,7 @@ export class HostService {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService) {
+	constructor(private valueChartService: ValueChartService, private displayedUsersService: DisplayedUsersService) {
 		this.valueChartParser = new JsonValueChartParser();
 	}
 
@@ -127,17 +128,21 @@ export class HostService {
 
 			// A new user has joined the hosted ValueChart. 
 			case MessageType.UserAdded:
-				var newUser: User = this.valueChartParser.parseUser(hostMessage.data);
+				let newUser: User = this.valueChartParser.parseUser(hostMessage.data);
 				this.valueChartService.getValueChart().setUser(newUser);
+				this.displayedUsersService.addUserToDisplay(newUser);
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
 
 			// An existing user has resubmitted their preferences.
 			case MessageType.UserChanged:
-				var updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
+				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
 
 				this.valueChartService.getValueChart().setUser(updatedUser);
+				
+				if (this.displayedUsersService.isUserDisplayed(updatedUser))
+					this.displayedUsersService.addUserToDisplay(updatedUser);
 
 				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 
@@ -145,11 +150,13 @@ export class HostService {
 
 			// A user has been deleted from the ValueChart.
 			case MessageType.UserRemoved:
-				var userToDelete: string = hostMessage.data;
+				let userToDelete: string = hostMessage.data;
 
-				var userIndex: number = this.valueChartService.getValueChart().getUsers().findIndex((user: User) => {
+				let userIndex: number = this.valueChartService.getValueChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
+				this.displayedUsersService.removeUserToDisplay(userToDelete);
+
 				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');

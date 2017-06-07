@@ -65,7 +65,7 @@ describe('View Existing Chart Page', () => {
 		expect(passwordField.getAttribute('value')).to.eventually.equal('0');	
 		
 		// Click to view value chart "Cities"
-		let continueBtn = p.element.all(by.buttonText('Continue'));	
+		let continueBtn = p.element.all(p.by.buttonText('Continue'));	
 		continueBtn.click().then(function() {
 			// Notification "Invalid Name or Password" appears
 			var InvalidNameOrPwSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Invalid Name or Password'));
@@ -96,7 +96,7 @@ describe('View Existing Chart Page', () => {
 			expect(passwordField.getAttribute('value')).to.eventually.equal('0');
 			
 			// Click "Continue" to view value chart "Cities"
-			let continueBtn = p.element.all(by.buttonText('Continue'));
+			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 			});
@@ -124,7 +124,7 @@ describe('View Existing Chart Page', () => {
 			expect(passwordField.getAttribute('value')).to.eventually.equal('t');
 			
 			// Click "Continue" to view value chart "Cities"
-			let continueBtn = p.element.all(by.buttonText('Continue'));
+			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/testemp');
 			});
@@ -177,7 +177,7 @@ describe('View Existing Chart Page', () => {
 			expect(passwordField.getAttribute('value')).to.eventually.equal('australia');
 			
 			// Click "Continue" to view value chart "Cities"
-			let continueBtn = p.element.all(by.buttonText('Continue'));
+			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/Cities');
 			});

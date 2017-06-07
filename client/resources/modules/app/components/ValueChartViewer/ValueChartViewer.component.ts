@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:12:48
+* @Last Modified time: 2017-06-07 15:03:49
 */
 
 // Import Angular Classes:
@@ -22,6 +22,7 @@ import { ValueChartDirective }													from '../../../ValueChart/directives/
 
 import { CurrentUserService }													from '../../services/CurrentUser.service';
 import { ValueChartService }													from '../../services/ValueChart.service';
+import { DisplayedUsersService }												from '../../services/DisplayedUsers.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
@@ -89,6 +90,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private route: ActivatedRoute,
 		public currentUserService: CurrentUserService,
 		public valueChartService: ValueChartService,
+		public displayedUsersService: DisplayedUsersService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService) { }
 
@@ -111,7 +113,8 @@ export class ValueChartViewerComponent implements OnInit {
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();
-		this.usersToDisplay = this.valueChart.getUsers();
+		this.displayedUsersService.setUsersToDisplay(this.valueChartService.getValueChart().getUsers());
+		this.usersToDisplay = this.displayedUsersService.getUsersToDisplay();
 
 		if (!this.currentUserService.isJoiningChart()) {
 			this.hostValueChart();
@@ -143,10 +146,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	updateRenderEvents(renderEvents: RenderEventsService) {
 		this.renderEvents = renderEvents;
-	}
-
-	updateUsersToDisplay(usersToDisplay: User[]): void {
-		this.usersToDisplay = usersToDisplay;
 	}
 
 	/* 	

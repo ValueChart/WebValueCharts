@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:26:45
+* @Last Modified time: 2017-06-07 14:34:31
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -55,6 +55,7 @@ describe('RendererConfigUtility', () => {
 			height: height,
 			el: null,
 			valueChart: null,
+			usersToDisplay: null,
 			interactionConfig: null,
 			renderRequired: { value: false },
 			maximumWeightMap: new WeightMap(),
