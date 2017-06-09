@@ -10,14 +10,16 @@
 						<th>Password</th>
 						<th>Number of Users</th>
 						<th>Creation</th>
+						<th>User Changes</th>
 					</thead>
 					<tbody>
 						<tr *ngFor="let chartSummary of valueChartOwnerships; let i = index ">
 							<th score="row">{{i + 1}}</th>
 							<td>{{chartSummary.name}}</td>
 							<td>{{chartSummary.password}}</td>
-							<td>{{chartSummary.numUsers}}</td>
+							<td>{{chartSummary.users.length}}</td>
 							<td>{{getStatusText(chartSummary)}}</td>
+							<td>{{chartSummary.locked ? 'Prevented': 'Allowed'}}</td>
 							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="editValueChart(chartSummary._id, chartSummary.password)">Edit</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="setValueChart(chartSummary._id, chartSummary.password)" data-toggle="modal" data-target="#export-modal">Export</button></td>
@@ -37,14 +39,16 @@
 						<th>Password</th>
 						<th>Number of Users</th>
 						<th>Creation</th>
+						<th>User Changes</th>
 					</thead>
 					<tbody>
 						<tr *ngFor="let chartSummary of valueChartMemberships; let i = index ">
 							<th score="row">{{i + 1}}</th>
 							<td>{{chartSummary.name}}</td>
 							<td>{{chartSummary.password}}</td>
-							<td>{{chartSummary.numUsers}}</td>
+							<td>{{chartSummary.users.length}}</td>
 							<td>{{getStatusText(chartSummary)}}</td>
+							<td>{{chartSummary.locked ? 'Prevented': 'Allowed'}}</td>
 							<td><button class="btn btn-sm btn-default" (click)="editPreferences(chartSummary._id, chartSummary.password)">Edit Preferences</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="setValueChart(chartSummary._id, chartSummary.password)" data-toggle="modal" data-target="#leave-modal">Leave Chart</button></td>
 						</tr>

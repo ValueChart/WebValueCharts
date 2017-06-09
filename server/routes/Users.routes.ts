@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 12:20:56
+* @Last Modified time: 2017-06-08 21:54:25
 */
 
 // Import Libraries and Express Middleware:
@@ -110,7 +110,7 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 // Get summaries of all ValueCharts the user created. These are just summaries, rather than full ValueCharts.
 // This endpoint will return summaries of all ValueCharts whose creator field equals the user parameter in the route.
 usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
 	var username = req.params.user;	
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
@@ -122,14 +122,9 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
-				var vcSummaries: any[] = [];
-				docs.forEach((doc: any) => {
-					// Create a summary object from the ValueChart.
-					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });
-				});
 				res.status(200)
 					.location('/Users/' + username + '/OwnedValueCharts')
-					.json({ data: vcSummaries });
+					.json({ data: docs });
 			} else {
 				res.status(404).send('Not Found');
 			}
@@ -140,26 +135,21 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 // Get summaries of all ValueCharts the user is a member of. These are just summaries, rather than full ValueCharts.
 // This endpoint will return summaries of all ValueCharts whose members contain the user parameter in the route.
 usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
 	var username = req.params.user;	
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
 		res.status(401).send('Unauthorized');	
 	} else {
-		valueChartCollection.find({ "users.username": username }, function(err: Error, docs: any[]) {
+		valueChartCollection.find({ "users": username }, function(err: Error, docs: any[]) {
 			if (err) {
 				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
-				var vcSummaries: any[] = [];
-				docs.forEach((doc: any) => {
-					// Create a summary object from the ValueChart.
-					vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: doc.incomplete });	
-				});
 				res.status(200)
 					.location('/Users/' + username + '/JoinedValueCharts')
-					.json({ data: vcSummaries });
+					.json({ data: docs });
 			} else {
 				res.status(404).send('Not Found');
 			}
