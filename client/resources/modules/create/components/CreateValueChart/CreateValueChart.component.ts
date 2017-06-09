@@ -106,8 +106,8 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.purpose === "newChart") {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
-			(<any>valueChart).incomplete = true; // Initialize ValueChart to incomplete
-			this.valueChartService.setValueChart(valueChart); // Set the chart
+
+			this.valueChartService.setValueChart(valueChart); 
 		}
 		this.valueChart = this.valueChartService.getValueChart();
 	}
@@ -122,10 +122,19 @@ export class CreateValueChartComponent implements OnInit {
 		this.sub.unsubscribe();	
 
 		// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
-		(<any>this.valueChart).incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
+		var incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
 			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 		
+		let status: any = {};
+		
+		status.userChangesPermitted = true;
+		status.incomplete = incomplete;
+		status.name = this.valueChart.getName();
+		status.fname = this.valueChart.getFName();
+		status.chartId = this.valueChart._id;
+
 		if (this.saveOnDestroy) {
+			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			this.autoSaveValueChart();
 		}
 	}
@@ -162,7 +171,7 @@ export class CreateValueChartComponent implements OnInit {
 	next(browserTriggered = false) {
 		if (this.creationStepsService.validate()) {
 			if (this.creationStepsService.step === this.creationStepsService.BASICS && this.creationStepsService.checkNameChanged()) {
-				this.nextIfNameAvailable(browserTriggered);
+				this.nextIfnameAvailable(browserTriggered);
 			}
 			else {
 				this.autoSaveValueChart();
@@ -211,8 +220,8 @@ export class CreateValueChartComponent implements OnInit {
 						If it was and navigation does not go through, we need to fix the navigation history.	
 						
 	*/
-	nextIfNameAvailable(browserTriggered = false) {
-		this.valueChartHttpService.isNameAvailable(this.valueChart.getId()).subscribe(isUnique => {
+	nextIfnameAvailable(browserTriggered = false) {
+		this.valueChartHttpService.isNameAvailable(this.valueChart.getFName()).subscribe(isUnique => {
 			if (isUnique === true) {
 				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;

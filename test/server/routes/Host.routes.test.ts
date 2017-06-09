@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:13:22
+* @Last Modified time: 2017-06-09 16:26:16
 */
 
 // Require Node Libraries:
@@ -41,10 +41,10 @@ describe('WebSocket: /Host', () => {
 		user = request.agent('http://localhost:3000/');
 
 		JsonGroupHotel.name = 'Test Hotel';
-		JsonGroupHotel.id = 'TestHotel';
+		JsonGroupHotel.fname = 'TestHotel';
 
 		// Clean any test charts that have been left it the database from previous executions.
-		user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
+		user.get('ValueCharts/' + JsonGroupHotel.fname + '/id')
 			.set('Accept', 'text')
 			.end(function(err, res) {
 
@@ -84,98 +84,6 @@ describe('WebSocket: /Host', () => {
 			};
 		});
 	});
-
-	describe('changing the userChangesAccepted setting', () => {
-		
-			it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
-				hostWebSocket.onmessage = (msg: MessageEvent) => {
-					var hostMessage: HostMessage = JSON.parse(msg.data);
-
-					expect(hostMessage.chartId).to.equal(chartId);
-					expect(hostMessage.type).to.equal(MessageType.ChangePermissions);
-					expect(hostMessage.data).to.equal(false);
-					done();
-				};
-
-				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
-			});
-
-			it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
-				hostWebSocket.onmessage = (msg: MessageEvent) => {
-					var hostMessage: HostMessage = JSON.parse(msg.data);
-
-					expect(hostMessage.chartId).to.equal(chartId);
-					expect(hostMessage.type).to.equal(MessageType.ChangePermissions);
-					expect(hostMessage.data).to.equal(true);
-					done();
-				};
-
-				hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: true, chartId: chartId }));
-			});
-	});
-
-	describe('attempting to add/remove/change users when userChangesAccepted is false', () => {
-		var argile: User;
-		var argileJson: any;
-
-		before(function(done: MochaDone) {
-			argile = new User('Argile');
-			argile.setWeightMap(new WeightMap());
-			argile.setScoreFunctionMap(new ScoreFunctionMap());
-
-			argileJson = JSON.parse(JSON.stringify(argile));
-
-			hostWebSocket.onmessage = (msg: MessageEvent) => {
-				done();
-			};
-			hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: false, chartId: chartId }));
-		});	
-
-		context('when attempting to post a new user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
-				user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
-					.set('Accept', 'application/json')
-						.expect(403)
-						.end(function(err, res) {
-					        if (err) return done(err);
-					        done();
-					    });
-			});
-		});
-
-		context('when attempting to delete new user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
-				user.delete('ValueCharts/' + chartId + '/users/Argile')
-					.set('Accept', 'application/json')
-						.expect(403)
-						.end(function(err, res) {
-					        if (err) return done(err);
-					        done();
-					    });
-			});
-		});
-
-		context('when attempting to modify a user', () => {
-			it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
-				user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
-					.set('Accept', 'application/json')
-						.expect(403)
-						.end(function(err, res) {
-					        if (err) return done(err);
-					        done();
-					    });
-			});
-		});
-
-
-		after(function(done: MochaDone) {
-			hostWebSocket.onmessage = (msg: MessageEvent) => {
-				done();
-			};
-			hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, data: true, chartId: chartId }));
-		});
-	});
-
 
 	describe('Adding a user to a hosted ValueChart', () => {
 		var argile: User;

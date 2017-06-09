@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:27:00
+* @Last Modified time: 2017-06-09 16:51:26
 */
 
 // Import Libraries and Express Middleware:
@@ -39,7 +39,7 @@ valueChartRoutes.all('/:chart/*', function(req: express.Request, res: express.Re
 valueChartRoutes.post('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	
-	valueChartsCollection.count({ id: req.body.id }, function(err: Error, count: number) {
+	valueChartsCollection.count({ fname: req.body.fname }, function(err: Error, count: number) {
 		if (count !== 0) {
 			res.status(400)	// Return status 400: Bad Request with an appropriate message if the ValueChart's name is already taken. We do NOT allow duplicate names.
 				.send('A ValueChart with that name already exists.');
@@ -94,7 +94,7 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	
 	var password: string = req.query.password;
 
-	valueChartsCollection.findOne({ id: identifier, password: password }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ fname: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -133,7 +133,7 @@ valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: e
 	});
 });
 
-// Update an existing user, or create one if it does not exist. This method should not be used to create a new ValueChart
+// Update an existing ValueChart, or create one if it does not exist. This method should not be used to create a new ValueChart
 // as it will fail if the provided id is not a valid id for the database. Use the post method to the ValueCharts collection instead.
 valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
@@ -188,8 +188,8 @@ valueChartRoutes.delete('/:chart', function(req: express.Request, res: express.R
 			res.status(400)
 				.json({ data: err });
 		} else {		
-			res.status(200).send('Not Found');	// The REST documentation for the delete method is a bit unclear on whether delete should 
-									// return the delete resource. I have chosen not to do so, as doc in this case is not actually
+			res.status(200).send('Deleted');	// The REST documentation for the delete method is a bit unclear on whether delete should 
+									// return the delete resource. I have chosen not to do so. Doc in this case is not actually
 									// the resource at all. Rather, it is a message notifying of successful deletion.
 		}
 	});
@@ -200,7 +200,7 @@ valueChartRoutes.get('/:chart/id', function(req: express.Request, res: express.R
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
 
-	valueChartsCollection.findOne({ id: identifier }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ fname: identifier }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -226,7 +226,7 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 	var password: string = req.query.password;
 
 
-	valueChartsCollection.findOne({ id: identifier, password: password }, function(err: Error, doc: any) {
+	valueChartsCollection.findOne({ fname: identifier, password: password }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -248,7 +248,7 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
 	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
 
-	valueChartsCollection.findOne({ id: identifier }, function (err: Error, foundDocument: any) {
+	valueChartsCollection.findOne({ fname: identifier }, function (err: Error, foundDocument: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -276,6 +276,67 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 			res.status(404).send('Not Found');
 		}
 	});
+});
+
+
+valueChartRoutes.put('/:chart/status', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+
+	var identifier: string = (<any> req).identifier;
+
+	statusCollection.findOne({ fname: identifier }, function(err: Error, foundDocument: any) {
+
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+		} else if (foundDocument) {
+			statusCollection.update({ _id: foundDocument._id }, req.body, [], function(err: Error, doc: any) {
+				res.location('/ValueCharts/' + identifier + '/status')
+					.status(200)
+					.json({ data: req.body });
+			});
+		} else {
+			statusCollection.insert(req.body, function(err: Error, doc: any) {
+				res.location('/ValueCharts/' + identifier + '/status')
+					.status(201)
+					.json({ data: req.body });
+			});
+		}
+	});
+});
+
+valueChartRoutes.get('/:chart/status', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+
+	var identifier: string = (<any> req).identifier;
+
+	statusCollection.findOne({ fname: identifier }, function(err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+
+		} else if (doc) {
+			res.location('/ValueCharts/' + identifier + '/status')
+				.status(200)
+				.json({ data: doc });
+		}
+	});
+});
+
+valueChartRoutes.delete('/:chart/status', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+
+	var identifier: string = (<any> req).identifier;
+
+	statusCollection.remove({ fname: identifier }, function (err: Error, result: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+
+		} else if (result) {
+			res.status(200).send('Deleted');
+		}
+	});	
 });
 
 // Set this router to use the valueChartUsersRoutes router for all routes that start with '/:chart/users'. This allows for separate router

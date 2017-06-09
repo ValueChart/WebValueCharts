@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 18:01:44
+* @Last Modified time: 2017-06-09 16:31:34
 */
 
 // Import Libraries and Middleware:
@@ -29,7 +29,7 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 	var chartId: string = req.params.chart;
 	// Initialize the event listeners that send messages to the client in response to changes to the hosted ValueChart.
 	var eventListeners: any[] = initEventListeners(chartId, ws);
-	hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open', userChangesAccepted: true });
+	hostConnections.set(chartId, { chartId: chartId, connectionStatus: 'open'});
 	// Send message confirming successful connection:
 	ws.send(JSON.stringify({ data: 'complete', chartId: chartId, type: MessageType.ConnectionInit }));
 
@@ -47,13 +47,6 @@ export var hostWebSocket = (ws: any, req: express.Request) => {
 		switch (hostMessage.type) {
 			case MessageType.ConnectionInit:
 				// Do nothing. The client should not send ConnectionInit messages.
-				break;
-			case MessageType.ChangePermissions:	
-				// Connection the permissions on the ValueChart to match the permissions in the message. If permissions 
-				// are set to false, then the back-end will not accept requests to change the hosted ValueChart. 
-				hostConnections.get(chartId).userChangesAccepted = hostMessage.data;
-				ws.send(JSON.stringify({ data: hostMessage.data, chartId: chartId, type: MessageType.ChangePermissions }));
-
 				break;
 			default:
 				// Do nothing. The message is not of a known type.

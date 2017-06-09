@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 14:48:55
+* @Last Modified time: 2017-06-09 11:13:33
 */
 
 import { Injectable } 												from '@angular/core';
@@ -37,10 +37,6 @@ export class HostService {
 	// 									Fields
 	// ========================================================================================
 	private hostUrl: string = 'host';			// The base URL of the host websocket on the server.
-
-	public userChangesAccepted: boolean = true;	// Whether the hosted ValueChart is currently accepting user changes. 
-												// This is used for tracking internal state. Setting this value will not turn
-												// off user changes.
 
 	public hostWebSocket: WebSocket;			// The websocket itself. This field will be undefined/null when websocket is closed.
 
@@ -82,23 +78,6 @@ export class HostService {
 	}
 
 	/*
-		@param userChangesAccepted - Whether the hosted ValueChart will accept changes from users that have joined it.
-		@param chartId - The id of the ValueChart to set user changes permissions on.
-		@returns {void}
-		@description 	Sends a message to the server via the websocket that sets whether the server will accept changes to preferences
-						from users that have joined the ValueChart. If false, existing users will be unable to change their submitted preferences
-						and new users will unable to submit their preferences to the ValueChart for the first time. Note that this method 
-						should ONLY be called when the websocket is open.
-	*/
-	setUserChangesAccepted(userChangesAccepted: boolean, chartId: string): void {
-		this.userChangesAccepted = userChangesAccepted;
-		var messageString: string = ((userChangesAccepted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be blocked');
-		toastr.warning(messageString);
-		// Send a message via the websocket that will cause the server to change user permissions for the ValueChart with the given id.
-		this.hostWebSocket.send(JSON.stringify({ type: MessageType.ChangePermissions, chartId: chartId, data: userChangesAccepted }));
-	}
-
-	/*
 		@returns {void}
 		@description 	Stops hosting a ValueChart by closing the websocket connection. The server will cleanup the resources associated 
 						with the websocket.
@@ -120,10 +99,6 @@ export class HostService {
 		switch (hostMessage.type) {
 			// The server is notifying the client that initialization has been completed on the server-side.
 			case MessageType.ConnectionInit:
-				break;
-
-			// The server will send a message confirming successful change of user submission settings. Nothing needs to be done here.
-			case MessageType.ChangePermissions:
 				break;
 
 			// A new user has joined the hosted ValueChart. 

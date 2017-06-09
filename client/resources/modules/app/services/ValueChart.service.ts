@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 14:23:12
+* @Last Modified time: 2017-06-09 14:46:00
 */
 
 // Import Angular Classes:
@@ -39,7 +39,7 @@ export class ValueChartService {
 	// ========================================================================================
 
 	private valueChart: ValueChart;
-	
+
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
 

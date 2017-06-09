@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 13:03:23
+* @Last Modified time: 2017-06-09 15:51:17
 */
 
 // Import Libraries and Express Middleware:
@@ -57,15 +57,17 @@ valueChartUsersRoutes.get('/:username', function(req: express.Request, res: expr
 // because it is defined before them in the stack.
 valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var identifier: string = (<any> req).identifier
-	var hostConnection: HostConnectionStatus = hostConnections.get(identifier);
 
-	// If the host connection is active, and user changes are not being accepted.
-	if (hostConnection && !hostConnection.userChangesAccepted) {
-		res.status(403)
-			.send('User Changes are Disabled by the Chart Owner');
-	} else {
-		next();
-	}
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+	statusCollection.findOne({ chartId: identifier }, (err: Error, doc: any) => {
+		// If the host connection is active, and user changes are not being accepted.
+		if (doc && !doc.userChangesPermitted) {
+			res.status(403)
+				.send('User Changes are Disabled by the Chart Owner');
+		} else {
+			next();
+		}
+	});
 });
 
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 14:30:19
+* @Last Modified time: 2017-06-09 15:54:40
 */
 	
 // Import Model Classes:
@@ -39,7 +39,7 @@ export class ValueChart {
 	// ========================================================================================
 
 	private name: string;					// The name of the ValueChart.
-	private id: string;						// The name of the ValueChart formatted for use as a HTML id.
+	private fname: string;						// The name of the ValueChart formatted to remove spaces and special characters.
 	private description: string;			// The description of the ValueChart.
 	private creator: string;				// The username of the creator of the ValueChart.
 	private rootObjectives: Objective[];	// The collection of root objectives for the ValueChart. This should almost always be a single abstract objective.
@@ -71,7 +71,7 @@ export class ValueChart {
 		this.rootObjectives = [];
 		this.alternatives = [];
 		this.users = [];
-		this.id = Formatter.nameToID(this.name);
+		this.fname = Formatter.nameToID(this.name);
 
 		if (users) {
 			this.users = users;
@@ -84,12 +84,12 @@ export class ValueChart {
 
 	// Note that methods that are simple getters/setters, or modifiers are not commented as they are self-explanatory.
 
-	getId(): string {
-		return this.id;
+	getFName(): string {
+		return this.fname;
 	}
 
-	setId(id: string) {
-		this.id = id;
+	setFName(fname: string) {
+		this.fname = fname;
 	}
 
 	getName(): string {
@@ -98,7 +98,7 @@ export class ValueChart {
 
 	setName(name: string): void {
 		this.name = name;
-		this.id = Formatter.nameToID(this.name);
+		this.fname = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

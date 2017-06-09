@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:47:19
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:06:29
+* @Last Modified time: 2017-06-09 15:55:17
 */
 
 
@@ -53,7 +53,7 @@ describe('ValueChart', () => {
 					expect(valueChart.getDescription()).to.equal('This is a test chart');
 					expect(valueChart.getCreator()).to.equal('Aaron');
 
-					expect(valueChart.getId()).to.equal('TestChart');
+					expect(valueChart.getFName()).to.equal('TestChart');
 				});
 			});
 

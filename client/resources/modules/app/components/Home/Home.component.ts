@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:16:47
+* @Last Modified time: 2017-06-09 15:59:37
 */
 
 // Import Angular Classes:
@@ -144,7 +144,7 @@ export class HomeComponent {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
-				var parameters = this.valueChartService.getValueChart().getId();
+				var parameters = this.valueChartService.getValueChart().getFName();
 				this.router.navigate(['/view/', parameters]);
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -163,7 +163,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.valueChartService.getValueChart().getId();
+		var parameters = this.valueChartService.getValueChart().getFName();
 		this.router.navigate(['/view/', parameters]);
 	}
 

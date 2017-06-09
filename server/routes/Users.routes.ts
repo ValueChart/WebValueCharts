@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-08 21:54:25
+* @Last Modified time: 2017-06-09 16:47:15
 */
 
 // Import Libraries and Express Middleware:
@@ -110,7 +110,9 @@ usersRoutes.delete('/:user', function(req: express.Request, res: express.Respons
 // Get summaries of all ValueCharts the user created. These are just summaries, rather than full ValueCharts.
 // This endpoint will return summaries of all ValueCharts whose creator field equals the user parameter in the route.
 usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+
 	var username = req.params.user;	
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
@@ -122,9 +124,23 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
-				res.status(200)
-					.location('/Users/' + username + '/OwnedValueCharts')
-					.json({ data: docs });
+				var vcSummaries: any[] = [];
+				var promises: any[] = [];
+
+				docs.forEach((doc: any) => {
+					promises.push(statusCollection.findOne({ fname: doc.fname }, function(err: Error, status: any) {
+						if (err) 
+							res.status(400).json({ data: err});
+						else if (status)
+							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: status.incomplete, userChangesPermitted: status.userChangesPermitted });
+					}));
+				});
+
+				Promise.all(promises).then(() => {
+					res.status(200)
+						.location('/Users/' + username + '/OwnedValueCharts')
+						.json({ data: vcSummaries });
+				});
 			} else {
 				res.status(404).send('Not Found');
 			}
@@ -135,26 +151,44 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 // Get summaries of all ValueCharts the user is a member of. These are just summaries, rather than full ValueCharts.
 // This endpoint will return summaries of all ValueCharts whose members contain the user parameter in the route.
 usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
+
 	var username = req.params.user;	
 
 	// Return 401: Unauthorized if the user isn't logged in, or the username of the logged in user does not match the username in request.
 	if (!req.isAuthenticated() || (req.user[0] && username !== req.user[0].username)) {
 		res.status(401).send('Unauthorized');	
 	} else {
-		valueChartCollection.find({ "users": username }, function(err: Error, docs: any[]) {
+		valueChartCollection.find({ "users.username": username }, function(err: Error, docs: any[]) {
 			if (err) {
 				res.status(400)
 					.json({ data: err });
 			} else if (docs) {
-				res.status(200)
-					.location('/Users/' + username + '/JoinedValueCharts')
-					.json({ data: docs });
+				var vcSummaries: any[] = [];
+				var promises: any[] = [];
+
+				docs.forEach((doc: any) => {
+					promises.push(statusCollection.findOne({ fname: doc.fname }, function(err: Error, status: any) {
+						if (err) 
+							res.status(400).json({ data: err});
+						else if (status)
+							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: status.incomplete, userChangesPermitted: status.userChangesPermitted });
+					}));
+				});
+
+				Promise.all(promises).then(() => {
+					res.status(200)
+						.location('/Users/' + username + '/JoinedValueCharts')
+						.json({ data: vcSummaries });
+				});
 			} else {
 				res.status(404).send('Not Found');
 			}
 		});
 	}
 });
+
+
 
 

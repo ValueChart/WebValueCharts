@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 10:21:26
+* @Last Modified time: 2017-06-09 15:55:21
 */
 
 // Import Angular Classes:
@@ -77,7 +77,7 @@ export class ExportValueChartComponent implements OnInit {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
-			return valueChart.getId() + '.xml';
+			return valueChart.getFName() + '.xml';
 		} else {
 			return '';
 		}

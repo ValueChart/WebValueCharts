@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 14:34:52
+* @Last Modified time: 2017-06-09 15:55:22
 */
 
 // Import Angular Classes:
@@ -159,6 +159,6 @@ export class DetailBoxComponent implements OnInit {
 
 
 	getValueChartUrl(): string {
-		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getId() + '?password=' + this.valueChart.password;
+		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getFName() + '?password=' + this.valueChart.password;
 	}
 }

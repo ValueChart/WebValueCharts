@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 10:22:02
+* @Last Modified time: 2017-06-09 15:55:20
 */
 
 // Import Angular Classes:
@@ -118,7 +118,7 @@ export class MyValueChartsComponent implements OnInit {
 					$('#validate-modal').modal('show');
 				}
 				else {
-					this.router.navigate(['/view/', valueChart.getId()]);
+					this.router.navigate(['/view/', valueChart.getFName()]);
 				}	
 			});
 	}
@@ -155,7 +155,7 @@ export class MyValueChartsComponent implements OnInit {
 		});
 	}
 
-	deleteValueChart(chartId: string): void {
+	deleteValueChart(chartId: string, chartName: string): void {
 		this.valueChartHttpService.deleteValueChart(chartId)
 			.subscribe(status => {
 				var index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
@@ -163,6 +163,10 @@ export class MyValueChartsComponent implements OnInit {
 				});
 				this.valueChartOwnerships.splice(index, 1);
 			});
+
+		this.valueChartHttpService.deleteValueChartStatus(chartName).subscribe((status) => {
+			// Do nothing;
+		});
 	}
 
 	setValueChart(chartId: string, password: string): void {
@@ -176,7 +180,7 @@ export class MyValueChartsComponent implements OnInit {
 		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
-			return valueChart.getId() + 'UserWeights.csv';
+			return valueChart.getFName() + 'UserWeights.csv';
 		} else {
 			return '';
 		}

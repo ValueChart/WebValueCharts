@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 22:28:42
+* @Last Modified time: 2017-06-09 16:30:32
 */
 
 // Require Node Libraries:
@@ -39,13 +39,13 @@ describe('ValueCharts Routes', () => {
 		valueChartParser = new JsonValueChartParser();
 
 		JsonGroupHotel.name = 'Test Hotel';
-		JsonGroupHotel.id = 'TestHotel';
+		JsonGroupHotel.fname = 'TestHotel';
 
 		user = request.agent('http://localhost:3000/');
 
 
 		// Clean any test charts that have been left it the database from previous executions.
-		user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
+		user.get('ValueCharts/' + JsonGroupHotel.fname + '/id')
 			.set('Accept', 'text')
 			.end(function(err, res) {
 				if (err) return done(err);
@@ -114,7 +114,7 @@ describe('ValueCharts Routes', () => {
 			context('when a ValueChart with the given name exists', () => {
 
 				it('should return the ID of the ValueChart along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/' + JsonGroupHotel.id + '/id')
+					user.get('ValueCharts/' + JsonGroupHotel.fname + '/id')
 							.set('Accept', 'text')
 							.expect(200)
 						    .expect((res: request.Response) => {
@@ -177,7 +177,7 @@ describe('ValueCharts Routes', () => {
 
 			context('when a ValueChart with the given name exists', () => {
 				it('should retrieve the ValueChart along with status code 200', (done: MochaDone) => {
-					user.get('ValueCharts/' + JsonGroupHotel.id + '?password=' + password)
+					user.get('ValueCharts/' + JsonGroupHotel.fname + '?password=' + password)
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
@@ -214,7 +214,7 @@ describe('ValueCharts Routes', () => {
 
 			before(function() {
 				JsonGroupHotel.name = 'Test Hotel Selection Problem';
-				JsonGroupHotel.id = 'TestHotelSelectionProblem';
+				JsonGroupHotel.fname = 'TestHotelSelectionProblem';
 				JsonGroupHotel.users = [JsonGroupHotel.users[0], JsonGroupHotel.users[0]];
 				alternative = JsonGroupHotel.alternatives.pop();
 			})
@@ -308,7 +308,7 @@ describe('ValueCharts Routes', () => {
 			before(function() {
 				JsonGroupHotel.alternatives.push(alternative);
 				JsonGroupHotel.name = 'Test Hotel';
-				JsonGroupHotel.id = 'TestHotel';
+				JsonGroupHotel.fname = 'TestHotel';
 				JsonGroupHotel.rootObjectives.push(JsonGroupHotel.rootObjectives[0].subObjectives[0]);
 			});
 
@@ -334,6 +334,37 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
+	});
+
+	describe('Route /ValueCharts/:Chart/status', () => {
+
+		it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
+			user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
+				.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: false, complete: true })
+				.set('Accept', 'application/json')
+				.expect('Content-Type', /json/)
+				.expect(201)
+				.expect((res: request.Response) => {
+					expect(res.body.data.userChangesPermitted).to.be.false;
+				}).end(function(err, res) {
+			        if (err) return done(err);
+			        done();
+			    });
+		});
+
+		it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
+			user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
+				.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: true, complete: true })
+				.set('Accept', 'application/json')
+				.expect('Content-Type', /json/)
+				.expect(200)
+				.expect((res: request.Response) => {
+					expect(res.body.data.userChangesPermitted).to.be.true;
+				}).end(function(err, res) {
+			        if (err) return done(err);
+			        done();
+			    });
+		});
 	});
 
 	describe('Route: /ValueCharts/:Chart/users', () => {
@@ -463,6 +494,75 @@ describe('ValueCharts Routes', () => {
 				});
 			});
 		});
+
+		context('attempting to add/remove/change users when userChangesPermitted is false', () => {
+			var argile: User;
+			var argileJson: any;
+
+			before(function(done: MochaDone) {
+				argile = new User('Argile');
+				argile.setWeightMap(new WeightMap());
+				argile.setScoreFunctionMap(new ScoreFunctionMap());
+
+				argileJson = JSON.parse(JSON.stringify(argile));
+
+				user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
+					.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: false, complete: true })
+					.set('Accept', 'application/json')
+					.end(function(err, res) {
+				        if (err) return done(err);
+				        done();
+				    });
+			});	
+
+			describe('Method: Post', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+			describe('Method: Put', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.delete('ValueCharts/' + chartId + '/users/Argile')
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+			describe('Method: Delete', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+
+			after(function(done: MochaDone) {
+				user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
+					.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: true, complete: true })
+					.set('Accept', 'application/json')
+					.end(function(err, res) {
+				        if (err) return done(err);
+				        done();
+				    });
+			});
+		});
+
 	});
 
 	after(function(done: MochaDone) {
@@ -471,9 +571,15 @@ describe('ValueCharts Routes', () => {
 			.expect(200)
 			.end(function(err, res) {
 		        if (err) return done(err);
-		        done();
+		
+				user.delete('ValueCharts/' + JsonGroupHotel.fname + '/status')
+					.set('Accept', 'application/json')
+					.expect(200)
+					.end(function(err, res) {
+				        if (err) return done(err);
+				        done();
+				    });
 		    });
+
 	});
-
-
 });

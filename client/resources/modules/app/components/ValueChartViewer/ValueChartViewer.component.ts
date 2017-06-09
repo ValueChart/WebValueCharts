@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 15:03:49
+* @Last Modified time: 2017-06-09 15:55:20
 */
 
 // Import Angular Classes:
@@ -68,7 +68,9 @@ export class ValueChartViewerComponent implements OnInit {
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
+
 	public valueChart: ValueChart;
+	public valueChartStatus: any = { userChangesPermitted: true, incomplete: false };
 	public usersToDisplay: User[];
 
 	// ValueChart Configuration:
@@ -113,6 +115,9 @@ export class ValueChartViewerComponent implements OnInit {
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();
+
+		this.valueChartHttpService.getValueChartStatus(this.valueChart.getFName()).subscribe((status) => { this.valueChartStatus = status; });
+
 		this.displayedUsersService.setUsersToDisplay(this.valueChartService.getValueChart().getUsers());
 		this.usersToDisplay = this.displayedUsersService.getUsersToDisplay();
 
@@ -310,6 +315,16 @@ export class ValueChartViewerComponent implements OnInit {
 		else {
 			toastr.error("Saving failed - score function outcomes can't all have the same value.")
 		}			
+	}
+
+	setUserChangesAccepted(userChangesPermitted: any): void {
+		this.valueChartStatus.userChangesPermitted = userChangesPermitted;
+
+		this.valueChartHttpService.setValueChartStatus(this.valueChartStatus).subscribe((status) => {
+			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be blocked');
+			toastr.warning(messageString);
+		});
+
 	}
 
 	// ================================ Undo/Redo ====================================

@@ -23,13 +23,13 @@
 				</div>
 			</div>
 			<div *ngIf="enableManagement()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="hostService.userChangesAccepted">
-					<button class="btn btn-danger" (click)="hostService.setUserChangesAccepted(false, valueChart._id)">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
+					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
 					Lock Chart
 					</button>
 				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!hostService.userChangesAccepted">
-					<button class="btn btn-success" (click)="hostService.setUserChangesAccepted(true, valueChart._id)">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartStatus.userChangesPermitted">
+					<button class="btn btn-success" (click)="setUserChangesAccepted(true)">
 					Unlock Chart
 					</button>
 				</div>
