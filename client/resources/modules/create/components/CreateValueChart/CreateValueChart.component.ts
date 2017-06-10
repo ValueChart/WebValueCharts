@@ -103,9 +103,9 @@ export class CreateValueChartComponent implements OnInit {
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 
 		// Initialize according to purpose
-		if (this.purpose === "newChart") {
+		if (this.purpose === 'newChart') {
 			this.currentUserService.setJoiningChart(false);
-			let valueChart = new ValueChart("", "", this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
+			let valueChart = new ValueChart('', '', this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 
 			this.valueChartService.setValueChart(valueChart); 
 		}
@@ -122,7 +122,7 @@ export class CreateValueChartComponent implements OnInit {
 		this.sub.unsubscribe();	
 
 		// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
-		var incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
+		let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
 			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 		
 		let status: any = {};
@@ -171,7 +171,7 @@ export class CreateValueChartComponent implements OnInit {
 	next(browserTriggered = false) {
 		if (this.creationStepsService.validate()) {
 			if (this.creationStepsService.step === this.creationStepsService.BASICS && this.creationStepsService.checkNameChanged()) {
-				this.nextIfnameAvailable(browserTriggered);
+				this.nextIfNameAvailable(browserTriggered);
 			}
 			else {
 				this.autoSaveValueChart();
@@ -193,10 +193,14 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	viewChart() {
 		if (this.creationStepsService.validate()) {	
-			// Catch validation errors introduced at other steps or in other users' preferences.
-			let errorMessages = this.validationService.validate(this.valueChart);
+			// Catch validation errors introduced at other steps.
+			// (Include structural errors and errors in current user's preferences.)
+			let errorMessages = this.validationService.validateStructure(this.valueChart);
+			if (this.valueChartService.currentUserIsDefined()) {
+				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
+			} 
 			if (errorMessages.length > 0) {
-				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + errorMessages.join('\n\n');
+				this.validationMessage = 'Cannot view chart. Please fix the following errors to proceed:\n\n' + errorMessages.join('\n\n');
 					$('#validate-modal').modal('show');
 			}
 			else {
@@ -220,7 +224,7 @@ export class CreateValueChartComponent implements OnInit {
 						If it was and navigation does not go through, we need to fix the navigation history.	
 						
 	*/
-	nextIfnameAvailable(browserTriggered = false) {
+	nextIfNameAvailable(browserTriggered = false) {
 		this.valueChartHttpService.isNameAvailable(this.valueChart.getFName()).subscribe(isUnique => {
 			if (isUnique === true) {
 				this.autoSaveValueChart();
@@ -240,13 +244,13 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {boolean}
 		@description 	Disable back button if:
 						(1) on the first step
-						(2) on Preferences step and the user navigated here using an 'Edit Preference Model" button
+						(2) on Preferences step and the user navigated here using an "Edit Preferences" button
 						(3) on Preferences step and a new user is joining a group chart (only the chart creator should be able to edit the structure)
 	*/
 	disableBackButton(): boolean {
 		return (this.creationStepsService.step === this.creationStepsService.BASICS
-			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "newUser")
-			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === "editPreferences"));
+			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'newUser')
+			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'editPreferences'));
 	}
 
 	/* 	
@@ -263,13 +267,13 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	 Return text for 'Next' button. Differs only at last step.
 	*/
 	nextButtonText(): string {
-		let text = "Next Stage >>";
+		let text = 'Next Stage >>';
 		if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
 			if (!this.valueChartService.currentUserIsDefined()) {
-				text = "Add Preferences >>";
+				text = 'Add Preferences >>';
 			}
 			else {
-				text = "Edit Preferences >>";
+				text = 'Edit Preferences >>';
 			}
 		}
 		return text;
@@ -280,9 +284,9 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	 Return text for 'Next' button. Differs only at last step.
 	*/
 	navigationModalText(): string {
-		let text = "Do you want to keep this ValueChart?";
+		let text = 'Do you want to keep this ValueChart?';
 		if (this.currentUserService.isJoiningChart()) {
-			text = "Are you sure you want to leave this ValueChart?";
+			text = 'Are you sure you want to leave this ValueChart?';
 		}
 		return text;
 	}
@@ -337,7 +341,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.navigationResponse.next(true);
 			}
 			else {
-				toastr.error("That name is already taken. Please choose another if you'd like to save the chart.");
+				toastr.error('That name is already taken. Please choose another if you would like to save the chart.');
 				this.navigationResponse.next(false);
 			}
 			$('#navigation-warning-modal').modal('hide');

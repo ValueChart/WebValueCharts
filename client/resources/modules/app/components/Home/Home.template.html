@@ -89,8 +89,8 @@
 	                        </div>
 	                    </div>
 	                    <div class="row">
-	                        <div *ngIf="correctiveAction !== 'none'" class="col-sm-offset-3 col-sm-9">
-	                        	<button type="submit" class="btn btn-lg btn-success" (click)="performCorrectiveAction()" data-dismiss="modal">Yes</button>
+	                        <div *ngIf="canFixChart" class="col-sm-offset-3 col-sm-9">
+	                        	<button type="submit" class="btn btn-lg btn-success" (click)="fixChart()" data-dismiss="modal">Yes</button>
 	                            <button type="submit" class="btn btn-lg btn-danger" data-dismiss="modal">Cancel</button>        
 	                        </div>
 	                    </div>

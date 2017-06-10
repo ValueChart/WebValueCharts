@@ -25,6 +25,7 @@ import { ValueChartService }													from '../../services/ValueChart.service
 import { DisplayedUsersService }												from '../../services/DisplayedUsers.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
+import { ValidationService }													from '../../services/Validation.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -68,10 +69,10 @@ export class ValueChartViewerComponent implements OnInit {
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
-
 	public valueChart: ValueChart;
 	public valueChartStatus: any = { userChangesPermitted: true, incomplete: false };
 	public usersToDisplay: User[];
+	public validationMessage: string;
 
 	// ValueChart Configuration:
 	public viewConfig: ViewConfig = <any> {};
@@ -94,7 +95,8 @@ export class ValueChartViewerComponent implements OnInit {
 		public valueChartService: ValueChartService,
 		public displayedUsersService: DisplayedUsersService,
 		private valueChartHttpService: ValueChartHttpService,
-		private hostService: HostService) { }
+		private hostService: HostService,
+		private validationService: ValidationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -118,8 +120,10 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.valueChartHttpService.getValueChartStatus(this.valueChart.getFName()).subscribe((status) => { this.valueChartStatus = status; });
 
-		this.displayedUsersService.setUsersToDisplay(this.valueChartService.getValueChart().getUsers());
-		this.usersToDisplay = this.displayedUsersService.getUsersToDisplay();
+		let invalidUsers = this.validationService.getInvalidUsers(this.valueChart);
+		this.usersToDisplay = _.clone(this.valueChartService.getValueChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
+		this.displayedUsersService.setUsersToDisplay(this.usersToDisplay);
+		this.displayedUsersService.setInvalidUsers(invalidUsers);
 
 		if (!this.currentUserService.isJoiningChart()) {
 			this.hostValueChart();
@@ -128,6 +132,12 @@ export class ValueChartViewerComponent implements OnInit {
 		$(window).resize((eventObjective: Event) => {
 			this.resizeValueChart();
 		});
+
+		if (invalidUsers.length > 0) {
+			let errorMessages = this.validationService.validateUsers(this.valueChart);
+			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
+			$('#validate-modal').modal('show');
+		}
 	}
 
 	updateView(viewConfig: ViewConfig) {

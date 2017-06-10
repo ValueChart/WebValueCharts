@@ -519,6 +519,16 @@ export class ValidationService {
 		return this.validateScoreFunctions(valueChart, user).concat(this.validateWeights(valueChart,user));
 	}
 
+	getInvalidUsers(valueChart: ValueChart): string[] {
+		let invalidUsers = [];
+		for (let user of valueChart.getUsers()) {
+			if (this.validateUser(valueChart, user).length > 0) {
+				invalidUsers.push(user.getUsername());
+			}
+		}
+		return invalidUsers;
+	}
+
 	// ================================ Validate ScoreFunctions ====================================
 
 	validateScoreFunctions(valueChart: ValueChart, user: User): string[] {

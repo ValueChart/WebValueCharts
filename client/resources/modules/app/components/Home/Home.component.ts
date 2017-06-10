@@ -52,8 +52,7 @@ export class HomeComponent {
 
 	// Upload validation fields:
 	public validationMessage: string;
-	public correctiveAction: string; // what the user may do to fix the chart
-									 // one of 'editChart', 'saveChart', or 'noEdit'
+	public canFixChart: boolean;
 
 	// ========================================================================================
 	// 									Constructor
@@ -145,7 +144,9 @@ export class HomeComponent {
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
 				var parameters = this.valueChartService.getValueChart().getFName();
-				this.router.navigate(['/view/', parameters]);
+				if (this.validateChartStructure(this.valueChartService.getValueChart())) {
+					this.router.navigate(['/view/', parameters]);
+				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
 			(error) => {
@@ -188,7 +189,7 @@ export class HomeComponent {
 				// The user uploaded a ValueChart so they aren't joining an existing one.
 				this.currentUserService.setJoiningChart(false);
 
-				if (this.validateUpload(this.valueChartService.getValueChart())) {
+				if (this.validateChartStructure(this.valueChartService.getValueChart())) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
 					this.saveValueChartToDatabase(this.valueChartService.getValueChart());
 					this.router.navigate(['/view/', this.valueChartService.getValueChart().getName()]);
@@ -203,30 +204,20 @@ export class HomeComponent {
 
 	/*
 		@returns {boolean}
-		@description 	Validates an uploaded chart and gives the user an opportunity to fix errors that they have control over.
+		@description 	Validates chart structure prior to viewing and gives the creator an opportunity to fix errors.
 						Returns true iff there were no validation errors.
 	*/
-	validateUpload(valueChart: ValueChart): boolean {
-		let structuralErrors = this.validationService.validateStructure(valueChart);
-		let userErrors = this.validationService.validateUsers(valueChart);	
-
-		if (structuralErrors.length > 0 || userErrors.length > 0) {
+	validateChartStructure(valueChart: ValueChart): boolean {
+		let structuralErrors = this.validationService.validateStructure(valueChart); 	
+		if (structuralErrors.length > 0) {
 			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
-				this.correctiveAction = 'none';
+				this.canFixChart = false;
 				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
 				$('#validate-modal').modal('show');
 			}
-			// Handle errors in chart structure
-			else if (structuralErrors.length > 0) {
-				this.correctiveAction = 'editChart';
-				this.validationMessage = "There are problems with this chart: \n\n - " + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
-				$('#validate-modal').modal('show');
-			}
-			// Handle errors in the users' preferences
-			// (If these exist IN ADDITION to the above, the user will be informed of them after fixing the other problems)
 			else {
-				this.correctiveAction = 'saveChart';
-				this.validationMessage = "Cannot view chart. There are problems with some users' preferences.\n\n" + userErrors.join('\n\n') + "\n\nWould you like to save the chart so that these users can fix their preferences?";
+				this.canFixChart = true;
+				this.validationMessage = "There are problems with this chart: \n\n" + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
 				$('#validate-modal').modal('show');
 			}
 			return false;
@@ -238,13 +229,8 @@ export class HomeComponent {
 		@returns {void}
 		@description 	Called in response to click of "Yes" button in validation error modal.
 	*/
-	performCorrectiveAction() {
-		if (this.correctiveAction === 'editChart') {
-			this.router.navigate(['/createValueChart/editChart/BasicInfo']);
-		}
-		else if (this.correctiveAction === 'saveChart') {
-			this.saveValueChartToDatabase(this.valueChartService.getValueChart());
-		}
+	fixChart() {
+		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 	}
 
 	/* 	

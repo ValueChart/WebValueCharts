@@ -115,9 +115,15 @@ export class HostService {
 				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
 
 				this.valueChartService.getValueChart().setUser(updatedUser);
-				
+
 				if (this.displayedUsersService.isUserDisplayed(updatedUser))
 					this.displayedUsersService.addUserToDisplay(updatedUser);
+
+				// If user was previously invalid, they will be valid now.
+				if (this.displayedUsersService.isUserInvalid(updatedUser.getUsername())) {
+					this.displayedUsersService.removeInvalidUser(updatedUser.getUsername());
+					this.displayedUsersService.addUserToDisplay(updatedUser);
+				}
 
 				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
 

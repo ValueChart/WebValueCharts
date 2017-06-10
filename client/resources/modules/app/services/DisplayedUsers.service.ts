@@ -27,7 +27,8 @@ export class DisplayedUsersService {
 	// 									Fields
 	// ========================================================================================
 
-	private usersToDisplay: User[];
+	private usersToDisplay: User[]; // Users to display in the chart
+	private invalidUsers: string[]; // Users that are invalid and should not be selectable
 
 	// ========================================================================================
 	// 									Constructor
@@ -42,16 +43,15 @@ export class DisplayedUsersService {
 	constructor(
 		private valueChartService: ValueChartService) {
 
-		this.setUsersToDisplay(this.valueChartService.getValueChart().getUsers());
-	}
-
-
-	getUsersToDisplay(): User[] {
-		return this.usersToDisplay;
+		this.setUsersToDisplay(_.clone(this.valueChartService.getValueChart().getUsers()));
 	}
 
 	setUsersToDisplay(users: User[]): void {
-		this.usersToDisplay = _.clone(users);
+		this.usersToDisplay = users;
+	}
+
+	setInvalidUsers(usernames: string[]): void {
+		this.invalidUsers = usernames;
 	}
 
 	addUserToDisplay(newUser: User): void {
@@ -82,7 +82,14 @@ export class DisplayedUsersService {
 		}
 	}
 
-	isUserDisplayed(userToFind: User) {
+	removeInvalidUser(username: string): void {
+		var index = this.invalidUsers.indexOf(username);
+		if (index !== -1) {
+			this.invalidUsers.splice(index, 1);		
+		}
+	}
+
+	isUserDisplayed(userToFind: User): boolean {
 		var userIndex: number = this.usersToDisplay.findIndex((user: User) => {
 			return userToFind.getUsername() === user.getUsername();
 		});
@@ -90,4 +97,7 @@ export class DisplayedUsersService {
 		return userIndex !== -1;
 	}
 
+	isUserInvalid(userToFind: string): boolean {
+		return this.invalidUsers.indexOf(userToFind) !== -1;
+	}
 }

@@ -109,10 +109,10 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
-				// Verify that the chart is valid before proceeding.
-				// (This will inform the creator of errors in other users' preferences, as well as 
-				//  any errors brought on by changes in validation since saving to the database.)
-				let errorMessages = this.validationService.validate(valueChart);
+				// Validate chart structure before proceeding.
+				// (This is a sanity check to catch any as any errors brought on by 
+				//  changes in validation since saving to the database.)
+				let errorMessages = this.validationService.validateStructure(valueChart);
 				if (errorMessages.length > 0) {
 					this.validationMessage = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
 					$('#validate-modal').modal('show');
