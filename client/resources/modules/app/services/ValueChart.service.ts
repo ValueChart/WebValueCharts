@@ -105,6 +105,10 @@ export class ValueChartService {
 		}).length > 0;
 	}
 
+	currentUserIsCreator(): boolean {
+		return this.currentUserService.getUsername() === this.valueChart.getCreator();
+	}
+
 	getCurrentUser(): User {
 		// Obviously we should have it so that two usernames are never the same.
 		var user: User = this.valueChart.getUsers().filter((user: User) => {

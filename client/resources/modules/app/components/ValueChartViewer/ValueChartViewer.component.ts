@@ -200,7 +200,7 @@ export class ValueChartViewerComponent implements OnInit {
 		return (this.currentUserService.isJoiningChart() 
 			|| (this.valueChartService.isIndividual()
 				&& this.valueChartService.currentUserIsDefined()
-				&& this.valueChart.getCreator() === this.currentUserService.getUsername()));
+				&& this.valueChartService.currentUserIsCreator()));
 	}
 
 	/* 	
@@ -210,7 +210,7 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	enableManagement(): boolean {
 		return (!this.currentUserService.isJoiningChart() 
-			&& this.valueChart.getCreator() === this.currentUserService.getUsername());
+			&& this.valueChartService.currentUserIsCreator());
 	}
 
 	/* 	
@@ -220,8 +220,8 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	enableEditPreferences(): boolean {
 		return (this.currentUserService.isJoiningChart() 
-			|| (this.valueChart.getCreator() === this.currentUserService.getUsername()
-				&& this.valueChartService.currentUserIsDefined()));
+			|| (this.valueChartService.currentUserIsDefined()
+				&& this.valueChartService.currentUserIsCreator()));
 	}
 
   /*   
@@ -256,6 +256,15 @@ export class ValueChartViewerComponent implements OnInit {
 			toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
 		}
 	}
+
+  /*   
+    @returns {void}
+    @description   Normalizes the user's weights then redirects to 
+  */
+  	editPreferences(): void {
+  		this.valueChartService.getCurrentUser().getWeightMap().normalize();
+  		this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+  	}
 
 	// ================================ Hosting/Joining/Saving a ValueChart ====================================
 

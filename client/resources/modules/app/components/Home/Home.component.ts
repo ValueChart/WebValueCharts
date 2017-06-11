@@ -144,7 +144,7 @@ export class HomeComponent {
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
 				var parameters = this.valueChartService.getValueChart().getFName();
-				if (this.validateChartStructure(this.valueChartService.getValueChart())) {
+				if (this.validateChartStructure()) {
 					this.router.navigate(['/view/', parameters]);
 				}
 			},
@@ -189,7 +189,7 @@ export class HomeComponent {
 				// The user uploaded a ValueChart so they aren't joining an existing one.
 				this.currentUserService.setJoiningChart(false);
 
-				if (this.validateChartStructure(this.valueChartService.getValueChart())) {
+				if (this.validateChartStructure()) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
 					this.saveValueChartToDatabase(this.valueChartService.getValueChart());
 					this.router.navigate(['/view/', this.valueChartService.getValueChart().getName()]);
@@ -207,10 +207,10 @@ export class HomeComponent {
 		@description 	Validates chart structure prior to viewing and gives the creator an opportunity to fix errors.
 						Returns true iff there were no validation errors.
 	*/
-	validateChartStructure(valueChart: ValueChart): boolean {
-		let structuralErrors = this.validationService.validateStructure(valueChart); 	
+	validateChartStructure(): boolean {
+		let structuralErrors = this.validationService.validateStructure(this.valueChartService.getValueChart()); 	
 		if (structuralErrors.length > 0) {
-			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
+			if (this.valueChartService.currentUserIsCreator()) {
 				this.canFixChart = false;
 				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
 				$('#validate-modal').modal('show');
