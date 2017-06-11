@@ -180,7 +180,7 @@ export class CreateValueChartComponent implements OnInit {
 			}
 		}
 		else {
-			toastr.error('There were problems with your submission. Please fix them to proceed.');
+			toastr.error("There were problems with your submission. Please fix them to proceed.");
 			if (browserTriggered) {
 				history.forward();
 			}
@@ -200,7 +200,7 @@ export class CreateValueChartComponent implements OnInit {
 				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
 			} 
 			if (errorMessages.length > 0) {
-				this.validationMessage = 'Cannot view chart. Please fix the following errors to proceed:\n\n' + errorMessages.join('\n\n');
+				this.validationMessage = "Cannot view chart. Please fix the following errors to proceed:\n\n" + errorMessages.join("\n\n");
 					$('#validate-modal').modal('show');
 			}
 			else {
@@ -210,7 +210,7 @@ export class CreateValueChartComponent implements OnInit {
 			}
 		}
 		else {
-			toastr.error('There were problems with your submission. Please fix them to proceed.');
+			toastr.error("There were problems with your submission. Please fix them to proceed.");
 		}
 	}
 
@@ -232,7 +232,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.creationStepsService.next(this.purpose);
 			}
 			else {
-				toastr.error('That name is already taken. Please choose another.')
+				toastr.error("That name is already taken. Please choose another.")
 				if (browserTriggered) {
 					history.forward();
 				}
@@ -284,9 +284,9 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	 Return text for 'Next' button. Differs only at last step.
 	*/
 	navigationModalText(): string {
-		let text = 'Do you want to keep this ValueChart?';
+		let text = "Do you want to keep this ValueChart?";
 		if (this.currentUserService.isJoiningChart()) {
-			text = 'Are you sure you want to leave this ValueChart?';
+			text = "Are you sure you want to leave this ValueChart?";
 		}
 		return text;
 	}
@@ -341,7 +341,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.navigationResponse.next(true);
 			}
 			else {
-				toastr.error('That name is already taken. Please choose another if you would like to save the chart.');
+				toastr.error("That name is already taken. Please choose another if you would like to save the chart.");
 				this.navigationResponse.next(false);
 			}
 			$('#navigation-warning-modal').modal('hide');

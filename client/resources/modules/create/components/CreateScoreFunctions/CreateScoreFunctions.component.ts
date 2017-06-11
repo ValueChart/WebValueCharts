@@ -156,7 +156,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
           this.user.setWeightMap(new WeightMap());
-          toastr.warning("Your weights have been reset because the best/worst outcome on some Objective has changed.");
+          toastr.warning("Your weights have been cleared because the best/worst outcome on some Objective has changed.");
           break;
         }
       }

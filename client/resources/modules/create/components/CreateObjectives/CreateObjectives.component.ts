@@ -98,26 +98,26 @@ export class CreateObjectivesComponent implements OnInit {
 
 		this.initialPrimObjRows = {};
 		this.objectiveRows = {};
-		this.rootObjRowID = "0";
-		this.selectedObjRow = "0";
+		this.rootObjRowID = '0';
+		this.selectedObjRow = '0';
 		this.objectivesCount = 0;
-		this.categoryToAdd = "";
+		this.categoryToAdd = '';
 		this.categoriesToAdd = [];
 		this.editing = false;
 		this.errorMessages = [];
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), "", "", 0);
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), '', '', 0);
 			this.objectivesCount++;
 		}
 		else {
 			this.editing = true;
 			let rootObjective: Objective = this.valueChart.getRootObjectives()[0];
 			rootObjective.setName(this.valueChart.getName());
-			this.objectiveToObjRow(rootObjective, "", 0);
+			this.objectiveToObjRow(rootObjective, '', 0);
 
-			// Store record of each ObjectiveRow of type 'primitive'
+			// Store record of each ObjectiveRow of type "primitive"
 			// This allows us to update references in other parts of the ValueChart when component is destroyed
 			for (let objID of this.objKeys()) {
 				let objrow: ObjectiveRow = this.objectiveRows[objID];
@@ -170,7 +170,6 @@ export class CreateObjectivesComponent implements OnInit {
 	handleDomainChanges(objIDs: string[]) {
 		let allWeightsReset = false;
 		let resetScoreFunctions: string[] = [];
-		let resetUsers: string[] = [];
 		for (let objID of objIDs) {
 			let oldDom = this.initialPrimObjRows[objID].dom;
 			let newDom = this.objectiveRows[objID].dom;
@@ -188,7 +187,7 @@ export class CreateObjectivesComponent implements OnInit {
 
 			// Check for changes to categorical domain options
 			// In this case, we can keep the previous ScoreFunction elements since there is no inherent scale
-			// However, if the best/worst outcomes were deleted for any users, we need to make adjustments accordingly
+			// However, if the best/worst outcomes were deleted for any users, their preferences will become invalid
 			else if (newDom.type === 'categorical') {
 				let addedCats = newDom.categories.filter(x => oldDom.categories.indexOf(x) === -1);
 				let removedCats = oldDom.categories.filter(x => newDom.categories.indexOf(x) === -1);
@@ -198,24 +197,15 @@ export class CreateObjectivesComponent implements OnInit {
 				for (let cat of addedCats) {
 					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
 				}
-				let resetUsersForObj = this.updateObjRefService.rescaleScoreFunctions(objName);
-				for (let userName of resetUsersForObj) {
-					if (resetUsers.indexOf(userName) === -1) {
-						resetUsers.push(userName);
-					}
-				}	
 			}
 			this.updateObjRefService.clearAlternativeValues(obj);
 		}
 		if (allWeightsReset) {
-			toastr.warning("All users' weights were reset.");
-			for (let objName of resetScoreFunctions) {
-				toastr.warning("All users' score functions for " + objName + " were reset to default.");
-			}
-		}
-		else {
-			for (let userName of resetUsers) {
-				toastr.warning(userName + "'s weights were reset.");
+			if (this.valueChart.getUsers().length > 0) {
+				let prefix = this.valueChart.getUsers().length === 1 ? "Your" : "All users'";
+				toastr.warning(prefix + " weights have been cleared because the best/worst outcome on some Objective has changed.");	
+				toastr.warning(prefix + " score functions for the following Objectives have been reset to default: " + resetScoreFunctions.join(", "));
+
 			}
 		}						
 	}
@@ -263,7 +253,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Creates a new, blank ObjectiveRow under an existing ObjectiveRow.
 	*/
 	addNewChildObjRow(parentID: string) {
-		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), "", "", parentID, this.objectiveRows[parentID].depth + 1));
+		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', parentID, this.objectiveRows[parentID].depth + 1));
 		this.resetErrorMessages();
 	}
 
@@ -285,7 +275,7 @@ export class CreateObjectivesComponent implements OnInit {
 	*/
 	deleteObjRow(objID: string) {
 		let parentID = this.objectiveRows[objID].parent;
-		if (parentID !== "") {
+		if (parentID !== '') {
 			this.objectiveRows[parentID].removeChild(objID);
 		}
 		let children = this.objectiveRows[objID].children.slice();
@@ -293,7 +283,7 @@ export class CreateObjectivesComponent implements OnInit {
 			this.deleteObjRow(child);
 		}
 		delete this.objectiveRows[objID];
-		this.selectedObjRow = "";
+		this.selectedObjRow = '';
 		this.resetErrorMessages();
 	}
 
@@ -302,7 +292,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Used by "Add Child" button. Returns true if no row is selected or a primitive objective row is selected.
 	*/
 	disableAddChild(): boolean {
-		return (this.selectedObjRow === "" || this.objectiveRows[this.selectedObjRow].type === 'primitive');
+		return (this.selectedObjRow === '' || this.objectiveRows[this.selectedObjRow].type === 'primitive');
 	}
 
 	/* 	
@@ -310,7 +300,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Used by "Delete" button. Returns true if no row is selected or the root is selected.
 	*/
 	disableDelete(): boolean {
-		return (this.selectedObjRow === "" || this.selectedObjRow === this.rootObjRowID);
+		return (this.selectedObjRow === '' || this.selectedObjRow === this.rootObjRowID);
 	}
 
 	/* 	
@@ -419,7 +409,7 @@ export class CreateObjectivesComponent implements OnInit {
 	*/
 	addCategory() {
 		this.categoriesToAdd.push(this.categoryToAdd);
-		this.categoryToAdd = "";
+		this.categoryToAdd = '';
 	}
 
 	/* 	
@@ -440,7 +430,7 @@ export class CreateObjectivesComponent implements OnInit {
 						This makes it easier for the user to add many categories to modal list in sequence.
 	*/
 	handleKeyPress(key: string) {
-		if (key === "Enter") {
+		if (key === 'Enter') {
 			this.addCategory();
 		}
 	}
@@ -450,7 +440,7 @@ export class CreateObjectivesComponent implements OnInit {
 	@description 	Removes selected categories from modal list.
 	*/
 	removeSelectedCategoriesModal() {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlistmodal")[0]);
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlistmodal')[0]);
 		for (let cat of selected) {
 			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat), 1);
 		}
@@ -461,7 +451,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Removes selected categories in main view from ObjectiveRow domain.
 	*/
 	removeSelectedCategoriesMain(objID: string) {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName("catlist" + objID)[0]);
+		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlist' + objID)[0]);
 		for (let cat of selected) {
 			this.objectiveRows[objID].dom.removeCategory(cat);
 		}
@@ -564,8 +554,8 @@ class ObjectiveRow {
 		this.desc = desc;
 		this.parent = parent;
 		this.depth = depth;
-		type ? this.type = type : this.type = "abstract";
-		color ? this.color = color : this.color = "red";
+		type ? this.type = type : this.type = 'abstract';
+		color ? this.color = color : this.color = 'red';
 		dom ? this.dom = dom : this.dom = new DomainDetails('categorical');
 		this.children = [];
 	}

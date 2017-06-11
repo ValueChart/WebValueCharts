@@ -107,29 +107,6 @@ export class UpdateObjectiveReferencesService {
 	}
 
 	/*
-		@returns {string[]}
-		@description 	 Transforms users' ScoreFunctions so that the best outcome has score of 1 and worst outcome has score of 0.
-						 Returns names of users whose ScoreFunctions for objName needed rescaling
-	*/
-	rescaleScoreFunctions(objName: string): string[] {
-		let rescaledUsers: string[] = [];
-		for (let user of this.valueChartService.getValueChart().getUsers()) {
-			let scoreFunctionMap = user.getScoreFunctionMap();
-			if (scoreFunctionMap) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
-				if (scoreFunction && scoreFunction.getRange() > 0) {
-					let rescaled = scoreFunction.rescale();
-					if (rescaled) {
-						user.setWeightMap(new WeightMap());
-						rescaledUsers.push(user.getUsername());
-					}
-				}
-			}
-		}
-		return rescaledUsers;	
-	}
-
-	/*
 		@returns {void}
 		@description 	 Check each Alternative's value for obj. Clear if no longer valid.
 	*/
