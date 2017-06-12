@@ -15,9 +15,10 @@ import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
+import { ValidationService }							from '../../services/Validation.service';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
 import { ValueChartXMLEncoder }							from '../../../utilities/classes/ValueChartXMLEncoder';
-import { ValidationService }							from '../../services/Validation.service';
+import * as Formatter									from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
@@ -134,14 +135,16 @@ export class MyValueChartsComponent implements OnInit {
 			});
 	}
 
-	editPreferences(chartId: string, password: string): void {
-		password = password || '';
-
-		this.valueChartHttpService.getValueChartSingleUser(chartId, password, this.currentUserService.getUsername())
+	editPreferences(chartId: string, chartName: string, password: string): void {
+		this.valueChartHttpService.getValueChartStructure(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setJoiningChart(true);
-				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+				this.valueChartHttpService.getUser(chartId, this.currentUserService.getUsername())
+					.subscribe(user => {
+						valueChart.setUser(user);
+						this.valueChartService.setValueChart(valueChart);
+						this.currentUserService.setJoiningChart(true);
+						this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+					});
 			});
 	}
 

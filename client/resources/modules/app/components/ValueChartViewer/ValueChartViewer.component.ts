@@ -259,11 +259,25 @@ export class ValueChartViewerComponent implements OnInit {
 
   /*   
     @returns {void}
-    @description   Normalizes the user's weights then redirects to 
+    @description   This is executed when the user clicks "Edit Preferences" and does the following:
+    				(1) If user is joining the chart, fetch the chart again - this is necessary to get any changes made to the chart structure by the creator
+    				(2) Normalize the user's weights in case the pump tool was used
+    				(3) Redirect to edit preference workflow
   */
   	editPreferences(): void {
-  		this.valueChartService.getCurrentUser().getWeightMap().normalize();
-  		this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+		if (this.currentUserService.isJoiningChart()) {
+			this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
+			.subscribe(valueChart => {
+				valueChart.setUser(this.valueChartService.getCurrentUser());
+				this.valueChartService.setValueChart(valueChart);
+				this.valueChartService.getCurrentUser().getWeightMap().normalize();
+				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+			});
+		}
+		else {
+			this.valueChartService.getCurrentUser().getWeightMap().normalize();
+			this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+		}	
   	}
 
 	// ================================ Hosting/Joining/Saving a ValueChart ====================================

@@ -156,20 +156,6 @@ export class ValueChartHttpService {
 	}
 
 	/*
-		@param chartId - The id of the ValueChart resource to be retrieved. This id is provided by the server upon creating/updating a ValueChart resource.
-		@param password - The password of the ValueChart to be retrieved. The client must have the correct password to be allowed to retrieve the ValueChart.
-		@param username - The username of the user whose ValueChart preferences should be included. 
-		@returns {Observable<boolean>} - An observable of the ValueChart that was requested. 
-		@description 	Queries the server to retrieve a copy of the ValueChart resource with the given id and password.
-						Only the data for the specified user will be included.
-	*/
-	getValueChartSingleUser(chartId: string, password: string, username: string): Observable<ValueChart> {
-		return this.http.get(this.valueChartsUrl + chartId + '/singleuser?password=' + password + '&username=' + username)
-			.map(this.extractValueChartData)
-			.catch(this.handleError);
-	}
-
-	/*
 		@param fname - The name of the ValueChart (formatted) whose structure is to be retrieved. This is NOT the id provided by the server, but rather the user assigned name.
 		@param password - The password for the ValueChart whose structure is to be retrieved.
 		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
@@ -236,6 +222,20 @@ export class ValueChartHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 		return this.http.post(this.valueChartsUrl + chartId + '/users', body, options)
+			.map(this.extractUserData)
+			.catch(this.handleError);
+	}
+
+	/*
+		@param chartId - The id of the ValueChart resource to be retrieved. This id is provided by the server upon creating/updating a ValueChart resource.
+		@param password - The password of the ValueChart to be retrieved. The client must have the correct password to be allowed to retrieve the ValueChart.
+		@param username - The username of the user whose ValueChart preferences should be included. 
+		@returns {Observable<boolean>} - An observable of the ValueChart that was requested. 
+		@description 	Queries the server to retrieve a copy of the ValueChart resource with the given id and password.
+						Only the data for the specified user will be included.
+	*/
+	getUser(chartId: string, username: string): Observable<User> {
+		return this.http.get(this.valueChartsUrl + chartId + '/users/' + username)
 			.map(this.extractUserData)
 			.catch(this.handleError);
 	}
