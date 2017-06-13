@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 13:28:35
+* @Last Modified time: 2017-06-13 11:12:21
 */
 
 // Import gulp packages:
@@ -87,16 +87,18 @@ e2e = function() {
 }
 
 serverTests = function() {
-  	return gulp.src(['test/server/**/*.js'], { read: false })
- 		.pipe(mocha({
- 	  		reporter: "mochawesome",
- 	 		reporterOptions: {
- 				reportDir: 'test/reports',
- 				reportFilename: 'server-report'
- 			}
-  		}));
-  }
-
+	return gulp.src(['test/server/**/*.js'], { read: false })
+		.pipe(mocha({
+	  		reporter: "mochawesome",
+	 		reporterOptions: {
+				reportDir: 'test/reports',
+				reportFilename: 'server-report'
+			}
+		}))
+		.once('error', () => {
+			process.exit(1);
+		});
+}
 
 
 // runTests is a wrapper that starts up a local server before executing
