@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:25:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 17:02:11
+* @Last Modified time: 2017-06-13 10:00:46
 */
 
 // Require Node Libraries:
@@ -280,14 +280,14 @@ describe('Users Routes', () => {
 		});
 	});
 
-	describe('Route: /Users/:user/ValueCharts', () => {
+	describe('Route: /Users/:user/OwnedValueCharts', () => {
 
 		context('when the user is not logged in', () => {
 
 			describe('Method: Get', () => {
 
-				it('should retrieve the ValueCharts associated with the logged-in user as well as status code 200', (done: MochaDone) => {
-					user.get('Users/amishkin/ValueCharts')
+				it('should return status code 401 - the user must be logged in to obtain their ValueCharts', (done: MochaDone) => {
+					user.get('Users/amishkin/OwnedValueCharts')
 						.set('Accept', 'application/json')
 						.expect(401)
 						.end(function(err, res) {
@@ -313,7 +313,7 @@ describe('Users Routes', () => {
 				});
 
 				it('should retrieve the ValueCharts associated with the logged-in user as well as status code 200', (done: MochaDone) => {
-					user.get('Users/amishkin/ValueCharts')
+					user.get('Users/amishkin/OwnedValueCharts')
 						.set('Accept', 'application/json')
 						.expect('Content-Type', /json/)
 						.expect(200)
