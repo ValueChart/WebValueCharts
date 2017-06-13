@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 17:05:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-02 12:51:48
+* @Last Modified time: 2017-06-13 12:13:36
 */
 
 // Require Node Libraries:
@@ -38,7 +38,7 @@ describe('Register Page', () => {
 
 		//Click to sign in
 		userLoginBtn.click().then(function() {
-			//p.browser.waitForAngular();
+			p.browser.waitForAngular();
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 	});
@@ -72,7 +72,7 @@ describe('Register Page', () => {
 
 		//Click to sign in
 		userLoginBtn.click().then(function() {
-			//p.browser.waitForAngular();
+			p.browser.waitForAngular();
 			expect(errorMessage.isDisplayed());
 		});
 	});
@@ -96,6 +96,7 @@ describe('Register Page', () => {
 		expect(tempUserName.getAttribute('value')).to.eventually.equal('tempUser')
 
 		tempContBtn.click().then(function() {
+			p.browser.waitForAngular();
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 

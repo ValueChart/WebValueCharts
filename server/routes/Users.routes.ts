@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 16:47:15
+* @Last Modified time: 2017-06-13 11:53:39
 */
 
 // Import Libraries and Express Middleware:
@@ -22,6 +22,19 @@ usersRoutes.post('/', passport.authenticate('local-signup'), function(req: expre
 });
 
 // Login. Doesn't conform to REST principles, but is necessary. The passport local-signin strategy does the actual logging in. See Auth.ts for more information. 
+usersRoutes.get('/currentUser', function(req: express.Request, res: express.Response) {
+
+	if (req.isAuthenticated()) {
+		res.status(200)
+			.json({ data: { username: req.user[0].username, password: req.user[0].password, loginResult: req.isAuthenticated() }});
+	} else {
+		res.status(200)
+			.json({ data: { loginResult: req.isAuthenticated() }});
+	}
+});
+
+
+// Login. Doesn't conform to REST principles, but is necessary. The passport local-signin strategy does the actual logging in. See Auth.ts for more information. 
 usersRoutes.post('/login', passport.authenticate('local-signin'), function(req: express.Request, res: express.Response) {
 
 	res.status(200)
@@ -31,15 +44,20 @@ usersRoutes.post('/login', passport.authenticate('local-signin'), function(req: 
 // Logout. Doesn't conform to REST principles, but is necessary.
 usersRoutes.get('/logout', function(req: express.Request, res: express.Response) {
 
-	var body: any = { data: { username: req.user[0].username, password: req.user[0].password, logoutResult: true } };
+	if (req.isAuthenticated()) {
+		var body: any = { data: { username: req.user[0].username, password: req.user[0].password, logoutResult: true } };
 
-	// Destroy the current user's session.
-	req.session.destroy(function (err) {
-		req.session = null;
-    	res.clearCookie('express.sid', { path: '/' });
-		req.logOut();
-		res.json(body);
-	});
+		// Destroy the current user's session.
+		req.session.destroy(function (err) {
+			req.session = null;
+	    	res.clearCookie('express.sid', { path: '/' });
+			req.logOut();
+			res.json(body);
+		});
+	} else {
+		res.status(200)
+			.json({ data: { loginResult: req.isAuthenticated() }});
+	}
 });
 
 // Get an existing user.

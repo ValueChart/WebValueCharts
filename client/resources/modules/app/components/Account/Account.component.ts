@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 16:30:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 21:37:16
+* @Last Modified time: 2017-06-13 12:28:49
 */
 
 import { Component } 												from '@angular/core';
@@ -72,8 +72,12 @@ export class AccountComponent implements OnInit {
 	}
 
 	updateUser(username: string, password: string, email: string): void {
+		this.validatePasswords(this.password, this.rePassword);
+		if (this.invalidCredentials)
+			return;
+
 		this.userHttpService.updateUser(username, password, email)
-			.subscribe(user => { this.credentialsUpdated = true; })
+			.subscribe(user => { this.credentialsUpdated = true; });
 	}
 
 	validatePasswords(passwordOne: string, passwordTwo: string): void {

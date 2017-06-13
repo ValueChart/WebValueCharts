@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-05 16:07:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 18:51:30
+* @Last Modified time: 2017-06-13 11:49:29
 */
 
 // Import Angular Classes:
@@ -11,6 +11,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	
 
 // Import Application Classes:
 import { CurrentUserService }													from './CurrentUser.service';
+import { UserHttpService }														from './UserHttp.service';
 
 
 
@@ -39,6 +40,7 @@ export class AuthGuardService implements CanActivate {
 	*/
 	constructor(
 		private router: Router,
+		private userHttpService: UserHttpService,
 		private currentUserService: CurrentUserService) { }
 
 
@@ -53,13 +55,25 @@ export class AuthGuardService implements CanActivate {
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
 						to the Angular 2 router.
 	*/
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-		// Does the current user have a username? The username will ALWAYS be defined if they are logged in as a permanent or temporary user. 
-		if (this.currentUserService.getUsername() !== undefined && this.currentUserService.getUsername() !== null && this.currentUserService.getUsername() !== '') {
-			return true;	// Allow the user to navigate to the activated route.
-		} else {
-			this.router.navigate(['/register']);		// Redirect the user to register, which is the only route they are allowed to view if they are not authenticated.
-			return false;								// Prevent the current navigation.
-		}
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
+
+		return new Promise((resolve, reject) => {
+			this.userHttpService.getCurrentUser().subscribe( (user: { username: string, password: string, loginResult: boolean }) => {
+				if (user.loginResult) {
+					this.currentUserService.setLoggedIn(true);
+					this.currentUserService.setUsername(user.username);
+				} else {
+					this.currentUserService.setLoggedIn(false);
+				}
+
+				// Does the current user have a username? The username will ALWAYS be defined if they are logged in as a permanent or temporary user. 
+				if (this.currentUserService.getUsername() !== undefined && this.currentUserService.getUsername() !== null && this.currentUserService.getUsername() !== '') {
+					return resolve(true);	// Allow the user to navigate to the activated route.
+				} else {
+					this.router.navigate(['/register']);		// Redirect the user to register, which is the only route they are allowed to view if they are not authenticated.
+					return resolve(false);						// Prevent the current navigation.
+				}
+			});
+		});
 	}
 }

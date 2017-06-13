@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 23:17:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-24 17:24:18
+* @Last Modified time: 2017-06-13 11:35:21
 */
 
 import '../../utilities/rxjs-operators';
@@ -59,6 +59,18 @@ export class UserHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 		return this.http.post(this.usersUrl, body, options)
+			.map(this.extractData)
+			.catch(this.handleError);
+	}
+
+	/*
+		@param username - The username of the user whose details are to be retrieved.
+		@returns {Observable<any>} - An observable of the user resource retrieved from the server.
+		@description 	Sends a request to the server to retrieve an existing user's details.
+						The information includes email, username, and password.
+	*/
+	getCurrentUser(): Observable<any> {
+		return this.http.get(this.usersUrl + 'currentUser')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

@@ -26,14 +26,14 @@
 					<input class="form-control" type="password" id="re-password-input" placeholder="password" (change)="validatePasswords(password, rePassword)" [(ngModel)]="rePassword" name="re-password">
 				</div>
 			</div>
+			<div class="form-group text-center">
+				<a class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</a>
+			</div>
 			<div [hidden]="!invalidCredentials" class="alert alert-danger">
 				<span class="col-sm-offset-4">{{invalidMessage}}</span>
 			</div>
 			<div [hidden]="!credentialsUpdated" class="alert alert-success">
 				<span class="col-sm-offset-4">Account details successfully updated</span>
-			</div>
-			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</a>
 			</div>
 		</form>
 	</div>

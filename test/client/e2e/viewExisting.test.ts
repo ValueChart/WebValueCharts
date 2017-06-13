@@ -33,6 +33,8 @@ describe('View Existing Chart Page', () => {
 		
 		// Click to sign in
 		userLoginBtn.click().then(function() {
+			p.browser.waitForAngular();
+
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 	});
@@ -67,6 +69,7 @@ describe('View Existing Chart Page', () => {
 		// Click to view value chart "Cities"
 		let continueBtn = p.element.all(p.by.buttonText('Continue'));	
 		continueBtn.click().then(function() {
+			p.browser.waitForAngular();
 			// Notification "Invalid Name or Password" appears
 			var InvalidNameOrPwSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Invalid Name or Password'));
 			expect(InvalidNameOrPwSpan.isDisplayed()).to.eventually.be.true; 
@@ -98,6 +101,7 @@ describe('View Existing Chart Page', () => {
 			// Click "Continue" to view value chart "Cities"
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
+				p.browser.waitForAngular();
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 			});
 	});
@@ -126,6 +130,7 @@ describe('View Existing Chart Page', () => {
 			// Click "Continue" to view value chart "Cities"
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
+				p.browser.waitForAngular();
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/testemp');
 			});
 
@@ -179,6 +184,7 @@ describe('View Existing Chart Page', () => {
 			// Click "Continue" to view value chart "Cities"
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
+				p.browser.waitForAngular();
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/Cities');
 			});
 	});

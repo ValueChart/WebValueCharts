@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-16 22:20:27
+* @Last Modified time: 2017-06-13 11:30:18
 */
 
 // Import Angular Classes:
@@ -40,8 +40,7 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 	templateUrl: './Root.template.html',
 	providers: [
 		XMLValueChartParserService,
-		ValueChartXMLEncoder,
-		UserHttpService]
+		ValueChartXMLEncoder]
 })
 export class RootComponent implements OnInit {
 

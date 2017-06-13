@@ -33,6 +33,7 @@ describe('My Account Page', () => {
 
 		// Click to sign in
 		userLoginBtn.click().then(function() {
+			p.browser.waitForAngular();
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 	});
@@ -49,8 +50,40 @@ describe('My Account Page', () => {
 		});
 	});
 
+	// Case 1: succesfully change the email.
+	// 		Still at 'myAccount' page:
+	// 		- Change email (without changing the password)
+	// 		- Click 'Update Account Details'
+	// 		- Green notification field should appear
+	it('should successfully change the account\'s email address', function(){
+		
+		// Find page elements
+		var emailField = p.browser.element(p.By.id('email-input'));
+		var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
 
-	// Case 1: Fail because reenter password doesn't match
+		p.browser.waitForAngular();
+
+
+		// Fill input keys 
+		emailField.clear();
+		emailField.sendKeys('vickytry002@gmail.com');
+		
+
+		// Ensure fields contain what is entered
+		expect(emailField.getAttribute('value')).to.eventually.equal('vickytry002@gmail.com');
+
+		// Click 'Update Account Details' button to update
+		updAccDtlBtn.click().then(function() {
+			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
+			// A green field notifying success should be displayed
+			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
+			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
+		});
+
+	});
+
+
+	// Case 2: Fail because reenter password doesn't match
 	// 		At the 'myAccount' page:
 	//		- Change password (reenter does not match)
 	// 		- Click 'Update Account Details'
@@ -80,36 +113,6 @@ describe('My Account Page', () => {
 			// A green field notifying success should be displayed
 			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','The entered passwords do not match'));
 			expect(succUpdSpan.isDisplayed()).to.eventually.be.true;
-		});
-
-	});
-
-
-	// Case 2: succesfully change the email.
-	// 		Still at 'myAccount' page:
-	// 		- Change email (without changing the password)
-	// 		- Click 'Update Account Details'
-	// 		- Green notification field should appear
-	it('should successfully change the account\'s email address', function(){
-		
-		// Find page elements
-		var emailField = p.browser.element(p.By.id('email-input'));
-		var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
-
-		// Fill input keys 
-		emailField.clear();
-		emailField.sendKeys('vickytry002@gmail.com');
-		
-
-		// Ensure fields contain what is entered
-		expect(emailField.getAttribute('value')).to.eventually.equal('vickytry002@gmail.com');
-
-		// Click 'Update Account Details' button to update
-		updAccDtlBtn.click().then(function() {
-			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
-			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
-			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
 		});
 
 	});
@@ -178,6 +181,7 @@ describe('My Account Page', () => {
 
 		// Click to sign in
 		userLoginBtn.click().then(function() {
+			p.browser.waitForAngular();
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
 		});
 
@@ -199,15 +203,23 @@ describe('My Account Page', () => {
 				var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
 				var emailField = p.browser.element(p.By.id('email-input'));
 
+				p.browser.waitForAngular();
 
-				passwordField.clear();
-				passwordField.sendKeys('001');
-				reEtrPwField.clear();
-				reEtrPwField.sendKeys('001');
-				emailField.clear();
-				emailField.sendKeys('vickytry001@gmail.com');
+				passwordField.clear().then(() => {
+					passwordField.clear();
+					passwordField.sendKeys('001');
+				});
+
+				reEtrPwField.clear().then(() => {
+					reEtrPwField.sendKeys('001');
+				});
+
+				emailField.clear().then(() => {
+					emailField.sendKeys('vickytry001@gmail.com');
+				});
 
 				updAccDtlBtn.click()
+				p.browser.waitForAngular();
 		});
 	});
 
