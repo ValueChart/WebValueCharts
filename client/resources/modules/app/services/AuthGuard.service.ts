@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-05 16:07:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-13 11:49:29
+* @Last Modified time: 2017-06-13 14:34:55
 */
 
 // Import Angular Classes:
@@ -56,24 +56,30 @@ export class AuthGuardService implements CanActivate {
 						to the Angular 2 router.
 	*/
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-
 		return new Promise((resolve, reject) => {
-			this.userHttpService.getCurrentUser().subscribe( (user: { username: string, password: string, loginResult: boolean }) => {
-				if (user.loginResult) {
-					this.currentUserService.setLoggedIn(true);
-					this.currentUserService.setUsername(user.username);
-				} else {
-					this.currentUserService.setLoggedIn(false);
-				}
+			let username  = this.currentUserService.getUsername();
+			if (!username) {
+					this.userHttpService.getCurrentUser().subscribe( (user: { username: string, password: string, loginResult: boolean }) => {
+						if (user.loginResult) {
+							this.currentUserService.setLoggedIn(true);
+							this.currentUserService.setUsername(user.username);
 
-				// Does the current user have a username? The username will ALWAYS be defined if they are logged in as a permanent or temporary user. 
-				if (this.currentUserService.getUsername() !== undefined && this.currentUserService.getUsername() !== null && this.currentUserService.getUsername() !== '') {
-					return resolve(true);	// Allow the user to navigate to the activated route.
-				} else {
-					this.router.navigate(['/register']);		// Redirect the user to register, which is the only route they are allowed to view if they are not authenticated.
-					return resolve(false);						// Prevent the current navigation.
-				}
-			});
+							if (state.url.indexOf('view') !== -1 || state.url.indexOf('createValueChart') !== -1 ) {			// Redirect to home if the user was creating or viewing a ValueChart, or attempting to reach register when they are logged in.
+								this.router.navigate(['/home']);		
+								resolve(false);			
+							} else {
+								resolve(true);	// Allow the user to navigate to the activated route.
+							}
+
+						} else {
+							this.currentUserService.setLoggedIn(false);
+							this.router.navigate(['/register']);		// Redirect the user to register, which is the only route they are allowed to view if they are not authenticated.
+							resolve(false);								// Prevent the current navigation.
+						}
+					});
+			} else {
+				resolve(true);
+			}
 		});
 	}
 }
