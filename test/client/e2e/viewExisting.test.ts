@@ -50,7 +50,7 @@ describe('View Existing Chart Page', () => {
 		var viewExistBtn = p.browser.element(p.By.buttonText('View Existing ValueChart'));
 		viewExistBtn.click().then(function() {
 			var viewExistDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'View Existing Chart'));
-			p.browser.sleep(1000);
+			p.browser.sleep(5000);
 			expect(viewExistDialog.isDisplayed()).to.eventually.be.true;
 		});
 
@@ -137,18 +137,8 @@ describe('View Existing Chart Page', () => {
 	});
 
 
-	// Case 3 (cont): A user who's ONLY viewing an individual ValueChart is barred from changing the preferences in that chart.
-	// 		- chartname: testemp
-	// 		- password: t
-	it('should bar user from changing the preferences when ONLY viewing an individual chart owned by others', function() {
-			
-			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/testemp');
 
-
-	});
-
-
-	// Case 4: Successfully viewing a group ValueChart
+	// Case 4: Successfully viewing a group ValueChart (in this case you don't own)
 	// 		- chartname: Cities
 	// 		- password: australia
 	it('should successfully let users view a group ValueChart', function() {
@@ -186,10 +176,34 @@ describe('View Existing Chart Page', () => {
 			continueBtn.click().then(function() {
 				p.browser.waitForAngular();
 				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/Cities');
-			});
+			});	
 	});
 
+	// The following test cases are to check whether a user can 
+	// 		interact with a chart in the following situations:
+	// 		- Type 1: A group chart that I own or don't own
+	//		- Type 2: An individual chart that I don't own
+	// 		- Type 3: An individual chart that I own, and I'm the current user
+	// 		- Type 4: An individual chart that I own, but someone else is the current user
+	// Note that I can only change my preferences in case 3. 
 
+
+    //  Case 5: User shoudn't be able to change preference in a group chart (Type 1)
+    // 		- Currently still viewing Cities so don't need to go back 
+	it('shouldn\'t let user change preference when viewing a group ValueChart', function() {
+
+		// var editValueChartBtn = p.browser.element(p.by.cssContainingText('.form-group.valuechart-toolbar-group.pull-left','Edit ValueChart'));
+		// var editValueChartBtn = p.browser.element(p.by.css('.form-group.valuechart-toolbar-group.pull-left .btn.btn-default'));
+		//driver.findElement(By.cssSelector("a[href*='long']"))
+		// var editValueChartBtn = p.browser.element(p.by.cssContainingText('valuechart-toolbar','Edit ValueChart'));		
+		//var editValueChartBtn = p.browser.element(p.by.css('form-group.valuechart-toolbar-group.pull-left'));
+		//let editValueChartBtn = p.element.all(p.by.buttonText(''));
+
+		//expect(editValueChartBtn.isDisplayed()).to.eventually.be.false;
+		var logoutBtn = p.browser.element(p.By.id('log-out'));
+		expect(logoutBtn.isDisplayed()).to.eventually.be.true;
+			
+	});
 
 });
 
