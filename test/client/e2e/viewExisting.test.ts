@@ -181,29 +181,35 @@ describe('View Existing Chart Page', () => {
 
 	// The following test cases are to check whether a user can 
 	// 		interact with a chart in the following situations:
-	// 		- Type 1: A group chart that I own or don't own
-	//		- Type 2: An individual chart that I don't own
-	// 		- Type 3: An individual chart that I own, and I'm the current user
-	// 		- Type 4: An individual chart that I own, but someone else is the current user
-	// Note that I can only change my preferences in case 3. 
+	//      - Type 1:   A group chart that I don't own	
+	// 		- Type 2:   A group chart that I own
+	//		- Type 3:   An individual chart that I don't own
+	// 		- Type 4:   An individual chart that I own, and I'm the current user
+	// 		- Type 4*:  An individual chart that I own, but someone else is the current user
+	// Note that I can only change my preferences in Type 4. 
 
 
-    //  Case 5: User shoudn't be able to change preference in a group chart (Type 1)
-    // 		- Currently still viewing Cities so don't need to go back 
-	it('shouldn\'t let user change preference when viewing a group ValueChart', function() {
+    //  Case 5: see Type 1
+    // 		- Currently still viewing 'Cities' so don't need to go back 
+	it('shouldn\'t let users change preference when viewing a group ValueChart they don\'t own', function() {
 
-		// var editValueChartBtn = p.browser.element(p.by.cssContainingText('.form-group.valuechart-toolbar-group.pull-left','Edit ValueChart'));
-		// var editValueChartBtn = p.browser.element(p.by.css('.form-group.valuechart-toolbar-group.pull-left .btn.btn-default'));
-		//driver.findElement(By.cssSelector("a[href*='long']"))
-		// var editValueChartBtn = p.browser.element(p.by.cssContainingText('valuechart-toolbar','Edit ValueChart'));		
-		//var editValueChartBtn = p.browser.element(p.by.css('form-group.valuechart-toolbar-group.pull-left'));
-		//let editValueChartBtn = p.element.all(p.by.buttonText(''));
+		// check whether the editing-related buttons are present or not
+		var editBtns = p.browser.element(p.By.css('#ValueChartView form a.btn-default')); // both 'Edit ValueChart' and 'Edit Preference' buttons
+		var exportValueChartBtn = p.browser.element(p.By.id('#download-value-chart'));
+		var lockChartBtn = p.browser.element(p.By.buttonText('Lock Chart'));
+		var saveChartBtn = p.browser.element(p.By.buttonText('Save Chart'));
 
-		//expect(editValueChartBtn.isDisplayed()).to.eventually.be.false;
-		var logoutBtn = p.browser.element(p.By.id('log-out'));
-		expect(logoutBtn.isDisplayed()).to.eventually.be.true;
+		expect(editBtns.isPresent()).to.eventually.be.false;
+		expect(exportValueChartBtn.isPresent()).to.eventually.be.false;
+		expect(lockChartBtn.isPresent()).to.eventually.be.false;
+		expect(saveChartBtn.isPresent()).to.eventually.be.false;
 			
 	});
+
+	// Case 7: See Type 3
+	// it('allows users to change preferences when viewing their own individual chart and that they are the only current user', function(){
+
+	// }
 
 });
 
