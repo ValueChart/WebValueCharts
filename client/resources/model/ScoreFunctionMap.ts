@@ -78,6 +78,19 @@ export class ScoreFunctionMap {
 		return scoreFunctionKeyPairs;
 	}
 
+	getAllScoreFunctionKeys(): string[] {
+		var keys = [];
+		var scoreFunctionIterator: Iterator<string> = this.scoreFunctions.keys();
+		var iteratorElement: IteratorResult<string> = scoreFunctionIterator.next();
+
+		while (iteratorElement.done === false) {
+			keys.push(iteratorElement.value);
+			iteratorElement = scoreFunctionIterator.next();
+		}
+
+		return keys;
+	}
+
 	getObjectiveScoreFunction(objectiveName: string): ScoreFunction {
 		return this.scoreFunctions.get(objectiveName);
 	}

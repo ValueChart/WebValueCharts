@@ -109,30 +109,6 @@ valueChartRoutes.get('/:chart', function(req: express.Request, res: express.Resp
 	});
 });
 
-// // Get an existing ValueChart by id. Only include the preferences for the user with the specified username.
-// valueChartRoutes.get('/:chart/singleuser', function(req: express.Request, res: express.Response, next: express.NextFunction) {
-// 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-// 	var identifier: string = (<any> req).identifier
-// 	var password: string = req.query.password;
-// 	var username: string = req.query.username;
-
-// 	valueChartsCollection.findOne({ _id: identifier, password: password }, function(err: Error, doc: any) {
-// 		if (err) {
-// 			res.status(400)
-// 				.json({ data: err });
-
-// 		} else if (doc) {
-// 			// Remove all users except the one with the specified username.
-// 			doc.users = (<any[]>doc.users).filter(function(e) { return e.username === username });
-// 			res.location('/ValueCharts/' + identifier)
-// 				.status(200)
-// 				.json({ data: doc });
-// 		} else {	// No ValueChart with that id + password combination was found. Return 404: Not Found.
-// 			res.status(404).send('Not Found')
-// 		}
-// 	});
-// });
-
 // Update an existing ValueChart, or create one if it does not exist. This method should not be used to create a new ValueChart
 // as it will fail if the provided id is not a valid id for the database. Use the post method to the ValueCharts collection instead.
 valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Response, next: express.NextFunction) {

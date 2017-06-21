@@ -116,21 +116,30 @@ export class PrimitiveObjective implements Objective {
 
 	getDefaultScoreFunction(): ScoreFunction {
 		if (this.defaultScoreFunction === undefined) {
-			this.initializeDefaultScoreFunction();
+			return this.getFlatScoreFunction();
 		}
 		return this.defaultScoreFunction;
 	}
 
-	initializeDefaultScoreFunction(): void {
-		if (this.getDomainType() === 'categorical' || this.getDomainType() === 'interval') {
-			this.defaultScoreFunction = new DiscreteScoreFunction();
-		}
-		else {
-			this.defaultScoreFunction = new ContinuousScoreFunction((<ContinuousDomain>this.domain).getMinValue(),(<ContinuousDomain>this.domain).getMaxValue());
-		}
-		this.defaultScoreFunction.initialize(this, ScoreFunction.FLAT);
+	setDefaultScoreFunction(scoreFunction: ScoreFunction): void {
+		this.defaultScoreFunction = scoreFunction;
 	}
 
+	/*
+		@returns {ScoreFunction}
+		@description	Creates and returns a new flat score function of the correct type for this PrimitiveObjective's domain.
+	*/
+	getFlatScoreFunction(): ScoreFunction {
+		let scoreFunction;
+		if (this.getDomainType() === 'categorical' || this.getDomainType() === 'interval') {
+			scoreFunction = new DiscreteScoreFunction();
+		}
+		else {
+			scoreFunction = new ContinuousScoreFunction((<ContinuousDomain>this.domain).getMinValue(),(<ContinuousDomain>this.domain).getMaxValue());
+		}
+		scoreFunction.initialize(this, ScoreFunction.FLAT);
+		return scoreFunction;
+	}
 
 	/*
 		@returns {PrimitiveObjective} - A PrimitiveObjective that is an exact copy of this PrimitiveObjective.

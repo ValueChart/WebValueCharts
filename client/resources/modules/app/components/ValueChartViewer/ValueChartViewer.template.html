@@ -17,7 +17,7 @@
 			</div>
 			<div *ngIf="currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" >
-					<button class="btn btn-success" (click)="submitPreferences()">
+					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
 					Submit Preferences
 					</button>
 				</div>

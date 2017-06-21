@@ -28,6 +28,7 @@ import { ValueChartHttpService }												from '../../services/ValueChartHttp.
 import { ValidationService }													from '../../services/Validation.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
+import { UpdateObjectiveReferencesService }										from '../../../create/services/UpdateObjectiveReferences.service';
 
 // Import Model Classes:
 import { ValueChart } 															from '../../../../model/ValueChart';
@@ -96,7 +97,8 @@ export class ValueChartViewerComponent implements OnInit {
 		public displayedUsersService: DisplayedUsersService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
-		private validationService: ValidationService) { }
+		private validationService: ValidationService,
+		private updateObjReferencesService: UpdateObjectiveReferencesService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -268,15 +270,20 @@ export class ValueChartViewerComponent implements OnInit {
 		if (this.currentUserService.isJoiningChart()) {
 			this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
 			.subscribe(valueChart => {
-				valueChart.setUser(this.valueChartService.getCurrentUser());
-				this.valueChartService.setValueChart(valueChart);
+				// Only apply changes if chart is valid
+				if (this.validationService.validateStructure(valueChart).length === 0) {
+					valueChart.setUser(this.valueChartService.getCurrentUser());
+					this.valueChartService.setValueChart(valueChart);
+					this.updateObjReferencesService.cleanUpPreferences(this.valueChartService.getCurrentUser(), true);
+					this.updateObjReferencesService.completePreferences(this.valueChartService.getCurrentUser(), true);
+				}
 				this.valueChartService.getCurrentUser().getWeightMap().normalize();
 				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
 			});
 		}
 		else {
 			this.valueChartService.getCurrentUser().getWeightMap().normalize();
-			this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+			this.router.navigate(['/createValueChart/editChart/ScoreFunctions']);
 		}	
   	}
 
@@ -290,6 +297,26 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	hostValueChart(): void {
 		this.hostService.hostGroupValueChart(this.valueChart._id);
+	}
+
+	
+	/* 	
+		@returns {void}
+		@description 	Checks if any changes have been made to the chart structure since the last submission.
+						If so, instruct the user to return to the create workflow to apply the changes.
+						Otherwise, submit preferences as usual.
+	*/
+	submitPreferencesIfChartUnchanged() {
+		this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
+		.subscribe(valueChart => {
+			valueChart.setUser(this.valueChartService.getCurrentUser());
+			if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChart)) { // Ignore changes if chart is not valid
+				toastr.error('The chart has been editted by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
+			}	
+			else {
+				this.submitPreferences();
+			}
+		});
 	}
 
 	/* 	
@@ -318,9 +345,9 @@ export class ValueChartViewerComponent implements OnInit {
 					// Add something to handle when the host has disabled user changes
 					console.log(error);
 					if (error === '403 - Forbidden')
-						toastr.warning('Preference submission failed. The Host has disabled new submissions');
+						toastr.warning('Preference submission failed. The Host has disabled new submissions.');
 					else 
-						toastr.error('Preference submission failed. There was an error submitting your preferences');
+						toastr.error('Preference submission failed. There was an error submitting your preferences.');
 				});			
 		}
 		else {

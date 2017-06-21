@@ -158,6 +158,14 @@ export class ContinuousScoreFunction extends ScoreFunction {
 		return this.interpolationStrategy(start, end, domainElement);
 	};
 
+	getMinDomainValue(): number {
+		return this.minDomainValue;
+	}
+
+	getMaxDomainValue(): number {
+		return this.maxDomainValue;
+	}
+
 
 	setInterpolationStrategy(strategy: InterpolationStrategy): void {
 		this.interpolationStrategy = strategy;

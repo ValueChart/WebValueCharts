@@ -48,8 +48,8 @@ export class CreateValueChartComponent implements OnInit {
 
 	// Navigation Control:
 	sub: any;
-	public window: any = window;
-	private saveOnDestroy: boolean = true;
+	window: any = window;
+	saveOnDestroy: boolean;
 	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 
@@ -106,10 +106,19 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.purpose === 'newChart') {
 			this.currentUserService.setJoiningChart(false);
 			let valueChart = new ValueChart('', '', this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
-
 			this.valueChartService.setValueChart(valueChart); 
 		}
+		else if (this.purpose === 'editChart') {
+			// Lock chart while editing
+			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
+				status.userChangesPermitted = false; 
+				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
+			});
+		}
 		this.valueChart = this.valueChartService.getValueChart();
+
+		// Initialize save-on-destroy to true unless user is joining chart
+		this.saveOnDestroy = !this.currentUserService.isJoiningChart();
 	}
 
 	/* 	
@@ -121,19 +130,17 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();	
 
-		// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
-		let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
-			|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
-		
-		let status: any = {};
-		
-		status.userChangesPermitted = true;
-		status.incomplete = incomplete;
-		status.name = this.valueChart.getName();
-		status.fname = this.valueChart.getFName();
-		status.chartId = this.valueChart._id;
-
 		if (this.saveOnDestroy) {
+			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
+			let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
+				|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
+			
+			let status: any = {};
+			status.userChangesPermitted = true;
+			status.incomplete = incomplete;
+			status.name = this.valueChart.getName();
+			status.fname = this.valueChart.getFName();
+			status.chartId = this.valueChart._id;
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			this.autoSaveValueChart();
 		}
@@ -355,7 +362,7 @@ export class CreateValueChartComponent implements OnInit {
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
 	autoSaveValueChart(): void {
-		if (this.purpose === 'newUser' || this.purpose === 'editPreferences') {
+		if (this.currentUserService.isJoiningChart()) {
 			return;	// Don't autosave. The user is joining or editing preferences for an existing ValueChart.
 		}
 		if (!this.valueChart._id) {

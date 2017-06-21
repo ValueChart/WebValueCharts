@@ -139,76 +139,14 @@ export class CreateObjectivesComponent implements OnInit {
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 		this.valueChartService.resetPrimitiveObjectives();
 		if (this.editing) {
-			this.updateReferences();
+			this.updateObjRefService.cleanUpAlternatives();
+			for (let user of this.valueChart.getUsers()) {
+				let showWarnings = this.valueChartService.currentUserIsDefined() && (this.valueChartService.getCurrentUser().getUsername() === user.getUsername());
+				this.updateObjRefService.cleanUpPreferences(user, showWarnings);
+				this.updateObjRefService.completePreferences(user, showWarnings);
+			}	
 		}
-	}
-
-	// ================================ Model Update Methods ====================================
-
-	/* 	
-		@returns {void}
-		@description 	Updates references to PrimitiveObjectives throughout the ValueChart.
-						Handles any other changes to the model that need to be made when the Objectives change.
-	*/
-	updateReferences() {
-		let initialPrimObjKeys = this.initialObjKeys();
-		let finalPrimObjKeys = this.objKeys().filter(x => this.objectiveRows[x].type === 'primitive');
-		let added = finalPrimObjKeys.filter(x => initialPrimObjKeys.indexOf(x) === -1);
-		let removed = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) === -1);
-		let kept = initialPrimObjKeys.filter(x => finalPrimObjKeys.indexOf(x) > -1);
-
-		this.updateObjRefService.addScoreFunctions(added.map(x => this.objectiveRows[x].name));
-		this.updateObjRefService.removeReferences(removed.map(x => this.initialPrimObjRows[x].name));
-		this.updateObjRefService.updateObjectiveNames(kept.map(x => this.initialPrimObjRows[x].name), kept.map(x => this.objectiveRows[x].name));
-		this.handleDomainChanges(kept);
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Updates ScoreFunctions and Weights in response to changes to Objective domains.
-	*/
-	handleDomainChanges(objIDs: string[]) {
-		let allWeightsReset = false;
-		let resetScoreFunctions: string[] = [];
-		for (let objID of objIDs) {
-			let oldDom = this.initialPrimObjRows[objID].dom;
-			let newDom = this.objectiveRows[objID].dom;
-			let objName = this.objectiveRows[objID].name;
-			let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(objName);
-
-			// Clear all ScoreFunctions and Weights if any of the following have changed: Domain type, min, max, or interval
-			// It may be possible to do something more clever in the future that preserves parts of the Users' previous ScoreFunctions
-			if (oldDom.type !== newDom.type || oldDom.min !== newDom.min || oldDom.max !== newDom.max || oldDom.interval !== newDom.interval) {
-				this.updateObjRefService.resetScoreFunction(obj);
-				this.updateObjRefService.clearWeightMaps(); // must be done because best/worst outcomes may have changed
-				allWeightsReset = true;
-				resetScoreFunctions.push(obj.getName());
-			}
-
-			// Check for changes to categorical domain options
-			// In this case, we can keep the previous ScoreFunction elements since there is no inherent scale
-			// However, if the best/worst outcomes were deleted for any users, their preferences will become invalid
-			else if (newDom.type === 'categorical') {
-				let addedCats = newDom.categories.filter(x => oldDom.categories.indexOf(x) === -1);
-				let removedCats = oldDom.categories.filter(x => newDom.categories.indexOf(x) === -1);
-				for (let cat of removedCats) {
-					this.updateObjRefService.removeElementFromScoreFunctions(objName, cat);
-				}
-				for (let cat of addedCats) {
-					this.updateObjRefService.addElementToScoreFunctions(objName, cat);
-				}
-			}
-			this.updateObjRefService.clearAlternativeValues(obj);
-		}
-		if (allWeightsReset) {
-			if (this.valueChart.getUsers().length > 0) {
-				let prefix = this.valueChart.getUsers().length === 1 ? "Your" : "All users'";
-				toastr.warning(prefix + " weights have been cleared because the best/worst outcome on some Objective has changed.");	
-				toastr.warning(prefix + " score functions for the following Objectives have been reset to default: " + resetScoreFunctions.join(", "));
-
-			}
-		}						
-	}
+	}						
 
 	// ================================ Objective Row Methods ====================================
 
@@ -347,6 +285,7 @@ export class CreateObjectivesComponent implements OnInit {
 			}
 			(<PrimitiveObjective>obj).setDomain(dom);
 			(<PrimitiveObjective>obj).setColor(objrow.color);
+			(<PrimitiveObjective>obj).setDefaultScoreFunction((<PrimitiveObjective>obj).getFlatScoreFunction());
 		}
 		else {
 			obj = new AbstractObjective(objrow.name, objrow.desc);

@@ -10,9 +10,10 @@ import { ScoreFunctionDirective }										from '../../../utilities/directives/S
 import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
+import { UpdateObjectiveReferencesService }         from '../../services/UpdateObjectiveReferences.service';
 import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
-
+ 
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
@@ -83,6 +84,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   constructor(
     public valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
+    private updateObjReferencesService: UpdateObjectiveReferencesService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
     private validationService: ValidationService) { }
@@ -105,7 +107,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
+    this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
+    this.latestDefaults = {};
 
+    // Initialize user
     let newUser = false;
     if (!this.valueChartService.currentUserIsDefined()) {
       let user = new User(this.currentUserService.getUsername());
@@ -115,29 +120,18 @@ export class CreateScoreFunctionsComponent implements OnInit {
       newUser = true;
     }
     this.user = this.valueChartService.getCurrentUser();
+
+    // Initialize/repair score functions
+    this.updateObjReferencesService.completeScoreFunctions(this.user, true);
+
+    // Initialize best/worst outcomes
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
-    this.latestDefaults = {};
-
-    // Make sure there is a score function for every Objective
-    for (let obj of this.valueChartService.getPrimitiveObjectives()) {
-      if (!this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
-        this.user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
-      }
-      // Make sure the score function is complete
-      let scoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
-      if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
-        let elements = [] ;
-        for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
-          if (scoreFunction.getScore(elt) === undefined) {
-            scoreFunction.setElementScore(elt, 0.5); // If score for element is missing for whatever reason, set it to 0.5
-          }
-        } 
-      } 
-      this.initialBestOutcomes[obj.getName()] = scoreFunction.bestElement;
-      this.initialWorstOutcomes[obj.getName()] = scoreFunction.worstElement; 
+    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
+      this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
     }
-    this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
+
     if (!newUser) {
       this.validate()   
     }
@@ -155,8 +149,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
         let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
-          this.user.setWeightMap(new WeightMap());
-          toastr.warning("Your weights have been cleared because the best/worst outcome on some Objective has changed.");
+          toastr.warning(this.updateObjReferencesService.BEST_WORST_OUTCOME_CHANGED);
           break;
         }
       }
