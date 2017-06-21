@@ -133,6 +133,7 @@ export class UpdateObjectiveReferencesService {
         		toastr.warning(this.BEST_WORST_OUTCOME_CHANGED);
         	}
         }
+        this.completePreferences(user, showWarnings);
 	}
 
 	/*

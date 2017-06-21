@@ -275,7 +275,6 @@ export class ValueChartViewerComponent implements OnInit {
 					valueChart.setUser(this.valueChartService.getCurrentUser());
 					this.valueChartService.setValueChart(valueChart);
 					this.updateObjReferencesService.cleanUpPreferences(this.valueChartService.getCurrentUser(), true);
-					this.updateObjReferencesService.completePreferences(this.valueChartService.getCurrentUser(), true);
 				}
 				this.valueChartService.getCurrentUser().getWeightMap().normalize();
 				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);

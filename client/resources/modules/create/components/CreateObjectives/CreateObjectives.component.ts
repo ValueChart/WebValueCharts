@@ -143,7 +143,6 @@ export class CreateObjectivesComponent implements OnInit {
 			for (let user of this.valueChart.getUsers()) {
 				let showWarnings = this.valueChartService.currentUserIsDefined() && (this.valueChartService.getCurrentUser().getUsername() === user.getUsername());
 				this.updateObjRefService.cleanUpPreferences(user, showWarnings);
-				this.updateObjRefService.completePreferences(user, showWarnings);
 			}	
 		}
 	}						
