@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:12:21
+* @Last Modified time: 2017-06-05 18:26:47
 */
 
 // Import Angular Classes:
@@ -126,6 +126,7 @@ export class ResizeWeightsInteraction {
 		}
 		var newWeight: number = previousWeight + pumpAmount;
 		this.incrementObjectiveWeight(labelDatum, currentUser.getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
+		currentUser.getWeightMap().normalize();
 	}
 
 	/*

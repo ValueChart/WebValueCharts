@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:12:56
+* @Last Modified time: 2017-06-22 14:45:44
 */
 
 // Import Angular Classes:
@@ -17,7 +17,6 @@ import { Observable }															from 'rxjs/Observable';
 import { Subscription } 														from 'rxjs/Subscription';
 import { Subject }																from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
-
 
 // Import Application Classes:
 // Services:
@@ -217,17 +216,22 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		}).map(this.rendererDataUtility.produceMaximumWeightMap)
 			.map(this.rendererDataUtility.produceRowData)
 			.map(this.rendererDataUtility.produceLabelData)
-			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(rendererUpdates);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceSummaryChartConfig)
+			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceObjectiveChartConfig)
+			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.objectiveChartRenderer.valueChartChanged);
 
 		rendererUpdates
-			.subscribe(this.labelRenderer.valueChartChanged)
+			.map(this.rendererConfigUtility.produceLabelConfig)
+			.map(this.rendererConfigUtility.produceRendererConfig)
+			.subscribe(this.labelRenderer.valueChartChanged);
 
 		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);
 		this.interactionSubject.subscribe(this.objectiveChartRenderer.interactionsChanged);

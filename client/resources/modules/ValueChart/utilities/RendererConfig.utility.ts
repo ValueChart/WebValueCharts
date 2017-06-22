@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:07:56
+* @Last Modified time: 2017-06-22 14:30:27
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as d3 														from 'd3';
+import * as _														from 'lodash';
 
 // Import Model Classes:
 import { User }														from '../../../model/User';
@@ -19,7 +20,7 @@ import { ValueChart }												from '../../../model/ValueChart';
 import { ViewConfig }												from '../../../types/Config.types';
 import { RendererConfig, RendererUpdate }							from '../../../types/RendererData.types';
 
-import { ChartOrientation }									from '../../../types/Config.types';
+import { ChartOrientation }											from '../../../types/Config.types';
 
 
 
@@ -30,6 +31,8 @@ export class RendererConfigUtility {
 	// 									Fields
 	// ========================================================================================
 
+
+	private offset: number = 10;
 
 	// ========================================================================================
 	// 									Constructor
@@ -95,4 +98,58 @@ export class RendererConfigUtility {
 		return u;
 	}
 
+	produceObjectiveChartConfig = (u: RendererUpdate): RendererUpdate => {
+		u = _.clone(u);
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			u.x = u.width;
+			u.y = u.height + this.offset;
+		} else {
+			u.x = 0;
+			u.y = u.height;
+		}
+
+		return u;
+	}
+
+	produceLabelConfig = (u: RendererUpdate): RendererUpdate => {
+		u = _.clone(u);
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			u.x = 0;
+			u.y = u.height + this.offset;
+		} else {
+			u.x = 0;
+			u.y = 0;
+		}
+
+		console.log(u);
+
+		return u;
+	}
+
+	produceSummaryChartConfig = (u: RendererUpdate): RendererUpdate => {
+		u = _.clone(u); 
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			let maxHeight = u.height;
+			let height = u.height / u.maximumWeightMap.getWeightTotal(); 
+			u.x = u.width;
+			u.y = maxHeight - height; 
+			u.height = height;
+		} else {
+			let maxWidth = u.width;
+			let width = u.width / u.maximumWeightMap.getWeightTotal(); 
+			u.x = u.width; 
+			u.y = u.height;
+			u.width = width;
+		}
+
+		 return u;
+	}
 }
+
+
+
+
+

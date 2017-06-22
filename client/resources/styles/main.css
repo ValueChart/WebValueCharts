@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 14:21:30
+* @Last Modified time: 2017-06-22 10:30:03
 */
 
 /* Global Styles */
@@ -267,7 +267,7 @@ a.upload {
 .objective-weight-outline {
     fill: transparent;
     stroke: red;
-    stroke-width: 3px;
+    stroke-width: 1px;
 }
 
 .summary-averageline {
@@ -278,6 +278,11 @@ a.upload {
 
 .summary-scoretotal {
     font-size: 22px;
+}
+
+.summary-cell {
+    stroke: white;
+    stroke-width: 3px;
 }
 
 .objective-alternative-label {
