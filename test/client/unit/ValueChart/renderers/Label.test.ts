@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:47:40
+* @Last Modified time: 2017-06-22 14:48:29
 */
 
 // Import Testing Resources:
@@ -207,6 +207,8 @@ var chartUndoRedoStub = {
 			renderRequired: { value: false },
 			height: height,
 			width: width,
+			x: 0,
+			y: 0,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 14:34:31
+* @Last Modified time: 2017-06-22 14:50:33
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -53,6 +53,8 @@ describe('RendererConfigUtility', () => {
 			viewConfig: viewConfig,
 			width: width,
 			height: height,
+			x: 0,
+			y:0,
 			el: null,
 			valueChart: null,
 			usersToDisplay: null,

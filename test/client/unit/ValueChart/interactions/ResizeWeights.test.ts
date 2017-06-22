@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 13:53:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:40:12
+* @Last Modified time: 2017-06-22 14:51:12
 */
 
 // Import Testing Resources:
@@ -103,6 +103,8 @@ describe('ResizeWeightsInteraction', () => {
 			renderRequired: { value: false },
 			height: height,
 			width: width,
+			x: 0,
+			y: 0,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 17:39:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:39:33
+* @Last Modified time: 2017-06-22 14:50:53
 */
 
 // Import Testing Resources:
@@ -92,6 +92,8 @@ describe('ReorderObjectivesInteraction', () => {
 			renderRequired: { value: false },
 			height: null,
 			width: null,
+			x: null,
+			y: null,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,

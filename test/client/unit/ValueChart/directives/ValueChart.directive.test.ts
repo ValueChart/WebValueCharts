@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:45:30
+* @Last Modified time: 2017-06-22 15:07:06
 */
 
 // Import Testing Resources:
@@ -741,20 +741,20 @@ describe('ValueChartDirective', () => {
 	var checkCachedRendererUpdates = (u: RendererUpdate) => {
 
 		// They should have the same attributes:
-		expect(summaryChartRenderer.lastRendererUpdate).to.deep.equal(u);
-		expect(objectiveChartRenderer.lastRendererUpdate).to.deep.equal(u);
-		expect(labelRenderer.lastRendererUpdate).to.deep.equal(u);
-		expect(reorderObjectivesInteraction.lastRendererUpdate).to.deep.equal(u);
-		expect(resizeWeightsInteraction.lastRendererUpdate).to.deep.equal(u);
-		expect(sortAlternativesInteraction.lastRendererUpdate).to.deep.equal(u);
+		expect(summaryChartRenderer.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
+		expect(objectiveChartRenderer.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
+		expect(labelRenderer.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
+		expect(reorderObjectivesInteraction.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
+		expect(resizeWeightsInteraction.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
+		expect(sortAlternativesInteraction.lastRendererUpdate.valueChart).to.deep.equal(u.valueChart);
 
-		// They should be the same references:
-		expect(labelRenderer.lastRendererUpdate).to.equal(u);
-		expect(summaryChartRenderer.lastRendererUpdate).to.equal(u);
-		expect(objectiveChartRenderer.lastRendererUpdate).to.equal(u);
-		expect(reorderObjectivesInteraction.lastRendererUpdate).to.equal(u);
-		expect(resizeWeightsInteraction.lastRendererUpdate).to.equal(u);
-		expect(sortAlternativesInteraction.lastRendererUpdate).to.equal(u);
+		// They should be the same attribute references:
+		expect(labelRenderer.lastRendererUpdate.valueChart).to.equal(u.valueChart);
+		expect(summaryChartRenderer.lastRendererUpdate.valueChart).to.equal(u.valueChart);
+		expect(objectiveChartRenderer.lastRendererUpdate.valueChart).to.equal(u.valueChart);
+		expect(reorderObjectivesInteraction.lastRendererUpdate.valueChart).to.equal(u.valueChart);
+		expect(resizeWeightsInteraction.lastRendererUpdate.valueChart).to.equal(u.valueChart);
+		expect(sortAlternativesInteraction.lastRendererUpdate.valueChart).to.equal(u.valueChart);
 
 		// Check score function updates:
 		u.valueChart.getAllPrimitiveObjectives().forEach((objective) => {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:30:27
+* @Last Modified time: 2017-06-22 15:09:05
 */
 
 // Import Angular Classes:
@@ -122,8 +122,6 @@ export class RendererConfigUtility {
 			u.x = 0;
 			u.y = 0;
 		}
-
-		console.log(u);
 
 		return u;
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:40:11
+* @Last Modified time: 2017-06-22 14:51:27
 */
 
 // Import Testing Resources:
@@ -78,6 +78,8 @@ describe('SortAlternativesInteraction', () => {
 			renderRequired: { value: false },
 			height: null,
 			width: null,
+			x: null,
+			y: null,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 17:15:17
+* @Last Modified time: 2017-06-22 15:09:13
 */
 
 // Import Angular Classes:
@@ -195,7 +195,6 @@ export class SortAlternativesInteraction {
 
 	// This function handles user clicks on objective labels by sorting the alternatives by their score for that objective.
 	private sortByObjective = (eventObject: Event) => {
-		console.log(eventObject);
 		this.chartUndoRedoService.saveAlternativesRecord(this.lastRendererUpdate.valueChart.getAlternatives());
 
 		var objective: Objective = (<any> d3.select(<any> eventObject.target).datum()).objective;

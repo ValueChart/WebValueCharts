@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:48:54
+* @Last Modified time: 2017-06-22 14:51:44
 */
 
 // Import Testing Resources:
@@ -86,6 +86,8 @@ describe('RendererDataUtility', () => {
 			renderRequired: { value: false },
 			height: height,
 			width: width,
+			x: null,
+			y: null,
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
