@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 12:26:54
+* @Last Modified time: 2017-06-22 10:50:13
 */
 
 // Import Angular Classes
@@ -290,12 +290,7 @@ export class SummaryChartRenderer {
 
 		// Position the entire chart in the view box.
 		this.chart
-			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.offset);
-				else
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10 + u.offset);
-			});
+			.attr('transform', 'translate(' + u.x + ',' + u.y + ')');
 
 		// Give the proper width and height to the chart outline. 
 		this.outline

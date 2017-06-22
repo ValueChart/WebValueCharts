@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:06:15
+* @Last Modified time: 2017-06-22 14:35:52
 */
 
 // Import Angular Classes
@@ -286,12 +286,7 @@ export class ObjectiveChartRenderer {
 	private renderObjectiveChart(u: RendererUpdate): void {
 		// Position the objective chart.
 		this.chart
-			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionTwoSize + 10);
-				else
-					return this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, u.rendererConfig.dimensionOneSize, 0);	// TODO: Fix this.
-			});
+			.attr('transform', 'translate(' + u.x + ',' + u.y + ')');
 
 		// Update the data behind the row outlines 
 		var rowOutlinesToUpdate = this.rowOutlines
@@ -512,9 +507,8 @@ export class ObjectiveChartRenderer {
 	// 		Anonymous functions that are used often enough to be made class fields
 	// ========================================================================================
 	calculateWeightOutlineDimensionTwo = (d: UserScoreData, i: number) => {
-		let weightDimensionTwoOffset: number = 2;
 		let userObjectiveWeight: number = d.user.getWeightMap().getObjectiveWeight(d.objective.getName());
-		return Math.max(this.lastRendererUpdate.rendererConfig.dimensionTwoScale(userObjectiveWeight) - weightDimensionTwoOffset, 0);
+		return Math.max(this.lastRendererUpdate.rendererConfig.dimensionTwoScale(userObjectiveWeight) - 1, 0);
 	}
 
 	// Calculate the CoordinateOne of a cell given the cells data and its index. Cells are all the same width (or height), so we simply divide the length of each row into equal amounts to find their locations.

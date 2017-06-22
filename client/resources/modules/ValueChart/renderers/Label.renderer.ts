@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:06:53
+* @Last Modified time: 2017-06-22 10:50:35
 */
 
 // Import Angular Classes:
@@ -309,14 +309,8 @@ export class LabelRenderer {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
 		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
 		// Position the root container for the label area. This positions all of its child elements as well.
-		// Unfortunately, we cannot use the generateTransformTranslation method here because positioning the labels does not merely involve a switch of x an y coordinates.
 		this.rootContainer
-			.attr('transform', () => {
-				if (u.viewConfig.viewOrientation === ChartOrientation.Vertical)
-					return 'translate(0,' + (u.rendererConfig.dimensionTwoSize + 10) + ')';
-				else
-					return 'translate(0,0)';
-			});
+			.attr('transform', 'translate(' + u.x + ',' + u.y + ')');
 
 
 		this.renderLabels(u, labelData, parentName);

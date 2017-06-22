@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 12:09:41
+* @Last Modified time: 2017-06-22 10:30:03
 */
 
 /* Global Styles */
@@ -281,8 +281,8 @@ a.upload {
 }
 
 .summary-cell {
-    stroke: black;
-    stroke-width: 1px;
+    stroke: white;
+    stroke-width: 3px;
 }
 
 .objective-alternative-label {

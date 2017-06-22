@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:02:01
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 18:20:19
+* @Last Modified time: 2017-06-22 14:30:27
 */
 
 // Import Angular Classes:
@@ -31,6 +31,8 @@ export class RendererConfigUtility {
 	// 									Fields
 	// ========================================================================================
 
+
+	private offset: number = 10;
 
 	// ========================================================================================
 	// 									Constructor
@@ -96,19 +98,50 @@ export class RendererConfigUtility {
 		return u;
 	}
 
-	produceSummaryChartConfig(u: RendererUpdate): RendererUpdate {
+	produceObjectiveChartConfig = (u: RendererUpdate): RendererUpdate => {
+		u = _.clone(u);
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			u.x = u.width;
+			u.y = u.height + this.offset;
+		} else {
+			u.x = 0;
+			u.y = u.height;
+		}
+
+		return u;
+	}
+
+	produceLabelConfig = (u: RendererUpdate): RendererUpdate => {
+		u = _.clone(u);
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			u.x = 0;
+			u.y = u.height + this.offset;
+		} else {
+			u.x = 0;
+			u.y = 0;
+		}
+
+		console.log(u);
+
+		return u;
+	}
+
+	produceSummaryChartConfig = (u: RendererUpdate): RendererUpdate => {
 		u = _.clone(u); 
-		u.offset = {};
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			let maxHeight = u.height;
 			let height = u.height / u.maximumWeightMap.getWeightTotal(); 
-			u.offset = maxHeight - height; 
+			u.x = u.width;
+			u.y = maxHeight - height; 
 			u.height = height;
 		} else {
 			let maxWidth = u.width;
 			let width = u.width / u.maximumWeightMap.getWeightTotal(); 
-			u.offset = maxWidth - width; 
+			u.x = u.width; 
+			u.y = u.height;
 			u.width = width;
 		}
 

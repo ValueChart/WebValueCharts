@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 18:13:09
+* @Last Modified time: 2017-06-22 10:35:12
 */
 
 // Import Angular Classes:
@@ -216,12 +216,14 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.subscribe(this.summaryChartRenderer.valueChartChanged);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceObjectiveChartConfig)
 			.map(this.rendererConfigUtility.produceRendererConfig)
 			.subscribe(this.objectiveChartRenderer.valueChartChanged);
 
 		rendererUpdates
+			.map(this.rendererConfigUtility.produceLabelConfig)
 			.map(this.rendererConfigUtility.produceRendererConfig)
-			.subscribe(this.labelRenderer.valueChartChanged)
+			.subscribe(this.labelRenderer.valueChartChanged);
 
 		this.interactionSubject.subscribe(this.summaryChartRenderer.interactionsChanged);
 		this.interactionSubject.subscribe(this.objectiveChartRenderer.interactionsChanged);
