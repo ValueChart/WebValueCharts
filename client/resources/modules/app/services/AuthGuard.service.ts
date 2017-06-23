@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-05 16:07:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-13 14:34:55
+* @Last Modified time: 2017-06-22 17:02:32
 */
 
 // Import Angular Classes:
@@ -11,6 +11,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	
 
 // Import Application Classes:
 import { CurrentUserService }													from './CurrentUser.service';
+import { ValueChartService }													from './ValueChart.service';
 import { UserHttpService }														from './UserHttp.service';
 
 
@@ -41,7 +42,8 @@ export class AuthGuardService implements CanActivate {
 	constructor(
 		private router: Router,
 		private userHttpService: UserHttpService,
-		private currentUserService: CurrentUserService) { }
+		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService) { }
 
 
 	// ========================================================================================
@@ -64,7 +66,7 @@ export class AuthGuardService implements CanActivate {
 							this.currentUserService.setLoggedIn(true);
 							this.currentUserService.setUsername(user.username);
 
-							if (state.url.indexOf('view') !== -1 || state.url.indexOf('createValueChart') !== -1 ) {			// Redirect to home if the user was creating or viewing a ValueChart, or attempting to reach register when they are logged in.
+							if (state.url.indexOf('createValueChart') !== -1 ) {			// Redirect to home if the user was creating or viewing a ValueChart, or attempting to reach register when they are logged in.
 								this.router.navigate(['/home']);		
 								resolve(false);			
 							} else {

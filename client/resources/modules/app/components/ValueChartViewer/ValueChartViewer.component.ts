@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:55:20
+* @Last Modified time: 2017-06-22 17:23:39
 */
 
 // Import Angular Classes:
@@ -13,6 +13,7 @@ import { Router, ActivatedRoute }												from '@angular/router';
 // Import Libraries:
 import * as d3 																	from 'd3';
 import * as _																	from 'lodash';
+import { Subscription }															from 'rxjs/Subscription';
 
 // Import Application Classes:
 import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
@@ -62,6 +63,9 @@ export class ValueChartViewerComponent implements OnInit {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
+
+	public routeSubscription: Subscription;
+	public viewType: String;
 
 	public valueChartWidth: number;
 	public valueChartHeight: number;
@@ -116,6 +120,10 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
+		this.routeSubscription = this.route.params.subscribe(parameters => {
+			this.viewType = parameters['viewType'];
+		});
+
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();

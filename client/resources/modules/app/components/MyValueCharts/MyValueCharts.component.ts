@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:55:20
+* @Last Modified time: 2017-06-22 15:53:10
 */
 
 // Import Angular Classes:
@@ -119,7 +119,8 @@ export class MyValueChartsComponent implements OnInit {
 					$('#validate-modal').modal('show');
 				}
 				else {
-					this.router.navigate(['/view/', valueChart.getFName()]);
+					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
+					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
 				}	
 			});
 	}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:59:37
+* @Last Modified time: 2017-06-22 15:52:42
 */
 
 // Import Angular Classes:
@@ -143,9 +143,9 @@ export class HomeComponent {
 				this.valueChartService.setValueChart(valueChart);
 				this.currentUserService.setJoiningChart(false);
 				$('#chart-credentials-modal').modal('hide');
-				var parameters = this.valueChartService.getValueChart().getFName();
 				if (this.validateChartStructure()) {
-					this.router.navigate(['/view/', parameters]);
+					let valueChart = this.valueChartService.getValueChart();
+					this.router.navigate(['view', 'group', valueChart.getFName()], { queryParams: { password: valueChart.password } });
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -164,8 +164,9 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
 		this.currentUserService.setJoiningChart(false);
-		var parameters = this.valueChartService.getValueChart().getFName();
-		this.router.navigate(['/view/', parameters]);
+		let valueChart = this.valueChartService.getValueChart();
+		let viewType = valueChart.isIndividual() ? 'individual' : 'group';
+		this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
 	}
 
 	/*
@@ -192,7 +193,9 @@ export class HomeComponent {
 				if (this.validateChartStructure()) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
 					this.saveValueChartToDatabase(this.valueChartService.getValueChart());
-					this.router.navigate(['/view/', this.valueChartService.getValueChart().getName()]);
+					let valueChart = this.valueChartService.getValueChart();
+					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
+					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
 				}		
 			}
 		};

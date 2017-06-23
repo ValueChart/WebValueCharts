@@ -131,7 +131,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/testemp');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/testemp?password=t');
 			});
 
 	});
@@ -175,7 +175,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/Cities');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
 			});	
 	});
 

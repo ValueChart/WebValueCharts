@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-23 15:33:37
+* @Last Modified time: 2017-06-22 17:20:25
 */
 
 // Import Angular Classes:
@@ -50,24 +50,43 @@ export class JoinGuardService implements CanActivate {
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
 						to the Angular 2 router.
 	*/
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
-		// Retrieve the ValueChart ID from the URL router parameters.
-		var name: string = route.params['ValueChart'];
-		// Retrieve the ValueChart password from the URL query parameters.
-		var password: string = document.location.search.substring(document.location.search.indexOf('password=') + 'password='.length);
+		return new Promise((resolve) => {
+			if (state.url.indexOf('join') !== -1) {
+				// Retrieve the ValueChart ID from the URL router parameters.
+				var name: string = route.params['ValueChart'];
+				// Retrieve the ValueChart password from the URL query parameters.
+				var password: string = route.queryParams.password;
 
-		// Retrieve the structure of that ValueChart that the user is joining.
-		this.valueChartHttpService.getValueChartStructure(name, password)
-			.subscribe(
-			valueChart => {
-				this.currentUserService.setJoiningChart(true);
-				this.valueChartService.setValueChart(valueChart);
-			},
-			error => {
-				this.router.navigate(['/register']); // The ValueChart does not exist. Redirect the user to the '/register' page.
-			});
+				// Retrieve the structure of that ValueChart that the user is joining.
+				this.valueChartHttpService.getValueChartStructure(name, password)
+					.subscribe(
+					valueChart => {
+						this.currentUserService.setJoiningChart(true);
+						this.valueChartService.setValueChart(valueChart);
+						resolve(true);	
+					},
+					error => {
+						this.router.navigate(['/register']); // The ValueChart does not exist. Redirect the user to the '/register' page.
+						resolve(false);	
+					});
 
-		return true;	// Always return true. This method is fetching the ValueChart structure, and should have no effect on navigation.
+			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getValueChart()) {
+
+				// Retrieve the ValueChart ID from the URL router parameters.
+				var name: string = route.params['ValueChart'];
+				// Retrieve the ValueChart password from the URL query parameters.
+				var password: string = route.queryParams.password;
+
+				this.valueChartHttpService.getValueChartByName(name, password)
+					.subscribe(valueChart => {
+						this.valueChartService.setValueChart(valueChart)
+						resolve(true);
+					});
+			} else {
+				resolve(true);
+			}
+		});
 	}
 }

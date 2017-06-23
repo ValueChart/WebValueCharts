@@ -213,7 +213,7 @@ export class CreateValueChartComponent implements OnInit {
 			else {
 				window.onpopstate = () => { };
 				(<any>window).destination = '/view/ValueChart';
-				this.router.navigate(['/view/ValueChart']);
+				this.router.navigate(['view', 'individual', this.valueChart.getFName()], { queryParams: { password: this.valueChart.password } });
 			}
 		}
 		else {
