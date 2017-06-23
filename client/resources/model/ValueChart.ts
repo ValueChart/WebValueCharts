@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:52:06
+* @Last Modified time: 2017-06-23 14:13:17
 */
 	
 // Import Model Classes:
@@ -297,6 +297,11 @@ export class ValueChart {
 		} else {
 			this.users[userIndex] = newUser;
 		}
+
+		if (this.users.length > 1) 
+			this.type = ChartType.Group;
+		else 
+			this.type = ChartType.Individual;
 	}
 
 	removeUser(userToDelete: User): void {
@@ -307,6 +312,11 @@ export class ValueChart {
 		if (index !== -1) {
 			this.users.splice(index, 1);
 		}
+
+		if (this.users.length > 1) 
+			this.type = ChartType.Group;
+		else 
+			this.type = ChartType.Individual;
 	}
 
 	/*

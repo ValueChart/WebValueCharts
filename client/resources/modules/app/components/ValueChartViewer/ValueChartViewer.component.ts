@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:29:14
+* @Last Modified time: 2017-06-23 16:05:07
 */
 
 // Import Angular Classes:
@@ -130,13 +130,11 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHttpService.getValueChartStatus(this.valueChart.getFName()).subscribe((status) => { this.valueChartStatus = status; });
 
 		let invalidUsers = this.validationService.getInvalidUsers(this.valueChart);
-		this.usersToDisplay = _.clone(this.valueChartService.getValueChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
+		this.usersToDisplay = _.clone(this.valueChartService.getGroupChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
 		this.displayedUsersService.setUsersToDisplay(this.usersToDisplay);
 		this.displayedUsersService.setInvalidUsers(invalidUsers);
 
-		if (!this.currentUserService.isJoiningChart()) {
-			this.hostValueChart();
-		}
+		this.hostValueChart();
 
 		this.updateEnableInteraction();
 
@@ -157,22 +155,30 @@ export class ValueChartViewerComponent implements OnInit {
 
 			if (!this.isMember && type === 'individual')
 				this.router.navigate(['view', 'group', this.valueChart.getFName()], { queryParamsHandling: "merge" });
-			else 
+			else
 				this.setChartView(type);
 		});
+
+		if (this.currentUserService.isJoiningChart()) {
+			this.valueChartHttpService.getValueChart(this.valueChart._id, this.valueChart.password)
+				.subscribe(( valueChart ) =>  {
+					valueChart.setUser(this.valueChartService.getCurrentUser());
+					this.valueChartService.setValueChart(valueChart);
+					this.displayedUsersService.setUsersToDisplay(_.clone(this.valueChartService.getGroupChart().getUsers()));
+				});
+		}
 	}
 
 	setChartView(type: string) {
 		this.viewType = type;
 
+		this.valueChartService.setActiveChart(type);
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.viewType == 'individual') {
-			this.usersToDisplay = _.clone(this.valueChart.getUsers()).filter((user) => { return user.getUsername() === this.currentUserService.getUsername(); });
-			this.valueChart.setType(ChartType.Individual);
+			this.usersToDisplay = this.valueChart.getUsers();
 		} else {
 			this.usersToDisplay = this.displayedUsersService.getUsersToDisplay();
-			this.valueChart.setType(ChartType.Group);
 		}
 
 		this.router.navigate(['view', type, this.valueChart.getFName()], { queryParamsHandling: "merge" });
@@ -238,7 +244,7 @@ export class ValueChartViewerComponent implements OnInit {
 	updateEnableInteraction() {
 		this.enableInteraction = (this.currentUserService.isJoiningChart() 
 			|| (this.valueChartService.isIndividual()
-				&& this.valueChartService.currentUserIsDefined()
+				&& this.valueChartService.currentUserIsMember()
 				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()));
 	}	
 
@@ -258,9 +264,7 @@ export class ValueChartViewerComponent implements OnInit {
 						True if current user is joining a chart, or the current user is the chart's creator and already a member of the chart.
 	*/
 	enableEditPreferences(): boolean {
-		return (this.currentUserService.isJoiningChart() 
-			|| (this.valueChartService.currentUserIsDefined()
-				&& this.valueChartService.currentUserIsCreator()));
+		return this.valueChartService.currentUserIsMember();
 	}
 
   /*   
@@ -318,6 +322,7 @@ export class ValueChartViewerComponent implements OnInit {
 			});
 		}
 		else {
+			this.setChartView('individual');
 			this.valueChartService.getCurrentUser().getWeightMap().normalize();
 			this.router.navigate(['/createValueChart/editChart/ScoreFunctions']);
 		}	
@@ -346,8 +351,8 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
 		.subscribe(valueChart => {
 			valueChart.setUser(this.valueChartService.getCurrentUser());
-			if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChart)) { // Ignore changes if chart is not valid
-				toastr.error('The chart has been editted by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
+			if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChartService.getIndividualChart())) { // Ignore changes if chart is not valid
+				toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
 			}	
 			else {
 				this.submitPreferences();
@@ -375,6 +380,7 @@ export class ValueChartViewerComponent implements OnInit {
 				// User added/updated!
 				(user: User) => {
 					toastr.success('Preferences successfully submitted');
+					this.currentUserService.setJoiningChart(false);
 				},
 				// Handle Server Errors
 				(error) => {

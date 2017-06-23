@@ -15,14 +15,7 @@
 			<div *ngIf="enableManagement()" class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
-			<div *ngIf="currentUserService.isJoiningChart()">
-				<div class="form-group valuechart-toolbar-group pull-left" >
-					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
-					Submit Preferences
-					</button>
-				</div>
-			</div>
-			<div *ngIf="isMember && valueChart.getUsers().length > 1">
+			<div *ngIf="isMember && valueChartService.isGroupChart() && !currentUserService.isJoiningChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
 					<button class="btn btn-primary" (click)="setChartView('individual')">
 					View Individual Chart
@@ -31,6 +24,13 @@
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'individual'">
 					<button class="btn btn-primary" (click)="setChartView('group')">
 					View Group Chart
+					</button>
+				</div>
+			</div>
+			<div *ngIf="enableInteraction">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="currentUserService.isJoiningChart() || valueChartService.isGroupChart()">
+					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
+					Submit Preferences
 					</button>
 				</div>
 			</div>
@@ -46,7 +46,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="!currentUserService.isJoiningChart() && valueChart.getUsers().length == 1">
+			<div *ngIf="!currentUserService.isJoiningChart() && !valueChartService.isGroupChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" >
 					<button class="btn btn-success" (click)="saveChart()">
 					Save Chart

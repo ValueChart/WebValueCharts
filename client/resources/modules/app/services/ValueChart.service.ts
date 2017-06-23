@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:23:33
+* @Last Modified time: 2017-06-23 16:24:33
 */
 
 // Import Angular Classes:
@@ -15,7 +15,7 @@ import * as _ 												from 'lodash';
 import { CurrentUserService }								from './CurrentUser.service';
 
 // Import Model Classes:
-import { ValueChart }										from '../../../model/ValueChart';
+import { ValueChart, ChartType }							from '../../../model/ValueChart';
 import { Objective }										from '../../../model/Objective';
 import { AbstractObjective }								from '../../../model/AbstractObjective';
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
@@ -41,7 +41,10 @@ export class ValueChartService {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChart: ValueChart;
+	private currentType: string;
+	private individualValueChart: ValueChart;
+	private groupValueChart: ValueChart;
+	private activeValueChart: ValueChart;
 
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
 														// re-traversing the objective hierarchy, which is costly.
@@ -64,14 +67,57 @@ export class ValueChartService {
 	// 									Methods
 	// ========================================================================================
 
+	setActiveChart(chartType: string): void {
+		this.currentType = chartType;
+		if (chartType === 'group') {
+			this.activeValueChart = this.groupValueChart;
+		} else {
+			this.activeValueChart = this.individualValueChart;
+		}
+	}
+
 	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
-		this.valueChart = valueChart;
-		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
+		if (valueChart.isIndividual()) {
+			this.individualValueChart = valueChart;
+			this.groupValueChart = _.clone(this.individualValueChart);
+			this.groupValueChart.setUsers(_.clone(this.groupValueChart.getUsers()));
+		} else {
+			this.groupValueChart = valueChart;
+			this.individualValueChart = _.clone(this.groupValueChart);
+
+			var user: User[] = this.groupValueChart.getUsers().filter((user: User) => {
+				return user.getUsername() === this.currentUserService.getUsername();
+			});
+
+			this.individualValueChart.setUsers(user);
+		}
+
+		this.groupValueChart.setType(ChartType.Group);
+		this.individualValueChart.setType(ChartType.Individual);
+
+		if (this.currentType === 'group')
+			this.activeValueChart = this.groupValueChart;
+		else 
+			this.activeValueChart = this.individualValueChart;
+
+		this.primitiveObjectives = this.activeValueChart.getAllPrimitiveObjectives();
+	}
+
+	isGroupChart(): boolean {
+		return this.groupValueChart && this.groupValueChart.getUsers().length > 1;
+	}
+
+	getGroupChart(): ValueChart {
+		return this.groupValueChart;
+	}
+
+	getIndividualChart(): ValueChart {
+		return this.individualValueChart;
 	}
 
 	getValueChart(): ValueChart {
-		return this.valueChart;
+		return this.activeValueChart;
 	}
 
 	getPrimitiveObjectives(): PrimitiveObjective[] {
@@ -79,11 +125,11 @@ export class ValueChartService {
 	}
 
 	getPrimitiveObjectivesByName(): string[] {
-		return this.valueChart.getAllPrimitiveObjectivesByName();
+		return this.activeValueChart.getAllPrimitiveObjectivesByName();
 	}
 
 	resetPrimitiveObjectives() {
-		this.primitiveObjectives = this.valueChart.getAllPrimitiveObjectives();
+		this.primitiveObjectives = this.activeValueChart.getAllPrimitiveObjectives();
 	}
 
 	getObjectiveByName(name: string): Objective {
@@ -96,29 +142,23 @@ export class ValueChartService {
 	}
 
 	isIndividual(): boolean {
-		if (this.valueChart) {
-			return this.valueChart.isIndividual();
+		if (this.activeValueChart) {
+			return this.activeValueChart.isIndividual();
 		}
 		return false;
 	}
 
-	currentUserIsDefined(): boolean {
-		return this.valueChart.getUsers().filter((user: User) => {
-			return user.getUsername() === this.currentUserService.getUsername();
-		}).length > 0;
-	}
-
 	currentUserIsCreator(): boolean {
-		return this.currentUserService.getUsername() === this.valueChart.getCreator();
+		return this.currentUserService.getUsername() === this.activeValueChart.getCreator();
 	}
 
 	currentUserIsMember(): boolean {
-		return _.findIndex(this.valueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
+		return _.findIndex(this.activeValueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
 	}
 
 	getCurrentUser(): User {
 		// Obviously we should have it so that two usernames are never the same.
-		var user: User = this.valueChart.getUsers().filter((user: User) => {
+		var user: User = this.activeValueChart.getUsers().filter((user: User) => {
 			return user.getUsername() === this.currentUserService.getUsername();
 		})[0];
 
@@ -130,7 +170,7 @@ export class ValueChartService {
 	}
 
 	getDefaultWeightMap(): WeightMap {
-		return this.valueChart.getDefaultWeightMap();
+		return this.activeValueChart.getDefaultWeightMap();
 	}
 
 	setWeightMap(user: User, weightMap: WeightMap) {

@@ -133,7 +133,7 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.saveOnDestroy) {
 			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
 			let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
-				|| (this.valueChartService.currentUserIsDefined() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
+				|| (this.valueChartService.currentUserIsMember() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 			
 			let status: any = {};
 			status.userChangesPermitted = true;
@@ -203,7 +203,7 @@ export class CreateValueChartComponent implements OnInit {
 			// Catch validation errors introduced at other steps.
 			// (Include structural errors and errors in current user's preferences.)
 			let errorMessages = this.validationService.validateStructure(this.valueChart);
-			if (this.valueChartService.currentUserIsDefined()) {
+			if (this.valueChartService.currentUserIsMember()) {
 				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
 			} 
 			if (errorMessages.length > 0) {
@@ -276,7 +276,7 @@ export class CreateValueChartComponent implements OnInit {
 	nextButtonText(): string {
 		let text = 'Next Stage >>';
 		if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
-			if (!this.valueChartService.currentUserIsDefined()) {
+			if (!this.valueChartService.currentUserIsMember()) {
 				text = 'Add Preferences >>';
 			}
 			else {

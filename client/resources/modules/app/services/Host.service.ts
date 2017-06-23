@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 11:13:33
+* @Last Modified time: 2017-06-23 14:06:19
 */
 
 import { Injectable } 												from '@angular/core';
@@ -104,7 +104,7 @@ export class HostService {
 			// A new user has joined the hosted ValueChart. 
 			case MessageType.UserAdded:
 				let newUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				this.valueChartService.getValueChart().setUser(newUser);
+				this.valueChartService.getGroupChart().setUser(newUser);
 				this.displayedUsersService.addUserToDisplay(newUser);
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
@@ -114,7 +114,7 @@ export class HostService {
 			case MessageType.UserChanged:
 				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
 
-				this.valueChartService.getValueChart().setUser(updatedUser);
+				this.valueChartService.getGroupChart().setUser(updatedUser);
 
 				if (this.displayedUsersService.isUserDisplayed(updatedUser))
 					this.displayedUsersService.addUserToDisplay(updatedUser);
@@ -133,13 +133,13 @@ export class HostService {
 			case MessageType.UserRemoved:
 				let userToDelete: string = hostMessage.data;
 
-				let userIndex: number = this.valueChartService.getValueChart().getUsers().findIndex((user: User) => {
+				let userIndex: number = this.valueChartService.getGroupChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
 				this.displayedUsersService.removeUserToDisplay(userToDelete);
 
 				// Delete the user from the ValueChart
-				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
+				this.valueChartService.getGroupChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 			default:

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 10:02:00
+* @Last Modified time: 2017-06-23 14:27:45
 */
 
 
@@ -68,7 +68,7 @@ export class DisplayedUsersService {
 		}
 
 		let indices: any = {};
-		this.valueChartService.getValueChart().getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
+		this.valueChartService.getGroupChart().getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
 
 		this.usersToDisplay.sort((a: User, b: User) => {
 			return indices[a.getUsername()] < indices[b.getUsername()] ? -1 : 1;

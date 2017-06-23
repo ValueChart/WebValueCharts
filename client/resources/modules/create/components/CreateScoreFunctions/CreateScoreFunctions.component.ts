@@ -112,7 +112,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
     // Initialize user
     let newUser = false;
-    if (!this.valueChartService.currentUserIsDefined()) {
+    if (!this.valueChartService.currentUserIsMember()) {
       let user = new User(this.currentUserService.getUsername());
       user.setScoreFunctionMap(new ScoreFunctionMap());
       user.setWeightMap(new WeightMap());
