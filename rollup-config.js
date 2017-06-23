@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-16 17:10:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-17 11:08:29
+* @Last Modified time: 2017-06-23 11:23:43
 */
 
 
@@ -29,7 +29,7 @@ export default {
       commonjs({
         include: [ 'node_modules/rxjs/**', 'node_modules/lodash/lodash.js' ],
         namedExports: {
-          './node_modules/lodash/lodash.js': [ 'clone', 'cloneDeep', 'isEqual', 'clamp' ]
+          './node_modules/lodash/lodash.js': [ 'clone', 'cloneDeep', 'isEqual', 'clamp', 'findIndex' ]
         }
       }),
       uglify()

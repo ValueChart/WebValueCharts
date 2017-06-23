@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:48:30
+* @Last Modified time: 2017-06-23 11:53:51
 */
 
 // Import Testing Resources:
@@ -36,7 +36,7 @@ import { WebValueChartsParser }							from '../../../../../client/resources/modu
 import { ObjectiveChartDefinitions }					from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
+import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
 import { Objective }									from '../../../../../client/resources/model/Objective';
 import { User }											from '../../../../../client/resources/model/User';
 import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
@@ -224,6 +224,7 @@ var renderEventsServiceStub = {
 					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
 					
 					u.valueChart.setUser(bob);
+					u.valueChart.setType(ChartType.Group);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -267,6 +268,7 @@ var renderEventsServiceStub = {
 			context('when the number of users in the ValueChart is decreased to be one', () => {
 				before(function() {
 					u.valueChart.removeUser(aaron);
+					u.valueChart.setType(ChartType.Individual);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);

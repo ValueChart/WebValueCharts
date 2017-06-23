@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:54:40
+* @Last Modified time: 2017-06-23 11:52:06
 */
 	
 // Import Model Classes:
@@ -31,6 +31,7 @@ import * as Formatter															from '../modules/utilities/classes/Formatter
 	elements.
 */
 
+export enum ChartType { Individual, Group };
 
 export class ValueChart {
 
@@ -38,6 +39,7 @@ export class ValueChart {
 	// 									Fields
 	// ========================================================================================
 
+	private type: ChartType;
 	private name: string;					// The name of the ValueChart.
 	private fname: string;						// The name of the ValueChart formatted to remove spaces and special characters.
 	private description: string;			// The description of the ValueChart.
@@ -84,6 +86,14 @@ export class ValueChart {
 
 	// Note that methods that are simple getters/setters, or modifiers are not commented as they are self-explanatory.
 
+	getType(): ChartType {
+		return this.type;
+	}
+
+	setType(type: ChartType): void {
+		this.type = type;
+	}
+
 	getFName(): string {
 		return this.fname;
 	}
@@ -118,7 +128,11 @@ export class ValueChart {
 	}
 
 	isIndividual(): boolean {
-		return this.users.length === 1;
+		if (this.type ===  undefined) {
+			this.type = this.users.length > 1 ? ChartType.Group : ChartType.Individual;
+		}
+
+		return this.type === ChartType.Individual;
 	}
 
 	getRootObjectives(): Objective[] {
@@ -266,6 +280,11 @@ export class ValueChart {
 
 	setUsers(users: User[]): void {
 		this.users = users;
+
+		if (this.users.length > 1) 
+			this.type = ChartType.Group;
+		else 
+			this.type = ChartType.Individual;
 	}
 
 	setUser(newUser: User): void {

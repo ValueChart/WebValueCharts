@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:48:28
+* @Last Modified time: 2017-06-23 11:55:51
 */
 
 // Import Testing Resources:
@@ -36,7 +36,7 @@ import { WebValueChartsParser }							from '../../../../../client/resources/modu
 import { SummaryChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/SummaryChart.definitions';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
+import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
 import { Objective }									from '../../../../../client/resources/model/Objective';
 import { User }											from '../../../../../client/resources/model/User';
 import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
@@ -224,6 +224,7 @@ var renderEventsServiceStub = {
 
 
 					u.valueChart.setUser(bob);
+					u.valueChart.setType(ChartType.Group);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -251,6 +252,7 @@ var renderEventsServiceStub = {
 			context('when the number of users in the ValueChart is decreased to one', () => {
 				before(function() {
 					u.valueChart.removeUser(aaron);
+					u.valueChart.setType(ChartType.Individual);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -290,6 +292,7 @@ var renderEventsServiceStub = {
 			context('when the number of users in the ValueChart is decreased to be zero', () => {
 				before(function() {
 					u.valueChart.removeUser(bob);
+					u.valueChart.setType(ChartType.Individual);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);

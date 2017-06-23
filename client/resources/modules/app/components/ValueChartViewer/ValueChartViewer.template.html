@@ -22,6 +22,18 @@
 					</button>
 				</div>
 			</div>
+			<div *ngIf="isMember && valueChart.getUsers().length > 1">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
+					<button class="btn btn-primary" (click)="setChartView('individual')">
+					View Individual Chart
+					</button>
+				</div>
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'individual'">
+					<button class="btn btn-primary" (click)="setChartView('group')">
+					View Group Chart
+					</button>
+				</div>
+			</div>
 			<div *ngIf="enableManagement()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
 					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
@@ -34,7 +46,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="!currentUserService.isJoiningChart() && enableInteraction()">
+			<div *ngIf="!currentUserService.isJoiningChart() && valueChart.getUsers().length == 1">
 				<div class="form-group valuechart-toolbar-group pull-left" >
 					<button class="btn btn-success" (click)="saveChart()">
 					Save Chart
@@ -53,7 +65,7 @@
 			</div>
 			<div class="col-xs-1 pull-right"></div>
 			<ViewOptions [chartType]="(this.valueChartService.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [chartType]="(this.enableInteraction() ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
+			<InteractionOptions [chartType]="(this.enableInteraction ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<DetailBox 

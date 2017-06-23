@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:48:29
+* @Last Modified time: 2017-06-23 11:54:54
 */
 
 // Import Testing Resources:
@@ -45,7 +45,7 @@ import { WebValueChartsParser }							from '../../../../../client/resources/modu
 import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
+import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
 import { Objective }									from '../../../../../client/resources/model/Objective';
 import { User }											from '../../../../../client/resources/model/User';
 import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
@@ -327,6 +327,7 @@ var chartUndoRedoStub = {
 					bob = randomizeUserWeights(bob, u.valueChart);
 					bob.setScoreFunctionMap(aaron.getScoreFunctionMap());
 					u.valueChart.setUser(bob);
+					u.valueChart.setType(ChartType.Group);
 					u.usersToDisplay = u.valueChart.getUsers();
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
@@ -350,6 +351,7 @@ var chartUndoRedoStub = {
 				before(function() {
 					u.valueChart.setUsers([]);
 					u.usersToDisplay = u.valueChart.getUsers();
+					u.valueChart.setType(ChartType.Individual);
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceLabelData(u);
@@ -371,6 +373,7 @@ var chartUndoRedoStub = {
 
 				u.valueChart.setUser(aaron);
 				u.usersToDisplay = u.valueChart.getUsers();
+				u.valueChart.setType(ChartType.Individual);
 
 				viewConfig.viewOrientation = ChartOrientation.Horizontal
 				u = rendererDataUtility.produceMaximumWeightMap(u);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-12-30 18:28:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 12:47:11
+* @Last Modified time: 2017-06-23 11:11:47
 */
 
 // Import Angular Classes:
@@ -21,10 +21,25 @@ import { InteractionConfig, WeightResizeType, PumpType, SortAlternativesType }	f
 })
 export class InteractionOptionsComponent implements OnInit {
 
-	@Input() chartType: string;
+	@Input('chartType') 
+	set setType (chartType: string) {
+		this.chartType = chartType;
+
+		this.config = {
+			weightResizeType: (this.chartType === 'interactive') ? WeightResizeType.Neighbors : WeightResizeType.None,
+			reorderObjectives: false,
+			sortAlternatives: SortAlternativesType.None,
+			pumpWeights: PumpType.None,
+			setObjectiveColors: false,
+			adjustScoreFunctions: (this.chartType === 'interactive')
+		}
+
+		this.updateInteractionConfig(this.config);
+	};
 
 	@Output() interactionConfig = new EventEmitter<InteractionConfig>();
 	
+	public chartType: string;
 	public config: InteractionConfig;
 	public WeightResizeType = WeightResizeType;
 	public PumpType = PumpType;

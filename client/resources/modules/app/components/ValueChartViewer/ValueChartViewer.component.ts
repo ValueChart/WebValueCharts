@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 17:23:39
+* @Last Modified time: 2017-06-23 11:29:14
 */
 
 // Import Angular Classes:
@@ -32,7 +32,7 @@ import { RenderEventsService }													from '../../../ValueChart/services/Re
 import { UpdateObjectiveReferencesService }										from '../../../create/services/UpdateObjectiveReferences.service';
 
 // Import Model Classes:
-import { ValueChart } 															from '../../../../model/ValueChart';
+import { ValueChart, ChartType } 												from '../../../../model/ValueChart';
 import { User }																	from '../../../../model/User';
 import { WeightMap } 															from '../../../../model/WeightMap';
 import { Alternative } 															from '../../../../model/Alternative';
@@ -65,7 +65,9 @@ export class ValueChartViewerComponent implements OnInit {
 	// ========================================================================================
 
 	public routeSubscription: Subscription;
-	public viewType: String;
+	public viewType: string;
+	public isMember: boolean;
+	public enableInteraction: boolean;
 
 	public valueChartWidth: number;
 	public valueChartHeight: number;
@@ -120,9 +122,6 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
-		this.routeSubscription = this.route.params.subscribe(parameters => {
-			this.viewType = parameters['viewType'];
-		});
 
 		this.resizeValueChart();
 
@@ -139,6 +138,8 @@ export class ValueChartViewerComponent implements OnInit {
 			this.hostValueChart();
 		}
 
+		this.updateEnableInteraction();
+
 		$(window).resize((eventObjective: Event) => {
 			this.resizeValueChart();
 		});
@@ -148,6 +149,34 @@ export class ValueChartViewerComponent implements OnInit {
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 			$('#validate-modal').modal('show');
 		}
+		
+		this.isMember = this.valueChartService.currentUserIsMember();
+
+		this.routeSubscription = this.route.params.subscribe(parameters => {
+			let type = parameters['viewType'];
+
+			if (!this.isMember && type === 'individual')
+				this.router.navigate(['view', 'group', this.valueChart.getFName()], { queryParamsHandling: "merge" });
+			else 
+				this.setChartView(type);
+		});
+	}
+
+	setChartView(type: string) {
+		this.viewType = type;
+
+		this.valueChart = this.valueChartService.getValueChart();
+
+		if (this.viewType == 'individual') {
+			this.usersToDisplay = _.clone(this.valueChart.getUsers()).filter((user) => { return user.getUsername() === this.currentUserService.getUsername(); });
+			this.valueChart.setType(ChartType.Individual);
+		} else {
+			this.usersToDisplay = this.displayedUsersService.getUsersToDisplay();
+			this.valueChart.setType(ChartType.Group);
+		}
+
+		this.router.navigate(['view', type, this.valueChart.getFName()], { queryParamsHandling: "merge" });
+		this.updateEnableInteraction();
 	}
 
 	updateView(viewConfig: ViewConfig) {
@@ -206,12 +235,12 @@ export class ValueChartViewerComponent implements OnInit {
 							(b) the chart creator
 						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
 	*/
-	enableInteraction(): boolean {
-		return (this.currentUserService.isJoiningChart() 
+	updateEnableInteraction() {
+		this.enableInteraction = (this.currentUserService.isJoiningChart() 
 			|| (this.valueChartService.isIndividual()
 				&& this.valueChartService.currentUserIsDefined()
-				&& this.valueChartService.currentUserIsCreator()));
-	}
+				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()));
+	}	
 
 	/* 	
 		@returns {boolean}

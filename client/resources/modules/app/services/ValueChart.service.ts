@@ -2,11 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 14:46:00
+* @Last Modified time: 2017-06-23 11:23:33
 */
 
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core';
+
+// Import Libraries:	
+import * as _ 												from 'lodash';
 
 // Import Application Classes:
 import { CurrentUserService }								from './CurrentUser.service';
@@ -107,6 +110,10 @@ export class ValueChartService {
 
 	currentUserIsCreator(): boolean {
 		return this.currentUserService.getUsername() === this.valueChart.getCreator();
+	}
+
+	currentUserIsMember(): boolean {
+		return _.findIndex(this.valueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
 	}
 
 	getCurrentUser(): User {

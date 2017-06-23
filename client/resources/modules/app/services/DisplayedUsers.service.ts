@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-07 15:07:54
+* @Last Modified time: 2017-06-23 10:02:00
 */
 
 
@@ -36,14 +36,16 @@ export class DisplayedUsersService {
 
 	/*
 		@returns {void}
-		@description 	Used for Angular's dependency injection ONLY. Unfortunately we are forced to assign handlers to the Undo/Redo services event emitters in this
-						method.
-						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
+		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
 		private valueChartService: ValueChartService) {
 
 		this.setUsersToDisplay(_.clone(this.valueChartService.getValueChart().getUsers()));
+	}
+
+	getUsersToDisplay(): User[] {
+		return this.usersToDisplay;
 	}
 
 	setUsersToDisplay(users: User[]): void {
