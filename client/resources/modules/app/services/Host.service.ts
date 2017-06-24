@@ -2,15 +2,19 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 14:06:19
+* @Last Modified time: 2017-06-23 17:21:58
 */
 
 import { Injectable } 												from '@angular/core';
+
+// Import Libraries:
+import * as _														from 'lodash';
 
 // Import Application Classes:
 import { ValueChartService }										from './ValueChart.service';
 import { DisplayedUsersService }									from './DisplayedUsers.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
+import { ValidationService }										from './Validation.service';
 
 // Import Model Classes:
 import { ValueChart }												from '../../../model/ValueChart';
@@ -52,7 +56,9 @@ export class HostService {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService, private displayedUsersService: DisplayedUsersService) {
+	constructor(private valueChartService: ValueChartService, 
+		private displayedUsersService: DisplayedUsersService,
+		private validationService: ValidationService) {
 		this.valueChartParser = new JsonValueChartParser();
 	}
 
@@ -142,6 +148,16 @@ export class HostService {
 				this.valueChartService.getGroupChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
+
+			case MessageType.StructureChanged:
+				let valueChart = this.valueChartParser.parseValueChart(hostMessage.data);
+				valueChart.setUsers([this.valueChartService.getCurrentUser()]);
+
+				if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChartService.getIndividualChart())) { // Ignore changes if chart is not valid
+					toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
+				}
+				break;
+
 			default:
 
 			// A keep connection message was sent by server. These messages a are hack used to keep the websocket open.

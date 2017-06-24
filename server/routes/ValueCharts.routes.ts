@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 16:51:26
+* @Last Modified time: 2017-06-23 17:13:00
 */
 
 // Import Libraries and Express Middleware:
@@ -127,6 +127,9 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 					res.location('/ValueCharts/' + identifier)
 						.status(200)
 						.json({ data: req.body });
+
+					// Notify any clients hosting this ValueChart that a user has been changed.
+					hostEventEmitter.emit(HostEventEmitter.STRUCTURE_CHANGED_EVENT + '-' + identifier, req.body);
 				} else {
 					res.status(404).send('Not Found');
 				}
@@ -142,6 +145,9 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 					res.location('/ValueCharts/' + doc._id)
 						.status(201)
 						.json({ data: doc });
+
+					// Notify any clients hosting this ValueChart that a user has been changed.
+					hostEventEmitter.emit(HostEventEmitter.STRUCTURE_CHANGED_EVENT + '-' + identifier, req.body);
 				} else {
 					res.status(404).send('Not Found');				
 				}

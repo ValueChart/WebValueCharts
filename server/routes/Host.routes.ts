@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 16:31:34
+* @Last Modified time: 2017-06-23 17:18:00
 */
 
 // Import Libraries and Middleware:
@@ -93,6 +93,11 @@ var initEventListeners = (chartId: string, ws: any): any[] => {
 		ws.send(JSON.stringify({ type: MessageType.UserChanged, data: user, chartId: chartId }));
 	};
 
+	var structureChangedListener = (valueChart: any) => {
+		console.log('User changed event detected');
+		ws.send(JSON.stringify({ type: MessageType.StructureChanged, data: valueChart, chartId: chartId }));
+	}
+
 	// Attach the handlers defined above to the correct events.
 	hostEventEmitter.on(HostEventEmitter.USER_ADDED_EVENT + '-' + chartId, addedListener);
 
@@ -100,7 +105,11 @@ var initEventListeners = (chartId: string, ws: any): any[] => {
 
 	hostEventEmitter.on(HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId, changedListener);
 
+	hostEventEmitter.on(HostEventEmitter.STRUCTURE_CHANGED_EVENT + '-' + chartId, structureChangedListener);
+
+
 	return [{ listener: addedListener, eventName: HostEventEmitter.USER_ADDED_EVENT + '-' + chartId }, 
 			{ listener: removedListener, eventName: HostEventEmitter.USER_REMOVED_EVENT + '-' + chartId }, 
-			{ listener: changedListener, eventName: HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId }];
+			{ listener: changedListener, eventName: HostEventEmitter.USER_CHANGED_EVENT + '-' + chartId },
+			{ listener: structureChangedListener, eventName: HostEventEmitter.STRUCTURE_CHANGED_EVENT + '-' + chartId }];
 }
