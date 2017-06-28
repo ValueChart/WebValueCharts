@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-30 21:57:34
+* @Last Modified time: 2017-06-27 15:28:55
 */
 
 // Import Model Classes:
-import { ValueChart } 														from '../../../model/ValueChart';
+import { ValueChart, ChartType } 											from '../../../model/ValueChart';
 import { User }																from '../../../model/User';
 import { WeightMap }														from '../../../model/WeightMap';
 import { Objective } 														from '../../../model/Objective';
@@ -60,6 +60,9 @@ export class JsonValueChartParser {
 		// Copy over all the properties from the WeightMap that is being saved.
 		valueChart._id = JsonValueChart._id;
 		valueChart.password = JsonValueChart.password;
+		let type = (JsonValueChart.type === 0) ? ChartType.Individual : ChartType.Group;
+
+		valueChart.setType(type);
 
 		if (JsonValueChart.rootObjectives !== undefined) {
 			// Parse Root Objectives

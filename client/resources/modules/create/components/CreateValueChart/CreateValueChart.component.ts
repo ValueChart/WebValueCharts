@@ -14,7 +14,7 @@ import { CreateScoreFunctionsComponent }								from '../CreateScoreFunctions/Cr
 import { CreateWeightsComponent }										from '../CreateWeights/CreateWeights.component';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
-import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
+import { CurrentUserService, UserRole }									from '../../../app/services/CurrentUser.service';
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
@@ -49,7 +49,8 @@ export class CreateValueChartComponent implements OnInit {
 	// Navigation Control:
 	sub: any;
 	window: any = window;
-	saveOnDestroy: boolean;
+	
+	public creatingOrEditing: boolean;
 	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 
@@ -87,6 +88,7 @@ export class CreateValueChartComponent implements OnInit {
 						Calling ngOnInit should be left to Angular. Do not call it manually.
 	*/
 	ngOnInit() {
+		this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
 
 		this.creationStepsService.goBack = new Observable<void>((subscriber: Subscriber<void>) => {
             subscriber.next(this.back(true));
@@ -101,14 +103,17 @@ export class CreateValueChartComponent implements OnInit {
 		// Bind purpose to corresponding URL parameter
 		this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
+		this.creatingOrEditing = false;
 
 		// Initialize according to purpose
 		if (this.purpose === 'newChart') {
-			this.currentUserService.setJoiningChart(false);
+			this.creatingOrEditing = true;
+
 			let valueChart = new ValueChart('', '', this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			this.valueChartService.setValueChart(valueChart); 
-		}
-		else if (this.purpose === 'editChart') {
+		} else if (this.purpose === 'editChart') {
+			this.creatingOrEditing = true;
+
 			// Lock chart while editing
 			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
 				status.userChangesPermitted = false; 
@@ -116,9 +121,6 @@ export class CreateValueChartComponent implements OnInit {
 			});
 		}
 		this.valueChart = this.valueChartService.getValueChart();
-
-		// Initialize save-on-destroy to true unless user is joining chart
-		this.saveOnDestroy = !this.currentUserService.isJoiningChart();
 	}
 
 	/* 	
@@ -130,7 +132,7 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();	
 
-		if (this.saveOnDestroy) {
+		if (this.creatingOrEditing) {
 			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
 			let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
 				|| (this.valueChartService.currentUserIsMember() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
@@ -142,6 +144,8 @@ export class CreateValueChartComponent implements OnInit {
 			status.fname = this.valueChart.getFName();
 			status.chartId = this.valueChart._id;
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
+
+			this.valueChartService.setValueChart(this.valueChart);
 			this.autoSaveValueChart();
 		}
 	}
@@ -292,7 +296,7 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	navigationModalText(): string {
 		let text = "Do you want to keep this ValueChart?";
-		if (this.currentUserService.isJoiningChart()) {
+		if (!this.creatingOrEditing) {
 			text = "Are you sure you want to leave this ValueChart?";
 		}
 		return text;
@@ -316,7 +320,7 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	This method handles the user's response to the navigation confirmation modal.
 						Navigation proceeds if the user elected to discard the chart or save the chart.
-						If this.saveOnDestroy is set to true, the chart will be saved when ngDestroy is called.
+						If this.creatingOrEditing is set to true, the chart will be saved when ngDestroy is called.
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate && keepValueChart && this.creationStepsService.step === this.creationStepsService.BASICS && 
@@ -325,7 +329,7 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else {
 			if (!keepValueChart) {
-				this.saveOnDestroy = false;
+				this.creatingOrEditing = false;
 				if (this.valueChart._id) {
 					this.deleteValueChart(this.valueChart);
 				}			
@@ -362,7 +366,7 @@ export class CreateValueChartComponent implements OnInit {
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
 	autoSaveValueChart(): void {
-		if (this.currentUserService.isJoiningChart()) {
+		if (!this.creatingOrEditing) {
 			return;	// Don't autosave. The user is joining or editing preferences for an existing ValueChart.
 		}
 		if (!this.valueChart._id) {

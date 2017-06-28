@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-12-30 18:28:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:11:47
+* @Last Modified time: 2017-06-27 17:45:12
 */
 
 // Import Angular Classes:
@@ -21,17 +21,17 @@ import { InteractionConfig, WeightResizeType, PumpType, SortAlternativesType }	f
 })
 export class InteractionOptionsComponent implements OnInit {
 
-	@Input('chartType') 
-	set setType (chartType: string) {
-		this.chartType = chartType;
+	@Input('interactive') 
+	set setType (interactive: boolean) {
+		this.interactive = interactive;
 
 		this.config = {
-			weightResizeType: (this.chartType === 'interactive') ? WeightResizeType.Neighbors : WeightResizeType.None,
+			weightResizeType: this.interactive ? WeightResizeType.Neighbors : WeightResizeType.None,
 			reorderObjectives: false,
 			sortAlternatives: SortAlternativesType.None,
 			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
-			adjustScoreFunctions: (this.chartType === 'interactive')
+			adjustScoreFunctions: this.interactive
 		}
 
 		this.updateInteractionConfig(this.config);
@@ -39,7 +39,7 @@ export class InteractionOptionsComponent implements OnInit {
 
 	@Output() interactionConfig = new EventEmitter<InteractionConfig>();
 	
-	public chartType: string;
+	public interactive: boolean;
 	public config: InteractionConfig;
 	public WeightResizeType = WeightResizeType;
 	public PumpType = PumpType;
@@ -48,12 +48,12 @@ export class InteractionOptionsComponent implements OnInit {
 
 	ngOnInit() {
 		this.config = {
-			weightResizeType: (this.chartType === 'interactive') ? WeightResizeType.Neighbors : WeightResizeType.None,
+			weightResizeType: this.interactive ? WeightResizeType.Neighbors : WeightResizeType.None,
 			reorderObjectives: false,
 			sortAlternatives: SortAlternativesType.None,
 			pumpWeights: PumpType.None,
 			setObjectiveColors: false,
-			adjustScoreFunctions: (this.chartType === 'interactive')
+			adjustScoreFunctions: this.interactive
 		}
 
 		this.updateInteractionConfig(this.config);

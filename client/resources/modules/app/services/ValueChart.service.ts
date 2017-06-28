@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 16:24:33
+* @Last Modified time: 2017-06-27 20:14:33
 */
 
 // Import Angular Classes:
@@ -43,7 +43,7 @@ export class ValueChartService {
 
 	private currentType: string;
 	private individualValueChart: ValueChart;
-	private groupValueChart: ValueChart;
+	private baseValueChart: ValueChart;
 	private activeValueChart: ValueChart;
 
 	private primitiveObjectives: PrimitiveObjective[];	// The list of PrimitiveObjective objects in the current ValueChart. This is saved to avoid
@@ -70,7 +70,7 @@ export class ValueChartService {
 	setActiveChart(chartType: string): void {
 		this.currentType = chartType;
 		if (chartType === 'group') {
-			this.activeValueChart = this.groupValueChart;
+			this.activeValueChart = this.baseValueChart;
 		} else {
 			this.activeValueChart = this.individualValueChart;
 		}
@@ -79,37 +79,32 @@ export class ValueChartService {
 	// Initialize Service fields based on the passed-in ValueChart.
 	setValueChart(valueChart: ValueChart): void {
 		if (valueChart.isIndividual()) {
-			this.individualValueChart = valueChart;
-			this.groupValueChart = _.clone(this.individualValueChart);
-			this.groupValueChart.setUsers(_.clone(this.groupValueChart.getUsers()));
+			this.baseValueChart = valueChart;
+			this.individualValueChart = _.clone(valueChart);
+			this.individualValueChart.setUsers(_.clone(this.baseValueChart.getUsers()));
 		} else {
-			this.groupValueChart = valueChart;
-			this.individualValueChart = _.clone(this.groupValueChart);
+			this.baseValueChart = valueChart;
+			this.individualValueChart = _.clone(this.baseValueChart);
 
-			var user: User[] = this.groupValueChart.getUsers().filter((user: User) => {
+			var user: User[] = this.baseValueChart.getUsers().filter((user: User) => {
 				return user.getUsername() === this.currentUserService.getUsername();
 			});
 
 			this.individualValueChart.setUsers(user);
 		}
 
-		this.groupValueChart.setType(ChartType.Group);
 		this.individualValueChart.setType(ChartType.Individual);
 
 		if (this.currentType === 'group')
-			this.activeValueChart = this.groupValueChart;
+			this.activeValueChart = this.baseValueChart;
 		else 
 			this.activeValueChart = this.individualValueChart;
 
 		this.primitiveObjectives = this.activeValueChart.getAllPrimitiveObjectives();
 	}
 
-	isGroupChart(): boolean {
-		return this.groupValueChart && this.groupValueChart.getUsers().length > 1;
-	}
-
-	getGroupChart(): ValueChart {
-		return this.groupValueChart;
+	getBaseValueChart(): ValueChart {
+		return this.baseValueChart;
 	}
 
 	getIndividualChart(): ValueChart {

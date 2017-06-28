@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 12:52:54
+* @Last Modified time: 2017-06-27 21:16:16
 */
 
 // Import Model Classes:
@@ -114,6 +114,10 @@ export class ValueChartXMLEncoder {
 		valueChartElement.setAttribute('name', valueChart.getName());
 		valueChartElement.setAttribute('creator', valueChart.getCreator());
 		valueChartElement.setAttribute('version', '2.0');
+		
+		let type = valueChart.isIndividual() ? 'individual' : 'group';
+		valueChartElement.setAttribute('type', type);
+
 		if (valueChart._id) {
 			valueChartElement.setAttribute('id', valueChart._id);
 		}

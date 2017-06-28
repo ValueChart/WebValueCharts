@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 13:08:12
+* @Last Modified time: 2017-06-27 21:16:42
 */
 
 // Import Model Classes:
-import { ValueChart } 														from '../../../model/ValueChart';
+import { ValueChart, ChartType } 											from '../../../model/ValueChart';
 import { User }																from '../../../model/User';
 import { WeightMap }														from '../../../model/WeightMap';
 import { Objective } 														from '../../../model/Objective';
@@ -67,6 +67,9 @@ export class WebValueChartsParser {
 		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
 		valueChart._id = valueChartElement.getAttribute('id');
 		valueChart.password = valueChartElement.getAttribute('password');
+		let type = (valueChartElement.getAttribute('type') === 'individual') ? ChartType.Individual : ChartType.Group;
+		valueChart.setType(type);
+
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
 		var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');

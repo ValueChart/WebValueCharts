@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-07 15:55:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-07-07 15:59:41
+* @Last Modified time: 2017-06-27 15:52:35
 */
 
 export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts creator="Aaron Mishkin" name="Hotel" password="password" version="2.0">
+<ValueCharts creator="Aaron Mishkin" name="Hotel" password="password" type="individual" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
@@ -142,7 +142,7 @@ export var singleHotel: string = `<?xml version="1.0" encoding="UTF-8" standalon
 
 
 export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts creator="Aaron" name="Hotel" password="password" version="2.0">
+<ValueCharts creator="Aaron" name="Hotel" password="password" type="group" version="2.0">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
@@ -319,103 +319,127 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 
 
 export var waterManagement: string = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts problem="OCRunoffMng">
-	<Colors>
-		<Color b="0" g="115" name="Potential_Domino_Effects" r="0"/>
-		<Color b="0" g="102" name="Disruption_to_stakeholders" r="0"/>
-		<Color b="0" g="51" name="Risk" r="0"/>
-		<Color b="128" g="0" name="Innovation_Support" r="0"/>
-		<Color b="115" g="0" name="Cliff_Erosion" r="0"/>
-		<Color b="89" g="0" name="Reuse_Capacity" r="0"/>
-	</Colors>
-	<Criteria>
-		<Criterion name="OCRunoffMng" type="abstract">
-			<Criterion name="Operation" type="abstract">
-				<Criterion name="Potential_Domino_Effects" type="primitive" weight="0.15">
-					<Domain type="continuous" unit="Unit3">
-						<ContinuousValue x="4.0" y="1.0"/>
-						<ContinuousValue x="10.0" y="0.66"/>
-						<ContinuousValue x="15.0" y="0.33"/>
-						<ContinuousValue x="20.0" y="0.0"/>
-					</Domain>
-				</Criterion>
-				<Criterion name="Disruption_to_stakeholders" type="primitive" weight="0.15">
-					<Domain type="discrete">
-						<DiscreteValue x="None" y="1.0"/>
-						<DiscreteValue x="Somewhat" y="0.5"/>
-						<DiscreteValue x="Very" y="0.0"/>
-					</Domain>
-				</Criterion>
-				<Criterion name="Risk" type="primitive" weight="0.2">
-					<Domain type="continuous" unit="Unit2">
-						<ContinuousValue x="2.0" y="1.0"/>
-						<ContinuousValue x="4.0" y="0.6"/>
-						<ContinuousValue x="6.0" y="0.4"/>
-						<ContinuousValue x="8.0" y="0.3"/>
-						<ContinuousValue x="10.0" y="0.2"/>
-						<ContinuousValue x="12.0" y="0.0"/>
-					</Domain>
-				</Criterion>
-			</Criterion>
-			<Criterion name="Sustainability" type="abstract">
-				<Criterion name="Innovation_Support" type="primitive" weight="0.15">
-					<Domain type="discrete">
-						<DiscreteValue x="No" y="0.0"/>
-						<DiscreteValue x="Medium" y="0.5"/>
-						<DiscreteValue x="High" y="1.0"/>
-					</Domain>
-				</Criterion>
-				<Criterion name="Cliff_Erosion" type="primitive" weight="0.15">
-					<Domain type="discrete">
-						<DiscreteValue x="None" y="1.0"/>
-						<DiscreteValue x="Medium" y="0.2"/>
-						<DiscreteValue x="Large" y="0.0"/>
-					</Domain>
-				</Criterion>
-				<Criterion name="Reuse_Capacity" type="primitive" weight="0.2">
-					<Domain type="continuous" unit="m3/month">
-						<ContinuousValue x="0.0" y="0.1"/>
-						<ContinuousValue x="20.0" y="0.0"/>
-						<ContinuousValue x="80.0" y="1.0"/>
-						<ContinuousValue x="100.0" y="1.0"/>
-					</Domain>
-				</Criterion>
-			</Criterion>
-		</Criterion>
-	</Criteria>
-	<Alternatives>
-		<Alternative name="Site Unchanged">
-			<AlternativeValue criterion="Risk" value="3.0"/>
-			<AlternativeValue criterion="Disruption_to_stakeholders" value="None"/>
-			<AlternativeValue criterion="Cliff_Erosion" value="None"/>
-			<AlternativeValue criterion="Innovation_Support" value="No"/>
-			<AlternativeValue criterion="Potential_Domino_Effects" value="4.0"/>
-			<AlternativeValue criterion="Reuse_Capacity" value="0.0"/>
-		</Alternative>
-		<Alternative name="Vantage College. Conventional Runoff Management">
-			<AlternativeValue criterion="Risk" value="2.0"/>
-			<AlternativeValue criterion="Disruption_to_stakeholders" value="Somewhat"/>
-			<AlternativeValue criterion="Cliff_Erosion" value="Medium"/>
-			<AlternativeValue criterion="Innovation_Support" value="No"/>
-			<AlternativeValue criterion="Potential_Domino_Effects" value="7.0"/>
-			<AlternativeValue criterion="Reuse_Capacity" value="0.0"/>
-		</Alternative>
-		<Alternative name="Vantage College. Best practice Onsite Runoff">
-			<AlternativeValue criterion="Risk" value="6.0"/>
-			<AlternativeValue criterion="Disruption_to_stakeholders" value="Somewhat"/>
-			<AlternativeValue criterion="Cliff_Erosion" value="Large"/>
-			<AlternativeValue criterion="Innovation_Support" value="Medium"/>
-			<AlternativeValue criterion="Potential_Domino_Effects" value="12.0"/>
-			<AlternativeValue criterion="Reuse_Capacity" value="50.0"/>
-		</Alternative>
-		<Alternative name="Direct Runoff to Sustainability Street">
-			<AlternativeValue criterion="Risk" value="12.0"/>
-			<AlternativeValue criterion="Disruption_to_stakeholders" value="Very"/>
-			<AlternativeValue criterion="Cliff_Erosion" value="Medium"/>
-			<AlternativeValue criterion="Innovation_Support" value="High"/>
-			<AlternativeValue criterion="Potential_Domino_Effects" value="20.0"/>
-			<AlternativeValue criterion="Reuse_Capacity" value="100.0"/>
-		</Alternative>
-	</Alternatives>
+<ValueCharts name="OCRunoffMng" creator="amishkin" version="2.0" type="individual">
+	<ChartStructure>
+		<Objectives>
+			<Objective name="OCRunoffMng" type="abstract">
+				<Objective name="Operation" type="abstract">
+					<Objective name="Potential_Domino_Effects" type="primitive" color="rgb(0, 115, 0)">
+						<Domain type="continuous" unit="undefined" min="4" max="20"/>
+						<Description>undefined</Description>
+					</Objective>
+					<Objective name="Disruption_to_stakeholders" type="primitive" color="rgb(0, 102, 0)">
+						<Domain type="categorical" ordered="false"/>
+						<Description>undefined</Description>
+					</Objective>
+					<Objective name="Risk" type="primitive" color="rgb(0, 51, 0)">
+						<Domain type="continuous" unit="undefined" min="2" max="12"/>
+						<Description>undefined</Description>
+					</Objective>
+				</Objective>
+				<Objective name="Sustainability" type="abstract">
+					<Objective name="Innovation_Support" type="primitive" color="rgb(0, 0, 128)">
+						<Domain type="categorical" ordered="false"/>
+						<Description>undefined</Description>
+					</Objective>
+					<Objective name="Cliff_Erosion" type="primitive" color="rgb(0, 0, 115)">
+						<Domain type="categorical" ordered="false"/>
+						<Description>undefined</Description>
+					</Objective>
+					<Objective name="Reuse_Capacity" type="primitive" color="rgb(0, 0, 89)">
+						<Domain type="continuous" unit="undefined" min="0" max="100"/>
+						<Description>undefined</Description>
+					</Objective>
+				</Objective>
+			</Objective>
+		</Objectives>
+		<Alternatives>
+			<Alternative name="Site Unchanged">
+				<AlternativeValue objective="Risk" value="3"/>
+				<AlternativeValue objective="Disruption_to_stakeholders" value="None"/>
+				<AlternativeValue objective="Cliff_Erosion" value="None"/>
+				<AlternativeValue objective="Innovation_Support" value="No"/>
+				<AlternativeValue objective="Potential_Domino_Effects" value="4"/>
+				<AlternativeValue objective="Reuse_Capacity" value="0"/>
+				<Description/>
+			</Alternative>
+			<Alternative name="Vantage College. Conventional Runoff Management">
+				<AlternativeValue objective="Risk" value="2"/>
+				<AlternativeValue objective="Disruption_to_stakeholders" value="Somewhat"/>
+				<AlternativeValue objective="Cliff_Erosion" value="Medium"/>
+				<AlternativeValue objective="Innovation_Support" value="No"/>
+				<AlternativeValue objective="Potential_Domino_Effects" value="7"/>
+				<AlternativeValue objective="Reuse_Capacity" value="0"/>
+				<Description/>
+			</Alternative>
+			<Alternative name="Vantage College. Best practice Onsite Runoff">
+				<AlternativeValue objective="Risk" value="6"/>
+				<AlternativeValue objective="Disruption_to_stakeholders" value="Somewhat"/>
+				<AlternativeValue objective="Cliff_Erosion" value="Large"/>
+				<AlternativeValue objective="Innovation_Support" value="Medium"/>
+				<AlternativeValue objective="Potential_Domino_Effects" value="12"/>
+				<AlternativeValue objective="Reuse_Capacity" value="50"/>
+				<Description/>
+			</Alternative>
+			<Alternative name="Direct Runoff to Sustainability Street">
+				<AlternativeValue objective="Risk" value="12"/>
+				<AlternativeValue objective="Disruption_to_stakeholders" value="Very"/>
+				<AlternativeValue objective="Cliff_Erosion" value="Medium"/>
+				<AlternativeValue objective="Innovation_Support" value="High"/>
+				<AlternativeValue objective="Potential_Domino_Effects" value="20"/>
+				<AlternativeValue objective="Reuse_Capacity" value="100"/>
+				<Description/>
+			</Alternative>
+		</Alternatives>
+	</ChartStructure>
+	<Users>
+		<User name="temp" color="#F3C300">
+			<Weights>
+				<Weight objective="Potential_Domino_Effects" value="0.15"/>
+				<Weight objective="Disruption_to_stakeholders" value="0.15"/>
+				<Weight objective="Risk" value="0.2"/>
+				<Weight objective="Innovation_Support" value="0.15"/>
+				<Weight objective="Cliff_Erosion" value="0.15"/>
+				<Weight objective="Reuse_Capacity" value="0.2"/>
+			</Weights>
+			<ScoreFunctions>
+				<ScoreFunction objective="Potential_Domino_Effects" type="continuous">
+					<Score value="1" domain-element="4"/>
+					<Score value="0.66" domain-element="10"/>
+					<Score value="0.33" domain-element="15"/>
+					<Score value="0" domain-element="20"/>
+				</ScoreFunction>
+				<ScoreFunction objective="Disruption_to_stakeholders" type="discrete">
+					<Score value="1" domain-element="None"/>
+					<Score value="0.5" domain-element="Somewhat"/>
+					<Score value="0" domain-element="Very"/>
+				</ScoreFunction>
+				<ScoreFunction objective="Risk" type="continuous">
+					<Score value="1" domain-element="2"/>
+					<Score value="0.6" domain-element="4"/>
+					<Score value="0.4" domain-element="6"/>
+					<Score value="0.3" domain-element="8"/>
+					<Score value="0.2" domain-element="10"/>
+					<Score value="0" domain-element="12"/>
+				</ScoreFunction>
+				<ScoreFunction objective="Innovation_Support" type="discrete">
+					<Score value="0" domain-element="No"/>
+					<Score value="0.5" domain-element="Medium"/>
+					<Score value="1" domain-element="High"/>
+				</ScoreFunction>
+				<ScoreFunction objective="Cliff_Erosion" type="discrete">
+					<Score value="1" domain-element="None"/>
+					<Score value="0.2" domain-element="Medium"/>
+					<Score value="0" domain-element="Large"/>
+				</ScoreFunction>
+				<ScoreFunction objective="Reuse_Capacity" type="continuous">
+					<Score value="0.1" domain-element="0"/>
+					<Score value="0" domain-element="20"/>
+					<Score value="1" domain-element="80"/>
+					<Score value="1" domain-element="100"/>
+				</ScoreFunction>
+			</ScoreFunctions>
+		</User>
+	</Users>
 </ValueCharts>`;
 

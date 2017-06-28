@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 15:53:10
+* @Last Modified time: 2017-06-27 20:05:29
 */
 
 // Import Angular Classes:
@@ -11,7 +11,7 @@ import { Router }										from '@angular/router';
 import { OnInit }										from '@angular/core';
 
 // Import Application Classes:
-import { CurrentUserService }							from '../../services/CurrentUser.service';
+import { CurrentUserService, UserRole }					from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
@@ -109,7 +109,7 @@ export class MyValueChartsComponent implements OnInit {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setJoiningChart(false);
+				this.updateRole()
 				// Validate chart structure before proceeding.
 				// (This is a sanity check to catch any as any errors brought on by 
 				//  changes in validation since saving to the database.)
@@ -131,7 +131,8 @@ export class MyValueChartsComponent implements OnInit {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setJoiningChart(false);
+				this.updateRole()
+
 				this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 			});
 	}
@@ -143,7 +144,7 @@ export class MyValueChartsComponent implements OnInit {
 					.subscribe(user => {
 						valueChart.setUser(user);
 						this.valueChartService.setValueChart(valueChart);
-						this.currentUserService.setJoiningChart(true);
+						this.updateRole()
 						this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
 					});
 			});
@@ -217,6 +218,12 @@ export class MyValueChartsComponent implements OnInit {
 		} else {
 			return 'Complete';
 		}
+	}
+
+	updateRole(): void {
+		let role = (this.valueChartService.currentUserIsMember()) ? UserRole.Participant : UserRole.Viewer;
+		this.currentUserService.setUserRole(role);
+		this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
 	}
 
 }

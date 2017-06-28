@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 17:47:01
+* @Last Modified time: 2017-06-27 17:58:43
 */
 
 // Import Angular Classes:
@@ -10,9 +10,9 @@ import { Injectable }     														from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService }													from './CurrentUser.service';
+import { CurrentUserService, UserRole }											from './CurrentUser.service';
 import { ValueChartService }													from './ValueChart.service';
-import { ValueChartHttpService }													from './ValueChartHttp.service';
+import { ValueChartHttpService }												from './ValueChartHttp.service';
 
 
 
@@ -63,7 +63,7 @@ export class JoinGuardService implements CanActivate {
 				this.valueChartHttpService.getValueChartStructure(name, password)
 					.subscribe(
 					valueChart => {
-						this.currentUserService.setJoiningChart(true);
+						this.currentUserService.setUserRole(UserRole.Joining)
 						this.valueChartService.setValueChart(valueChart);
 						resolve(true);	
 					},

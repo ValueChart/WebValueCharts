@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:53:38
+* @Last Modified time: 2017-06-27 17:43:50
 */
 
 // Import Angular Classes:
@@ -13,6 +13,7 @@ import { EventEmitter }															from '@angular/core';
 
 // Import Types:
 import { ViewConfig, ChartOrientation }											from '../../../../../types/Config.types';
+import { ChartType }															from '../../../../../model/ValueChart'
 
 @Component({
 	selector: 'ViewOptions',
@@ -21,11 +22,12 @@ import { ViewConfig, ChartOrientation }											from '../../../../../types/Con
 })
 export class ViewOptionsComponent implements OnInit {
 
+	public ChartType = ChartType;
 
 	@Output() viewConfig = new EventEmitter<ViewConfig>();
 	public config: ViewConfig;
 
-	@Input() chartType: string;
+	@Input() chartType: ChartType;
 
 	public ChartOrientation = ChartOrientation;
 

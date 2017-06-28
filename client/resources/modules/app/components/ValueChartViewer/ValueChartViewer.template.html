@@ -3,19 +3,19 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<a class="btn btn-default" *ngIf="enableManagement()" [routerLink]="['/createValueChart/editChart/BasicInfo']">
+				<button class="btn btn-default" *ngIf="enableManagement()" (click)="editValueChart()">
 				Edit ValueChart
-				</a>
+				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left" >
-				<button class="btn btn-default" *ngIf="enableEditPreferences()" (click)="editPreferences()">
+				<button class="btn btn-default" *ngIf="currentUserService.getUserRole() !== UserRole.Viewer" (click)="editPreferences()">
 				Edit Preferences
 				</button>
 			</div>
-			<div *ngIf="enableManagement()" class="form-group valuechart-toolbar-group pull-left">
+			<div class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
-			<div *ngIf="isMember && valueChartService.isGroupChart() && !currentUserService.isJoiningChart()">
+			<div *ngIf="currentUserService.getUserRole() === UserRole.Participant && valueChartService.getBaseValueChart().getType() === ChartType.Group">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
 					<button class="btn btn-primary" (click)="setChartView('individual')">
 					View Individual Chart
@@ -27,10 +27,10 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="enableInteraction">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="currentUserService.isJoiningChart() || valueChartService.isGroupChart()">
+			<div *ngIf="currentUserService.getUserRole() !== UserRole.Viewer">
+				<div class="form-group valuechart-toolbar-group pull-left">
 					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
-					Submit Preferences
+					Save
 					</button>
 				</div>
 			</div>
@@ -46,13 +46,6 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="!currentUserService.isJoiningChart() && !valueChartService.isGroupChart()">
-				<div class="form-group valuechart-toolbar-group pull-left" >
-					<button class="btn btn-success" (click)="saveChart()">
-					Save Chart
-					</button>
-				</div>
-			</div>
 			<div class="form-group valuechart-toolbar-group pull-right">
 				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
 				Redo
@@ -64,8 +57,8 @@
 				</button>
 			</div>
 			<div class="col-xs-1 pull-right"></div>
-			<ViewOptions [chartType]="(this.valueChartService.isIndividual() ? 'individual' : 'group')" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [chartType]="(this.enableInteraction ? 'interactive' : 'static')" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
+			<ViewOptions [chartType]="valueChart.getType()" (viewConfig)="updateView($event)"></ViewOptions>
+			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<DetailBox 

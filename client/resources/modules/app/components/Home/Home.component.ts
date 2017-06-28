@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 15:52:42
+* @Last Modified time: 2017-06-27 17:53:18
 */
 
 // Import Angular Classes:
@@ -11,7 +11,7 @@ import { Router }										from '@angular/router';
 
 // Import Application Classes:
 import { XMLValueChartParserService } 					from '../../services/XMLValueChartParser.service';
-import { CurrentUserService }							from '../../services/CurrentUser.service';
+import { CurrentUserService, UserRole }					from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ValidationService }							from '../../services/Validation.service';
@@ -118,7 +118,7 @@ export class HomeComponent {
 			.subscribe(
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setJoiningChart(true);
+				this.currentUserService.setUserRole(UserRole.Joining);
 				$('#chart-credentials-modal').modal('hide');
 				this.router.navigate(['createValueChart/newUser/ScoreFunctions']);
 			},
@@ -141,7 +141,7 @@ export class HomeComponent {
 			.subscribe(
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setJoiningChart(false);
+				this.currentUserService.setUserRole(UserRole.Viewer);
 				$('#chart-credentials-modal').modal('hide');
 				if (this.validateChartStructure()) {
 					let valueChart = this.valueChartService.getValueChart();
@@ -163,7 +163,7 @@ export class HomeComponent {
 	*/
 	selectDemoValueChart(demoChart: any): void {
 		this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(demoChart.xmlString));
-		this.currentUserService.setJoiningChart(false);
+		this.currentUserService.setUserRole(UserRole.Participant);
 		let valueChart = this.valueChartService.getValueChart();
 		let viewType = valueChart.isIndividual() ? 'individual' : 'group';
 		this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
@@ -187,8 +187,13 @@ export class HomeComponent {
 				// Parse the XML string and set it to be the ValueChartService's active chart.
 				this.valueChartService.setValueChart(this.valueChartParser.parseValueChart(xmlString));
 				
+				let role: UserRole = UserRole.Viewer;
 				// The user uploaded a ValueChart so they aren't joining an existing one.
-				this.currentUserService.setJoiningChart(false);
+				if (this.valueChartService.currentUserIsMember())
+					role = UserRole.Participant;
+
+				this.currentUserService.setUserRole(role)
+				this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
 
 				if (this.validateChartStructure()) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.

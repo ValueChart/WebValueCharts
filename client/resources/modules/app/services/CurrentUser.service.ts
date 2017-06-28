@@ -2,11 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 17:35:30
+* @Last Modified time: 2017-06-27 17:27:39
 */
 
 // Import Angular Classes:
 import { Injectable } 												from '@angular/core';
+
+export enum UserRole {
+	Viewer,					// The user is viewing a ValueChart. They are not permitted to edit the ValueChart or interact with it in any way.
+	Joining,				// The user is joining a ValueChart but has not yet become a participant by saving their preferences.
+	Participant 			// The user is participating in a ValueChart.
+}
+
 
 /*
 	This class contains all useful information about the current application-level user, which it exposes to any component, directive,
@@ -27,8 +34,8 @@ export class CurrentUserService {
 
 	private username: string; 				// The username of the current user.
 	private loggedIn: boolean;				// Whether or not the current user is logged in.
-	private joiningChart: boolean;			// Whether or not the current user is joining and existing ValueChart. This controls
-											// whether joining or hosting functionality will be exposed to the user.
+	private owner: boolean;					// Whether or not the current user 
+	private userRole: UserRole;				// The role of the current user.
 
 
 	// ========================================================================================
@@ -55,16 +62,24 @@ export class CurrentUserService {
 		this.username = username;
 	}
 
-	setJoiningChart(joiningChart: boolean): void {
-		this.joiningChart = joiningChart;
+	setUserRole(role: UserRole) {
+		this.userRole = role;
+	}
+
+	getUserRole(): UserRole {
+		return this.userRole;
+	}
+
+	isOwner(): boolean {
+		return this.owner;
+	}
+
+	setOwner(owner: boolean): void {
+		this.owner = owner;
 	}
 
 	setLoggedIn(loggedIn: boolean): void {
 		this.loggedIn = loggedIn;
-	}
-
-	isJoiningChart(): boolean {
-		return this.joiningChart;
 	}
 
 	isLoggedIn(): boolean {

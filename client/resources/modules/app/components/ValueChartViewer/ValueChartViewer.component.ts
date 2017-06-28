@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 16:05:07
+* @Last Modified time: 2017-06-27 20:53:47
 */
 
 // Import Angular Classes:
@@ -21,7 +21,7 @@ import { InteractionOptionsComponent }											from '../widgets/InteractionOpt
 
 import { ValueChartDirective }													from '../../../ValueChart/directives/ValueChart.directive';
 
-import { CurrentUserService }													from '../../services/CurrentUser.service';
+import { CurrentUserService, UserRole }											from '../../services/CurrentUser.service';
 import { ValueChartService }													from '../../services/ValueChart.service';
 import { DisplayedUsersService }												from '../../services/DisplayedUsers.service';
 import { HostService }															from '../../services/Host.service';
@@ -64,10 +64,11 @@ export class ValueChartViewerComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
+	public ChartType = ChartType;
+	public UserRole = UserRole;
+
 	public routeSubscription: Subscription;
 	public viewType: string;
-	public isMember: boolean;
-	public enableInteraction: boolean;
 
 	public valueChartWidth: number;
 	public valueChartHeight: number;
@@ -122,7 +123,6 @@ export class ValueChartViewerComponent implements OnInit {
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
-
 		this.resizeValueChart();
 
 		this.valueChart = this.valueChartService.getValueChart();
@@ -130,13 +130,17 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHttpService.getValueChartStatus(this.valueChart.getFName()).subscribe((status) => { this.valueChartStatus = status; });
 
 		let invalidUsers = this.validationService.getInvalidUsers(this.valueChart);
-		this.usersToDisplay = _.clone(this.valueChartService.getGroupChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
-		this.displayedUsersService.setUsersToDisplay(this.usersToDisplay);
+		let usersToDisplay = _.clone(this.valueChartService.getBaseValueChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
+		this.displayedUsersService.setUsersToDisplay(usersToDisplay);
+		
+		if (!this.valueChart.isIndividual())
+			this.usersToDisplay = usersToDisplay;
+		else 
+			this.usersToDisplay = _.clone(this.valueChart.getUsers());
+
 		this.displayedUsersService.setInvalidUsers(invalidUsers);
 
 		this.hostValueChart();
-
-		this.updateEnableInteraction();
 
 		$(window).resize((eventObjective: Event) => {
 			this.resizeValueChart();
@@ -148,23 +152,17 @@ export class ValueChartViewerComponent implements OnInit {
 			$('#validate-modal').modal('show');
 		}
 		
-		this.isMember = this.valueChartService.currentUserIsMember();
-
 		this.routeSubscription = this.route.params.subscribe(parameters => {
 			let type = parameters['viewType'];
-
-			if (!this.isMember && type === 'individual')
-				this.router.navigate(['view', 'group', this.valueChart.getFName()], { queryParamsHandling: "merge" });
-			else
-				this.setChartView(type);
+			this.setChartView(type);
 		});
 
-		if (this.currentUserService.isJoiningChart()) {
+		if (this.currentUserService.getUserRole() === UserRole.Joining) {
 			this.valueChartHttpService.getValueChart(this.valueChart._id, this.valueChart.password)
 				.subscribe(( valueChart ) =>  {
 					valueChart.setUser(this.valueChartService.getCurrentUser());
 					this.valueChartService.setValueChart(valueChart);
-					this.displayedUsersService.setUsersToDisplay(_.clone(this.valueChartService.getGroupChart().getUsers()));
+					this.displayedUsersService.setUsersToDisplay(_.clone(this.valueChartService.getBaseValueChart().getUsers()));
 				});
 		}
 	}
@@ -182,7 +180,6 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 
 		this.router.navigate(['view', type, this.valueChart.getFName()], { queryParamsHandling: "merge" });
-		this.updateEnableInteraction();
 	}
 
 	updateView(viewConfig: ViewConfig) {
@@ -241,11 +238,8 @@ export class ValueChartViewerComponent implements OnInit {
 							(b) the chart creator
 						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
 	*/
-	updateEnableInteraction() {
-		this.enableInteraction = (this.currentUserService.isJoiningChart() 
-			|| (this.valueChartService.isIndividual()
-				&& this.valueChartService.currentUserIsMember()
-				&& this.valueChart.getUsers()[0].getUsername() === this.currentUserService.getUsername()));
+	enableInteraction() {
+		return this.currentUserService.getUserRole() !== UserRole.Viewer && this.valueChart.isIndividual();
 	}	
 
 	/* 	
@@ -254,17 +248,7 @@ export class ValueChartViewerComponent implements OnInit {
 						Management activities include: Edit chart, export chart, lock/unlock chart, and remove users
 	*/
 	enableManagement(): boolean {
-		return (!this.currentUserService.isJoiningChart() 
-			&& this.valueChartService.currentUserIsCreator());
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Whether or not to show the Edit Preferences button.
-						True if current user is joining a chart, or the current user is the chart's creator and already a member of the chart.
-	*/
-	enableEditPreferences(): boolean {
-		return this.valueChartService.currentUserIsMember();
+		return this.currentUserService.isOwner();
 	}
 
   /*   
@@ -308,12 +292,14 @@ export class ValueChartViewerComponent implements OnInit {
     				(3) Redirect to edit preference workflow
   */
   	editPreferences(): void {
-		if (this.currentUserService.isJoiningChart()) {
+		this.setChartView('individual');
+		
+		if (!this.currentUserService.isOwner()) {
 			this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
 			.subscribe(valueChart => {
 				// Only apply changes if chart is valid
 				if (this.validationService.validateStructure(valueChart).length === 0) {
-					valueChart.setUser(this.valueChartService.getCurrentUser());
+					valueChart.setUsers(this.valueChartService.getBaseValueChart().getUsers());
 					this.valueChartService.setValueChart(valueChart);
 					this.updateObjReferencesService.cleanUpPreferences(this.valueChartService.getCurrentUser(), true);
 				}
@@ -322,10 +308,14 @@ export class ValueChartViewerComponent implements OnInit {
 			});
 		}
 		else {
-			this.setChartView('individual');
 			this.valueChartService.getCurrentUser().getWeightMap().normalize();
-			this.router.navigate(['/createValueChart/editChart/ScoreFunctions']);
+			this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
 		}	
+  	}
+
+  	editValueChart(): void {
+  		this.valueChartService.setActiveChart('group');
+  		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
   	}
 
 	// ================================ Hosting/Joining/Saving a ValueChart ====================================
@@ -379,40 +369,18 @@ export class ValueChartViewerComponent implements OnInit {
 				.subscribe(
 				// User added/updated!
 				(user: User) => {
-					toastr.success('Preferences successfully submitted');
-					this.currentUserService.setJoiningChart(false);
+					toastr.success('Save successful');
+					this.currentUserService.setUserRole(UserRole.Participant);
 				},
 				// Handle Server Errors
 				(error) => {
 					// Add something to handle when the host has disabled user changes
 					console.log(error);
 					if (error === '403 - Forbidden')
-						toastr.warning('Preference submission failed. The Host has disabled new submissions.');
+						toastr.warning('Saving failed. The Host has disabled changes.');
 					else 
-						toastr.error('Preference submission failed. There was an error submitting your preferences.');
+						toastr.error('Saving failed. There was an error saving your preferences.');
 				});			
-		}
-		else {
-			toastr.error("Saving failed - score function outcomes can't all have the same value.")
-		}			
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Updates the chart on the database.
-	*/
-	saveChart(): void {
-		if (this.checkScoreFunctionRanges()) {
-			this.rescaleScoreFunctions();
-			this.valueChartService.getCurrentUser().getWeightMap().normalize();
-			
-			this.valueChartHttpService.updateValueChart(this.valueChart)
-				.subscribe(
-				(valuechart) => { toastr.success('ValueChart saved'); },
-				(error) => {
-					// Handle any errors here.
-					toastr.warning('Saving failed');
-				});
 		}
 		else {
 			toastr.error("Saving failed - score function outcomes can't all have the same value.")
@@ -423,7 +391,7 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartStatus.userChangesPermitted = userChangesPermitted;
 
 		this.valueChartHttpService.setValueChartStatus(this.valueChartStatus).subscribe((status) => {
-			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be blocked');
+			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be prevented');
 			toastr.warning(messageString);
 		});
 

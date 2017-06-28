@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 14:55:33
+* @Last Modified time: 2017-06-27 17:13:25
 */
 
 // Import Angular Classes:
@@ -10,7 +10,7 @@ import { Component }										from '@angular/core';
 import { Router, NavigationExtras }							from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService }								from '../../services/CurrentUser.service';
+import { CurrentUserService, UserRole }						from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
 
 /*
@@ -119,7 +119,7 @@ export class RegisterComponent {
 
 	getRedirectRoute(): string[] {
 		// If the user is joining a chart, then navigate to createValueChart
-		if (this.currentUserService.isJoiningChart()) {
+		if (this.currentUserService.getUserRole() === UserRole.Joining) {
 			return ['createValueChart/newUser/ScoreFunctions'];
 		} else {	// Else, navigate to the create page as normal
 			return ['home'];

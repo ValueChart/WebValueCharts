@@ -47,7 +47,7 @@
 					<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu dropdown-menu-left" aria-labelledby="objectives-dropdown">
-						<li class="dropdown dropdown-submenu" *ngIf="chartType === 'interactive'">
+						<li class="dropdown dropdown-submenu" *ngIf="interactive">
 							<a href="javascript:void(0)" id="pump-dropdown" data-toggle="dropdown"
 								aria-haspopup="true" aria-expanded="true">
 								Pump Weights
@@ -67,7 +67,7 @@
 								</li>
 							</ul>
 						</li>
-						<li class="dropdown dropdown-submenu" *ngIf="chartType === 'interactive'">
+						<li class="dropdown dropdown-submenu" *ngIf="interactive">
 							<a href="javascript:void(0)" id="weightResizeType-dropdown" data-toggle="dropdown"
 								aria-haspopup="true" aria-expanded="true">
 								Weight Resize Strategy

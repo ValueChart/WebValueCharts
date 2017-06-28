@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 17:21:58
+* @Last Modified time: 2017-06-27 20:59:15
 */
 
 import { Injectable } 												from '@angular/core';
@@ -11,13 +11,14 @@ import { Injectable } 												from '@angular/core';
 import * as _														from 'lodash';
 
 // Import Application Classes:
+import { CurrentUserService }										from './CurrentUser.service';
 import { ValueChartService }										from './ValueChart.service';
 import { DisplayedUsersService }									from './DisplayedUsers.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 import { ValidationService }										from './Validation.service';
 
 // Import Model Classes:
-import { ValueChart }												from '../../../model/ValueChart';
+import { ValueChart, ChartType }									from '../../../model/ValueChart';
 import { User }														from '../../../model/User';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 
@@ -56,7 +57,9 @@ export class HostService {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService, 
+	constructor(
+		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService, 
 		private displayedUsersService: DisplayedUsersService,
 		private validationService: ValidationService) {
 		this.valueChartParser = new JsonValueChartParser();
@@ -110,7 +113,8 @@ export class HostService {
 			// A new user has joined the hosted ValueChart. 
 			case MessageType.UserAdded:
 				let newUser: User = this.valueChartParser.parseUser(hostMessage.data);
-				this.valueChartService.getGroupChart().setUser(newUser);
+				this.valueChartService.getBaseValueChart().setUser(newUser);
+				// this.valueChartService.getBaseValueChart().setType(ChartType.Group);
 				this.displayedUsersService.addUserToDisplay(newUser);
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
@@ -120,7 +124,10 @@ export class HostService {
 			case MessageType.UserChanged:
 				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
 
-				this.valueChartService.getGroupChart().setUser(updatedUser);
+				if (updatedUser.getUsername() === this.currentUserService.getUsername())
+					return;
+
+				this.valueChartService.getBaseValueChart().setUser(updatedUser);
 
 				if (this.displayedUsersService.isUserDisplayed(updatedUser))
 					this.displayedUsersService.addUserToDisplay(updatedUser);
@@ -139,13 +146,13 @@ export class HostService {
 			case MessageType.UserRemoved:
 				let userToDelete: string = hostMessage.data;
 
-				let userIndex: number = this.valueChartService.getGroupChart().getUsers().findIndex((user: User) => {
+				let userIndex: number = this.valueChartService.getBaseValueChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
 				this.displayedUsersService.removeUserToDisplay(userToDelete);
 
 				// Delete the user from the ValueChart
-				this.valueChartService.getGroupChart().getUsers().splice(userIndex, 1);
+				this.valueChartService.getBaseValueChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 

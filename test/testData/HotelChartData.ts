@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 12:59:38
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-29 20:49:27
+* @Last Modified time: 2017-06-27 21:12:04
 */
 
 export var HotelChartData: string = 
 `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0">
+<ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0" type="individual">
 	<ChartStructure>
 		<Objectives>
 			<Objective name="Hotel" type="abstract">
