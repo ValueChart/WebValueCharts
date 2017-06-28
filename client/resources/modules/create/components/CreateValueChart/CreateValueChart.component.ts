@@ -88,8 +88,6 @@ export class CreateValueChartComponent implements OnInit {
 						Calling ngOnInit should be left to Angular. Do not call it manually.
 	*/
 	ngOnInit() {
-		this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
-
 		this.creationStepsService.goBack = new Observable<void>((subscriber: Subscriber<void>) => {
             subscriber.next(this.back(true));
             subscriber.complete();
@@ -207,6 +205,10 @@ export class CreateValueChartComponent implements OnInit {
 			// Catch validation errors introduced at other steps.
 			// (Include structural errors and errors in current user's preferences.)
 			let errorMessages = this.validationService.validateStructure(this.valueChart);
+
+			if (this.creatingOrEditing)
+				this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
+
 			if (this.valueChartService.currentUserIsMember()) {
 				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
 			} 

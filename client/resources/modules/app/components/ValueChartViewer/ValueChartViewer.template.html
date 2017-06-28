@@ -3,19 +3,19 @@
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-default" *ngIf="enableManagement()" (click)="editValueChart()">
+				<button class="btn btn-default" *ngIf="currentUserService.isOwner()" (click)="editValueChart()">
 				Edit ValueChart
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left" >
-				<button class="btn btn-default" *ngIf="currentUserService.getUserRole() !== UserRole.Viewer" (click)="editPreferences()">
+				<button class="btn btn-default" *ngIf="currentUserService.isParticipant()" (click)="editPreferences()">
 				Edit Preferences
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
-			<div *ngIf="currentUserService.getUserRole() === UserRole.Participant && valueChartService.getBaseValueChart().getType() === ChartType.Group">
+			<div *ngIf="(currentUserService.getUserRole() === UserRole.Participant || currentUserService.getUserRole() === UserRole.OwnerAndParticipant) && valueChartService.getBaseValueChart().getType() === ChartType.Group">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
 					<button class="btn btn-primary" (click)="setChartView('individual')">
 					View Individual Chart
@@ -27,14 +27,14 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="currentUserService.getUserRole() !== UserRole.Viewer">
+			<div *ngIf="currentUserService.isParticipant()">
 				<div class="form-group valuechart-toolbar-group pull-left">
 					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
 					Save
 					</button>
 				</div>
 			</div>
-			<div *ngIf="enableManagement()">
+			<div *ngIf="currentUserService.isOwner()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
 					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
 					Lock Chart
@@ -63,7 +63,7 @@
 	</div>
 	<DetailBox 
 	[valueChart]="valueChart" 
-	[enableManagement]="enableManagement()" 
+	[enableManagement]="currentUserService.isOwner()" 
 	[viewConfig]="viewConfig" 
 	[height]="valueChartHeight / 4" 
 	[width]="valueChartWidth / 3"

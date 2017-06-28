@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 20:05:29
+* @Last Modified time: 2017-06-28 11:48:43
 */
 
 // Import Angular Classes:
@@ -109,7 +109,12 @@ export class MyValueChartsComponent implements OnInit {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
-				this.updateRole()
+				
+				if (this.valueChartService.currentUserIsMember())
+					this.currentUserService.setUserRole(UserRole.OwnerAndParticipant);
+				else 
+					this.currentUserService.setUserRole(UserRole.Owner);
+
 				// Validate chart structure before proceeding.
 				// (This is a sanity check to catch any as any errors brought on by 
 				//  changes in validation since saving to the database.)
@@ -131,22 +136,23 @@ export class MyValueChartsComponent implements OnInit {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
-				this.updateRole()
+				if (this.valueChartService.currentUserIsMember())
+					this.currentUserService.setUserRole(UserRole.OwnerAndParticipant);
+				else 
+					this.currentUserService.setUserRole(UserRole.Owner);
 
 				this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 			});
 	}
 
 	editPreferences(chartId: string, chartName: string, password: string): void {
-		this.valueChartHttpService.getValueChartStructure(Formatter.nameToID(chartName), password)
+		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
-				this.valueChartHttpService.getUser(chartId, this.currentUserService.getUsername())
-					.subscribe(user => {
-						valueChart.setUser(user);
-						this.valueChartService.setValueChart(valueChart);
-						this.updateRole()
-						this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
-					});
+				this.valueChartService.setValueChart(valueChart);
+				this.valueChartService.setActiveChart('individual');
+				this.currentUserService.setUserRole(UserRole.Participant);
+
+				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
 			});
 	}
 
@@ -219,11 +225,4 @@ export class MyValueChartsComponent implements OnInit {
 			return 'Complete';
 		}
 	}
-
-	updateRole(): void {
-		let role = (this.valueChartService.currentUserIsMember()) ? UserRole.Participant : UserRole.Viewer;
-		this.currentUserService.setUserRole(role);
-		this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
-	}
-
 }

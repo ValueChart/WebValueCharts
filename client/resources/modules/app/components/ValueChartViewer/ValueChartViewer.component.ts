@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 20:53:47
+* @Last Modified time: 2017-06-28 12:05:51
 */
 
 // Import Angular Classes:
@@ -239,17 +239,8 @@ export class ValueChartViewerComponent implements OnInit {
 						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
 	*/
 	enableInteraction() {
-		return this.currentUserService.getUserRole() !== UserRole.Viewer && this.valueChart.isIndividual();
+		return this.currentUserService.isParticipant() && this.valueChart.isIndividual();
 	}	
-
-	/* 	
-		@returns {boolean}
-		@description 	Whether or not the current user should be permitted to manage the chart.
-						Management activities include: Edit chart, export chart, lock/unlock chart, and remove users
-	*/
-	enableManagement(): boolean {
-		return this.currentUserService.isOwner();
-	}
 
   /*   
     @returns {void}

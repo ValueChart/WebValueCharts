@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 17:53:18
+* @Last Modified time: 2017-06-28 11:49:50
 */
 
 // Import Angular Classes:
@@ -190,10 +190,10 @@ export class HomeComponent {
 				let role: UserRole = UserRole.Viewer;
 				// The user uploaded a ValueChart so they aren't joining an existing one.
 				if (this.valueChartService.currentUserIsMember())
-					role = UserRole.Participant;
-
+					role = UserRole.OwnerAndParticipant;
+				else 
+					role = UserRole.Owner;
 				this.currentUserService.setUserRole(role)
-				this.currentUserService.setOwner(this.valueChartService.currentUserIsCreator());
 
 				if (this.validateChartStructure()) {
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
