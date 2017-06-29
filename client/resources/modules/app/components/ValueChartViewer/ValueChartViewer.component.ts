@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-28 12:05:51
+* @Last Modified time: 2017-06-29 16:13:30
 */
 
 // Import Angular Classes:
@@ -361,7 +361,8 @@ export class ValueChartViewerComponent implements OnInit {
 				// User added/updated!
 				(user: User) => {
 					toastr.success('Save successful');
-					this.currentUserService.setUserRole(UserRole.Participant);
+					if (this.currentUserService.getUserRole() === UserRole.Joining)
+						this.currentUserService.setUserRole(UserRole.Participant);
 				},
 				// Handle Server Errors
 				(error) => {
