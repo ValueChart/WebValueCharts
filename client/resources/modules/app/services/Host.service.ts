@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 20:59:15
+* @Last Modified time: 2017-06-29 18:00:37
 */
 
 import { Injectable } 												from '@angular/core';
@@ -113,8 +113,11 @@ export class HostService {
 			// A new user has joined the hosted ValueChart. 
 			case MessageType.UserAdded:
 				let newUser: User = this.valueChartParser.parseUser(hostMessage.data);
+
+				if (newUser.getUsername() === this.currentUserService.getUsername())
+					return;
+
 				this.valueChartService.getBaseValueChart().setUser(newUser);
-				// this.valueChartService.getBaseValueChart().setType(ChartType.Group);
 				this.displayedUsersService.addUserToDisplay(newUser);
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');

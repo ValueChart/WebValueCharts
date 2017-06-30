@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 16:13:30
+* @Last Modified time: 2017-06-29 18:03:31
 */
 
 // Import Angular Classes:
@@ -156,15 +156,6 @@ export class ValueChartViewerComponent implements OnInit {
 			let type = parameters['viewType'];
 			this.setChartView(type);
 		});
-
-		if (this.currentUserService.getUserRole() === UserRole.Joining) {
-			this.valueChartHttpService.getValueChart(this.valueChart._id, this.valueChart.password)
-				.subscribe(( valueChart ) =>  {
-					valueChart.setUser(this.valueChartService.getCurrentUser());
-					this.valueChartService.setValueChart(valueChart);
-					this.displayedUsersService.setUsersToDisplay(_.clone(this.valueChartService.getBaseValueChart().getUsers()));
-				});
-		}
 	}
 
 	setChartView(type: string) {
@@ -240,7 +231,11 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	enableInteraction() {
 		return this.currentUserService.isParticipant() && this.valueChart.isIndividual();
-	}	
+	}
+
+	enableGroupChartView() {
+		return this.currentUserService.isParticipant() && (this.valueChartService.getBaseValueChart().getType() === ChartType.Group) && this.valueChartService.currentUserIsMember();
+	}
 
   /*   
     @returns {void}
@@ -361,8 +356,10 @@ export class ValueChartViewerComponent implements OnInit {
 				// User added/updated!
 				(user: User) => {
 					toastr.success('Save successful');
-					if (this.currentUserService.getUserRole() === UserRole.Joining)
-						this.currentUserService.setUserRole(UserRole.Participant);
+					if (!this.valueChartService.currentUserIsMember()) {
+						this.valueChartService.getBaseValueChart().setUser(this.valueChartService.getCurrentUser());
+						this.displayedUsersService.addUserToDisplay(this.valueChartService.getCurrentUser());
+					}
 				},
 				// Handle Server Errors
 				(error) => {

@@ -15,7 +15,7 @@
 			<div class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
-			<div *ngIf="(currentUserService.getUserRole() === UserRole.Participant || currentUserService.getUserRole() === UserRole.OwnerAndParticipant) && valueChartService.getBaseValueChart().getType() === ChartType.Group">
+			<div *ngIf="enableGroupChartView()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
 					<button class="btn btn-primary" (click)="setChartView('individual')">
 					View Individual Chart

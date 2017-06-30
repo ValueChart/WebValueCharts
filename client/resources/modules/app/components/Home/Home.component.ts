@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-28 11:49:50
+* @Last Modified time: 2017-06-29 17:48:17
 */
 
 // Import Angular Classes:
@@ -114,11 +114,13 @@ export class HomeComponent {
 						name and password.
 	*/
 	joinValueChart(chartName: string, chartPassword: string): void {
-		this.valueChartHttpService.getValueChartStructure(Formatter.nameToID(chartName), chartPassword)
+		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
 				this.valueChartService.setValueChart(valueChart);
-				this.currentUserService.setUserRole(UserRole.Joining);
+				this.valueChartService.setActiveChart('individual');
+				
+				this.currentUserService.setUserRole(UserRole.Participant);
 				$('#chart-credentials-modal').modal('hide');
 				this.router.navigate(['createValueChart/newUser/ScoreFunctions']);
 			},

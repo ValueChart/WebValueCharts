@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 17:58:43
+* @Last Modified time: 2017-06-29 17:39:06
 */
 
 // Import Angular Classes:
@@ -63,7 +63,7 @@ export class JoinGuardService implements CanActivate {
 				this.valueChartHttpService.getValueChartStructure(name, password)
 					.subscribe(
 					valueChart => {
-						this.currentUserService.setUserRole(UserRole.Joining)
+						this.currentUserService.setUserRole(UserRole.Participant)
 						this.valueChartService.setValueChart(valueChart);
 						resolve(true);	
 					},

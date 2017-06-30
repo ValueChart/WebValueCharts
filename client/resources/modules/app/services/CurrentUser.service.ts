@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-28 12:05:59
+* @Last Modified time: 2017-06-29 17:38:26
 */
 
 // Import Angular Classes:
@@ -10,7 +10,6 @@ import { Injectable } 												from '@angular/core';
 
 export enum UserRole {
 	Viewer,					// The user is viewing a ValueChart. They are not permitted to edit the ValueChart or interact with it in any way.
-	Joining,				// The user is joining a ValueChart but has not yet become a participant by saving their preferences.
 	Participant, 			// The user is participating in a ValueChart.
 	Owner,
 	OwnerAndParticipant
@@ -77,7 +76,7 @@ export class CurrentUserService {
 	}
 
 	isParticipant(): boolean {
-		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant || this.userRole === UserRole.Joining;
+		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant;
 	}
 
 	setLoggedIn(loggedIn: boolean): void {

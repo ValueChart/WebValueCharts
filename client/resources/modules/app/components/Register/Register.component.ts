@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 17:13:25
+* @Last Modified time: 2017-06-29 17:39:14
 */
 
 // Import Angular Classes:
@@ -119,7 +119,7 @@ export class RegisterComponent {
 
 	getRedirectRoute(): string[] {
 		// If the user is joining a chart, then navigate to createValueChart
-		if (this.currentUserService.getUserRole() === UserRole.Joining) {
+		if (this.currentUserService.getUserRole() === UserRole.Participant) {
 			return ['createValueChart/newUser/ScoreFunctions'];
 		} else {	// Else, navigate to the create page as normal
 			return ['home'];

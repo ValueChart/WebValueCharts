@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 20:14:33
+* @Last Modified time: 2017-06-29 17:47:02
 */
 
 // Import Angular Classes:
@@ -66,6 +66,14 @@ export class ValueChartService {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	currentUserIsCreator(): boolean {
+		return this.currentUserService.getUsername() === this.baseValueChart.getCreator();
+	}
+
+	currentUserIsMember(): boolean {
+		return _.findIndex(this.baseValueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
+	}
 
 	setActiveChart(chartType: string): void {
 		this.currentType = chartType;
@@ -134,21 +142,6 @@ export class ValueChartService {
 			}
 		}
 		throw "Objective not found";
-	}
-
-	isIndividual(): boolean {
-		if (this.activeValueChart) {
-			return this.activeValueChart.isIndividual();
-		}
-		return false;
-	}
-
-	currentUserIsCreator(): boolean {
-		return this.currentUserService.getUsername() === this.activeValueChart.getCreator();
-	}
-
-	currentUserIsMember(): boolean {
-		return _.findIndex(this.activeValueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
 	}
 
 	getCurrentUser(): User {
