@@ -2,16 +2,19 @@
 import { Component, OnInit, OnDestroy }										from '@angular/core';
 import { Observable }     													from 'rxjs/Observable';
 import { Subscriber }     													from 'rxjs/Subscriber';
+import * as _																from 'lodash';
+
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }												from '../../../app/services/ValueChart.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
-import { ValidationService }											from '../../../app/services/Validation.service';
+import { ValidationService }												from '../../../app/services/Validation.service';
 
 // Import Model Classes:
-import { ValueChart } 														from '../../../../model/ValueChart';
+import { ValueChart, ChartType } 											from '../../../../model/ValueChart';
+import { User }																from '../../../../model/User';
 
 /*
 	This component defines the UI controls for defining the basic info for a ValueChart (name, description, and password).
@@ -34,6 +37,10 @@ export class CreateBasicInfoComponent implements OnInit {
 	validationTriggered: boolean;
 	originalName: string;
 	errorMessages: string[]; // Validation error messages
+
+	// Chart type:
+	public ChartType = ChartType;
+	public type: ChartType;
 
 	// ========================================================================================
 	// 									Constructor
@@ -68,7 +75,8 @@ export class CreateBasicInfoComponent implements OnInit {
             subscriber.next(this.nameChanged());
             subscriber.complete();
         });
-        this.valueChart = this.valueChartService.getValueChart();
+        this.valueChart = this.valueChartService.getBaseValueChart();
+        this.type = this.valueChart.getType();
         this.validationTriggered = false;
 		this.originalName = this.valueChart.getName();
 		this.errorMessages = [];
@@ -110,6 +118,26 @@ export class CreateBasicInfoComponent implements OnInit {
 	}
 
 	nameChanged(): boolean {
-		return this.originalName !== this.valueChartService.getValueChart().getName();
+		return this.originalName !== this.valueChart.getName();
+	}
+
+	// ================================ Convert Chart Type ====================================
+
+	confirmConvert() {
+		if (!_.isEqual(this.valueChart.getUsers(),this.valueChartService.getIndividualChart().getUsers())) {
+			$('#convert-type-modal').modal('show');
+		}
+		else {
+			this.convertToIndividual();
+		}
+	}
+
+	convertToIndividual() {
+		let user: User[] = [];
+		if (this.valueChartService.currentUserIsMember()) {
+			user.push(this.valueChartService.getCurrentUser());
+		}
+		this.valueChart.setUsers(user);
+		this.valueChart.setType(ChartType.Individual);
 	}
 }

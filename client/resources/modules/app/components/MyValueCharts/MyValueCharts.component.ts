@@ -108,13 +108,7 @@ export class MyValueChartsComponent implements OnInit {
 		
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
 				
-				if (this.valueChartService.currentUserIsMember())
-					this.currentUserService.setUserRole(UserRole.OwnerAndParticipant);
-				else 
-					this.currentUserService.setUserRole(UserRole.Owner);
-
 				// Validate chart structure before proceeding.
 				// (This is a sanity check to catch any as any errors brought on by 
 				//  changes in validation since saving to the database.)
@@ -124,6 +118,8 @@ export class MyValueChartsComponent implements OnInit {
 					$('#validate-modal').modal('show');
 				}
 				else {
+					this.valueChartService.setBaseValueChart(valueChart);
+					this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
 					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
 					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
 				}	
@@ -135,11 +131,8 @@ export class MyValueChartsComponent implements OnInit {
 
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
-				if (this.valueChartService.currentUserIsMember())
-					this.currentUserService.setUserRole(UserRole.OwnerAndParticipant);
-				else 
-					this.currentUserService.setUserRole(UserRole.Owner);
+				this.valueChartService.setBaseValueChart(valueChart);
+				this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
 
 				this.router.navigate(['/createValueChart/editChart/BasicInfo']);
 			});
@@ -148,8 +141,7 @@ export class MyValueChartsComponent implements OnInit {
 	editPreferences(chartId: string, chartName: string, password: string): void {
 		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
-				this.valueChartService.setActiveChart('individual');
+				this.valueChartService.setBaseValueChart(valueChart);
 				this.currentUserService.setUserRole(UserRole.Participant);
 
 				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
@@ -183,12 +175,12 @@ export class MyValueChartsComponent implements OnInit {
 	setValueChart(chartId: string, password: string): void {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
+				this.valueChartService.setBaseValueChart(valueChart);
 			});
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
 
 		if (valueChart) {
 			return valueChart.getFName() + 'UserWeights.csv';
@@ -198,7 +190,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	exportUserWeights() {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
 		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.

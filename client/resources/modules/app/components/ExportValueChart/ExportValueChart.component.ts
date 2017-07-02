@@ -27,7 +27,7 @@ import { ValueChart }										from '../../../../model/ValueChart';
 	template: `
 				<div class="export-value-chart">
 					<a class="btn btn-default" id="download-value-chart"
-						[class.disabled]="!valueChartService.getValueChart()" 
+						[class.disabled]="!valueChartService.getBaseValueChart()" 
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
 						(click)="downloadValueChart()">
@@ -74,7 +74,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
 
 		if (valueChart) {
 			return valueChart.getFName() + '.xml';
@@ -85,8 +85,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	downloadValueChart(): void {
-		console.log('downloading chart');
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', valueChartObjectURL);		// Set the download link on the <a> element to be the URL created for the XML string.

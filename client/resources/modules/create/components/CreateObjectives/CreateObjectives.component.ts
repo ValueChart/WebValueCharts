@@ -1,8 +1,8 @@
 // Import Angular Classes:
 import { Component, OnInit }											from '@angular/core';
 import { NgClass } 														from '@angular/common';
-import { Observable }     													from 'rxjs/Observable';
-import { Subscriber }     													from 'rxjs/Subscriber';
+import { Observable }     												from 'rxjs/Observable';
+import { Subscriber }     												from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
@@ -105,7 +105,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoriesToAdd = [];
 		this.editing = false;
 		this.errorMessages = [];
-		this.valueChart = this.valueChartService.getValueChart();
+		this.valueChart = this.valueChartService.getBaseValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
 			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), '', '', 0);

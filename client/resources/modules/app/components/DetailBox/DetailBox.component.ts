@@ -18,7 +18,7 @@ import { ObjectiveChartDefinitions }											from '../../../ValueChart/definit
 
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { HostService }															from '../../services/Host.service';
-import { DisplayedUsersService }													from '../../services/DisplayedUsers.service';
+import { DisplayedUsersService }												from '../../services/DisplayedUsers.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 
@@ -49,6 +49,7 @@ export class DetailBoxComponent implements OnInit {
 	@Input() chartElement: d3.Selection<any, any, any, any>;
 	@Input() enableManagement: boolean
 	@Input() viewConfig: ViewConfig;
+	@Input() showUsers: boolean;
 	@Input() width: number;
 	@Input() height: number;
 

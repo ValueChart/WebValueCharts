@@ -64,7 +64,7 @@ export class JoinGuardService implements CanActivate {
 					.subscribe(
 					valueChart => {
 						this.currentUserService.setUserRole(UserRole.Participant)
-						this.valueChartService.setValueChart(valueChart);
+						this.valueChartService.setBaseValueChart(valueChart);
 						resolve(true);	
 					},
 					error => {
@@ -72,7 +72,7 @@ export class JoinGuardService implements CanActivate {
 						resolve(false);	
 					});
 
-			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getValueChart()) {
+			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getBaseValueChart()) {
 
 				// Retrieve the ValueChart ID from the URL router parameters.
 				var name: string = route.params['ValueChart'];
@@ -81,7 +81,7 @@ export class JoinGuardService implements CanActivate {
 
 				this.valueChartHttpService.getValueChartByName(name, password)
 					.subscribe(valueChart => {
-						this.valueChartService.setValueChart(valueChart)
+						this.valueChartService.setBaseValueChart(valueChart)
 						resolve(true);
 					});
 			} else {

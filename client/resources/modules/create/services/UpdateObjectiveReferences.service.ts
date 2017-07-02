@@ -59,7 +59,7 @@ export class UpdateObjectiveReferencesService {
 	*/
 	removeAlternativeEntries() {
 		let objNames = this.valueChartService.getPrimitiveObjectivesByName();
-		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
+		for (let alt of this.valueChartService.getBaseValueChart().getAlternatives()) {
 			for (let key in alt.getAllObjectiveValuePairs().keys()) {
 				if (objNames.indexOf(key) === -1) {
 					alt.removeObjective(key);
@@ -74,7 +74,7 @@ export class UpdateObjectiveReferencesService {
 	*/
 	clearAlternativeValues() {
 		for (let obj of this.valueChartService.getPrimitiveObjectives()) {
-			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
+			for (let alt of this.valueChartService.getBaseValueChart().getAlternatives()) {
 				if (obj.getDomainType() === "continuous") {
 					let dom = <ContinuousDomain>obj.getDomain();
 					let altVal: number = Number(alt.getObjectiveValue(obj.getName()));

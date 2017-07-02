@@ -15,6 +15,18 @@
 			<div class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
+			<div *ngIf="currentUserService.isOwner() && !valueChartService.getBaseValueChart().isIndividual()">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
+					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
+					Lock Chart
+					</button>
+				</div>
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartStatus.userChangesPermitted">
+					<button class="btn btn-success" (click)="setUserChangesAccepted(true)">
+					Unlock Chart
+					</button>
+				</div>
+			</div>
 			<div *ngIf="enableGroupChartView()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
 					<button class="btn btn-primary" (click)="setChartView('individual')">
@@ -33,19 +45,7 @@
 					Save
 					</button>
 				</div>
-			</div>
-			<div *ngIf="currentUserService.isOwner()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
-					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
-					Lock Chart
-					</button>
-				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartStatus.userChangesPermitted">
-					<button class="btn btn-success" (click)="setUserChangesAccepted(true)">
-					Unlock Chart
-					</button>
-				</div>
-			</div>
+			</div>	
 			<div class="form-group valuechart-toolbar-group pull-right">
 				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
 				Redo
@@ -61,15 +61,16 @@
 			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
-	<DetailBox 
-	[valueChart]="valueChart" 
-	[enableManagement]="currentUserService.isOwner()" 
-	[viewConfig]="viewConfig" 
-	[height]="valueChartHeight / 4" 
-	[width]="valueChartWidth / 3"
-	[renderEventsService]="renderEvents"
-	[chartElement]="chartElement">
-	</DetailBox>
+		<DetailBox 
+		[valueChart]="valueChart"
+		[enableManagement]="currentUserService.isOwner()" 
+		[showUsers]="!valueChartService.getBaseValueChart().isIndividual()"
+		[viewConfig]="viewConfig" 
+		[height]="valueChartHeight / 4" 
+		[width]="valueChartWidth / 3"
+		[renderEventsService]="renderEvents"
+		[chartElement]="chartElement">
+		</DetailBox>
 	<div>
 		<ValueChart
 		[valueChart]="valueChart"

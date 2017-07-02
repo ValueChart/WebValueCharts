@@ -113,7 +113,7 @@ export class CreateWeightsComponent implements OnInit {
 	ngOnDestroy() {
 		// Update weight map
 		if (this.updateWeights) {	
-			this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
+			this.user.setWeightMap(this.getWeightMapFromRanks());
 		}
 	}
 
@@ -161,7 +161,7 @@ export class CreateWeightsComponent implements OnInit {
 		let bestOutcome;
 		let bestOutcomeScore = 0;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
+		for (let alt of this.valueChartService.getBaseValueChart().getAlternatives()) {
 			let outcome = alt.getObjectiveValue(objName);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore > bestOutcomeScore) {
@@ -183,7 +183,7 @@ export class CreateWeightsComponent implements OnInit {
 		let worstOutcome;
 		let worstOutcomeScore = 1;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
+		for (let alt of this.valueChartService.getBaseValueChart().getAlternatives()) {
 			let outcome = alt.getObjectiveValue(objName);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore < worstOutcomeScore) {
@@ -287,11 +287,11 @@ export class CreateWeightsComponent implements OnInit {
 	*/
 	setErrorMessages(): void {
 		// Update weight map
-		if (this.updateWeights) {	
-			this.valueChartService.setWeightMap(this.user, this.getWeightMapFromRanks());
+		if (this.updateWeights) {
+			this.user.setWeightMap(this.getWeightMapFromRanks());
 		}
 		// Validate
-		this.errorMessages = this.validationService.validateWeights(this.valueChartService.getValueChart(), this.user);
+		this.errorMessages = this.validationService.validateWeights(this.valueChartService.getBaseValueChart(), this.user);
 	}
 
 	/* 	

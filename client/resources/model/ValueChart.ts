@@ -243,9 +243,9 @@ export class ValueChart {
 		this.alternatives = alternatives;
 	}
 
-	addAlternative(alernative: Alternative): void {
-		if (this.alternatives.indexOf(alernative) === -1) {
-			this.alternatives.push(alernative);
+	addAlternative(alternative: Alternative): void {
+		if (this.alternatives.indexOf(alternative) === -1) {
+			this.alternatives.push(alternative);
 		}
 	}
 
@@ -280,11 +280,6 @@ export class ValueChart {
 
 	setUsers(users: User[]): void {
 		this.users = users;
-
-		if (this.users.length > 1) 
-			this.type = ChartType.Group;
-		else 
-			this.type = ChartType.Individual;
 	}
 
 	setUser(newUser: User): void {
@@ -297,11 +292,6 @@ export class ValueChart {
 		} else {
 			this.users[userIndex] = newUser;
 		}
-
-		if (this.users.length > 1) 
-			this.type = ChartType.Group;
-		else 
-			this.type = ChartType.Individual;
 	}
 
 	removeUser(userToDelete: User): void {
@@ -312,11 +302,6 @@ export class ValueChart {
 		if (index !== -1) {
 			this.users.splice(index, 1);
 		}
-
-		if (this.users.length > 1) 
-			this.type = ChartType.Group;
-		else 
-			this.type = ChartType.Individual;
 	}
 
 	/*

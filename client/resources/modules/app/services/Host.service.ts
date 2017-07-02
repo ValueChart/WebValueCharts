@@ -162,7 +162,7 @@ export class HostService {
 			case MessageType.StructureChanged:
 				let valueChart = this.valueChartParser.parseValueChart(hostMessage.data);
 				valueChart.setUsers([this.valueChartService.getCurrentUser()]);
-
+				valueChart.setType(ChartType.Individual);
 				if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChartService.getIndividualChart())) { // Ignore changes if chart is not valid
 					toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
 				}

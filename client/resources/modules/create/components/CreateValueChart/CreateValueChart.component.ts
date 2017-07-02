@@ -20,7 +20,7 @@ import { ValueChartService }											from '../../../app/services/ValueChart.se
 import { ValidationService }											from '../../../app/services/Validation.service';
 
 // Import Model Classes:
-import { ValueChart } 													from '../../../../model/ValueChart';
+import { ValueChart, ChartType } 										from '../../../../model/ValueChart';
 import { User }															from '../../../../model/User';
 
 /*
@@ -50,7 +50,7 @@ export class CreateValueChartComponent implements OnInit {
 	sub: any;
 	window: any = window;
 	
-	public creatingOrEditing: boolean;
+	public saveOnDestroy: boolean;
 	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 
@@ -101,24 +101,22 @@ export class CreateValueChartComponent implements OnInit {
 		// Bind purpose to corresponding URL parameter
 		this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
-		this.creatingOrEditing = false;
 
-		// Initialize according to purpose
 		if (this.purpose === 'newChart') {
-			this.creatingOrEditing = true;
-
 			let valueChart = new ValueChart('', '', this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
-			this.valueChartService.setValueChart(valueChart); 
-		} else if (this.purpose === 'editChart') {
-			this.creatingOrEditing = true;
+			valueChart.setType(ChartType.Individual); // initialize type to individual
+			this.valueChartService.setBaseValueChart(valueChart); 
+		}	
+		this.valueChart = this.valueChartService.getBaseValueChart();
+		this.saveOnDestroy = this.valueChartService.currentUserIsCreator();
 
-			// Lock chart while editing
-			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
+		// Lock chart while creator is editing
+		if (this.purpose === 'editChart' || (this.purpose === 'editPreferences' && this.valueChartService.currentUserIsCreator())) {	
+			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getBaseValueChart().getFName()).subscribe((status) => { 
 				status.userChangesPermitted = false; 
 				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			});
 		}
-		this.valueChart = this.valueChartService.getValueChart();
 	}
 
 	/* 	
@@ -130,7 +128,7 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();	
 
-		if (this.creatingOrEditing) {
+		if (this.saveOnDestroy) {
 			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
 			let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
 				|| (this.valueChartService.currentUserIsMember() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
@@ -143,7 +141,6 @@ export class CreateValueChartComponent implements OnInit {
 			status.chartId = this.valueChart._id;
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 
-			this.valueChartService.setValueChart(this.valueChart);
 			this.autoSaveValueChart();
 		}
 	}
@@ -206,9 +203,6 @@ export class CreateValueChartComponent implements OnInit {
 			// (Include structural errors and errors in current user's preferences.)
 			let errorMessages = this.validationService.validateStructure(this.valueChart);
 
-			if (this.creatingOrEditing)
-				this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
-
 			if (this.valueChartService.currentUserIsMember()) {
 				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
 			} 
@@ -217,13 +211,28 @@ export class CreateValueChartComponent implements OnInit {
 					$('#validate-modal').modal('show');
 			}
 			else {
+				this.setUserRole();
 				window.onpopstate = () => { };
 				(<any>window).destination = '/view/ValueChart';
-				this.router.navigate(['view', 'individual', this.valueChart.getFName()], { queryParams: { password: this.valueChart.password } });
+				let viewType = this.valueChartService.currentUserIsMember() ? 'individual' : 'group';
+				this.router.navigate(['view', viewType, this.valueChart.getFName()], { queryParams: { password: this.valueChart.password } });
 			}
 		}
 		else {
 			toastr.error("There were problems with your submission. Please fix them to proceed.");
+		}
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Sets the user role according to membership and ownership status.
+	*/
+	setUserRole() {
+		if (this.valueChartService.currentUserIsCreator()) {
+			this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
+		}
+		else {
+			this.currentUserService.setUserRole(UserRole.Participant);
 		}
 	}
 
@@ -257,22 +266,25 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {boolean}
 		@description 	Disable back button if:
 						(1) on the first step
-						(2) on Preferences step and the user navigated here using an "Edit Preferences" button
-						(3) on Preferences step and a new user is joining a group chart (only the chart creator should be able to edit the structure)
+						(2) on Preferences step and the user is joining the chart or editing preferences
 	*/
 	disableBackButton(): boolean {
 		return (this.creationStepsService.step === this.creationStepsService.BASICS
-			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'newUser')
-			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'editPreferences'));
+   			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'newUser')
+            || (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.purpose === 'editPreferences'));
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Disable the View Chart button if not on Alternatives or Priorities step.
+		@description 	Enable the View Chart button if:
+						(1) the purpose is editChart or editPreferences
+						(2) on the last step (Priorities)
+						(3) on the Alternatives step and this is a group chart (allowing creator to skip joining)
 	*/
-	disableViewChartButton(): boolean {
-		return (this.creationStepsService.step !== this.creationStepsService.ALTERNATIVES
-			&& this.creationStepsService.step !== this.creationStepsService.PRIORITIES);
+	enableViewChartButton(): boolean {
+		return (this.purpose === 'editChart' || this.purpose === 'editPreferences'
+			|| this.creationStepsService.step === this.creationStepsService.PRIORITIES
+			|| (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES && this.valueChart.getType() === ChartType.Group));
 	}
 
 	/* 	
@@ -281,25 +293,13 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	nextButtonText(): string {
 		let text = 'Next Stage >>';
-		if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
+		if (!this.valueChart.isIndividual() && this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
 			if (!this.valueChartService.currentUserIsMember()) {
 				text = 'Add Preferences >>';
 			}
 			else {
 				text = 'Edit Preferences >>';
 			}
-		}
-		return text;
-	}
-
-	/* 	
-		@returns {string}
-		@description 	 Return text for 'Next' button. Differs only at last step.
-	*/
-	navigationModalText(): string {
-		let text = "Do you want to keep this ValueChart?";
-		if (!this.creatingOrEditing) {
-			text = "Are you sure you want to leave this ValueChart?";
 		}
 		return text;
 	}
@@ -322,7 +322,7 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	This method handles the user's response to the navigation confirmation modal.
 						Navigation proceeds if the user elected to discard the chart or save the chart.
-						If this.creatingOrEditing is set to true, the chart will be saved when ngDestroy is called.
+						If this.saveOnDestroy is set to true, the chart will be saved when ngDestroy is called.
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate && keepValueChart && this.creationStepsService.step === this.creationStepsService.BASICS && 
@@ -331,7 +331,7 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else {
 			if (!keepValueChart) {
-				this.creatingOrEditing = false;
+				this.saveOnDestroy = false;
 				if (this.valueChart._id) {
 					this.deleteValueChart(this.valueChart);
 				}			
@@ -368,8 +368,8 @@ export class CreateValueChartComponent implements OnInit {
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
 	autoSaveValueChart(): void {
-		if (!this.creatingOrEditing) {
-			return;	// Don't autosave. The user is joining or editing preferences for an existing ValueChart.
+		if (!this.valueChartService.currentUserIsCreator()) {
+			return;	// Don't autosave. A non-creator is joining or editing preferences for an existing ValueChart.
 		}
 		if (!this.valueChart._id) {
 			// Save the ValueChart for the first time.

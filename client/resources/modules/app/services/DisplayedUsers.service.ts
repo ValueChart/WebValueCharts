@@ -40,8 +40,6 @@ export class DisplayedUsersService {
 	*/
 	constructor(
 		private valueChartService: ValueChartService) {
-
-		this.setUsersToDisplay(_.clone(this.valueChartService.getValueChart().getUsers()));
 	}
 
 	getUsersToDisplay(): User[] {

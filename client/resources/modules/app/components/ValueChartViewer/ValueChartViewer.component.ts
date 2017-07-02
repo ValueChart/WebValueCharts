@@ -125,33 +125,29 @@ export class ValueChartViewerComponent implements OnInit {
 	ngOnInit() {
 		this.resizeValueChart();
 
-		this.valueChart = this.valueChartService.getValueChart();
-
+		this.valueChart = this.valueChartService.getBaseValueChart();
+		this.valueChartService.initializeIndividualChart();
 		this.valueChartHttpService.getValueChartStatus(this.valueChart.getFName()).subscribe((status) => { this.valueChartStatus = status; });
 
-		let invalidUsers = this.validationService.getInvalidUsers(this.valueChart);
-		let usersToDisplay = _.clone(this.valueChartService.getBaseValueChart().getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
-		this.displayedUsersService.setUsersToDisplay(usersToDisplay);
-		
-		if (!this.valueChart.isIndividual())
-			this.usersToDisplay = usersToDisplay;
-		else 
-			this.usersToDisplay = _.clone(this.valueChart.getUsers());
-
-		this.displayedUsersService.setInvalidUsers(invalidUsers);
+		if (!this.valueChart.isIndividual()) {
+			let invalidUsers = this.validationService.getInvalidUsers(this.valueChart);
+			let usersToDisplay = _.clone(this.valueChart.getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
+			this.displayedUsersService.setUsersToDisplay(usersToDisplay);
+			this.displayedUsersService.setInvalidUsers(invalidUsers);
+			
+			if (invalidUsers.length > 0) {
+				let errorMessages = this.validationService.validateUsers(this.valueChart);
+				this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
+				$('#validate-modal').modal('show');
+			}
+		}
 
 		this.hostValueChart();
 
 		$(window).resize((eventObjective: Event) => {
 			this.resizeValueChart();
 		});
-
-		if (invalidUsers.length > 0) {
-			let errorMessages = this.validationService.validateUsers(this.valueChart);
-			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
-			$('#validate-modal').modal('show');
-		}
-		
+	
 		this.routeSubscription = this.route.params.subscribe(parameters => {
 			let type = parameters['viewType'];
 			this.setChartView(type);
@@ -160,9 +156,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 	setChartView(type: string) {
 		this.viewType = type;
-
 		this.valueChartService.setActiveChart(type);
-		this.valueChart = this.valueChartService.getValueChart();
+		this.valueChart = this.valueChartService.getActiveValueChart();
 
 		if (this.viewType == 'individual') {
 			this.usersToDisplay = this.valueChart.getUsers();
@@ -224,10 +219,6 @@ export class ValueChartViewerComponent implements OnInit {
 	/* 	
 		@returns {boolean}
 		@description 	Whether or not the current user may interactively change the scores and weights.
-						True if the current user is joining the chart OR the chart contains exactly ONE user who is:
-							(a) the current user AND
-							(b) the chart creator
-						Under any other circumstances, the current user should not be permitted to alter the scores and weights.
 	*/
 	enableInteraction() {
 		return this.currentUserService.isParticipant() && this.valueChart.isIndividual();
@@ -286,7 +277,7 @@ export class ValueChartViewerComponent implements OnInit {
 				// Only apply changes if chart is valid
 				if (this.validationService.validateStructure(valueChart).length === 0) {
 					valueChart.setUsers(this.valueChartService.getBaseValueChart().getUsers());
-					this.valueChartService.setValueChart(valueChart);
+					this.valueChartService.setBaseValueChart(valueChart);
 					this.updateObjReferencesService.cleanUpPreferences(this.valueChartService.getCurrentUser(), true);
 				}
 				this.valueChartService.getCurrentUser().getWeightMap().normalize();
@@ -300,7 +291,6 @@ export class ValueChartViewerComponent implements OnInit {
   	}
 
   	editValueChart(): void {
-  		this.valueChartService.setActiveChart('group');
   		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
   	}
 
@@ -327,6 +317,7 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHttpService.getValueChartStructure(this.valueChart.getFName(), this.valueChart.password)
 		.subscribe(valueChart => {
 			valueChart.setUser(this.valueChartService.getCurrentUser());
+			valueChart.setType(ChartType.Individual);
 			if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChartService.getIndividualChart())) { // Ignore changes if chart is not valid
 				toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
 			}	
@@ -363,8 +354,6 @@ export class ValueChartViewerComponent implements OnInit {
 				},
 				// Handle Server Errors
 				(error) => {
-					// Add something to handle when the host has disabled user changes
-					console.log(error);
 					if (error === '403 - Forbidden')
 						toastr.warning('Saving failed. The Host has disabled changes.');
 					else 
@@ -389,11 +378,11 @@ export class ValueChartViewerComponent implements OnInit {
 	// ================================ Undo/Redo ====================================
 
 	undoChartChange(): void {
-		this.undoRedoService.undo(this.valueChartService.getValueChart());
+		this.undoRedoService.undo(this.valueChartService.getActiveValueChart());
 	}
 
 	redoChartChange(): void {
-		this.undoRedoService.redo(this.valueChartService.getValueChart());
+		this.undoRedoService.redo(this.valueChartService.getActiveValueChart());
 	}
 
 	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
