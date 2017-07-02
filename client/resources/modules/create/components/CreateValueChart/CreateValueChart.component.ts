@@ -134,7 +134,7 @@ export class CreateValueChartComponent implements OnInit {
 				|| (this.valueChartService.currentUserIsMember() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
 			
 			let status: any = {};
-			status.userChangesPermitted = true;
+			status.userChangesPermitted = !incomplete;
 			status.incomplete = incomplete;
 			status.name = this.valueChart.getName();
 			status.fname = this.valueChart.getFName();
@@ -397,6 +397,15 @@ export class CreateValueChartComponent implements OnInit {
 				// Set the id of the ValueChart.
 				this.valueChart._id = valueChart._id;
 				toastr.success('ValueChart auto-saved');
+
+				// Create status document
+				let status: any = {};
+				status.userChangesPermitted = false;
+				status.incomplete = true;
+				status.name = this.valueChart.getName();
+				status.fname = this.valueChart.getFName();
+				status.chartId = this.valueChart._id;
+				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			},
 			// Handle Server Errors
 			(error) => {
