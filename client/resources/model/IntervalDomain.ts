@@ -38,7 +38,8 @@ export class IntervalDomain implements Domain {
 		this.interval = interval;
 		this.min = min;
 		this.max = max;
-		this.calculateElements()
+		this.elements = [];
+		this.calculateElements();
 	}
 
 	// ========================================================================================
@@ -49,21 +50,8 @@ export class IntervalDomain implements Domain {
 		return this.interval;
 	}
 
-	setInterval(interval: number): void {
-		this.interval = interval;
-		// Update the array of elements.
-		this.calculateElements();
-	}
-
 	getRange(): number[] {
 		return [this.min, this.max];
-	}
-
-	setRange(range: number[]): void {
-		this.min = range[0];
-		this.max = range[1];
-		// Update the array of elements.
-		this.calculateElements();
 	}
 
 	getMinValue(): number {
@@ -80,14 +68,15 @@ export class IntervalDomain implements Domain {
 
 	calculateElements(): void {
 		var elements: string[] = [];
-		var currentElement: number = this.min;
-		while (currentElement < this.max) {
-			elements.push('' + currentElement);	// Convert the element into a string.
-			currentElement += this.interval;
+		if (this.interval > 0) {
+			var currentElement: number = this.min;
+			while (currentElement < this.max) {
+				elements.push('' + currentElement);	// Convert the element into a string.
+				currentElement += this.interval;
+			}
+			// Convert the element into a string.
+			elements.push('' + this.max);
 		}
-		// Convert the element into a string.
-		elements.push('' + this.max);
-
 		this.elements = elements;
 	}
 }
