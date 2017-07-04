@@ -30,10 +30,10 @@
 				<button class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</button>
 			</div>
 			<div [hidden]="!invalidCredentials" class="alert alert-danger">
-				<span class="col-sm-offset-5">{{invalidMessage}}</span>
+				<span id="fail-message" class="col-sm-offset-5">{{invalidMessage}}</span>
 			</div>
 			<div [hidden]="!credentialsUpdated" class="alert alert-success">
-				<span class="col-sm-offset-5">Account details successfully updated</span>
+				<span id="success-message" class="col-sm-offset-5">Account details successfully updated</span>
 			</div>
 		</form>
 	</div>

@@ -109,8 +109,8 @@ describe('View Existing Chart Page', () => {
 
 
 	// Case 3: Successfully viewing an individual ValueChart that you don't own
-	// 		- chartname: testemp
-	// 		- password: t
+	// 		- chartname: ThisIsATestChart
+	// 		- password: temp
 	it('should successfully let users view an individual ValueChart', function() {
 			
 			// Find page elements
@@ -119,19 +119,19 @@ describe('View Existing Chart Page', () => {
 
 			// Fill input keys
 			vcNameField.clear();
-			vcNameField.sendKeys('testemp');
+			vcNameField.sendKeys('ThisIsATestChart');
 			passwordField.clear();
-			passwordField.sendKeys('t');
+			passwordField.sendKeys('temp');
 
 			// Ensure fields contain what is entered
-			expect(vcNameField.getAttribute('value')).to.eventually.equal('testemp');
-			expect(passwordField.getAttribute('value')).to.eventually.equal('t');
+			expect(vcNameField.getAttribute('value')).to.eventually.equal('ThisIsATestChart');
+			expect(passwordField.getAttribute('value')).to.eventually.equal('temp');
 			
 			// Click "Continue" to view value chart "Cities"
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/testemp?password=t');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/ThisIsATestChart?password=temp');
 			});
 
 	});
