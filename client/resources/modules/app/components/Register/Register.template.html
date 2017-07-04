@@ -18,14 +18,14 @@
 				</div>
 			</div>
 			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" (click)="login(username, password)" id="login-button">Login</a>
-				<a class="btn btn-success btn-lg" (click)="state = 'createAccount'" id="create-account-button">Create an Account</a>
+				<button class="btn btn-success btn-lg" (click)="login(username, password)" id="login-button">Login</button>
+				<button class="btn btn-success btn-lg" (click)="state = 'createAccount'" id="create-account-button">Create an Account</button>
 			</div>
 			<div class="form-group text-center">
 				<h3>Or</h3>
 			</div>
 			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" id="continue-button" data-toggle="modal" data-target="#temporary-user-modal">Continue as a Temporary User</a>
+				<button class="btn btn-success btn-lg" id="continue-button" data-toggle="modal" data-target="#temporary-user-modal">Continue as a Temporary User</button>
 			</div>
 			<div [hidden]="!(invalidPasswords || invalidUsername)" class="alert alert-danger text-center">
 				<span>Invalid Username or Password</span>
@@ -57,8 +57,8 @@
 				</div>
 			</div>
 			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" (click)="createNewUser(username, password, email)" id="createUser-button">Create Account</a>
-				<a class="btn btn-success btn-lg" (click)="state = 'login'" id="back-button">Back</a>
+				<button class="btn btn-success btn-lg" (click)="createNewUser(username, password, email)" id="createUser-button">Create Account</button>
+				<button class="btn btn-success btn-lg" (click)="state = 'login'" id="back-button">Back</button>
 			</div>
 			<div [hidden]="!(invalidPasswords || invalidUsername)" class="alert alert-danger text-center">
 				<span>{{invalidMessage}}</span>

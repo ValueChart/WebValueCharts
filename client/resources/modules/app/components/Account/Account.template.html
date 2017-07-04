@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="flex-column">
 		<h2 class="my-account-header text-center">Account Management</h2>
-			<form class="form-horizontal">
+		<form class="form-horizontal">
 			<div class="form-group form-group-lg">
 				<label class="col-sm-4 control-label" for="email-input">Email</label>
 				<div class="col-sm-5 col-md-4">
@@ -27,13 +27,13 @@
 				</div>
 			</div>
 			<div class="form-group text-center">
-				<a class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</a>
+				<button class="btn btn-success btn-lg" (click)="updateUser(username, password, email)" id="createUser-button">Update Account Details</button>
 			</div>
 			<div [hidden]="!invalidCredentials" class="alert alert-danger">
-				<span class="col-sm-offset-4">{{invalidMessage}}</span>
+				<span class="col-sm-offset-5">{{invalidMessage}}</span>
 			</div>
 			<div [hidden]="!credentialsUpdated" class="alert alert-success">
-				<span class="col-sm-offset-4">Account details successfully updated</span>
+				<span class="col-sm-offset-5">Account details successfully updated</span>
 			</div>
 		</form>
 	</div>
