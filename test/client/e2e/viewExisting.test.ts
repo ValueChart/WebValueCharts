@@ -193,15 +193,40 @@ describe('View Existing Chart Page', () => {
     // 		- Currently still viewing 'Cities' so don't need to go back 
 	it('shouldn\'t let users change preference when viewing a group ValueChart they don\'t own', function() {
 
-		// check whether the editing-related buttons are present or not
-		// var exportValueChartBtn = p.browser.element(p.By.id('#download-value-chart'));
-		// var lockChartBtn = p.browser.element(p.By.buttonText('Lock Chart'));
-		// var saveChartBtn = p.browser.element(p.By.buttonText('Save'));
 
-		// expect(exportValueChartBtn.isPresent()).to.eventually.be.true;
-		// expect(lockChartBtn.isPresent()).to.eventually.be.false;
-		// expect(saveChartBtn.isPresent()).to.eventually.be.false;
-			
+		// Check whether the editing-related buttons are present or not
+		var editBtns = p.browser.element(p.By.css('#ValueChartView form a.btn-default')); // both 'Edit ValueChart' and 'Edit Preference' buttons
+		var exportValueChartBtn = p.browser.element(p.By.id('#download-value-chart'));
+		var lockChartBtn = p.browser.element(p.By.buttonText('Lock Chart'));
+		var saveChartBtn = p.browser.element(p.By.buttonText('Save Chart'));
+
+		expect(editBtns.isPresent()).to.eventually.be.false;
+		expect(exportValueChartBtn.isPresent()).to.eventually.be.false;
+		expect(lockChartBtn.isPresent()).to.eventually.be.false;
+		expect(saveChartBtn.isPresent()).to.eventually.be.false;
+
+		// Check if user can drag and drop
+		var divider1 = p.browser.element(p.by.id('label-TotalPopulation-divider'));
+		var rectangle1 = p.browser.element(p.by.id('label-TotalPopulation-outline'));
+		var height1; 
+		rectangle1.getSize().then(function(eleSize){
+   			height1 = eleSize.height;
+   			console.log('height: '+ height1); //eleSize is the element's size object
+   			p.browser.actions().dragAndDrop(divider1, rectangle1).perform();
+   			var rectangle2 = element(by.id('label-TotalPopulation-outline'));
+			var height2; 
+			rectangle2.getSize().then(function(eleSize){
+	   			height2 = eleSize.height;
+	   			console.log('new height: '+ height2); //eleSize is the element's size object
+	  			expect(height1).to.equal(height2);
+	        });	
+        });	
+
+		// objRectangle.getSize().then(function(eleSize){
+  //  		 	console.log('element size: '+ eleSize); //eleSize is the element's size object
+  //   		expect(eleSize.height).to.equal(height);
+  //       });
+
 	});
 
 	// Case 7: See Type 3
