@@ -175,7 +175,22 @@ describe('View Existing Chart Page', () => {
 				continueBtn.click().then(function() {
 					p.browser.waitForAngular();
 					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
+					// Expecting "Invalid Users" pop-up dialog
+					var InvldUsrDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'Invalid Users'));
+					p.browser.sleep(1000);
+					expect(InvldUsrDialog.isDisplayed()).to.eventually.be.true;
 				});	
+
+				var peripheralArea = p.browser.element(p.by.id('validate-modal'));
+				peripheralArea.click().then(function() {
+					p.browser.waitForAngular();
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
+					// Expecting "Invalid Users" pop-up dialog to disappear
+					var InvldUsrDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'Invalid Users'));
+					p.browser.sleep(1000);
+					expect(InvldUsrDialog.isDisplayed()).to.eventually.be.false;
+				});	
+
 			});
 
 	});
@@ -195,7 +210,7 @@ describe('View Existing Chart Page', () => {
 	it('shouldn\'t let users change preference when viewing a group ValueChart they don\'t own', function() {
 
 
-		// Check whether the editing-related buttons are present or not
+		// Check if editing-related buttons are present or not (they should not)
 		var editBtns = p.browser.element(p.By.css('#ValueChartView form a.btn-default')); // both 'Edit ValueChart' and 'Edit Preference' buttons
 		var exportValueChartBtn = p.browser.element(p.By.id('#download-value-chart'));
 		var lockChartBtn = p.browser.element(p.By.buttonText('Lock Chart'));
@@ -206,7 +221,7 @@ describe('View Existing Chart Page', () => {
 		expect(lockChartBtn.isPresent()).to.eventually.be.false;
 		expect(saveChartBtn.isPresent()).to.eventually.be.false;
 
-		// Check if user can drag and drop
+		// Check if users are able to drag and drop (they should not)
 		var divider1 = p.browser.element(p.by.id('label-TotalPopulation-divider'));
 		var rectangle1 = p.browser.element(p.by.id('label-TotalPopulation-outline'));
 		var height1; 
@@ -223,11 +238,76 @@ describe('View Existing Chart Page', () => {
 	        });	
         });	
 
-		// objRectangle.getSize().then(function(eleSize){
-  //  		 	console.log('element size: '+ eleSize); //eleSize is the element's size object
-  //   		expect(eleSize.height).to.equal(height);
-  //       });
+		
+	});
 
+
+    //  Case 6: see Type 2
+    // 		- Using ValueChart StudyArea 
+	it('should let users change preference when viewing an individual ValueChart they own', function() {
+
+		// Go back to the home page
+		var vcHomeHypertext = p.browser.element(p.By.cssContainingText('.navbar-brand', 'ValueCharts'));
+		vcHomeHypertext.click().then(function() {	
+			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/home');
+		});
+
+		// Click "View Existing ValueChart" button, triggering a pop-up dialog
+		var viewExistBtn = p.browser.element(p.By.buttonText('View Existing ValueChart'));
+		viewExistBtn.click().then(function() {
+			var viewExistDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'View Existing Chart'));
+			p.browser.sleep(1000);
+			expect(viewExistDialog.isDisplayed()).to.eventually.be.true;
+
+		// Log into Chart StudyArea:
+		//		- Name: StudyArea
+		//		- Password: study
+		var vcNameField = p.browser.element(p.By.id('chart-name-input'));
+		var passwordField = p.browser.element(p.By.id('chart-passsword-input'));
+
+		vcNameField.clear();
+		vcNameField.sendKeys('StudyArea');
+		passwordField.clear();
+		passwordField.sendKeys('study');
+
+		expect(vcNameField.getAttribute('value')).to.eventually.equal('StudyArea');
+		expect(passwordField.getAttribute('value')).to.eventually.equal('study');
+		
+		let continueBtn = p.element.all(p.by.buttonText('Continue'));
+		continueBtn.click().then(function() {
+			p.browser.waitForAngular();
+			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/StudyArea?password=study');
+		});
+
+		// Check if the editing-related buttons are present or not
+		var editBtns = p.browser.element(p.By.css('#ValueChartView form a.btn-default')); // both 'Edit ValueChart' and 'Edit Preference' buttons
+		var exportValueChartBtn = p.browser.element(p.By.id('#download-value-chart'));
+		var lockChartBtn = p.browser.element(p.By.buttonText('Lock Chart'));
+		var saveChartBtn = p.browser.element(p.By.buttonText('Save Chart'));
+
+		expect(editBtns.isPresent()).to.eventually.be.false;
+		expect(exportValueChartBtn.isPresent()).to.eventually.be.false;
+		expect(lockChartBtn.isPresent()).to.eventually.be.false;
+		expect(saveChartBtn.isPresent()).to.eventually.be.false;
+
+		// Check if users are able to drag and drop (they should be)
+		// var divider1 = p.browser.element(p.by.id('label-TotalPopulation-divider'));
+		// var rectangle1 = p.browser.element(p.by.id('label-TotalPopulation-outline'));
+		// var height1; 
+		// rectangle1.getSize().then(function(eleSize){
+  //  			height1 = eleSize.height;
+  //  			console.log('height: '+ height1); //eleSize is the element's size object
+  //  			p.browser.actions().dragAndDrop(divider1, rectangle1).perform();
+  //  			var rectangle2 = element(by.id('label-TotalPopulation-outline'));
+		// 	var height2; 
+		// 	rectangle2.getSize().then(function(eleSize){
+	 //   			height2 = eleSize.height;
+	 //   			console.log('new height: '+ height2); //eleSize is the element's size object
+	 //  			expect(height1).to.equal(height2);
+	 //        });	
+  //       });	
+
+		
 	});
 
 	// Case 7: See Type 3
