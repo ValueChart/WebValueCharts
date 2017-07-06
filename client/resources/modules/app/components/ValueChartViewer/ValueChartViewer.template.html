@@ -1,21 +1,21 @@
-<div id="ValueChartView">
+<div *ngIf="!loading" id="ValueChartView">
 	<input type="color" id="primitiveObjective-color-picker">
 	<div class="valuechart-toolbar">
 		<form class="form-inline col-xs-12">
 			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-default" *ngIf="currentUserService.isOwner()" (click)="editValueChart()">
+				<button class="btn btn-default" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
 				Edit ValueChart
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left" >
-				<button class="btn btn-default" *ngIf="currentUserService.isParticipant()" (click)="editPreferences()">
+				<button class="btn btn-default" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
 				Edit Preferences
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-left">
 					<ExportValueChart></ExportValueChart>
 			</div>
-			<div *ngIf="currentUserService.isOwner() && !valueChartService.getBaseValueChart().isIndividual()">
+			<div *ngIf="valueChartViewerService.isOwner() && !valueChartViewerService.getBaseValueChart().isIndividual()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartStatus.userChangesPermitted">
 					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
 					Lock Chart
@@ -28,18 +28,18 @@
 				</div>
 			</div>
 			<div *ngIf="enableGroupChartView()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'group'">
-					<button class="btn btn-primary" (click)="setChartView('individual')">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === ChartType.Group">
+					<button class="btn btn-primary" (click)="setTypeToView(ChartType.Individual)">
 					View Individual Chart
 					</button>
 				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === 'individual'">
-					<button class="btn btn-primary" (click)="setChartView('group')">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="viewType === ChartType.Individual">
+					<button class="btn btn-primary" (click)="setTypeToView(ChartType.Group)">
 					View Group Chart
 					</button>
 				</div>
 			</div>
-			<div *ngIf="currentUserService.isParticipant()">
+			<div *ngIf="valueChartViewerService.isParticipant()">
 				<div class="form-group valuechart-toolbar-group pull-left">
 					<button class="btn btn-success" (click)="submitPreferencesIfChartUnchanged()">
 					Save
@@ -57,14 +57,14 @@
 				</button>
 			</div>
 			<div class="col-xs-1 pull-right"></div>
-			<ViewOptions [chartType]="valueChart.getType()" (viewConfig)="updateView($event)"></ViewOptions>
+			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
 			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 		<DetailBox 
-		[valueChart]="valueChart"
-		[enableManagement]="currentUserService.isOwner()" 
-		[showUsers]="!valueChartService.getBaseValueChart().isIndividual()"
+		[valueChart]="valueChartViewerService.getActiveValueChart()"
+		[enableManagement]="valueChartViewerService.isOwner()" 
+		[showUsers]="!valueChartViewerService.getBaseValueChart().isIndividual()"
 		[viewConfig]="viewConfig" 
 		[height]="valueChartHeight / 4" 
 		[width]="valueChartWidth / 3"
@@ -73,7 +73,7 @@
 		</DetailBox>
 	<div>
 		<ValueChart
-		[valueChart]="valueChart"
+		[valueChart]="valueChartViewerService.getActiveValueChart()"
 		[width]="valueChartWidth"
 		[height]="valueChartHeight"
 		[viewConfig]="viewConfig"

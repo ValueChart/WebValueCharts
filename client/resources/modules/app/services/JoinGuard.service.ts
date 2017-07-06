@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 17:39:06
+* @Last Modified time: 2017-07-05 20:45:56
 */
 
 // Import Angular Classes:
@@ -10,10 +10,11 @@ import { Injectable }     														from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService, UserRole }											from './CurrentUser.service';
+import { CurrentUserService }													from './CurrentUser.service';
 import { ValueChartService }													from './ValueChart.service';
 import { ValueChartHttpService }												from './ValueChartHttp.service';
 
+import { UserRole }																from '../../../types/UserRole'
 
 
 /*
@@ -60,19 +61,18 @@ export class JoinGuardService implements CanActivate {
 				var password: string = (<any> route.queryParams).password;
 
 				// Retrieve the structure of that ValueChart that the user is joining.
-				this.valueChartHttpService.getValueChartStructure(name, password)
+				this.valueChartHttpService.getValueChartByName(name, password)
 					.subscribe(
 					valueChart => {
-						this.currentUserService.setUserRole(UserRole.Participant)
-						this.valueChartService.setBaseValueChart(valueChart);
+						this.valueChartService.setValueChart(valueChart);
 						resolve(true);	
 					},
 					error => {
-						this.router.navigate(['/register']); // The ValueChart does not exist. Redirect the user to the '/register' page.
+						this.router.navigate(['/register'], { queryParamsHandling: "merge"}); // The ValueChart does not exist. Redirect the user to the '/register' page.
 						resolve(false);	
 					});
 
-			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getBaseValueChart()) {
+			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getValueChart()) {
 
 				// Retrieve the ValueChart ID from the URL router parameters.
 				var name: string = route.params['ValueChart'];
@@ -81,7 +81,7 @@ export class JoinGuardService implements CanActivate {
 
 				this.valueChartHttpService.getValueChartByName(name, password)
 					.subscribe(valueChart => {
-						this.valueChartService.setBaseValueChart(valueChart)
+						this.valueChartService.setValueChart(valueChart)
 						resolve(true);
 					});
 			} else {

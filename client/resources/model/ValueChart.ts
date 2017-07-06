@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 14:13:17
+* @Last Modified time: 2017-07-05 19:02:14
 */
 	
 // Import Model Classes:
@@ -41,7 +41,7 @@ export class ValueChart {
 
 	private type: ChartType;
 	private name: string;					// The name of the ValueChart.
-	private fname: string;						// The name of the ValueChart formatted to remove spaces and special characters.
+	private fname: string;					// The name of the ValueChart formatted to remove spaces and special characters.
 	private description: string;			// The description of the ValueChart.
 	private creator: string;				// The username of the creator of the ValueChart.
 	private rootObjectives: Objective[];	// The collection of root objectives for the ValueChart. This should almost always be a single abstract objective.
@@ -292,6 +292,14 @@ export class ValueChart {
 		} else {
 			this.users[userIndex] = newUser;
 		}
+	}
+
+	getUser(username: string): User{
+		var user: User = this.users.filter((user: User) => {
+			return user.getUsername() === username;
+		})[0];
+
+		return user;
 	}
 
 	removeUser(userToDelete: User): void {

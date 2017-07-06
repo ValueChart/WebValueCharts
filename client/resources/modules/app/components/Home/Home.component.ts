@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-04 17:16:44
+* @Last Modified time: 2017-07-05 20:30:37
 */
 
 // Import Angular Classes:
@@ -11,7 +11,7 @@ import { Router }										from '@angular/router';
 
 // Import Application Classes:
 import { XMLValueChartParserService } 					from '../../services/XMLValueChartParser.service';
-import { CurrentUserService, UserRole }					from '../../services/CurrentUser.service';
+import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ValidationService }							from '../../services/Validation.service';
@@ -21,6 +21,9 @@ import { ValueChart, ChartType }						from '../../../../model/ValueChart';
 
 // Import Utility Classes:
 import * as Formatter									from '../../../utilities/classes/Formatter';
+
+import { UserRole }										from '../../../../types/UserRole'
+
 
 // Import Sample Data:
 import { singleHotel, groupHotel, waterManagement}		from '../../../../data/DemoValueCharts';
@@ -122,9 +125,8 @@ export class HomeComponent {
 					toastr.error("The chart you are trying to join is single-user only.")
 				}
 				else {
-					this.valueChartService.setBaseValueChart(valueChart);	
-					this.currentUserService.setUserRole(UserRole.Participant);
-					this.router.navigate(['createValueChart/newUser/ScoreFunctions']);
+					this.valueChartService.setValueChart(valueChart);	
+					this.router.navigate(['create', 'newUser', UserRole.UnsavedParticipant, 'ScoreFunctions']);
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -148,12 +150,9 @@ export class HomeComponent {
 
 				$('#chart-credentials-modal').modal('hide');
 				if (this.validateChartStructure(valueChart)) {
-					this.valueChartService.setBaseValueChart(valueChart);
-					this.currentUserService.setUserRole(UserRole.Viewer);
+					this.valueChartService.setValueChart(valueChart);
 
-					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
-
-					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), UserRole.Viewer], { queryParams: { password: valueChart.password } });
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -171,10 +170,8 @@ export class HomeComponent {
 	*/
 	selectDemoValueChart(demoChart: any): void {
 		let valueChart = this.valueChartParser.parseValueChart(demoChart.xmlString);
-		this.valueChartService.setBaseValueChart(valueChart);
-		this.currentUserService.setUserRole(UserRole.Participant);
-		let viewType = valueChart.isIndividual() ? 'individual' : 'group';
-		this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
+		this.valueChartService.setValueChart(valueChart);
+		this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), UserRole.Participant], { queryParams: { password: valueChart.password } });
 	}
 
 	/*
@@ -195,19 +192,17 @@ export class HomeComponent {
 				let valueChart = this.valueChartParser.parseValueChart(xmlString);
 
 				if (this.validateChartStructure(valueChart)) {
-					this.valueChartService.setBaseValueChart(valueChart);
+					this.valueChartService.setValueChart(valueChart);
 					
 					let role: UserRole = UserRole.Viewer;
 					if (this.valueChartService.currentUserIsMember())
 						role = UserRole.OwnerAndParticipant;
 					else 
 						role = UserRole.Owner;
-					this.currentUserService.setUserRole(role);
 
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
 					this.saveValueChartToDatabase(valueChart);
-					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
-					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), role], { queryParams: { password: valueChart.password } });
 				}		
 			}
 		};
@@ -245,7 +240,7 @@ export class HomeComponent {
 		@description 	Called in response to click of "Yes" button in validation error modal.
 	*/
 	fixChart() {
-		this.router.navigate(['/createValueChart/editChart/BasicInfo']);
+		this.router.navigate(['create', 'editChart', UserRole.Owner, 'BasicInfo']);
 	}
 
 	/* 	

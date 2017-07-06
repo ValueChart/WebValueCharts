@@ -97,7 +97,7 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-offset-3 col-sm-9">
-                        	<button type="submit" class="btn btn-lg btn-success" (click)="deleteValueChart(valueChartService.getBaseValueChart()._id, valueChartService.getBaseValueChart().getFName())" data-dismiss="modal">OK</button>
+                        	<button type="submit" class="btn btn-lg btn-success" (click)="deleteValueChart(valueChartService.getValueChart()._id, valueChartService.getValueChart().getFName())" data-dismiss="modal">OK</button>
                             <button type="submit" class="btn btn-lg btn-danger" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
@@ -120,7 +120,7 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-offset-3 col-sm-9">
-                        	<button type="submit" class="btn btn-lg btn-success" (click)="leaveChart(valueChartService.getBaseValueChart()._id)" data-dismiss="modal">OK</button>
+                        	<button type="submit" class="btn btn-lg btn-success" (click)="leaveChart(valueChartService.getValueChart()._id)" data-dismiss="modal">OK</button>
                             <button type="submit" class="btn btn-lg btn-danger" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>

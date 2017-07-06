@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 17:02:23
+* @Last Modified time: 2017-07-05 19:35:09
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -25,9 +25,6 @@ import { JoinGuardService }											from './services/JoinGuard.service';
 import { CreationStepsService }										from '../create/services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }							from '../create/services/UpdateObjectiveReferences.service';
 import { ValidationService }										from './services/Validation.service';
-import { HostService }												from './services/Host.service';
-import { DisplayedUsersService }									from './services/DisplayedUsers.service';
-
 
 /*
 	This is the route configuration for the main application router. This is where components are assigned to url paths. 
@@ -53,8 +50,8 @@ const routes: Routes = [
 	{ path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
-	{ path: 'view/:viewType/:ValueChart', component: ValueChartViewerComponent, canActivate: [AuthGuardService, JoinGuardService] },
-	{ path: 'scoreFunction/:viewType', component: ScoreFunctionViewerComponent },
+	{ path: 'ValueCharts/:ValueChart/:ChartType/:UserRole', component: ValueChartViewerComponent, canActivate: [AuthGuardService, JoinGuardService] },
+	{ path: 'scoreFunction/:ViewType', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register.
 	{ path: '**', redirectTo: '/register'}
 ];
@@ -62,7 +59,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, DisplayedUsersService, CreationStepsService, UpdateObjectiveReferencesService, ValidationService, HostService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateObjectiveReferencesService, ValidationService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.

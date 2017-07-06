@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 19:36:45
+* @Last Modified time: 2017-07-05 20:19:57
 */
 
 // Import Angular Classes:
@@ -16,7 +16,7 @@ import { CreateValueChartComponent } 							from '../components/CreateValueChart
 import { CreationStepsService }									from './CreationSteps.service';
 
 /*
-	CreationGuardService is an Angular service that is used to control navigation away from the '/createValueChart/:purpose' route.
+	CreationGuardService is an Angular service that is used to control navigation away from the '/create/:purpose' route.
 	
 	** Case 1 **
 	A significant issue during ValueChart creation is that users can accidentally navigate away from the creation page by clicking
@@ -73,7 +73,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 	// ========================================================================================
 
 	/*
-		@returns {boolean} - Whether navigation away from the deactivated route (always '/createValueChart/:purpose') will be permitted or not.
+		@returns {boolean} - Whether navigation away from the deactivated route (always '/create/:purpose') will be permitted or not.
 		@description 	Used by the Angular router to determine whether the current user will be permitted to navigate away from the creation workflow
 						based on a user's interaction with a modal window.
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
@@ -88,7 +88,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		//	(2) the destination is ValueChartViewer
 		//	(3) 'purpose' is anything other than newChart (no need to prompt if user is editing or joining)
 		if (component.allowedToNavigate || destination.indexOf('/view/') !== -1 
-			|| window.location.pathname.indexOf('/createValueChart/newChart') === -1) {
+			|| window.location.pathname.indexOf('/create/newChart') === -1) {
 			return true;
 		}		
 		else {
@@ -110,7 +110,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 	}
 
 		/*
-		@returns {boolean} - Whether navigation to activated route (always '/createValueChart/:purpose/:step') will be permitted or not.
+		@returns {boolean} - Whether navigation to activated route (always '/create/:purpose/:step') will be permitted or not.
 		@description 	Used by the Angular router to determine whether the current user will be permitted to navigate to a creation workflow
 						step based on how navigation was triggered (by Angular or by browser). See in-line comments for details.
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
@@ -120,7 +120,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		var creationStepsService: CreationStepsService = this.creationStepsService;
 
 		// Allow navigation if we are coming into the component from outside of the creation workflow.
-		if (window.location.pathname.indexOf('/createValueChart/') === -1) {
+		if (window.location.pathname.indexOf('/create/') === -1) {
 			return true;
 		}
 		// Navigation was triggered through "proper channels" (using buttons in CreateValueChart).

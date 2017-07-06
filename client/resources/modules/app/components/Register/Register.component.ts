@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 17:39:14
+* @Last Modified time: 2017-07-05 20:35:58
 */
 
 // Import Angular Classes:
@@ -10,8 +10,12 @@ import { Component }										from '@angular/core';
 import { Router, NavigationExtras }							from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService, UserRole }						from '../../services/CurrentUser.service';
+import { CurrentUserService }								from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
+
+import { UserRole }											from '../../../../types/UserRole'
+
+
 
 /*
 	This component implements the user login and account creation page. It allows users to login to the ValueCharts application
@@ -117,10 +121,10 @@ export class RegisterComponent {
 		this.setUsername(username);
 	}
 
-	getRedirectRoute(): string[] {
+	getRedirectRoute(): any[] {
 		// If the user is joining a chart, then navigate to createValueChart
-		if (this.currentUserService.getUserRole() === UserRole.Participant) {
-			return ['createValueChart/newUser/ScoreFunctions'];
+		if (document.location.href.indexOf('newUser') !== -1) {
+			return ['create', 'newUser', UserRole.UnsavedParticipant, 'ScoreFunctions'];
 		} else {	// Else, navigate to the create page as normal
 			return ['home'];
 		}

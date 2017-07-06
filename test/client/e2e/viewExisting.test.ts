@@ -131,7 +131,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/individual/ThisIsATestChart?password=temp');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/ThisIsATestChart/0/0?password=temp');
 			});
 
 	});
@@ -179,6 +179,7 @@ describe('View Existing Chart Page', () => {
 					var InvldUsrDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'Invalid Users'));
 					p.browser.sleep(1000);
 					expect(InvldUsrDialog.isDisplayed()).to.eventually.be.true;
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1/0?password=australia');
 				});	
 
 				var peripheralArea = p.browser.element(p.by.id('validate-modal'));

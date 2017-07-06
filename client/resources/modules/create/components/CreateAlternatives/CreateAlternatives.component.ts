@@ -74,7 +74,7 @@ export class CreateAlternativesComponent implements OnInit {
             subscriber.next(this.validate());
             subscriber.complete();
         });
-        this.valueChart = this.valueChartService.getBaseValueChart();
+        this.valueChart = this.valueChartService.getValueChart();
 		this.alternatives = {};
 		this.isSelected = {};
 		this.alternativesCount = 0;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-28 11:48:43
+* @Last Modified time: 2017-07-05 20:32:43
 */
 
 // Import Angular Classes:
@@ -11,7 +11,7 @@ import { Router }										from '@angular/router';
 import { OnInit }										from '@angular/core';
 
 // Import Application Classes:
-import { CurrentUserService, UserRole }					from '../../services/CurrentUser.service';
+import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
@@ -22,6 +22,7 @@ import * as Formatter									from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
+import { UserRole }										from '../../../../types/UserRole'
 
 /*
 	This component implements the My ValueChart's page. The my ValueChart page is where an authenticated user can view and manage the 
@@ -118,10 +119,9 @@ export class MyValueChartsComponent implements OnInit {
 					$('#validate-modal').modal('show');
 				}
 				else {
-					this.valueChartService.setBaseValueChart(valueChart);
-					this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
-					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
-					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
+					this.valueChartService.setValueChart(valueChart);
+					let role = this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner;
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), role], { queryParams: { password: valueChart.password } });
 				}	
 			});
 	}
@@ -131,20 +131,18 @@ export class MyValueChartsComponent implements OnInit {
 
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.valueChartService.setBaseValueChart(valueChart);
-				this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
+				this.valueChartService.setValueChart(valueChart);
 
-				this.router.navigate(['/createValueChart/editChart/BasicInfo']);
+				this.router.navigate(['create', 'editChart', UserRole.Owner, 'BasicInfo']);
 			});
 	}
 
 	editPreferences(chartId: string, chartName: string, password: string): void {
 		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
-				this.valueChartService.setBaseValueChart(valueChart);
-				this.currentUserService.setUserRole(UserRole.Participant);
+				this.valueChartService.setValueChart(valueChart);
 
-				this.router.navigate(['/createValueChart/editPreferences/ScoreFunctions']);
+				this.router.navigate(['create', 'editPreferences', UserRole.Participant, 'ScoreFunctions']);
 			});
 	}
 
@@ -175,12 +173,12 @@ export class MyValueChartsComponent implements OnInit {
 	setValueChart(chartId: string, password: string): void {
 		this.valueChartHttpService.getValueChart(chartId, password)
 			.subscribe(valueChart => {
-				this.valueChartService.setBaseValueChart(valueChart);
+				this.valueChartService.setValueChart(valueChart);
 			});
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
 			return valueChart.getFName() + 'UserWeights.csv';
@@ -190,7 +188,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	exportUserWeights() {
-		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.

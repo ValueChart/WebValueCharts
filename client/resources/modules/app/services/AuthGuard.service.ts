@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-05 16:07:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 17:02:32
+* @Last Modified time: 2017-07-05 20:35:16
 */
 
 // Import Angular Classes:
@@ -66,7 +66,7 @@ export class AuthGuardService implements CanActivate {
 							this.currentUserService.setLoggedIn(true);
 							this.currentUserService.setUsername(user.username);
 
-							if (state.url.indexOf('createValueChart') !== -1 ) {			// Redirect to home if the user was creating or viewing a ValueChart, or attempting to reach register when they are logged in.
+							if (state.url.indexOf('create') !== -1 ) {	// Redirect to home if the user was creating or viewing a ValueChart, or attempting to reach register when they are logged in.
 								this.router.navigate(['/home']);		
 								resolve(false);			
 							} else {
