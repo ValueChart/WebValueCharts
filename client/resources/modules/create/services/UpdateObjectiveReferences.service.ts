@@ -58,7 +58,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	 Removes Alternative entries for Objectives that are not in the chart.
 	*/
 	removeAlternativeEntries() {
-		let objNames = this.valueChartService.getPrimitiveObjectivesByName();
+		let objNames = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
 		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 			for (let key in alt.getAllObjectiveValuePairs().keys()) {
 				if (objNames.indexOf(key) === -1) {
@@ -73,7 +73,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	 Checks each Alternative's outcome on each Objective. Clears if no longer in range.
 	*/
 	clearAlternativeValues() {
-		for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
 			for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
 				if (obj.getDomainType() === "continuous") {
 					let dom = <ContinuousDomain>obj.getDomain();
@@ -105,7 +105,7 @@ export class UpdateObjectiveReferencesService {
 		let bestWorstChanged = false;
 		this.removeScoreFunctions(user);
 		this.removeWeights(user);
-		for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
       		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
 	      		if (obj.getDomainType() === 'categorical' && scoreFunction.type === 'discrete') {
@@ -141,7 +141,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	Removes score functions for Objectives that are not in the chart.
 	*/
 	removeScoreFunctions(user: User) {
-		let objNames = this.valueChartService.getPrimitiveObjectivesByName();
+		let objNames = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
 		for (let key of user.getScoreFunctionMap().getAllScoreFunctionKeys()) {
 			if (objNames.indexOf(key) === -1) {
 				user.getScoreFunctionMap().removeObjectiveScoreFunction(key);
@@ -154,7 +154,7 @@ export class UpdateObjectiveReferencesService {
 		@description 	Removes weights for Objectives that are not in the chart.
 	*/
 	removeWeights(user: User) {
-		let objNames = this.valueChartService.getPrimitiveObjectivesByName();
+		let objNames = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
 		var elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
 		var iteratorElement: IteratorResult<string> = elementIterator.next();
 		while (iteratorElement.done === false) {
@@ -213,7 +213,7 @@ export class UpdateObjectiveReferencesService {
 	*/
 	completeScoreFunctions(user: User, showWarnings: boolean) {
 		let completed = [];
-		for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
 			// Make sure there is a score function for every Objective (initialized to default)
       		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
         		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
@@ -256,7 +256,7 @@ export class UpdateObjectiveReferencesService {
 	*/
 	completeWeights(user: User, showWarnings: boolean) {
 		let addedWeights = [];
-		for (let obj of this.valueChartService.getPrimitiveObjectives()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
       		if (user.getWeightMap().getObjectiveWeight(obj.getName()) === undefined) {
       			user.getWeightMap().setObjectiveWeight(obj.getName(), 0.0);
       			addedWeights.push(obj.getName())

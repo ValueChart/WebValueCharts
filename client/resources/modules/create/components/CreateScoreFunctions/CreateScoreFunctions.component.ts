@@ -107,19 +107,19 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.valueChartService.getPrimitiveObjectives()[0].getName();
+    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
     this.latestDefaults = {};
 
     // Initialize user
     let newUser = false;
-    if (!this.valueChartService.currentUserIsMember()) {
+    if (!this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername())) {
       let user = new User(this.currentUserService.getUsername());
       user.setScoreFunctionMap(new ScoreFunctionMap());
       user.setWeightMap(new WeightMap());
       this.valueChartService.getValueChart().setUser(user);
       newUser = true;
     }
-    this.user = this.valueChartService.getCurrentUser();
+    this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
     // Initialize/repair score functions
     this.updateObjReferencesService.completeScoreFunctions(this.user, true);
@@ -127,7 +127,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     // Initialize best/worst outcomes
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
-    for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+    for (let objName of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
       this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
       this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
     }
@@ -145,7 +145,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   ngOnDestroy() {
     // Clear weight map if best or worst outcome has changed
     if (this.user.getWeightMap().getWeightTotal() > 0) {
-      for (let objName of this.valueChartService.getPrimitiveObjectivesByName()) {
+      for (let objName of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
         let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
@@ -164,7 +164,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
                    (Currently called when user clicks "Next" button next to dropdown).
   */
   advanceSelectedObjective() {
-    let primObjs: string[] = this.valueChartService.getPrimitiveObjectivesByName();
+    let primObjs: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
     let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
     let nextIndex: number = selectedIndex + 1;
     if (nextIndex >= primObjs.length) {

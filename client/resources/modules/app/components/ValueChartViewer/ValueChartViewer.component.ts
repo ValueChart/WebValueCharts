@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 21:01:31
+* @Last Modified time: 2017-07-06 13:50:29
 */
 
 // Import Angular Classes:
@@ -193,7 +193,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 			if (this.valueChartViewerService.getBaseValueChart().getType() == ChartType.Individual) {
 				this.valueChartViewerService.setActiveValueChart(this.valueChartViewerService.getBaseValueChart());
-			} else if (this.valueChartViewerService.currentUserIsMember()) {
+			} else {
 				let individualChart = _.clone(this.valueChartViewerService.getBaseValueChart());
 				individualChart.setType(ChartType.Individual);
 				individualChart.setUsers([individualChart.getUser(this.currentUserService.getUsername())]);
@@ -270,7 +270,7 @@ export class ValueChartViewerComponent implements OnInit {
 		return this.valueChartViewerService.isParticipant() 
 			&& (this.valueChartViewerService.getUserRole() !== UserRole.UnsavedParticipant) 
 			&& (this.valueChartViewerService.getBaseValueChart().getType() === ChartType.Group) 
-			&& this.valueChartViewerService.currentUserIsMember();
+			&& this.valueChartViewerService.userIsMember(this.currentUserService.getUsername());
 	}
 
   /*   
@@ -398,7 +398,7 @@ export class ValueChartViewerComponent implements OnInit {
 				(user: User) => {
 					toastr.success('Save successful');
 					if (this.valueChartViewerService.getUserRole() === UserRole.UnsavedParticipant) {
-						let newRole = (this.valueChartViewerService.currentUserIsCreator()) ? UserRole.OwnerAndParticipant : UserRole.Participant;
+						let newRole = (this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername())) ? UserRole.OwnerAndParticipant : UserRole.Participant;
 						this.valueChartViewerService.setUserRole(newRole);
 					}
 				},

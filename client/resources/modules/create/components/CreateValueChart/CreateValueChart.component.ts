@@ -113,10 +113,13 @@ export class CreateValueChartComponent implements OnInit {
 			this.valueChartService.setValueChart(valueChart); 
 		}	
 		this.valueChart = this.valueChartService.getValueChart();
-		this.saveOnDestroy = this.valueChartService.currentUserIsCreator();
+		
+		let isCreator = this.valueChart.getCreator() === this.currentUserService.getUsername();
+
+		this.saveOnDestroy = isCreator;
 
 		// Lock chart while creator is editing
-		if (this.purpose === 'editChart' || (this.purpose === 'editPreferences' && this.valueChartService.currentUserIsCreator())) {	
+		if (this.purpose === 'editChart' || (this.purpose === 'editPreferences' && isCreator)) {	
 			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
 				status.userChangesPermitted = false; 
 				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
@@ -136,7 +139,7 @@ export class CreateValueChartComponent implements OnInit {
 		if (this.saveOnDestroy) {
 			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
 			let incomplete = (this.validationService.validateStructure(this.valueChart).length > 0
-				|| (this.valueChartService.currentUserIsMember() && this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()).length > 0 ));
+				|| (this.valueChart.isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChart, this.valueChart.getUser(this.currentUserService.getUsername())).length > 0 ));
 			
 			let status: any = {};
 			status.userChangesPermitted = !incomplete;
@@ -208,8 +211,8 @@ export class CreateValueChartComponent implements OnInit {
 			// (Include structural errors and errors in current user's preferences.)
 			let errorMessages = this.validationService.validateStructure(this.valueChart);
 
-			if (this.valueChartService.currentUserIsMember()) {
-				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChartService.getCurrentUser()));
+			if (this.valueChart.isMember(this.currentUserService.getUsername())) {
+				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChart, this.valueChart.getUser(this.currentUserService.getUsername())));
 			} 
 			if (errorMessages.length > 0) {
 				this.validationMessage = "Cannot view chart. Please fix the following errors to proceed:\n\n" + errorMessages.join("\n\n");
@@ -217,12 +220,12 @@ export class CreateValueChartComponent implements OnInit {
 			}
 			else {
 				// TODO: Set the user role here
-				if (this.userRole === UserRole.Owner && this.valueChartService.currentUserIsMember())
+				if (this.userRole === UserRole.Owner && this.valueChart.isMember(this.currentUserService.getUsername()))
 					this.userRole = UserRole.OwnerAndParticipant;
 
 				window.onpopstate = () => { };
 				(<any>window).destination = '/view/ValueChart';
-				let chartType = this.valueChartService.currentUserIsMember() ? ChartType.Individual : ChartType.Group;
+				let chartType = this.valueChart.isMember(this.currentUserService.getUsername()) ? ChartType.Individual : ChartType.Group;
 				this.router.navigate(['ValueCharts', this.valueChart.getFName(), chartType, this.userRole], { queryParams: { password: this.valueChart.password } });
 			}
 		}
@@ -288,7 +291,7 @@ export class CreateValueChartComponent implements OnInit {
 	nextButtonText(): string {
 		let text = 'Next Stage >>';
 		if (!this.valueChart.isIndividual() && this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
-			if (!this.valueChartService.currentUserIsMember()) {
+			if (!this.valueChart.isMember(this.currentUserService.getUsername())) {
 				text = 'Add Preferences >>';
 			}
 			else {

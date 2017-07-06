@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 19:02:14
+* @Last Modified time: 2017-07-06 14:01:46
 */
 	
 // Import Model Classes:
@@ -300,6 +300,10 @@ export class ValueChart {
 		})[0];
 
 		return user;
+	}
+
+	isMember(username: string): boolean {
+		return this.getUser(username) !== undefined;
 	}
 
 	removeUser(userToDelete: User): void {

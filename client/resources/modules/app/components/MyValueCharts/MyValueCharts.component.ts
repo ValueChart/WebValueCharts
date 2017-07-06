@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:32:43
+* @Last Modified time: 2017-07-06 14:05:56
 */
 
 // Import Angular Classes:
@@ -120,7 +120,7 @@ export class MyValueChartsComponent implements OnInit {
 				}
 				else {
 					this.valueChartService.setValueChart(valueChart);
-					let role = this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner;
+					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.OwnerAndParticipant : UserRole.Owner;
 					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), role], { queryParams: { password: valueChart.password } });
 				}	
 			});

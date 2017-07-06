@@ -7,6 +7,7 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
@@ -74,6 +75,7 @@ export class CreateObjectivesComponent implements OnInit {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
+		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private updateObjRefService: UpdateObjectiveReferencesService,
@@ -137,11 +139,10 @@ export class CreateObjectivesComponent implements OnInit {
 	ngOnDestroy() {
 		// Convert temporary structures to ValueChart structures
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
-		this.valueChartService.resetPrimitiveObjectives();
 		if (this.editing) {
 			this.updateObjRefService.cleanUpAlternatives();
 			for (let user of this.valueChart.getUsers()) {
-				let showWarnings = this.valueChartService.currentUserIsMember() && (this.valueChartService.getCurrentUser().getUsername() === user.getUsername());
+				let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
 				this.updateObjRefService.cleanUpPreferences(user, showWarnings);
 			}	
 		}

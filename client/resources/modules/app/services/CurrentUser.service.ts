@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:07:32
+* @Last Modified time: 2017-07-06 09:52:46
 */
 
 // Import Angular Classes:
@@ -10,8 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 /*
 	This class contains all useful information about the current application-level user, which it exposes to any component, directive,
-	or other service that requires it. Currently, this information is limited to the username, and login status of the current user, as well
-	as whether they are joining an existing ValueChart, or potentially creating/hosting their own. Many components require this class to determine
+	or other service that requires it. Currently, this information is limited to the username, and login status of the current user. Many components require this class to determine
 	what functionality the user should be allowed to access. The My Account page is an excellent example of this; users that are temporary and not
 	logged in will not be allowed to reach this page. The application level router (app.routes.ts) also uses this service to determine whether users
 	are allowed to leave the register page. The username field of this class MUST be defined before the router will allow users to view any other page 

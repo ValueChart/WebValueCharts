@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:09:11
+* @Last Modified time: 2017-07-06 13:54:48
 */
 
 
@@ -13,13 +13,11 @@ import { Injectable } 										from '@angular/core';
 // Import Libraries:
 import * as _												from 'lodash';
 
-// Import Application Classes:
-import { CurrentUserService }								from './CurrentUser.service';
-
 // Import Model Classes:
 import { User }												from '../../../model/User';
 import { ValueChart, ChartType }							from '../../../model/ValueChart';
 
+// Import Types:
 import { UserRole }											from '../../../types/UserRole'
 
 @Injectable()
@@ -35,7 +33,7 @@ export class ValueChartViewerService {
 	private usersToDisplay: User[]; // Users to display in the chart
 	private invalidUsers: string[]; // Users that are invalid and should not be selectable
 
-	private userRole: UserRole;				// The role of the current user.
+	private userRole: UserRole;		// The role of the current user.
 
 	// ========================================================================================
 	// 									Constructor
@@ -45,7 +43,39 @@ export class ValueChartViewerService {
 		@returns {void}
 		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(public currentUserService: CurrentUserService)	{ }
+	constructor()	{ }
+
+	// ========================================================================================
+	// 									Methods
+	// ========================================================================================
+
+	// ====================== Methods for Managing Current User Role  ======================
+
+	userIsCreator(username: string): boolean {
+		return username === this.baseValueChart.getCreator();
+	}
+
+	userIsMember(username: string): boolean {
+		return !_.isNil(this.baseValueChart.getUser(username));
+	}
+
+	setUserRole(role: UserRole) {
+		this.userRole = role;
+	}
+
+	getUserRole(): UserRole {
+		return this.userRole;
+	}
+
+	isOwner(): boolean {
+		return this.userRole === UserRole.Owner || this.userRole === UserRole.OwnerAndParticipant; 
+	}
+
+	isParticipant(): boolean {
+		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant || this.userRole === UserRole.UnsavedParticipant;
+	}
+
+	// ====================== Methods for Managing the Active ValueChart ======================
 
 	setActiveValueChart(valueChart: ValueChart): void {
 		this.activeValueChart = valueChart;
@@ -62,6 +92,8 @@ export class ValueChartViewerService {
 	getActiveValueChart(): ValueChart {
 		return this.activeValueChart;
 	}
+
+	// ====================== Methods for Managing the Displayed Users ======================
 
 	getUsersToDisplay(): User[] {
 		return this.usersToDisplay;
@@ -120,30 +152,6 @@ export class ValueChartViewerService {
 
 	isUserInvalid(userToFind: string): boolean {
 		return this.invalidUsers.indexOf(userToFind) !== -1;
-	}
-
-	currentUserIsCreator(): boolean {
-		return this.currentUserService.getUsername() === this.baseValueChart.getCreator();
-	}
-
-	currentUserIsMember(): boolean {
-		return _.findIndex(this.baseValueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
-	}
-
-	setUserRole(role: UserRole) {
-		this.userRole = role;
-	}
-
-	getUserRole(): UserRole {
-		return this.userRole;
-	}
-
-	isOwner(): boolean {
-		return this.userRole === UserRole.Owner || this.userRole === UserRole.OwnerAndParticipant; 
-	}
-
-	isParticipant(): boolean {
-		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant || this.userRole === UserRole.UnsavedParticipant;
 	}
 
 }

@@ -6,6 +6,7 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValidationService }                        					from '../../../app/services/Validation.service';
 
@@ -57,6 +58,7 @@ export class CreateWeightsComponent implements OnInit {
 	        This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
+		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService, 
 		private creationStepsService: CreationStepsService,
 		private validationService: ValidationService) { }
@@ -79,18 +81,18 @@ export class CreateWeightsComponent implements OnInit {
         });
 		this.rankedObjectives = [];
 		this.isRanked = {};
-		this.user = this.valueChartService.getCurrentUser();
+		this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
 		// If weight map is empty, set all Objectives to unranked
 		if (this.user.getWeightMap().getWeightTotal() === 0) {
-			for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 				this.isRanked[obj] = false;
 			}
 		}
 		// Weights have already been set by the user
 		else {
-			let objectives: string[] = this.valueChartService.getPrimitiveObjectivesByName();
-			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getPrimitiveObjectives());
+			let objectives: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
+			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getValueChart().getAllPrimitiveObjectives());
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
 			for (let pair of sortedPairs) {
@@ -127,7 +129,7 @@ export class CreateWeightsComponent implements OnInit {
 		if (this.rankedObjectives.length === 0) {
 			return "Imagine the worst case scenario highlighted in red. Click on the objective you would most prefer to change from the worst to the best based on the values in the table below.";
 		}
-		else if (this.rankedObjectives.length < this.valueChartService.getPrimitiveObjectives().length) {
+		else if (this.rankedObjectives.length < this.valueChartService.getValueChart().getAllPrimitiveObjectives().length) {
 			return "From the remaining objectives, which would you prefer to change next from the worst value to the best value?";
 		}
 		else {
@@ -203,7 +205,7 @@ export class CreateWeightsComponent implements OnInit {
 	*/
 	getUnrankedObjectives(): string[] {
 		let unrankedObjectives: string[] = [];
-		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 			if (!this.isRanked[obj]) {
 				unrankedObjectives.push(obj);
 			}
@@ -230,7 +232,7 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Clears current ranking and sets all Objectives to unranked.
 	*/
 	resetRanks() {
-		for (let obj of this.valueChartService.getPrimitiveObjectivesByName()) {
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
 			this.isRanked[obj] = false;
 		}
 		this.rankedObjectives = [];

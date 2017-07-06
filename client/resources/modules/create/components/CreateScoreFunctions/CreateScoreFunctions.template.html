@@ -6,7 +6,7 @@
             <label class="control-label select-objective-control">Select Objective:</label>
             <div class="input-group">
                 <select class="form-control select-objective-control" id="score-function-dropdown" [(ngModel)]="selectedObjective">
-                    <option *ngFor="let obj of valueChartService.getPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+                    <option *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
                 </select>
                 <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
                     Next

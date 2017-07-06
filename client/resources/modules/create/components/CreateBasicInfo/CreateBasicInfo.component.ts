@@ -8,6 +8,7 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }												from '../../../app/services/ValueChart.service';
+import { CurrentUserService }												from '../../../app/services/CurrentUser.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
 import { ValidationService }												from '../../../app/services/Validation.service';
@@ -50,7 +51,9 @@ export class CreateBasicInfoComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(public valueChartService: ValueChartService,
+	constructor(
+		public currentUserService: CurrentUserService,
+		public valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private valueChartHttpService: ValueChartHttpService,
 		private validationService: ValidationService) { }
@@ -133,11 +136,14 @@ export class CreateBasicInfoComponent implements OnInit {
 	}
 
 	convertToIndividual() {
-		let user: User[] = [];
-		if (this.valueChartService.currentUserIsMember()) {
-			user.push(this.valueChartService.getCurrentUser());
+		let users: User[] = [];
+		let currentUser = this.valueChart.getUser(this.currentUserService.getUsername());
+
+		if (!_.isNil(currentUser)) {
+			users.push(currentUser);
 		}
-		this.valueChart.setUsers(user);
+		
+		this.valueChart.setUsers(users);
 		this.valueChart.setType(ChartType.Individual);
 	}
 }
