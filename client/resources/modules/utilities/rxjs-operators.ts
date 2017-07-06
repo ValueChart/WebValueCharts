@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:35:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-26 12:39:09
+* @Last Modified time: 2017-07-05 14:38:19
 */
 
 /* 
@@ -19,6 +19,7 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/zip';
 
 // Operators
 import 'rxjs/add/operator/catch';

@@ -75,7 +75,7 @@ export class CreateBasicInfoComponent implements OnInit {
             subscriber.next(this.nameChanged());
             subscriber.complete();
         });
-        this.valueChart = this.valueChartService.getBaseValueChart();
+        this.valueChart = this.valueChartService.getValueChart();
         this.type = this.valueChart.getType();
         this.validationTriggered = false;
 		this.originalName = this.valueChart.getName();
@@ -124,7 +124,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	// ================================ Convert Chart Type ====================================
 
 	confirmConvert() {
-		if (!_.isEqual(this.valueChart.getUsers(),this.valueChartService.getIndividualChart().getUsers())) {
+		if (!_.isEqual(this.valueChart.getUsers(),this.valueChartService.getValueChart().getUsers())) {
 			$('#convert-type-modal').modal('show');
 		}
 		else {

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 19:50:46
+* @Last Modified time: 2017-07-05 20:09:11
 */
 
 
@@ -14,21 +14,28 @@ import { Injectable } 										from '@angular/core';
 import * as _												from 'lodash';
 
 // Import Application Classes:
-import { ValueChartService }								from './ValueChart.service';
+import { CurrentUserService }								from './CurrentUser.service';
 
 // Import Model Classes:
 import { User }												from '../../../model/User';
+import { ValueChart, ChartType }							from '../../../model/ValueChart';
 
+import { UserRole }											from '../../../types/UserRole'
 
 @Injectable()
-export class DisplayedUsersService {
+export class ValueChartViewerService {
 
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
 
+	private baseValueChart: ValueChart;
+	private activeValueChart: ValueChart;
+
 	private usersToDisplay: User[]; // Users to display in the chart
 	private invalidUsers: string[]; // Users that are invalid and should not be selectable
+
+	private userRole: UserRole;				// The role of the current user.
 
 	// ========================================================================================
 	// 									Constructor
@@ -38,8 +45,22 @@ export class DisplayedUsersService {
 		@returns {void}
 		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(
-		private valueChartService: ValueChartService) {
+	constructor(public currentUserService: CurrentUserService)	{ }
+
+	setActiveValueChart(valueChart: ValueChart): void {
+		this.activeValueChart = valueChart;
+	}
+
+	setBaseValueChart(valueChart: ValueChart): void {
+		this.baseValueChart = valueChart;
+	}
+
+	getBaseValueChart(): ValueChart {
+		return this.baseValueChart;
+	}
+
+	getActiveValueChart(): ValueChart {
+		return this.activeValueChart;
 	}
 
 	getUsersToDisplay(): User[] {
@@ -66,7 +87,7 @@ export class DisplayedUsersService {
 		}
 
 		let indices: any = {};
-		this.valueChartService.getBaseValueChart().getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
+		this.baseValueChart.getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
 
 		this.usersToDisplay.sort((a: User, b: User) => {
 			return indices[a.getUsername()] < indices[b.getUsername()] ? -1 : 1;
@@ -100,4 +121,29 @@ export class DisplayedUsersService {
 	isUserInvalid(userToFind: string): boolean {
 		return this.invalidUsers.indexOf(userToFind) !== -1;
 	}
+
+	currentUserIsCreator(): boolean {
+		return this.currentUserService.getUsername() === this.baseValueChart.getCreator();
+	}
+
+	currentUserIsMember(): boolean {
+		return _.findIndex(this.baseValueChart.getUsers(), (user: User) => { return user.getUsername() === this.currentUserService.getUsername(); } ) !== -1;
+	}
+
+	setUserRole(role: UserRole) {
+		this.userRole = role;
+	}
+
+	getUserRole(): UserRole {
+		return this.userRole;
+	}
+
+	isOwner(): boolean {
+		return this.userRole === UserRole.Owner || this.userRole === UserRole.OwnerAndParticipant; 
+	}
+
+	isParticipant(): boolean {
+		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant || this.userRole === UserRole.UnsavedParticipant;
+	}
+
 }

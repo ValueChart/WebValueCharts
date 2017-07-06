@@ -105,7 +105,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.categoriesToAdd = [];
 		this.editing = false;
 		this.errorMessages = [];
-		this.valueChart = this.valueChartService.getBaseValueChart();
+		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
 			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), '', '', 0);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:55:22
+* @Last Modified time: 2017-07-05 20:22:44
 */
 
 // Import Angular Classes:
@@ -18,7 +18,7 @@ import { ObjectiveChartDefinitions }											from '../../../ValueChart/definit
 
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { HostService }															from '../../services/Host.service';
-import { DisplayedUsersService }												from '../../services/DisplayedUsers.service';
+import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 
@@ -76,7 +76,7 @@ export class DetailBoxComponent implements OnInit {
 	constructor(
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
-		private displayedUsersService: DisplayedUsersService) { }
+		private valueChartViewerService: ValueChartViewerService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -118,9 +118,9 @@ export class DetailBoxComponent implements OnInit {
 
 	changeDisplayedUsers(user: User, eventObject: Event): void {
 		if ((<HTMLInputElement> eventObject.target).checked) {
-			this.displayedUsersService.addUserToDisplay(user);
+			this.valueChartViewerService.addUserToDisplay(user);
 		} else {
-			this.displayedUsersService.removeUserToDisplay(user.getUsername());
+			this.valueChartViewerService.removeUserToDisplay(user.getUsername());
 		}
 	}
 
@@ -160,6 +160,6 @@ export class DetailBoxComponent implements OnInit {
 
 
 	getValueChartUrl(): string {
-		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getFName() + '?password=' + this.valueChart.password;
+		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getFName() + '?password=' + this.valueChart.password + '&purpose=newUser';
 	}
 }

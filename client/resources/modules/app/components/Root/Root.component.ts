@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 17:58:14
+* @Last Modified time: 2017-07-05 20:13:33
 */
 
 // Import Angular Classes:
@@ -115,13 +115,11 @@ export class RootComponent implements OnInit {
 				.subscribe(logoutResult => {
 					this.currentUserService.setLoggedIn(false);
 					this.currentUserService.setUsername(undefined);
-					this.currentUserService.setUserRole(undefined);
 					(<any> window).destination = '/register';
 					this.router.navigate(['/register']);
 				});
 		} else {
 			this.currentUserService.setUsername(undefined);
-			this.currentUserService.setUserRole(undefined);
 			(<any> window).destination = '/register';
 			this.router.navigate(['/register']);
 		}

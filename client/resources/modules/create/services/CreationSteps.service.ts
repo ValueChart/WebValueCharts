@@ -8,6 +8,8 @@ import '../../utilities/rxjs-operators';
 import { ValueChartService }					from '../../app/services/ValueChart.service';
 import { ValidationService }					from '../../app/services/Validation.service';
 
+import { UserRole }								from '../../../types/UserRole';
+
 /*
 	This class defines the names and orders of steps in the Creation workflow and the transitions between them.
 */
@@ -82,18 +84,18 @@ export class CreationStepsService {
 		@returns {void}
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
-	next(purpose: string) {
+	next(purpose: string, role: UserRole) {
 		this.step = this.nextStep[this.step];
-		this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
+		this.router.navigate(['create/', purpose, role, this.step]);
 	}
 
 	/* 	
 		@returns {void}
 		@description 	Navigates to the component for the previous step and returns the previous step.
 	*/
-	previous(purpose: string) {
+	previous(purpose: string, role: UserRole) {
 		this.step = this.previousStep[this.step];
-		this.router.navigate(['createValueChart/' + purpose + '/' + this.step]);
+		this.router.navigate(['create/', purpose, role, this.step]);
 	}
 
 	/* 	

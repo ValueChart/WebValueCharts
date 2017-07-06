@@ -131,7 +131,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/individual/ThisIsATestChart?password=temp');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/ThisIsATestChart/0/0?password=temp');
 			});
 
 	});
@@ -174,7 +174,7 @@ describe('View Existing Chart Page', () => {
 				let continueBtn = p.element.all(p.by.buttonText('Continue'));
 				continueBtn.click().then(function() {
 					p.browser.waitForAngular();
-					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1/0?password=australia');
 				});	
 			});
 

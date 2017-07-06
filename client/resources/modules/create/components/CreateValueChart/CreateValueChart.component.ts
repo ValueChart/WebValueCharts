@@ -14,7 +14,7 @@ import { CreateScoreFunctionsComponent }								from '../CreateScoreFunctions/Cr
 import { CreateWeightsComponent }										from '../CreateWeights/CreateWeights.component';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
-import { CurrentUserService, UserRole }									from '../../../app/services/CurrentUser.service';
+import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
@@ -22,6 +22,7 @@ import { ValidationService }											from '../../../app/services/Validation.se
 // Import Model Classes:
 import { ValueChart, ChartType } 										from '../../../../model/ValueChart';
 import { User }															from '../../../../model/User';
+import { UserRole }														from '../../../../types/UserRole'
 
 /*
 	This component handles the workflow to create new value charts, edit value charts, and add new users to charts. 
@@ -45,6 +46,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	valueChart: ValueChart;
 	purpose: string; // "newChart" or "newUser" or "editChart" or "editPreferences"
+	private userRole: UserRole;
 
 	// Navigation Control:
 	sub: any;
@@ -99,20 +101,23 @@ export class CreateValueChartComponent implements OnInit {
         });
 
 		// Bind purpose to corresponding URL parameter
-		this.sub = this.route.params.subscribe(params => this.purpose = params['purpose']);
+		this.sub = this.route.params.subscribe(params => { 
+			this.purpose = params['purpose'];
+			this.userRole = params['UserRole'];
+		});
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 
 		if (this.purpose === 'newChart') {
 			let valueChart = new ValueChart('', '', this.currentUserService.getUsername()); // Create new ValueChart with a temporary name and description
 			valueChart.setType(ChartType.Individual); // initialize type to individual
-			this.valueChartService.setBaseValueChart(valueChart); 
+			this.valueChartService.setValueChart(valueChart); 
 		}	
-		this.valueChart = this.valueChartService.getBaseValueChart();
+		this.valueChart = this.valueChartService.getValueChart();
 		this.saveOnDestroy = this.valueChartService.currentUserIsCreator();
 
 		// Lock chart while creator is editing
 		if (this.purpose === 'editChart' || (this.purpose === 'editPreferences' && this.valueChartService.currentUserIsCreator())) {	
-			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getBaseValueChart().getFName()).subscribe((status) => { 
+			this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
 				status.userChangesPermitted = false; 
 				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			});
@@ -158,7 +163,7 @@ export class CreateValueChartComponent implements OnInit {
 	back(browserTriggered = false) {
 		this.autoSaveValueChart();
 		this.creationStepsService.allowedToNavigateInternally = true;
-		this.creationStepsService.previous(this.purpose);				
+		this.creationStepsService.previous(this.purpose, this.userRole);				
 	}
 
 	/* 	
@@ -182,7 +187,7 @@ export class CreateValueChartComponent implements OnInit {
 			else {
 				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
-				this.creationStepsService.next(this.purpose);
+				this.creationStepsService.next(this.purpose, this.userRole);
 			}
 		}
 		else {
@@ -211,28 +216,18 @@ export class CreateValueChartComponent implements OnInit {
 					$('#validate-modal').modal('show');
 			}
 			else {
-				this.setUserRole();
+				// TODO: Set the user role here
+				if (this.userRole === UserRole.Owner && this.valueChartService.currentUserIsMember())
+					this.userRole = UserRole.OwnerAndParticipant;
+
 				window.onpopstate = () => { };
 				(<any>window).destination = '/view/ValueChart';
-				let viewType = this.valueChartService.currentUserIsMember() ? 'individual' : 'group';
-				this.router.navigate(['view', viewType, this.valueChart.getFName()], { queryParams: { password: this.valueChart.password } });
+				let chartType = this.valueChartService.currentUserIsMember() ? ChartType.Individual : ChartType.Group;
+				this.router.navigate(['ValueCharts', this.valueChart.getFName(), chartType, this.userRole], { queryParams: { password: this.valueChart.password } });
 			}
 		}
 		else {
 			toastr.error("There were problems with your submission. Please fix them to proceed.");
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Sets the user role according to membership and ownership status.
-	*/
-	setUserRole() {
-		if (this.valueChartService.currentUserIsCreator()) {
-			this.currentUserService.setUserRole(this.valueChartService.currentUserIsMember() ? UserRole.OwnerAndParticipant : UserRole.Owner);
-		}
-		else {
-			this.currentUserService.setUserRole(UserRole.Participant);
 		}
 	}
 
@@ -251,9 +246,8 @@ export class CreateValueChartComponent implements OnInit {
 			if (isUnique === true) {
 				this.autoSaveValueChart();
 				this.creationStepsService.allowedToNavigateInternally = true;
-				this.creationStepsService.next(this.purpose);
-			}
-			else {
+				this.creationStepsService.next(this.purpose, this.userRole);
+			} else {
 				toastr.error("That name is already taken. Please choose another.")
 				if (browserTriggered) {
 					history.forward();
@@ -368,7 +362,7 @@ export class CreateValueChartComponent implements OnInit {
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
 	autoSaveValueChart(): void {
-		if (!this.valueChartService.currentUserIsCreator()) {
+		if (this.purpose == 'newUser' || this.purpose == 'editPreferences') {
 			return;	// Don't autosave. A non-creator is joining or editing preferences for an existing ValueChart.
 		}
 		if (!this.valueChart._id) {

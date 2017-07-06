@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 18:00:37
+* @Last Modified time: 2017-07-05 19:50:48
 */
 
 import { Injectable } 												from '@angular/core';
@@ -13,7 +13,7 @@ import * as _														from 'lodash';
 // Import Application Classes:
 import { CurrentUserService }										from './CurrentUser.service';
 import { ValueChartService }										from './ValueChart.service';
-import { DisplayedUsersService }									from './DisplayedUsers.service';
+import { ValueChartViewerService }									from './ValueChartViewer.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 import { ValidationService }										from './Validation.service';
 
@@ -59,8 +59,7 @@ export class HostService {
 	*/
 	constructor(
 		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService, 
-		private displayedUsersService: DisplayedUsersService,
+		private valueChartViewerService: ValueChartViewerService,
 		private validationService: ValidationService) {
 		this.valueChartParser = new JsonValueChartParser();
 	}
@@ -117,8 +116,8 @@ export class HostService {
 				if (newUser.getUsername() === this.currentUserService.getUsername())
 					return;
 
-				this.valueChartService.getBaseValueChart().setUser(newUser);
-				this.displayedUsersService.addUserToDisplay(newUser);
+				this.valueChartViewerService.getBaseValueChart().setUser(newUser);
+				this.valueChartViewerService.addUserToDisplay(newUser);
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
@@ -130,15 +129,15 @@ export class HostService {
 				if (updatedUser.getUsername() === this.currentUserService.getUsername())
 					return;
 
-				this.valueChartService.getBaseValueChart().setUser(updatedUser);
+				this.valueChartViewerService.getBaseValueChart().setUser(updatedUser);
 
-				if (this.displayedUsersService.isUserDisplayed(updatedUser))
-					this.displayedUsersService.addUserToDisplay(updatedUser);
+				if (this.valueChartViewerService.isUserDisplayed(updatedUser))
+					this.valueChartViewerService.addUserToDisplay(updatedUser);
 
 				// If user was previously invalid, they will be valid now.
-				if (this.displayedUsersService.isUserInvalid(updatedUser.getUsername())) {
-					this.displayedUsersService.removeInvalidUser(updatedUser.getUsername());
-					this.displayedUsersService.addUserToDisplay(updatedUser);
+				if (this.valueChartViewerService.isUserInvalid(updatedUser.getUsername())) {
+					this.valueChartViewerService.removeInvalidUser(updatedUser.getUsername());
+					this.valueChartViewerService.addUserToDisplay(updatedUser);
 				}
 
 				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
@@ -149,21 +148,26 @@ export class HostService {
 			case MessageType.UserRemoved:
 				let userToDelete: string = hostMessage.data;
 
-				let userIndex: number = this.valueChartService.getBaseValueChart().getUsers().findIndex((user: User) => {
+				let userIndex: number = this.valueChartViewerService.getBaseValueChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
-				this.displayedUsersService.removeUserToDisplay(userToDelete);
+				this.valueChartViewerService.removeUserToDisplay(userToDelete);
 
 				// Delete the user from the ValueChart
-				this.valueChartService.getBaseValueChart().getUsers().splice(userIndex, 1);
+				this.valueChartViewerService.getBaseValueChart().getUsers().splice(userIndex, 1);
 				toastr.warning(userToDelete + ' has left the ValueChart');
 				break;
 
 			case MessageType.StructureChanged:
-				let valueChart = this.valueChartParser.parseValueChart(hostMessage.data);
-				valueChart.setUsers([this.valueChartService.getCurrentUser()]);
-				valueChart.setType(ChartType.Individual);
-				if (this.validationService.validateStructure(valueChart).length === 0 && !_.isEqual(valueChart,this.valueChartService.getIndividualChart())) { // Ignore changes if chart is not valid
+				let newStructure = this.valueChartParser.parseValueChart(hostMessage.data);
+				newStructure.setUsers([]);
+				newStructure.setType(ChartType.Individual);
+
+				let oldStructure = _.clone(this.valueChartViewerService.getBaseValueChart());
+				oldStructure.setUsers([]);
+				oldStructure.setType(ChartType.Individual);
+
+				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, oldStructure)) { // Ignore changes if chart is not valid
 					toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
 				}
 				break;

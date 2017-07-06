@@ -116,7 +116,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
       let user = new User(this.currentUserService.getUsername());
       user.setScoreFunctionMap(new ScoreFunctionMap());
       user.setWeightMap(new WeightMap());
-      this.valueChartService.getBaseValueChart().setUser(user);
+      this.valueChartService.getValueChart().setUser(user);
       newUser = true;
     }
     this.user = this.valueChartService.getCurrentUser();
@@ -193,7 +193,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   validate(): boolean {
     this.validationTriggered = true;
-    this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getBaseValueChart(), this.user);
+    this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
     return this.errorMessages.length === 0;
   }
 
@@ -204,7 +204,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   resetErrorMessages(): void {
     if (this.validationTriggered) {
-      this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getBaseValueChart(), this.user);
+      this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
     }
   }
 }

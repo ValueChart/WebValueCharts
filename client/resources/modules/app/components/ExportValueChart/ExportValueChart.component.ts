@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 15:55:21
+* @Last Modified time: 2017-07-05 19:55:07
 */
 
 // Import Angular Classes:
@@ -27,7 +27,7 @@ import { ValueChart }										from '../../../../model/ValueChart';
 	template: `
 				<div class="export-value-chart">
 					<a class="btn btn-default" id="download-value-chart"
-						[class.disabled]="!valueChartService.getBaseValueChart()" 
+						[class.disabled]="!valueChartService.getValueChart()" 
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
 						(click)="downloadValueChart()">
@@ -74,7 +74,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (valueChart) {
 			return valueChart.getFName() + '.xml';
@@ -85,7 +85,7 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	downloadValueChart(): void {
-		var valueChart: ValueChart = this.valueChartService.getBaseValueChart();
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', valueChartObjectURL);		// Set the download link on the <a> element to be the URL created for the XML string.

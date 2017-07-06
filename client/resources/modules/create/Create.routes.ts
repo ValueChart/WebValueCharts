@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 10:02:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-08-30 16:30:53
+* @Last Modified time: 2017-07-05 20:26:07
 */
 
 // Import Angular Classes:
@@ -29,7 +29,7 @@ import { CreationGuardService }					from './services/CreationGuard.service';
 
 const creationRoutes: Routes = [
 	{
-		path: 'createValueChart/:purpose',
+		path: 'create/:purpose/:UserRole',
 		component: CreateValueChartComponent,
 		canActivate: [AuthGuardService],
 		canDeactivate: [CreationGuardService],

@@ -2,19 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 17:38:26
+* @Last Modified time: 2017-07-05 20:07:32
 */
 
 // Import Angular Classes:
 import { Injectable } 												from '@angular/core';
-
-export enum UserRole {
-	Viewer,					// The user is viewing a ValueChart. They are not permitted to edit the ValueChart or interact with it in any way.
-	Participant, 			// The user is participating in a ValueChart.
-	Owner,
-	OwnerAndParticipant
-}
-
 
 /*
 	This class contains all useful information about the current application-level user, which it exposes to any component, directive,
@@ -35,8 +27,6 @@ export class CurrentUserService {
 
 	private username: string; 				// The username of the current user.
 	private loggedIn: boolean;				// Whether or not the current user is logged in.
-	private owner: boolean;					// Whether or not the current user 
-	private userRole: UserRole;				// The role of the current user.
 
 
 	// ========================================================================================
@@ -61,22 +51,6 @@ export class CurrentUserService {
 
 	setUsername(username: string): void {
 		this.username = username;
-	}
-
-	setUserRole(role: UserRole) {
-		this.userRole = role;
-	}
-
-	getUserRole(): UserRole {
-		return this.userRole;
-	}
-
-	isOwner(): boolean {
-		return this.userRole === UserRole.Owner || this.userRole === UserRole.OwnerAndParticipant; 
-	}
-
-	isParticipant(): boolean {
-		return this.userRole === UserRole.OwnerAndParticipant || this.userRole === UserRole.Participant;
 	}
 
 	setLoggedIn(loggedIn: boolean): void {
