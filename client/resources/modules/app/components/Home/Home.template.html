@@ -26,28 +26,30 @@
 									<h4 class="modal-title" id="modal-header">{{getModalTitle()}}</h4>
 								</div>
 								<div class="modal-body">
-									<div class="row">
-										<label for="chart-name-input" class="col-sm-3 col-sm-offset-2 control-label">ValueChart Name</label>
-										<div class="col-sm-6">
-											<input type="text" class="form-control" id="chart-name-input" placeholder="Name" [(ngModel)]="valueChartName" name="valueChartName">
+									<form>
+										<div class="row">
+											<label for="chart-name-input" class="col-sm-3 col-sm-offset-2 control-label">ValueChart Name</label>
+											<div class="col-sm-6">
+												<input type="text" class="form-control" id="chart-name-input" placeholder="Name" [(ngModel)]="valueChartName" name="valueChartName">
+											</div>
 										</div>
-									</div>
-									<div class="row">
-										<label for="chart-passsword-input" class="col-sm-3 col-sm-offset-2 control-label">Password</label>
-										<div class="col-sm-6">
-											<input class="form-control" id="chart-passsword-input" placeholder="Password" [(ngModel)]="valueChartPassword" name="valueChartName">
+										<div class="row">
+											<label for="chart-passsword-input" class="col-sm-3 col-sm-offset-2 control-label">Password</label>
+											<div class="col-sm-6">
+												<input class="form-control" id="chart-passsword-input" placeholder="Password" [(ngModel)]="valueChartPassword" name="valueChartName">
+											</div>
 										</div>
-									</div>
-									<div class="row">
-										<div class="col-sm-offset-5 col-sm-7">
-											<button type="submit" class="btn btn-success" (click)="handleModalInputs(valueChartName, valueChartPassword)">Continue</button>
+										<div class="row">
+											<div class="col-sm-offset-5 col-sm-7">
+												<button type="submit" class="btn btn-success" (click)="handleModalInputs(valueChartName, valueChartPassword)">Continue</button>
+											</div>
 										</div>
-									</div>
-									<div class="row">
-										<div [hidden]="!invalidCredentials" class="alert alert-danger">
-											<span class="col-sm-offset-4">Invalid Name or Password</span>
+										<div class="row">
+											<div [hidden]="!invalidCredentials" class="alert alert-danger">
+												<span class="col-sm-offset-4">Invalid Name or Password</span>
+											</div>
 										</div>
-									</div>
+									</form>
 								</div>
 							</div>
 						</div>

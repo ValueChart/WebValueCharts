@@ -109,8 +109,8 @@ describe('View Existing Chart Page', () => {
 
 
 	// Case 3: Successfully viewing an individual ValueChart that you don't own
-	// 		- chartname: testemp
-	// 		- password: t
+	// 		- chartname: ThisIsATestChart
+	// 		- password: temp
 	it('should successfully let users view an individual ValueChart', function() {
 			
 			// Find page elements
@@ -119,19 +119,19 @@ describe('View Existing Chart Page', () => {
 
 			// Fill input keys
 			vcNameField.clear();
-			vcNameField.sendKeys('testemp');
+			vcNameField.sendKeys('ThisIsATestChart');
 			passwordField.clear();
-			passwordField.sendKeys('t');
+			passwordField.sendKeys('temp');
 
 			// Ensure fields contain what is entered
-			expect(vcNameField.getAttribute('value')).to.eventually.equal('testemp');
-			expect(passwordField.getAttribute('value')).to.eventually.equal('t');
+			expect(vcNameField.getAttribute('value')).to.eventually.equal('ThisIsATestChart');
+			expect(passwordField.getAttribute('value')).to.eventually.equal('temp');
 			
 			// Click "Continue" to view value chart "Cities"
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/testemp?password=t');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/individual/ThisIsATestChart?password=temp');
 			});
 
 	});
@@ -155,28 +155,29 @@ describe('View Existing Chart Page', () => {
 				var viewExistDialog = p.browser.element(p.by.cssContainingText('#modal-header', 'View Existing Chart'));
 				p.browser.sleep(1000);
 				expect(viewExistDialog.isDisplayed()).to.eventually.be.true;
-		});
+	
+				// Find page elements
+				var vcNameField = p.browser.element(p.By.id('chart-name-input'));
+				var passwordField = p.browser.element(p.By.id('chart-passsword-input'));
 
-			// Find page elements
-			var vcNameField = p.browser.element(p.By.id('chart-name-input'));
-			var passwordField = p.browser.element(p.By.id('chart-passsword-input'));
+				// Fill input keys
+				vcNameField.clear();
+				vcNameField.sendKeys('Cities');
+				passwordField.clear();
+				passwordField.sendKeys('australia');
 
-			// Fill input keys
-			vcNameField.clear();
-			vcNameField.sendKeys('Cities');
-			passwordField.clear();
-			passwordField.sendKeys('australia');
+				// Ensure fields contain what is entered
+				expect(vcNameField.getAttribute('value')).to.eventually.equal('Cities');
+				expect(passwordField.getAttribute('value')).to.eventually.equal('australia');
+				
+				// Click "Continue" to view value chart "Cities"
+				let continueBtn = p.element.all(p.by.buttonText('Continue'));
+				continueBtn.click().then(function() {
+					p.browser.waitForAngular();
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
+				});	
+			});
 
-			// Ensure fields contain what is entered
-			expect(vcNameField.getAttribute('value')).to.eventually.equal('Cities');
-			expect(passwordField.getAttribute('value')).to.eventually.equal('australia');
-			
-			// Click "Continue" to view value chart "Cities"
-			let continueBtn = p.element.all(p.by.buttonText('Continue'));
-			continueBtn.click().then(function() {
-				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/view/group/Cities?password=australia');
-			});	
 	});
 
 	// The following test cases are to check whether a user can 

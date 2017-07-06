@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-03 21:22:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-13 11:53:39
+* @Last Modified time: 2017-07-04 15:22:41
 */
 
 // Import Libraries and Express Middleware:
@@ -155,6 +155,13 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 				});
 
 				Promise.all(promises).then(() => {
+					vcSummaries.sort((a, b) => {
+						if (a.name < b.name)
+							return -1;
+						else
+							return 1;
+					});
+
 					res.status(200)
 						.location('/Users/' + username + '/OwnedValueCharts')
 						.json({ data: vcSummaries });
@@ -196,6 +203,13 @@ usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: 
 				});
 
 				Promise.all(promises).then(() => {
+					vcSummaries.sort((a, b) => {
+						if (a.name < b.name)
+							return -1;
+						else
+							return 1;
+					});
+
 					res.status(200)
 						.location('/Users/' + username + '/JoinedValueCharts')
 						.json({ data: vcSummaries });

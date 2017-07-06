@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-29 17:48:17
+* @Last Modified time: 2017-07-04 17:16:44
 */
 
 // Import Angular Classes:
@@ -145,11 +145,15 @@ export class HomeComponent {
 		this.valueChartHttpService.getValueChartByName(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
+
 				$('#chart-credentials-modal').modal('hide');
 				if (this.validateChartStructure(valueChart)) {
 					this.valueChartService.setBaseValueChart(valueChart);
 					this.currentUserService.setUserRole(UserRole.Viewer);
-					this.router.navigate(['view', 'group', valueChart.getFName()], { queryParams: { password: valueChart.password } });
+
+					let viewType = valueChart.isIndividual() ? 'individual' : 'group';
+
+					this.router.navigate(['view', viewType, valueChart.getFName()], { queryParams: { password: valueChart.password } });
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -219,7 +223,7 @@ export class HomeComponent {
 						Returns true iff there were no validation errors.
 	*/
 	validateChartStructure(valueChart: ValueChart): boolean {
-		let structuralErrors = this.validationService.validateStructure(this.valueChartService.getBaseValueChart()); 	
+		let structuralErrors = this.validationService.validateStructure(valueChart); 	
 		if (structuralErrors.length > 0) {
 			if (this.valueChartService.currentUserIsCreator()) {
 				this.canFixChart = false;

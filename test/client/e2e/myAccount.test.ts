@@ -19,9 +19,9 @@ describe('My Account Page', () => {
 	it('should login', function() {
 
 		// Find page element
-		var userNameField = p.browser.element(p.By.name('username'));
-		var userPassField = p.browser.element(p.By.name('password'));
-		var userLoginBtn = p.browser.element(p.By.id('login-button'));
+		var userNameField = p.element(p.by.name('username'));
+		var userPassField = p.element(p.by.name('password'));
+		var userLoginBtn = p.element(p.by.id('login-button'));
 
 		// Fill input keys
 		userNameField.sendKeys('vickytry001')
@@ -44,7 +44,7 @@ describe('My Account Page', () => {
 	// Once loggin, click 'myAccount' button to modify account details
 	it('should allow users to go to account managment page', function(){
 		
-		var myAccBtn = p.browser.element(p.By.id('my-account'));
+		var myAccBtn = p.element(p.by.id('my-account'));
 		myAccBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 		});
@@ -58,8 +58,8 @@ describe('My Account Page', () => {
 	it('should successfully change the account\'s email address', function(){
 		
 		// Find page elements
-		var emailField = p.browser.element(p.By.id('email-input'));
-		var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
+		var emailField = p.element(p.by.id('email-input'));
+		var updAccDtlBtn = p.element(p.by.id('createUser-button'));
 
 		p.browser.waitForAngular();
 
@@ -76,7 +76,7 @@ describe('My Account Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
+			var succUpdSpan = p.element(p.by.id('success-message'));
 			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
 		});
 
@@ -92,9 +92,9 @@ describe('My Account Page', () => {
 	it('shouldn\'t update account details because passwords does not match', function(){
 		
 		// find page elements
-		var passwordField = p.browser.element(p.By.id('password-input'));
-		var reEtrPwField = p.browser.element(p.By.id('re-password-input'));
-		var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
+		var passwordField = p.element(p.by.id('password-input'));
+		var reEtrPwField = p.element(p.by.id('re-password-input'));
+		var updAccDtlBtn = p.element(p.by.id('createUser-button'));
 
 		// Fill input keys
 		passwordField.clear();
@@ -111,7 +111,7 @@ describe('My Account Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','The entered passwords do not match'));
+			var succUpdSpan = p.element(p.by.id('fail-message'));
 			expect(succUpdSpan.isDisplayed()).to.eventually.be.true;
 		});
 
@@ -126,9 +126,9 @@ describe('My Account Page', () => {
 	it('should successfully change the account\'s password', function(){
 		
 		// Find page elements
-		var passwordField = p.browser.element(p.By.id('password-input'));
-		var reEtrPwField = p.browser.element(p.By.id('re-password-input'));
-		var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
+		var passwordField = p.element(p.by.id('password-input'));
+		var reEtrPwField = p.element(p.by.id('re-password-input'));
+		var updAccDtlBtn = p.element(p.by.id('createUser-button'));
 
 		// Fill input keys 
 		passwordField.clear();
@@ -144,7 +144,7 @@ describe('My Account Page', () => {
 		updAccDtlBtn.click().then(function() {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/myAccount');
 			// A green field notifying success should be displayed
-			var succUpdSpan = p.browser.element(p.By.cssContainingText('.col-sm-offset-4','Account details successfully updated'));
+			var succUpdSpan = p.element(p.by.id('success-message'));
 			expect(succUpdSpan.isDisplayed()).to.eventually.be.true; // .to.be.true; & .to.equal(true);
 		});
 
@@ -156,7 +156,7 @@ describe('My Account Page', () => {
 	//   - Password: 002
 	it('should successfuly log into the modified account', function(){
 
-		var logoutBtn = p.browser.element(p.By.id('log-out'));
+		var logoutBtn = p.element(p.by.id('log-out'));
 
 		// Click logout button and log out
 		logoutBtn.click().then(function() {
@@ -167,9 +167,9 @@ describe('My Account Page', () => {
 		// Log into the modified account (002)
 
 		// Find page element
-		var userNameField = p.browser.element(p.By.name('username'));
-		var userPassField = p.browser.element(p.By.name('password'));
-		var userLoginBtn = p.browser.element(p.By.id('login-button'));
+		var userNameField = p.element(p.by.name('username'));
+		var userPassField = p.element(p.by.name('password'));
+		var userLoginBtn = p.element(p.by.id('login-button'));
 
 		// Fill input keys
 		userNameField.sendKeys('vickytry001')
@@ -194,14 +194,14 @@ describe('My Account Page', () => {
 	//   - Email; vickytry001@gmail.com
 	//   - Password: 001
 	after(function() {
-		var myAccBtn = p.browser.element(p.By.id('my-account'));
+		var myAccBtn = p.element(p.by.id('my-account'));
 
 		myAccBtn.click().then(() => {
 
-				var passwordField = p.browser.element(p.By.id('password-input'));
-				var reEtrPwField = p.browser.element(p.By.id('re-password-input'));
-				var updAccDtlBtn = p.browser.element(p.By.id('createUser-button'));
-				var emailField = p.browser.element(p.By.id('email-input'));
+				var passwordField = p.element(p.by.id('password-input'));
+				var reEtrPwField = p.element(p.by.id('re-password-input'));
+				var updAccDtlBtn = p.element(p.by.id('createUser-button'));
+				var emailField = p.element(p.by.id('email-input'));
 
 				p.browser.waitForAngular();
 
