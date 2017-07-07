@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 19:55:07
+* @Last Modified time: 2017-07-07 11:11:08
 */
 
 // Import Angular Classes:
@@ -27,7 +27,7 @@ import { ValueChart }										from '../../../../model/ValueChart';
 	template: `
 				<div class="export-value-chart">
 					<a class="btn btn-default" id="download-value-chart"
-						[class.disabled]="!valueChartService.getValueChart()" 
+						[class.disabled]="!valueChartService.valueChartIsDefined()" 
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
 						(click)="downloadValueChart()">
@@ -74,10 +74,8 @@ export class ExportValueChartComponent implements OnInit {
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
-
-		if (valueChart) {
-			return valueChart.getFName() + '.xml';
+		if (this.valueChartService.valueChartIsDefined()) {
+			return this.valueChartService.getValueChart().getFName() + '.xml';
 		} else {
 			return '';
 		}

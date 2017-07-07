@@ -2,11 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 15:55:48
+* @Last Modified time: 2017-07-07 10:58:29
 */
 
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core'
+
+import * as _ 												from 'lodash';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
@@ -46,6 +48,13 @@ export class ValueChartService {
 	}
 
 	getValueChart(): ValueChart {
+		if (_.isNil(this.valueChart))
+			throw 'ValueChart is not defined';
+
 		return this.valueChart;
+	}
+
+	valueChartIsDefined(): boolean {
+		return !_.isNil(this.valueChart);
 	}
 }

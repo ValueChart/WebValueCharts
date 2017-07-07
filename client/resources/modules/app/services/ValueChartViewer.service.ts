@@ -2,16 +2,18 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 13:54:48
+* @Last Modified time: 2017-07-07 11:02:31
 */
 
 
 // Import Angular Classes:
 import { Injectable } 										from '@angular/core';
 
-
 // Import Libraries:
 import * as _												from 'lodash';
+
+// Import Application Classes:
+import { ValueChartService }								from './ValueChart.service';
 
 // Import Model Classes:
 import { User }												from '../../../model/User';
@@ -27,7 +29,6 @@ export class ValueChartViewerService {
 	// 									Fields
 	// ========================================================================================
 
-	private baseValueChart: ValueChart;
 	private activeValueChart: ValueChart;
 
 	private usersToDisplay: User[]; // Users to display in the chart
@@ -43,7 +44,7 @@ export class ValueChartViewerService {
 		@returns {void}
 		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor()	{ }
+	constructor(private valueChartService: ValueChartService)	{ }
 
 	// ========================================================================================
 	// 									Methods
@@ -52,11 +53,11 @@ export class ValueChartViewerService {
 	// ====================== Methods for Managing Current User Role  ======================
 
 	userIsCreator(username: string): boolean {
-		return username === this.baseValueChart.getCreator();
+		return username === this.valueChartService.getValueChart().getCreator();
 	}
 
 	userIsMember(username: string): boolean {
-		return !_.isNil(this.baseValueChart.getUser(username));
+		return !_.isNil(this.valueChartService.getValueChart().getUser(username));
 	}
 
 	setUserRole(role: UserRole) {
@@ -81,15 +82,10 @@ export class ValueChartViewerService {
 		this.activeValueChart = valueChart;
 	}
 
-	setBaseValueChart(valueChart: ValueChart): void {
-		this.baseValueChart = valueChart;
-	}
-
-	getBaseValueChart(): ValueChart {
-		return this.baseValueChart;
-	}
-
 	getActiveValueChart(): ValueChart {
+		if (_.isNil(this.activeValueChart))
+			throw 'ValueChart is not defined';
+
 		return this.activeValueChart;
 	}
 
@@ -119,7 +115,7 @@ export class ValueChartViewerService {
 		}
 
 		let indices: any = {};
-		this.baseValueChart.getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
+		this.valueChartService.getValueChart().getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
 
 		this.usersToDisplay.sort((a: User, b: User) => {
 			return indices[a.getUsername()] < indices[b.getUsername()] ? -1 : 1;

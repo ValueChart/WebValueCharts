@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 21:37:46
+* @Last Modified time: 2017-07-07 11:09:56
 */
 
 // Import Angular Classes:
@@ -182,10 +182,8 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	getValueChartName(): string {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
-
-		if (valueChart) {
-			return valueChart.getFName() + 'UserWeights.csv';
+		if (this.valueChartService.valueChartIsDefined()) {
+			return this.valueChartService.getValueChart().getFName() + 'UserWeights.csv';
 		} else {
 			return '';
 		}

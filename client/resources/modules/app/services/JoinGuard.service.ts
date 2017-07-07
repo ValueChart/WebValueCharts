@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-10 14:54:26
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 22:05:06
+* @Last Modified time: 2017-07-07 10:48:16
 */
 
 // Import Angular Classes:
@@ -72,18 +72,6 @@ export class JoinGuardService implements CanActivate {
 						resolve(false);	
 					});
 
-			} else if (state.url.indexOf('view') !== -1 && !this.valueChartService.getValueChart()) {
-
-				// Retrieve the ValueChart ID from the URL router parameters.
-				var name: string = route.params['ValueChart'];
-				// Retrieve the ValueChart password from the URL query parameters.
-				var password: string = (<any> route.queryParams).password;
-
-				this.valueChartHttpService.getValueChartByName(name, password)
-					.subscribe(valueChart => {
-						this.valueChartService.setValueChart(valueChart)
-						resolve(true);
-					});
 			} else {
 				resolve(true);
 			}

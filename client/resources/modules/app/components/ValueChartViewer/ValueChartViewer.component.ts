@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 22:24:29
+* @Last Modified time: 2017-07-07 11:45:39
 */
 
 // Import Angular Classes:
@@ -72,7 +72,6 @@ export class ValueChartViewerComponent implements OnInit {
 	public UserRole = UserRole;
 
 	public routeSubscription: Subscription;
-	public viewType: ChartType;
 
 	public valueChartWidth: number;
 	public valueChartHeight: number;
@@ -147,22 +146,15 @@ export class ValueChartViewerComponent implements OnInit {
 				
 				this.valueChartViewerService.setUserRole(role);
 
-				if (this.valueChartService.getValueChart() === undefined) {
-						this.valueChartHttpService.getValueChartByName(fname, password)
-							.subscribe(valueChart => {
-								this.valueChartViewerService.setBaseValueChart(valueChart);
-								this.initializeView(type);
-								this.loading = false;
-							});
-				} else {
-					this.valueChartViewerService.setBaseValueChart(this.valueChartService.getValueChart());
-					this.initializeView(type);
-					this.loading = false;
+				if (this.loading) {
+					this.initializeValueChart(fname, password, type);
 				}
 
 				this.valueChartHttpService.getValueChartStatus(fname)
 					.subscribe(status => this.valueChartStatus = status);
 			});
+
+		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType']) });
 
 		this.resizeValueChart();
 		$(window).resize((eventObjective: Event) => {
@@ -170,8 +162,22 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 	}
 
+	initializeValueChart(fname: string, password: string, type: ChartType): void {
+		if (!this.valueChartService.valueChartIsDefined()) {
+			this.valueChartHttpService.getValueChartByName(fname, password)
+				.subscribe(valueChart => {
+					this.valueChartService.setValueChart(valueChart);
+					this.initializeView(type);
+					this.loading = false;
+				});
+		} else {
+			this.initializeView(type);
+			this.loading = false;
+		}
+	}
+
 	initializeView(type: ChartType): void {
-		let valueChart = this.valueChartViewerService.getBaseValueChart();
+		let valueChart = this.valueChartService.getValueChart();
 
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
 		this.usersToDisplay = _.clone(valueChart.getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
@@ -183,19 +189,17 @@ export class ValueChartViewerComponent implements OnInit {
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 			$('#validate-modal').modal('show');
 		}
-		this.setTypeToView(type);
+		this.setValueChartTypeToView(type);
 		this.hostValueChart();
 	}
 
-	setTypeToView(type: ChartType) {
-		this.viewType = type;
+	setValueChartTypeToView(type: ChartType) {
+		if (type == ChartType.Individual) {
 
-		if (this.viewType == ChartType.Individual) {
-
-			if (this.valueChartViewerService.getBaseValueChart().getType() == ChartType.Individual) {
-				this.valueChartViewerService.setActiveValueChart(this.valueChartViewerService.getBaseValueChart());
+			if (this.valueChartService.getValueChart().getType() == ChartType.Individual) {
+				this.valueChartViewerService.setActiveValueChart(this.valueChartService.getValueChart());
 			} else {
-				let individualChart = _.clone(this.valueChartViewerService.getBaseValueChart());
+				let individualChart = _.clone(this.valueChartService.getValueChart());
 				individualChart.setType(ChartType.Individual);
 				individualChart.setUsers([individualChart.getUser(this.currentUserService.getUsername())]);
 				this.valueChartViewerService.setActiveValueChart(individualChart);
@@ -204,7 +208,7 @@ export class ValueChartViewerComponent implements OnInit {
 			// TODO:<aaron> Clean this up.
 			this.usersToDisplay = this.valueChartViewerService.getActiveValueChart().getUsers();
 		} else {
-			this.valueChartViewerService.setActiveValueChart(this.valueChartViewerService.getBaseValueChart());
+			this.valueChartViewerService.setActiveValueChart(this.valueChartService.getValueChart());
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 
@@ -270,7 +274,7 @@ export class ValueChartViewerComponent implements OnInit {
 	enableGroupChartView() {
 		return this.valueChartViewerService.isParticipant() 
 			&& (this.valueChartViewerService.getUserRole() !== UserRole.UnsavedParticipant) 
-			&& (this.valueChartViewerService.getBaseValueChart().getType() === ChartType.Group) 
+			&& (this.valueChartService.getValueChart().getType() === ChartType.Group) 
 			&& this.valueChartViewerService.userIsMember(this.currentUserService.getUsername());
 	}
 
@@ -314,16 +318,14 @@ export class ValueChartViewerComponent implements OnInit {
     				(2) Normalize the user's weights in case the pump tool was used
     				(3) Redirect to edit preference workflow
   */
-  	editPreferences(): void {
-		this.setTypeToView(ChartType.Individual);
-		
+  	editPreferences(): void {		
 		if (!this.valueChartViewerService.isOwner()) {
 			this.valueChartHttpService.getValueChartStructure(this.valueChartViewerService.getActiveValueChart().getFName(), this.valueChartViewerService.getActiveValueChart().password)
 			.subscribe(valueChart => {
 				// Only apply changes if chart is valid
 				if (this.validationService.validateStructure(valueChart).length === 0) {
-					valueChart.setUsers(this.valueChartViewerService.getBaseValueChart().getUsers());
-					this.valueChartViewerService.setBaseValueChart(valueChart);
+					valueChart.setUsers(this.valueChartService.getValueChart().getUsers());
+					this.valueChartService.setValueChart(valueChart);
 					this.updateObjReferencesService.cleanUpPreferences(valueChart, this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()), true);
 				}
 				this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
@@ -365,7 +367,7 @@ export class ValueChartViewerComponent implements OnInit {
 			newStructure.setUsers([]);
 			newStructure.setType(ChartType.Individual);
 
-			let currentStructure = _.clone(this.valueChartViewerService.getBaseValueChart());
+			let currentStructure = _.clone(this.valueChartService.getValueChart());
 			currentStructure.setUsers([]);
 			currentStructure.setType(ChartType.Individual);
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 22:12:38
+* @Last Modified time: 2017-07-07 10:48:23
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -50,7 +50,7 @@ const routes: Routes = [
 	{ path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
-	{ path: 'ValueCharts/:ValueChart/:ChartType', component: ValueChartViewerComponent, canActivate: [AuthGuardService, JoinGuardService] },
+	{ path: 'ValueCharts/:ValueChart/:ChartType', component: ValueChartViewerComponent, canActivate: [AuthGuardService] },
 	{ path: 'scoreFunction/:ViewType', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register.
 	{ path: '**', redirectTo: '/register'}
