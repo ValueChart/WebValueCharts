@@ -2,18 +2,23 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 21:20:00
+* @Last Modified time: 2017-07-07 15:53:42
 */
 
 // Import Angular Classes:
 import { Injectable }    										from '@angular/core';
-import { CanDeactivate, CanActivate }						  	from '@angular/router';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } 			from '@angular/router';
+import { CanDeactivate, CanActivate, NavigationStart }			from '@angular/router';
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } 	from '@angular/router';
 import { Observable }    										from 'rxjs/Observable';
+import '../../utilities/rxjs-operators';
+
 
 // Import Application Classes:
 import { CreateValueChartComponent } 							from '../components/CreateValueChart/CreateValueChart.component';
 import { CreationStepsService }									from './CreationSteps.service';
+
+// Import Types
+import { CreatePurpose }										from '../../../types/CreatePurpose';
 
 /*
 	CreationGuardService is an Angular service that is used to control navigation away from the '/create/:purpose' route.
@@ -66,7 +71,18 @@ import { CreationStepsService }									from './CreationSteps.service';
 @Injectable()
 export class CreationGuardService implements CanDeactivate<CreateValueChartComponent>, CanActivate {
 	
-	constructor(private creationStepsService: CreationStepsService) {}
+	private destination: string;
+
+	constructor(
+		private router: Router,
+		private creationStepsService: CreationStepsService) {
+
+		// Record the navigation destination from the NavigationState event.
+		this.router
+		    .events
+		    .filter(e => e instanceof NavigationStart)
+		    .subscribe((e: NavigationStart) => this.destination = e.url)
+	}
 
 	// ========================================================================================
 	// 									Methods
@@ -79,33 +95,21 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
 						to the Angular 2 router.
 	*/
-	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-		// Determine the destination based on whether (<any> window).destination is set.
-		var destination: string = (<any> window).destination ? (<any> window).destination : window.location.pathname;
+	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 
-		// Allow navigation away from component if:
-		//	(1) allowedToNavigate is true
-		//	(2) the destination is ValueChartViewer
-		//	(3) 'purpose' is anything other than newChart (no need to prompt if user is editing or joining)
-		if (component.allowedToNavigate || destination.indexOf('/view/') !== -1 
-			|| window.location.pathname.indexOf('/create/0') === -1) {
-			return true;
-		}		
-		else {
-			var observable = component.openNavigationModal();
-			// Register a subscriber that will be called when the user makes a selection.
-			observable.subscribe((navigate: boolean) => {
-				if (navigate) {
-					// Set the allowed to navigate flag.
-					component.allowedToNavigate = true;
-					component.router.navigate([destination]);
-				} else {
-					history.forward();	// The user does NOT want to navigate. Fix the URL and browser history by navigating forward.
-				}
-			
-				(<any> window).destination = undefined;	// window.destination must be reset regardless of whether the user chooses to navigate or not.
-			});
-			return false; // Cancel navigation by default and wait for the user response.
+
+
+		let purpose: CreatePurpose = parseInt(route.params['purpose']);
+
+		// Immediately allow navigation away from component if:
+		//	(1) The CreatePurpose is not NewValueChart;
+		//	(2) the destination is the ValueChartViewer;
+		if ( this.destination.indexOf('ValueCharts') !== -1 // We are going to the ValueChart Viewer
+			|| purpose !== CreatePurpose.NewValueChart) {	// We were not creating a new ValueChart
+			return Observable.from([true]);
+		} else {
+			// Otherwise, open the navigation model and ask the user for instructions.
+			return component.openNavigationModal();
 		}	
 	}
 

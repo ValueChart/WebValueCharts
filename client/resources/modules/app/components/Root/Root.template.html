@@ -3,7 +3,7 @@
 		<div class="navbar navbar-default navbar-fixed-top">
 			<div class="container-fluid">
 				<div class="navbar-header col-xs-2">
-					<a class="navbar-brand" (click)="window.destination='/home'" [routerLink]="['/home']">ValueCharts</a>
+					<a class="navbar-brand" [routerLink]="['/home']">ValueCharts</a>
 				</div>
 				<ul class="nav pull-right col-xs-10">
 					<form class="form-inline center-form pull-right">
@@ -13,13 +13,13 @@
 							</a>
 						</div>
 						<div class="form-group navbar-group" *ngIf="currentUserService.isLoggedIn()">
-							<a class="btn btn-default" (click)="window.destination='/myValueCharts'" [routerLink]="['/myValueCharts']" id="my-valuecharts-button">
+							<a class="btn btn-default" [routerLink]="['/myValueCharts']" id="my-valuecharts-button">
 								My ValueCharts
 							</a>
 						</div>
 											
 						<div class="form-group navbar-group" *ngIf="currentUserService.isLoggedIn()">
-							<a class="btn btn-default" (click)="window.destination='/myAccount'" [routerLink]="['/myAccount']" id="my-account">
+							<a class="btn btn-default" [routerLink]="['/myAccount']" id="my-account">
 								My Account
 							</a>
 						</div>
