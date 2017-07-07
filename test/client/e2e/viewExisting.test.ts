@@ -131,7 +131,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {	
 				p.browser.waitForAngular();
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/ThisIsATestChart/0/0?password=temp');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/ThisIsATestChart/0?password=temp&role=0');
 			});
 
 	});
@@ -174,7 +174,7 @@ describe('View Existing Chart Page', () => {
 				let continueBtn = p.element.all(p.by.buttonText('Continue'));
 				continueBtn.click().then(function() {
 					p.browser.waitForAngular();
-					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1/0?password=australia');
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1/?password=australia&role=0');
 					
 					// Why are we expecting the invalid users dialog to appear?
 
@@ -282,7 +282,7 @@ describe('View Existing Chart Page', () => {
 			let continueBtn = p.element.all(p.by.buttonText('Continue'));
 			continueBtn.click().then(function() {
 				p.browser.waitForAngular();	
-				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/StudyArea/1/0?password=study');
+				expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/StudyArea/1?password=study&role=0');
 			});
 
 			// Check if the editing-related buttons are present or not

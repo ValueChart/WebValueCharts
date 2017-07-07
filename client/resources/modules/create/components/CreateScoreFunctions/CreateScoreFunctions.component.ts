@@ -6,11 +6,11 @@ import { Subscriber }                               from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
-import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
-import { ValueChartService }										  	from '../../../app/services/ValueChart.service';
+import { ValueChartService }                  from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
 import { UpdateObjectiveReferencesService }         from '../../services/UpdateObjectiveReferences.service';
+import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
+import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
  
@@ -122,7 +122,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
     // Initialize/repair score functions
-    this.updateObjReferencesService.completeScoreFunctions(this.user, true);
+    this.updateObjReferencesService.completeScoreFunctions(this.valueChartService.getValueChart(), this.user, true);
 
     // Initialize best/worst outcomes
     this.initialBestOutcomes = {};
@@ -181,7 +181,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
                    (Currently called when user selects a new default from the dropdown or clicks 'Reset').
   */
   resetScoreFunction() {
-    let obj: PrimitiveObjective = <PrimitiveObjective>this.valueChartService.getObjectiveByName(this.selectedObjective);
+    let obj: PrimitiveObjective = <PrimitiveObjective>this.getObjectiveByName(this.selectedObjective);
     this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective).initialize(obj,this.latestDefaults[this.selectedObjective]);
   }
 
@@ -206,5 +206,14 @@ export class CreateScoreFunctionsComponent implements OnInit {
     if (this.validationTriggered) {
       this.errorMessages = this.validationService.validateScoreFunctions(this.valueChartService.getValueChart(), this.user);
     }
+  }
+
+  public getObjectiveByName(name: string): Objective {
+    for (let obj of this.valueChartService.getValueChart().getAllObjectives()) {
+      if (obj.getName() === name) {
+        return obj;
+      }
+    }
+    throw "Objective not found";
   }
 }

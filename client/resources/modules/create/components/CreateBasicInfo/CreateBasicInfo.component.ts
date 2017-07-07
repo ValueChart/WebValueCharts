@@ -7,9 +7,9 @@ import * as _																from 'lodash';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }												from '../../../app/services/ValueChart.service';
-import { CurrentUserService }												from '../../../app/services/CurrentUser.service';
+import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
+import { CurrentUserService }												from '../../../app/services/CurrentUser.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
 import { ValidationService }												from '../../../app/services/Validation.service';
 

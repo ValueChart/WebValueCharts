@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 13:50:29
+* @Last Modified time: 2017-07-06 22:24:29
 */
 
 // Import Angular Classes:
@@ -44,6 +44,7 @@ import { PrimitiveObjective } 													from '../../../../model/PrimitiveObje
 import { ViewConfig, InteractionConfig }										from '../../../../types/Config.types';
 import { ScoreFunctionRecord }													from '../../../../types/Record.types';
 import { UserRole }																from '../../../../types/UserRole'
+import { CreatePurpose }														from '../../../../types/CreatePurpose'
 
 /*
 	This class is responsible for displaying a ValueChart visualization. It uses the ValueChartDirective to create and render a ValueChart, and
@@ -138,7 +139,7 @@ export class ValueChartViewerComponent implements OnInit {
 				// Retrieve the ValueChart type from the URL route parameters. 			
 				let type: ChartType = Number.parseInt(urlParameters.params['ChartType']);
 				// Retrieve the ValueChart type from the URL route parameters. 			
-				let role: UserRole = Number.parseInt(urlParameters.params['UserRole']);
+				let role: UserRole = Number.parseInt(urlParameters.queryParams['role']);
 				// Retrieve the ValueChart name from the URL route parameters.
 				let fname: string = urlParameters.params['ValueChart'];
 				// Retrieve the ValueChart password from the URL query parameters.
@@ -207,7 +208,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 
-		this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type, this.valueChartViewerService.getUserRole()], { queryParamsHandling: "merge" });
+		this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
 	}
 
 	updateView(viewConfig: ViewConfig) {
@@ -323,20 +324,20 @@ export class ValueChartViewerComponent implements OnInit {
 				if (this.validationService.validateStructure(valueChart).length === 0) {
 					valueChart.setUsers(this.valueChartViewerService.getBaseValueChart().getUsers());
 					this.valueChartViewerService.setBaseValueChart(valueChart);
-					this.updateObjReferencesService.cleanUpPreferences(this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()), true);
+					this.updateObjReferencesService.cleanUpPreferences(valueChart, this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()), true);
 				}
 				this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
-				this.router.navigate(['create', 'editPreferences', this.valueChartViewerService.getUserRole(), 'ScoreFunctions']);
+				this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
 			});
 		}
 		else {
 			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
-			this.router.navigate(['create', 'editPreferences', this.valueChartViewerService.getUserRole(), 'ScoreFunctions']);
+			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
 		}	
   	}
 
   	editValueChart(): void {
-  		this.router.navigate(['create', 'editChart', this.valueChartViewerService.getUserRole(), 'BasicInfo']);
+  		this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: this.valueChartViewerService.getUserRole() } });
   	}
 
 	// ================================ Hosting/Joining/Saving a ValueChart ====================================

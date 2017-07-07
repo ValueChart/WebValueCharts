@@ -6,10 +6,10 @@ import { Subscriber }     												from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }											from '../../../app/services/ValueChart.service';
-import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
-import { CreationStepsService }											from '../../services/CreationSteps.service';
+import { ValueChartService }										from '../../../app/services/ValueChart.service';
 import { UpdateObjectiveReferencesService }								from '../../services/UpdateObjectiveReferences.service';
+import { CreationStepsService }											from '../../services/CreationSteps.service';
+import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
@@ -140,10 +140,10 @@ export class CreateObjectivesComponent implements OnInit {
 		// Convert temporary structures to ValueChart structures
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 		if (this.editing) {
-			this.updateObjRefService.cleanUpAlternatives();
+			this.updateObjRefService.cleanUpAlternatives(this.valueChart);
 			for (let user of this.valueChart.getUsers()) {
 				let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
-				this.updateObjRefService.cleanUpPreferences(user, showWarnings);
+				this.updateObjRefService.cleanUpPreferences(this.valueChart, user, showWarnings);
 			}	
 		}
 	}						

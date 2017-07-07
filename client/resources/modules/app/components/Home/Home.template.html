@@ -3,7 +3,7 @@
 		<div class="flex-row column-container col-xs-12">
 			<form class="form-inline flex-row column-container">
 				<div class="form-group">
-					<a class="btn btn-success btn-lg" [routerLink]="['/create/newChart/3/BasicInfo']" id="createValueChart">
+					<a class="btn btn-success btn-lg" (click)="createValueChart()" id="createValueChart">
 						Create a ValueChart
 					</a>
 					<a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">

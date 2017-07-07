@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 17:13:00
+* @Last Modified time: 2017-07-06 17:28:27
 */
 
 // Import Libraries and Express Middleware:
@@ -135,7 +135,6 @@ valueChartRoutes.put('/:chart', function(req: express.Request, res: express.Resp
 				}
 			});
 		} else {
-
 			valueChartsCollection.insert(req.body, function(err: Error, doc: any) {
 				if (err) {
 					res.status(400)

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:19:57
+* @Last Modified time: 2017-07-06 21:20:00
 */
 
 // Import Angular Classes:
@@ -88,7 +88,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		//	(2) the destination is ValueChartViewer
 		//	(3) 'purpose' is anything other than newChart (no need to prompt if user is editing or joining)
 		if (component.allowedToNavigate || destination.indexOf('/view/') !== -1 
-			|| window.location.pathname.indexOf('/create/newChart') === -1) {
+			|| window.location.pathname.indexOf('/create/0') === -1) {
 			return true;
 		}		
 		else {

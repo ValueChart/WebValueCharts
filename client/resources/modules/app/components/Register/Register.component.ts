@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 09:56:10
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:35:58
+* @Last Modified time: 2017-07-06 21:27:16
 */
 
 // Import Angular Classes:
@@ -13,7 +13,9 @@ import { Router, NavigationExtras }							from '@angular/router';
 import { CurrentUserService }								from '../../services/CurrentUser.service';
 import { UserHttpService }									from '../../services/UserHttp.service';
 
+// Import Types
 import { UserRole }											from '../../../../types/UserRole'
+import { CreatePurpose }									from '../../../../types/CreatePurpose'
 
 
 
@@ -121,25 +123,15 @@ export class RegisterComponent {
 		this.setUsername(username);
 	}
 
-	getRedirectRoute(): any[] {
-		// If the user is joining a chart, then navigate to createValueChart
-		if (document.location.href.indexOf('newUser') !== -1) {
-			return ['create', 'newUser', UserRole.UnsavedParticipant, 'ScoreFunctions'];
-		} else {	// Else, navigate to the create page as normal
-			return ['home'];
-		}
-	}
-
 	setUsername(username: string): void {
-		let navigationExtras: NavigationExtras = {
-			queryParamsHandling: "merge",
-			preserveFragment: true
-		};
 
 		this.currentUserService.setUsername(username);
 
-		this.router.navigate(this.getRedirectRoute(), navigationExtras);
+		// If the user is joining a chart, then navigate to createValueChart
+		if (document.location.href.indexOf('newUser') !== -1) {
+			this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
+		} else {	// Else, navigate to the create page as normal
+			this.router.navigate(['home']);
+		}
 	}
-
-
 }

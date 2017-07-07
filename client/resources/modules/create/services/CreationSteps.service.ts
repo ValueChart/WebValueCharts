@@ -8,7 +8,9 @@ import '../../utilities/rxjs-operators';
 import { ValueChartService }					from '../../app/services/ValueChart.service';
 import { ValidationService }					from '../../app/services/Validation.service';
 
+// Import Types
 import { UserRole }								from '../../../types/UserRole';
+import { CreatePurpose }						from '../../../types/CreatePurpose';
 
 /*
 	This class defines the names and orders of steps in the Creation workflow and the transitions between them.
@@ -50,6 +52,7 @@ export class CreationStepsService {
 
 	step: string = ""; // The current step that CreateValueCharts is on.
 
+	private purpose: CreatePurpose;
 
 	// ========================================================================================
 	// 									Constructor
@@ -84,18 +87,26 @@ export class CreationStepsService {
 		@returns {void}
 		@description 	Navigates to the component for the next step and returns the next step.
 	*/
-	next(purpose: string, role: UserRole) {
+	next(purpose: CreatePurpose) {
 		this.step = this.nextStep[this.step];
-		this.router.navigate(['create/', purpose, role, this.step]);
+		this.router.navigate(['create', purpose, this.step], { queryParamsHandling: 'merge' });
 	}
 
 	/* 	
 		@returns {void}
 		@description 	Navigates to the component for the previous step and returns the previous step.
 	*/
-	previous(purpose: string, role: UserRole) {
+	previous(purpose: CreatePurpose) {
 		this.step = this.previousStep[this.step];
-		this.router.navigate(['create/', purpose, role, this.step]);
+		this.router.navigate(['create', purpose, this.step], { queryParamsHandling: 'merge' });
+	}
+
+	getCreationPurpose(): CreatePurpose {
+		return this.purpose;
+	}
+
+	setCreationPurpose(purpose: CreatePurpose): void {
+		this.purpose = purpose;
 	}
 
 	/* 	

@@ -21,13 +21,13 @@
                 </select>
                 <button type="button" class="btn btn-default" [disabled]="!latestDefaults[selectedObjective]" (click)="resetScoreFunction()">Reset</button>
             </div>
-            <body id="objective-description">{{valueChartService.getObjectiveByName(selectedObjective).getDescription()}}</body>
+            <body id="objective-description">{{getObjectiveByName(selectedObjective).getDescription()}}</body>
         </div> 
         <div class="col-xs-offset-3">
             <ScoreFunction 
                 [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(selectedObjective)]"
                 [colors]="[user.color]"
-                [objective]="valueChartService.getObjectiveByName(selectedObjective)"
+                [objective]="getObjectiveByName(selectedObjective)"
                 [width]="440"
                 [height]="300"
                 [viewOrientation]="ChartOrientation.Vertical"

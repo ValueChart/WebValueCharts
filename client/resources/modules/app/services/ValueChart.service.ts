@@ -2,29 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 13:51:20
+* @Last Modified time: 2017-07-06 15:55:48
 */
 
 // Import Angular Classes:
-import { Injectable } 										from '@angular/core';
-
-// Import Libraries:	
-import * as _ 												from 'lodash';
+import { Injectable } 										from '@angular/core'
 
 // Import Model Classes:
-import { ValueChart, ChartType }							from '../../../model/ValueChart';
-import { Objective }										from '../../../model/Objective';
-import { AbstractObjective }								from '../../../model/AbstractObjective';
-import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
-import { User }												from '../../../model/User';
-import { Alternative }										from '../../../model/Alternative';
-import { WeightMap }										from '../../../model/WeightMap';
-import { ScoreFunctionMap }									from '../../../model/ScoreFunctionMap';
-import { ScoreFunction }									from '../../../model/ScoreFunction';
-import { DiscreteScoreFunction }							from '../../../model/DiscreteScoreFunction';
-import { ContinuousScoreFunction }							from '../../../model/ContinuousScoreFunction';
-import { CategoricalDomain }								from '../../../model/CategoricalDomain';
-import { ContinuousDomain }									from '../../../model/ContinuousDomain';
+import { ValueChart }										from '../../../model/ValueChart';
 
 /*
 	This class stores a ValueChart and exposes this state to any component, directive, or service in the application
@@ -62,14 +47,5 @@ export class ValueChartService {
 
 	getValueChart(): ValueChart {
 		return this.valueChart;
-	}
-
-	getObjectiveByName(name: string): Objective {
-		for (let obj of this.valueChart.getAllObjectives()) {
-			if (obj.getName() === name) {
-				return obj;
-			}
-		}
-		throw "Objective not found";
 	}
 }

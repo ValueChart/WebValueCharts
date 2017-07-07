@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 14:57:27
+* @Last Modified time: 2017-07-06 21:42:04
 */
 
 // Import Angular Classes:
@@ -22,7 +22,9 @@ import { ValueChart, ChartType }						from '../../../../model/ValueChart';
 // Import Utility Classes:
 import * as Formatter									from '../../../utilities/classes/Formatter';
 
+// Import Types
 import { UserRole }										from '../../../../types/UserRole'
+import { CreatePurpose }								from '../../../../types/CreatePurpose'
 
 
 // Import Sample Data:
@@ -44,6 +46,9 @@ export class HomeComponent {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
+
+	public UserRole = UserRole;
+	public CreatePurpose = CreatePurpose;
 
 	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Runoff Management', type: 'Individual' }]
 
@@ -117,6 +122,7 @@ export class HomeComponent {
 						name and password.
 	*/
 	joinValueChart(chartName: string, chartPassword: string): void {
+		
 		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
@@ -126,7 +132,7 @@ export class HomeComponent {
 				}
 				else {
 					this.valueChartService.setValueChart(valueChart);	
-					this.router.navigate(['create', 'newUser', UserRole.UnsavedParticipant, 'ScoreFunctions']);
+					this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -152,7 +158,7 @@ export class HomeComponent {
 				if (this.validateChartStructure(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);
 
-					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), UserRole.Viewer], { queryParams: { password: valueChart.password } });
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Viewer } });
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
@@ -160,6 +166,10 @@ export class HomeComponent {
 				if (error === '404 - Not Found')
 					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
 			});
+	}
+
+	createValueChart(): void {
+		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: CreatePurpose.NewValueChart }});
 	}
 
 	/*
@@ -171,7 +181,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		let valueChart = this.valueChartParser.parseValueChart(demoChart.xmlString);
 		this.valueChartService.setValueChart(valueChart);
-		this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), UserRole.Participant], { queryParams: { password: valueChart.password } });
+		this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Participant } });
 	}
 
 	/*
@@ -202,7 +212,7 @@ export class HomeComponent {
 
 					// Navigate to the ValueChartViewerComponent to display the ValueChart.
 					this.saveValueChartToDatabase(valueChart);
-					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), role], { queryParams: { password: valueChart.password } });
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: role } });
 				}		
 			}
 		};
@@ -240,7 +250,7 @@ export class HomeComponent {
 		@description 	Called in response to click of "Yes" button in validation error modal.
 	*/
 	fixChart() {
-		this.router.navigate(['create', 'editChart', UserRole.Owner, 'BasicInfo']);
+		this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 	}
 
 	/* 	

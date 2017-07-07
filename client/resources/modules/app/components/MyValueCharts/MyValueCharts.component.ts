@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 14:05:56
+* @Last Modified time: 2017-07-06 21:37:46
 */
 
 // Import Angular Classes:
@@ -22,7 +22,11 @@ import * as Formatter									from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../../model/ValueChart';
+
+// Import Types
 import { UserRole }										from '../../../../types/UserRole'
+import { CreatePurpose }								from '../../../../types/CreatePurpose'
+
 
 /*
 	This component implements the My ValueChart's page. The my ValueChart page is where an authenticated user can view and manage the 
@@ -121,7 +125,7 @@ export class MyValueChartsComponent implements OnInit {
 				else {
 					this.valueChartService.setValueChart(valueChart);
 					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.OwnerAndParticipant : UserRole.Owner;
-					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType(), role], { queryParams: { password: valueChart.password } });
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: role } });
 				}	
 			});
 	}
@@ -133,7 +137,7 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 
-				this.router.navigate(['create', 'editChart', UserRole.Owner, 'BasicInfo']);
+				this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 			});
 	}
 
@@ -142,7 +146,7 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
 
-				this.router.navigate(['create', 'editPreferences', UserRole.Participant, 'ScoreFunctions']);
+				this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
 			});
 	}
 
