@@ -174,7 +174,7 @@ describe('View Existing Chart Page', () => {
 				let continueBtn = p.element.all(p.by.buttonText('Continue'));
 				continueBtn.click().then(function() {
 					p.browser.waitForAngular();
-					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1/?password=australia&role=0');
+					expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/ValueCharts/Cities/1?password=australia&role=0');
 					
 					// Why are we expecting the invalid users dialog to appear?
 
