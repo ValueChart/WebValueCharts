@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
-* @Last Modified by:   vw511
-* @Last Modified time: 2017-07-06 11:02:17
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2017-07-07 17:14:19
 */
 
 // Import gulp packages:
@@ -79,7 +79,7 @@ unit = function(done) {
 
 // Execute protractor end-to-end tests.
 e2e = function() {
-	return gulp.src(["test/client/e2e/viewExisting.test.js"])
+	return gulp.src(["test/client/e2e/**/*.js"])
 	    .pipe(protractor({
 	        configFile: "protractor.conf.js"
 	    }))
