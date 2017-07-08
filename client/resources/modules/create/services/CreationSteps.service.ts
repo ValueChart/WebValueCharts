@@ -7,6 +7,7 @@ import '../../utilities/rxjs-operators';
 // ImportApplication Classes:
 import { ValueChartService }					from '../../app/services/ValueChart.service';
 import { ValidationService }					from '../../app/services/Validation.service';
+import { ValueChartHttpService }				from '../../app/services/ValueChartHttp.service';
 
 // Import Types
 import { UserRole }								from '../../../types/UserRole';
@@ -35,22 +36,14 @@ export class CreationStepsService {
 																// These are set by each step's component during ngInit.
 																// This enables the parent component (CreateValueChart)
 																// to trigger validation in its children and observe the result.
-	nameChanged: Observable<boolean>; // This is set by the CreateBasicInfo component.
+	nameChanged: Function; // This is set by the CreateBasicInfo component.
 									  // It enables the parent component (CreateValueChart)
 									  // to check whether or not the name has been changed,
 									  // so it can check or not check for uniqueness accordingly.
 
-	goBack: Observable<void>;    // This is set by the CreateValueChart component.
-								 // It allows CreationGuard to trigger call to "back()" in CreateValueChart.
-
-	goNext: Observable<void>;  	 // This is set by the CreateValueChart component.
-								 // It allows CreationGuard to trigger call to "next()" in CreateValueChart.
-
-	allowedToNavigateInternally: boolean = false; // This is set by CreateValueChart indicating that navigation was triggered
-												  // by a component method.
-												  // This allows CreationGuard to intercept navigation triggered by browser buttons.
-
 	step: string = ""; // The current step that CreateValueCharts is on.
+
+	autoSaveValueChart: any;
 
 	private purpose: CreatePurpose;
 
@@ -64,7 +57,8 @@ export class CreationStepsService {
 	*/
 	constructor(private router: Router, 
 		private valueChartService: ValueChartService, 
-		private validationService: ValidationService) {
+		private validationService: ValidationService,
+		private valueChartHttpService: ValueChartHttpService) {
 
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
 		this.nextStep[this.OBJECTIVES] = this.ALTERNATIVES;
@@ -122,16 +116,7 @@ export class CreationStepsService {
         return valid;
 	}
 
-	/* 	
-		@returns {boolean}
-		@description 	Subscribes to the Observable nameChanged, which triggers check for name change in CreateBasicInfo.
-						Returns true iff the name has been changed.
-	*/
-	checkNameChanged(): boolean {
-		let changed: boolean;
-		this.nameChanged.subscribe(hasChanged => {
-			changed = hasChanged;
-		});
-        return changed;
+	isNameAvailable(): Observable<boolean> {
+		return this.valueChartHttpService.isNameAvailable(this.valueChartService.getValueChart().getFName());
 	}
 }

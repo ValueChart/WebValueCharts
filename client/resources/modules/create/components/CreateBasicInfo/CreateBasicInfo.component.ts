@@ -74,10 +74,7 @@ export class CreateBasicInfoComponent implements OnInit {
             subscriber.next(this.validate());
             subscriber.complete();
         });
-        this.creationStepsService.nameChanged = new Observable<boolean>((subscriber: Subscriber<boolean>) => {
-            subscriber.next(this.nameChanged());
-            subscriber.complete();
-        });
+        this.creationStepsService.nameChanged = this.nameChanged;
         this.valueChart = this.valueChartService.getValueChart();
         this.type = this.valueChart.getType();
         this.validationTriggered = false;
@@ -120,7 +117,7 @@ export class CreateBasicInfoComponent implements OnInit {
 		}
 	}
 
-	nameChanged(): boolean {
+	nameChanged = (): boolean => {
 		return this.originalName !== this.valueChart.getName();
 	}
 

@@ -83,15 +83,8 @@ export class CreateValueChartComponent implements OnInit {
 						Calling ngOnInit should be left to Angular. Do not call it manually.
 	*/
 	ngOnInit() {
-		this.creationStepsService.goBack = new Observable<void>((subscriber: Subscriber<void>) => {
-            subscriber.next(this.back(true));
-            subscriber.complete();
-        });
 
-        this.creationStepsService.goNext = new Observable<void>((subscriber: Subscriber<void>) => {
-            subscriber.next(this.next(true));
-            subscriber.complete();
-        });
+		this.creationStepsService.autoSaveValueChart = this.autoSaveValueChart;
 
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 
@@ -155,13 +148,10 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description 	Navigates to previous step
 						Update ValueChart in database unless changes were made by a new user that is joining a group chart.
-						(In this case, the user gets added to the chart in the database after the final submission.)
-						browserTriggered indicates whether or not navigation was triggered by browser controls.
-						(Parameter currently unused in this method.)			
+						(In this case, the user gets added to the chart in the database after the final submission.)		
 	*/
-	back(browserTriggered = false) {
+	back() {
 		this.autoSaveValueChart();
-		this.creationStepsService.allowedToNavigateInternally = true;
 		this.creationStepsService.previous(this.creationStepsService.getCreationPurpose());				
 	}
 
@@ -175,25 +165,19 @@ export class CreateValueChartComponent implements OnInit {
 
 						If this is the last step, proceed to ViewValueChart.
 
-						browserTriggered indicates whether or not navigation was triggered by browser controls.
-						If it was and navigation does not go through, we need to fix the navigation history.	
 	*/
-	next(browserTriggered = false) {
+	next() {
 		if (this.creationStepsService.validate()) {
-			if (this.creationStepsService.step === this.creationStepsService.BASICS && this.creationStepsService.checkNameChanged()) {
-				this.nextIfNameAvailable(browserTriggered);
+			if (this.creationStepsService.step === this.creationStepsService.BASICS && this.creationStepsService.nameChanged()) {
+				this.nextIfNameAvailable();
 			}
 			else {
 				this.autoSaveValueChart();
-				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.creationStepsService.getCreationPurpose());
 			}
 		}
 		else {
 			toastr.error("There were problems with your submission. Please fix them to proceed.");
-			if (browserTriggered) {
-				history.forward();
-			}
 		}
 	}
 
@@ -238,22 +222,14 @@ export class CreateValueChartComponent implements OnInit {
 		@description 	If on step BASICS and the name has been changed, then we need to check if the name is available before proceeding.
 						This can't be done along with the rest of validation because it requires an asynchronous call.
 						Everything from here until navigation needs to be wrapped in this call; otherwise it may proceed before the call has finished.
-
-						browserTriggered indicates whether or not navigation was triggered by browser controls.
-						If it was and navigation does not go through, we need to fix the navigation history.	
-						
 	*/
-	nextIfNameAvailable(browserTriggered = false) {
+	nextIfNameAvailable() {
 		this.valueChartHttpService.isNameAvailable(this.valueChartService.getValueChart().getFName()).subscribe(isUnique => {
 			if (isUnique === true) {
 				this.autoSaveValueChart();
-				this.creationStepsService.allowedToNavigateInternally = true;
 				this.creationStepsService.next(this.creationStepsService.getCreationPurpose());
 			} else {
 				toastr.error("That name is already taken. Please choose another.")
-				if (browserTriggered) {
-					history.forward();
-				}
 			}
 		});
 	}
@@ -322,7 +298,7 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	handleNavigationReponse(keepValueChart: boolean, navigate: boolean): void {
 		if (navigate && keepValueChart && this.creationStepsService.step === this.creationStepsService.BASICS && 
-			this.creationStepsService.checkNameChanged()) {
+			this.creationStepsService.nameChanged()) {
 			this.navigateAndSaveIfNameAvailable();
 		}
 		else {
@@ -363,7 +339,7 @@ export class CreateValueChartComponent implements OnInit {
 		@returns {void}
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
-	autoSaveValueChart(): void {
+	autoSaveValueChart = (): void => {
 		if (this.autoSaveEnabled) {
 			if (!this.valueChartService.getValueChart()._id) {
 				// Save the ValueChart for the first time.

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 15:53:42
+* @Last Modified time: 2017-07-07 17:05:30
 */
 
 // Import Angular Classes:
@@ -72,6 +72,7 @@ import { CreatePurpose }										from '../../../types/CreatePurpose';
 export class CreationGuardService implements CanDeactivate<CreateValueChartComponent>, CanActivate {
 	
 	private destination: string;
+	private browserActivated: boolean;
 
 	constructor(
 		private router: Router,
@@ -82,6 +83,8 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		    .events
 		    .filter(e => e instanceof NavigationStart)
 		    .subscribe((e: NavigationStart) => this.destination = e.url)
+
+		window.onpopstate = (event: Event) => { this.browserActivated = true; }
 	}
 
 	// ========================================================================================
@@ -96,8 +99,6 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 						to the Angular 2 router.
 	*/
 	canDeactivate(component: CreateValueChartComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-
-
 
 		let purpose: CreatePurpose = parseInt(route.params['purpose']);
 
@@ -120,37 +121,59 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 						This method should NEVER be called manually. Leave routing, and calling of the canActivate, canDeactivate, etc. classes
 						to the Angular 2 router.
 	*/
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-		var creationStepsService: CreationStepsService = this.creationStepsService;
-
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Promise<boolean> {
 		// Allow navigation if we are coming into the component from outside of the creation workflow.
 		if (window.location.pathname.indexOf('/create/') === -1) {
 			return true;
 		}
 		// Navigation was triggered through "proper channels" (using buttons in CreateValueChart).
-		else if (creationStepsService.allowedToNavigateInternally) {
-			creationStepsService.allowedToNavigateInternally = false;
+		else if (!this.browserActivated) {
 			return true;
 		}
 		// Navigation was triggered by browser buttons (Next, Back).
 		// We need to intercept this and proceed with navigation through the proper channels. 
 		// That way, the component state is updated along with the route.
 		else {
+			this.browserActivated = false;
+			let previousStep = this.creationStepsService.previousStep[this.creationStepsService.step];
+			let followingStep = this.creationStepsService.nextStep[this.creationStepsService.step];
 			// Navigating to previous step
-			if (state.url.indexOf(creationStepsService.previousStep[creationStepsService.step]) !== -1 ) {
-				creationStepsService.goBack.subscribe(); // Trigger navigation through the component.
-			}
-			// Navigating to next step
-			else if (state.url.indexOf(creationStepsService.nextStep[creationStepsService.step]) !== -1 ) {
-				creationStepsService.goNext.subscribe(); // Trigger navigation through the component.
-			}
-			// Invalid route, cancel. The create workflow is not designed to allow users to skip over steps.
-			// (This might happen if the user changes the URL manually or selects a link from browsing history...
-			//  this is an ugly fix, but it's temporary - routing and navigation for the create workflow needs to be reworked.)
-			else {
-				history.forward();
-			}			
-			return false; // Cancel this instance of navigation.
+			if (this.creationStepsService.nameChanged() && this.creationStepsService.step == this.creationStepsService.BASICS) {
+				return new Promise((resolve) => {
+					this.creationStepsService.isNameAvailable()
+						.subscribe((available: boolean) => {
+							if (!available) {
+								toastr.error("That name is already taken. Please choose another.");
+								resolve(false);
+							} else {
+								resolve(this.handleBackForward(state, previousStep, followingStep));
+							}
+					});
+				});
+			} else {
+				return this.handleBackForward(state, previousStep, followingStep);
+			}		
+		}
+	}
+
+	handleBackForward(state: RouterStateSnapshot, previousStep: string, followingStep: string): boolean {
+		if (state.url.indexOf(previousStep) !== -1 ) {
+			this.creationStepsService.autoSaveValueChart();
+			this.creationStepsService.step = previousStep;
+			return true;
+		}
+		// Navigating to next step
+		else if (state.url.indexOf(followingStep) !== -1 ) {
+			this.creationStepsService.autoSaveValueChart();
+			this.creationStepsService.step = followingStep;
+			return true;
+		}
+		// Invalid route, cancel. The create workflow is not designed to allow users to skip over steps.
+		// (This might happen if the user changes the URL manually or selects a link from browsing history...
+		//  this is an ugly fix, but it's temporary - routing and navigation for the create workflow needs to be reworked.)
+		else {
+			history.forward();
+			return false;
 		}
 	}
 }
