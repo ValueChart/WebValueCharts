@@ -4,6 +4,8 @@ import * as _												from 'lodash';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
+import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
+import { Alternative }										from '../../../model/Alternative';
 import { User }												from '../../../model/User';
 import { CategoricalDomain }								from '../../../model/CategoricalDomain';
 import { ContinuousDomain }									from '../../../model/ContinuousDomain';
@@ -40,6 +42,18 @@ export class UpdateObjectiveReferencesService {
 	// 									Methods
 	// ========================================================================================
 
+
+	updateValueChart(oldStructure: ValueChart, newStructure: ValueChart) {
+		oldStructure.setCreator(newStructure.getCreator());
+		oldStructure.setDescription(newStructure.getDescription());
+		oldStructure.setName(newStructure.getName());
+		oldStructure.setRootObjectives(newStructure.getRootObjectives());
+		oldStructure.setAlternatives(newStructure.getAlternatives());
+		oldStructure.password = newStructure.password;
+		oldStructure._id = newStructure._id;
+	}
+
+
  	// ================================ Clean-up Alternatives ====================================
 
 	/*
@@ -47,17 +61,21 @@ export class UpdateObjectiveReferencesService {
 		@description 	Repairs alternatives to align with the Objectives in the chart. 
 	*/
 	cleanUpAlternatives(valueChart: ValueChart) {
-		this.removeAlternativeEntries(valueChart);
-		this.clearAlternativeValues(valueChart);
+		let primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
+		let alternatives: Alternative[] = valueChart.getAlternatives();
+
+		this.removeAlternativeEntries(primitiveObjectives, alternatives);
+		this.clearAlternativeValues(primitiveObjectives, alternatives);
 	}
 
 	/*
 		@returns {void}
 		@description 	 Removes Alternative entries for Objectives that are not in the chart.
 	*/
-	removeAlternativeEntries(valueChart: ValueChart) {
-		let objNames = valueChart.getAllPrimitiveObjectivesByName();
-		for (let alt of valueChart.getAlternatives()) {
+	removeAlternativeEntries(primitiveObjectives: PrimitiveObjective[], alternatives: Alternative[]) {
+		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+
+		for (let alt of alternatives) {
 			for (let key in alt.getAllObjectiveValuePairs().keys()) {
 				if (objNames.indexOf(key) === -1) {
 					alt.removeObjective(key);
@@ -70,9 +88,9 @@ export class UpdateObjectiveReferencesService {
 		@returns {void}
 		@description 	 Checks each Alternative's outcome on each Objective. Clears if no longer in range.
 	*/
-	clearAlternativeValues(valueChart: ValueChart) {
-		for (let obj of valueChart.getAllPrimitiveObjectives()) {
-			for (let alt of valueChart.getAlternatives()) {
+	clearAlternativeValues(primitiveObjectives: PrimitiveObjective[], alternatives: Alternative[]) {
+		for (let obj of primitiveObjectives) {
+			for (let alt of alternatives) {
 				if (obj.getDomainType() === "continuous") {
 					let dom = <ContinuousDomain>obj.getDomain();
 					let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
@@ -92,17 +110,26 @@ export class UpdateObjectiveReferencesService {
 
  	// ================================ Clean-up Preferences ====================================
 
+ 	cleanUpPreferences(valueChart: ValueChart, users: User[], showWarnings: boolean): User[] {
+ 		for (let user of users) {
+ 		  	user  = this.cleanUpUserPreferences(valueChart, user, showWarnings);
+ 		}
+
+ 		return users;
+ 	}
+
  	/*
 		@returns {string[]}
 		@description 	Removes all elements from the user's preference model that should not be there.
 						This includes score functions and weights for non-existent Objectives and scores for non-existent domain elements.
 						Resets score functions if any of the following have changed: domain type, min, max, interval.
 	*/
-	cleanUpPreferences(valueChart: ValueChart, user: User, showWarnings: boolean) {
+	cleanUpUserPreferences(valueChart: ValueChart, user: User, showWarnings: boolean): User {
+		let primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
 		let resetScoreFunctions = [];
 		let bestWorstChanged = false;
-		this.removeScoreFunctions(valueChart, user);
-		this.removeWeights(valueChart, user);
+		this.removeScoreFunctions(primitiveObjectives, user);
+		this.removeWeights(primitiveObjectives, user);
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
       		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
@@ -131,15 +158,18 @@ export class UpdateObjectiveReferencesService {
         		toastr.warning(this.BEST_WORST_OUTCOME_CHANGED);
         	}
         }
-        this.completePreferences(valueChart, user, showWarnings);
+        this.completePreferences(primitiveObjectives, user, showWarnings);
+
+        return user;
 	}
 
 	/*
 		@returns {void}
 		@description 	Removes score functions for Objectives that are not in the chart.
 	*/
-	removeScoreFunctions(valueChart: ValueChart, user: User) {
-		let objNames = valueChart.getAllPrimitiveObjectivesByName();
+	removeScoreFunctions(primitiveObjectives: PrimitiveObjective[], user: User) {
+		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+
 		for (let key of user.getScoreFunctionMap().getAllScoreFunctionKeys()) {
 			if (objNames.indexOf(key) === -1) {
 				user.getScoreFunctionMap().removeObjectiveScoreFunction(key);
@@ -151,8 +181,9 @@ export class UpdateObjectiveReferencesService {
 		@returns {void}
 		@description 	Removes weights for Objectives that are not in the chart.
 	*/
-	removeWeights(valueChart: ValueChart, user: User) {
-		let objNames = valueChart.getAllPrimitiveObjectivesByName();
+	removeWeights(primitiveObjectives: PrimitiveObjective[], user: User) {
+		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+
 		var elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
 		var iteratorElement: IteratorResult<string> = elementIterator.next();
 		while (iteratorElement.done === false) {
@@ -197,11 +228,11 @@ export class UpdateObjectiveReferencesService {
 		@description 	Adds missing elements to the user's preference model.
 						This includes score functions and weights for all Objectives and scores for all domain elements.
 	*/
-	completePreferences(valueChart: ValueChart, user: User, showWarnings: boolean) {
-		this.completeScoreFunctions(valueChart, user, showWarnings);
+	completePreferences(primitiveObjectives: PrimitiveObjective[], user: User, showWarnings: boolean) {
+		this.completeScoreFunctions(primitiveObjectives, user, showWarnings);
 		// Only insert missing weights if all weights are already set
 		if (user.getWeightMap().getWeightTotal() === 1) {
-			this.completeWeights(valueChart, user, showWarnings);
+			this.completeWeights(primitiveObjectives, user, showWarnings);
 		}	
 	}
 
@@ -209,9 +240,9 @@ export class UpdateObjectiveReferencesService {
 		@returns {string[]}
 		@description 	Initializes and completes user's score functions to align with the Objectives in the chart.
 	*/
-	completeScoreFunctions(valueChart: ValueChart, user: User, showWarnings: boolean) {
+	completeScoreFunctions(primitiveObjectives: PrimitiveObjective[], user: User, showWarnings: boolean) {
 		let completed = [];
-		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+		for (let obj of primitiveObjectives) {
 			// Make sure there is a score function for every Objective (initialized to default)
       		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
         		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
@@ -252,9 +283,9 @@ export class UpdateObjectiveReferencesService {
 		@returns {string[]}
 		@description 	Inserts missing Objective weights, initialized to 0 
 	*/
-	completeWeights(valueChart: ValueChart, user: User, showWarnings: boolean) {
+	completeWeights(primitiveObjectives: PrimitiveObjective[], user: User, showWarnings: boolean) {
 		let addedWeights = [];
-		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+		for (let obj of primitiveObjectives) {
       		if (user.getWeightMap().getObjectiveWeight(obj.getName()) === undefined) {
       			user.getWeightMap().setObjectiveWeight(obj.getName(), 0.0);
       			addedWeights.push(obj.getName())

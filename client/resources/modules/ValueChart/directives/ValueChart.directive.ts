@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:45:44
+* @Last Modified time: 2017-07-08 13:08:43
 */
 
 // Import Angular Classes:
@@ -273,6 +273,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			return;
 
 		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.usersToDisplay, this.renderRequired.value)) {
+			console.log('changes detected');
 			this.renderRequired.value = false;
 			this.rendererService.initUserColors(this.valueChart);
 			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });

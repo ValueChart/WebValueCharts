@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 10:48:23
+* @Last Modified time: 2017-07-08 12:52:12
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -22,9 +22,10 @@ import { CurrentUserService }										from './services/CurrentUser.service';
 import { ValueChartService }										from './services/ValueChart.service';
 import { AuthGuardService }											from './services/AuthGuard.service';
 import { JoinGuardService }											from './services/JoinGuard.service';
-import { CreationStepsService }										from '../create/services/CreationSteps.service';
-import { UpdateObjectiveReferencesService }							from '../create/services/UpdateObjectiveReferences.service';
+import { UpdateObjectiveReferencesService }							from './services/UpdateObjectiveReferences.service';
 import { ValidationService }										from './services/Validation.service';
+// TODO: Does this really need to be provided here?
+import { CreationStepsService }										from '../create/services/CreationSteps.service';
 
 /*
 	This is the route configuration for the main application router. This is where components are assigned to url paths. 

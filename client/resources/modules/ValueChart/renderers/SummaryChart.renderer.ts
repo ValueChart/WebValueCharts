@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:30:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:46:45
+* @Last Modified time: 2017-07-08 14:00:56
 */
 
 // Import Angular Classes
@@ -70,6 +70,7 @@ export class SummaryChartRenderer {
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
 
 	private numUsers: number;
+	private numAlternatives: number;
 
 	// ========================================================================================
 	// 									Constructor
@@ -96,11 +97,11 @@ export class SummaryChartRenderer {
 			this.createSummaryChart(update);
 		}
 
-
-		if (this.numUsers != update.usersToDisplay.length) {
+		if (this.numUsers != update.usersToDisplay.length || this.numAlternatives !== update.valueChart.getAlternatives().length) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 		}
 
+		this.numAlternatives = update.valueChart.getAlternatives().length;
 		this.numUsers = update.usersToDisplay.length;
 
 		this.updateInteractions(update);

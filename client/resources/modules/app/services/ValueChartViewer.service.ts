@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 11:02:31
+* @Last Modified time: 2017-07-08 13:43:06
 */
 
 
@@ -14,6 +14,7 @@ import * as _												from 'lodash';
 
 // Import Application Classes:
 import { ValueChartService }								from './ValueChart.service';
+import { CurrentUserService }								from './CurrentUser.service';
 
 // Import Model Classes:
 import { User }												from '../../../model/User';
@@ -44,7 +45,9 @@ export class ValueChartViewerService {
 		@returns {void}
 		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor(private valueChartService: ValueChartService)	{ }
+	constructor(
+		private currentUserService: CurrentUserService,
+		private valueChartService: ValueChartService)	{ }
 
 	// ========================================================================================
 	// 									Methods
@@ -87,6 +90,17 @@ export class ValueChartViewerService {
 			throw 'ValueChart is not defined';
 
 		return this.activeValueChart;
+	}
+
+	generateIndividualChart(): ValueChart {
+		if (this.valueChartService.getValueChart().getType() == ChartType.Individual) {
+			return this.valueChartService.getValueChart();
+		} else {
+			let individualChart = _.clone(this.valueChartService.getValueChart());
+			individualChart.setType(ChartType.Individual);
+			individualChart.setUsers([individualChart.getUser(this.currentUserService.getUsername())]);
+			return individualChart;
+		}
 	}
 
 	// ====================== Methods for Managing the Displayed Users ======================

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 11:45:39
+* @Last Modified time: 2017-07-08 13:43:40
 */
 
 // Import Angular Classes:
@@ -29,9 +29,9 @@ import { ValueChartViewerService }												from '../../services/ValueChartVie
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { ValidationService }													from '../../services/Validation.service';
+import { UpdateObjectiveReferencesService }										from '../../services/UpdateObjectiveReferences.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
-import { UpdateObjectiveReferencesService }										from '../../../create/services/UpdateObjectiveReferences.service';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 												from '../../../../model/ValueChart';
@@ -196,14 +196,8 @@ export class ValueChartViewerComponent implements OnInit {
 	setValueChartTypeToView(type: ChartType) {
 		if (type == ChartType.Individual) {
 
-			if (this.valueChartService.getValueChart().getType() == ChartType.Individual) {
-				this.valueChartViewerService.setActiveValueChart(this.valueChartService.getValueChart());
-			} else {
-				let individualChart = _.clone(this.valueChartService.getValueChart());
-				individualChart.setType(ChartType.Individual);
-				individualChart.setUsers([individualChart.getUser(this.currentUserService.getUsername())]);
-				this.valueChartViewerService.setActiveValueChart(individualChart);
-			}
+			let individualChart = this.valueChartViewerService.generateIndividualChart();
+			this.valueChartViewerService.setActiveValueChart(individualChart);
 
 			// TODO:<aaron> Clean this up.
 			this.usersToDisplay = this.valueChartViewerService.getActiveValueChart().getUsers();
@@ -319,23 +313,8 @@ export class ValueChartViewerComponent implements OnInit {
     				(3) Redirect to edit preference workflow
   */
   	editPreferences(): void {		
-		if (!this.valueChartViewerService.isOwner()) {
-			this.valueChartHttpService.getValueChartStructure(this.valueChartViewerService.getActiveValueChart().getFName(), this.valueChartViewerService.getActiveValueChart().password)
-			.subscribe(valueChart => {
-				// Only apply changes if chart is valid
-				if (this.validationService.validateStructure(valueChart).length === 0) {
-					valueChart.setUsers(this.valueChartService.getValueChart().getUsers());
-					this.valueChartService.setValueChart(valueChart);
-					this.updateObjReferencesService.cleanUpPreferences(valueChart, this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()), true);
-				}
-				this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
-				this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
-			});
-		}
-		else {
-			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
-			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
-		}	
+		this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
+		this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
   	}
 
   	editValueChart(): void {

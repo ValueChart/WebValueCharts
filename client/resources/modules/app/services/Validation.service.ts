@@ -35,6 +35,8 @@ export class ValidationService {
 	// ========================================================================================
 
 	// Move these?
+	// Yes, these should be moved to their own file - aaron.
+	
 	NAME_MISSING: string = "Chart must have a name.";
 	NAME_INVALID: string = "Chart name contains disallowed characters.";
 	PASSWORD_MISSING: string = "Chart must have a password.";

@@ -6,13 +6,13 @@ import { Subscriber }                               from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }                  from '../../../app/services/ValueChart.service';
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
-import { UpdateObjectiveReferencesService }         from '../../services/UpdateObjectiveReferences.service';
-import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
+import { UpdateObjectiveReferencesService }         from '../../../app/services/UpdateObjectiveReferences.service';
+import { ValueChartService }                        from '../../../app/services/ValueChart.service';
 import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
-import { ChartUndoRedoService }											from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
+import { ChartUndoRedoService }                     from '../../../ValueChart/services/ChartUndoRedo.service';
+import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
  
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
@@ -122,7 +122,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
     // Initialize/repair score functions
-    this.updateObjReferencesService.completeScoreFunctions(this.valueChartService.getValueChart(), this.user, true);
+    this.updateObjReferencesService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user, true);
 
     // Initialize best/worst outcomes
     this.initialBestOutcomes = {};

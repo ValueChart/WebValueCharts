@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 11:09:37
+* @Last Modified time: 2017-07-08 13:44:15
 */
 
 import { Injectable } 												from '@angular/core';
@@ -14,8 +14,9 @@ import * as _														from 'lodash';
 import { CurrentUserService }										from './CurrentUser.service';
 import { ValueChartService }										from './ValueChart.service';
 import { ValueChartViewerService }									from './ValueChartViewer.service';
-import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 import { ValidationService }										from './Validation.service';
+import { UpdateObjectiveReferencesService }							from './UpdateObjectiveReferences.service';
+import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:
 import { ValueChart, ChartType }									from '../../../model/ValueChart';
@@ -61,6 +62,7 @@ export class HostService {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService,
+		private updateObjectiveReferencesService: UpdateObjectiveReferencesService,
 		private validationService: ValidationService) {
 		this.valueChartParser = new JsonValueChartParser();
 	}
@@ -161,15 +163,22 @@ export class HostService {
 
 			case MessageType.StructureChanged:
 				let newStructure = this.valueChartParser.parseValueChart(hostMessage.data);
-				newStructure.setUsers([]);
-				newStructure.setType(ChartType.Individual);
+				newStructure.setUsers(this.valueChartService.getValueChart().getUsers());
+				newStructure.setType(this.valueChartService.getValueChart().getType());
 
-				let oldStructure = _.clone(this.valueChartService.getValueChart());
-				oldStructure.setUsers([]);
-				oldStructure.setType(ChartType.Individual);
 
-				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, oldStructure)) { // Ignore changes if chart is not valid
-					toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
+				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
+				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 		// TODO: Implement detailed change detection?
+
+					this.updateObjectiveReferencesService.cleanUpPreferences(newStructure, this.valueChartService.getValueChart().getUsers(), true);
+					this.updateObjectiveReferencesService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
+
+					if (this.valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual) {
+						let individualChart = this.valueChartViewerService.generateIndividualChart();
+						this.valueChartViewerService.setActiveValueChart(individualChart);
+					}
+
+					toastr.warning('The chart has been edited by its creator.');
 				}
 				break;
 
