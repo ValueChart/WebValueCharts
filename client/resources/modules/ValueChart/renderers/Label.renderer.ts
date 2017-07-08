@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:45:57
+* @Last Modified time: 2017-07-08 15:52:45
 */
 
 // Import Angular Classes:
@@ -10,6 +10,7 @@ import { Injectable } 												from '@angular/core';
 
 // Import libraries:
 import * as d3 														from 'd3';
+import * as _														from 'lodash';
 import { Subject }													from 'rxjs/Subject';
 import '../../utilities/rxjs-operators';
 
@@ -77,7 +78,6 @@ export class LabelRenderer {
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
 
-	private numUsers: number;
 	private viewOrientation: ChartOrientation;
 
 
@@ -113,8 +113,9 @@ export class LabelRenderer {
 			this.createLabelSpace(update);
 		}
 
-		if (this.reordered) {
+		if (this.reordered || update.structuralUpdate) {
 			this.createLabels(update, update.labelData, this.labelContainer);
+			console.log('triggered');
 		}
 
 		this.updateInteractions(update);

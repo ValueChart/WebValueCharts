@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 17:39:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:50:53
+* @Last Modified time: 2017-07-08 16:27:12
 */
 
 // Import Testing Resources:
@@ -97,7 +97,8 @@ describe('ReorderObjectivesInteraction', () => {
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		u = rendererDataUtility.produceMaximumWeightMap(u);

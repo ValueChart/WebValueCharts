@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:51:44
+* @Last Modified time: 2017-07-08 16:32:37
 */
 
 // Import Testing Resources:
@@ -91,7 +91,8 @@ describe('RendererDataUtility', () => {
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		aaron = hotelChart.getUsers()[0];

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 12:27:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:50:33
+* @Last Modified time: 2017-07-08 16:28:00
 */
 
 import { ComponentFixture, TestBed }					from '@angular/core/testing';
@@ -63,7 +63,8 @@ describe('RendererConfigUtility', () => {
 			maximumWeightMap: new WeightMap(),
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		u.maximumWeightMap['weightTotal'] = 1;

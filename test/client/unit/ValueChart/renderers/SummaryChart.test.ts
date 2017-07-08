@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:55:51
+* @Last Modified time: 2017-07-08 16:29:49
 */
 
 // Import Testing Resources:
@@ -157,7 +157,8 @@ var renderEventsServiceStub = {
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		aaron = hotelChart.getUsers()[0];
@@ -226,6 +227,7 @@ var renderEventsServiceStub = {
 					u.valueChart.setUser(bob);
 					u.valueChart.setType(ChartType.Group);
 					u.usersToDisplay = u.valueChart.getUsers();
+					u.structuralUpdate = true;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -254,6 +256,7 @@ var renderEventsServiceStub = {
 					u.valueChart.removeUser(aaron);
 					u.valueChart.setType(ChartType.Individual);
 					u.usersToDisplay = u.valueChart.getUsers();
+					u.structuralUpdate = true;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -276,6 +279,7 @@ var renderEventsServiceStub = {
 				before(function() {					
 					bob = randomizeUserWeights(bob, u.valueChart);
 					bob = randomizeAllUserScoreFunctions(bob, u.valueChart);
+					u.structuralUpdate = false;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);
@@ -294,6 +298,7 @@ var renderEventsServiceStub = {
 					u.valueChart.removeUser(bob);
 					u.valueChart.setType(ChartType.Individual);
 					u.usersToDisplay = u.valueChart.getUsers();
+					u.structuralUpdate = true;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceRowData(u);

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 15:04:53
+* @Last Modified time: 2017-07-08 16:07:02
 */
 
 // Import Angular Classes:
@@ -81,16 +81,28 @@ export class ChangeDetectionService {
 						if detectChanges has not yet been called. startChangeDetection should be used to initialize change detection before using this method.
 						detectChanges should be used to detect changes that require an entire re-rendering of the ValueChart. 
 	*/
-	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, usersToDisplay: User[], renderRequired: boolean): boolean {
-		var valueChartChanged: boolean =  !_.isEqual(valueChart, this.valueChartRecord);
+	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, renderRequired: boolean): boolean {
+		var valueChartChanged: boolean =  !_.isEqual(valueChart.getUsers(), this.valueChartRecord.getUsers());
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
+
+		if (valueChartChanged)
+			this.valueChartRecord = _.cloneDeep(valueChart);
+
+		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
+	}
+
+	detectStructuralChanges(valueChart: ValueChart, usersToDisplay: User[]): boolean {
 		var usersToDisplayChanged: boolean = usersToDisplay.length !== this.usersToDisplayRecord.length;
+		var alternativesChanged: boolean = !_.isEqual(valueChart.getAlternatives(), this.valueChartRecord.getAlternatives())
+		var objectivesChanged: boolean = !_.isEqual(valueChart.getRootObjectives(), this.valueChartRecord.getRootObjectives())
 
-		this.valueChartRecord = _.cloneDeep(valueChart);
-		this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
+		if (usersToDisplayChanged || alternativesChanged || objectivesChanged) {
+			this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
+			this.valueChartRecord = _.cloneDeep(valueChart);
+		}
 
-		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || usersToDisplayChanged || renderRequired;
+		return usersToDisplayChanged || alternativesChanged || objectivesChanged;
 	}
 
 	/*

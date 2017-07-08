@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 14:51:27
+* @Last Modified time: 2017-07-08 16:27:26
 */
 
 // Import Testing Resources:
@@ -83,7 +83,8 @@ describe('SortAlternativesInteraction', () => {
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		u = rendererDataUtility.produceMaximumWeightMap(u);

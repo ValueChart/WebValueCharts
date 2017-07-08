@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 11:54:54
+* @Last Modified time: 2017-07-08 16:31:34
 */
 
 // Import Testing Resources:
@@ -212,7 +212,8 @@ var chartUndoRedoStub = {
 			maximumWeightMap: null,
 			rowData: null,
 			labelData: null,
-			rendererConfig: null
+			rendererConfig: null,
+			structuralUpdate: null
 		}
 
 		aaron = hotelChart.getUsers()[0];
@@ -329,6 +330,7 @@ var chartUndoRedoStub = {
 					u.valueChart.setUser(bob);
 					u.valueChart.setType(ChartType.Group);
 					u.usersToDisplay = u.valueChart.getUsers();
+					u.structuralUpdate = true;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceLabelData(u);
@@ -352,6 +354,7 @@ var chartUndoRedoStub = {
 					u.valueChart.setUsers([]);
 					u.usersToDisplay = u.valueChart.getUsers();
 					u.valueChart.setType(ChartType.Individual);
+					u.structuralUpdate = true;
 
 					u = rendererDataUtility.produceMaximumWeightMap(u);
 					u = rendererDataUtility.produceLabelData(u);
@@ -374,6 +377,7 @@ var chartUndoRedoStub = {
 				u.valueChart.setUser(aaron);
 				u.usersToDisplay = u.valueChart.getUsers();
 				u.valueChart.setType(ChartType.Individual);
+				u.structuralUpdate = false;
 
 				viewConfig.viewOrientation = ChartOrientation.Horizontal
 				u = rendererDataUtility.produceMaximumWeightMap(u);

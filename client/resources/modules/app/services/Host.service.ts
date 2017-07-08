@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 13:44:15
+* @Last Modified time: 2017-07-08 15:44:24
 */
 
 import { Injectable } 												from '@angular/core';
@@ -105,6 +105,7 @@ export class HostService {
 	hostMessageHandler = (msg: MessageEvent) => {
 
 		var hostMessage: HostMessage = JSON.parse(msg.data);	// Messages are always stringified JSON that must be parsed.
+		var errors: string[];
 
 		// Handle the message depending on its type. 
 		switch (hostMessage.type) {
@@ -120,7 +121,13 @@ export class HostService {
 					return;
 
 				this.valueChartService.getValueChart().setUser(newUser);
-				this.valueChartViewerService.addUserToDisplay(newUser);
+
+				errors = this.validationService.validateUser(this.valueChartService.getValueChart(), newUser);
+
+				if (errors.length === 0)
+					this.valueChartViewerService.addUserToDisplay(newUser);
+				else
+					this.valueChartViewerService.addInvalidUser(newUser.getUsername());
 
 				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
 				break;
@@ -134,11 +141,13 @@ export class HostService {
 
 				this.valueChartService.getValueChart().setUser(updatedUser);
 
+				errors = this.validationService.validateUser(this.valueChartService.getValueChart(), updatedUser);
+
 				if (this.valueChartViewerService.isUserDisplayed(updatedUser))
 					this.valueChartViewerService.addUserToDisplay(updatedUser);
 
 				// If user was previously invalid, they will be valid now.
-				if (this.valueChartViewerService.isUserInvalid(updatedUser.getUsername())) {
+				if (errors.length === 0) {
 					this.valueChartViewerService.removeInvalidUser(updatedUser.getUsername());
 					this.valueChartViewerService.addUserToDisplay(updatedUser);
 				}
@@ -155,6 +164,7 @@ export class HostService {
 					return user.getUsername() === userToDelete;
 				});
 				this.valueChartViewerService.removeUserToDisplay(userToDelete);
+				this.valueChartViewerService.removeInvalidUser(userToDelete);
 
 				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
@@ -168,17 +178,30 @@ export class HostService {
 
 
 				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
-				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 		// TODO: Implement detailed change detection?
+				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 
+					toastr.warning('The ValueChart has been changed by the owner.');
 
 					this.updateObjectiveReferencesService.cleanUpPreferences(newStructure, this.valueChartService.getValueChart().getUsers(), true);
 					this.updateObjectiveReferencesService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
 
+					// Notify the current user of any errors in their preferences.
+					errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
+					if (errors.length > 0) {
+						errors.forEach(error => toastr.error(error));
+					}
+					
+					// Hide Invalid Users:
+					let invalidUsers = this.validationService.getInvalidUsers(this.valueChartService.getValueChart());
+					let usersToDisplay = this.valueChartViewerService.getUsersToDisplay().filter((user: User) => { return invalidUsers.indexOf(user.getUsername()) === -1 });
+					this.valueChartViewerService.setUsersToDisplay(usersToDisplay);
+					this.valueChartViewerService.setInvalidUsers(invalidUsers);
+
+					// Update the active ValueChart:
 					if (this.valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual) {
 						let individualChart = this.valueChartViewerService.generateIndividualChart();
 						this.valueChartViewerService.setActiveValueChart(individualChart);
 					}
 
-					toastr.warning('The chart has been edited by its creator.');
 				}
 				break;
 

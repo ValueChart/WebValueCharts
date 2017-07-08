@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 13:43:06
+* @Last Modified time: 2017-07-08 15:36:39
 */
 
 
@@ -143,6 +143,11 @@ export class ValueChartViewerService {
 		if (index !== -1) {
 			this.usersToDisplay.splice(index, 1);
 		}
+	}
+
+	addInvalidUser(username: string): void {
+		if (this.invalidUsers.indexOf(username) === -1)
+			this.invalidUsers.push(username);
 	}
 
 	removeInvalidUser(username: string): void {

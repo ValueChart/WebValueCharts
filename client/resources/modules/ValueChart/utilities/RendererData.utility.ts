@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-06 14:46:08
+* @Last Modified time: 2017-07-08 16:13:51
 */
 
 // Import Angular Classes:
@@ -95,7 +95,7 @@ export class RendererDataUtility {
 
 	public produceLabelData = (u: RendererUpdate) => {
 		// Re-generate the label data if it is undefined, or if the root labelDatum is undefined.
-		if (!this.labelData || !this.labelData[0]) {
+		if (!this.labelData || !this.labelData[0] || u.structuralUpdate) {
 			this.generateLabelData(u);
 		}
 

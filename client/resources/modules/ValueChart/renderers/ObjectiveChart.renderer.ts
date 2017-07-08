@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 14:06:35
+* @Last Modified time: 2017-07-08 15:52:40
 */
 
 // Import Angular Classes
@@ -67,9 +67,6 @@ export class ObjectiveChartRenderer {
 	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
 	public domainLabels: d3.Selection<any, any, any, any>;
 
-	private numUsers: number;
-	private numAlternatives: number;
-
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -96,13 +93,11 @@ export class ObjectiveChartRenderer {
 		}
 
 
-		if (this.numUsers != update.usersToDisplay.length || this.numAlternatives !== update.valueChart.getAlternatives().length) {
+		if (update.structuralUpdate) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 			this.toggleDomainLabels(update.viewConfig.displayDomainValues);
 		}
 
-		this.numUsers = update.usersToDisplay.length;
-		this.numAlternatives = update.valueChart.getAlternatives().length;
 		this.updateInteractions(update);
 		this.renderObjectiveChart(update);
 	}
