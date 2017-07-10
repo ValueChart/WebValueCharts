@@ -244,8 +244,8 @@ export class ValueChart {
 		}
 	}
 
-	removeAlternative(alernative: Alternative): void {
-		var alternativeIndex: number = this.alternatives.indexOf(alernative);
+	removeAlternative(alternative: Alternative): void {
+		var alternativeIndex: number = this.alternatives.indexOf(alternative);
 		if (alternativeIndex !== -1) {
 			this.alternatives.splice(alternativeIndex, 1);
 		}

@@ -19,6 +19,7 @@ import { AbstractObjective }											from '../../../../model/AbstractObjective
 import { PrimitiveObjective }											from '../../../../model/PrimitiveObjective';
 import { ScoreFunction }												from '../../../../model/ScoreFunction';
 import { Alternative }													from '../../../../model/Alternative';
+import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
 
 /*
   This component defines the UI for eliciting weights with SMARTER.
@@ -200,13 +201,24 @@ export class CreateWeightsComponent implements OnInit {
 	}
 
 	/* 	
-		@returns {string[]}
+		@returns {string}
+		@description 	Returns unit string to append to best/worst outcome. 
+	*/
+	getUnitString(obj: PrimitiveObjective): string {
+		if (obj.getDomainType() === 'continuous' && (<ContinuousDomain>obj.getDomain()).unit) {
+			return " " + ((<ContinuousDomain>obj.getDomain()).unit);
+		}
+		return "";
+	}
+
+	/* 	
+		@returns {PrimitiveObjective[]}
 		@description 	Gets names of all PrimitiveObjectives that haven't been ranked. 
 	*/
-	getUnrankedObjectives(): string[] {
-		let unrankedObjectives: string[] = [];
-		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
-			if (!this.isRanked[obj]) {
+	getUnrankedObjectives(): PrimitiveObjective[] {
+		let unrankedObjectives: PrimitiveObjective[] = [];
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
+			if (!this.isRanked[obj.getName()]) {
 				unrankedObjectives.push(obj);
 			}
 		}
