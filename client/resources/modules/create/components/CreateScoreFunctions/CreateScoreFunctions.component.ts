@@ -7,7 +7,7 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
-import { UpdateObjectiveReferencesService }         from '../../../app/services/UpdateObjectiveReferences.service';
+import { UpdateValueChartService }         from '../../../app/services/UpdateValueChart.service';
 import { ValueChartService }                        from '../../../app/services/ValueChart.service';
 import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
@@ -84,7 +84,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   constructor(
     public valueChartService: ValueChartService,
     private creationStepsService: CreationStepsService,
-    private updateObjReferencesService: UpdateObjectiveReferencesService,
+    private updateValueChartService: UpdateValueChartService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
     private validationService: ValidationService) { }
@@ -121,8 +121,9 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
     this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
-    // Initialize/repair score functions
-    this.updateObjReferencesService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user, true);
+    // Initialize/repair score functions and print the relevant warning messages.
+    let warnings = this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user);
+    warnings.forEach(warning => toastr.warning(warning, '', { timeOut: 60000 }));
 
     // Initialize best/worst outcomes
     this.initialBestOutcomes = {};
@@ -149,7 +150,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
         let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
-          toastr.warning(this.updateObjReferencesService.BEST_WORST_OUTCOME_CHANGED);
+          toastr.warning(this.updateValueChartService.BEST_WORST_OUTCOME_CHANGED);
           break;
         }
       }

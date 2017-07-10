@@ -8,7 +8,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
-import { UpdateObjectiveReferencesService }								from '../../../app/services/UpdateObjectiveReferences.service';
+import { UpdateValueChartService }								from '../../../app/services/UpdateValueChart.service';
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
@@ -78,7 +78,7 @@ export class CreateObjectivesComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
-		private updateObjRefService: UpdateObjectiveReferencesService,
+		private updateObjRefService: UpdateValueChartService,
 		private validationService: ValidationService) { }
 
 	// ========================================================================================
@@ -143,7 +143,11 @@ export class CreateObjectivesComponent implements OnInit {
 			this.updateObjRefService.cleanUpAlternatives(this.valueChart);
 			for (let user of this.valueChart.getUsers()) {
 				let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
-				this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user, showWarnings);
+				let warnings = this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user);
+
+				if (showWarnings) {
+					warnings.forEach(warning => toastr.warning(warning,'' , { timeOut: 60000 }));
+				}
 			}	
 		}
 	}						

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 12:52:12
+* @Last Modified time: 2017-07-09 15:53:20
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -22,7 +22,7 @@ import { CurrentUserService }										from './services/CurrentUser.service';
 import { ValueChartService }										from './services/ValueChart.service';
 import { AuthGuardService }											from './services/AuthGuard.service';
 import { JoinGuardService }											from './services/JoinGuard.service';
-import { UpdateObjectiveReferencesService }							from './services/UpdateObjectiveReferences.service';
+import { UpdateValueChartService }							from './services/UpdateValueChart.service';
 import { ValidationService }										from './services/Validation.service';
 // TODO: Does this really need to be provided here?
 import { CreationStepsService }										from '../create/services/CreationSteps.service';
@@ -60,7 +60,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateObjectiveReferencesService, ValidationService]
+	[AuthGuardService, JoinGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.

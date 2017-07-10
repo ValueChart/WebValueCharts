@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 13:43:40
+* @Last Modified time: 2017-07-09 17:18:40
 */
 
 // Import Angular Classes:
@@ -29,7 +29,7 @@ import { ValueChartViewerService }												from '../../services/ValueChartVie
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { ValidationService }													from '../../services/Validation.service';
-import { UpdateObjectiveReferencesService }										from '../../services/UpdateObjectiveReferences.service';
+import { UpdateValueChartService }										from '../../services/UpdateValueChart.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -110,7 +110,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
 		private validationService: ValidationService,
-		private updateObjReferencesService: UpdateObjectiveReferencesService) { }
+		private updateValueChartService: UpdateValueChartService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -147,7 +147,17 @@ export class ValueChartViewerComponent implements OnInit {
 				this.valueChartViewerService.setUserRole(role);
 
 				if (this.loading) {
-					this.initializeValueChart(fname, password, type);
+					if (!this.valueChartService.valueChartIsDefined()) {
+						this.valueChartHttpService.getValueChartByName(fname, password)
+							.subscribe(valueChart => {
+								this.valueChartService.setValueChart(valueChart);
+								this.initializeViewer(type);
+								this.loading = false;
+							});
+					} else {
+						this.initializeViewer(type);
+						this.loading = false;
+					}
 				}
 
 				this.valueChartHttpService.getValueChartStatus(fname)
@@ -162,33 +172,18 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 	}
 
-	initializeValueChart(fname: string, password: string, type: ChartType): void {
-		if (!this.valueChartService.valueChartIsDefined()) {
-			this.valueChartHttpService.getValueChartByName(fname, password)
-				.subscribe(valueChart => {
-					this.valueChartService.setValueChart(valueChart);
-					this.initializeView(type);
-					this.loading = false;
-				});
-		} else {
-			this.initializeView(type);
-			this.loading = false;
-		}
-	}
-
-	initializeView(type: ChartType): void {
+	initializeViewer(type: ChartType): void {
 		let valueChart = this.valueChartService.getValueChart();
 
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
-		this.usersToDisplay = _.clone(valueChart.getUsers().filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
-		this.valueChartViewerService.setUsersToDisplay(this.usersToDisplay);
-		this.valueChartViewerService.setInvalidUsers(invalidUsers);
-		
-		if (invalidUsers.length > 0) {
+		this.valueChartViewerService.initializeUsers(valueChart.getUsers(), invalidUsers);
+
+		if (invalidUsers.length > 0 && this.valueChartViewerService.getUserRole() !== UserRole.UnsavedParticipant) {
 			let errorMessages = this.validationService.validateUsers(valueChart);
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 			$('#validate-modal').modal('show');
 		}
+
 		this.setValueChartTypeToView(type);
 		this.hostValueChart();
 	}
@@ -274,21 +269,6 @@ export class ValueChartViewerComponent implements OnInit {
 
   /*   
     @returns {void}
-    @description   Check that no score function has a range of 0 (i.e. best and worst outcomes have the same score)
-  */
-	checkScoreFunctionRanges(): boolean {
-  		let currentUser: User = this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername());
-		for (let objName of this.valueChartViewerService.getActiveValueChart().getAllPrimitiveObjectivesByName()) {
-  			let scoreFunction = currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objName);
-  			if (scoreFunction.getRange() === 0) {
-  				return false;
-  			}
-    	}
-    	return true;
-  	}
-
-  /*   
-    @returns {void}
     @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
   */
 	rescaleScoreFunctions(): void {
@@ -333,32 +313,6 @@ export class ValueChartViewerComponent implements OnInit {
 		this.hostService.hostGroupValueChart(this.valueChartViewerService.getActiveValueChart()._id);
 	}
 
-	
-	/* 	
-		@returns {void}
-		@description 	Checks if any changes have been made to the chart structure since the last submission.
-						If so, instruct the user to return to the create workflow to apply the changes.
-						Otherwise, submit preferences as usual.
-	*/
-	submitPreferencesIfChartUnchanged() {
-		this.valueChartHttpService.getValueChartStructure(this.valueChartViewerService.getActiveValueChart().getFName(), this.valueChartViewerService.getActiveValueChart().password)
-		.subscribe(newStructure => {
-			newStructure.setUsers([]);
-			newStructure.setType(ChartType.Individual);
-
-			let currentStructure = _.clone(this.valueChartService.getValueChart());
-			currentStructure.setUsers([]);
-			currentStructure.setType(ChartType.Individual);
-
-			if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, currentStructure)) { // Ignore changes if chart is not valid
-				toastr.error('The chart has been edited by its creator since your last submission. Please click "Edit Preferences" to apply the changes and fix any issues.');
-			}	
-			else {
-				this.submitPreferences();
-			}
-		});
-	}
-
 	/* 	
 		@returns {void}
 		@description 	Submits the current user's preferences to the copy of the ValueChart on the database. Anyone hosting the ValueChart will
@@ -367,8 +321,13 @@ export class ValueChartViewerComponent implements OnInit {
 						ValueChart.
 	*/
 	submitPreferences(): void {
-		if (this.checkScoreFunctionRanges()) {
-			var currentUser: User = this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername());
+		var currentUser: User = this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername());
+		let errors: string[] = this.validationService.validateUser(this.valueChartService.getValueChart(), currentUser);
+
+		if (errors.length > 0) {
+			toastr.error('Saving failed. Your preferences are not valid.');
+			errors.forEach(error => toastr.error(error,'' , { timeOut: 300000, closeButton: true }));
+		} else {
 			this.rescaleScoreFunctions();
 			currentUser.getWeightMap().normalize();
 
@@ -391,10 +350,7 @@ export class ValueChartViewerComponent implements OnInit {
 					else 
 						toastr.error('Saving failed. There was an error saving your preferences.');
 				});			
-		}
-		else {
-			toastr.error("Saving failed - score function outcomes can't all have the same value.")
-		}			
+		}		
 	}
 
 	setUserChangesAccepted(userChangesPermitted: any): void {

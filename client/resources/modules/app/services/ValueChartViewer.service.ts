@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 15:36:39
+* @Last Modified time: 2017-07-08 18:10:44
 */
 
 
@@ -104,6 +104,14 @@ export class ValueChartViewerService {
 	}
 
 	// ====================== Methods for Managing the Displayed Users ======================
+
+	initializeUsers(users: User[], invalidUsers: string[]): void {
+		let valueChart = this.valueChartService.getValueChart();
+
+		this.usersToDisplay = _.clone(users.filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
+		this.setUsersToDisplay(this.usersToDisplay);
+		this.setInvalidUsers(invalidUsers);
+	}
 
 	getUsersToDisplay(): User[] {
 		return this.usersToDisplay;

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 15:44:24
+* @Last Modified time: 2017-07-09 16:53:50
 */
 
 import { Injectable } 												from '@angular/core';
@@ -15,7 +15,7 @@ import { CurrentUserService }										from './CurrentUser.service';
 import { ValueChartService }										from './ValueChart.service';
 import { ValueChartViewerService }									from './ValueChartViewer.service';
 import { ValidationService }										from './Validation.service';
-import { UpdateObjectiveReferencesService }							from './UpdateObjectiveReferences.service';
+import { UpdateValueChartService }							from './UpdateValueChart.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:
@@ -62,7 +62,7 @@ export class HostService {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService,
-		private updateObjectiveReferencesService: UpdateObjectiveReferencesService,
+		private updateValueChartService: UpdateValueChartService,
 		private validationService: ValidationService) {
 		this.valueChartParser = new JsonValueChartParser();
 	}
@@ -168,9 +168,10 @@ export class HostService {
 
 				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
-				toastr.warning(userToDelete + ' has left the ValueChart');
+				toastr.info(userToDelete + ' has left the ValueChart');
 				break;
 
+			// The ValueChart's owner has changed its structure (i.e. the basic details, the alternatives, or the objectives)
 			case MessageType.StructureChanged:
 				let newStructure = this.valueChartParser.parseValueChart(hostMessage.data);
 				newStructure.setUsers(this.valueChartService.getValueChart().getUsers());
@@ -179,22 +180,31 @@ export class HostService {
 
 				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
 				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 
-					toastr.warning('The ValueChart has been changed by the owner.');
+					toastr.info('The ValueChart has been changed by the owner.');
+						
+					// This is where we implement more detailed change notifications.
 
-					this.updateObjectiveReferencesService.cleanUpPreferences(newStructure, this.valueChartService.getValueChart().getUsers(), true);
-					this.updateObjectiveReferencesService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
+					let changes: string[] = this.updateValueChartService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
+					changes.forEach(change => toastr.info(change, '', { timeOut: 60000 }));
+
+					// Update the user's preferences.
+					let warnings: string[] = [];
+					this.valueChartService.getValueChart().getUsers().forEach((user: User) => {
+						let userWarnings = this.updateValueChartService.cleanUpUserPreferences(this.valueChartService.getValueChart(), user);
+						// Print Warnings ONLY for the current user;
+						if (user.getUsername() === this.currentUserService.getUsername())
+							warnings = userWarnings;
+					});
+
+					warnings.forEach((warning: string) => toastr.warning(warning, '', { timeOut: 60000 }));
 
 					// Notify the current user of any errors in their preferences.
 					errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
-					if (errors.length > 0) {
-						errors.forEach(error => toastr.error(error));
-					}
+					errors.forEach(error => toastr.error(error,'' , { timeOut: 300000, closeButton: true }));
 					
 					// Hide Invalid Users:
 					let invalidUsers = this.validationService.getInvalidUsers(this.valueChartService.getValueChart());
-					let usersToDisplay = this.valueChartViewerService.getUsersToDisplay().filter((user: User) => { return invalidUsers.indexOf(user.getUsername()) === -1 });
-					this.valueChartViewerService.setUsersToDisplay(usersToDisplay);
-					this.valueChartViewerService.setInvalidUsers(invalidUsers);
+					this.valueChartViewerService.initializeUsers(this.valueChartViewerService.getUsersToDisplay(), invalidUsers);
 
 					// Update the active ValueChart:
 					if (this.valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual) {
