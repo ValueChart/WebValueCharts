@@ -98,7 +98,7 @@ export class CreationStepsService {
 	// ================================ Navigation Methods ====================================
 
 	/* 	
-		@returns {Observable<boolean>}
+		@returns boolean
 		@description 	Prepares to navigate to previous step.
 						Returns whether or not navigation may proceed (for now, always true).
 	*/
@@ -109,7 +109,7 @@ export class CreationStepsService {
 	}
 
 	/* 	
-		@returns {Observable<boolean>}
+		@returns boolean
 		@description 	Prepares to navigate to the next step.
 						Returns whether or not navigation may proceed.
 						(True if validation of the current step passes and the chart name is not already taken).

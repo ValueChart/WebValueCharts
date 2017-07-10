@@ -51,7 +51,7 @@ export class ValidationService {
 	CONT_DOMAIN_INCOMPLETE: string ="Continuous domains must have a min and a max. Please fix ";
 	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix: ";
 	RANGE_INVALID: string = "Min must be less than max. Please fix: ";
-	INTERVAL_INVALID: string = "Interval must be greater than 0 and less than max - min. Please fix: ";
+	INTERVAL_INVALID: string = "Interval must be a positive factor of max - min. Please fix: ";
 	NO_ALTERNATIVES: string = "Chart must have at least one Alternative.";
 	ALTERNATIVE_NAMES_MISSING: string = "Every Alternative must have a name.";
 	ALTERNATIVE_NAMES_NOT_UNIQUE: string = "Alternative names must be unique.";
@@ -60,7 +60,6 @@ export class ValidationService {
 	OBJECTIVE_OUTCOMES_INVALID: string = "Objective outcomes must fall within the specified range. Please fix: ";
 	SCORE_FUNCTIONS_MISSING: string = "Please define a score function for: ";
 	SCORE_FUNCTIONS_INCOMPLETE: string = "Please complete score function for: ";
-	SCORE_FUNCTION_VALUE_INVALID: string = "Score function values must be between 0 and 1. Please fix score functions for: ";
 	SCORE_FUNCTION_RANGE_INVALID: string = "Score functions must range from 0 to 1.  Please fix score functions for: ";
 	WEIGHTS_MISSING: string = "Please supply weights for: ";
 	WEIGHTS_SUM_INVALID: string = "Weights must sum to 1.";
@@ -86,6 +85,11 @@ export class ValidationService {
 	// 									Methods
 	// ========================================================================================
 
+	/* 	
+		@returns {string[]}
+		@description 	Validates the whole chart.
+						Returns a list of error messages.
+	*/
 	validate(valueChart: ValueChart): string[] {
 		return this.validateStructure(valueChart).concat(this.validateUsers(valueChart));
 	}
@@ -93,6 +97,11 @@ export class ValidationService {
 
 	// ================================ VALIDATE CHART STRUCTURE ====================================
 
+	/* 	
+		@returns {string[]}
+		@description 	Validates the chart structure (basic info, objectives, and alternatives).
+						Returns a list of error messages.
+	*/
 	validateStructure(valueChart: ValueChart): string[] {
 		return this.validateBasicInfo(valueChart).concat(this.validateObjectives(valueChart), this.validateAlternatives(valueChart));
 	}
@@ -350,14 +359,15 @@ export class ValidationService {
 
 	/* 	
 		@returns {string[]}
-		@description 	Returns the names of Objectives with an invalid interval.
+		@description 	Returns the names of Objectives with an invalid interval
+						(interval must be a positive factor of range).
 	*/
 	intervalInvalid(valueChart: ValueChart): string[] {
 		let objectives = [];
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
 			if (obj.getDomainType() === 'interval') {
 				let dom = <IntervalDomain>obj.getDomain();
-				if (dom.getInterval() >= (dom.getMaxValue() - dom.getMinValue()) || (dom.getInterval() <= 0)) {
+				if (dom.getInterval() <= 0 || (dom.getMaxValue() - dom.getMinValue()) % dom.getInterval() !== 0) {
 					objectives.push(obj.getName());
 				}
 			}
@@ -465,7 +475,8 @@ export class ValidationService {
 
 	/* 	
 		@returns {string[]}
-		@description 	Returns true iff the values entered for every continuous Objective for every Alternative are within the set range.
+		@description 	Returns a list of formatted strings for each Alternative that has an invalid outcome on at least one Objective.
+						(Each string contains the Alternative name followed by a list of Objectives with invalid outcomes.)
 	*/
 	invalidOutcomes(valueChart: ValueChart): string[] {
 		let alternatives = [];
@@ -505,6 +516,11 @@ export class ValidationService {
 
 	// ================================ VALIDATE CHART USERS ====================================
 
+	/* 	
+		@returns {string[]}
+		@description 	Validates the chart users.
+						Returns a list of error messages.
+	*/
 	validateUsers(valueChart: ValueChart): string[] {
 		let errorMessages = [];
 		let userErrorMessages = [];
@@ -517,10 +533,19 @@ export class ValidationService {
 		return errorMessages;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Validates a specified user in the chart.
+						Returns a list of error messages.
+	*/	
 	validateUser(valueChart: ValueChart, user: User): string[] {
 		return this.validateScoreFunctions(valueChart, user).concat(this.validateWeights(valueChart,user));
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Returns the usernames of invalid users in the chart.
+	*/
 	getInvalidUsers(valueChart: ValueChart): string[] {
 		let invalidUsers = [];
 		for (let user of valueChart.getUsers()) {
@@ -543,10 +568,6 @@ export class ValidationService {
 		if (incompleteScoreFunctions.length > 0) {
 			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join(', ')));
 		}
-		let invalidScoreFunctionValues = this.invalidScoreFunctionValues(valueChart,user);
-		if (invalidScoreFunctionValues.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_VALUE_INVALID.concat(invalidScoreFunctionValues.join(', ')));
-		}
 		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart, user);
 		if (invalidScoreFunctionRange.length > 0) {
 			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join(', ')));
@@ -554,6 +575,11 @@ export class ValidationService {
 		return errorMessages;
 	}
 
+	
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives that are missing a score function for user.
+	*/
 	missingScoreFunctions(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
@@ -565,6 +591,11 @@ export class ValidationService {
 		return objectives;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives whose score functions are not complete for user 
+						(i.e. they are missing scores for some domain elements).
+	*/
 	incompleteScoreFunctions(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
@@ -589,28 +620,10 @@ export class ValidationService {
 		return objectives;
 	}
 
-	invalidScoreFunctionValues(valueChart: ValueChart, user: User): string[] {
-		let objectives = [];
-		let scoreFunctionMap = user.getScoreFunctionMap();
-		if (scoreFunctionMap) {
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);	
-				if (scoreFunction) {
-					let elements = [] ;
-					for (let elt of scoreFunction.getAllElements()) {
-		      			if (scoreFunction.getScore(elt) > 1 || scoreFunction.getScore(elt) < 0) {
-		      				elements.push(elt);
-		      			}
-	      			}
-	      			if (elements.length > 0) {
-		      			objectives.push(objName);
-		      		}
-	      		}	
-			}
-		}
-		return objectives;
-	}
-
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives whose score functions for user do not range from 0 to 1. 
+	*/
 	invalidScoreFunctionRange(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
@@ -646,6 +659,10 @@ export class ValidationService {
 		return errorMessages;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives that are missing a weight for user.
+	*/
 	missingWeights(valueChart: ValueChart, user: User): string[] {
 		let weightMap = user.getWeightMap();
 		let objectives = [];
@@ -657,6 +674,10 @@ export class ValidationService {
 		return objectives;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff weights for user sum to 1 within margin of error.
+	*/
 	invalidWeightSum(valueChart: ValueChart, user: User): boolean {
 		let error = 1e-3 * valueChart.getAllPrimitiveObjectivesByName().length;
 		let weightMap = user.getWeightMap();
@@ -666,6 +687,11 @@ export class ValidationService {
 		return false;
 	}
 
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives that have invalid weights for user
+						(i.e. not between 0 and 1).
+	*/
 	invalidWeightRange(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let weightMap = user.getWeightMap();
