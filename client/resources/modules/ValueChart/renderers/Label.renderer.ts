@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 17:08:01
+* @Last Modified time: 2017-07-09 18:00:22
 */
 
 // Import Angular Classes:
@@ -115,7 +115,6 @@ export class LabelRenderer {
 
 		if (this.reordered || update.structuralUpdate) {
 			this.createLabels(update, update.labelData, this.labelContainer);
-			console.log('triggered');
 		}
 
 		this.updateInteractions(update);
