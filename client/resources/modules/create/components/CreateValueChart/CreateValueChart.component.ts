@@ -45,13 +45,7 @@ export class CreateValueChartComponent implements OnInit {
 	// Navigation Control:
 	sub: any;
 	window: any = window;
-	
-	public autoSaveEnabled: boolean;
-	allowedToNavigate: boolean = false;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
-
-	// Whole chart validation:
-	validationMessage: string;
 	public loading = true;
 	// ========================================================================================
 	// 									Constructor
@@ -84,26 +78,22 @@ export class CreateValueChartComponent implements OnInit {
 	*/
 	ngOnInit() {
 
-		this.creationStepsService.autoSaveValueChart = this.autoSaveValueChart;
-
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
-
 
 		// Lock chart while creator is editing
 		if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart || this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {	
 			this.lockValueChart()
 		}
 
-
 		this.sub = this.route.params.subscribe(params => { 
 			this.creationStepsService.setCreationPurpose(parseInt(params['purpose']));
-			
 
 			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {
 				var valueChart = new ValueChart('', '', this.currentUserService.getUsername()); 
 				this.valueChartService.setValueChart(valueChart);
 			}
-			this.autoSaveEnabled = this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart || this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart
+			this.creationStepsService.setAutoSaveEnabled(this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart 
+														|| this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart);
 			this.loading = false;
 		});
 
@@ -125,7 +115,7 @@ export class CreateValueChartComponent implements OnInit {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();
 
-		if (this.autoSaveEnabled) {
+		if (this.creationStepsService.getAutoSaveEnabled()) {
 			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
 			let incomplete = (this.validationService.validateStructure(this.valueChartService.getValueChart()).length > 0
 				|| (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())).length > 0 ));
@@ -138,109 +128,17 @@ export class CreateValueChartComponent implements OnInit {
 			status.chartId = this.valueChartService.getValueChart()._id;
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 
-			this.autoSaveValueChart();
+			this.creationStepsService.autoSaveValueChart();
 		}
-	}
-
-	// ================================ Navigation Methods ====================================
-
-	/* 	
-		@returns {void}
-		@description 	Navigates to previous step
-						Update ValueChart in database unless changes were made by a new user that is joining a group chart.
-						(In this case, the user gets added to the chart in the database after the final submission.)		
-	*/
-	back() {
-		this.autoSaveValueChart();
-		this.creationStepsService.previous(this.creationStepsService.getCreationPurpose());				
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Navigates to next step if validation of current step succeeds.
-
-						If on the first step and creation a new chart, save to database.
-						Otherwise, update ValueChart in database unless changes were made by a new user that is joining a group chart.
-						(In this case, the user gets added to the chart in the database after the final submission.)
-
-						If this is the last step, proceed to ViewValueChart.
-
-	*/
-	next() {
-		if (this.creationStepsService.validate()) {
-			if (this.creationStepsService.step === this.creationStepsService.BASICS && this.creationStepsService.nameChanged()) {
-				this.nextIfNameAvailable();
-			}
-			else {
-				this.autoSaveValueChart();
-				this.creationStepsService.next(this.creationStepsService.getCreationPurpose());
-			}
-		}
-		else {
-			toastr.error("There were problems with your submission. Please fix them to proceed.");
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Navigates to ValueChartViewer if validation succeeds.
-	*/
-	viewChart() {
-		if (this.creationStepsService.validate()) {	
-			// Catch validation errors introduced at other steps.
-			// (Include structural errors and errors in current user's preferences.)
-			let errorMessages = this.validationService.validateStructure(this.valueChartService.getValueChart());
-
-			if (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername())) {
-				errorMessages = errorMessages.concat(this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())));
-			} 
-			if (errorMessages.length > 0) {
-				this.validationMessage = "Cannot view chart. Please fix the following errors to proceed:\n\n" + errorMessages.join("\n\n");
-					$('#validate-modal').modal('show');
-			}
-			else {
-				this.valueChartService.setValueChart(this.valueChartService.getValueChart());
-
-				window.onpopstate = () => { };
-				(<any>window).destination = '/view/ValueChart';
-				let chartType = this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) ? ChartType.Individual : ChartType.Group;
-				if (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.valueChartService.getValueChart().getCreator() === this.currentUserService.getUsername()) {
-					this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password, role: UserRole.OwnerAndParticipant } });		
-				} else {
-					this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password }, queryParamsHandling: 'merge' });		
-				}
-
-			}
-		}
-		else {
-			toastr.error("There were problems with your submission. Please fix them to proceed.");
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	If on step BASICS and the name has been changed, then we need to check if the name is available before proceeding.
-						This can't be done along with the rest of validation because it requires an asynchronous call.
-						Everything from here until navigation needs to be wrapped in this call; otherwise it may proceed before the call has finished.
-	*/
-	nextIfNameAvailable() {
-		this.valueChartHttpService.isNameAvailable(this.valueChartService.getValueChart().getFName()).subscribe(isUnique => {
-			if (isUnique === true) {
-				this.autoSaveValueChart();
-				this.creationStepsService.next(this.creationStepsService.getCreationPurpose());
-			} else {
-				toastr.error("That name is already taken. Please choose another.")
-			}
-		});
 	}
 
 	/* 	
 		@returns {boolean}
-		@description 	Disable back button if:
+		@description 	Disable previous button if:
 						(1) on the first step
 						(2) on Preferences step and the user is joining the chart or editing preferences
 	*/
-	disableBackButton(): boolean {
+	disablePreviousButton(): boolean {
 		return (this.creationStepsService.step === this.creationStepsService.BASICS
    			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.creationStepsService.getCreationPurpose() === CreatePurpose.NewUser)
             || (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.creationStepsService.getCreationPurpose() === CreatePurpose.EditUser));
@@ -303,9 +201,9 @@ export class CreateValueChartComponent implements OnInit {
 		}
 		else {
 			if (!keepValueChart) {
-				this.autoSaveEnabled = false;
+				this.creationStepsService.setAutoSaveEnabled(false);
 				if (this.valueChartService.getValueChart()._id) {
-					this.deleteValueChart(this.valueChartService.getValueChart());
+					this.creationStepsService.deleteValueChart(this.valueChartService.getValueChart());
 				}			
 			}
 			this.navigationResponse.next(navigate);
@@ -321,77 +219,15 @@ export class CreateValueChartComponent implements OnInit {
 						
 	*/
 	navigateAndSaveIfNameAvailable() {
-		this.valueChartHttpService.isNameAvailable(this.valueChartService.getValueChart().getName()).subscribe(isUnique => {
-			if (isUnique === true) {
+		this.valueChartHttpService.isNameAvailable(this.valueChartService.getValueChart().getName()).subscribe(available => {
+			if (available) {
 				this.navigationResponse.next(true);
 			}
 			else {
-				toastr.error("That name is already taken. Please choose another if you would like to save the chart.");
+				toastr.error(this.creationStepsService.NAME_TAKEN);
 				this.navigationResponse.next(false);
 			}
 			$('#navigation-warning-modal').modal('hide');
 		});
-	}
-
-	// ================================ Database Access Methods ====================================
-
-	/* 	
-		@returns {void}
-		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
-	*/
-	autoSaveValueChart = (): void => {
-		if (this.autoSaveEnabled) {
-			if (!this.valueChartService.getValueChart()._id) {
-				// Save the ValueChart for the first time.
-				this.saveValueChartToDatabase();
-			} else {
-				// Update the ValueChart.
-				this.valueChartHttpService.updateValueChart(this.valueChartService.getValueChart())
-					.subscribe(
-					(valuechart) => { toastr.success('ValueChart auto-saved'); },
-					(error) => {
-						// Handle any errors here.
-						toastr.warning('Auto-saving failed');
-					});
-			}
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description	Create a new ValueChart in the database. Set valueChart._id to the id assigned by the database.
-	*/
-	saveValueChartToDatabase(): void {
-		this.valueChartHttpService.createValueChart(this.valueChartService.getValueChart())
-			.subscribe(
-			(valueChart: ValueChart) => {
-				// Set the id of the ValueChart.
-				this.valueChartService.getValueChart()._id = valueChart._id;
-				toastr.success('ValueChart auto-saved');
-
-				// Create status document
-				let status: any = {};
-				status.userChangesPermitted = false;
-				status.incomplete = true;
-				status.name = this.valueChartService.getValueChart().getName();
-				status.fname = this.valueChartService.getValueChart().getFName();
-				status.chartId = this.valueChartService.getValueChart()._id;
-				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
-			},
-			// Handle Server Errors
-			(error) => {
-				toastr.warning('Auto-saving failed');
-			});
-	}
-
-	/* 	
-		@returns {void}
-		@description	Remove valueChart from database. valueChart_.id is the id assigned by the database.
-	*/
-	deleteValueChart(valueChart: ValueChart): void {
-		if (valueChart._id) {
-			this.valueChartHttpService.deleteValueChart(valueChart._id)
-				.subscribe(status => { toastr.error('ValueChart deleted'); });
-		}
 	}
 }

@@ -38,7 +38,6 @@ export class IntervalDomain implements Domain {
 		this.interval = interval;
 		this.min = min;
 		this.max = max;
-		this.elements = [];
 		this.calculateElements();
 	}
 
