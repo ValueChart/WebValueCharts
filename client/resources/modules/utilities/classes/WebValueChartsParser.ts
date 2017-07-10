@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 22:32:34
+* @Last Modified time: 2017-07-10 10:24:35
 */
 
 // Import Libraries
@@ -79,8 +79,10 @@ export class WebValueChartsParser {
 
 
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
-		var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');
-		var alternativesParentElement: Element = chartStructureElement.querySelector('Alternatives');
+		if (chartStructureElement) {
+			var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');
+			var alternativesParentElement: Element = chartStructureElement.querySelector('Alternatives');
+		}
 
 		valueChart.setRootObjectives(this.parseObjectives(objectivesParentElement));
 		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement));
@@ -96,6 +98,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseObjectives(objectivesParentElement: Element): Objective[] {
+		if (!objectivesParentElement)
+			return;
+
 		var objectives: Objective[] = [];
 
 		var objectiveElements: Element[] = (<any>objectivesParentElement).children;
@@ -182,6 +187,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseAlternatives(alternativesParentElement: Element): Alternative[] {
+		if (!alternativesParentElement)
+			return;
+
 		var alternatives: Alternative[] = [];
 
 		var alternativeElements: NodeListOf<Element> = alternativesParentElement.querySelectorAll('Alternative');
@@ -228,6 +236,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseUsers(usersParentElement: Element): User[] {
+		if (!usersParentElement)
+			return; 
+
 		var users: User[] = [];
 
 		var userElements: NodeListOf<Element> = usersParentElement.querySelectorAll('User');
@@ -258,6 +269,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseWeightMap(weightsParentElement: Element): WeightMap {
+		if (!weightsParentElement)
+			return; 
+
 		var weightMap: WeightMap = new WeightMap();
 
 		var weightElements: NodeListOf<Element> = weightsParentElement.querySelectorAll('Weight');
@@ -281,6 +295,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
+		if (!scoreFunctionsParentElement)
+			return;
+
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
 		var scoreFunctionElements: NodeListOf<Element> = scoreFunctionsParentElement.querySelectorAll('ScoreFunction');
@@ -304,6 +321,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseScoreFunction(scoreFunctionElement: Element): ScoreFunction {
+		if (!scoreFunctionElement)
+			return; 
+		
 		var scoreFunction: ScoreFunction;
 
 		var type: string = scoreFunctionElement.getAttribute('type');

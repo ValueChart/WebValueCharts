@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 19:01:39
+* @Last Modified time: 2017-07-10 10:54:28
 */
 
 // Import Angular Classes:
@@ -203,7 +203,7 @@ export class HomeComponent {
 
 				if (this.validateChartStructure(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);
-					
+
 					let role: UserRole = UserRole.Viewer;
 					if (valueChart.isMember(this.currentUserService.getUsername()))
 						role = UserRole.OwnerAndParticipant;
