@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 21:42:04
+* @Last Modified time: 2017-07-09 19:01:39
 */
 
 // Import Angular Classes:
@@ -230,7 +230,8 @@ export class HomeComponent {
 	validateChartStructure(valueChart: ValueChart): boolean {
 		let structuralErrors = this.validationService.validateStructure(valueChart); 	
 		if (structuralErrors.length > 0) {
-			if (valueChart.getCreator() === this.currentUserService.getUsername()) {
+		
+			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
 				this.canFixChart = false;
 				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
 				$('#validate-modal').modal('show');

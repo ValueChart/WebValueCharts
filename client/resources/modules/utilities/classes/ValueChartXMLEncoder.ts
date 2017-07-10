@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 21:16:16
+* @Last Modified time: 2017-07-09 18:53:24
 */
 
 // Import Model Classes:
@@ -124,7 +124,10 @@ export class ValueChartXMLEncoder {
 		if (valueChart.password) {
 			valueChartElement.setAttribute('password', valueChart.password);
 		}
-		
+
+		let descriptionElement: Element = xmlDocument.createElement('Description');
+		descriptionElement.innerHTML = valueChart.getDescription();
+		valueChartElement.appendChild(descriptionElement);
 
 		var chartStructureElement: Element = xmlDocument.createElement('ChartStructure');
 		valueChartElement.appendChild(chartStructureElement);
@@ -158,6 +161,10 @@ export class ValueChartXMLEncoder {
 		var objectiveElement = xmlDocument.createElement('Objective');
 		objectiveElement.setAttribute('name', objective.getName());
 		objectiveElement.setAttribute('type', objective.objectiveType);
+		
+		let descriptionElement: Element = xmlDocument.createElement('Description');
+		descriptionElement.innerHTML = objective.getDescription();
+		objectiveElement.appendChild(descriptionElement);
 
 		if (objective.objectiveType === 'abstract') {
 			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
@@ -167,9 +174,6 @@ export class ValueChartXMLEncoder {
 			objectiveElement.setAttribute('color', (<PrimitiveObjective>objective).getColor());
 			objectiveElement.appendChild(this.convertDomainIntoElement((<PrimitiveObjective>objective).getDomain(), xmlDocument));
 
-			let descriptionElement: Element = xmlDocument.createElement('Description');
-			descriptionElement.innerHTML = objective.getDescription();
-			objectiveElement.appendChild(descriptionElement);
 		}
 
 		return objectiveElement;
@@ -193,6 +197,11 @@ export class ValueChartXMLEncoder {
 			domainElement.setAttribute('max', '' + (<ContinuousDomain>domain).getMaxValue());
 		} else if (domain.type === 'categorical') {
 			domainElement.setAttribute('ordered', '' + (<CategoricalDomain>domain).ordered);
+			(<CategoricalDomain>domain).getElements().forEach((category: string) => {
+				let categoryElement = xmlDocument.createElement('Category');
+				categoryElement.innerHTML = category;
+				domainElement.appendChild(categoryElement);
+			});
 		} else if (domain.type === 'interval') {
 			domainElement.setAttribute('interval', '' + (<IntervalDomain>domain).getInterval());
 			domainElement.setAttribute('min', '' + (<IntervalDomain>domain).getMinValue());

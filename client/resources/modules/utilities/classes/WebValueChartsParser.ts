@@ -2,8 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 21:16:42
+* @Last Modified time: 2017-07-09 22:32:34
 */
+
+// Import Libraries
+import * as _ 																from 'lodash';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 											from '../../../model/ValueChart';
@@ -59,7 +62,11 @@ export class WebValueChartsParser {
 
 		var valueChartName: string = valueChartElement.getAttribute('name');
 		var valueChartCreator: string = valueChartElement.getAttribute('creator');
-		var valueChartDescription: string = valueChartElement.querySelector('Description').innerHTML;
+		var valueChartDescription: string = '';
+		var descriptionElement = valueChartElement.querySelector('Description');
+
+		if (descriptionElement)
+			valueChartDescription = descriptionElement.innerHTML;
 
 		var usersParentElement: Element = valueChartElement.querySelector('Users');
 		var users: User[] = this.parseUsers(usersParentElement);
@@ -76,7 +83,7 @@ export class WebValueChartsParser {
 		var alternativesParentElement: Element = chartStructureElement.querySelector('Alternatives');
 
 		valueChart.setRootObjectives(this.parseObjectives(objectivesParentElement));
-		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement, valueChart.getAllPrimitiveObjectives()));
+		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement));
 
 		return valueChart;
 	}
@@ -94,12 +101,21 @@ export class WebValueChartsParser {
 		var objectiveElements: Element[] = (<any>objectivesParentElement).children;
 
 		for (var i = 0; i < objectiveElements.length; i++) {
+
 			let objectiveElement: Element = objectiveElements[i];
+			
+			if (objectiveElement.tagName !== 'Objective')
+				continue;
+
 			let objective: Objective;
 
 			let type: string = objectiveElement.getAttribute('type');
 			let name: string = objectiveElement.getAttribute('name');
-			let description: string = objectiveElement.querySelector('Description').innerHTML;
+			let descriptionElement = objectiveElement.querySelector('Description');
+			let description: string = '';
+
+			if (descriptionElement)
+				description = descriptionElement.innerHTML;
 
 			if (type === 'abstract') {
 				objective = new AbstractObjective(name, description);
@@ -126,6 +142,9 @@ export class WebValueChartsParser {
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
 	public parseDomain(domainElement: Element): Domain {
+		if (!domainElement)
+			return new CategoricalDomain(false);	// No Domain was provided; return an empty categorical domain.
+
 		var domain: Domain;
 
 		var type: string = domainElement.getAttribute('type');
@@ -137,6 +156,10 @@ export class WebValueChartsParser {
 		} else if (type === 'categorical') {
 			let ordered: boolean = (domainElement.getAttribute('ordered') === 'true');
 			domain = new CategoricalDomain(ordered)
+			let categoryElements = domainElement.children;
+			for (var i = 0; i < categoryElements.length; i++) {
+				(<CategoricalDomain>domain).addElement(categoryElements[i].innerHTML);
+			}
 		} else if (type === 'interval') {
 			let min: number = +domainElement.getAttribute('min');
 			let max: number = +domainElement.getAttribute('max');
@@ -158,7 +181,7 @@ export class WebValueChartsParser {
 						alternatives. This updating is done in-place.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	public parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
+	public parseAlternatives(alternativesParentElement: Element): Alternative[] {
 		var alternatives: Alternative[] = [];
 
 		var alternativeElements: NodeListOf<Element> = alternativesParentElement.querySelectorAll('Alternative');
@@ -167,7 +190,10 @@ export class WebValueChartsParser {
 			let alternativeElement: Element = alternativeElements[i];
 
 			let name: string = alternativeElement.getAttribute('name');
-			let description: string = alternativeElement.querySelector('Description').innerHTML;
+			let descriptionElement = alternativeElement.querySelector('Description');
+			let description: string = '';
+			if (descriptionElement)
+				description = descriptionElement.innerHTML;
 
 			let alternative: Alternative = new Alternative(name, description);
 
@@ -180,15 +206,10 @@ export class WebValueChartsParser {
 				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
 
-				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
-					return objective.getName() === objectiveName;
-				});
-
-				if (correspondingObjective.getDomainType() === 'categorical') {
-					(<CategoricalDomain>correspondingObjective.getDomain()).addElement(<string>domainValue);
-				} else if (correspondingObjective.getDomainType() === 'continuous') {
-					domainValue = +domainValue;											// Convert the domain value to a number
+				if (_.isNumber(domainValue)) {
+					domainValue = +domainValue;	// Convert the domain value to a number
 				}
+
 				alternative.setObjectiveValue(objectiveName, domainValue);
 			}
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 13:06:54
+* @Last Modified time: 2017-07-09 22:38:42
 */
 
 // Import Node Libraries: 
@@ -51,10 +51,10 @@ describe('WebValueChartsParser', () => {
 
 		before(function() {
 			areaScoreFunctionElement = xmlDocument.querySelector('ScoreFunction[objective=area]');
-			areaObjectiveScores = [{domainElement: 'nightlife', score: 0.25}, {domainElement: 'beach', score: 0.5}, {domainElement: 'airport', score: 1}];
+			areaObjectiveScores = [{domainElement: 'nightlife', score: 0}, {domainElement: 'beach', score: 0.5}, {domainElement: 'airport', score: 1}];
 
 			sizeScoreFunctionElement = xmlDocument.querySelector('ScoreFunction[objective=size]');
-			sizeObjectiveScores = [{domainElement: 200.0, score: 1}, {domainElement: 237.5, score: 0.8}, {domainElement: 275.0, score: 0.6}, {domainElement: 312.5, score: 0.4}, {domainElement: 350.0, score: 0.2}];
+			sizeObjectiveScores = [{domainElement: 200.0, score: 1}, {domainElement: 237.5, score: 0.8}, {domainElement: 275.0, score: 0.6}, {domainElement: 312.5, score: 0.4}, {domainElement: 350.0, score: 0}];
 		});
 
 		it('should correctly parse a continuous ScoreFunction from the XML document', () => {
@@ -272,7 +272,7 @@ describe('WebValueChartsParser', () => {
 			});
 
 			it('should parse all of the alternatives from the XML document', () => {
-				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement, primitiveObjectives);
+				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement);
 
 				expect(alternatives).to.have.length(6);
 
@@ -280,27 +280,9 @@ describe('WebValueChartsParser', () => {
 					expect(alternatives[i].getName()).to.equal(alternativeValues[i].alternativeName);
 
 					alternativeValues[i].objectiveValues.forEach((objectiveValue: any) => {
-						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal(objectiveValue.value);
+						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal('' + objectiveValue.value);
 					});
 				}
-			});
-
-			it('should update the domains of the categorical objectives when alternatives are parsed', () => {
-
-				primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-					if (objective.getDomainType() === 'categorical') {
-						expect((<CategoricalDomain> objective.getDomain()).getElements()).to.have.length(0);
-					}
-				});
-
-				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement, primitiveObjectives);
-
-				primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-					if (objective.getDomainType() === 'categorical') {
-						expect((<CategoricalDomain> objective.getDomain()).getElements()).to.not.have.length(0);
-					}
-				});
-
 			});
 
 		});
