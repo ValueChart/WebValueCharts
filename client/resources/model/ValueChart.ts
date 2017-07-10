@@ -128,10 +128,6 @@ export class ValueChart {
 	}
 
 	isIndividual(): boolean {
-		if (this.type ===  undefined) {
-			this.type = this.users.length > 1 ? ChartType.Group : ChartType.Individual;
-		}
-
 		return this.type === ChartType.Individual;
 	}
 
@@ -155,7 +151,6 @@ export class ValueChart {
 			this.rootObjectives.splice(objectiveIndex, 1);
 		}
 	}
-
 
 	/*
 		@returns {Objective[]} - An array of all objectives in the ValueChart. This array is NOT ordered.	

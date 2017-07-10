@@ -124,7 +124,8 @@ export class CreateBasicInfoComponent implements OnInit {
 	// ================================ Convert Chart Type ====================================
 
 	confirmConvert() {
-		if (!_.isEqual(this.valueChart.getUsers(),this.valueChartService.getValueChart().getUsers())) {
+		let numUsers = this.valueChart.getUsers().length;
+		if (numUsers > 1 || (numUsers === 1 && !this.valueChart.isMember(this.valueChart.getCreator()))) {
 			$('#convert-type-modal').modal('show');
 		}
 		else {

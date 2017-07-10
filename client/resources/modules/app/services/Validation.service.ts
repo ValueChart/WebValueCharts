@@ -5,7 +5,7 @@ import { Injectable } 										from '@angular/core';
 import *	as Formatter									from '../../utilities/classes/Formatter';
 
 // Import Model Classes:
-import { ValueChart }										from '../../../model/ValueChart';
+import { ValueChart, ChartType }							from '../../../model/ValueChart';
 import { Objective }										from '../../../model/Objective';
 import { AbstractObjective }								from '../../../model/AbstractObjective';
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
@@ -41,6 +41,7 @@ export class ValidationService {
 	NAME_INVALID: string = "Chart name contains disallowed characters.";
 	PASSWORD_MISSING: string = "Chart must have a password.";
 	PASSWORD_INVALID: string = "Chart password may not contain spaces."
+	TYPE_INVALID: string = "Individual charts may only contain preferences for the creator.";
 	NO_PRIMITIVE_OBJECTIVES: string = "The chart must have at least one base Objective.";
 	OBJECTIVE_NAMES_MISSING: string = "Every Objective must have a name.";
 	OBJECTIVE_NAMES_NOT_UNIQUE: string = "Objective names must be unique.";
@@ -122,6 +123,9 @@ export class ValidationService {
 		else if (!this.passwordValid(valueChart)) {
 			errorMessages.push(this.PASSWORD_INVALID);
 		}
+		if (!this.typeValid(valueChart)) {
+			errorMessages.push(this.TYPE_INVALID);
+		}
 		return errorMessages;
 	}
 
@@ -152,7 +156,6 @@ export class ValidationService {
 		return (valueChart.password !== undefined && valueChart.password !== "");
 	}
 
-
 	/* 	
 		@returns {boolean}
 		@description 	Returns true iff the password contains no spaces.
@@ -160,6 +163,20 @@ export class ValidationService {
 	passwordValid(valueChart: ValueChart): boolean {
 		let regex = new RegExp("^[^\\s]*$");
 		return (valueChart.password.search(regex) !== -1);
+	}
+
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff the chart type is valid given the users.
+	*/
+	typeValid(valueChart: ValueChart): boolean {
+		if (valueChart.getType() === ChartType.Individual) {
+			let numUsers = valueChart.getUsers().length;
+			if (numUsers > 1 || (numUsers === 1 && !valueChart.isMember(valueChart.getCreator()))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// ================================ Validate Objectives ====================================
@@ -512,7 +529,6 @@ export class ValidationService {
 		}
 		return alternatives;
 	}
-
 
 	// ================================ VALIDATE CHART USERS ====================================
 
