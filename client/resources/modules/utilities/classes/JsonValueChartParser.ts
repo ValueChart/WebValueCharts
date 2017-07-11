@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 20:48:02
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-27 15:28:55
+* @Last Modified time: 2017-07-10 16:53:37
 */
 
 // Import Model Classes:
@@ -61,7 +61,6 @@ export class JsonValueChartParser {
 		valueChart._id = JsonValueChart._id;
 		valueChart.password = JsonValueChart.password;
 		let type = (JsonValueChart.type === 0) ? ChartType.Individual : ChartType.Group;
-
 		valueChart.setType(type);
 
 		if (JsonValueChart.rootObjectives !== undefined) {

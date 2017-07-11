@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-27 15:53:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:07:02
+* @Last Modified time: 2017-07-10 17:06:49
 */
 
 // Import Angular Classes:
@@ -12,7 +12,7 @@ import { Injectable } 															from '@angular/core';
 import * as _ 																	from 'lodash';
 
 // Import Model Classes: 
-import { ValueChart } 															from '../../../model/ValueChart';
+import { ValueChart, ChartType } 												from '../../../model/ValueChart';
 import { ScoreFunction } 														from '../../../model/ScoreFunction';
 import { User }																	from '../../../model/User';
 
@@ -28,6 +28,7 @@ export class ChangeDetectionService {
 
 	// Copies of the input values to the ValueChartDirective. Used for comparison purposes.
 	public valueChartRecord: ValueChart;							// Copy of the previous ValueChart. Its should be the same as the ValueChart input to the ValueChartDirective unless a change has taken place.
+	public chartTypeRecord: ChartType									// Copy of the previous ValueChart type.
 	public viewConfigRecord: ViewConfig = <any>{};					// Copy of the previous view config. Its fields should equal those of the viewConfig object in RendererConfigUtility unless a change has taken place.
 	public interactionConfigRecord: InteractionConfig = <any>{};	// Copy of the previous interaction config. Its fields should equal those of the interactionConfig object in ValueChartDirective unless a change has taken place.
 	public widthRecord: number;										// Copy of the previous width. It should equal the width in ValueChartDirective unless a change has taken place.
@@ -61,10 +62,9 @@ export class ChangeDetectionService {
 		this.valueChartRecord = _.cloneDeep(valueChart);
 		this.widthRecord = _.clone(width);
 		this.heightRecord = _.clone(height);
-
+		this.chartTypeRecord = _.clone(valueChart.getType());
 		this.viewConfigRecord = _.cloneDeep(viewConfig);
 		this.interactionConfigRecord = _.cloneDeep(interactionConfig);
-	
 		this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
 	}
 
@@ -83,13 +83,16 @@ export class ChangeDetectionService {
 	*/
 	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, renderRequired: boolean): boolean {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart.getUsers(), this.valueChartRecord.getUsers());
+		var chartTypeChanged: boolean = !_.isEqual(valueChart.getType(), this.chartTypeRecord);
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
 
 		if (valueChartChanged)
 			this.valueChartRecord = _.cloneDeep(valueChart);
 
-		return valueChartChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
+		this.chartTypeRecord = _.clone(valueChart.getType());
+
+		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
 	}
 
 	detectStructuralChanges(valueChart: ValueChart, usersToDisplay: User[]): boolean {

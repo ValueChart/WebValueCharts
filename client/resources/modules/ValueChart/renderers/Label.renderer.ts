@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 11:13:25
+* @Last Modified time: 2017-07-10 16:42:36
 */
 
 // Import Angular Classes:
@@ -33,6 +33,7 @@ import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScor
 import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
 
 // Import Model Classes:
+import { ValueChart, ChartType }									from '../../../model/ValueChart';
 import { User }														from '../../../model/User';
 import { Objective }												from '../../../model/Objective';
 import { PrimitiveObjective }										from '../../../model/PrimitiveObjective';
@@ -418,7 +419,7 @@ export class LabelRenderer {
 			.attr('dy', '1.2em')
 			.text((d: LabelData) => {
 				var bestWorstText = '';
-				if (d.objective.objectiveType === 'primitive' && u.valueChart.getUsers().length > 0) {
+				if (d.objective.objectiveType === 'primitive' && u.valueChart.getType() === ChartType.Individual) {
 					var scoreFunction = u.usersToDisplay[0].getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
