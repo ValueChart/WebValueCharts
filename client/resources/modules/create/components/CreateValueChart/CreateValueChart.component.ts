@@ -79,21 +79,23 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnInit() {
 
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
-
-		// Lock chart while creator is editing
-		if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart || this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {	
-			this.lockValueChart()
-		}
+		this.creationStepsService.setAutoSaveEnabled(false);
 
 		this.sub = this.route.params.subscribe(params => { 
 			this.creationStepsService.setCreationPurpose(parseInt(params['purpose']));
 
 			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {
-				var valueChart = new ValueChart('', '', this.currentUserService.getUsername()); 
+				var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
+				valueChart.setType(ChartType.Individual); 
 				this.valueChartService.setValueChart(valueChart);
 			}
-			this.creationStepsService.setAutoSaveEnabled(this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart 
-														|| this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart);
+			
+			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart 
+				|| this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
+				this.lockValueChart();
+				this.creationStepsService.setAutoSaveEnabled(true);
+			}
+
 			this.loading = false;
 		});
 

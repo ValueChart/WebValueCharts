@@ -260,7 +260,7 @@ export class CreateWeightsComponent implements OnInit {
 	getWeightMapFromRanks(): WeightMap {
 		let weights = new WeightMap();
 		let rank = 1;
-		let numObjectives = this.rankedObjectives.length;
+		let numObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives().length;
 		for (let obj of this.rankedObjectives) {
 			let weight = this.computeSum(rank, numObjectives) / numObjectives;
 			weights.setObjectiveWeight(obj, weight);

@@ -175,7 +175,7 @@ export class UpdateValueChartService {
 		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
 
 		for (let alt of alternatives) {
-			for (let key in alt.getAllObjectiveValuePairs().keys()) {
+			for (let key of alt.getObjectiveKeys()) {
 				if (objNames.indexOf(key) === -1) {
 					alt.removeObjective(key);
 				}
@@ -286,6 +286,7 @@ export class UpdateValueChartService {
 	*/
 	removeWeights(primitiveObjectives: PrimitiveObjective[], user: User) {
 		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+		let renormalize = user.getWeightMap().getWeightTotal() === 1;
 
 		var elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
 		var iteratorElement: IteratorResult<string> = elementIterator.next();
@@ -295,7 +296,10 @@ export class UpdateValueChartService {
           	}
 			iteratorElement = elementIterator.next();
 		}
-		user.getWeightMap().normalize();
+		if (renormalize) {
+			user.getWeightMap().normalize();
+		}
+		
 	}
 
 	/*

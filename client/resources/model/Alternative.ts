@@ -94,6 +94,20 @@ export class Alternative {
 		return objectiveValuePairs;
 	}
 
+	getObjectiveKeys(): string[] {
+		var objectiveKeys = [];
+
+		var mapIterator: Iterator<string> = this.objectiveValues.keys();
+		var iteratorElement: IteratorResult<string> = mapIterator.next();
+
+		while (iteratorElement.done === false) {
+			objectiveKeys.push(iteratorElement.value);
+			iteratorElement = mapIterator.next();
+		}
+
+		return objectiveKeys;
+	}
+
 	setObjectiveValue(objectiveName: string, value: string | number): void {
 		this.objectiveValues.set(objectiveName, value);
 	}

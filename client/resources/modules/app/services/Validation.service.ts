@@ -517,7 +517,7 @@ export class ValidationService {
 					}
 					else if (obj.getDomainType() === 'categorical') {
 						let dom: CategoricalDomain = <CategoricalDomain>obj.getDomain();
-						if (dom.getElements().indexOf(<string>objValue) === -1 ) {
+						if (dom.getElements().indexOf(String(objValue)) === -1 ) {
 							objectives.push(obj.getName());
 						}
 					}					
