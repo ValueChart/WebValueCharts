@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 16:42:36
+* @Last Modified time: 2017-07-11 09:02:26
 */
 
 // Import Angular Classes:
@@ -419,7 +419,7 @@ export class LabelRenderer {
 			.attr('dy', '1.2em')
 			.text((d: LabelData) => {
 				var bestWorstText = '';
-				if (d.objective.objectiveType === 'primitive' && u.valueChart.getType() === ChartType.Individual) {
+				if (d.objective.objectiveType === 'primitive' && u.valueChart.getType() === ChartType.Individual && u.usersToDisplay[0]) {
 					var scoreFunction = u.usersToDisplay[0].getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
