@@ -315,7 +315,13 @@ export class CreateObjectivesComponent implements OnInit {
 				dom = new IntervalDomain(objrow.dom.min, objrow.dom.max, objrow.dom.interval);
 			}
 			else {
-				dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max, objrow.dom.unit);
+				if (objrow.dom.unit) {
+					dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max, objrow.dom.unit);
+				}
+				else {
+					dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max);
+				}
+				
 			}
 			(<PrimitiveObjective>obj).setDomain(dom);
 			(<PrimitiveObjective>obj).setColor(objrow.color);

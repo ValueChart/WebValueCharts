@@ -83,7 +83,7 @@
                             <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />     
+                            <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />  
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
                             <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />

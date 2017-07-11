@@ -293,15 +293,7 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 	}
 
-  /*   
-    @returns {void}
-    @description   This is executed when the user clicks "Edit Preferences" and does the following:
-    				(1) If user is joining the chart, fetch the chart again - this is necessary to get any changes made to the chart structure by the creator
-    				(2) Normalize the user's weights in case the pump tool was used
-    				(3) Redirect to edit preference workflow
-  */
   	editPreferences(): void {		
-		this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getWeightMap().normalize();
 		this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
   	}
 
@@ -337,7 +329,6 @@ export class ValueChartViewerComponent implements OnInit {
 			this.userNotificationService.displayErrors(errors);
 		} else {
 			this.rescaleScoreFunctions();
-			currentUser.getWeightMap().normalize();
 
 			// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 			// that has been retrieved from the server.
