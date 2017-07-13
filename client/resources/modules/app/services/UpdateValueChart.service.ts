@@ -193,7 +193,7 @@ export class UpdateValueChartService {
 				if (obj.getDomainType() === "continuous") {
 					let dom = <ContinuousDomain>obj.getDomain();
 					let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
-					if (altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
+					if (isNaN(altVal) || altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
 						alt.removeObjective(obj.getName());
 					}
 				}
@@ -286,20 +286,22 @@ export class UpdateValueChartService {
 	*/
 	removeWeights(primitiveObjectives: PrimitiveObjective[], user: User) {
 		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
-		let renormalize = user.getWeightMap().getWeightTotal() === 1;
+		let error = 1e-8 * primitiveObjectives.length;
+		let renormalize = user.getWeightMap().getWeightTotal() > 1 - error && user.getWeightMap().getWeightTotal() < 1 + error;
 
 		var elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
 		var iteratorElement: IteratorResult<string> = elementIterator.next();
+		var size = 0;
 		while (iteratorElement.done === false) {
 			if (objNames.indexOf(<string>iteratorElement.value) === -1) {
             	user.getWeightMap().removeObjectiveWeight(<string>iteratorElement.value);
           	}
 			iteratorElement = elementIterator.next();
+			size++;
 		}
 		if (renormalize) {
 			user.getWeightMap().normalize();
-		}
-		
+		}	
 	}
 
 	/*
@@ -340,7 +342,8 @@ export class UpdateValueChartService {
 
 		warnings = warnings.concat(this.completeScoreFunctions(primitiveObjectives, user));
 		// Only insert missing weights if all weights are already set
-		if (user.getWeightMap().getWeightTotal() === 1) {
+		let error = 1e-8 * primitiveObjectives.length;
+		if (user.getWeightMap().getWeightTotal() > 1 - error && user.getWeightMap().getWeightTotal() < 1 + error) {
 			warnings = warnings.concat(this.completeWeights(primitiveObjectives, user));
 		}	
 

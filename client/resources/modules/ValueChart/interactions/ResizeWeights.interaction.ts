@@ -146,7 +146,8 @@ export class ResizeWeightsInteraction {
 		if (resizeType !== WeightResizeType.None) {
 			dragToResizeWeights
 				.on('start', this.resizeWeightsStart)
-				.on('drag', this.resizeWeights);
+				.on('drag', this.resizeWeights)
+				.on('end', this.resizeWeightsEnd);
 		}
 
 		if (labelRootContainer) {
@@ -188,6 +189,12 @@ export class ResizeWeightsInteraction {
 	private resizeWeightsStart = (d: any, i: number) => {
 		// Save the current state of the Weight Map.
 		this.chartUndoRedoService.saveWeightMapRecord(this.lastRendererUpdate.valueChart.getUsers()[0].getWeightMap());
+	}
+
+	// An anonymous function that is used to handle the event fired when dragging to rearrange weights ends.
+	private resizeWeightsEnd = (d: any, i: number) => {
+		// Save the current state of the Weight Map.
+		this.lastRendererUpdate.valueChart.getUsers()[0].getWeightMap().normalize();
 	}
 
 	// An anonymous function that is used to handle the regular drag events that are fired whenever the user continues to drag label divider.

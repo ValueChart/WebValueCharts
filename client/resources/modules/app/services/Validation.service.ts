@@ -695,7 +695,7 @@ export class ValidationService {
 		@description 	Returns true iff weights for user sum to 1 within margin of error.
 	*/
 	invalidWeightSum(valueChart: ValueChart, user: User): boolean {
-		let error = 1e-3 * valueChart.getAllPrimitiveObjectivesByName().length;
+		let error = 1e-8 * valueChart.getAllPrimitiveObjectivesByName().length;
 		let weightMap = user.getWeightMap();
 		if (weightMap && (weightMap.getWeightTotal() < 1 - error || weightMap.getWeightTotal() > 1 + error)) {
 			return true;
