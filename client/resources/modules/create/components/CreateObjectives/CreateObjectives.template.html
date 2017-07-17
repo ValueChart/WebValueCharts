@@ -44,7 +44,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()">
+                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].initializeDefaultScoreFunction(); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
                         <option [value]="'interval'">interval</option>
@@ -151,6 +151,14 @@
                 <h4 class="modal-title" id="myModalLabel">Edit Default Score Function</h4>
             </div>     
             <div *ngIf="defaultScoreFunctionModalOpen" class="modal-body">
+                <div class="input-group">
+                    <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="objectiveRows[selectedObjRow].latestDefault" (ngModelChange)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">
+                        <option value="{{ScoreFunction.FLAT}}">Flat</option>
+                        <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
+                        <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>
+                    </select>
+                    <button type="button" class="btn btn-default" (click)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">Reset</button>
+                </div>
                 <ScoreFunction 
                 [scoreFunctions]="[objectiveRows[selectedObjRow].defaultScoreFunction]"
                 [colors]="[objectiveRows[selectedObjRow].color]"

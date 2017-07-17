@@ -52,6 +52,7 @@ export class CreateObjectivesComponent implements OnInit {
 	// ========================================================================================
 
 	public ChartOrientation = ChartOrientation;
+	public ScoreFunction = ScoreFunction;
 	public services: any = {}; // Services container to pass to ScoreFunctionDirective
 
 	// The ValueChart:
@@ -535,6 +536,7 @@ class ObjectiveRow {
 	dom: DomainDetails;
 	children: string[];
 	defaultScoreFunction: ScoreFunction;
+	latestDefault: string; // Track latest selection in default dropdown
 
 	constructor(id: string, name: string, desc: string, parent: string, depth: number, type?: string, color?: string, dom?: DomainDetails, defaultScoreFunction?: ScoreFunction) {
 		this.id = id;
@@ -545,9 +547,9 @@ class ObjectiveRow {
 		type ? this.type = type : this.type = 'abstract';
 		color ? this.color = color : this.color = 'red';
 		dom ? this.dom = dom : this.dom = new DomainDetails('categorical');
-		if (defaultScoreFunction)
-			this.defaultScoreFunction = defaultScoreFunction;
+		defaultScoreFunction ? this.defaultScoreFunction = defaultScoreFunction : this.initializeDefaultScoreFunction();
 		this.children = [];
+		this.latestDefault = ScoreFunction.FLAT;
 	}
 
 	addChild(child: string) {
@@ -559,21 +561,31 @@ class ObjectiveRow {
         this.children.splice(i, 1);
 	}
 
-	resetDefaultScoreFunction() {
+	initializeDefaultScoreFunction() {
 		let scoreFunction;
-		if (this.dom.type === 'categorical') {
+		if (this.dom.type === 'categorical' || this.dom.type === 'interval') {
 			scoreFunction = new DiscreteScoreFunction();
-			scoreFunction.initialize(ScoreFunction.FLAT, this.dom.categories);
-		}
-		else if (this.dom.type === 'interval') {
-			scoreFunction = new DiscreteScoreFunction();
-			scoreFunction.initialize(ScoreFunction.FLAT, this.dom.calculateIntervalDomainElements());
 		}
 		else {
 			scoreFunction = new ContinuousScoreFunction(this.dom.min, this.dom.max);
-			scoreFunction.initialize(ScoreFunction.FLAT);
 		}
 		this.defaultScoreFunction = scoreFunction;
+		this.latestDefault = ScoreFunction.FLAT;
+		this.resetDefaultScoreFunction();
+	}
+
+	resetDefaultScoreFunction() {
+		if (this.dom.type === 'categorical') {
+			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.categories);
+		}
+		else if (this.dom.type === 'interval') {
+			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.calculateIntervalDomainElements());
+		}
+		else {
+			(<ContinuousScoreFunction>this.defaultScoreFunction).setMinDomainValue(this.dom.min);
+			(<ContinuousScoreFunction>this.defaultScoreFunction).setMaxDomainValue(this.dom.max);
+			(<ContinuousScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault);
+		}
 	}
 
 	copy(): ObjectiveRow {
