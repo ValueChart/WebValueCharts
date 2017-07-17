@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:10:33
+* @Last Modified time: 2017-07-17 11:27:12
 */
 
 // Import Angular Classes:
@@ -197,7 +197,13 @@ export class ValueChartViewerComponent implements OnInit {
 			// TODO:<aaron> Clean this up.
 			this.usersToDisplay = this.valueChartViewerService.getActiveValueChart().getUsers();
 		} else {
-			this.valueChartViewerService.setActiveValueChart(this.valueChartService.getValueChart());
+			let baseValueChart = this.valueChartService.getValueChart();
+			this.valueChartViewerService.setActiveValueChart(baseValueChart);
+			
+			let currentUser = baseValueChart.getUser(this.currentUserService.getUsername());
+			let errors = this.validationService.validateUser(baseValueChart, currentUser);
+			this.valueChartViewerService.updateInvalidUser(currentUser, errors)
+
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 

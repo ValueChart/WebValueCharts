@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 18:10:44
+* @Last Modified time: 2017-07-17 11:27:56
 */
 
 
@@ -175,6 +175,16 @@ export class ValueChartViewerService {
 
 	isUserInvalid(userToFind: string): boolean {
 		return this.invalidUsers.indexOf(userToFind) !== -1;
+	}
+
+	updateInvalidUser(user: User, errors: string[]): void {
+		if (errors.length === 0 && this.isUserInvalid(this.currentUserService.getUsername())) {
+			this.removeInvalidUser(this.currentUserService.getUsername());
+			this.addUserToDisplay(user);
+		} else if (errors.length > 0) {
+			this.addInvalidUser(user.getUsername());
+			this.removeUserToDisplay(user.getUsername());
+		}
 	}
 
 }
