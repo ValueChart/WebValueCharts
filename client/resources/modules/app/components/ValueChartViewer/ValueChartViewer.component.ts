@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 17:09:17
+* @Last Modified time: 2017-07-17 11:10:33
 */
 
 // Import Angular Classes:
@@ -340,7 +340,11 @@ export class ValueChartViewerComponent implements OnInit {
 					toastr.success('Save successful');
 					if (this.valueChartViewerService.getUserRole() === UserRole.UnsavedParticipant) {
 						let newRole = (this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername())) ? UserRole.OwnerAndParticipant : UserRole.Participant;
+						let type = this.valueChartViewerService.getActiveValueChart().getType();
 						this.valueChartViewerService.setUserRole(newRole);
+
+						// Update the URL parameters to reflect the new user role.
+						this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type ], { queryParamsHandling: "merge", queryParams: { role: newRole } });
 					}
 				},
 				// Handle Server Errors
