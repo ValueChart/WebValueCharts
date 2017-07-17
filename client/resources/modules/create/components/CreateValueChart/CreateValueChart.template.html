@@ -59,4 +59,11 @@
             </div>
         </div>
     </div>
+    <NotificationModal
+    [display]="creationStepsService.displayValidationModal"
+    [title]="'Validation Error'"
+    [body]="creationStepsService.validationMessage"
+    [actionEnabled]="false"
+    (modalClosed)="creationStepsService.displayValidationModal = $event">
+    </NotificationModal>
 </div>

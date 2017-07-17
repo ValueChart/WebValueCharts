@@ -22,26 +22,14 @@
     </div>
 </div>
 
-<div class="modal fade" id="convert-type-modal" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="modal-header">Convert to Individual Chart</h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-sm-11 col-sm-offset-1">
-						<h3>Are you sure you want to convert this to an individual chart? Other users' data will be lost.</h3>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" class="btn btn-lg btn-success" (click)="convertToIndividual()" data-dismiss="modal">OK</button>
-						<button type="submit" class="btn btn-lg btn-danger" (click)="type = ChartType.Group" data-dismiss="modal">Cancel</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+<NotificationModal
+[display]="displayModal"
+[title]="'Convert to Individual Chart'"
+[body]="'Are you sure you want to convert this to an individual chart? Other users\' data will be lost.'"
+[actionEnabled]="true"
+[noActionText]="'Cancel'"
+[actionText]="'Ok'"
+[actionFunction]="convertToIndividual.bind(this)"
+[noActionFunction]="resetType.bind(this)"
+(modalClosed)="displayModal = $event">
+</NotificationModal>

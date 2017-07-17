@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 12:09:11
+* @Last Modified time: 2017-07-17 13:34:07
 */
 
 // Import Angular Classes:
@@ -18,9 +18,6 @@ import { Observable }															from 'rxjs/Observable';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ViewOptionsComponent }													from '../widgets/ViewOptions/ViewOptions.component'
-import { InteractionOptionsComponent }											from '../widgets/InteractionOptions/InteractionOptions.component'
-
 import { ValueChartDirective }													from '../../../ValueChart/directives/ValueChart.directive';
 
 import { ValueChartService }													from '../../services/ValueChart.service';
@@ -83,7 +80,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	public valueChartStatus: any = { userChangesPermitted: true, incomplete: false };
 	public usersToDisplay: User[];
-	public validationMessage: string;
+	public validationMessage: string = '';
 
 	// ValueChart Configuration:
 	public viewConfig: ViewConfig = <any> {};
@@ -183,7 +180,6 @@ export class ValueChartViewerComponent implements OnInit {
 		if (invalidUsers.length > 0 && this.valueChartViewerService.getUserRole() !== UserRole.UnsavedParticipant) {
 			let errorMessages = this.validationService.validateUsers(valueChart);
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
-			$('#validate-modal').modal('show');
 		}
 
 		this.setValueChartTypeToView(type);
@@ -209,7 +205,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 
-		this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
+		// this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
 	}
 
 	updateView(viewConfig: ViewConfig) {

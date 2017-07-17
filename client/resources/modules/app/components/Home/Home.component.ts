@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:55:03
+* @Last Modified time: 2017-07-17 14:35:10
 */
 
 // Import Angular Classes:
@@ -60,6 +60,7 @@ export class HomeComponent {
 									   // this is needed so we can use the same credentials modal in both cases
 
 	// Upload validation fields:
+	public displayValidationModal = false;
 	public validationMessage: string;
 	public canFixChart: boolean;
 
@@ -203,8 +204,8 @@ export class HomeComponent {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;	// Retrieve the file contents string from the file reader.
 				let valueChart = this.valueChartParser.parseValueChart(xmlString);
 
+				this.valueChartService.setValueChart(valueChart);
 				if (this.validateChartStructure(valueChart)) {
-					this.valueChartService.setValueChart(valueChart);
 
 					let role: UserRole = UserRole.Viewer;
 					if (valueChart.isMember(this.currentUserService.getUsername()))
@@ -236,12 +237,12 @@ export class HomeComponent {
 			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
 				this.canFixChart = false;
 				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
-				$('#validate-modal').modal('show');
+				this.displayValidationModal = true;
 			}
 			else {
 				this.canFixChart = true;
 				this.validationMessage = "There are problems with this chart: \n\n" + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
-				$('#validate-modal').modal('show');
+				this.displayValidationModal = true;
 			}
 			return false;
 		}

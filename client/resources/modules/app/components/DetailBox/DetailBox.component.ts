@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:53:25
+* @Last Modified time: 2017-07-17 15:52:14
 */
 
 // Import Angular Classes:
@@ -61,6 +61,8 @@ export class DetailBoxComponent implements OnInit {
 	private alternativeObjectiveValues: (string | number)[];
 
 	public userToRemove: User;
+	public displayModal: boolean = false;
+	public actionFunction: Function;
 
 	public detailBoxCurrentTab: string;
 	public DETAIL_BOX_CHART_TAB: string = 'chart';

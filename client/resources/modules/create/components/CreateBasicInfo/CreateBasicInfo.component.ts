@@ -38,6 +38,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	validationTriggered: boolean;
 	originalName: string;
 	errorMessages: string[]; // Validation error messages
+	public displayModal = false;
 
 	// Chart type:
 	public ChartType = ChartType;
@@ -126,7 +127,7 @@ export class CreateBasicInfoComponent implements OnInit {
 	confirmConvert() {
 		let numUsers = this.valueChart.getUsers().length;
 		if (numUsers > 1 || (numUsers === 1 && !this.valueChart.isMember(this.valueChart.getCreator()))) {
-			$('#convert-type-modal').modal('show');
+			this.displayModal = true;
 		}
 		else {
 			this.convertToIndividual();
@@ -143,5 +144,9 @@ export class CreateBasicInfoComponent implements OnInit {
 		
 		this.valueChart.setUsers(users);
 		this.valueChart.setType(ChartType.Individual);
+	}
+
+	resetType(): void {
+		this.type = ChartType.Group;
 	}
 }

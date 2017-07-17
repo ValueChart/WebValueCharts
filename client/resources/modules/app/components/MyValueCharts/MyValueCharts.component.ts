@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 11:09:56
+* @Last Modified time: 2017-07-17 15:43:36
 */
 
 // Import Angular Classes:
@@ -59,7 +59,12 @@ export class MyValueChartsComponent implements OnInit {
 	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
 										// on the client side using object URLs.	
 
-	public validationMessage: string;
+    public displayModal: boolean = false;
+    public modalActionEnabled: boolean = false;
+    public modalActionFunction: Function = () => { };
+	public modalTitle: string;
+	public modalBody: string;
+
 
 
 	// ========================================================================================
@@ -119,8 +124,10 @@ export class MyValueChartsComponent implements OnInit {
 				//  changes in validation since saving to the database.)
 				let errorMessages = this.validationService.validateStructure(valueChart);
 				if (errorMessages.length > 0) {
-					this.validationMessage = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
-					$('#validate-modal').modal('show');
+					this.modalTitle = 'Validation Error';
+					this.modalBody = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
+					this.modalActionEnabled = false;
+					this.displayModal = true;
 				}
 				else {
 					this.valueChartService.setValueChart(valueChart);
@@ -150,7 +157,17 @@ export class MyValueChartsComponent implements OnInit {
 			});
 	}
 
-	leaveChart(chartId: string): void {
+	displayLeaveChart(chartId: string, chartPassword: string): void {
+		this.setValueChart(chartId, chartPassword);
+
+		this.modalTitle = 'Leave ValueChart';
+		this.modalBody = 'Are you sure you want to leave this ValueChart?';
+		this.modalActionEnabled = true;
+		this.modalActionFunction = this.leaveValueChart.bind(this, chartId);
+		this.displayModal = true;
+	}
+
+	leaveValueChart(chartId: string): void {
 		this.valueChartHttpService.deleteUser(chartId, this.currentUserService.getUsername())
 			.subscribe(username => {
 				var index: number = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
@@ -160,7 +177,17 @@ export class MyValueChartsComponent implements OnInit {
 		});
 	}
 
-	deleteValueChart(chartId: string, chartName: string): void {
+	displayDeleteChart(chartId: string, chartPassword: string): void {
+		this.setValueChart(chartId, chartPassword);
+
+		this.modalTitle = 'Delete ValueChart';
+		this.modalBody = 'Are you sure you want to permanently delete this ValueChart?';
+		this.modalActionEnabled = true;
+		this.modalActionFunction = this.deleteValueChart.bind(this, chartId);
+		this.displayModal = true;
+	}
+
+	deleteValueChart(chartId: string): void {
 		this.valueChartHttpService.deleteValueChart(chartId)
 			.subscribe(status => {
 				var index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
@@ -169,7 +196,7 @@ export class MyValueChartsComponent implements OnInit {
 				this.valueChartOwnerships.splice(index, 1);
 			});
 
-		this.valueChartHttpService.deleteValueChartStatus(chartName).subscribe((status) => {
+		this.valueChartHttpService.deleteValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => {
 			// Do nothing;
 		});
 	}

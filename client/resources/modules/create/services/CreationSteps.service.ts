@@ -47,6 +47,7 @@ export class CreationStepsService {
 
 	// Error messages
 	validationMessage: string;
+	public displayValidationModal: boolean = false;
 	NAME_TAKEN: string = "That name is already taken. Please choose another.";
 
 	// ========================================================================================
@@ -213,7 +214,7 @@ export class CreationStepsService {
 			} 
 			if (errorMessages.length > 0) {
 				this.validationMessage = "Cannot view chart. Please fix the following errors to proceed:\n\n" + errorMessages.join("\n\n");
-				$('#validatation-modal').modal('show');
+				this.displayValidationModal = true;
 				return false;
 			}
 		}

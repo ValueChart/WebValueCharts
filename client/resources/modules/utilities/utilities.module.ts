@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-18 11:10:25
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-24 15:13:04
+* @Last Modified time: 2017-07-17 13:20:04
 */
 
 
@@ -14,6 +14,7 @@ import { HttpModule } 							from '@angular/http';
 
 // Import Application Classes:
 import { ScoreFunctionDirective }				from './directives/ScoreFunction.directive';
+import { NotificationModalComponent }			from './components/NotificationModal.component';
 
 
 /*
@@ -32,10 +33,12 @@ import { ScoreFunctionDirective }				from './directives/ScoreFunction.directive'
 		CommonModule,
 	],
 	declarations: [
-		ScoreFunctionDirective
+		ScoreFunctionDirective,
+		NotificationModalComponent
 	],
 	exports: [
-		ScoreFunctionDirective
+		ScoreFunctionDirective,
+		NotificationModalComponent
 	],
 	providers: [
 	],
