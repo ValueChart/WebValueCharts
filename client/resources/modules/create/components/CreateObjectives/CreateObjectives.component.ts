@@ -8,9 +8,12 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
-import { UpdateValueChartService }								from '../../../app/services/UpdateValueChart.service';
+import { UpdateValueChartService }										from '../../../app/services/UpdateValueChart.service';
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
+import { ChartUndoRedoService }                     					from '../../../ValueChart/services/ChartUndoRedo.service';
+import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
+import { RendererScoreFunctionUtility }									from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 import *	as Formatter												from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
@@ -23,6 +26,12 @@ import { CategoricalDomain }											from '../../../../model/CategoricalDomain
 import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
 import { IntervalDomain }												from '../../../../model/IntervalDomain';
 import { Alternative }													from '../../../../model/Alternative';
+import { ScoreFunction }												from '../../../../model/ScoreFunction';
+import { DiscreteScoreFunction }										from '../../../../model/DiscreteScoreFunction';
+import { ContinuousScoreFunction }										from '../../../../model/ContinuousScoreFunction';
+
+// Import Types:
+import { ChartOrientation }                         					from '../../../../types/Config.types';
 
 /*
 	This component defines the UI controls for creating and editing the Objective structure of a ValueChart.
@@ -32,13 +41,17 @@ import { Alternative }													from '../../../../model/Alternative';
 
 @Component({
 	selector: 'CreateObjectives',
-	templateUrl: './CreateObjectives.template.html'
+	templateUrl: './CreateObjectives.template.html',
+	providers: [RendererScoreFunctionUtility]
 })
 export class CreateObjectivesComponent implements OnInit {
 
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
+
+	public ChartOrientation = ChartOrientation;
+	public services: any = {}; // Services container to pass to ScoreFunctionDirective
 
 	// The ValueChart:
 	valueChart: ValueChart;
@@ -58,6 +71,9 @@ export class CreateObjectivesComponent implements OnInit {
     // Add Category modal fields:
     categoryToAdd: string; // Category in input field of modal
     categoriesToAdd: string[]; // Categories in modal list
+
+    // Default Score Function modal fields:
+    defaultScoreFunctionModalOpen = false;
 
     // Validation fields:
     validationTriggered: boolean = false; // Specifies whether or not validation has been triggered (this happens when the user attempts to navigate)
@@ -79,7 +95,8 @@ export class CreateObjectivesComponent implements OnInit {
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
 		private updateObjRefService: UpdateValueChartService,
-		private validationService: ValidationService) { }
+		private validationService: ValidationService,
+		private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -97,6 +114,8 @@ export class CreateObjectivesComponent implements OnInit {
             subscriber.next(this.validate());
             subscriber.complete();
         });
+        this.services.chartUndoRedoService = new ChartUndoRedoService();
+    	this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
 
 		this.initialPrimObjRows = {};
 		this.objectiveRows = {};
@@ -246,6 +265,15 @@ export class CreateObjectivesComponent implements OnInit {
 	}
 
 	/* 	
+		@returns {boolean}
+		@description 	Disable the "Edit" button in objID's row if the domain is not valid.
+	*/
+	disableEditDefaultScoreFunction(objID: string): boolean {
+		let objrow: ObjectiveRow = this.objectiveRows[objID];
+		return this.objectiveRows[objID].type === 'abstract' || !this.objectiveRows[objID].dom.isValid();
+	}
+
+	/* 	
 		@returns {string[]}
 		@description 	Gets the ObjectiveRow IDs as a list in the order that they will be displayed.
 	*/
@@ -289,7 +317,7 @@ export class CreateObjectivesComponent implements OnInit {
 			}
 			(<PrimitiveObjective>obj).setDomain(dom);
 			(<PrimitiveObjective>obj).setColor(objrow.color);
-			(<PrimitiveObjective>obj).setDefaultScoreFunction((<PrimitiveObjective>obj).getFlatScoreFunction());
+			(<PrimitiveObjective>obj).setDefaultScoreFunction(objrow.defaultScoreFunction);
 		}
 		else {
 			obj = new AbstractObjective(objrow.name, objrow.desc);
@@ -315,7 +343,7 @@ export class CreateObjectivesComponent implements OnInit {
 		}
 		else {
 			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getName(), obj.getDescription(), parentID, depth, 'primitive', (<PrimitiveObjective>obj).getColor(),
-				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()));
+				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()), (<PrimitiveObjective>obj).getDefaultScoreFunction());
 			this.addObjRow(parentID, objrow);
 		}
 	}
@@ -360,8 +388,15 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Moves categories from modal list to ObjectiveRow domain.
 	*/
 	addCategories() {
+		let editing = this.objectiveRows[this.selectedObjRow].dom.isValid();
 		for (let cat of this.categoriesToAdd) {
 			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
+			if (editing){
+				(<DiscreteScoreFunction>this.objectiveRows[this.selectedObjRow].defaultScoreFunction).setElementScore(cat, 0.5);
+			}
+		}
+		if (!editing) {
+			this.objectiveRows[this.selectedObjRow].resetDefaultScoreFunction();
 		}
 		this.categoriesToAdd = [];
 		this.resetErrorMessages();
@@ -379,8 +414,8 @@ export class CreateObjectivesComponent implements OnInit {
 	}
 
 	/* 	
-	@returns {void}
-	@description 	Removes selected categories from modal list.
+		@returns {void}
+		@description 	Removes selected categories from modal list.
 	*/
 	removeSelectedCategoriesModal() {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlistmodal')[0]);
@@ -397,6 +432,7 @@ export class CreateObjectivesComponent implements OnInit {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlist' + objID)[0]);
 		for (let cat of selected) {
 			this.objectiveRows[objID].dom.removeCategory(cat);
+			this.objectiveRows[objID].defaultScoreFunction.removeElement(cat);
 		}
 		this.resetErrorMessages();
 	}
@@ -490,8 +526,9 @@ class ObjectiveRow {
 	color: string;
 	dom: DomainDetails;
 	children: string[];
+	defaultScoreFunction: ScoreFunction;
 
-	constructor(id: string, name: string, desc: string, parent: string, depth: number, type?: string, color?: string, dom?: DomainDetails) {
+	constructor(id: string, name: string, desc: string, parent: string, depth: number, type?: string, color?: string, dom?: DomainDetails, defaultScoreFunction?: ScoreFunction) {
 		this.id = id;
 		this.name = name;
 		this.desc = desc;
@@ -500,6 +537,8 @@ class ObjectiveRow {
 		type ? this.type = type : this.type = 'abstract';
 		color ? this.color = color : this.color = 'red';
 		dom ? this.dom = dom : this.dom = new DomainDetails('categorical');
+		if (defaultScoreFunction)
+			this.defaultScoreFunction = defaultScoreFunction;
 		this.children = [];
 	}
 
@@ -512,9 +551,26 @@ class ObjectiveRow {
         this.children.splice(i, 1);
 	}
 
+	resetDefaultScoreFunction() {
+		let scoreFunction;
+		if (this.dom.type === 'categorical') {
+			scoreFunction = new DiscreteScoreFunction();
+			scoreFunction.initialize(ScoreFunction.FLAT, this.dom.categories);
+		}
+		else if (this.dom.type === 'interval') {
+			scoreFunction = new DiscreteScoreFunction();
+			scoreFunction.initialize(ScoreFunction.FLAT, this.dom.calculateIntervalDomainElements());
+		}
+		else {
+			scoreFunction = new ContinuousScoreFunction(this.dom.min, this.dom.max);
+			scoreFunction.initialize(ScoreFunction.FLAT);
+		}
+		this.defaultScoreFunction = scoreFunction;
+	}
+
 	copy(): ObjectiveRow {
 		let domCopy = this.dom.copy();
-		return new ObjectiveRow(this.id, this.name, this.desc, this.parent, this.depth, this.type, this.color, domCopy);
+		return new ObjectiveRow(this.id, this.name, this.desc, this.parent, this.depth, this.type, this.color, domCopy, this.defaultScoreFunction);
 	}
 }
 
@@ -538,6 +594,29 @@ class DomainDetails {
 	removeCategory(cat: string) {
 		let i = this.categories.indexOf(cat);
         this.categories.splice(i, 1);
+	}
+
+	calculateIntervalDomainElements(): string[] {
+		let elements: string[] = [];
+		if (this.interval > 0) {
+			let currentElement: number = this.min;
+			while (currentElement < this.max) {
+				elements.push('' + currentElement);
+				currentElement += this.interval;
+			}
+			elements.push('' + this.max);
+		}
+		return elements;
+	}
+
+	isValid(): boolean {
+		if (this.type === 'categorical') {
+			return this.categories.length > 1;
+		}
+		else if (this.min !== undefined && !isNaN(this.min) && this.max !== undefined && !isNaN(this.max) && this.min < this.max) {
+			return (this.type === 'continuous' || (this.interval > 0 && (this.max - this.min) % this.interval === 0));
+		}
+		return false;
 	}
 
 	copy(): DomainDetails {

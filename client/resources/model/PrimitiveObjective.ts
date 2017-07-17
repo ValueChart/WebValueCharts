@@ -8,6 +8,8 @@
 // Import Model Classes:
 import { Objective } 					from './Objective';
 import { Domain } 						from './Domain';
+import { CategoricalDomain } 			from './CategoricalDomain';
+import { IntervalDomain } 				from './IntervalDomain';
 import { ContinuousDomain } 			from './ContinuousDomain';
 import { ScoreFunction } 				from './ScoreFunction';
 import { DiscreteScoreFunction } 		from './DiscreteScoreFunction';
@@ -116,7 +118,7 @@ export class PrimitiveObjective implements Objective {
 
 	getDefaultScoreFunction(): ScoreFunction {
 		if (this.defaultScoreFunction === undefined) {
-			return this.getFlatScoreFunction();
+			return this.getInitialScoreFunction(ScoreFunction.FLAT);
 		}
 		return this.defaultScoreFunction;
 	}
@@ -126,18 +128,20 @@ export class PrimitiveObjective implements Objective {
 	}
 
 	/*
+		@param type - The type of function (for now, one of: flat, positive linear, negative linear).
 		@returns {ScoreFunction}
-		@description	Creates and returns a new flat score function of the correct type for this PrimitiveObjective's domain.
+		@description	Creates and returns a new score function of the specified type for this PrimitiveObjective's domain.
 	*/
-	getFlatScoreFunction(): ScoreFunction {
+	getInitialScoreFunction(type: string): ScoreFunction {
 		let scoreFunction;
 		if (this.getDomainType() === 'categorical' || this.getDomainType() === 'interval') {
 			scoreFunction = new DiscreteScoreFunction();
+			scoreFunction.initialize(type, (<CategoricalDomain | IntervalDomain>this.domain).getElements());
 		}
 		else {
 			scoreFunction = new ContinuousScoreFunction((<ContinuousDomain>this.domain).getMinValue(),(<ContinuousDomain>this.domain).getMaxValue());
+			scoreFunction.initialize(type);
 		}
-		scoreFunction.initialize(this, ScoreFunction.FLAT);
 		return scoreFunction;
 	}
 

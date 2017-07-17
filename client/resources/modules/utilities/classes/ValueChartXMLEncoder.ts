@@ -173,9 +173,8 @@ export class ValueChartXMLEncoder {
 		} else {
 			objectiveElement.setAttribute('color', (<PrimitiveObjective>objective).getColor());
 			objectiveElement.appendChild(this.convertDomainIntoElement((<PrimitiveObjective>objective).getDomain(), xmlDocument));
-
+			objectiveElement.appendChild(this.convertDefaultScoreFunctionIntoElement((<PrimitiveObjective>objective).getDefaultScoreFunction(), xmlDocument));
 		}
-
 		return objectiveElement;
 	}
 
@@ -331,19 +330,47 @@ export class ValueChartXMLEncoder {
 		var scoreFunctionElement: Element = xmlDocument.createElement('ScoreFunction');
 		scoreFunctionElement.setAttribute('objective', objectiveName);
 		scoreFunctionElement.setAttribute('type', scoreFunction.type);
-
+		
 		var domainValues: (string | number)[] = scoreFunction.getAllElements();
-
 		domainValues.forEach((domainValue: string | number) => {
-			let scoreElement: Element = xmlDocument.createElement('Score');
-
-			scoreElement.setAttribute('value', '' + scoreFunction.getScore(domainValue));
-			scoreElement.setAttribute('domain-element', '' + domainValue);
-
-			scoreFunctionElement.appendChild(scoreElement);
+			scoreFunctionElement.appendChild(this.convertScoreIntoElement(domainValue, scoreFunction.getScore(domainValue), xmlDocument));
 		});
 
 		return scoreFunctionElement;
+	}
+
+	/*
+		@param scoreFunction - The ScoreFunction object that is to be encoded as an XML element.
+		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
+								new elements. It is NOT modified.
+		@returns {Element} - An XML element that represents the given ScoreFunction. 
+		@description	Encodes a ScoreFunction object as an XML element.
+	*/
+	public convertDefaultScoreFunctionIntoElement(scoreFunction: ScoreFunction, xmlDocument: XMLDocument): Element {
+		var scoreFunctionElement: Element = xmlDocument.createElement('DefaultScoreFunction');
+		scoreFunctionElement.setAttribute('type', scoreFunction.type);
+
+		var domainValues: (string | number)[] = scoreFunction.getAllElements();
+		domainValues.forEach((domainValue: string | number) => {
+			scoreFunctionElement.appendChild(this.convertScoreIntoElement(domainValue, scoreFunction.getScore(domainValue), xmlDocument));
+		});
+
+		return scoreFunctionElement;
+	}
+
+	/*
+		@param domainValue - The domain elemment to set the score for.
+		@param score - The score value.
+		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
+								new elements. It is NOT modified.
+		@returns {Element} - An XML element that represents the Score. 
+		@description	Encodes a ScoreFunction object as an XML element.
+	*/
+	public convertScoreIntoElement(domainValue: string | number, score: number, xmlDocument: XMLDocument) {
+		let scoreElement: Element = xmlDocument.createElement('Score');
+		scoreElement.setAttribute('value', '' + score);
+		scoreElement.setAttribute('domain-element', '' + domainValue);
+		return scoreElement;
 	}
 }
 

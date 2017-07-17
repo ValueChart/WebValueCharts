@@ -39,40 +39,38 @@ export class DiscreteScoreFunction extends ScoreFunction {
 	// ========================================================================================
 
 	/*
-		@param obj - The Primitive Objective for which to initialize the score function.
 		@param type - The type of function (for now, one of: flat, positive linear, negative linear).
 		@returns {void}	
-		@description	Initializes the score function to a specified default for some objective.
+		@description	Initializes the score function to a specified default.
 	*/
-	initialize(obj: PrimitiveObjective, type: string) {
+	initialize(type: string, elements: string[]) {
 		this.elementScoreMap.clear();
-		let dom = (<CategoricalDomain | IntervalDomain>obj.getDomain()).getElements();
 		if (type === ScoreFunction.FLAT) {
-			for (let item of dom) {
-				this.setElementScore(item, 0.5);
+			for (let element of elements) {
+				this.setElementScore(element, 0.5);
 			}
 		}
 		else if (type === ScoreFunction.POSLIN) {
-			let increment = 1.0 / (dom.length - 1);
+			let increment = 1.0 / (elements.length - 1);
 			let currentScore = 0;
-			for (let item of dom) {
-				this.setElementScore(item, currentScore);
+			for (let element of elements) {
+				this.setElementScore(element, currentScore);
 				currentScore += increment;
 			}
-			// Set score of last item to exactly 1 
+			// Set score of last element to exactly 1 
 			// (This is necessary because the arithmetic method is not precise -
 			//	the value must be exactly 1 for validation to pass.)
-			this.setElementScore(dom[dom.length - 1], 1); 											 
+			this.setElementScore(elements[elements.length - 1], 1); 											 
 		}
 		else if (type === ScoreFunction.NEGLIN) {
-			let increment = 1.0 / (dom.length - 1);
+			let increment = 1.0 / (elements.length - 1);
 			let currentScore = 1;
-			for (let item of dom) {
-				this.setElementScore(item, currentScore);
+			for (let element of elements) {
+				this.setElementScore(element, currentScore);
 				currentScore -= increment;
 			}
-			// Set score of last item to exactly 0 (see above)
-			this.setElementScore(dom[dom.length - 1], 0); 	
+			// Set score of last element to exactly 0 (see above)
+			this.setElementScore(elements[elements.length - 1], 0); 	
 		}
 		else {
 			throw ("Unknown initial score function type");

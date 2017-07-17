@@ -211,7 +211,7 @@ export class CreationStepsService {
 			} 
 			if (errorMessages.length > 0) {
 				this.validationMessage = "Cannot view chart. Please fix the following errors to proceed:\n\n" + errorMessages.join("\n\n");
-				$('#validate-modal').modal('show');
+				$('#validatation-modal').modal('show');
 				return false;
 			}
 		}

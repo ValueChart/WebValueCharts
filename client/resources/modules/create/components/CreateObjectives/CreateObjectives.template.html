@@ -10,6 +10,7 @@
             <th>Color</th>
             <th>Domain Type</th>
             <th>Domain Info</th>
+            <th *ngIf="!valueChart.isIndividual()">Default Score Function</th>
         </tr>
     </thead>
     <tbody>
@@ -43,7 +44,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="resetErrorMessages()">
+                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
                         <option [value]="'interval'">interval</option>
@@ -61,12 +62,8 @@
                             </SELECT>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#myCategoryModal">
-                                Add
-                            </button>
-                            <button type="button" class="btn btn-sm btn-default" (click)="removeSelectedCategoriesMain(objID)">
-                                Delete
-                            </button>
+                            <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#categories-modal">Add</button>
+                            <button type="button" class="btn btn-sm btn-default" (click)="removeSelectedCategoriesMain(objID)">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -80,22 +77,27 @@
                     </div>
                     <div class="objectives-table-row">
                         <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value); resetErrorMessages()" maxlength="100" />
+                            <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                         </div>
                         <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); resetErrorMessages()" maxlength="100" />
+                            <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />
-                            
+                            <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />     
                         </div>
                         <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); resetErrorMessages()" maxlength="100" />
+                            <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                         </div>
                     </div>
                 </div>
+            </th>
+            <th *ngIf="!valueChart.isIndividual()">
+                <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
+                <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                    <button class="btn btn-sm btn-default" [disabled]="disableEditDefaultScoreFunction(objID)" (click)="selectedObjRow=objID; defaultScoreFunctionModalOpen=true" data-toggle="modal" data-target="#default-score-function-modal">Edit</button>
+                </div>
             </th>         
-        </tr>                             
+        </tr>                  
     </tbody>
 </table>
 
@@ -107,30 +109,19 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="myCategoryModal" tabindex="-1" role="dialog" 
-     aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- Categories Modal -->
+<div class="modal fade" id="categories-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <!-- Modal Header -->
             <div class="modal-header">
-                <button type="button" class="close" 
-                   data-dismiss="modal">
-                       <span aria-hidden="true">&times;</span>
-                       <span class="sr-only">Close</span>
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    Add Categories
-                </h4>
-            </div>      
-            <!-- Modal Body -->
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add Categories</h4>
+            </div>     
             <div class="modal-body">
                 <form role="form">
                     <div class="input-group form-group">
-                        <input class="form-control" id="add-category-input" [(ngModel)]="categoryToAdd" name="newcat" type="text" (keypress)="handleKeyPress($event.key)"/>
-                        <button type="button" class="btn btn-default" (click)="addCategory()">
-                                >>
-                        </button>
+                        <input class="form-control" [(ngModel)]="categoryToAdd" name="newcat" type="text" (keypress)="handleKeyPress($event.key)"/>
+                        <button type="button" class="btn btn-default" (click)="addCategory()">>></button>
                     </div>
                     <div class="form-group">
                         <SELECT SIZE="8" class="form-control" name="catlistmodal" MULTIPLE>
@@ -138,17 +129,45 @@
                         </SELECT>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-default" (click)="removeSelectedCategoriesModal()">
-                            Delete
-                        </button>
+                        <button type="button" class="btn btn-default" (click)="removeSelectedCategoriesModal()">Delete</button>
                     </div>
                 </form>
             </div>           
-            <!-- Modal Footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" (click)="addCategories()" data-dismiss="modal">
                     OK
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Default Score Function Modal -->
+<div class="modal fade" id="default-score-function-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="defaultScoreFunctionModalOpen=false" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Default Score Function</h4>
+            </div>     
+            <div *ngIf="defaultScoreFunctionModalOpen" class="modal-body">
+                <ScoreFunction 
+                [scoreFunctions]="[objectiveRows[selectedObjRow].defaultScoreFunction]"
+                [colors]="[objectiveRows[selectedObjRow].color]"
+                [objective]="objRowToObjective(objectiveRows[selectedObjRow])"
+                [width]="440"
+                [height]="300"
+                [viewOrientation]="ChartOrientation.Vertical"
+                [services]="services"
+                [individualOnly]="true"
+                [enableInteraction]="true">
+                <svg class="svg-content-createvaluechart" viewBox="0 0, 440, 300" preserveAspectRatio="xMinYMin meet">
+                    <g class="expanded-score-function"></g>
+                </svg>
+                </ScoreFunction> 
+            </div>           
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" (click)="defaultScoreFunctionModalOpen=false" data-dismiss="modal">OK</button>
             </div>
         </div>
     </div>

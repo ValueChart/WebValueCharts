@@ -7,13 +7,12 @@ import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { CreationStepsService }                     from '../../services/CreationSteps.service';
-import { UpdateValueChartService }         from '../../../app/services/UpdateValueChart.service';
+import { UpdateValueChartService }                  from '../../../app/services/UpdateValueChart.service';
 import { ValueChartService }                        from '../../../app/services/ValueChart.service';
 import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
 import { ChartUndoRedoService }                     from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
- 
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
 
 // Import Model Classes:
@@ -183,7 +182,13 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   resetScoreFunction() {
     let obj: PrimitiveObjective = <PrimitiveObjective>this.getObjectiveByName(this.selectedObjective);
-    this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective).initialize(obj,this.latestDefaults[this.selectedObjective]);
+    if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+      let elements = (<CategoricalDomain | IntervalDomain>obj.getDomain()).getElements();
+      (<DiscreteScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective)).initialize(this.latestDefaults[this.selectedObjective], elements);
+    }
+    else {
+      (<ContinuousScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective)).initialize(this.latestDefaults[this.selectedObjective]);
+    }
   }
 
   // ================================ Validation Methods ====================================

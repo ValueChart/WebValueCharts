@@ -379,7 +379,7 @@ export class UpdateValueChartService {
 
     /*
 		@returns {boolean}
-		@description 	Inserts missing domain elements into discrete score functions. Initializes scores to 0.
+		@description 	Inserts missing domain elements into discrete score functions. Initializes scores to 0.5.
 						Returns true iff new elements were inserted.
 	*/
 	addMissingElements(dom: CategoricalDomain, scoreFunction: DiscreteScoreFunction): boolean {
@@ -387,7 +387,7 @@ export class UpdateValueChartService {
 		let elements = dom.getElements();
         for (let elt of elements) {
 			if (scoreFunction.getScore(elt) === undefined) {
-				scoreFunction.setElementScore(elt, 0);
+				scoreFunction.setElementScore(elt, 0.5);
 				completed = true;
 			}
         }

@@ -77,7 +77,6 @@ export class WebValueChartsParser {
 		let type = (valueChartElement.getAttribute('type') === 'individual') ? ChartType.Individual : ChartType.Group;
 		valueChart.setType(type);
 
-
 		var chartStructureElement: Element = valueChartElement.querySelector('ChartStructure');
 		if (chartStructureElement) {
 			var objectivesParentElement: Element = chartStructureElement.querySelector('Objectives');
@@ -116,23 +115,28 @@ export class WebValueChartsParser {
 
 			let type: string = objectiveElement.getAttribute('type');
 			let name: string = objectiveElement.getAttribute('name');
-			let descriptionElement = objectiveElement.querySelector('Description');
-			let description: string = '';
 
+			let description: string = '';
+			let descriptionElement = objectiveElement.querySelector('Description');
 			if (descriptionElement)
 				description = descriptionElement.innerHTML;
 
 			if (type === 'abstract') {
 				objective = new AbstractObjective(name, description);
 				(<AbstractObjective>objective).setDirectSubObjectives(this.parseObjectives(objectiveElement));
-			} else {
-				let color: string = objectiveElement.getAttribute('color');
+			} else {			
 				objective = new PrimitiveObjective(name, description);
+
+				let color: string = objectiveElement.getAttribute('color');
 				(<PrimitiveObjective>objective).setColor(color);
 
 				let domainElement: Element = objectiveElement.querySelector('Domain');
-
 				(<PrimitiveObjective>objective).setDomain(this.parseDomain(domainElement));
+
+				let defaultScoreFunctionElement: Element = objectiveElement.querySelector('DefaultScoreFunction');
+				if (defaultScoreFunctionElement) {
+					(<PrimitiveObjective>objective).setDefaultScoreFunction(this.parseScoreFunction(defaultScoreFunctionElement));
+				}
 			}
 			objectives.push(objective);
 		}

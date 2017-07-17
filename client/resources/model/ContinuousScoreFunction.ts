@@ -62,15 +62,14 @@ export class ContinuousScoreFunction extends ScoreFunction {
 	// ========================================================================================
 
 	/*
-		@param obj - The Primitive Objective for which to initialize the score function.
 		@param type - The type of function (for now, one of: flat, positive linear, negative linear).
 		@returns {void}	
-		@description	Initializes the score function to a specified default for some objective.
+		@description	Initializes the score function to a specified default.
 	*/
-	initialize(obj: PrimitiveObjective, type: string) {
+	initialize(type: string) {
 		this.elementScoreMap.clear();
-		let min: number = (<ContinuousDomain>obj.getDomain()).getMinValue();
-		let max: number = (<ContinuousDomain>obj.getDomain()).getMaxValue();
+		let min: number = this.minDomainValue;
+		let max: number = this.maxDomainValue;
 		let increment = (max - min) / 4.0;
 		// Add three evenly-spaced points between min and max
 		if (type === ScoreFunction.FLAT) {

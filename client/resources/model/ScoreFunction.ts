@@ -192,8 +192,6 @@ export abstract class ScoreFunction implements Memento {
 		return this.getScore(this.bestElement) - this.getScore(this.worstElement);
 	}
 
-	abstract initialize(obj: PrimitiveObjective, type: string): void;
-
 	abstract setElementScore(domainElement: number | string, score: number): void;
 
 	abstract getScore(domainElement: number | string): number;
