@@ -7,45 +7,76 @@
 
 export var HotelChartData: string = 
 `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ValueCharts name="Hotel" creator="Aaron Mishkin" version="2.0" type="individual" password="password">
-    <Description>Description Information Goes Here</Description>
+<ValueCharts creator="Aaron Mishkin" name="Hotel" password="password" type="individual" version="2.0">
+    <Description>Description Information Goes Here </Description>
     <ChartStructure>
         <Objectives>
             <Objective name="Hotel" type="abstract">
-                <Description>Description Information Goes Here</Description>
+                <Description>Description Information Goes Here </Description>
                 <Objective name="location" type="abstract">
-                    <Description>Description Information Goes Here</Description>
-                    <Objective name="area" type="primitive" color="#C0392B">
-                        <Description>Description Information Goes Here</Description>
-                        <Domain type="categorical" ordered="false">
+                    <Description>Description Information Goes Here </Description>
+                    <Objective color="#C0392B" name="area" type="primitive">
+                        <Description>Description Information Goes Here </Description>
+                        <Domain ordered="false" type="categorical">
                             <Category>airport</Category>
                             <Category>beach</Category>
                             <Category>nightlife</Category>
                         </Domain>
+                        <DefaultScoreFunction type="discrete">
+                            <Score domain-element="airport" value="0.5"/>
+                            <Score domain-element="beach" value="0.5"/>
+                            <Score domain-element="nightlife" value="0.5"/>
+                        </DefaultScoreFunction>
                     </Objective>
-                    <Objective name="skytrain-distance" type="primitive" color="#7D3C98">
-                        <Description>Description Information Goes Here</Description>
-                        <Domain type="continuous" unit="blocks" min="1" max="9"/>
+                    <Objective color="#7D3C98" name="skytrain-distance" type="primitive">
+                        <Description>Description Information Goes Here </Description>
+                        <Domain max="9" min="1" type="continuous" unit="blocks"/>
+                        <DefaultScoreFunction type="continuous">
+                            <Score domain-element="1" value="0.5"/>
+                            <Score domain-element="3" value="0.5"/>
+                            <Score domain-element="5" value="0.5"/>
+                            <Score domain-element="7" value="0.5"/>
+                            <Score domain-element="9" value="0.5"/>
+                        </DefaultScoreFunction>
                     </Objective>
                 </Objective>
                 <Objective name="room" type="abstract">
-                    <Description>Description Information Goes Here</Description>
-                    <Objective name="size" type="primitive" color="#2980B9">
-                        <Description>Description Information Goes Here</Description>
-                        <Domain type="continuous" unit="sq-ft" min="200" max="350"/>
+                    <Description>Description Information Goes Here </Description>
+                    <Objective color="#2980B9" name="size" type="primitive">
+                        <Description>Description Information Goes Here </Description>
+                        <Domain max="350" min="200" type="continuous" unit="sq-ft"/>
+                        <DefaultScoreFunction type="continuous">
+                            <Score domain-element="200" value="0.5"/>
+                            <Score domain-element="237.5" value="0.5"/>
+                            <Score domain-element="275" value="0.5"/>
+                            <Score domain-element="312.5" value="0.5"/>
+                            <Score domain-element="350" value="0.5"/>
+                        </DefaultScoreFunction>
                     </Objective>
-                    <Objective name="internet-access" type="primitive" color="#27AE60">
-                        <Description>Description Information Goes Here</Description>
-                        <Domain type="categorical" ordered="false">
+                    <Objective color="#27AE60" name="internet-access" type="primitive">
+                        <Description>Description Information Goes Here </Description>
+                        <Domain ordered="false" type="categorical">
                             <Category>none</Category>
                             <Category>highspeed</Category>
                             <Category>lowspeed</Category>
                         </Domain>
+                        <DefaultScoreFunction type="discrete">
+                            <Score domain-element="none" value="0.5"/>
+                            <Score domain-element="highspeed" value="0.5"/>
+                            <Score domain-element="lowspeed" value="0.5"/>
+                        </DefaultScoreFunction>
                     </Objective>
                 </Objective>
-                <Objective name="rate" type="primitive" color="#F1C40F">
-                    <Description>Description Information Goes Here</Description>
-                    <Domain type="continuous" unit="CAD" min="100" max="200"/>
+                <Objective color="#F1C40F" name="rate" type="primitive">
+                    <Description>Description Information Goes Here </Description>
+                    <Domain max="200" min="100" type="continuous" unit="CAD"/>
+                    <DefaultScoreFunction type="continuous">
+                        <Score domain-element="100" value="0.5"/>
+                        <Score domain-element="125" value="0.5"/>
+                        <Score domain-element="150" value="0.5"/>
+                        <Score domain-element="175" value="0.5"/>
+                        <Score domain-element="200" value="0.5"/>
+                    </DefaultScoreFunction>
                 </Objective>
             </Objective>
         </Objectives>
@@ -111,35 +142,35 @@ export var HotelChartData: string =
             </Weights>
             <ScoreFunctions>
                 <ScoreFunction objective="area" type="discrete">
-                    <Score value="0" domain-element="nightlife"/>
-                    <Score value="0.5" domain-element="beach"/>
-                    <Score value="1" domain-element="airport"/>
+                    <Score domain-element="nightlife" value="0"/>
+                    <Score domain-element="beach" value="0.5"/>
+                    <Score domain-element="airport" value="1"/>
                 </ScoreFunction>
                 <ScoreFunction objective="skytrain-distance" type="continuous">
-                    <Score value="1" domain-element="1"/>
-                    <Score value="0.5" domain-element="3"/>
-                    <Score value="0.2" domain-element="5"/>
-                    <Score value="0.1" domain-element="7"/>
-                    <Score value="0" domain-element="9"/>
+                    <Score domain-element="1" value="1"/>
+                    <Score domain-element="3" value="0.5"/>
+                    <Score domain-element="5" value="0.2"/>
+                    <Score domain-element="7" value="0.1"/>
+                    <Score domain-element="9" value="0"/>
                 </ScoreFunction>
                 <ScoreFunction objective="size" type="continuous">
-                    <Score value="1" domain-element="200"/>
-                    <Score value="0.8" domain-element="237.5"/>
-                    <Score value="0.6" domain-element="275"/>
-                    <Score value="0.4" domain-element="312.5"/>
-                    <Score value="0" domain-element="350"/>
+                    <Score domain-element="200" value="1"/>
+                    <Score domain-element="237.5" value="0.8"/>
+                    <Score domain-element="275" value="0.6"/>
+                    <Score domain-element="312.5" value="0.4"/>
+                    <Score domain-element="350" value="0"/>
                 </ScoreFunction>
                 <ScoreFunction objective="internet-access" type="discrete">
-                    <Score value="0" domain-element="none"/>
-                    <Score value="1" domain-element="highspeed"/>
-                    <Score value="0.5" domain-element="lowspeed"/>
+                    <Score domain-element="none" value="0"/>
+                    <Score domain-element="highspeed" value="1"/>
+                    <Score domain-element="lowspeed" value="0.5"/>
                 </ScoreFunction>
                 <ScoreFunction objective="rate" type="continuous">
-                    <Score value="1" domain-element="100"/>
-                    <Score value="0.75" domain-element="125"/>
-                    <Score value="0.5" domain-element="150"/>
-                    <Score value="0.25" domain-element="175"/>
-                    <Score value="0" domain-element="200"/>
+                    <Score domain-element="100" value="1"/>
+                    <Score domain-element="125" value="0.75"/>
+                    <Score domain-element="150" value="0.5"/>
+                    <Score domain-element="175" value="0.25"/>
+                    <Score domain-element="200" value="0"/>
                 </ScoreFunction>
             </ScoreFunctions>
         </User>
