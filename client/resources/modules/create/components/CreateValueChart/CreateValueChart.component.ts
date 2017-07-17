@@ -13,6 +13,7 @@ import { ValueChartService }											from '../../../app/services/ValueChart.se
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
+import { UserNotificationService }										from '../../../app/services/UserNotification.service';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 										from '../../../../model/ValueChart';
@@ -63,7 +64,8 @@ export class CreateValueChartComponent implements OnInit {
 		public creationStepsService: CreationStepsService,
 		private route: ActivatedRoute,
 		private valueChartHttpService: ValueChartHttpService,
-		private validationService: ValidationService) { }
+		private validationService: ValidationService,
+		private userNotificationService: UserNotificationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -226,7 +228,7 @@ export class CreateValueChartComponent implements OnInit {
 				this.navigationResponse.next(true);
 			}
 			else {
-				toastr.error(this.creationStepsService.NAME_TAKEN);
+				this.userNotificationService.displayErrors([this.creationStepsService.NAME_TAKEN]);
 				this.navigationResponse.next(false);
 			}
 			$('#navigation-warning-modal').modal('hide');

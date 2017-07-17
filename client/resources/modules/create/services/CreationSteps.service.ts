@@ -8,6 +8,7 @@ import '../../utilities/rxjs-operators';
 import { ValueChartService }					from '../../app/services/ValueChart.service';
 import { CurrentUserService }					from '../../app/services/CurrentUser.service';
 import { ValidationService }					from '../../app/services/Validation.service';
+import { UserNotificationService }				from '../../app/services/UserNotification.service';
 import { ValueChartHttpService }				from '../../app/services/ValueChartHttp.service';
 
 // Import Types
@@ -60,6 +61,7 @@ export class CreationStepsService {
 		private valueChartService: ValueChartService, 
 		private currentUserService: CurrentUserService, 
 		private validationService: ValidationService,
+		private userNotificationService: UserNotificationService,
 		private valueChartHttpService: ValueChartHttpService) {
 
 		this.nextStep[this.BASICS] = this.OBJECTIVES;
@@ -123,7 +125,7 @@ export class CreationStepsService {
 							this.step = this.nextStep[this.step];
 						}
 						else {
-							toastr.error(this.NAME_TAKEN);
+							this.userNotificationService.displayErrors([this.NAME_TAKEN]);
 						}
 						resolve(available);
 					});
@@ -136,7 +138,7 @@ export class CreationStepsService {
 			}		
 		}
 		else {
-			toastr.error("There were problems with your submission. Please fix them to proceed.");
+			this.userNotificationService.displayErrors(["There were problems with your submission. Please fix them to proceed."]);
 			return false;
 		}
 	}
@@ -154,7 +156,7 @@ export class CreationStepsService {
 						this.navigateToViewer();
 					}
 					else {
-						toastr.error(this.NAME_TAKEN);
+						this.userNotificationService.displayErrors([this.NAME_TAKEN]);
 					}
 				});
 			}
@@ -216,7 +218,7 @@ export class CreationStepsService {
 			}
 		}
 		else {
-			toastr.error("There were problems with your submission. Please fix them to proceed.");
+			this.userNotificationService.displayErrors(["There were problems with your submission. Please fix them to proceed."]);
 			return false;
 		}
 		return true;
@@ -237,10 +239,10 @@ export class CreationStepsService {
 				// Update the ValueChart.
 				this.valueChartHttpService.updateValueChart(this.valueChartService.getValueChart())
 					.subscribe(
-					(valuechart) => { toastr.success('ValueChart auto-saved'); },
+					(valuechart) => { this.userNotificationService.displaySuccesses(['ValueChart auto-saved']); },
 					(error) => {
 						// Handle any errors here.
-						toastr.warning('Auto-saving failed');
+						this.userNotificationService.displayWarnings(['Auto-saving failed']);
 					});
 			}
 		}
@@ -256,7 +258,7 @@ export class CreationStepsService {
 			(valueChart: ValueChart) => {
 				// Set the id of the ValueChart.
 				this.valueChartService.getValueChart()._id = valueChart._id;
-				toastr.success('ValueChart auto-saved');
+				this.userNotificationService.displaySuccesses(['ValueChart auto-saved']);
 
 				// Create status document
 				let status: any = {};
@@ -269,7 +271,7 @@ export class CreationStepsService {
 			},
 			// Handle Server Errors
 			(error) => {
-				toastr.warning('Auto-saving failed');
+				this.userNotificationService.displayWarnings(['Auto-saving failed']);
 			});
 	}
 
@@ -280,7 +282,7 @@ export class CreationStepsService {
 	deleteValueChart(valueChart: ValueChart): void {
 		if (valueChart._id) {
 			this.valueChartHttpService.deleteValueChart(valueChart._id)
-				.subscribe(status => { toastr.error('ValueChart deleted'); });
+				.subscribe(status => { this.userNotificationService.displayErrors(['ValueChart deleted'])});
 		}
 	}
 

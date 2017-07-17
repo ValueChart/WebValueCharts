@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:27:12
+* @Last Modified time: 2017-07-17 12:09:11
 */
 
 // Import Angular Classes:
@@ -29,7 +29,8 @@ import { ValueChartViewerService }												from '../../services/ValueChartVie
 import { HostService }															from '../../services/Host.service';
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
 import { ValidationService }													from '../../services/Validation.service';
-import { UpdateValueChartService }										from '../../services/UpdateValueChart.service';
+import { UpdateValueChartService }												from '../../services/UpdateValueChart.service';
+import { UserNotificationService }												from '../../services/UserNotification.service'; 
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -110,6 +111,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
 		private validationService: ValidationService,
+		private userNotificationService: UserNotificationService,
 		private updateValueChartService: UpdateValueChartService) { }
 
 	// ========================================================================================
@@ -287,7 +289,7 @@ export class ValueChartViewerComponent implements OnInit {
 			}
 		}
 		if (rescaled) {
-			toastr.warning("Score functions rescaled so that scores range from 0 to 1.");
+			this.userNotificationService.displayWarnings(["Score functions rescaled so that scores range from 0 to 1."]);
 		}
 	}
 
@@ -331,8 +333,8 @@ export class ValueChartViewerComponent implements OnInit {
 		let errors: string[] = this.validationService.validateUser(this.valueChartService.getValueChart(), currentUser);
 
 		if (errors.length > 0) {
-			toastr.error('Saving failed. Your preferences are not valid.');
-			errors.forEach(error => toastr.error(error,'' , { timeOut: 300000, closeButton: true }));
+			this.userNotificationService.displayWarnings(['Saving failed. Your preferences are not valid.']);
+			this.userNotificationService.displayErrors(errors);
 		} else {
 			this.rescaleScoreFunctions();
 			currentUser.getWeightMap().normalize();
@@ -343,7 +345,7 @@ export class ValueChartViewerComponent implements OnInit {
 				.subscribe(
 				// User added/updated!
 				(user: User) => {
-					toastr.success('Save successful');
+					this.userNotificationService.displaySuccesses(['Save successful']);
 					if (this.valueChartViewerService.getUserRole() === UserRole.UnsavedParticipant) {
 						let newRole = (this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername())) ? UserRole.OwnerAndParticipant : UserRole.Participant;
 						let type = this.valueChartViewerService.getActiveValueChart().getType();
@@ -356,9 +358,9 @@ export class ValueChartViewerComponent implements OnInit {
 				// Handle Server Errors
 				(error) => {
 					if (error === '403 - Forbidden')
-						toastr.warning('Saving failed. The Host has disabled changes.');
+						this.userNotificationService.displayWarnings(['Saving failed. The Host has disabled changes.']);
 					else 
-						toastr.error('Saving failed. There was an error saving your preferences.');
+						this.userNotificationService.displayErrors(['Saving failed. There was an error saving your preferences.']);
 				});			
 		}		
 	}
@@ -368,7 +370,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.valueChartHttpService.setValueChartStatus(this.valueChartStatus).subscribe((status) => {
 			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be prevented');
-			toastr.warning(messageString);
+			this.userNotificationService.displayWarnings([messageString]);
 		});
 
 	}

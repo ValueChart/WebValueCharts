@@ -8,6 +8,7 @@ import '../../../utilities/rxjs-operators';
 // Import Application Classes:
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { UserNotificationService }										from '../../../app/services/UserNotification.service';
 import { UpdateValueChartService }										from '../../../app/services/UpdateValueChart.service';
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
@@ -96,6 +97,7 @@ export class CreateObjectivesComponent implements OnInit {
 		private creationStepsService: CreationStepsService,
 		private updateObjRefService: UpdateValueChartService,
 		private validationService: ValidationService,
+		private userNotificationService: UserNotificationService,
 		private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
 
 	// ========================================================================================
@@ -165,7 +167,7 @@ export class CreateObjectivesComponent implements OnInit {
 				let warnings = this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user);
 
 				if (showWarnings) {
-					warnings.forEach(warning => toastr.warning(warning,'' , { timeOut: 60000 }));
+					this.userNotificationService.displayWarnings(warnings);
 				}
 			}	
 		}

@@ -11,6 +11,7 @@ import { UpdateValueChartService }                  from '../../../app/services/
 import { ValueChartService }                        from '../../../app/services/ValueChart.service';
 import { CurrentUserService }                       from '../../../app/services/CurrentUser.service';
 import { ValidationService }                        from '../../../app/services/Validation.service';
+import { UserNotificationService }                  from '../../../app/services/UserNotification.service';
 import { ChartUndoRedoService }                     from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
@@ -86,7 +87,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     private updateValueChartService: UpdateValueChartService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
-    private validationService: ValidationService) { }
+    private validationService: ValidationService,
+    private userNotificationService: UserNotificationService) { }
 
   // ========================================================================================
   //                   Methods
@@ -122,7 +124,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
 
     // Initialize/repair score functions and print the relevant warning messages.
     let warnings = this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user);
-    warnings.forEach(warning => toastr.warning(warning, '', { timeOut: 60000 }));
+    this.userNotificationService.displayWarnings(warnings);
 
     // Initialize best/worst outcomes
     this.initialBestOutcomes = {};
@@ -149,7 +151,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
         let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
-          toastr.warning(this.updateValueChartService.BEST_WORST_OUTCOME_CHANGED);
+          this.userNotificationService.displayWarnings([this.updateValueChartService.BEST_WORST_OUTCOME_CHANGED]);
           break;
         }
       }

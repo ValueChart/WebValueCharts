@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 15:49:45
+* @Last Modified time: 2017-07-17 11:55:15
 */
 
 // Import Angular Classes:
@@ -97,7 +97,6 @@ export class RootComponent implements OnInit {
 		// Attach this Angular application reference to the window object.
 		// This is to make it accessible to any additional windows that are created
 		// by this window. This is specifically used by the ScoreFunctionViewerComponent.
-		toastr.options.newestOnTop = false;
 		(<any>window).angularAppRef = this.applicationRef;
 		(<any>window).childWindows = {};					// Initialize a map to used as storage for references to an windows created by this window.
 	}

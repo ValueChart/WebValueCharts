@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 16:53:50
+* @Last Modified time: 2017-07-17 11:50:12
 */
 
 import { Injectable } 												from '@angular/core';
@@ -11,11 +11,12 @@ import { Injectable } 												from '@angular/core';
 import * as _														from 'lodash';
 
 // Import Application Classes:
+import { UserNotificationService }									from './UserNotification.service'; 
 import { CurrentUserService }										from './CurrentUser.service';
 import { ValueChartService }										from './ValueChart.service';
 import { ValueChartViewerService }									from './ValueChartViewer.service';
 import { ValidationService }										from './Validation.service';
-import { UpdateValueChartService }							from './UpdateValueChart.service';
+import { UpdateValueChartService }									from './UpdateValueChart.service';
 import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
 
 // Import Model Classes:
@@ -59,6 +60,7 @@ export class HostService {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
+		private userNotificationService: UserNotificationService,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService,
@@ -129,7 +131,7 @@ export class HostService {
 				else
 					this.valueChartViewerService.addInvalidUser(newUser.getUsername());
 
-				toastr.info(newUser.getUsername() + ' has joined the ValueChart');
+				this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
 				break;
 
 			// An existing user has resubmitted their preferences.
@@ -152,7 +154,7 @@ export class HostService {
 					this.valueChartViewerService.addUserToDisplay(updatedUser);
 				}
 
-				toastr.info(updatedUser.getUsername() + ' has updated their preferences');
+				this.userNotificationService.displayInfo([updatedUser.getUsername() + ' has updated their preferences']);
 
 				break;
 
@@ -168,7 +170,7 @@ export class HostService {
 
 				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
-				toastr.info(userToDelete + ' has left the ValueChart');
+				this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
 				break;
 
 			// The ValueChart's owner has changed its structure (i.e. the basic details, the alternatives, or the objectives)
@@ -180,12 +182,8 @@ export class HostService {
 
 				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
 				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 
-					toastr.info('The ValueChart has been changed by the owner.');
-						
-					// This is where we implement more detailed change notifications.
-
 					let changes: string[] = this.updateValueChartService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
-					changes.forEach(change => toastr.info(change, '', { timeOut: 60000 }));
+					this.userNotificationService.displayInfo(changes);
 
 					// Update the user's preferences.
 					let warnings: string[] = [];
@@ -196,11 +194,11 @@ export class HostService {
 							warnings = userWarnings;
 					});
 
-					warnings.forEach((warning: string) => toastr.warning(warning, '', { timeOut: 60000 }));
+					this.userNotificationService.displayWarnings(warnings);
 
 					// Notify the current user of any errors in their preferences.
 					errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
-					errors.forEach(error => toastr.error(error,'' , { timeOut: 300000, closeButton: true }));
+					this.userNotificationService.displayErrors(errors);
 					
 					// Hide Invalid Users:
 					let invalidUsers = this.validationService.getInvalidUsers(this.valueChartService.getValueChart());

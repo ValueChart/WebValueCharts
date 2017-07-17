@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-05 20:22:44
+* @Last Modified time: 2017-07-17 11:53:25
 */
 
 // Import Angular Classes:
@@ -17,6 +17,7 @@ import { Subscription }															from 'rxjs/Subscription';
 import { ObjectiveChartDefinitions }											from '../../../ValueChart/definitions/ObjectiveChart.definitions';
 
 import { ValueChartHttpService }												from '../../services/ValueChartHttp.service';
+import { UserNotificationService }												from '../../services/UserNotification.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
@@ -74,6 +75,7 @@ export class DetailBoxComponent implements OnInit {
 
 
 	constructor(
+		private userNotificationService: UserNotificationService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
 		private valueChartViewerService: ValueChartViewerService) { }
@@ -138,13 +140,13 @@ export class DetailBoxComponent implements OnInit {
 					});
 					// Delete the user from the ValueChart
 					this.valueChart.getUsers().splice(userIndex, 1);
-					toastr.warning(userToDelete.getUsername() + ' has left the ValueChart');
+					this.userNotificationService.displayInfo([userToDelete.getUsername() + ' has left the ValueChart']);
 				}
 
 				// The Host connection is active, so let it handle notifications about the deleted user.
 			},
 			err => {
-				toastr.error(userToDelete.getUsername() + ' could not be deleted');
+				this.userNotificationService.displayErrors([userToDelete.getUsername() + ' could not be deleted']);
 			});
 	}
 

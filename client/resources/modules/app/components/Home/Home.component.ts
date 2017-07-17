@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 10:54:28
+* @Last Modified time: 2017-07-17 11:55:03
 */
 
 // Import Angular Classes:
@@ -15,6 +15,7 @@ import { CurrentUserService }							from '../../services/CurrentUser.service';
 import { ValueChartService }							from '../../services/ValueChart.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ValidationService }							from '../../services/Validation.service';
+import { UserNotificationService }						from '../../services/UserNotification.service';
 
 // Import Model Classes:
 import { ValueChart, ChartType }						from '../../../../model/ValueChart';
@@ -77,7 +78,8 @@ export class HomeComponent {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartHttpService: ValueChartHttpService,
-		private validationService: ValidationService) { }
+		private validationService: ValidationService,
+		private userNotificationService: UserNotificationService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -128,7 +130,7 @@ export class HomeComponent {
 			(valueChart: ValueChart) => {
 				$('#chart-credentials-modal').modal('hide');
 				if (valueChart.isIndividual()) {
-					toastr.error("The chart you are trying to join is single-user only.")
+					this.userNotificationService.displayErrors(["The chart you are trying to join is single-user only."]);
 				}
 				else {
 					this.valueChartService.setValueChart(valueChart);	
@@ -266,20 +268,20 @@ export class HomeComponent {
 				(valuechart: ValueChart) => {
 					// Set the id of the ValueChart.
 					valueChart._id = valuechart._id;
-					toastr.success('ValueChart saved');
+					this.userNotificationService.displaySuccesses(['ValueChart saved']);
 				},
 				// Handle Server Errors
 				(error) => {
-					toastr.warning('Saving failed');
+					this.userNotificationService.displayErrors(['Saving failed']);
 				});
 		} else {
 			// Update the ValueChart.
 			this.valueChartHttpService.updateValueChart(valueChart)
 				.subscribe(
-				(valuechart) => { toastr.success('ValueChart saved'); },
+				(valuechart) => { this.userNotificationService.displaySuccesses(['ValueChart saved']); },
 				(error) => {
 					// Handle any errors here.
-					toastr.warning('Saving failed');
+					this.userNotificationService.displayErrors(['Saving failed']);
 				});
 		}
 	}
