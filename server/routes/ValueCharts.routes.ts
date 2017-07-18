@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 17:50:59
+* @Last Modified time: 2017-07-18 11:07:37
 */
 
 // Import Libraries and Express Middleware:
@@ -268,7 +268,7 @@ valueChartRoutes.put('/:chart/status', function(req: express.Request, res: expre
 
 	var identifier: string = (<any> req).identifier;
 
-	statusCollection.findOne({ fname: identifier }, function(err: Error, foundDocument: any) {
+	statusCollection.findOne({ chartId: identifier }, function(err: Error, foundDocument: any) {
 
 		if (err) {
 			res.status(400)
@@ -294,7 +294,7 @@ valueChartRoutes.get('/:chart/status', function(req: express.Request, res: expre
 
 	var identifier: string = (<any> req).identifier;
 
-	statusCollection.findOne({ fname: identifier }, function(err: Error, doc: any) {
+	statusCollection.findOne({ chartId: identifier }, function(err: Error, doc: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });
@@ -312,7 +312,7 @@ valueChartRoutes.delete('/:chart/status', function(req: express.Request, res: ex
 
 	var identifier: string = (<any> req).identifier;
 
-	statusCollection.remove({ fname: identifier }, function (err: Error, result: any) {
+	statusCollection.remove({ chartId: identifier }, function (err: Error, result: any) {
 		if (err) {
 			res.status(400)
 				.json({ data: err });

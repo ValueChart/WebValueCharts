@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 21:53:50
+* @Last Modified time: 2017-07-18 11:15:48
 */
 
 // Import Angular Classes:
@@ -43,6 +43,7 @@ import { ViewConfig, InteractionConfig }										from '../../../../types/Config
 import { ScoreFunctionRecord }													from '../../../../types/Record.types';
 import { UserRole }																from '../../../../types/UserRole'
 import { CreatePurpose }														from '../../../../types/CreatePurpose'
+import { ValueChartStatus }														from '../../../../types/ValueChartStatus'
 
 /*
 	This class is responsible for displaying a ValueChart visualization. It uses the ValueChartDirective to create and render a ValueChart, and
@@ -79,7 +80,7 @@ export class ValueChartViewerComponent implements OnInit {
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
-	public valueChartStatus: any = { userChangesPermitted: true, incomplete: false };
+	public valueChartStatus: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };
 	public usersToDisplay: User[];
 	public validationMessage: string = '';
 
@@ -159,8 +160,6 @@ export class ValueChartViewerComponent implements OnInit {
 					}
 				}
 
-				this.valueChartHttpService.getValueChartStatus(fname)
-					.subscribe(status => this.valueChartStatus = status);
 			});
 
 		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType'], this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())) });
@@ -183,6 +182,9 @@ export class ValueChartViewerComponent implements OnInit {
 			let errorMessages = this.validationService.validateUsers(valueChart);
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 		}
+
+		this.valueChartHttpService.getValueChartStatus(valueChart._id)
+			.subscribe(status => this.valueChartStatus = status);
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();

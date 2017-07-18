@@ -17,6 +17,7 @@ import { ValueChartHttpService }				from '../../app/services/ValueChartHttp.serv
 // Import Types
 import { UserRole }								from '../../../types/UserRole';
 import { CreatePurpose }						from '../../../types/CreatePurpose';
+import { ValueChartStatus }						from '../../../types/ValueChartStatus';
 import { ValueChart, ChartType } 				from '../../../model/ValueChart';
 import { User } 								from '../../../model/User';
 
@@ -272,11 +273,9 @@ export class CreationStepsService {
 				this.userNotificationService.displaySuccesses(['ValueChart auto-saved']);
 
 				// Create status document
-				let status: any = {};
+				let status: ValueChartStatus = <any> {};
 				status.userChangesPermitted = false;
 				status.incomplete = true;
-				status.name = this.valueChartService.getValueChart().getName();
-				status.fname = this.valueChartService.getValueChart().getFName();
 				status.chartId = this.valueChartService.getValueChart()._id;
 				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 			},

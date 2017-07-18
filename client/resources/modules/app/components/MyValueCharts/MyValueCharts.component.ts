@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 15:43:36
+* @Last Modified time: 2017-07-18 11:22:56
 */
 
 // Import Angular Classes:
@@ -196,7 +196,7 @@ export class MyValueChartsComponent implements OnInit {
 				this.valueChartOwnerships.splice(index, 1);
 			});
 
-		this.valueChartHttpService.deleteValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => {
+		this.valueChartHttpService.deleteValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
 			// Do nothing;
 		});
 	}

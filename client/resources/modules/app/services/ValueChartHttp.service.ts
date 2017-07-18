@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 17:39:09
+* @Last Modified time: 2017-07-18 11:08:12
 */
 
 // Import Angular Classes:
@@ -190,20 +190,20 @@ export class ValueChartHttpService {
 		let options = new RequestOptions({ headers: headers });
 
 
-		return this.http.put(this.valueChartsUrl + status.fname + '/status', body, options)
+		return this.http.put(this.valueChartsUrl + status.chartId + '/status', body, options)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}
 
 
-	getValueChartStatus(fname: string): Observable<any> {
-		return this.http.get(this.valueChartsUrl + fname + '/status')
+	getValueChartStatus(chartId: string): Observable<any> {
+		return this.http.get(this.valueChartsUrl + chartId + '/status')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}
 
-	deleteValueChartStatus(fname: string): Observable<any> {
-		return this.http.delete(this.valueChartsUrl + fname + '/status')
+	deleteValueChartStatus(chartId: string): Observable<any> {
+		return this.http.delete(this.valueChartsUrl + chartId + '/status')
 			.map(this.extractBody)
 			.catch(this.handleError);
 	}

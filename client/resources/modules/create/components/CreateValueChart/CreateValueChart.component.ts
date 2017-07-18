@@ -108,7 +108,7 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	lockValueChart(): void {
-		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart().getFName()).subscribe((status) => { 
+		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => { 
 			status.userChangesPermitted = false; 
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 		});
