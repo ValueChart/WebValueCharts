@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 16:45:09
+* @Last Modified time: 2017-07-17 21:53:50
 */
 
 // Import Angular Classes:
@@ -68,6 +68,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	public ChartType = ChartType;
 	public UserRole = UserRole;
+	public userRecord: User;
 
 	public routeSubscription: Subscription;
 
@@ -85,7 +86,6 @@ export class ValueChartViewerComponent implements OnInit {
 	// ValueChart Configuration:
 	public viewConfig: ViewConfig = <any> {};
 	public interactionConfig: InteractionConfig = <any> {};
-
 
 	public loading: boolean = true;
 
@@ -163,7 +163,7 @@ export class ValueChartViewerComponent implements OnInit {
 					.subscribe(status => this.valueChartStatus = status);
 			});
 
-		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType']) });
+		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType'], this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())) });
 
 		this.resizeValueChart();
 		$(window).resize((eventObjective: Event) => {
@@ -173,6 +173,8 @@ export class ValueChartViewerComponent implements OnInit {
 
 	initializeViewer(type: ChartType): void {
 		let valueChart = this.valueChartService.getValueChart();
+		let currentUser = valueChart.getUser(this.currentUserService.getUsername());
+		this.userRecord = _.cloneDeep(currentUser);
 
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
 		this.valueChartViewerService.initializeUsers(valueChart.getUsers(), invalidUsers);
@@ -182,11 +184,11 @@ export class ValueChartViewerComponent implements OnInit {
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 		}
 
-		this.setValueChartTypeToView(type);
+		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
 	}
 
-	setValueChartTypeToView(type: ChartType) {
+	setValueChartTypeToView(type: ChartType, currentUser: User) {
 		if (type == ChartType.Individual) {
 
 			let individualChart = this.valueChartViewerService.generateIndividualChart();
@@ -198,7 +200,6 @@ export class ValueChartViewerComponent implements OnInit {
 			let baseValueChart = this.valueChartService.getValueChart();
 			this.valueChartViewerService.setActiveValueChart(baseValueChart);
 			
-			let currentUser = baseValueChart.getUser(this.currentUserService.getUsername());
 			if (currentUser) {
 				let errors = this.validationService.validateUser(baseValueChart, currentUser);
 				this.valueChartViewerService.updateInvalidUser(currentUser, errors)
@@ -207,7 +208,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 
-		// this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
+		this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
 	}
 
 	updateView(viewConfig: ViewConfig) {
@@ -335,6 +336,8 @@ export class ValueChartViewerComponent implements OnInit {
 				// User added/updated!
 				(user: User) => {
 					this.userNotificationService.displaySuccesses(['Save successful']);
+					this.userRecord = _.cloneDeep(user);
+
 					if (this.valueChartViewerService.getUserRole() === UserRole.UnsavedParticipant) {
 						let newRole = (this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername())) ? UserRole.OwnerAndParticipant : UserRole.Participant;
 						let type = this.valueChartViewerService.getActiveValueChart().getType();

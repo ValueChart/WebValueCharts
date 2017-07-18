@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 09:46:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 12:04:14
+* @Last Modified time: 2017-07-17 21:40:32
 */
 
 import { Routes, RouterModule } 									from '@angular/router';
@@ -22,6 +22,7 @@ import { CurrentUserService }										from './services/CurrentUser.service';
 import { ValueChartService }										from './services/ValueChart.service';
 import { AuthGuardService }											from './services/AuthGuard.service';
 import { JoinGuardService }											from './services/JoinGuard.service';
+import { ViewerGuardService }										from './services/ViewerGuard.service';
 import { UpdateValueChartService }									from './services/UpdateValueChart.service';
 import { ValidationService }										from './services/Validation.service';
 import { UserNotificationService }									from './services/UserNotification.service';
@@ -53,7 +54,7 @@ const routes: Routes = [
 	{ path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
 	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuardService] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuardService] },
-	{ path: 'ValueCharts/:ValueChart/:ChartType', component: ValueChartViewerComponent, canActivate: [AuthGuardService] },
+	{ path: 'ValueCharts/:ValueChart/:ChartType', component: ValueChartViewerComponent, canActivate: [AuthGuardService], canDeactivate: [ViewerGuardService] },
 	{ path: 'scoreFunction/:ViewType', component: ScoreFunctionViewerComponent },
 	// Setup default URL as /register.
 	{ path: '**', redirectTo: '/register'}
@@ -62,7 +63,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService]
+	[AuthGuardService, JoinGuardService, ViewerGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.
