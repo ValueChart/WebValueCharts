@@ -153,6 +153,8 @@ export abstract class ScoreFunction implements Memento {
 	*/
 	setElementScoreMap(newMap: Map<number | string, number>): void {
 		this.elementScoreMap = newMap;
+		this.findBestElement();
+		this.findWorstElement();
 	}
 
 	removeElement(domainElement: number | string): void {

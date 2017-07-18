@@ -189,7 +189,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   resetScoreFunction() {
     let obj: PrimitiveObjective = <PrimitiveObjective>this.getObjectiveByName(this.selectedObjective);
-    if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+    if (this.latestDefaults[this.selectedObjective] === 'default') {
+      this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective).setElementScoreMap(_.cloneDeep(obj.getDefaultScoreFunction().getElementScoreMap()));
+    }
+    else if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
       let elements = (<CategoricalDomain | IntervalDomain>obj.getDomain()).getElements();
       (<DiscreteScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective)).initialize(this.latestDefaults[this.selectedObjective], elements);
     }
