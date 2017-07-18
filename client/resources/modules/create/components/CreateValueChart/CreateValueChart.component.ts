@@ -6,6 +6,8 @@ import { Subscriber }     												from 'rxjs/Subscriber';
 import { Subject }														from 'rxjs/Subject';
 import '../../../utilities/rxjs-operators';
 
+import * as _ 															from 'lodash';
+
 // Import Application Classes:
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { UpdateValueChartService }										from '../../../app/services/UpdateValueChart.service';
@@ -97,6 +99,8 @@ export class CreateValueChartComponent implements OnInit {
 				this.lockValueChart();
 				this.creationStepsService.setAutoSaveEnabled(true);
 			}
+			
+			this.creationStepsService.valueChartCopy = _.cloneDeep(valueChart);
 
 			this.loading = false;
 		});

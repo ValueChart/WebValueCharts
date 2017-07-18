@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 21:17:39
+* @Last Modified time: 2017-07-17 17:39:09
 */
 
 // Import Angular Classes:
@@ -173,14 +173,13 @@ export class ValueChartHttpService {
 		@param valueChart - The valueChart object whose structure will replace the resource on the server. valueChart may have users. They will be ignored by the server.
 		@returns {Observable<ValueChart>} - An observable of a ValueChart object with an empty array for the users list.
 		@description 	Queries the server to set the structure of the ValueChart resource with the given id and password.
-						A 
 	*/
-	setValueChartStructure(chartId: string, valueChart: ValueChart): Observable<ValueChart> {
+	updateValueChartStructure(fname: string, valueChart: ValueChart): Observable<ValueChart> {
 		let body = JSON.stringify(valueChart);
 		let headers = new Headers({ 'Content-Type': 'application/json' });
 		let options = new RequestOptions({ headers: headers });
 
-		return this.http.put(this.valueChartsUrl + chartId + '/structure', body, options)
+		return this.http.put(this.valueChartsUrl + fname + '/structure', body, options)
 			.map(this.extractValueChartData)
 			.catch(this.handleError);
 	}

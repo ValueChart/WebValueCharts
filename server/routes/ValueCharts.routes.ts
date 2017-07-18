@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 17:28:27
+* @Last Modified time: 2017-07-17 17:50:59
 */
 
 // Import Libraries and Express Middleware:
@@ -227,7 +227,7 @@ valueChartRoutes.get('/:chart/structure', function(req: express.Request, res: ex
 // Update the structure of an existing ValueChart.
 valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var valueChartsCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
-	var identifier: string = (<any> req).identifier;	// ChartId is misleading here. It is the name, not id.
+	var identifier: string = (<any> req).identifier;
 
 	valueChartsCollection.findOne({ fname: identifier }, function (err: Error, foundDocument: any) {
 		if (err) {
@@ -248,6 +248,9 @@ valueChartRoutes.put('/:chart/structure', function(req: express.Request, res: ex
 					req.body.users = undefined;
 					req.body._id = foundDocument._id;
 
+					// Notify any clients hosting this ValueChart that the structure has been changed.
+					hostEventEmitter.emit(HostEventEmitter.STRUCTURE_CHANGED_EVENT + '-' + foundDocument._id, req.body);
+					
 					res.location('/ValueCharts/' + identifier + '/structure')
 						.status(200)
 						.json({ data: req.body });
