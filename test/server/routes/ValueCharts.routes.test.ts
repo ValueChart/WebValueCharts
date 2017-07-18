@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 16:30:32
+* @Last Modified time: 2017-07-18 11:54:40
 */
 
 // Require Node Libraries:
@@ -339,8 +339,8 @@ describe('ValueCharts Routes', () => {
 	describe('Route /ValueCharts/:Chart/status', () => {
 
 		it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
-			user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
-				.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: false, complete: true })
+			user.put('ValueCharts/' + chartId + '/status')
+				.send({ chartId: chartId, userChangesPermitted: false, complete: true })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(201)
@@ -353,8 +353,8 @@ describe('ValueCharts Routes', () => {
 		});
 
 		it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
-			user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
-				.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: true, complete: true })
+			user.put('ValueCharts/' + chartId + '/status')
+				.send({ chartId: chartId, userChangesPermitted: true, complete: true })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(200)
@@ -506,8 +506,8 @@ describe('ValueCharts Routes', () => {
 
 				argileJson = JSON.parse(JSON.stringify(argile));
 
-				user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
-					.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: false, complete: true })
+				user.put('ValueCharts/' + chartId + '/status')
+					.send({ chartId: chartId, userChangesPermitted: false, complete: true })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -553,8 +553,8 @@ describe('ValueCharts Routes', () => {
 
 
 			after(function(done: MochaDone) {
-				user.put('ValueCharts/' + JsonGroupHotel.fname + '/status')
-					.send({ name: JsonGroupHotel.name, fname: JsonGroupHotel.fname, chartId: chartId, userChangesPermitted: true, complete: true })
+				user.put('ValueCharts/' + chartId + '/status')
+					.send({ chartId: chartId, userChangesPermitted: true, complete: true })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -572,7 +572,7 @@ describe('ValueCharts Routes', () => {
 			.end(function(err, res) {
 		        if (err) return done(err);
 		
-				user.delete('ValueCharts/' + JsonGroupHotel.fname + '/status')
+				user.delete('ValueCharts/' + chartId + '/status')
 					.set('Accept', 'application/json')
 					.expect(200)
 					.end(function(err, res) {
