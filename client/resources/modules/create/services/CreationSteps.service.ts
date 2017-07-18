@@ -4,6 +4,9 @@ import { Router }								from '@angular/router';
 import { Observable }     						from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
+// Import Libraries: 
+import * as _ 									from 'lodash';
+
 // ImportApplication Classes:
 import { ValueChartService }					from '../../app/services/ValueChart.service';
 import { CurrentUserService }					from '../../app/services/CurrentUser.service';
@@ -49,6 +52,9 @@ export class CreationStepsService {
 	validationMessage: string;
 	public displayValidationModal: boolean = false;
 	NAME_TAKEN: string = "That name is already taken. Please choose another.";
+
+	// Copy of the current ValueChart. This is used to determine if there are changes which should be autosaved.
+	private valueChartCopy: ValueChart;
 
 	// ========================================================================================
 	// 									Constructor
@@ -232,11 +238,14 @@ export class CreationStepsService {
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
 	autoSaveValueChart = (): void => {
+		if (!this.valueChartCopy)
+			this.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
+		
 		if (this.autoSaveEnabled) {
 			if (!this.valueChartService.getValueChart()._id) {
 				// Save the ValueChart for the first time.
 				this.saveValueChartToDatabase();
-			} else {
+			} else if (!_.isEqual(this.valueChartService.getValueChart(), this.valueChartCopy)) {
 				// Update the ValueChart.
 				this.valueChartHttpService.updateValueChart(this.valueChartService.getValueChart())
 					.subscribe(
@@ -246,6 +255,8 @@ export class CreationStepsService {
 						this.userNotificationService.displayWarnings(['Auto-saving failed']);
 					});
 			}
+			
+			this.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
 		}
 	}
 
