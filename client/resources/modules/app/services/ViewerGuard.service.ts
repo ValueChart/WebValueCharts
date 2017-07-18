@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-07-17 21:38:08
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 21:52:26
+* @Last Modified time: 2017-07-18 10:50:38
 */
 
 // Import Angular Classes:
@@ -30,14 +30,24 @@ import { UserRole }												from '../../../types/UserRole';
 @Injectable()
 export class ViewerGuardService implements CanDeactivate<ValueChartViewerComponent> {
 
+	private destination: string;
 
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
 
 	constructor(
+		private router: Router,
 		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService) {}
+		private valueChartService: ValueChartService) {
+
+		// Record the navigation destination from the NavigationState event.
+		this.router
+		    .events
+		    .filter(e => e instanceof NavigationStart)
+		    .subscribe((e: NavigationStart) => this.destination = e.url)	
+	}
+
 
 
 	// ========================================================================================
@@ -55,8 +65,8 @@ export class ViewerGuardService implements CanDeactivate<ValueChartViewerCompone
 		let currentUser = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 		let role: UserRole = parseInt(route.queryParams['role']);
 
-		// The user is always allowed to navigate away when they are not a member of the ValueChart or if they are only viewing the ValueChart.
-		if (!currentUser || role === UserRole.Viewer || role === UserRole.Owner) {
+		// The user is always allowed to navigate away when they are not a member of the ValueChart, if they are only viewing the ValueChart, or if they are not actually leaving the viewer.
+		if (!currentUser || role === UserRole.Viewer || role === UserRole.Owner || !this.destination || this.destination.indexOf('ValueCharts/') !== -1) {
 			return true;
 		} else if (!_.isEqual(currentUser, component.userRecord)) {	
 			return window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-19 21:37:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 17:07:57
+* @Last Modified time: 2017-07-18 10:33:56
 */
 
 // Import Angular Classes:
@@ -61,7 +61,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		// Immediately allow navigation away from component if:
 		//	(1) The CreatePurpose is not NewValueChart;
 		//	(2) the destination is the ValueChartViewer;
-		if ( this.destination.indexOf('ValueCharts') !== -1 // We are going to the ValueChart Viewer
+		if ( this.destination.indexOf('ValueCharts/') !== -1 // We are going to the ValueChart Viewer
 			|| purpose !== CreatePurpose.NewValueChart) {	// We were not creating a new ValueChart
 			return Observable.from([true]);
 		} else {

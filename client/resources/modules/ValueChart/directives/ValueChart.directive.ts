@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:00:36
+* @Last Modified time: 2017-07-18 10:40:50
 */
 
 // Import Angular Classes:
@@ -164,7 +164,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		// Configure ValueChart size.
 		this.calculateDefaultComponentSize();
-		this.rendererService.initUserColors(this.valueChart);
 
 		// Initialize Change Detection:
 		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig, this.usersToDisplay);
@@ -273,8 +272,6 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			return;
 
 		if (this.changeDetectionService.detectStructuralChanges(this.valueChart, this.usersToDisplay)) {
-			this.rendererService.initUserColors(this.valueChart);
-
 			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay, structuralUpdate: true });
 		}
 

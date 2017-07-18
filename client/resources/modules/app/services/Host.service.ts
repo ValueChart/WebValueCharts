@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:50:12
+* @Last Modified time: 2017-07-18 10:42:41
 */
 
 import { Injectable } 												from '@angular/core';
@@ -130,6 +130,8 @@ export class HostService {
 					this.valueChartViewerService.addUserToDisplay(newUser);
 				else
 					this.valueChartViewerService.addInvalidUser(newUser.getUsername());
+
+				this.valueChartViewerService.initUserColors(this.valueChartService.getValueChart());
 
 				this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
 				break;

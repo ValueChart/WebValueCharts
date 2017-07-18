@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-07 14:21:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:27:56
+* @Last Modified time: 2017-07-18 10:42:02
 */
 
 
@@ -36,6 +36,10 @@ export class ValueChartViewerService {
 	private invalidUsers: string[]; // Users that are invalid and should not be selectable
 
 	private userRole: UserRole;		// The role of the current user.
+
+	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
+	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26']
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -111,6 +115,7 @@ export class ValueChartViewerService {
 		this.usersToDisplay = _.clone(users.filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
 		this.setUsersToDisplay(this.usersToDisplay);
 		this.setInvalidUsers(invalidUsers);
+		this.initUserColors(valueChart);
 	}
 
 	getUsersToDisplay(): User[] {
@@ -185,6 +190,21 @@ export class ValueChartViewerService {
 			this.addInvalidUser(user.getUsername());
 			this.removeUserToDisplay(user.getUsername());
 		}
+	}
+
+	/*
+		@returns {void}
+		@description	Assigns a color to every user in the ValueChart that does not yet have a color. Note that users that join the ValueChart
+						do not have colors, so this method must be called whenever a new user joins.
+
+	*/
+	initUserColors(valueChart: ValueChart): void {
+		// Assign a color to each user without one in the ValueChart
+		valueChart.getUsers().forEach((user: User, index: number) => {
+			if (!user.color || user.color == "#000000") {
+				user.color = this.kellyColors[index];
+			}
+		});
 	}
 
 }
