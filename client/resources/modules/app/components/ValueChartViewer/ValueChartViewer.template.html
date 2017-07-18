@@ -56,7 +56,6 @@
 				Undo
 				</button>
 			</div>
-			<div class="col-xs-1 pull-right"></div>
 			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
 			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 12:26:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 15:09:13
+* @Last Modified time: 2017-07-18 14:23:26
 */
 
 // Import Angular Classes:
@@ -68,7 +68,7 @@ export class SortAlternativesInteraction {
 	private originalAlternativeOrder: AlternativesRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
 																// class to reset the alternative order.
 
-	private clicks: Observable<Event>;
+	private clicks: Observable<any>;
 	private onClick: Subscription;
 
 	// Fields for sorting alternatives manually - Please see ReorderObjectivesInteraction for more information.
