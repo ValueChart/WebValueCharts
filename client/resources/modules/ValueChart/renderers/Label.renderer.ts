@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-11 09:02:26
+* @Last Modified time: 2017-07-18 13:21:12
 */
 
 // Import Angular Classes:
@@ -491,7 +491,8 @@ export class LabelRenderer {
 
 		this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
 		this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
-		this.scoreFunctionInteractionSubject.subscribe(renderer.interactionConfigChanged);
+		this.scoreFunctionInteractionSubject.map((interactionConfig: any) => { return { adjustScoreFunctions: (interactionConfig.adjustScoreFunctions && !objective.getDefaultScoreFunction().immutable), expandScoreFunctions: interactionConfig.expandScoreFunctions }; })
+				.subscribe(renderer.interactionConfigChanged);
 
 		this.renderScoreFunction(u, objective, this.scoreFunctionSubjects[objective.getId()], scoreFunction);
 	}
@@ -539,10 +540,11 @@ export class LabelRenderer {
 		{ 
 			width: width,
 			height: height, 
-			interactionConfig: { adjustScoreFunctions: u.interactionConfig.adjustScoreFunctions, expandScoreFunctions: true },
+			interactionConfig: { adjustScoreFunctions: (u.interactionConfig.adjustScoreFunctions && !objective.getDefaultScoreFunction().immutable), expandScoreFunctions: true },
 			scoreFunctions: scoreFunctions,
 			colors: colors,
 			viewOrientation: u.viewConfig.viewOrientation,
+			individual: u.valueChart.isIndividual()
 		});
 
 

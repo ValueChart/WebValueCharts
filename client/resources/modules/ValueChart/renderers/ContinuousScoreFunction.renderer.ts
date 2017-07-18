@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:41:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:04:07
+* @Last Modified time: 2017-07-18 12:19:55
 */
 
 // Import Angular Classes:
@@ -287,7 +287,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
-		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
+		this.plottedPoints.style('fill', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); })
 			.style('fill-opacity', 0.5)
 			.style('stroke-width', 1)
 			.style('stroke', 'black');

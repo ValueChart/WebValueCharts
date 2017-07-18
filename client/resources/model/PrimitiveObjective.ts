@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-22 20:40:21
+* @Last Modified time: 2017-07-18 13:00:29
 */
 
 // Import Model Classes:
@@ -36,14 +36,14 @@ export class PrimitiveObjective implements Objective {
 	// ========================================================================================
 
 
-	public objectiveType: string;			// The type of objective. This must always be 'primitive';
-	private name: string;					// The name of the objective. This field is ALWAYS used as the key for Alternatives, WeightMaps, and ScoreFunctionMaps. NEVER use id.
-	private id: string;						// The id of the objective. This is for use as an HTML id ONLY, and is formatted from the name field specifically for this purpose. 
-	private description: string;			// The description of the objective.
-	private color: string;					// The color of the objective in a ValueChart.
-	private domain: Domain;					// The domain of the objective. 
+	public objectiveType: string;					// The type of objective. This must always be 'primitive';
+	public scoreFunctionFixed: boolean 				// True if defaultScoreFunction is common to all users and cannot be customized.
+	private name: string;							// The name of the objective. This field is ALWAYS used as the key for Alternatives, WeightMaps, and ScoreFunctionMaps. NEVER use id.
+	private id: string;								// The id of the objective. This is for use as an HTML id ONLY, and is formatted from the name field specifically for this purpose. 
+	private description: string;					// The description of the objective.
+	private color: string;							// The color of the objective in a ValueChart.
+	private domain: Domain;							// The domain of the objective. 
 	private defaultScoreFunction: ScoreFunction;	// The default score function for all users.
-	private scoreFunctionFixed: boolean 	// True if defaultScoreFunction is common to all users and cannot be customized.
 
 
 	// ========================================================================================

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:28:26
+* @Last Modified time: 2017-07-18 12:34:05
 */
 
 // Import Testing Resources:
@@ -89,7 +89,8 @@ describe('RendererScoreFunctionUtility', () => {
 			interactionConfig: null,
 			heightScale: null,
 			scoreFunctionData: null,
-			styleUpdate: null
+			styleUpdate: null,
+			individual: null
 		}
 	});
 

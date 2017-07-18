@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-10 10:40:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:03:58
+* @Last Modified time: 2017-07-18 12:18:29
 */
 
 // Import Angular Classes:
@@ -276,9 +276,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
-		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); })
+		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); })
 		this.barLabels.style('font-size', 8);
-		this.barTops.style('fill', (d: DomainElement) => { return ((u.scoreFunctionData.length === 1) ? u.objective.getColor() : d.color); });
+		this.barTops.style('fill', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); });
 	}
 
 	/*

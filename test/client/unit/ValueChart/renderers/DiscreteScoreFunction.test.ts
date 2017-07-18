@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 15:04:37
+* @Last Modified time: 2017-07-18 12:32:48
 */
 
 // Import Testing Resources:
@@ -135,7 +135,8 @@ describe('DiscreteScoreFunctionRenderer', () => {
 			colors: [aaron.color],
 			heightScale: null,
 			scoreFunctionData: null,
-			styleUpdate: null
+			styleUpdate: null,
+			individual: true
 		}
 	});
 
@@ -205,6 +206,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
 					u.colors = [aaron.color, bob.color];
+					u.individual = false;
 
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	
@@ -278,6 +280,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				before(function() {
 					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
 					u.colors = [aaron.color];
+					u.individual = true;
 
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	
@@ -300,6 +303,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				before(function() {
 					u.scoreFunctions = [];
 					u.colors = [];
+					u.individual = false;
 
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	

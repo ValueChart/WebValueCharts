@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:30:08
+* @Last Modified time: 2017-07-18 13:28:22
 */
 
 // Import Angular Classes:
@@ -62,7 +62,6 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	private rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	private chartUndoRedoService: ChartUndoRedoService;
 
-
 	private scoreFunctionPlotContainer: d3.Selection<any, any, any, any>;
 	private scoreFunctionRenderer: ScoreFunctionRenderer;
 	private scoreDistributionChartContainer: d3.Selection<any, any, any, any>;
@@ -73,7 +72,8 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 	public colors: string[];
 	public objectiveToDisplay: PrimitiveObjective;
 	public enableInteraction: boolean;
-	
+	public individual: boolean;
+
 	private viewType: string;
 
 	private previousScoreFunctions: ScoreFunction[];
@@ -108,7 +108,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 						method rather than in the constructor.
 	*/
 	ngOnInit() {
-		this.sub = this.route.params.subscribe(params => this.viewType = params['viewType']);
+		this.sub = this.route.params.subscribe(params => this.viewType = params['ViewType']);
 
 		this.scoreFunctionPlotContainer = d3.select('.expanded-score-function');
 		this.scoreDistributionChartContainer = d3.select('.score-distribution-plot');
@@ -121,6 +121,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
 			this.rendererScoreFunctionUtility = new RendererScoreFunctionUtility();
 			this.enableInteraction = (<any>window.opener).enableInteraction;
+			this.individual = (<any>window.opener).individual;
 		}
 
 		this.services.chartUndoRedoService = this.chartUndoRedoService;

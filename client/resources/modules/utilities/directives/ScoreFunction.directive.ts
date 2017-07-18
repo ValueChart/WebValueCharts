@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 15:15:09
+* @Last Modified time: 2017-07-18 13:28:41
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -48,7 +48,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 	@Input() width: number;
 	@Input() height: number;
 	@Input() viewOrientation: ChartOrientation;
-	@Input() individualOnly: boolean;
+	@Input() individual: boolean;
 	@Input() enableInteraction: boolean;
 
 	// Services:
@@ -131,7 +131,8 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 				colors: this.colors,
 				scoreFunctions: this.scoreFunctions,
 				viewOrientation: this.viewOrientation,
-				interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction }
+				interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction },
+				individual: this.individual
 			});
 
 		this.interactionSubject.next({ expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction });
@@ -156,10 +157,11 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 				{
 					width: this.width, 
 					height: this.height, 
-					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction },
+					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: (this.enableInteraction && !this.objective.getDefaultScoreFunction().immutable) },
 					colors: this.colors,
 					scoreFunctions: this.scoreFunctions,
-					viewOrientation: this.viewOrientation
+					viewOrientation: this.viewOrientation,
+					individual: this.individual
 				});
 			
 			this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);

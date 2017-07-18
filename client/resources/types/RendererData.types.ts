@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-28 15:42:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 15:53:05
+* @Last Modified time: 2017-07-18 12:18:15
 */
 
 import * as d3								from 'd3';
@@ -112,7 +112,8 @@ export interface RendererConfig {
 	to render Score Function plots.
 */
 export interface ScoreFunctionUpdate {
-	el: d3.Selection<any, any, any, any>,
+	el: d3.Selection<any, any, any, any>;
+	individual: boolean;
 	viewOrientation: ChartOrientation;
 	interactionConfig: { adjustScoreFunctions: boolean, expandScoreFunctions: boolean };
 	width: number;

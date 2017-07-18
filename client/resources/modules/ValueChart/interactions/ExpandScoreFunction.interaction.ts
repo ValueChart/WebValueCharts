@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:40:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-31 16:04:10
+* @Last Modified time: 2017-07-18 12:28:54
 */
 
 // Import Angular Classes:
@@ -112,6 +112,7 @@ export class ExpandScoreFunctionInteraction {
 		(<any>window).objectiveToPlot = objective;
 		(<any>window).chartUndoRedoService = this.chartUndoRedoService;
 		(<any>window).enableInteraction = this.lastRendererUpdate.interactionConfig.adjustScoreFunctions;
+		(<any>window).individual = this.lastRendererUpdate.individual;
 
 		// Open the pop-up. Note that this.popUpRef is a reference to the child window.
 		this.popUpRef = window.open(this.SCORE_FUNCTION_ROUTE,
