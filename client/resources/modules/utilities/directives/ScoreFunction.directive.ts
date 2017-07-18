@@ -104,7 +104,6 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 
 	initScoreFunctionPlot(): void {
 
-
 		if (this.objective.getDomainType() === 'continuous') {
 			this.scoreFunctionRenderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 		} else {

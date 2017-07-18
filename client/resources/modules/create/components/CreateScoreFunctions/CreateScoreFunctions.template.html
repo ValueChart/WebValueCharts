@@ -6,7 +6,7 @@
             <label class="control-label select-objective-control">Select Objective:</label>
             <div class="input-group">
                 <select class="form-control select-objective-control" id="score-function-dropdown" [(ngModel)]="selectedObjective">
-                    <option *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectivesByName()" [value]="obj">{{obj}}</option>
+                    <option *ngFor="let obj of getMutableObjectives()" [value]="obj">{{obj}}</option>
                 </select>
                 <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
                     Next
@@ -15,9 +15,9 @@
             <label class="control-label select-objective-control">Select Default:</label>
             <div class="input-group">
                 <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
-                    <option [value]="flat">Flat</option>
-                    <option [value]="poslin">Positive Linear</option>
-                    <option [value]="neglin">Negative Linear</option>
+                    <option value="{{ScoreFunction.FLAT}}">Flat</option>
+                    <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
+                    <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>
                 </select>
                 <button type="button" class="btn btn-default" [disabled]="!latestDefaults[selectedObjective]" (click)="resetScoreFunction()">Reset</button>
             </div>

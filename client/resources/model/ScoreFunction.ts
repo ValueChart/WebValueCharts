@@ -27,6 +27,7 @@ export abstract class ScoreFunction implements Memento {
 	public bestElement: string | number;						// The element of the objective's domain that has the highest score. 
 	public worstElement: string | number;						// The element of the objective's domain that has the lowest score.
 	protected elementScoreMap: Map<number | string, number>;	// The Map object used by this class to map user assigned scores to objective domain elements.
+	public immutable = false;									// True if this ScoreFunction may not be altered by the user (determined by chart creator).
 
 	// Default initial function types
 	static FLAT: string = 'flat';

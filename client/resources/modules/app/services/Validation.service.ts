@@ -53,6 +53,8 @@ export class ValidationService {
 	INTERVAL_DOMAIN_INCOMPLETE: string = "Interval domains must have a min, max, and interval. Please fix: ";
 	RANGE_INVALID: string = "Min must be less than max. Please fix: ";
 	INTERVAL_INVALID: string = "Interval must be a positive factor of max - min. Please fix: ";
+	DEFAULT_SCORE_FUNCTION_INCOMPLETE: string = "Please complete default score function for: ";
+	DEFAULT_SCORE_FUNCTION_RANGE_INVALID: string = "Fixed default score functions must range from 0 to 1.  Please fix score functions for: ";
 	NO_ALTERNATIVES: string = "Chart must have at least one Alternative.";
 	ALTERNATIVE_NAMES_MISSING: string = "Every Alternative must have a name.";
 	ALTERNATIVE_NAMES_NOT_UNIQUE: string = "Alternative names must be unique.";
@@ -224,6 +226,14 @@ export class ValidationService {
 		if (intervalInvalid.length > 0) {
 			errorMessages.push(this.INTERVAL_INVALID.concat(intervalInvalid.join(', ')));
 		}
+		let defaultScoreFunctionIncomplete = this.defaultScoreFunctionIncomplete(valueChart);
+		if (defaultScoreFunctionIncomplete.length > 0) {
+			errorMessages.push(this.DEFAULT_SCORE_FUNCTION_INCOMPLETE.concat(defaultScoreFunctionIncomplete.join(', ')));
+		}
+		let defaultScoreFunctionRangeInvalid = this.defaultScoreFunctionRangeInvalid(valueChart);
+		if (defaultScoreFunctionRangeInvalid.length > 0) {
+			errorMessages.push(this.DEFAULT_SCORE_FUNCTION_RANGE_INVALID.concat(defaultScoreFunctionRangeInvalid.join(', ')));
+		}
 		return errorMessages;
 	}
 
@@ -387,6 +397,47 @@ export class ValidationService {
 				if (dom.getInterval() <= 0 || (dom.getMaxValue() - dom.getMinValue()) % dom.getInterval() !== 0) {
 					objectives.push(obj.getName());
 				}
+			}
+		}
+		return objectives;
+	}
+
+		/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives whose default score functions are not complete.
+						(i.e. they are missing scores for some domain elements).
+	*/
+	defaultScoreFunctionIncomplete(valueChart: ValueChart): string[] {
+		let objectives = [];
+		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+			if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
+				let scoreFunction = obj.getDefaultScoreFunction();
+				let elements = [] ;
+				for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
+      				if (scoreFunction.getScore(elt) === undefined) {
+      					elements.push(elt);
+      				}
+      			}
+      			if (elements.length > 0) {
+      				objectives.push(obj.getName());
+      			}
+			}	
+		}
+		return objectives;
+	}
+
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives with immutable default score functions that do not range from 0 to 1.
+	*/
+	defaultScoreFunctionRangeInvalid(valueChart: ValueChart): string[] {
+		let objectives = [];
+		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+			if (obj.getDefaultScoreFunction().immutable) {
+				let scoreFunction = obj.getDefaultScoreFunction();
+				if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+      				objectives.push(obj.getName());
+      			}
 			}
 		}
 		return objectives;

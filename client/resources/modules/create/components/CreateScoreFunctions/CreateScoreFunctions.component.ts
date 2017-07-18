@@ -52,12 +52,13 @@ export class CreateScoreFunctionsComponent implements OnInit {
   // ========================================================================================
 
   public ChartOrientation = ChartOrientation;
+  public ScoreFunction = ScoreFunction;
 
   user: User;
   selectedObjective: string; // Objective selected in the dropdown menu
   initialBestOutcomes: { [objName: string]: string | number }; // Track initial best outcomes for each Objective
                                                                // so we can reset weights if it changes
-  initialWorstOutcomes: { [objName: string]: string | number }; // Track initial best outcomes for each Objective
+  initialWorstOutcomes: { [objName: string]: string | number }; // Track initial worst outcomes for each Objective
                                                                 // so we can reset weights if it changes
   latestDefaults: { [objName: string]: string }; // Track latest default function so we can set dropdown accordingly
   public services: any = {}; // Services container to pass to ScoreFunctionDirective
@@ -66,11 +67,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
   // Validation fields:
   validationTriggered: boolean = false;
   errorMessages: string[]; // Validation error messages
-
-  // Default initial function types
-  flat: string = ScoreFunction.FLAT;
-  poslin: string = ScoreFunction.POSLIN;
-  neglin: string = ScoreFunction.NEGLIN;
 
   // ========================================================================================
   //                   Constructor
@@ -108,7 +104,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
+    this.selectedObjective = this.getMutableObjectives()[0];
     this.latestDefaults = {};
 
     // Initialize user
@@ -159,6 +155,15 @@ export class CreateScoreFunctionsComponent implements OnInit {
   }
 
   // ================================ Objective Selection Methods ====================================
+
+  /*   
+    @returns {void}
+    @description   Return names of Objectives whose default score functions are mutable.
+  */
+  getMutableObjectives() {
+    let mutableObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives().filter(obj => !obj.getDefaultScoreFunction().immutable);
+    return mutableObjectives.map(obj => obj.getName());
+  }
 
   /*   
     @returns {void}

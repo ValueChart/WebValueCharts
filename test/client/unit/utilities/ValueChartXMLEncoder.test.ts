@@ -62,7 +62,7 @@ describe('ValueChartXMlEncoder', () => {
 			});	
 
 			it('should convert the ScoreFunction into XML that is identical to the source XML when serialized', () => {
-				var rateScoreFunctionElement: Element = valueChartXMLEncoder.convertScoreFunctionIntoElement(rateScoreFunction, 'rate', xmlDocument);
+				var rateScoreFunctionElement: Element = valueChartXMLEncoder.convertScoreFunctionIntoElement(rateScoreFunction, 'rate', xmlDocument, false);
 				expect(xmlSerializer.serializeToString(rateScoreFunctionElement)).to.equal(rateScoreFunctionXMLString);
 			});
 
@@ -79,7 +79,7 @@ describe('ValueChartXMlEncoder', () => {
 			});	
 
 			it('should convert the ScoreFunction into XML that is identical to the source XML when serialized', () => {
-				var rateScoreFunctionElement: Element = valueChartXMLEncoder.convertScoreFunctionIntoElement(internetAccessScoreFuction, 'internet-access', xmlDocument);
+				var rateScoreFunctionElement: Element = valueChartXMLEncoder.convertScoreFunctionIntoElement(internetAccessScoreFuction, 'internet-access', xmlDocument, false);
 				expect(xmlSerializer.serializeToString(rateScoreFunctionElement)).to.equal(internetAccessScoreFunctionXMLString);
 			});	
 		});

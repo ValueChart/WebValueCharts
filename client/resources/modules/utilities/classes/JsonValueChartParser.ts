@@ -190,6 +190,8 @@ export class JsonValueChartParser {
 			scoreFunction = new DiscreteScoreFunction();
 		}
 
+		scoreFunction.immutable = jsonScoreFunction.immutable === true;
+
 		for (var i = 0; i < jsonScoreFunction.elementScoreMap.length; i++) {
 			scoreFunction.setElementScore(jsonScoreFunction.elementScoreMap[i][0], jsonScoreFunction.elementScoreMap[i][1]);
 		}

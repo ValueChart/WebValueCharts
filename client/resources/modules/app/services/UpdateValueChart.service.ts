@@ -360,7 +360,9 @@ export class UpdateValueChartService {
 		let completed = [];
 		for (let obj of primitiveObjectives) {
 			// Make sure there is a score function for every Objective (initialized to default)
-      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
+			// Also, set immutable score functions to be an exact replica of the default
+      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())
+      			|| obj.getDefaultScoreFunction().immutable) {
         		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
      		}
      		else {

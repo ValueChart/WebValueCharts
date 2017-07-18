@@ -337,6 +337,9 @@ export class WebValueChartsParser {
 			scoreFunction = new DiscreteScoreFunction();
 		}
 
+		var immutable: string = scoreFunctionElement.getAttribute('immutable');
+		scoreFunction.immutable = immutable === 'true' ? true : false;
+
 		var scoresElement: NodeListOf<Element> = scoreFunctionElement.querySelectorAll('Score');
 
 		for (var i = 0; i < scoresElement.length; i++) {
