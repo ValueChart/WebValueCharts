@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 13:28:41
+* @Last Modified time: 2017-07-19 12:11:42
 */
 
 import { Directive, Input }												from '@angular/core';
@@ -157,7 +157,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 				{
 					width: this.width, 
 					height: this.height, 
-					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: (this.enableInteraction && !this.objective.getDefaultScoreFunction().immutable) },
+					interactionConfig: { expandScoreFunctions: false, adjustScoreFunctions: this.enableInteraction },
 					colors: this.colors,
 					scoreFunctions: this.scoreFunctions,
 					viewOrientation: this.viewOrientation,

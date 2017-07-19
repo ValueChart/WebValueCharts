@@ -104,7 +104,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.getMutableObjectives()[0];
+    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()[0];
     this.latestDefaults = {};
 
     // Initialize user
@@ -155,15 +155,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
   }
 
   // ================================ Objective Selection Methods ====================================
-
-  /*   
-    @returns {void}
-    @description   Return names of Objectives whose default score functions are mutable.
-  */
-  getMutableObjectives() {
-    let mutableObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives().filter(obj => !obj.getDefaultScoreFunction().immutable);
-    return mutableObjectives.map(obj => obj.getName());
-  }
 
   /*   
     @returns {void}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-12 16:46:23
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 13:28:22
+* @Last Modified time: 2017-07-19 12:12:13
 */
 
 // Import Angular Classes:
@@ -120,7 +120,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.objectiveToDisplay = (<any>window.opener).objectiveToPlot;
 			this.chartUndoRedoService = (<any>window.opener).chartUndoRedoService;
 			this.rendererScoreFunctionUtility = new RendererScoreFunctionUtility();
-			this.enableInteraction = (<any>window.opener).enableInteraction;
+			this.enableInteraction = ((<any>window.opener).enableInteraction && !this.objectiveToDisplay.getDefaultScoreFunction().immutable);
 			this.individual = (<any>window.opener).individual;
 		}
 

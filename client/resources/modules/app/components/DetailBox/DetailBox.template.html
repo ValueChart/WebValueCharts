@@ -66,7 +66,7 @@
 					{{user.getUsername()}}
 					<div *ngIf="!valueChart.isIndividual()">
 						<span class="pull-right"><input type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-						<button *ngIf="enableManagement" class="pull-right btn btn-danger btn-xxs" (click)="userToRemove=user; displayModal = true; actionFunction = removeUser.bind(this, userToRemove)">Remove</button>
+						<button *ngIf="enableManagement" class="pull-right btn btn-danger btn-xxs" (click)="displayRemoveUser(user)">Remove</button>
 						<input class="pull-right" type="checkbox" [disabled]="valueChartViewerService.isUserInvalid(user.getUsername())" [checked]="valueChartViewerService.isUserDisplayed(user)" (change)="changeDisplayedUsers(user, $event)">
 					</div>
 				</h5>

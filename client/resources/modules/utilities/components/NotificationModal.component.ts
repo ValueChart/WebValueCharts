@@ -2,11 +2,11 @@
 * @Author: aaronpmishkin
 * @Date:   2017-07-17 12:55:57
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 16:20:50
+* @Last Modified time: 2017-07-19 13:40:37
 */
 
 import { Component, OnInit, Input, Output }										from '@angular/core';
-import { EventEmitter }															from '@angular/core';
+import { EventEmitter, ElementRef }												from '@angular/core';
 
 
 @Component({
@@ -26,10 +26,12 @@ export class NotificationModalComponent implements OnInit {
 	public set display(display: boolean) {
 		this.displayModal = display;
 
+		let modalElement = $(this.elementRef.nativeElement).find('#notification-modal');
+
 		if (display)
-			$('#notification-modal').modal('show')
+			modalElement.modal('show')
 		else
-			$('#notification-modal').modal('hide');
+			modalElement.modal('hide');
 	}
 
 
@@ -52,9 +54,13 @@ export class NotificationModalComponent implements OnInit {
 		@description 	Used for Angular's dependency injection ONLY. It should not be used to do any initialization of the class.
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
-	constructor() {}
+	constructor(private elementRef: ElementRef) {}
+
+
 
 	ngOnInit() {
-		$('#notification-modal').on('hide.bs.modal', (event: Event) => { this.modalClosed.emit(false); });
+
+
+		$(this.elementRef.nativeElement).find('#notification-modal').on('hide.bs.modal', (event: Event) => { this.modalClosed.emit(false); });
 	}
 }

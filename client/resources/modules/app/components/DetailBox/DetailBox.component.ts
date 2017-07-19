@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-15 10:25:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 15:52:14
+* @Last Modified time: 2017-07-19 13:13:49
 */
 
 // Import Angular Classes:
@@ -126,6 +126,12 @@ export class DetailBoxComponent implements OnInit {
 		} else {
 			this.valueChartViewerService.removeUserToDisplay(user.getUsername());
 		}
+	}
+
+	displayRemoveUser(user: User): void {
+		this.userToRemove = user; 
+		this.actionFunction = this.removeUser.bind(this, this.userToRemove)
+		this.displayModal = true; 
 	}
 
 	/* 	

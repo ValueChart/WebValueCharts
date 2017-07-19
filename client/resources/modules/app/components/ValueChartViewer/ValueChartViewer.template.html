@@ -60,16 +60,6 @@
 			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
-		<DetailBox 
-		[valueChart]="valueChartViewerService.getActiveValueChart()"
-		[enableManagement]="valueChartViewerService.isOwner()" 
-		[showUsers]="!valueChartService.getValueChart().isIndividual()"
-		[viewConfig]="viewConfig" 
-		[height]="valueChartHeight / 4" 
-		[width]="valueChartWidth / 3"
-		[renderEventsService]="renderEvents"
-		[chartElement]="chartElement">
-		</DetailBox>
 	<div>
 		<ValueChart
 		[valueChart]="valueChartViewerService.getActiveValueChart()"
@@ -82,6 +72,18 @@
 		(undoRedo)="updateUndoRedo($event)"
 		(renderEvents)="updateRenderEvents($event)">
 		</ValueChart>
+	</div>
+	<div>
+		<DetailBox 
+		[valueChart]="valueChartViewerService.getActiveValueChart()"
+		[enableManagement]="valueChartViewerService.isOwner()" 
+		[showUsers]="!valueChartService.getValueChart().isIndividual()"
+		[viewConfig]="viewConfig" 
+		[height]="valueChartHeight / 4" 
+		[width]="valueChartWidth / 3"
+		[renderEventsService]="renderEvents"
+		[chartElement]="chartElement">
+		</DetailBox>
 	</div>
 </div>
 <NotificationModal
