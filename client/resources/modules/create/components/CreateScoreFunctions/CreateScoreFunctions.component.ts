@@ -215,8 +215,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
   }
 
-  public getObjectiveByName(name: string): Objective {
-    for (let obj of this.valueChartService.getValueChart().getAllObjectives()) {
+  public getObjectiveByName(name: string): PrimitiveObjective {
+    for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
       if (obj.getName() === name) {
         return obj;
       }
