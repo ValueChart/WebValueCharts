@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 11:22:56
+* @Last Modified time: 2017-07-19 16:32:04
 */
 
 // Import Angular Classes:
@@ -101,6 +101,25 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(
 			valueChartOwnerships => {
 				this.valueChartOwnerships = valueChartOwnerships;
+				if (!this.valueChartService.valueChartIsDefined())
+					return;
+				
+				let valueChart = this.valueChartService.getValueChart();
+				let status = this.valueChartService.getStatus();
+
+				// Update the summary with local (possibly more up-to-date) information.
+				this.valueChartOwnerships.forEach((chartSummary: any) => {
+					if (chartSummary._id === valueChart._id) {
+							chartSummary.name = valueChart.getName();
+							chartSummary.password = valueChart.password;
+							chartSummary.numUsers = valueChart.getUsers().length;
+						}
+
+					if (chartSummary._id === status.chartId) {
+						chartSummary.incomplete = status.incomplete;
+						chartSummary.userChangesPermitted = status.userChangesPermitted;
+					}
+				});
 			});
 
 		//	Retrieve summary objects for all of the ValueCharts the current user is a member of.

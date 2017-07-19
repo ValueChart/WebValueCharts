@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 13:07:39
+* @Last Modified time: 2017-07-19 16:19:23
 */
 
 // Import Angular Classes:
@@ -80,7 +80,6 @@ export class ValueChartViewerComponent implements OnInit {
 	public undoRedoService: ChartUndoRedoService;
 	public renderEvents: RenderEventsService;
 
-	public valueChartStatus: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };
 	public usersToDisplay: User[];
 	public validationMessage: string = '';
 
@@ -183,8 +182,8 @@ export class ValueChartViewerComponent implements OnInit {
 			this.validationMessage = "The following users' preferences are invalid. They have been hidden from the chart:\n\n" + errorMessages.join('\n\n');
 		}
 
-		this.valueChartHttpService.getValueChartStatus(valueChart._id)
-			.subscribe(status => this.valueChartStatus = status);
+		if (this.valueChartService.getStatus().chartId !== valueChart._id) // If the status document is not associated with this ValueChart, fetch the correct one.
+			this.valueChartHttpService.getValueChartStatus(valueChart._id).subscribe(status => this.valueChartService.setStatus(status));
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
@@ -360,9 +359,9 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 	setUserChangesAccepted(userChangesPermitted: any): void {
-		this.valueChartStatus.userChangesPermitted = userChangesPermitted;
+		this.valueChartService.getStatus().userChangesPermitted = userChangesPermitted;
 
-		this.valueChartHttpService.setValueChartStatus(this.valueChartStatus).subscribe((status) => {
+		this.valueChartHttpService.setValueChartStatus(this.valueChartService.getStatus()).subscribe((status) => {
 			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be prevented');
 			this.userNotificationService.displayWarnings([messageString]);
 		});

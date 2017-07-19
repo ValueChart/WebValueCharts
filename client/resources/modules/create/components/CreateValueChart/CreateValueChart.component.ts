@@ -110,7 +110,7 @@ export class CreateValueChartComponent implements OnInit {
 	lockValueChart(): void {
 		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => { 
 			status.userChangesPermitted = false; 
-			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
+			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 		});
 	}
 
@@ -134,6 +134,7 @@ export class CreateValueChartComponent implements OnInit {
 			status.name = this.valueChartService.getValueChart().getName();
 			status.fname = this.valueChartService.getValueChart().getFName();
 			status.chartId = this.valueChartService.getValueChart()._id;
+			this.valueChartService.setStatus(status);
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 
 			this.creationStepsService.autoSaveValueChart();

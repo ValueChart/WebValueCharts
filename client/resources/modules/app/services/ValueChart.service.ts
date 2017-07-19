@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:09:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 10:58:29
+* @Last Modified time: 2017-07-19 16:15:02
 */
 
 // Import Angular Classes:
@@ -12,6 +12,9 @@ import * as _ 												from 'lodash';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
+
+// Import Types:
+import { ValueChartStatus }									from '../../../types/ValueChartStatus';
 
 /*
 	This class stores a ValueChart and exposes this state to any component, directive, or service in the application
@@ -26,6 +29,7 @@ export class ValueChartService {
 	// ========================================================================================
 
 	private valueChart: ValueChart;
+	private status: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };
 
 	// ========================================================================================
 	// 									Constructor
@@ -56,5 +60,13 @@ export class ValueChartService {
 
 	valueChartIsDefined(): boolean {
 		return !_.isNil(this.valueChart);
+	}
+
+	getStatus(): ValueChartStatus {
+		return this.status;
+	}
+
+	setStatus(status: ValueChartStatus): void {
+		this.status = status;
 	}
 }
