@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 13:00:29
+* @Last Modified time: 2017-07-19 15:29:51
 */
 
 // Import Model Classes:
@@ -144,6 +144,7 @@ export class PrimitiveObjective implements Objective {
 		}
 		return scoreFunction;
 	}
+
 
 	/*
 		@returns {PrimitiveObjective} - A PrimitiveObjective that is an exact copy of this PrimitiveObjective.

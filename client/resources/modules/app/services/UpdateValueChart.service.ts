@@ -5,6 +5,7 @@ import * as _												from 'lodash';
 // Import Model Classes:
 import { ValueChart }										from '../../../model/ValueChart';
 import { PrimitiveObjective }								from '../../../model/PrimitiveObjective';
+import { AbstractObjective }								from '../../../model/AbstractObjective';
 import { Alternative }										from '../../../model/Alternative';
 import { Objective }										from '../../../model/Objective';
 import { User }												from '../../../model/User';
@@ -37,7 +38,6 @@ export class UpdateValueChartService {
 	public OBJECTIVE_ADDED: string = "A new objective has been added to the ValueChart: "
 	public OBJECTIVE_REMOVED: string = "An objective has been removed from the ValueChart: "
 	public OBJECTIVE_CHANGED: string = "An existing objective has been modified: "
-
 
 	public BEST_WORST_OUTCOME_CHANGED: string = "The best/worst outcomes on some Objectives have changed. You may want to revisit your weights.";
 	public SCORE_FUNCTIONS_RESET: string = "Your score functions for the following Objectives have been reset to default: ";
@@ -108,13 +108,16 @@ export class UpdateValueChartService {
 		var oldObjectives = oldStructure.getAllObjectives();
 
 		// Get all alternatives in newStructure that are different from those in oldStructure. 
-		var differences = _.differenceWith(newObjectives, oldObjectives, _.isEqual);
+		var differences = _.differenceWith(newObjectives, oldObjectives, this.compareObjectives);
 		
 		differences.forEach((objective: Objective) => {
-			if (_.findIndex(oldObjectives, ['name', objective.getName()]) === -1)	// Was the objective in the old structure?
+			let oldIndex = _.findIndex(oldObjectives, ['name', objective.getName()]);
+
+			if (oldIndex === -1) {	// Was the objective in the old structure?
 				changeList.push(this.OBJECTIVE_ADDED + objective.getName());
-			else
+			} else {
 				changeList.push(this.OBJECTIVE_CHANGED + objective.getName());
+			}
 		});
 
 		// Get all objectives in the oldStructure that are not in the new structure (by the 'name' property).
@@ -132,7 +135,7 @@ export class UpdateValueChartService {
 		var changeList: string[] = [];
 
 		// Get all alternatives in newStructure that are different from those in oldStructure. 
-		var differences = _.differenceWith(newStructure.getAlternatives(), oldStructure.getAlternatives(), _.isEqual);
+		var differences = _.differenceWith(newStructure.getAlternatives(), oldStructure.getAlternatives(), this.compareAlternatives);
 		
 		differences.forEach((alternative: Alternative) => {
 			if (_.findIndex(oldStructure.getAlternatives(), ['name', alternative.getName()]) === -1)		// Was the alternative in the old structure?
@@ -150,6 +153,41 @@ export class UpdateValueChartService {
 		oldStructure.setAlternatives(newStructure.getAlternatives());
 
 		return changeList;
+	}
+
+	compareObjectives(a: Objective, b: Objective): boolean {
+		if (a.objectiveType === 'primitive' || b.objectiveType === 'primitive')
+			return _.isEqual(a, b);
+		else {
+			let aCopy = _.clone(a);
+			let bCopy = _.clone(b);
+
+			(<AbstractObjective> aCopy).setDirectSubObjectives([]);
+			(<AbstractObjective> bCopy).setDirectSubObjectives([]);
+
+			let fieldsSame = _.isEqual(aCopy, bCopy);	// Check if the immediate properties are the same.
+			// Check (by name) to see if the children are the same.
+			let childrenSame = _.differenceBy((<AbstractObjective> a).getDirectSubObjectives(), (<AbstractObjective> b).getDirectSubObjectives(), 'name').length === 0;
+
+			return fieldsSame && childrenSame;
+		}
+	}
+
+	compareAlternatives(a: Alternative, b: Alternative): boolean {
+		let aCopy = _.cloneDeep(a);
+		let bCopy = _.cloneDeep(b);
+
+		let differentKeys = _.xor(a.getObjectiveKeys(), b.getObjectiveKeys());
+
+		console.log(differentKeys);
+
+		// Ignore new or removed values due to new or removed objectives.
+		differentKeys.forEach((key: string) => {
+			aCopy.setObjectiveValue(key, null);
+			bCopy.setObjectiveValue(key, null);
+		});
+
+		return _.isEqual(aCopy, bCopy);
 	}
 
 
