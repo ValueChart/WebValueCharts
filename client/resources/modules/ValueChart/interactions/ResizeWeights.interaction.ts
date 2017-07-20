@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-24 13:30:21
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-05 18:26:47
+* @Last Modified time: 2017-07-20 10:32:24
 */
 
 // Import Angular Classes:
@@ -118,14 +118,31 @@ export class ResizeWeightsInteraction {
 		var totalWeight: number = currentUser.getWeightMap().getWeightTotal();
 		var labelDatum: LabelData = <any> d3.select(<any> eventObject.target).datum();
 		var previousWeight: number = currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
-		var percentChange: number = (((<any>eventObject).pumpType === PumpType.Increase) ? 0.01 : -0.01);
-		var pumpAmount = (percentChange * totalWeight) / ((1 - percentChange) - (previousWeight / totalWeight));
+		
+		if ((<any>eventObject).pumpType === PumpType.Increase) {
+			let pumpAmount = (0.01 * totalWeight) / ((1 - 0.01) - (previousWeight / totalWeight));
 
-		if (previousWeight + pumpAmount < 0) {
-			pumpAmount = 0 - previousWeight;
+			var newWeight: number = previousWeight + pumpAmount;
+			this.incrementObjectiveWeight(labelDatum, currentUser.getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
+		} else {
+			let decrimentAmount = -0.01
+			if (previousWeight - decrimentAmount < 0) {
+				decrimentAmount = 0 - previousWeight;
+			}
+			let primitiveObjectives = this.lastRendererUpdate.valueChart.getAllPrimitiveObjectives();
+			let incrementAmount = (-1 * decrimentAmount) / (primitiveObjectives.length - 1);
+
+			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
+				if (objective.getName() === labelDatum.objective.getName())
+					currentUser.getWeightMap().setObjectiveWeight(objective.getName(), previousWeight + decrimentAmount);
+				else {
+					let oldWeight = currentUser.getWeightMap().getObjectiveWeight(objective.getName());
+					currentUser.getWeightMap().setObjectiveWeight(objective.getName(), oldWeight + incrementAmount);
+				}					
+			});
+
 		}
-		var newWeight: number = previousWeight + pumpAmount;
-		this.incrementObjectiveWeight(labelDatum, currentUser.getWeightMap(),newWeight , pumpAmount, newWeight);	// Update Children's weights.
+
 		currentUser.getWeightMap().normalize();
 	}
 
