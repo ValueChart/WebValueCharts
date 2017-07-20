@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 14:35:10
+* @Last Modified time: 2017-07-19 16:57:22
 */
 
 // Import Angular Classes:
@@ -203,20 +203,11 @@ export class HomeComponent {
 			if (event.isTrusted) {
 				var xmlString = (<FileReader>fileReaderEvent.target).result;	// Retrieve the file contents string from the file reader.
 				let valueChart = this.valueChartParser.parseValueChart(xmlString);
+				valueChart.setCreator(this.currentUserService.getUsername());	// Set the current user as the owner.
+				valueChart.setName('');											// Erase the ValueChart's name. The owner must give it a new one.
 
 				this.valueChartService.setValueChart(valueChart);
-				if (this.validateChartStructure(valueChart)) {
-
-					let role: UserRole = UserRole.Viewer;
-					if (valueChart.isMember(this.currentUserService.getUsername()))
-						role = UserRole.OwnerAndParticipant;
-					else 
-						role = UserRole.Owner;
-
-					// Navigate to the ValueChartViewerComponent to display the ValueChart.
-					this.saveValueChartToDatabase(valueChart);
-					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: role } });
-				}		
+				this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 			}
 		};
 		// Read the file as a text string. This should be fine because ONLY XML files should be uploaded.

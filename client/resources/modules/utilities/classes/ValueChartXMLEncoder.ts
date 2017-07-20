@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 18:53:24
+* @Last Modified time: 2017-07-19 16:53:10
 */
 
 // Import Model Classes:
@@ -118,9 +118,6 @@ export class ValueChartXMLEncoder {
 		let type = valueChart.isIndividual() ? 'individual' : 'group';
 		valueChartElement.setAttribute('type', type);
 
-		if (valueChart._id) {
-			valueChartElement.setAttribute('id', valueChart._id);
-		}
 		if (valueChart.password) {
 			valueChartElement.setAttribute('password', valueChart.password);
 		}

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 10:24:35
+* @Last Modified time: 2017-07-19 16:52:55
 */
 
 // Import Libraries
@@ -72,7 +72,6 @@ export class WebValueChartsParser {
 		var users: User[] = this.parseUsers(usersParentElement);
 
 		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
-		valueChart._id = valueChartElement.getAttribute('id');
 		valueChart.password = valueChartElement.getAttribute('password');
 		let type = (valueChartElement.getAttribute('type') === 'individual') ? ChartType.Individual : ChartType.Group;
 		valueChart.setType(type);
