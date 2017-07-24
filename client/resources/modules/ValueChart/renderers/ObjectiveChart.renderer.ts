@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 12:53:30
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 15:52:40
+* @Last Modified time: 2017-07-24 10:51:29
 */
 
 // Import Angular Classes
@@ -62,10 +62,9 @@ export class ObjectiveChartRenderer {
 	public cells: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
 	public userScores: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
 	public weightOutlines: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
-	public objectiveDomainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
+	public domainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
 	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
-	public domainLabels: d3.Selection<any, any, any, any>;
 
 	// ========================================================================================
 	// 									Constructor
@@ -258,14 +257,12 @@ export class ObjectiveChartRenderer {
 		var updateDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; });
 
-		this.domainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);
-
 		// Update domain labels to conform to the data.
 		updateDomainLabels.exit().remove();
 		updateDomainLabels.enter().append('text')
 			.classed(ObjectiveChartDefinitions.DOMAIN_LABEL, true);
 
-		this.objectiveDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);
+		this.domainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);		
 	}
 
 
@@ -393,12 +390,12 @@ export class ObjectiveChartRenderer {
 
 		this.domainLabels
 			.data((d: CellData) => { return [d]; })
-			.text((d: CellData, i: number) => { return d.value })
+			.text((d: CellData, i: number) => { return '' + d.value })
 			.attr(u.rendererConfig.coordinateOne, (u.rendererConfig.dimensionOneSize / u.valueChart.getAlternatives().length) / 3)
 			.attr(u.rendererConfig.coordinateTwo, (d: CellData, i: number) => {
 				let maxObjectiveWeight: number = 0;
 				if (d.userScores.length > 0) {
-					u.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());				
+					maxObjectiveWeight = u.maximumWeightMap.getObjectiveWeight(d.userScores[0].objective.getName());				
 				}
 				return (u.viewConfig.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.dimensionTwoScale(maxObjectiveWeight) - domainLabelCoord : domainLabelCoord;
 			});
@@ -495,9 +492,9 @@ export class ObjectiveChartRenderer {
 	*/
 	private toggleDomainLabels(displayDomainValues: boolean): void {
 		if (displayDomainValues) {
-			this.objectiveDomainLabels.style('display', 'block');
+			this.domainLabels.style('display', 'block');
 		} else {
-			this.objectiveDomainLabels.style('display', 'none');
+			this.domainLabels.style('display', 'none');
 		}
 	}
 

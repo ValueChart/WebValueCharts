@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 15:34:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-01 14:05:32
+* @Last Modified time: 2017-07-24 10:28:42
 */
 
 // Import Angular Classes:
@@ -112,6 +112,9 @@ export abstract class ScoreFunctionRenderer {
 
 
 	public scoreFunctionChanged = (update: ScoreFunctionUpdate) => {
+		if (this.lastRendererUpdate)
+			var dimensionOneChanged = this.lastRendererUpdate.rendererConfig.dimensionOneSize !== update.rendererConfig.dimensionOneSize;
+		
 		this.lastRendererUpdate = update;
 
 		if (this.rootContainer == undefined) {
@@ -127,7 +130,7 @@ export abstract class ScoreFunctionRenderer {
 		}
 
 		this.updateInteractions(update);
-		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
+		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation || dimensionOneChanged));
 
 		if (update.styleUpdate) {
 			this.applyStyles(update);

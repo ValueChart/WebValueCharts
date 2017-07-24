@@ -179,8 +179,6 @@ export class UpdateValueChartService {
 
 		let differentKeys = _.xor(a.getObjectiveKeys(), b.getObjectiveKeys());
 
-		console.log(differentKeys);
-
 		// Ignore new or removed values due to new or removed objectives.
 		differentKeys.forEach((key: string) => {
 			aCopy.setObjectiveValue(key, null);

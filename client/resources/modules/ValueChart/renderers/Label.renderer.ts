@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-07 13:39:52
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 13:21:12
+* @Last Modified time: 2017-07-24 10:36:47
 */
 
 // Import Angular Classes:
@@ -356,8 +356,9 @@ export class LabelRenderer {
 				this.labelSelections[labelDatum.objective.getId()].scoreFunction.attr('transform', labelTransform)
 			
 				// ONLY render the Score Functions if they are being displayed.
-				if (u.viewConfig.displayScoreFunctions)
+				if (u.viewConfig.displayScoreFunctions) {
 					this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId()], this.labelSelections[labelDatum.objective.getId()].scoreFunction);
+				}
 
 			} else {
 				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
