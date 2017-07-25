@@ -64,7 +64,7 @@ export class ValueChartViewerService {
 	}
 
 	userIsMember(username: string): boolean {
-		return !_.isNil(this.valueChartService.getValueChart().getUser(username));
+		return this.valueChartService.getValueChart().isMember(username);
 	}
 
 	setUserRole(role: UserRole) {

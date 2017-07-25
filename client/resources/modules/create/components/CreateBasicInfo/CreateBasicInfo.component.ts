@@ -135,15 +135,21 @@ export class CreateBasicInfoComponent implements OnInit {
 	}
 
 	convertToIndividual() {
-		let users: User[] = [];
-		let currentUser = this.valueChart.getUser(this.currentUserService.getUsername());
+		// Record the users that will be removed
+		let otherUsers = this.valueChart.getUsers().map(user => user.getUsername()).filter(username => 
+			username !== this.currentUserService.getUsername());
 
+		// Update the local chart to contain only the current user
+		let newUsers: User[] = [];
+		let currentUser = this.valueChart.getUser(this.currentUserService.getUsername());
 		if (!_.isNil(currentUser)) {
-			users.push(currentUser);
+			newUsers.push(currentUser);
 		}
-		
-		this.valueChart.setUsers(users);
+		this.valueChart.setUsers(newUsers);
 		this.valueChart.setType(ChartType.Individual);
+
+		// Manually remove the old users from the database to alert the event listeners
+		otherUsers.map(username => this.valueChartHttpService.deleteUser(this.valueChart._id, username).subscribe());
 	}
 
 	resetType(): void {

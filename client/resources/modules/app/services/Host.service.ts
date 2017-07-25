@@ -26,6 +26,7 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 
 // Import Types: 
 import { HostMessage, MessageType }									from '../../../types/HostMessage';
+import { UserRole }													from '../../../types/UserRole';
 
 /*
 	This class contains all the methods require to host a ValueChart. A hosted ValueChart is a ValueChart
@@ -170,6 +171,12 @@ export class HostService {
 				this.valueChartViewerService.removeUserToDisplay(userToDelete);
 				this.valueChartViewerService.removeInvalidUser(userToDelete);
 
+				// Update the user role
+				if (userToDelete === this.currentUserService.getUsername() && this.valueChartViewerService.userIsMember(userToDelete)) {
+					let newRole = this.valueChartViewerService.isOwner() ? UserRole.Owner : UserRole.Viewer;
+					this.valueChartViewerService.setUserRole(newRole);
+				}
+
 				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
 				this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
@@ -181,17 +188,19 @@ export class HostService {
 				newStructure.setUsers(this.valueChartService.getValueChart().getUsers());
 				newStructure.setType(this.valueChartService.getValueChart().getType());
 
-
 				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
 				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 
 					let changes: string[] = this.updateValueChartService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
-					this.userNotificationService.displayInfo(changes);
+					
+					// Notify other users of the changes.
+					if (!this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername()))
+						this.userNotificationService.displayInfo(changes);
 
 					// Update the user's preferences.
 					let warnings: string[] = [];
 					this.valueChartService.getValueChart().getUsers().forEach((user: User) => {
 						let userWarnings = this.updateValueChartService.cleanUpUserPreferences(this.valueChartService.getValueChart(), user);
-						// Print Warnings ONLY for the current user;
+						// Print Warnings ONLY for the current user.
 						if (user.getUsername() === this.currentUserService.getUsername())
 							warnings = userWarnings;
 					});
@@ -199,19 +208,20 @@ export class HostService {
 					this.userNotificationService.displayWarnings(warnings);
 
 					// Notify the current user of any errors in their preferences.
-					errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
-					this.userNotificationService.displayErrors(errors);
-					
-					// Hide Invalid Users:
+					if (this.valueChartViewerService.userIsMember(this.currentUserService.getUsername())) {
+						errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
+						this.userNotificationService.displayErrors(errors);
+					}
+								
+					// Hide invalid users.
 					let invalidUsers = this.validationService.getInvalidUsers(this.valueChartService.getValueChart());
 					this.valueChartViewerService.initializeUsers(this.valueChartViewerService.getUsersToDisplay(), invalidUsers);
 
-					// Update the active ValueChart:
+					// Update the active ValueChart.
 					if (this.valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual) {
 						let individualChart = this.valueChartViewerService.generateIndividualChart();
 						this.valueChartViewerService.setActiveValueChart(individualChart);
 					}
-
 				}
 				break;
 

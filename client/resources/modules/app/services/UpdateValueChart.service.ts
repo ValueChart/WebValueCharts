@@ -245,16 +245,6 @@ export class UpdateValueChartService {
 
  	// ================================ Clean-up Preferences ====================================
 
- 	cleanUpPreferences(valueChart: ValueChart, users: User[]): string[] {
- 		let warnings: string[] = [];
-
- 		for (let user of users) {
- 		  	warnings = warnings.concat(this.cleanUpUserPreferences(valueChart, user));
- 		}
-
- 		return warnings;
- 	}
-
  	/*
 		@returns {string[]}
 		@description 	Removes all elements from the user's preference model that should not be there.

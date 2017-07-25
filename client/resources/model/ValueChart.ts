@@ -20,6 +20,9 @@ import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 // Import Utility Classes:
 import * as Formatter															from '../modules/utilities/classes/Formatter';
 
+// Import Libraries:
+import * as _												from 'lodash';
+
 
 /*
 	This class is the representation of all of a ValueChart's internal data. It uses the Alternative class to represent the decision options
@@ -298,7 +301,7 @@ export class ValueChart {
 	}
 
 	isMember(username: string): boolean {
-		return this.getUser(username) !== undefined;
+		return !_.isNil(this.getUser(username));
 	}
 
 	removeUser(userToDelete: User): void {
