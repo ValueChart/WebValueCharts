@@ -83,9 +83,8 @@ export class DiscreteScoreFunction extends ScoreFunction {
 
 	setElementScore(domainElement: string, score: number): void {
 		this.elementScoreMap.set(domainElement, score);
-		this.updateBestAndWorstElements(domainElement, score);
+		this.updateBestAndWorstElements();
 	}
-
 
 	/*
 		@returns {DiscreteScoreFunction} - A DiscreteScoreFunction that is an exact copy of this DiscreteScoreFunction.

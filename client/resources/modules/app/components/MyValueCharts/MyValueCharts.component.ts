@@ -263,4 +263,12 @@ export class MyValueChartsComponent implements OnInit {
 			return 'Complete';
 		}
 	}
+
+	getChangesPermittedText(valueChartSummary: any): string {
+		if (valueChartSummary.userChangesPermitted && !valueChartSummary.incomplete) {
+			return 'Allowed';
+		} else {
+			return 'Prevented';
+		}
+	}
 }

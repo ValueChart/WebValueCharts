@@ -114,7 +114,7 @@ export class ContinuousScoreFunction extends ScoreFunction {
 		if (domainElement < this.minDomainValue || this.minDomainValue === undefined)
 			this.minDomainValue = domainElement;
 
-		this.updateBestAndWorstElements(domainElement, score);
+		this.updateBestAndWorstElements();
 	}
 
 	/*
@@ -149,7 +149,6 @@ export class ContinuousScoreFunction extends ScoreFunction {
 			}
 			iteratorElement = elementIterator.next();
 		}
-
 
 		var start = { element: belowElement, score: this.elementScoreMap.get(belowElement) };
 		var end = { element: aboveElement, score: this.elementScoreMap.get(aboveElement) };

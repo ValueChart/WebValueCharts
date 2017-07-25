@@ -362,7 +362,7 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartService.getStatus().userChangesPermitted = userChangesPermitted;
 
 		this.valueChartHttpService.setValueChartStatus(this.valueChartService.getStatus()).subscribe((status) => {
-			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed' : 'ValueChart locked. Changes will be prevented');
+			var messageString: string = ((userChangesPermitted) ? 'ValueChart unlocked. Changes will be allowed.' : 'ValueChart locked. Changes will be prevented.');
 			this.userNotificationService.displayWarnings([messageString]);
 		});
 

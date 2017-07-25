@@ -74,65 +74,28 @@ export abstract class ScoreFunction implements Memento {
 
 	/*
 		@returns {void}
-		@description	Iterators over the internal Map object to find the objective domain element with the highest assigned score, and then updates the
-						bestElement field to be this element.
+		@description	Updates the bestElement and worstElement class fields to insure that they are consistent with user assigned scores.
+						This method should be called whenever the score of a domain element in the ScoreFunction is changed.
 	*/
-	findBestElement(): void {
+	updateBestAndWorstElements() {
 		var elementIterator: Iterator<number | string> = this.elementScoreMap.keys();
 		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
 
 		var bestElementSoFar = iteratorElement.value;
+		var worstElementSoFar = iteratorElement.value;
 		while (iteratorElement.done === false) {
 			let currentElementScore: number = this.elementScoreMap.get(iteratorElement.value);
 
 			if (this.elementScoreMap.get(bestElementSoFar) < currentElementScore) {
 				bestElementSoFar = iteratorElement.value;
 			}
-			iteratorElement = elementIterator.next();
-		}
-		this.bestElement = bestElementSoFar;
-	}
-
-	/*
-		@returns {void}
-		@description	Iterators over the internal Map object to find the objective domain element with the lowest assigned score, and then updates the
-						worstElement field to be this element.
-	*/
-	findWorstElement(): void {
-		var elementIterator: Iterator<number | string> = this.elementScoreMap.keys();
-		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
-
-		var worstElementSoFar = iteratorElement.value;
-		while (iteratorElement.done === false) {
-			let currentElementScore: number = this.elementScoreMap.get(iteratorElement.value);
-
 			if (this.elementScoreMap.get(worstElementSoFar) > currentElementScore) {
 				worstElementSoFar = iteratorElement.value;
 			}
 			iteratorElement = elementIterator.next();
 		}
+		this.bestElement = bestElementSoFar;
 		this.worstElement = worstElementSoFar;
-	}
-
-
-	/*
-		@param updatedDomainElement -  the domain element whose score was just updated.
-		@param updatedScore - the new score of the updated domain element.
-		@returns {void}
-		@description	Updates the bestElement and worstElement class fields to insure that they are consistent with user assigned scores.
-						This method should be called whenever the score of a domain element in the ScoreFunction is changed.
-	*/
-	updateBestAndWorstElements(updatedDomainElement: string | number, updatedScore: number) {
-		
-		if (updatedDomainElement === this.bestElement)		
-			this.findBestElement();
-		if (updatedDomainElement === this.worstElement)
-			this.findWorstElement();
-
-		if (this.bestElement === undefined || updatedScore > this.elementScoreMap.get(this.bestElement))
-			this.bestElement = updatedDomainElement;
-		if (this.worstElement === undefined || updatedScore < this.elementScoreMap.get(this.worstElement))
-			this.worstElement = updatedDomainElement;
 	}
 
 
@@ -153,18 +116,12 @@ export abstract class ScoreFunction implements Memento {
 	*/
 	setElementScoreMap(newMap: Map<number | string, number>): void {
 		this.elementScoreMap = newMap;
-		this.findBestElement();
-		this.findWorstElement();
+		this.updateBestAndWorstElements();
 	}
 
 	removeElement(domainElement: number | string): void {
 		this.elementScoreMap.delete(domainElement);
-
-		if (domainElement === this.worstElement)
-			this.findWorstElement();
-
-		if (domainElement === this.bestElement)
-			this.findBestElement();
+		this.updateBestAndWorstElements();
 	}
 
 
