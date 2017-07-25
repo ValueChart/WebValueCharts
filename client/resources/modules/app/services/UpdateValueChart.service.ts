@@ -398,6 +398,7 @@ export class UpdateValueChartService {
 			        if (this.addMissingElements(<CategoricalDomain>obj.getDomain(),<DiscreteScoreFunction>scoreFunction)) {
 			        	completed.push(obj.getName());
 			        }
+			        this.reorderElements(<CategoricalDomain>obj.getDomain(),<DiscreteScoreFunction>scoreFunction);
 			    }
      		}
      	}
@@ -423,6 +424,18 @@ export class UpdateValueChartService {
 			}
         }
         return completed;
+	}
+
+	/*
+		@description 	Sorts the score function elements to be in the same order as the domain elements.
+	*/
+	reorderElements(dom: CategoricalDomain, scoreFunction: DiscreteScoreFunction) {
+		let elementScoreMap = new Map<number | string, number>();
+		let elements = dom.getElements();
+        for (let elt of elements) {
+			elementScoreMap.set(elt, scoreFunction.getScore(elt));
+        }
+        scoreFunction.setElementScoreMap(elementScoreMap);
 	}
 
 	/*
