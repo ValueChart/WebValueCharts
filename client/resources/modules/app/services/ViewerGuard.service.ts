@@ -65,8 +65,8 @@ export class ViewerGuardService implements CanDeactivate<ValueChartViewerCompone
 		let currentUser = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 		let role: UserRole = parseInt(route.queryParams['role']);
 
-		// The user is always allowed to navigate away when they are not a member of the ValueChart, if they are only viewing the ValueChart, or if they are not actually leaving the viewer.
-		if (!currentUser || role === UserRole.Viewer || role === UserRole.Owner || !this.destination || this.destination.indexOf('ValueCharts/') !== -1) {
+		// The user is always allowed to navigate away when they are not a member of the ValueChart, if they are only viewing the ValueChart, or if they are returning to the viewer or the create workflow.
+		if (!currentUser || role === UserRole.Viewer || role === UserRole.Owner || !this.destination || this.destination.indexOf('ValueCharts/') !== -1 || this.destination.indexOf('create/') !== -1) {
 			return true;
 		} else if (!_.isEqual(currentUser, component.userRecord)) {	
 			return window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');
