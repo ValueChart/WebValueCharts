@@ -62,7 +62,6 @@ export class HomeComponent {
 	// Upload validation fields:
 	public displayValidationModal = false;
 	public validationMessage: string;
-	public canFixChart: boolean;
 
 	// ========================================================================================
 	// 									Constructor
@@ -130,10 +129,7 @@ export class HomeComponent {
 			.subscribe(
 			(valueChart: ValueChart) => {
 				$('#chart-credentials-modal').modal('hide');
-				if (valueChart.isIndividual()) {
-					this.userNotificationService.displayErrors(["The chart you are trying to join is single-user only."]);
-				}
-				else {
+				if (this.validateChartForJoining(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);	
 					this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
 				}
@@ -158,9 +154,8 @@ export class HomeComponent {
 			(valueChart: ValueChart) => {
 
 				$('#chart-credentials-modal').modal('hide');
-				if (this.validateChartStructure(valueChart)) {
+				if (this.validateChartForViewing(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);
-
 					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Viewer } });
 				}
 			},
@@ -221,20 +216,37 @@ export class HomeComponent {
 		@description 	Validates chart structure prior to viewing and gives the creator an opportunity to fix errors.
 						Returns true iff there were no validation errors.
 	*/
-	validateChartStructure(valueChart: ValueChart): boolean {
+	validateChartForViewing(valueChart: ValueChart): boolean {
 		let structuralErrors = this.validationService.validateStructure(valueChart); 	
 		if (structuralErrors.length > 0) {
-		
 			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
-				this.canFixChart = false;
-				this.validationMessage = "Cannot view chart. There are problems with this chart that can only be fixed by its creator.";
-				this.displayValidationModal = true;
+				this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by its creator."]);
 			}
 			else {
-				this.canFixChart = true;
 				this.validationMessage = "There are problems with this chart: \n\n" + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
 				this.displayValidationModal = true;
 			}
+			return false;
+		}
+		return true;
+	}
+
+	/*
+		@returns {boolean}
+		@description 	Validates chart structure prior to joining.
+						Returns true if it is ok for the current user to join.
+	*/
+	validateChartForJoining(valueChart: ValueChart): boolean {
+		if (valueChart.isIndividual()) {
+			this.userNotificationService.displayErrors(["The chart you are trying to join is single-user only."]);
+			return false;
+		}
+		else if (valueChart.getCreator() === this.currentUserService.getUsername()) {
+			this.userNotificationService.displayErrors(["You cannot join a chart that you own."]);
+			return false;
+		}	
+		else if (this.validationService.validateStructure(valueChart).length > 0) {
+			this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by its creator."]);
 			return false;
 		}
 		return true;

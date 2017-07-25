@@ -469,9 +469,9 @@ var renderEventsServiceStub = {
 
 	var checkViewToggles = () => {
 		if (viewConfig.displayDomainValues) {
-			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('block');
+			expect(objectiveChartRenderer.domainLabels.style('display')).to.equal('block');
 		} else {
-			expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');			
+			expect(objectiveChartRenderer.domainLabels.style('display')).to.equal('none');			
 		}
 	}
 });

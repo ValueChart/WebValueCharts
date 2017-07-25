@@ -340,7 +340,7 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: false, complete: true })
+				.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(201)
@@ -354,7 +354,7 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: true, complete: true })
+				.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(200)
@@ -507,7 +507,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: false, complete: true })
+					.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -554,7 +554,75 @@ describe('ValueCharts Routes', () => {
 
 			after(function(done: MochaDone) {
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, complete: true })
+					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+					.set('Accept', 'application/json')
+					.end(function(err, res) {
+				        if (err) return done(err);
+				        done();
+				    });
+			});
+		});
+
+		context('attempting to add/remove/change users when incomplete is true', () => {
+			var argile: User;
+			var argileJson: any;
+
+			before(function(done: MochaDone) {
+				argile = new User('Argile');
+				argile.setWeightMap(new WeightMap());
+				argile.setScoreFunctionMap(new ScoreFunctionMap());
+
+				argileJson = JSON.parse(JSON.stringify(argile));
+
+				user.put('ValueCharts/' + chartId + '/status')
+					.send({ chartId: chartId, userChangesPermitted: true, incomplete: true })
+					.set('Accept', 'application/json')
+					.end(function(err, res) {
+				        if (err) return done(err);
+				        done();
+				    });
+			});	
+
+			describe('Method: Post', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.post('ValueCharts/' + chartId + '/users/').send(argileJson)
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+			describe('Method: Put', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.delete('ValueCharts/' + chartId + '/users/Argile')
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+			describe('Method: Delete', () => {
+				it('should return the 403: forbidden status code and not add the user to the ValueChart', (done: MochaDone) => {
+					user.put('ValueCharts/' + chartId + '/users/Argile').send(argileJson)
+						.set('Accept', 'application/json')
+							.expect(403)
+							.end(function(err, res) {
+						        if (err) return done(err);
+						        done();
+						    });
+				});
+			});
+
+
+			after(function(done: MochaDone) {
+				user.put('ValueCharts/' + chartId + '/status')
+					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);

@@ -63,8 +63,14 @@ valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Respo
 		// If the host connection is active, and user changes are not being accepted.
 		if (doc && !doc.userChangesPermitted) {
 			res.status(403)
-				.send('User Changes are Disabled by the Chart Owner');
-		} else {
+				.send('User changes are disabled by the chart owner.');
+		} 
+		// If the host connection is active, but the chart is incomplete/invalid.
+		else if (doc && doc.incomplete) {
+			res.status(403)
+				.send('User changes rejected. The chart is not valid.');
+		}
+		else {
 			next();
 		}
 	});

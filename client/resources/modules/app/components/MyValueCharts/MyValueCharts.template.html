@@ -48,7 +48,7 @@
 							<td>{{chartSummary.password}}</td>
 							<td>{{chartSummary.numUsers}}</td>
 							<td>{{getStatusText(chartSummary)}}</td>
-							<td>{{chartSummary.userChangesPermitted ? 'Allowed': 'Prevented'}}</td>
+							<td>{{chartSummary.userChangesPermitted && !chartSummary.incomplete ? 'Allowed': 'Prevented'}}</td>
 							<td><button class="btn btn-sm btn-default" (click)="editPreferences(chartSummary._id, chartSummary.name, chartSummary.password)">Edit Preferences</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="displayLeaveChart(chartSummary._id, chartSummary.password)">Leave Chart</button></td>
 						</tr>

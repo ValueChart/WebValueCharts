@@ -50,6 +50,9 @@ export class CreateValueChartComponent implements OnInit {
 	window: any = window;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 	public loading = true;
+
+	private initiallyLocked = false; // Records whether or not the chart was already locked by its owner PRIOR to locking for editing
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -108,7 +111,9 @@ export class CreateValueChartComponent implements OnInit {
 	}
 
 	lockValueChart(): void {
-		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => { 
+		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
+			if (status.userChangesPermitted !== undefined)
+				this.initiallyLocked = !status.userChangesPermitted; 
 			status.userChangesPermitted = false; 
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 		});
@@ -129,7 +134,7 @@ export class CreateValueChartComponent implements OnInit {
 				|| (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())).length > 0 ));
 			
 			let status: any = {};
-			status.userChangesPermitted = !incomplete;
+			status.userChangesPermitted = !this.initiallyLocked;
 			status.incomplete = incomplete;
 			status.name = this.valueChartService.getValueChart().getName();
 			status.fname = this.valueChartService.getValueChart().getFName();

@@ -666,7 +666,7 @@ describe('ValueChartDirective', () => {
 				expect(labelRenderer.rootContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).style('display')).to.equal('block');
 				expect(summaryChartRenderer.scoreTotalsContainer.style('display')).to.equal('none');
 				expect(summaryChartRenderer.utilityAxisContainer.style('display')).to.equal('block');
-				expect(objectiveChartRenderer.objectiveDomainLabels.style('display')).to.equal('none');
+				expect(objectiveChartRenderer.domainLabels.style('display')).to.equal('none');
 				expect(summaryChartRenderer.averageLinesContainer.style('display')).to.equal('none');
 			});	
 		});
