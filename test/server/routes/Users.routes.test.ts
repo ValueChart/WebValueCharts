@@ -330,4 +330,66 @@ describe('Users Routes', () => {
 			});
 		});
 	});
+
+	describe('Route: /Users/:user/JoinedValueCharts', () => {
+
+		context('when the user is not logged in', () => {
+
+			describe('Method: Get', () => {
+
+				before(function(done: MochaDone) {
+					user.get('Users/logout')
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(200)
+						.end(function(err, res) {
+							if (err) return done(err);
+							done();
+						});
+				});
+
+				it('should return status code 401 - the user must be logged in to obtain their ValueCharts', (done: MochaDone) => {
+					user.get('Users/amishkin/JoinedValueCharts')
+						.set('Accept', 'application/json')
+						.expect(401)
+						.end(function(err, res) {
+							if (err) return done(err);
+							done();
+						});
+				});
+			});
+		});
+
+		context('when the user is logged in', () => {
+
+			describe('Method: Get', () => {
+
+				before(function(done: MochaDone) {
+					user.post('Users/login').send({ username: 'amishkin', password: 'temp' })
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.end(function(err, res) {
+							if (err) return done(err);
+							done();
+						});
+				});
+
+				it('should retrieve the ValueCharts associated with the logged-in user as well as status code 200', (done: MochaDone) => {
+					user.get('Users/amishkin/JoinedValueCharts')
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(200)
+						.expect((res: request.Response) => {
+							var response = res.body.data;
+							expect(response).to.not.be.undefined;
+							expect(response.length).not.equal(0);
+
+						}).end(function(err, res) {
+							if (err) return done(err);
+							done();
+						});
+				});
+			});
+		});
+	});
 });
