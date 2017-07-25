@@ -22,8 +22,9 @@ import { ValueChart, ChartType } 										from '../../../../model/ValueChart';
 import { User }															from '../../../../model/User';
 
 // Import Types
-import { UserRole }														from '../../../../types/UserRole'
-import { CreatePurpose }												from '../../../../types/CreatePurpose'
+import { UserRole }														from '../../../../types/UserRole';
+import { CreatePurpose }												from '../../../../types/CreatePurpose';
+import { ValueChartStatus }												from '../../../../types/ValueChartStatus';
 
 /*
 	This component handles the workflow to create new value charts, edit value charts, and add new users to charts. 
@@ -92,18 +93,15 @@ export class CreateValueChartComponent implements OnInit {
 			this.creationStepsService.setCreationPurpose(parseInt(params['purpose']));
 
 			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {
-				var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
-				valueChart.setType(ChartType.Individual); 
-				this.valueChartService.setValueChart(valueChart);
-			}
-			
-			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart 
-				|| this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
-				this.lockValueChart();
 				this.creationStepsService.setAutoSaveEnabled(true);
 			}
 			
-			this.creationStepsService.valueChartCopy = _.cloneDeep(valueChart);
+			else if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
+				this.creationStepsService.setAutoSaveEnabled(true);
+				this.lockValueChart();	
+			}
+			
+			this.creationStepsService.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
 
 			this.loading = false;
 		});
@@ -112,8 +110,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	lockValueChart(): void {
 		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
-			if (status.userChangesPermitted !== undefined)
-				this.initiallyLocked = !status.userChangesPermitted; 
+			this.initiallyLocked = !status.userChangesPermitted; 
 			status.userChangesPermitted = false; 
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 		});
@@ -133,16 +130,15 @@ export class CreateValueChartComponent implements OnInit {
 			let incomplete = (this.validationService.validateStructure(this.valueChartService.getValueChart()).length > 0
 				|| (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())).length > 0 ));
 			
-			let status: any = {};
+			let status: ValueChartStatus = <any> {};
 			status.userChangesPermitted = !this.initiallyLocked;
 			status.incomplete = incomplete;
-			status.name = this.valueChartService.getValueChart().getName();
-			status.fname = this.valueChartService.getValueChart().getFName();
 			status.chartId = this.valueChartService.getValueChart()._id;
+			status.fname = this.valueChartService.getValueChart().getFName();
 			this.valueChartService.setStatus(status);
 			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
 
-			this.creationStepsService.autoSaveValueChart();
+			this.creationStepsService.autoSaveValueChart(false);
 		}
 	}
 

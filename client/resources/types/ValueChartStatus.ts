@@ -9,4 +9,5 @@ export interface ValueChartStatus {
 	userChangesPermitted: boolean;
 	incomplete: boolean;
 	chartId: string;
+	fname: string;
 }

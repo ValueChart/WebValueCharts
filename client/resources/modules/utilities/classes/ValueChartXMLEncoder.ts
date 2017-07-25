@@ -188,7 +188,8 @@ export class ValueChartXMLEncoder {
 		domainElement.setAttribute('type', domain.type);
 
 		if (domain.type === 'continuous') {
-			domainElement.setAttribute('unit', (<ContinuousDomain>domain).unit);
+			if ((<ContinuousDomain>domain).unit)
+				domainElement.setAttribute('unit', (<ContinuousDomain>domain).unit);
 			domainElement.setAttribute('min', '' + (<ContinuousDomain>domain).getMinValue());
 			domainElement.setAttribute('max', '' + (<ContinuousDomain>domain).getMaxValue());
 		} else if (domain.type === 'categorical') {

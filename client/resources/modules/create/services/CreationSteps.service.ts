@@ -123,7 +123,7 @@ export class CreationStepsService {
 		@returns boolean
 		@description 	Prepares to navigate to the next step.
 						Returns whether or not navigation may proceed.
-						(True if validation of the current step passes and the chart name is not already taken).
+						(True if validation of the current step passes and the chart name is not already taken.)
 	*/
 	next(): boolean | Promise<boolean> {
 		if (this.validate()) {
@@ -175,7 +175,7 @@ export class CreationStepsService {
 		}	
 	}
 
-		/* 	
+	/* 	
 		@returns {void}
 		@description 	Navigates to ValueChartViewer.
 	*/
@@ -236,16 +236,17 @@ export class CreationStepsService {
 	// ================================ Database Access Methods ====================================
 
 	/* 	
+		@param createStatusDocument - whether or not to create a new status document if saving the chart for the first time. 
 		@returns {void}
 		@description	Update valueChart in database. valueChart_.id is the id assigned by the database.
 	*/
-	autoSaveValueChart = (): void => {
+	autoSaveValueChart = (createStatusDocument = true): void => {
 		let valueChart: ValueChart = this.valueChartService.getValueChart();
 
 		if (this.autoSaveEnabled) {
 			if (!valueChart._id) {
 				// Save the ValueChart for the first time.
-				this.saveValueChartToDatabase();
+				this.saveValueChartToDatabase(createStatusDocument);
 			} else if (!_.isEqual(valueChart, this.valueChartCopy)) {
 				// Update the ValueChart.
 				this.valueChartHttpService.updateValueChart(valueChart).subscribe(
@@ -261,10 +262,11 @@ export class CreationStepsService {
 	}
 
 	/* 	
+		@param createStatusDocument - whether or not to create a new status document along with the chart.
 		@returns {void}
 		@description	Create a new ValueChart in the database. Set valueChart._id to the id assigned by the database.
 	*/
-	saveValueChartToDatabase(): void {
+	saveValueChartToDatabase(createStatusDocument: boolean): void {
 		this.valueChartHttpService.createValueChart(this.valueChartService.getValueChart())
 			.subscribe(
 			(valueChart: ValueChart) => {
@@ -272,12 +274,14 @@ export class CreationStepsService {
 				this.valueChartService.getValueChart()._id = valueChart._id;
 				this.userNotificationService.displaySuccesses(['ValueChart auto-saved']);
 
-				// Create status document
-				let status: ValueChartStatus = <any> {};
-				status.userChangesPermitted = false;
-				status.incomplete = true;
-				status.chartId = this.valueChartService.getValueChart()._id;
-				this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
+				if (createStatusDocument) {
+					let status: ValueChartStatus = <any> {};
+					status.userChangesPermitted = false;
+					status.incomplete = true;
+					status.chartId = this.valueChartService.getValueChart()._id;
+					status.fname = this.valueChartService.getValueChart().getFName();
+					this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });
+				}	
 			},
 			// Handle Server Errors
 			(error) => {

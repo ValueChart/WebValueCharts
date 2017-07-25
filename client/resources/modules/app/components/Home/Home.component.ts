@@ -167,6 +167,9 @@ export class HomeComponent {
 	}
 
 	createValueChart(): void {
+		var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
+		valueChart.setType(ChartType.Individual); 
+		this.valueChartService.setValueChart(valueChart);
 		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: CreatePurpose.NewValueChart }});
 	}
 
@@ -202,7 +205,7 @@ export class HomeComponent {
 				valueChart.setName('');											// Erase the ValueChart's name. The owner must give it a new one.
 
 				this.valueChartService.setValueChart(valueChart);
-				this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
+				this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 			}
 		};
 		// Read the file as a text string. This should be fine because ONLY XML files should be uploaded.
