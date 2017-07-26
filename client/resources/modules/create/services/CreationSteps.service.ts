@@ -276,8 +276,8 @@ export class CreationStepsService {
 
 				if (createStatusDocument) {
 					let status: ValueChartStatus = <any> {};
-					status.userChangesPermitted = false;
-					status.incomplete = true;
+					status.userChangesPermitted = true;
+					status.incomplete = true; // prevent changes to users while chart is being created
 					status.chartId = this.valueChartService.getValueChart()._id;
 					status.fname = this.valueChartService.getValueChart().getFName();
 					this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { status = newStatus; });

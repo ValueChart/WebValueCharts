@@ -52,7 +52,7 @@ export class CreateValueChartComponent implements OnInit {
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 	public loading = true;
 
-	private initiallyLocked = false; // Records whether or not the chart was already locked by its owner PRIOR to locking for editing
+	private lockedByCreator = false; // Records whether or not the chart is locked by its creator
 
 	// ========================================================================================
 	// 									Constructor
@@ -98,7 +98,11 @@ export class CreateValueChartComponent implements OnInit {
 			
 			else if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
 				this.creationStepsService.setAutoSaveEnabled(true);
-				this.lockValueChart();	
+				this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
+					this.lockedByCreator = !status.userChangesPermitted; 
+					status.incomplete = true; // prevent changes to users while chart is being edited
+					this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
+				});
 			}
 			
 			this.creationStepsService.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
@@ -106,14 +110,6 @@ export class CreateValueChartComponent implements OnInit {
 			this.loading = false;
 		});
 
-	}
-
-	lockValueChart(): void {
-		this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
-			this.initiallyLocked = !status.userChangesPermitted; 
-			status.userChangesPermitted = false; 
-			this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
-		});
 	}
 
 	/* 	
@@ -126,13 +122,13 @@ export class CreateValueChartComponent implements OnInit {
 		this.sub.unsubscribe();
 
 		if (this.creationStepsService.getAutoSaveEnabled()) {
-			// Check validity of chart structure and current user's preferences. Set to incomplete if not valid.
-			let incomplete = (this.validationService.validateStructure(this.valueChartService.getValueChart()).length > 0
+			// Check validity of chart structure and current user's preferences. Prevent changes to users if not valid.
+			let lockedBySystem = (this.validationService.validateStructure(this.valueChartService.getValueChart()).length > 0
 				|| (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())).length > 0 ));
 			
 			let status: ValueChartStatus = <any> {};
-			status.userChangesPermitted = !this.initiallyLocked;
-			status.incomplete = incomplete;
+			status.userChangesPermitted = !this.lockedByCreator;
+			status.incomplete = lockedBySystem;
 			status.chartId = this.valueChartService.getValueChart()._id;
 			status.fname = this.valueChartService.getValueChart().getFName();
 			this.valueChartService.setStatus(status);
