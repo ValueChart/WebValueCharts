@@ -19,9 +19,9 @@ export class UserNotificationService {
 	// ========================================================================================
 
 	static ERROR_TIMEOUT: number = 0;			// Errors that must be addressed can only be dismissed manually.
-	static WARNING_TIMEOUT: number = 60000;		// 1 minute timeout for warnings that don't need to be addressed.
-	static SUCCESS_TIMEOUT: number = 20000;		// 20 second timeout for successful action notifications
-	static INFO_TIMOUT: number = 60000;			// 1 minute timeout for update/information notifications
+	static WARNING_TIMEOUT: number = 10000;		// 10 second timeout for warnings that don't need to be addressed.
+	static SUCCESS_TIMEOUT: number = 10000;		// 10 second timeout for successful action notifications
+	static INFO_TIMOUT: number = 10000;			// 10 second timeout for update/information notifications
 
 	// ========================================================================================
 	// 									Constructor

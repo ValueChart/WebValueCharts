@@ -491,6 +491,17 @@ export class CreateObjectivesComponent implements OnInit {
 	validate(): boolean {
 		this.validationTriggered = true;
 		this.setErrorMessages();
+
+		// Clean up references to Objectives
+		this.updateObjRefService.cleanUpAlternatives(this.valueChart);
+		for (let user of this.valueChart.getUsers()) {
+			let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
+			let warnings = this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user);
+			if (showWarnings) {
+				this.userNotificationService.displayWarnings(warnings);
+			}
+		}
+		
 		return this.errorMessages.length === 0;
 	}
 
