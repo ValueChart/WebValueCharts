@@ -182,7 +182,7 @@ export class HomeComponent {
 	selectDemoValueChart(demoChart: any): void {
 		let valueChart = this.valueChartParser.parseValueChart(demoChart.xmlString);
 		this.valueChartService.setValueChart(valueChart);
-		this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Participant } });
+		this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Viewer } });
 	}
 
 	/*
