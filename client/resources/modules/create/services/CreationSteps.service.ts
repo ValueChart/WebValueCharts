@@ -187,7 +187,7 @@ export class CreationStepsService {
 		if (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.valueChartService.getValueChart().getCreator() === this.currentUserService.getUsername()) {
 			this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password, role: UserRole.OwnerAndParticipant } });		
 		} else {
-			this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password }, queryParamsHandling: 'merge' });		
+			this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password, role: UserRole.Owner } });		
 		}
 	}
 
