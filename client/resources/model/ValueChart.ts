@@ -231,6 +231,15 @@ export class ValueChart {
 		return primObj;
 	}
 
+	/*   
+	@returns {void}
+	@description   Return names of Objectives whose default score functions are mutable.
+	*/
+	getMutableObjectives() {
+		let mutableObjectives = this.getAllPrimitiveObjectives().filter(obj => !obj.getDefaultScoreFunction().immutable);
+		return mutableObjectives.map(obj => obj.getName());
+	}
+
 	// Alternative Related Methods:
 
 	getAlternatives(): Alternative[] {

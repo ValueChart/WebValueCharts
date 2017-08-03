@@ -38,8 +38,8 @@ export class CreationStepsService {
 	PREFERENCES: string = 'ScoreFunctions';
 	PRIORITIES: string = 'Weights';
 
-	nextStep: { [currentStep: string]: string; } = {}; // Map from step to next step.
-	previousStep: { [currentStep: string]: string; } = {}; // Map from step to previous step.
+	private nextStep: { [currentStep: string]: string; } = {}; // Map from step to next step.
+	private previousStep: { [currentStep: string]: string; } = {}; // Map from step to previous step.
 	observables: { [step: string]: Observable<boolean>; } = {}; // A collection of Observable objects for each step.
 																// These are set by each step's component during ngInit.
 																// This enables the parent component (CreateValueChart)
@@ -109,13 +109,35 @@ export class CreationStepsService {
 	// ================================ Navigation Methods ====================================
 
 	/* 	
+		@returns string
+		@description 	Returns the previous step.
+	*/
+	getPreviousStep(currentStep: string): string {
+		if (currentStep === this.PRIORITIES && this.valueChartService.getValueChart().getMutableObjectives().length === 0) {
+			return this.ALTERNATIVES;
+		}
+		return this.previousStep[currentStep];
+	}
+
+	/* 	
+		@returns string
+		@description 	Returns the next step.
+	*/
+	getNextStep(currentStep: string): string {
+		if (currentStep === this.ALTERNATIVES && this.valueChartService.getValueChart().getMutableObjectives().length === 0) {
+			return this.PRIORITIES;
+		}
+		return this.nextStep[currentStep];
+	}
+
+	/* 	
 		@returns boolean
 		@description 	Prepares to navigate to previous step.
 						Returns whether or not navigation may proceed (for now, always true).
 	*/
 	previous(): boolean {
 		this.autoSaveValueChart();
-		this.step = this.previousStep[this.step];
+		this.step = this.getPreviousStep(this.step);
 		return true;
 	}
 
@@ -131,7 +153,7 @@ export class CreationStepsService {
 				return new Promise((resolve) => {this.isNameAvailable().subscribe((available: boolean) => {
 						if (available) {
 							this.autoSaveValueChart();
-							this.step = this.nextStep[this.step];
+							this.step = this.getNextStep(this.step);
 						}
 						else {
 							this.userNotificationService.displayErrors([this.NAME_TAKEN]);
@@ -142,7 +164,7 @@ export class CreationStepsService {
 			}
 			else {
 				this.autoSaveValueChart();
-				this.step = this.nextStep[this.step];
+				this.step = this.getNextStep(this.step);
 				return true;
 			}		
 		}

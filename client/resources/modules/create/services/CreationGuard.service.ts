@@ -82,8 +82,8 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 			return true;
 		}
 		else {
-			let previousStep = this.creationStepsService.previousStep[this.creationStepsService.step];
-			let nextStep = this.creationStepsService.nextStep[this.creationStepsService.step];
+			let previousStep = this.creationStepsService.getPreviousStep(this.creationStepsService.step);
+			let nextStep = this.creationStepsService.getNextStep(this.creationStepsService.step);
 
 			// Navigating to previous step
 			if (this.browserActivated ? state.url.indexOf(previousStep) !== -1 : this.destination.indexOf(previousStep) !== -1) {

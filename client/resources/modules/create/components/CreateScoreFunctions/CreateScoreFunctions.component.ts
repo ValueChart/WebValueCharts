@@ -104,7 +104,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()[0];
+    this.selectedObjective = this.valueChartService.getValueChart().getMutableObjectives()[0];
     this.latestDefaults = {};
 
     // Initialize user
@@ -113,25 +113,23 @@ export class CreateScoreFunctionsComponent implements OnInit {
       let user = new User(this.currentUserService.getUsername());
       user.setScoreFunctionMap(new ScoreFunctionMap());
       user.setWeightMap(new WeightMap());
+      this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user);
       this.valueChartService.getValueChart().setUser(user);
       newUser = true;
     }
     this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
-    // Initialize/repair score functions and print the relevant warning messages.
-    let warnings = this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user);
-    this.userNotificationService.displayWarnings(warnings);
-
-    // Initialize best/worst outcomes
+    // Initialize latest defaults and best/worst outcomes
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
-    for (let objName of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
+    for (let objName of this.valueChartService.getValueChart().getMutableObjectives()) {
       this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
       this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
+      this.latestDefaults[objName] = "default";
     }
 
     if (!newUser) {
-      this.validate()   
+      this.validate();   
     }
   }
 
@@ -143,7 +141,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   ngOnDestroy() {
     // Clear weight map if best or worst outcome has changed
     if (this.user.getWeightMap().getWeightTotal() > 0) {
-      for (let objName of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
+      for (let objName of this.valueChartService.getValueChart().getMutableObjectives()) {
         let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
         let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
         if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
@@ -162,7 +160,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
                    (Currently called when user clicks "Next" button next to dropdown).
   */
   advanceSelectedObjective() {
-    let primObjs: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
+    let primObjs: string[] = this.valueChartService.getValueChart().getMutableObjectives();
     let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
     let nextIndex: number = selectedIndex + 1;
     if (nextIndex >= primObjs.length) {

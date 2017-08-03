@@ -11,6 +11,7 @@
             <th>Domain Type</th>
             <th>Domain Info</th>
             <th *ngIf="!valueChart.isIndividual()">Default Score Function</th>
+            <th *ngIf="!valueChart.isIndividual()">Admin Defined<input type="checkbox" [ngModel]="allImmutable()" (ngModelChange)="toggleAllImmutable()"/></th>
         </tr>
     </thead>
     <tbody>
@@ -95,9 +96,14 @@
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
                     <div><button class="btn btn-sm btn-default" [disabled]="disableEditDefaultScoreFunction(objID)" (click)="selectedObjRow=objID; defaultScoreFunctionModalOpen=true" data-toggle="modal" data-target="#default-score-function-modal">Edit</button></div>
-                    <div><input [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" type="checkbox"/><label>Fixed</label></div>
                 </div>
-            </th>         
+            </th>
+            <th *ngIf="!valueChart.isIndividual()">
+                <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
+                <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                    <div><input [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" type="checkbox"/></div>
+                </div>
+            </th>       
         </tr>                  
     </tbody>
 </table>
@@ -181,3 +187,4 @@
         </div>
     </div>
 </div>
+

@@ -380,6 +380,35 @@ export class CreateObjectivesComponent implements OnInit {
 		return domDets;
 	}
 
+	/* 	
+		@returns {boolean}
+		@description 	Returns true iff all default score functions are immutable.
+	*/
+	allImmutable(): boolean {
+		if (this.objKeys().length === 0) {
+			return false;
+		}
+		for (let key of this.objKeys()) {
+			if (this.objectiveRows[key].type === 'primitive' && !this.objectiveRows[key].defaultScoreFunction.immutable) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/* 	
+		@returns {void}
+		@description 	Sets all default score functions to mutable if all are immutable, sets all to immutable otherwise.
+	*/
+	toggleAllImmutable() {
+		let allImmutable = this.allImmutable();
+		for (let key of this.objKeys()) {
+			if (this.objectiveRows[key].type === 'primitive') {
+				this.objectiveRows[key].defaultScoreFunction.immutable = !allImmutable;
+			}
+		}
+	}
+
 	// ================================ Categorical Domain Methods ====================================
 
 	/* 	

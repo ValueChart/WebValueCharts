@@ -293,8 +293,14 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 	}
 
-  	editPreferences(): void {		
-		this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
+  	editPreferences(): void {	
+  		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
+  		}
+  		else {
+  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
+  		}
+		
   	}
 
   	editValueChart(): void {

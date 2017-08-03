@@ -171,8 +171,12 @@ export class MyValueChartsComponent implements OnInit {
 		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
 				this.valueChartService.setValueChart(valueChart);
-
-				this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
+		  		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+		  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
+		  		}
+		  		else {
+		  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.Participant }});
+		  		}
 			});
 	}
 

@@ -131,7 +131,12 @@ export class HomeComponent {
 				$('#chart-credentials-modal').modal('hide');
 				if (this.validateChartForJoining(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);	
-					this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
+					if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
+			  		}
+			  		else {
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.UnsavedParticipant }});
+			  		}
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)

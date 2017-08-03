@@ -1,14 +1,15 @@
 // Import Angular Classes:
 import { Component, OnInit }											from '@angular/core';
-import { Observable }     													from 'rxjs/Observable';
-import { Subscriber }     													from 'rxjs/Subscriber';
+import { Observable }     												from 'rxjs/Observable';
+import { Subscriber }     												from 'rxjs/Subscriber';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }										from '../../../app/services/ValueChart.service';
+import { ValueChartService }											from '../../../app/services/ValueChart.service';
 import { CreationStepsService }											from '../../services/CreationSteps.service';
 import { CurrentUserService }											from '../../../app/services/CurrentUser.service';
 import { ValidationService }                        					from '../../../app/services/Validation.service';
+import { UpdateValueChartService }                  					from '../../../app/services/UpdateValueChart.service';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../../model/ValueChart';
@@ -20,6 +21,7 @@ import { PrimitiveObjective }											from '../../../../model/PrimitiveObjecti
 import { ScoreFunction }												from '../../../../model/ScoreFunction';
 import { Alternative }													from '../../../../model/Alternative';
 import { ContinuousDomain }												from '../../../../model/ContinuousDomain';
+import { ScoreFunctionMap }												from '../../../../model/ScoreFunctionMap';
 
 /*
   This component defines the UI for eliciting weights with SMARTER.
@@ -62,7 +64,8 @@ export class CreateWeightsComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService, 
 		private creationStepsService: CreationStepsService,
-		private validationService: ValidationService) { }
+		private validationService: ValidationService,
+		private updateValueChartService: UpdateValueChartService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -82,6 +85,16 @@ export class CreateWeightsComponent implements OnInit {
         });
 		this.rankedObjectives = [];
 		this.isRanked = {};
+
+		// Initialize user
+		let newUser = false;
+		if (!this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername())) {
+			let user = new User(this.currentUserService.getUsername());
+			user.setScoreFunctionMap(new ScoreFunctionMap());
+			user.setWeightMap(new WeightMap());
+			this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), user);
+			this.valueChartService.getValueChart().setUser(user);
+		}
 		this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 
 		// If weight map is empty, set all Objectives to unranked
