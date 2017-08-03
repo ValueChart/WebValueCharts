@@ -152,7 +152,7 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Don't show previous button at all if:
+		@description 	Do not show previous button at all if:
 						(1) the user is joining the chart or editing preferences AND
 						(2) there are no mutable objectives 
 						In this case, there is only one step - Priorities.
