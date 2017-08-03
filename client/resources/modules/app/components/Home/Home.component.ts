@@ -170,7 +170,7 @@ export class HomeComponent {
 		var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
 		valueChart.setType(ChartType.Individual); 
 		this.valueChartService.setValueChart(valueChart);
-		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: CreatePurpose.NewValueChart }});
+		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 	}
 
 	/*
