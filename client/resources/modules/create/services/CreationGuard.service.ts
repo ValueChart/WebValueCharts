@@ -6,10 +6,10 @@
 */
 
 // Import Angular Classes:
-import { Injectable }    										from '@angular/core';
-import { CanDeactivate, CanActivate, NavigationStart }			from '@angular/router';
-import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } 	from '@angular/router';
-import { Observable }    										from 'rxjs/Observable';
+import { Injectable }    												from '@angular/core';
+import { CanDeactivate, CanActivate, NavigationStart, NavigationEnd  }	from '@angular/router';
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot} 			from '@angular/router';
+import { Observable }    												from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
 
@@ -27,6 +27,7 @@ import { CreatePurpose }										from '../../../types/CreatePurpose';
 @Injectable()
 export class CreationGuardService implements CanDeactivate<CreateValueChartComponent>, CanActivate {
 	
+	private source: string;
 	private destination: string;
 	private browserActivated: boolean;
 
@@ -34,13 +35,17 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 		private router: Router,
 		private creationStepsService: CreationStepsService) {
 
+		// Record the navigation source from the NavigationState event.
+		this.router
+		    .events
+		    .filter(e => e instanceof NavigationEnd)
+		    .subscribe((e: NavigationEnd) => this.source = e.url)
+
 		// Record the navigation destination from the NavigationState event.
 		this.router
 		    .events
 		    .filter(e => e instanceof NavigationStart)
 		    .subscribe((e: NavigationStart) => this.destination = e.url)
-
-		window.onpopstate = (event: Event) => { this.browserActivated = true; }
 	}
 
 	// ========================================================================================
@@ -78,7 +83,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 	*/
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Promise<boolean> {
 		// Allow navigation if we are coming into the component from outside of the creation workflow.
-		if (window.location.pathname.indexOf('/create/') === -1) {
+		if (this.source.indexOf('/create/') === -1) {
 			return true;
 		}
 		else {
@@ -86,11 +91,11 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 			let nextStep = this.creationStepsService.getNextStep(this.creationStepsService.step);
 
 			// Navigating to previous step
-			if (this.browserActivated ? state.url.indexOf(previousStep) !== -1 : this.destination.indexOf(previousStep) !== -1) {
+			if (this.destination.indexOf(previousStep) !== -1) {
 				return this.creationStepsService.previous();
 			}
 			// Navigating to next step
-			else if (this.browserActivated ? state.url.indexOf(nextStep) !== -1 : this.destination.indexOf(nextStep) !== -1) {
+			else if (this.destination.indexOf(nextStep) !== -1) {
 				return this.creationStepsService.next();
 			}
 			// Invalid route, cancel. The create workflow is not designed to allow users to skip over steps.
