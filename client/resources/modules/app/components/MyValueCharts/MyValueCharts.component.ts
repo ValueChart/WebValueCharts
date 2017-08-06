@@ -139,8 +139,7 @@ export class MyValueChartsComponent implements OnInit {
 			.subscribe(valueChart => {
 				
 				// Validate chart structure before proceeding.
-				// (This is a sanity check to catch any as any errors brought on by 
-				//  changes in validation since saving to the database.)
+				// (This is a sanity check to catch any as any errors brought on by changes in validation since saving to the database.)
 				let errorMessages = this.validationService.validateStructure(valueChart);
 				if (errorMessages.length > 0) {
 					this.modalTitle = 'Validation Error';
@@ -170,13 +169,23 @@ export class MyValueChartsComponent implements OnInit {
 	editPreferences(chartId: string, chartName: string, password: string): void {
 		this.valueChartHttpService.getValueChart(Formatter.nameToID(chartName), password)
 			.subscribe(valueChart => {
-				this.valueChartService.setValueChart(valueChart);
-		  		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
-		  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
-		  		}
-		  		else {
-		  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.Participant }});
-		  		}
+				// Validate chart structure before proceeding.
+				// (This is a sanity check to catch any as any errors brought on by changes in validation since saving to the database.)
+				if (this.validationService.validateStructure(valueChart).length > 0) {
+					this.modalTitle = 'Validation Error';
+					this.modalBody = "Cannot edit preferences. There are problems with this chart that can only be fixed by the owner.";
+					this.modalActionEnabled = false;
+					this.displayModal = true;
+				}
+				else {
+					this.valueChartService.setValueChart(valueChart);
+			  		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
+			  		}
+			  		else {
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.Participant }});
+			  		}
+				}
 			});
 	}
 

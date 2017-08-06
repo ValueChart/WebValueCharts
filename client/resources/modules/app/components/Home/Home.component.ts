@@ -254,7 +254,7 @@ export class HomeComponent {
 			return false;
 		}	
 		else if (this.validationService.validateStructure(valueChart).length > 0) {
-			this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by its creator."]);
+			this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by the owner."]);
 			return false;
 		}
 		return true;
