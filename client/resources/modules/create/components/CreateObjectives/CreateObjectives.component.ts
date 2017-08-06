@@ -320,12 +320,13 @@ export class CreateObjectivesComponent implements OnInit {
 				}
 				else {
 					dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max);
-				}
-				
+				}				
 			}
 			(<PrimitiveObjective>obj).setDomain(dom);
 			(<PrimitiveObjective>obj).setColor(objrow.color);
-			(<PrimitiveObjective>obj).setDefaultScoreFunction(objrow.defaultScoreFunction);
+			if (!this.valueChart.isIndividual()) {
+				(<PrimitiveObjective>obj).setDefaultScoreFunction(objrow.defaultScoreFunction);
+			}	
 		}
 		else {
 			obj = new AbstractObjective(objrow.name, objrow.desc);

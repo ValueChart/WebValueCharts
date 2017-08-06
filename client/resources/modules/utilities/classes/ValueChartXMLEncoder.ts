@@ -134,7 +134,7 @@ export class ValueChartXMLEncoder {
 
 		// Encode the objective hierarchy.
 		valueChart.getRootObjectives().forEach((objective: Objective) => {
-			objectivesParentElement.appendChild(this.convertObjectiveIntoElement(objective, xmlDocument));
+			objectivesParentElement.appendChild(this.convertObjectiveIntoElement(objective, xmlDocument, valueChart.isIndividual()));
 		});
 
 		// Encode the alternatives.
@@ -151,10 +151,11 @@ export class ValueChartXMLEncoder {
 		@param objective - The Objective object that is to be encoded into an XML element. This may be either an AbstractObjective or a PrimitiveObjective. 
 		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
 								new elements. It is NOT modified.
+		@param isIndividual - Whether this is an individual chart (as opposed to a group chart).
 		@returns {Element} - An XML element representing the objective that was provided. 
 		@description	Encodes an objective and all its fields (including any subobjectives) as an XML element. 
 	*/
-	public convertObjectiveIntoElement(objective: Objective, xmlDocument: XMLDocument): Element {
+	public convertObjectiveIntoElement(objective: Objective, xmlDocument: XMLDocument, isIndividual: boolean): Element {
 		var objectiveElement = xmlDocument.createElement('Objective');
 		objectiveElement.setAttribute('name', objective.getName());
 		objectiveElement.setAttribute('type', objective.objectiveType);
@@ -165,12 +166,14 @@ export class ValueChartXMLEncoder {
 
 		if (objective.objectiveType === 'abstract') {
 			(<AbstractObjective>objective).getDirectSubObjectives().forEach((subObjective: Objective) => {
-				objectiveElement.appendChild(this.convertObjectiveIntoElement(subObjective, xmlDocument));	// Recursively encode AbstractObjectives.
+				objectiveElement.appendChild(this.convertObjectiveIntoElement(subObjective, xmlDocument, isIndividual));	// Recursively encode AbstractObjectives.
 			});
 		} else {
 			objectiveElement.setAttribute('color', (<PrimitiveObjective>objective).getColor());
 			objectiveElement.appendChild(this.convertDomainIntoElement((<PrimitiveObjective>objective).getDomain(), xmlDocument));
-			objectiveElement.appendChild(this.convertScoreFunctionIntoElement((<PrimitiveObjective>objective).getDefaultScoreFunction(), objective.getName(), xmlDocument, true));
+			if (!isIndividual) {
+				objectiveElement.appendChild(this.convertScoreFunctionIntoElement((<PrimitiveObjective>objective).getDefaultScoreFunction(), objective.getName(), xmlDocument, true));
+			}
 		}
 		return objectiveElement;
 	}
@@ -188,8 +191,9 @@ export class ValueChartXMLEncoder {
 		domainElement.setAttribute('type', domain.type);
 
 		if (domain.type === 'continuous') {
-			if ((<ContinuousDomain>domain).unit)
+			if ((<ContinuousDomain>domain).unit) {
 				domainElement.setAttribute('unit', (<ContinuousDomain>domain).unit);
+			}
 			domainElement.setAttribute('min', '' + (<ContinuousDomain>domain).getMinValue());
 			domainElement.setAttribute('max', '' + (<ContinuousDomain>domain).getMaxValue());
 		} else if (domain.type === 'categorical') {

@@ -113,7 +113,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
       let user = new User(this.currentUserService.getUsername());
       user.setScoreFunctionMap(new ScoreFunctionMap());
       user.setWeightMap(new WeightMap());
-      this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), this.user);
+      this.updateValueChartService.completeScoreFunctions(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), user);
       this.valueChartService.getValueChart().setUser(user);
       newUser = true;
     }

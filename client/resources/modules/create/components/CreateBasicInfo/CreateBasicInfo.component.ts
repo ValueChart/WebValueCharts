@@ -148,6 +148,11 @@ export class CreateBasicInfoComponent implements OnInit {
 		this.valueChart.setUsers(newUsers);
 		this.valueChart.setType(ChartType.Individual);
 
+		// Clear the default score functions
+		for (let obj of this.valueChart.getAllPrimitiveObjectives()) {
+			obj.setDefaultScoreFunction(undefined);
+		}
+
 		// Manually remove the old users from the database to alert the event listeners
 		otherUsers.map(username => this.valueChartHttpService.deleteUser(this.valueChart._id, username).subscribe());
 	}

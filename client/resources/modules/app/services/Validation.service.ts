@@ -226,13 +226,15 @@ export class ValidationService {
 		if (intervalInvalid.length > 0) {
 			errorMessages.push(this.INTERVAL_INVALID.concat(intervalInvalid.join(', ')));
 		}
-		let defaultScoreFunctionIncomplete = this.defaultScoreFunctionIncomplete(valueChart);
-		if (defaultScoreFunctionIncomplete.length > 0) {
-			errorMessages.push(this.DEFAULT_SCORE_FUNCTION_INCOMPLETE.concat(defaultScoreFunctionIncomplete.join(', ')));
-		}
-		let defaultScoreFunctionRangeInvalid = this.defaultScoreFunctionRangeInvalid(valueChart);
-		if (defaultScoreFunctionRangeInvalid.length > 0) {
-			errorMessages.push(this.DEFAULT_SCORE_FUNCTION_RANGE_INVALID.concat(defaultScoreFunctionRangeInvalid.join(', ')));
+		if (!valueChart.isIndividual()) {
+			let defaultScoreFunctionIncomplete = this.defaultScoreFunctionIncomplete(valueChart);
+			if (defaultScoreFunctionIncomplete.length > 0) {
+				errorMessages.push(this.DEFAULT_SCORE_FUNCTION_INCOMPLETE.concat(defaultScoreFunctionIncomplete.join(', ')));
+			}
+			let defaultScoreFunctionRangeInvalid = this.defaultScoreFunctionRangeInvalid(valueChart);
+			if (defaultScoreFunctionRangeInvalid.length > 0) {
+				errorMessages.push(this.DEFAULT_SCORE_FUNCTION_RANGE_INVALID.concat(defaultScoreFunctionRangeInvalid.join(', ')));
+			}
 		}
 		return errorMessages;
 	}
