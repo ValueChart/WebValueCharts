@@ -22,22 +22,10 @@ export var HotelChartData: string =
                             <Category>beach</Category>
                             <Category>nightlife</Category>
                         </Domain>
-                        <DefaultScoreFunction type="discrete">
-                            <Score domain-element="airport" value="0.5"/>
-                            <Score domain-element="beach" value="0.5"/>
-                            <Score domain-element="nightlife" value="0.5"/>
-                        </DefaultScoreFunction>
                     </Objective>
                     <Objective color="#7D3C98" name="skytrain-distance" type="primitive">
                         <Description>Description Information Goes Here </Description>
                         <Domain max="9" min="1" type="continuous" unit="blocks"/>
-                        <DefaultScoreFunction type="continuous">
-                            <Score domain-element="1" value="0.5"/>
-                            <Score domain-element="3" value="0.5"/>
-                            <Score domain-element="5" value="0.5"/>
-                            <Score domain-element="7" value="0.5"/>
-                            <Score domain-element="9" value="0.5"/>
-                        </DefaultScoreFunction>
                     </Objective>
                 </Objective>
                 <Objective name="room" type="abstract">
@@ -45,13 +33,6 @@ export var HotelChartData: string =
                     <Objective color="#2980B9" name="size" type="primitive">
                         <Description>Description Information Goes Here </Description>
                         <Domain max="350" min="200" type="continuous" unit="sq-ft"/>
-                        <DefaultScoreFunction type="continuous">
-                            <Score domain-element="200" value="0.5"/>
-                            <Score domain-element="237.5" value="0.5"/>
-                            <Score domain-element="275" value="0.5"/>
-                            <Score domain-element="312.5" value="0.5"/>
-                            <Score domain-element="350" value="0.5"/>
-                        </DefaultScoreFunction>
                     </Objective>
                     <Objective color="#27AE60" name="internet-access" type="primitive">
                         <Description>Description Information Goes Here </Description>
@@ -60,23 +41,11 @@ export var HotelChartData: string =
                             <Category>highspeed</Category>
                             <Category>lowspeed</Category>
                         </Domain>
-                        <DefaultScoreFunction type="discrete">
-                            <Score domain-element="none" value="0.5"/>
-                            <Score domain-element="highspeed" value="0.5"/>
-                            <Score domain-element="lowspeed" value="0.5"/>
-                        </DefaultScoreFunction>
                     </Objective>
                 </Objective>
                 <Objective color="#F1C40F" name="rate" type="primitive">
                     <Description>Description Information Goes Here </Description>
                     <Domain max="200" min="100" type="continuous" unit="CAD"/>
-                    <DefaultScoreFunction type="continuous">
-                        <Score domain-element="100" value="0.5"/>
-                        <Score domain-element="125" value="0.5"/>
-                        <Score domain-element="150" value="0.5"/>
-                        <Score domain-element="175" value="0.5"/>
-                        <Score domain-element="200" value="0.5"/>
-                    </DefaultScoreFunction>
                 </Objective>
             </Objective>
         </Objectives>
