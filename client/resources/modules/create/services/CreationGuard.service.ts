@@ -83,7 +83,7 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 	*/
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Promise<boolean> {
 		// Allow navigation if we are coming into the component from outside of the creation workflow.
-		if (this.source.indexOf('/create/') === -1) {
+		if (window.location.pathname.indexOf('/create/') === -1 || (this.source !== undefined && this.source.indexOf('/create/') === -1)) {
 			return true;
 		}
 		else {
@@ -91,15 +91,15 @@ export class CreationGuardService implements CanDeactivate<CreateValueChartCompo
 			let nextStep = this.creationStepsService.getNextStep(this.creationStepsService.step);
 
 			// Navigating to previous step
-			if (this.destination.indexOf(previousStep) !== -1) {
+			if (this.destination !== undefined && this.destination.indexOf(previousStep) !== -1) {
 				return this.creationStepsService.previous();
 			}
 			// Navigating to next step
-			else if (this.destination.indexOf(nextStep) !== -1) {
+			else if (this.destination !== undefined && this.destination.indexOf(nextStep) !== -1) {
 				return this.creationStepsService.next();
 			}
 			// Invalid route, cancel. The create workflow is not designed to allow users to skip over steps.
-			// (This might happen if the user changes the URL manually or selects a link from browsing history.
+			// (This might happen if the user selects a link from browsing history.
 			//  Return to this later - we should show page not found or something to that effect.)
 			else {
 				history.forward();

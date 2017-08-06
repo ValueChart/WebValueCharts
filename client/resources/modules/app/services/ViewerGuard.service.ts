@@ -24,7 +24,7 @@ import { CurrentUserService } 									from './CurrentUser.service';
 import { UserRole }												from '../../../types/UserRole';
 
 /*
-	CreationGuardService is an Angular service that is used to control navigation away from and to the '/create/:purpose' route.
+	ViewerGuardService is an Angular service that is used to control navigation away from and to the '/ValueCharts/:ValueChart/:ChartType' route.
 */
 
 @Injectable()
