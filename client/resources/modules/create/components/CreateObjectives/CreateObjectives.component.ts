@@ -96,7 +96,7 @@ export class CreateObjectivesComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private creationStepsService: CreationStepsService,
-		private updateObjRefService: UpdateValueChartService,
+		private updateValueChartService: UpdateValueChartService,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService,
 		private rendererScoreFunctionUtility: RendererScoreFunctionUtility) { }
@@ -162,10 +162,10 @@ export class CreateObjectivesComponent implements OnInit {
 		// Convert temporary structures to ValueChart structures
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
 		if (this.editing) {
-			this.updateObjRefService.cleanUpAlternatives(this.valueChart);
+			this.updateValueChartService.cleanUpAlternatives(this.valueChart);
 			for (let user of this.valueChart.getUsers()) {
 				let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
-				let warnings = this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user);
+				let warnings = this.updateValueChartService.cleanUpUserPreferences(this.valueChart, user);
 				if (showWarnings) {
 					this.userNotificationService.displayWarnings(warnings);
 				}
@@ -523,10 +523,10 @@ export class CreateObjectivesComponent implements OnInit {
 		this.setErrorMessages();
 
 		// Clean up references to Objectives
-		this.updateObjRefService.cleanUpAlternatives(this.valueChart);
+		this.updateValueChartService.cleanUpAlternatives(this.valueChart);
 		for (let user of this.valueChart.getUsers()) {
 			let showWarnings = this.valueChart.isMember(this.currentUserService.getUsername()) && (this.currentUserService.getUsername() === user.getUsername());
-			let warnings = this.updateObjRefService.cleanUpUserPreferences(this.valueChart, user);
+			let warnings = this.updateValueChartService.cleanUpUserPreferences(this.valueChart, user);
 			if (showWarnings) {
 				this.userNotificationService.displayWarnings(warnings);
 			}
