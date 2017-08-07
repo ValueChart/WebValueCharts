@@ -200,7 +200,7 @@ export class UpdateValueChartService {
 		let alternatives: Alternative[] = valueChart.getAlternatives();
 
 		this.removeAlternativeEntries(primitiveObjectives, alternatives);
-		this.clearAlternativeValues(primitiveObjectives, alternatives);
+		this.cleanAlternativeValues(primitiveObjectives, alternatives);
 	}
 
 	/*
@@ -221,9 +221,11 @@ export class UpdateValueChartService {
 
 	/*
 		@returns {void}
-		@description 	 Checks each Alternative's outcome on each Objective. Clears if no longer in range.
+		@description 	 Checks each Alternative's outcome on each Objective.
+						 (1) Clears if no longer in range.
+						 (2) Converts to type to number for continuous domain and string otherwise (this is needed in case the domain type was changed).
 	*/
-	clearAlternativeValues(primitiveObjectives: PrimitiveObjective[], alternatives: Alternative[]) {
+	cleanAlternativeValues(primitiveObjectives: PrimitiveObjective[], alternatives: Alternative[]) {
 		for (let obj of primitiveObjectives) {
 			for (let alt of alternatives) {
 				if (obj.getDomainType() === "continuous") {
@@ -232,11 +234,17 @@ export class UpdateValueChartService {
 					if (isNaN(altVal) || altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
 						alt.removeObjective(obj.getName());
 					}
+					else {
+						alt.setObjectiveValue(obj.getName(), altVal);
+					}		
 				}
 				else {
 					let altVal: string = String(alt.getObjectiveValue(obj.getName()));
 					if ((<CategoricalDomain>obj.getDomain()).getElements().indexOf(altVal) === -1) {
 						alt.removeObjective(obj.getName());
+					}
+					else {
+						alt.setObjectiveValue(obj.getName(), altVal);
 					}
 				}
 			}

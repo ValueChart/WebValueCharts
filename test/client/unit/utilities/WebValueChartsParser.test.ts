@@ -272,7 +272,7 @@ describe('WebValueChartsParser', () => {
 			});
 
 			it('should parse all of the alternatives from the XML document', () => {
-				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement);
+				var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativesParentElement, primitiveObjectives);
 
 				expect(alternatives).to.have.length(6);
 
@@ -280,7 +280,7 @@ describe('WebValueChartsParser', () => {
 					expect(alternatives[i].getName()).to.equal(alternativeValues[i].alternativeName);
 
 					alternativeValues[i].objectiveValues.forEach((objectiveValue: any) => {
-						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal('' + objectiveValue.value);
+						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal(objectiveValue.value);
 					});
 				}
 			});

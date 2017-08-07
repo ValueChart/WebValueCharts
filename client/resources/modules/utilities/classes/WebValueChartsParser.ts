@@ -83,7 +83,7 @@ export class WebValueChartsParser {
 		}
 
 		valueChart.setRootObjectives(this.parseObjectives(objectivesParentElement));
-		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement));
+		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement, valueChart.getAllPrimitiveObjectives()));
 
 		return valueChart;
 	}
@@ -189,7 +189,7 @@ export class WebValueChartsParser {
 						alternatives. This updating is done in-place.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	public parseAlternatives(alternativesParentElement: Element): Alternative[] {
+	public parseAlternatives(alternativesParentElement: Element, primitiveObjectives: PrimitiveObjective[]): Alternative[] {
 		if (!alternativesParentElement)
 			return;
 
@@ -216,10 +216,11 @@ export class WebValueChartsParser {
 				let objectiveName: string = alternativeValueElement.getAttribute('objective');
 				let domainValue: string | number = alternativeValueElement.getAttribute('value');
 
-
-				if (_.isNumber(domainValue)) {
-					domainValue = +domainValue;	// Convert the domain value to a number
-				}
+				let correspondingObjective: PrimitiveObjective = primitiveObjectives.find((objective: PrimitiveObjective) => {
+ 					return objective.getName() === objectiveName;
+ 				});
+ 				if (correspondingObjective.getDomainType() === 'continuous')
+ 					domainValue = +domainValue;
 
 				alternative.setObjectiveValue(objectiveName, domainValue);
 			}
