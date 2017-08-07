@@ -270,10 +270,14 @@ export class UpdateValueChartService {
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
       		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
-	      		if (obj.getDomainType() === 'categorical' && scoreFunction.type === 'discrete') {
-			        this.removeScoreFunctionEntries(<CategoricalDomain>obj.getDomain(),<DiscreteScoreFunction>scoreFunction);
+	      		if ((obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') 
+	      			&& scoreFunction.type === 'discrete') {
+			        this.removeScoreFunctionElements(obj.getDefaultScoreFunction(), scoreFunction);
 			    }
-			    // Reset score functions if there were changes to any of the following: Domain type, min, max, or interval
+			    // Reset score functions in any of the following cases:
+			    //	(1) Domain type was changed from categorical/interval to continuous
+			    //	(1) Domain type was changed from  continuous to categorical/interval
+			    //	(3)	Domain type is continuous and max or min was changed
 				// It may be possible to do something more clever in the future that preserves parts of the previous score function
 			    else {
 			    	if (!_.isEqual(scoreFunction.getAllElements(), obj.getDefaultScoreFunction().getAllElements())) {
@@ -286,7 +290,6 @@ export class UpdateValueChartService {
       			}
       		}
       	}
-
   		if (resetScoreFunctions.length > 0) {
     		warnings.push(this.SCORE_FUNCTIONS_RESET + resetScoreFunctions.join(", "));
     	}
@@ -342,8 +345,8 @@ export class UpdateValueChartService {
 		@returns {void}
 		@description 	Removes non-existent domain elements from discrete score functions.
 	*/
-	removeScoreFunctionEntries(dom: CategoricalDomain, scoreFunction: DiscreteScoreFunction) {
-		let elements = dom.getElements();
+	removeScoreFunctionElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction) {
+		let elements = defaultScoreFunction.getAllElements();
 		var elementIterator: Iterator<number | string> = scoreFunction.getElementScoreMap().keys();
 		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
 		while (iteratorElement.done === false) {
@@ -402,12 +405,10 @@ export class UpdateValueChartService {
      		else {
      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
      			// Make sure score functions are complete
-	      		if (obj.getDomainType() === 'categorical' && scoreFunction.type === 'discrete') {
-			        if (this.addMissingElements(<CategoricalDomain>obj.getDomain(),<DiscreteScoreFunction>scoreFunction)) {
-			        	completed.push(obj.getName());
-			        }
-			        this.reorderElements(<CategoricalDomain>obj.getDomain(),<DiscreteScoreFunction>scoreFunction);
-			    }
+		        if (this.addMissingElements(obj.getDefaultScoreFunction(), scoreFunction)) {
+		        	completed.push(obj.getName());
+		        }
+		        this.reorderElements(obj.getDefaultScoreFunction(), scoreFunction);
      		}
      	}
      	if (completed.length > 0) {
@@ -419,15 +420,15 @@ export class UpdateValueChartService {
 
     /*
 		@returns {boolean}
-		@description 	Inserts missing domain elements into discrete score functions. Initializes scores to 0.5.
+		@description 	Inserts missing elements into score functions.
 						Returns true iff new elements were inserted.
 	*/
-	addMissingElements(dom: CategoricalDomain, scoreFunction: DiscreteScoreFunction): boolean {
+	addMissingElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction): boolean {
 		let completed = false;
-		let elements = dom.getElements();
+		let elements = defaultScoreFunction.getAllElements();
         for (let elt of elements) {
 			if (scoreFunction.getScore(elt) === undefined) {
-				scoreFunction.setElementScore(elt, 0.5);
+				scoreFunction.setElementScore(elt, defaultScoreFunction.getScore(elt));
 				completed = true;
 			}
         }
@@ -435,11 +436,11 @@ export class UpdateValueChartService {
 	}
 
 	/*
-		@description 	Sorts the score function elements to be in the same order as the domain elements.
+		@description 	Sorts the score function elements to be in the same order as the default score function elements.
 	*/
-	reorderElements(dom: CategoricalDomain, scoreFunction: DiscreteScoreFunction) {
+	reorderElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction) {
 		let elementScoreMap = new Map<number | string, number>();
-		let elements = dom.getElements();
+		let elements = defaultScoreFunction.getAllElements();
         for (let elt of elements) {
 			elementScoreMap.set(elt, scoreFunction.getScore(elt));
         }
