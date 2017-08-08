@@ -228,6 +228,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
+		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	/* 	
@@ -551,4 +552,5 @@ export class ValueChartViewerComponent implements OnInit {
 		if (message.type === this.undoRedoService.WEIGHT_MAP_CHANGE)
 			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).setWeightMap(message.data);
 	}
+
 }
