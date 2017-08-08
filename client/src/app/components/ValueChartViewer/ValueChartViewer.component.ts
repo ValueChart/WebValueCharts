@@ -228,6 +228,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
+		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	/* 	
@@ -513,8 +514,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	}
 
-	// ================================ Preference Learning ====================================	
-
 	sampleNewAlternative(): void {
 		var valueChart = this.valueChartService.getValueChart();
 		var username = this.currentUserService.getUsername();
@@ -531,7 +530,7 @@ export class ValueChartViewerComponent implements OnInit {
 			valueChart.setAlternatives(oldAlternatives);
 		});
 	}
-
+	
 	// ================================ Undo/Redo ====================================
 
 	undoChartChange(): void {
