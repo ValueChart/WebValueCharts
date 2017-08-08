@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 16:19:23
+* @Last Modified time: 2017-08-08 14:09:09
 */
 
 // Import Angular Classes:
@@ -28,6 +28,7 @@ import { ValueChartHttpService }												from '../../services/ValueChartHttp.
 import { ValidationService }													from '../../services/Validation.service';
 import { UpdateValueChartService }												from '../../services/UpdateValueChart.service';
 import { UserNotificationService }												from '../../services/UserNotification.service'; 
+import { PreferenceLearningService }											from '../../services/PreferenceLearning.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -59,7 +60,7 @@ import { ValueChartStatus }														from '../../../../types/ValueChartStatu
 @Component({
 	selector: 'ValueChartViewer',
 	templateUrl: './ValueChartViewer.template.html',
-	providers: [ ValueChartViewerService, HostService ]
+	providers: [ ValueChartViewerService, HostService, PreferenceLearningService ]
 })
 export class ValueChartViewerComponent implements OnInit {
 
@@ -105,6 +106,7 @@ export class ValueChartViewerComponent implements OnInit {
 		public currentUserService: CurrentUserService,
 		private router: Router,
 		private route: ActivatedRoute,
+		private preferenceLearningService: PreferenceLearningService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
 		private validationService: ValidationService,
@@ -187,6 +189,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
+		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	setValueChartTypeToView(type: ChartType, currentUser: User) {
@@ -372,6 +375,12 @@ export class ValueChartViewerComponent implements OnInit {
 			this.userNotificationService.displayWarnings([messageString]);
 		});
 
+	}
+
+	// ================================ Preference Learning ====================================	
+
+	sampleNewAlternative(): void {
+		this.preferenceLearningService.sampleNewAlternative();
 	}
 
 	// ================================ Undo/Redo ====================================

@@ -45,6 +45,13 @@
 					Save
 					</button>
 				</div>
+			</div>
+			<div>
+				<div class="form-group valuechart-toolbar-group pull-left">
+					<button class="btn btn-primary" (click)="sampleNewAlternative()">
+					Get Alternative
+					</button>
+				</div>
 			</div>	
 			<div class="form-group valuechart-toolbar-group pull-right">
 				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
