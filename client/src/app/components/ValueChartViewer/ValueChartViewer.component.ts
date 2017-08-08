@@ -226,6 +226,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
+		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	/* 	
@@ -510,7 +511,6 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 
 	}
-
 
 	// ================================ Undo/Redo ====================================
 
