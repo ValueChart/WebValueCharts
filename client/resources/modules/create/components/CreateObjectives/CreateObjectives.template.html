@@ -25,7 +25,7 @@
                 <input class="form-control objectives-table-input" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
             </th>
             <th>
-                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="resetErrorMessages()">
+                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
                     <option [value]="'abstract'">parent objective</option>
                     <option [value]="'primitive'">base objective</option>
                 </select>
@@ -33,13 +33,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control" [(ngModel)]="objectiveRows[objID].color">
-                        <option [value]="'red'">red</option>
-                        <option [value]="'blue'">blue</option>
-                        <option [value]="'green'">green</option>
-                        <option [value]="'purple'">purple</option>
-                        <option [value]="'orange'">orange</option>
-                    </select>
+                    <span class="pull-right"><input type="color" [(ngModel)]="objectiveRows[objID].color"></span>
                 </div>
             </th> 
             <th>
