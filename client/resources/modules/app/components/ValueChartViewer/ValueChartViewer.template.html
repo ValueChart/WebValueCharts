@@ -27,7 +27,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="enableGroupChartView()">
+			<div *ngIf="canViewGroupChart()">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartViewerService.getActiveValueChart().getType() === ChartType.Group">
 					<button class="btn btn-primary" (click)="setValueChartTypeToView(ChartType.Individual)">
 					View Individual Chart
@@ -39,9 +39,9 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="valueChartViewerService.isParticipant()">
+			<div *ngIf="canSave()">
 				<div class="form-group valuechart-toolbar-group pull-left">
-					<button class="btn btn-success" (click)="submitPreferences()">
+					<button class="btn btn-success" (click)="save()">
 					Save
 					</button>
 				</div>
@@ -57,7 +57,7 @@
 				</button>
 			</div>
 			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [interactive]="this.enableInteraction()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
+			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<div>

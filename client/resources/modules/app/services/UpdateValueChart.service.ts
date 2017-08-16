@@ -31,13 +31,15 @@ export class UpdateValueChartService {
 	public PASSWORD_CHANGED: string = "The ValueChart's password has been changed to: ";
 	public TYPE_CHANGED: string = "The type of the ValueChart has been changed to: ";
 
-	public ALTERNATIVE_ADDED: string = "A new alternative has been added to the ValueChart: "
-	public ALTERNATIVE_REMOVED: string = "An alternative has been removed from the ValueChart: "
-	public ALTERNATIVE_CHANGED: string = "An existing alternative has been modified: "
+	public ALTERNATIVE_ADDED: string = "A new alternative has been added to the ValueChart: ";
+	public ALTERNATIVE_REMOVED: string = "An alternative has been removed from the ValueChart: ";
+	public ALTERNATIVE_CHANGED: string = "An existing alternative has been modified: ";
+	public ALTERNATIVES_REORDERED: string = "The alternatives have been reordered.";
 
-	public OBJECTIVE_ADDED: string = "A new objective has been added to the ValueChart: "
-	public OBJECTIVE_REMOVED: string = "An objective has been removed from the ValueChart: "
-	public OBJECTIVE_CHANGED: string = "An existing objective has been modified: "
+	public OBJECTIVE_ADDED: string = "A new objective has been added to the ValueChart: ";
+	public OBJECTIVE_REMOVED: string = "An objective has been removed from the ValueChart: ";
+	public OBJECTIVE_CHANGED: string = "An existing objective has been modified: ";
+	public OBJECTIVES_REORDERED: string = "The objectives have been reordered.";
 
 	public BEST_WORST_OUTCOME_CHANGED: string = "The best/worst outcomes on some Objectives have changed. You may want to revisit your weights.";
 	public SCORE_FUNCTIONS_RESET: string = "Your score functions for the following Objectives have been reset to default: ";
@@ -126,6 +128,9 @@ export class UpdateValueChartService {
 			changeList.push(this.OBJECTIVE_REMOVED + objective.getName());
 		});
 
+		if (differences.length == 0 && deletedObjectives.length == 0 && !_.isEqual(newObjectives, oldObjectives))
+			changeList.push(this.OBJECTIVES_REORDERED);
+
 		oldStructure.setRootObjectives(newStructure.getRootObjectives());
 
 		return changeList;
@@ -133,22 +138,27 @@ export class UpdateValueChartService {
 
 	updateAlternatives(oldStructure: ValueChart, newStructure: ValueChart): string[] {
 		var changeList: string[] = [];
+		var newAlternatives = newStructure.getAlternatives();
+		var oldAlternatives = oldStructure.getAlternatives();
 
 		// Get all alternatives in newStructure that are different from those in oldStructure. 
-		var differences = _.differenceWith(newStructure.getAlternatives(), oldStructure.getAlternatives(), this.compareAlternatives);
+		var differences = _.differenceWith(newAlternatives, oldAlternatives, this.compareAlternatives);
 		
 		differences.forEach((alternative: Alternative) => {
-			if (_.findIndex(oldStructure.getAlternatives(), ['name', alternative.getName()]) === -1)		// Was the alternative in the old structure?
+			if (_.findIndex(oldAlternatives, ['name', alternative.getName()]) === -1)		// Was the alternative in the old structure?
 				changeList.push(this.ALTERNATIVE_ADDED + alternative.getName());
 			else
 				changeList.push(this.ALTERNATIVE_CHANGED + alternative.getName());
 		});
 
 		// Get all alternatives in the oldStructure that are not in the new structure (by the 'name' property).
-		var deletedAlternatives = _.differenceBy(oldStructure.getAlternatives(), newStructure.getAlternatives(), 'name');
+		var deletedAlternatives = _.differenceBy(oldAlternatives, newAlternatives, 'name');
 		deletedAlternatives.forEach((alternative: Alternative) => {
 			changeList.push(this.ALTERNATIVE_REMOVED + alternative.getName());
 		});
+
+		if (differences.length == 0 && deletedAlternatives.length == 0 && !_.isEqual(newAlternatives, oldAlternatives))
+			changeList.push(this.ALTERNATIVES_REORDERED);
 
 		oldStructure.setAlternatives(newStructure.getAlternatives());
 

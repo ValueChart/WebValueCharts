@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 16:19:23
+* @Last Modified time: 2017-08-16 12:27:10
 */
 
 // Import Angular Classes:
@@ -260,19 +260,38 @@ export class ValueChartViewerComponent implements OnInit {
 		this.valueChartHeight = (window.innerHeight * 0.75) * 1.5;
 	}
 
+
+	// TODO <@aaron>: Cleanup these methods.
+
 	/* 	
 		@returns {boolean}
 		@description 	Whether or not the current user may interactively change the scores and weights.
 	*/
-	enableInteraction() {
+	canInteract(): boolean {
 		return this.valueChartViewerService.isParticipant() && this.valueChartViewerService.getActiveValueChart().isIndividual();
 	}
 
-	enableGroupChartView() {
+	/*   
+	  @returns {boolean}
+	  @description	Help function to determine whether or not the current user has access to the "View Group Chart" button.
+	  				A user can view the Group Chart when: 	1) there is a group chart to view;
+															2) they have submitted their preferences to the Group Chart;
+	*/
+	canViewGroupChart(): boolean {
 		return this.valueChartViewerService.isParticipant() 
 			&& (this.valueChartViewerService.getUserRole() !== UserRole.UnsavedParticipant) 
 			&& (this.valueChartService.getValueChart().getType() === ChartType.Group) 
 			&& this.valueChartViewerService.userIsMember(this.currentUserService.getUsername());
+	}
+
+	/*   
+	  @returns {boolean}
+	  @description	Helper function to determine whether or not the current user has access to the "Save" button.
+	  				This is almost the same as canInteract; it is different in that ValueChart owners that are not members
+	  				are allowed to save changes to the order of alternatives and objectives.
+	*/
+	canSave(): boolean {
+		return this.valueChartViewerService.isParticipant() || this.valueChartViewerService.getUserRole() == UserRole.Owner;
 	}
 
   /*   
@@ -317,6 +336,29 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	hostValueChart(): void {
 		this.hostService.hostGroupValueChart(this.valueChartViewerService.getActiveValueChart()._id);
+	}
+
+
+	/* 	
+		@returns {void}
+		@description 	Save the current user's changes to the ValueChart.
+						If the current user is the ValueChart owner, this method will also save the ValueChart structure.
+	*/
+	save(): void {
+		let userRole = this.valueChartViewerService.getUserRole();
+		
+		if (this.valueChartViewerService.isParticipant())
+			this.submitPreferences()
+		
+		if (userRole == UserRole.Owner || userRole == UserRole.OwnerAndParticipant) {
+			// Update the ValueChart.
+			this.valueChartHttpService.updateValueChartStructure(this.valueChartService.getValueChart()).subscribe(
+				(result: ValueChart) => { this.userNotificationService.displaySuccesses(['Save successful']); },
+				(error: any) => {
+					// Handle any errors here.
+					this.userNotificationService.displayWarnings(['Saving Failed.']);
+				});
+		}
 	}
 
 	/* 	
@@ -373,6 +415,9 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 
 	}
+
+
+	// TODO <@aaron>: Move the Undo/Redo functionality to its own component.
 
 	// ================================ Undo/Redo ====================================
 
