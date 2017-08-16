@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 16:32:04
+* @Last Modified time: 2017-08-16 13:30:28
 */
 
 // Import Angular Classes:
@@ -202,7 +202,7 @@ export class MyValueChartsComponent implements OnInit {
 	leaveValueChart(chartId: string): void {
 		this.valueChartHttpService.deleteUser(chartId, this.currentUserService.getUsername())
 			.subscribe(username => {
-				var index: number = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
+				let index: number = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
 					return valueChartSummary._id === chartId;
 				});
 				this.valueChartMemberships.splice(index, 1);
@@ -222,10 +222,15 @@ export class MyValueChartsComponent implements OnInit {
 	deleteValueChart(chartId: string): void {
 		this.valueChartHttpService.deleteValueChart(chartId)
 			.subscribe(status => {
-				var index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
+				let index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
 					return valueChartSummary._id === chartId;
 				});
 				this.valueChartOwnerships.splice(index, 1);
+
+				index = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
+					return valueChartSummary._id === chartId;
+				});
+				this.valueChartMemberships.splice(index, 1);
 			});
 
 		this.valueChartHttpService.deleteValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
