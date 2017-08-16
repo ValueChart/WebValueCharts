@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:27:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 12:31:49
+* @Last Modified time: 2017-08-16 14:44:55
 */
 
 // Import Testing Resources:
@@ -30,7 +30,7 @@ import { ChartUndoRedoService }							from '../../../../../client/resources/modu
 import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
 import { AdjustScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/AdjustScoreFunction.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes
 import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
@@ -78,7 +78,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number;
 	var u: ScoreFunctionUpdate;
 	var aaron: User;
@@ -88,7 +88,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 10:21:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:25:48
+* @Last Modified time: 2017-08-16 14:44:53
 */
 
 // Import Testing Resources:
@@ -17,7 +17,7 @@ import { HotelChartData }					from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
 import { ChangeDetectionService }			from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
-import { WebValueChartsParser }				from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }				from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes
 import { ValueChart }						from '../../../../../client/resources/model/ValueChart';
@@ -31,7 +31,7 @@ import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	fr
 describe('ChangeDetectionService', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var changeDetectionService: ChangeDetectionService;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var usersToDisplay: User[];
@@ -43,7 +43,7 @@ describe('ChangeDetectionService', () => {
 
 		changeDetectionService = TestBed.get(ChangeDetectionService);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 17:39:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:27:12
+* @Last Modified time: 2017-08-16 14:44:57
 */
 
 // Import Testing Resources:
@@ -26,7 +26,7 @@ import { RendererService }								from '../../../../../client/resources/modules/
 import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
 import { ReorderObjectivesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Definitions Classes:
 import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
@@ -53,7 +53,7 @@ describe('ReorderObjectivesInteraction', () => {
 	var reorderObjectivesInteraction: ReorderObjectivesInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var viewConfig: ViewConfig;
 	var u: RendererUpdate;
 
@@ -69,7 +69,7 @@ describe('ReorderObjectivesInteraction', () => {
 		reorderObjectivesInteraction = TestBed.get(ReorderObjectivesInteraction);
 
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

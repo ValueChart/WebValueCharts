@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 13:45:45
+* @Last Modified time: 2017-08-16 14:46:11
 */
 
 // Require Node Libraries:
@@ -10,7 +10,7 @@ import { expect } 								from 'chai';
 import * as request								from 'supertest';
 
 // Import Utility Classes:
-import { JsonValueChartParser }					from '../../../client/resources/modules/utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }					from '../../../client/resources/modules/utilities/classes/JsonValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart }							from '../../../client/resources/model/ValueChart';

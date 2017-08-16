@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 12:34:05
+* @Last Modified time: 2017-08-16 14:44:51
 */
 
 // Import Testing Resources:
@@ -23,7 +23,7 @@ import { randomizeUserScoreFunction }					from '../../../../utilities/Testing.ut
 
 // Import Application Classes:
 import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes
 import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
@@ -44,7 +44,7 @@ import { ChartOrientation }								from '../../../../../client/resources/types/C
 describe('RendererScoreFunctionUtility', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	var width: number, height: number;
 	var u: ScoreFunctionUpdate;
@@ -60,7 +60,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 		rendererScoreFunctionUtility = TestBed.get(RendererScoreFunctionUtility);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 21:10:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-09 22:38:42
+* @Last Modified time: 2017-08-16 14:44:58
 */
 
 // Import Node Libraries: 
 import { expect }												from 'chai';
 
 // Import Application Classes:
-import { WebValueChartsParser }									from '../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }									from '../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart }											from '../../../../client/resources/model/ValueChart';
@@ -30,13 +30,13 @@ import { HotelChartData }										from '../../../testData/HotelChartData';
 
 
 
-describe('WebValueChartsParser', () => {
-	var valueChartParser: WebValueChartsParser;
+describe('XmlValueChartParser', () => {
+	var valueChartParser: XmlValueChartParser;
 	var xmlDocParser: DOMParser;
 	var xmlDocument: Document;
 
 	before(function() {
-		valueChartParser = new WebValueChartsParser();
+		valueChartParser = new XmlValueChartParser();
 		xmlDocParser = new DOMParser();
 		xmlDocument = xmlDocParser.parseFromString(HotelChartData, 'application/xml');
 	});

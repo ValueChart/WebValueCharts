@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 14:10:59
+* @Last Modified time: 2017-08-16 14:46:12
 */
 
 // Import Angular Classes:
@@ -13,7 +13,7 @@ import { Observable }     											from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
 // IMport Application Classes: 
-import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart }												from '../../../model/ValueChart';

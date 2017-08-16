@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-17 11:55:15
+* @Last Modified time: 2017-08-16 14:46:42
 */
 
 // Import Angular Classes:
@@ -18,7 +18,7 @@ import { CurrentUserService }										from '../../services/CurrentUser.service'
 import { ValueChartService }										from '../../services/ValueChart.service';
 import { UserHttpService }											from '../../services/UserHttp.service';
 import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
-import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueChartXMLEncoder';
+import { XmlValueChartEncoder }										from '../../../utilities/classes/XmlValueChart.encoder';
 
 
 /*
@@ -40,7 +40,7 @@ import { ValueChartXMLEncoder }										from '../../../utilities/classes/ValueC
 	templateUrl: './Root.template.html',
 	providers: [
 		XMLValueChartParserService,
-		ValueChartXMLEncoder]
+		XmlValueChartEncoder]
 })
 export class RootComponent implements OnInit {
 

@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-02 12:20:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 11:11:08
+* @Last Modified time: 2017-08-16 14:48:47
 */
 
 // Import Angular Classes:
@@ -11,7 +11,7 @@ import { OnInit } 											from '@angular/core';
 
 // Import Application Classes:
 import { ValueChartService }								from '../../services/ValueChart.service';
-import { ValueChartXMLEncoder }								from '../../../utilities/classes/ValueChartXMLEncoder';
+import { XmlValueChartEncoder }								from '../../../utilities/classes/XmlValueChart.encoder';
 
 // Import Model Classes:
 import { ValueChart }										from '../../../../model/ValueChart';
@@ -42,7 +42,7 @@ export class ExportValueChartComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartXMLEncoder: ValueChartXMLEncoder;
+	private valueChartXmlEncoder: XmlValueChartEncoder;
 	private valueChartStringURL: string;
 
 	private downloadLink: HTMLElement;
@@ -69,7 +69,7 @@ export class ExportValueChartComponent implements OnInit {
 						method rather than in the constructor.
 	*/
 	ngOnInit() {
-		this.valueChartXMLEncoder = new ValueChartXMLEncoder();
+		this.valueChartXmlEncoder = new XmlValueChartEncoder();
 		this.downloadLink = <HTMLElement> document.querySelector('#download-value-chart');
 	}
 
@@ -95,7 +95,7 @@ export class ExportValueChartComponent implements OnInit {
 			return;
 
 		// Obtain a XML string for the user defined weights in the given ValueChart. 
-		var valueChartString: string = this.valueChartXMLEncoder.encodeValueChart(valueChart);
+		var valueChartString: string = this.valueChartXmlEncoder.encodeValueChart(valueChart);
 		// Convert the string into a blob. We must do this before we can create a download URL for the XML string.
 		var valueChartBlob: Blob = new Blob([valueChartString], { type: 'text/xml' });
 

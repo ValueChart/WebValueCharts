@@ -2,13 +2,13 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-03 15:10:45
+* @Last Modified time: 2017-08-16 14:45:29
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
 
 // Import Application Classes:
-import { XmlValueChartLegacyParser }								from '../../../../client/resources/modules/utilities/classes/XmlValueChartLegacyParser';
+import { XmlLegacyValueChartParser }								from '../../../../client/resources/modules/utilities/classes/XmlLegacyValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart }											from '../../../../client/resources/model/ValueChart';
@@ -31,13 +31,13 @@ var XMLTestString: string = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone
 
 
 
-describe('XmlValueChartLegacyParser', () => {
-	var valueChartParser: XmlValueChartLegacyParser;
+describe('XmlLegacyValueChartParser', () => {
+	var valueChartParser: XmlLegacyValueChartParser;
 	var xmlDocParser: DOMParser;
 	var xmlDocument: Document;
 
 	before(function() {
-		valueChartParser = new XmlValueChartLegacyParser();
+		valueChartParser = new XmlLegacyValueChartParser();
 		xmlDocParser = new DOMParser();
 		xmlDocument = xmlDocParser.parseFromString(XMLTestString, 'application/xml');
 	});

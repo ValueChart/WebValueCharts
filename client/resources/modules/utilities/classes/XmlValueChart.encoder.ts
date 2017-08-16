@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-30 16:45:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 16:53:10
+* @Last Modified time: 2017-08-16 14:39:59
 */
 
 // Import Model Classes:
@@ -33,7 +33,7 @@ import { CategoricalDomain } 												from '../../../model/CategoricalDomain'
 	has been encoded into XML.
 */
 
-export class ValueChartXMLEncoder {
+export class XmlValueChartEncoder {
 
 	// ========================================================================================
 	// 									Fields

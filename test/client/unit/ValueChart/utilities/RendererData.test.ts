@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:32:37
+* @Last Modified time: 2017-08-16 14:44:52
 */
 
 // Import Testing Resources:
@@ -17,7 +17,7 @@ import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
 import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes
 import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
@@ -37,7 +37,7 @@ import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	fr
 describe('RendererDataUtility', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var rendererDataUtility: RendererDataUtility;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
@@ -51,7 +51,7 @@ describe('RendererDataUtility', () => {
 
 		rendererDataUtility = TestBed.get(RendererDataUtility);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

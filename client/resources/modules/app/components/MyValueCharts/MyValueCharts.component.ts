@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-04 13:09:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 13:30:28
+* @Last Modified time: 2017-08-16 14:48:46
 */
 
 // Import Angular Classes:
@@ -17,7 +17,7 @@ import { UserHttpService }								from '../../services/UserHttp.service';
 import { ValueChartHttpService }						from '../../services/ValueChartHttp.service';
 import { ValidationService }							from '../../services/Validation.service';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
-import { ValueChartXMLEncoder }							from '../../../utilities/classes/ValueChartXMLEncoder';
+import { XmlValueChartEncoder }							from '../../../utilities/classes/XmlValueChart.encoder';
 import * as Formatter									from '../../../utilities/classes/Formatter';
 
 // Import Model Classes:
@@ -78,7 +78,7 @@ export class MyValueChartsComponent implements OnInit {
 	*/
 	constructor(
 		private router: Router,
-		private valueChartXMLEncoder: ValueChartXMLEncoder,
+		private valueChartXmlEncoder: XmlValueChartEncoder,
 		private currentUserService: CurrentUserService,
 		public valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
@@ -266,7 +266,7 @@ export class MyValueChartsComponent implements OnInit {
 			return;
 		
 		// Obtain a CSV string for the user defined weights in the given ValueChart. 
-		var weightString: string = this.valueChartXMLEncoder.encodeUserWeights(valueChart);
+		var weightString: string = this.valueChartXmlEncoder.encodeUserWeights(valueChart);
 		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
 		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
 

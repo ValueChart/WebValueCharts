@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 09:56:50
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:27:26
+* @Last Modified time: 2017-08-16 14:44:56
 */
 
 // Import Testing Resources:
@@ -26,7 +26,7 @@ import { RendererService }								from '../../../../../client/resources/modules/
 import { ChartUndoRedoService }								from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
 import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Definitions Classes:
 import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
@@ -51,7 +51,7 @@ describe('SortAlternativesInteraction', () => {
 	var sortAlternativesInteraction: SortAlternativesInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var u: RendererUpdate;
 
 
@@ -65,7 +65,7 @@ describe('SortAlternativesInteraction', () => {
 		sortAlternativesInteraction = TestBed.get(SortAlternativesInteraction);
 
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

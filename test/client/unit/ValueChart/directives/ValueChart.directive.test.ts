@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 15:07:06
+* @Last Modified time: 2017-08-16 14:44:58
 */
 
 // Import Testing Resources:
@@ -48,7 +48,7 @@ import { SortAlternativesInteraction } 										from '../../../../../client/res
 import { SetObjectiveColorsInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
 import { ExpandScoreFunctionInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
 
-import { WebValueChartsParser } 											from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser } 											from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes
 import { ValueChart } 														from '../../../../../client/resources/model/ValueChart';
@@ -122,7 +122,7 @@ describe('ValueChartDirective', () => {
 	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 
 	var aaron: User;
@@ -232,7 +232,7 @@ describe('ValueChartDirective', () => {
 	describe('createValueChart(): void', () => {
 
 		before(function() {
-			parser = new WebValueChartsParser();
+			parser = new XmlValueChartParser();
 			var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 			hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -302,7 +302,7 @@ describe('ValueChartDirective', () => {
 		context('when all of the directive\'s input parameters are held constant (ie. no changes are made to the inputs)', () => {
 
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -353,7 +353,7 @@ describe('ValueChartDirective', () => {
 		context('when the input ValueChart is modified', () => {
 
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -418,7 +418,7 @@ describe('ValueChartDirective', () => {
 			context('when an existing user\'s score functions are changed', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -465,7 +465,7 @@ describe('ValueChartDirective', () => {
 			context('when a new user is added to the ValueChart', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -513,7 +513,7 @@ describe('ValueChartDirective', () => {
 
 			context('when a user is deleted from the ValueChart (leaving it with no users)', () => {
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -561,7 +561,7 @@ describe('ValueChartDirective', () => {
 			context('when a user is deleted from the ValueChart (when it has many users)', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -612,7 +612,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the view orientation of the ValueChart is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -638,7 +638,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the view configuration is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -673,7 +673,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the interaction configuration is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -699,7 +699,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the width and/or height of the ValueChart is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 

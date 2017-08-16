@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 12:13:00
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 12:21:16
+* @Last Modified time: 2017-08-16 14:46:12
 */
 
 import { Injectable } 												from '@angular/core';
@@ -17,7 +17,7 @@ import { ValueChartService }										from './ValueChart.service';
 import { ValueChartViewerService }									from './ValueChartViewer.service';
 import { ValidationService }										from './Validation.service';
 import { UpdateValueChartService }									from './UpdateValueChart.service';
-import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }										from '../../utilities/classes/JsonValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart, ChartType }									from '../../../model/ValueChart';

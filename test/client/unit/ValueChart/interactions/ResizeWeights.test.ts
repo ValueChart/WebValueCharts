@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 13:53:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:27:21
+* @Last Modified time: 2017-08-16 14:44:56
 */
 
 // Import Testing Resources:
@@ -26,7 +26,7 @@ import { RendererService }								from '../../../../../client/resources/modules/
 import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
 import { ResizeWeightsInteraction }						from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Definitions Classes:
 import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
@@ -52,7 +52,7 @@ describe('ResizeWeightsInteraction', () => {
 	var resizeWeightsInteraction: ResizeWeightsInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 
@@ -68,7 +68,7 @@ describe('ResizeWeightsInteraction', () => {
 		resizeWeightsInteraction = TestBed.get(ResizeWeightsInteraction);
 
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

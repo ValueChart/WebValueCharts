@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-20 13:14:15
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:29:49
+* @Last Modified time: 2017-08-16 14:44:53
 */
 
 // Import Testing Resources:
@@ -30,7 +30,7 @@ import { RendererService }								from '../../../../../client/resources/modules/
 import { RenderEventsService }							from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
 import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Definitions Classes:
 import { SummaryChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/SummaryChart.definitions';
@@ -85,7 +85,7 @@ var renderEventsServiceStub = {
 	var summaryChartRenderer: SummaryChartRenderer;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 	var aaron: User;
@@ -93,7 +93,7 @@ var renderEventsServiceStub = {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 

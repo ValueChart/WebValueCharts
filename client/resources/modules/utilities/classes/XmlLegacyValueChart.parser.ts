@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-29 11:15:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-18 12:57:40
+* @Last Modified time: 2017-08-16 14:40:40
 */
 
 // Import Model Classes:
@@ -27,14 +27,14 @@ import { CategoricalDomain } 												from '../../../model/CategoricalDomain'
 	expects all XML documents to be complete ValueCharts. It should be expanded to parse XML ValueCharts robustly and will completeness
 	checking in the future.
 
-	XmlValueChartLegacyParser parses the ValueChartsPlus XML schema for a ValueChart ONLY. It cannot parse the WebValueCharts XML schema
-	This is what the WebValueChartsParser class is for. The ValueChartsPlus XML schema for ValueCharts is no longer in use, and this class only
+	XmlLegacyValueChartParser parses the ValueChartsPlus XML schema for a ValueChart ONLY. It cannot parse the WebValueCharts XML schema
+	This is what the XmlValueChartParser class is for. The ValueChartsPlus XML schema for ValueCharts is no longer in use, and this class only
 	exists to allow for "legacy" support of the old format. New ValueCharts should NOT be created in this format, and ValueChartParser should
 	almost always be used instead of ValueChartLegacyParser.See the github wiki for more information about 
 	the two different XML schemas, or the hotel.xml file for an example of the ValueChartsPlus XML schema.
 */
 
-export class XmlValueChartLegacyParser {
+export class XmlLegacyValueChartParser {
 
 	// ========================================================================================
 	// 									Constructor

@@ -2,14 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 11:04:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-10 10:34:15
+* @Last Modified time: 2017-08-16 14:48:12
 */
 // Import Angular Classes
 import { Injectable } 															from '@angular/core';
 
 // Import Utility Classes
-import { XmlValueChartLegacyParser }											from '../../utilities/classes/XmlValueChartLegacyParser';
-import { WebValueChartsParser }													from '../../utilities/classes/WebValueChartsParser';
+import { XmlLegacyValueChartParser }											from '../../utilities/classes/XmlLegacyValueChart.parser';
+import { XmlValueChartParser }													from '../../utilities/classes/XmlValueChart.parser';
 
 // Import Model Classes:
 import { ValueChart }															from '../../../model/ValueChart';
@@ -17,7 +17,7 @@ import { ValueChart }															from '../../../model/ValueChart';
 
 /*
 	This class is an Angular service that provides an interface for parsing XML ValueCharts regardless of their schema. It uses instances of the
-	XmlValueChartLegacyParser and WebValueChartsParser classes to parse XML ValueCharts of either the WebValueCharts, or the ValueChartsPlus (deprecated) schema.
+	XmlLegacyValueChartParser and XmlValueChartParser classes to parse XML ValueCharts of either the WebValueCharts, or the ValueChartsPlus (deprecated) schema.
 	Please see the Wiki for more information about these two different schemas. 
 */
 
@@ -30,8 +30,8 @@ export class XMLValueChartParserService {
 
 	private xmlDocParser: DOMParser;							// A DOM parser used to parse XML strings into document objects.
 
-	private valueChartPlusParser: XmlValueChartLegacyParser;	// The utility class for parsing ValueChartsPlus Schema XML ValueCharts.
-	private webValueChartsParser: WebValueChartsParser;			// The utility class for parsing WebValueCharts Schema XML ValueCharts.
+	private xmlLegacyValueChartParser: XmlLegacyValueChartParser;	// The utility class for parsing ValueChartsPlus Schema XML ValueCharts.
+	private xmlValueChartParser: XmlValueChartParser;			// The utility class for parsing WebValueCharts Schema XML ValueCharts.
 
 	// ========================================================================================
 	// 									Constructor
@@ -40,8 +40,8 @@ export class XMLValueChartParserService {
 	constructor() {
 		// Initialize the parser fields.
 		this.xmlDocParser = new DOMParser();
-		this.valueChartPlusParser = new XmlValueChartLegacyParser();
-		this.webValueChartsParser = new WebValueChartsParser();
+		this.xmlLegacyValueChartParser = new XmlLegacyValueChartParser();
+		this.xmlValueChartParser = new XmlValueChartParser();
 	}
 
 	// ========================================================================================
@@ -64,13 +64,13 @@ export class XMLValueChartParserService {
 		// The ValueChart XML representation is version 1.0, or the version is not defined. This means the XML is of the deprecated ValueChartsPlus schema.
 		if (!valueChartElement.getAttribute('version') || valueChartElement.getAttribute('version') === '1.0') {
 			try {
-				valueChart = this.valueChartPlusParser.parseValueChart(xmlDocument);	// Parse with the deprecated, legacy parser.
+				valueChart = this.xmlLegacyValueChartParser.parseValueChart(xmlDocument);	// Parse with the deprecated, legacy parser.
 			} catch (e) {
 				console.log(e);
 			}
 		} else {	// The ValueChart XML representation is version 2.0. This means the XML is of the WebValueCharts schema.
 			try {
-				valueChart = this.webValueChartsParser.parseValueChart(xmlDocument);	// Parse with the regular parser.
+				valueChart = this.xmlValueChartParser.parseValueChart(xmlDocument);	// Parse with the regular parser.
 			} catch (e) {
 				console.log(e);
 			}

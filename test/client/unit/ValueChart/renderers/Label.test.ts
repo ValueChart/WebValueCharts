@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:31:34
+* @Last Modified time: 2017-08-16 14:44:54
 */
 
 // Import Testing Resources:
@@ -39,7 +39,7 @@ import { SetObjectiveColorsInteraction }				from '../../../../../client/resource
 import { ReorderObjectivesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
 import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
 
 // Import Definitions Classes:
 import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
@@ -133,7 +133,7 @@ var chartUndoRedoStub = {
 	var labelRenderer: LabelRenderer;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 	var aaron: User;
@@ -141,7 +141,7 @@ var chartUndoRedoStub = {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
