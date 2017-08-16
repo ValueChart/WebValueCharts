@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 11:54:40
+* @Last Modified time: 2017-08-16 13:45:45
 */
 
 // Require Node Libraries:
@@ -391,6 +391,44 @@ describe('ValueCharts Routes', () => {
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.equal('Argile');
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+		});
+
+		describe('Method: Put', () => {
+			
+			it('should replace the ValueChart\'s user list and return the new user list with status code 201', (done: MochaDone) => {
+				user.put('ValueCharts/' + chartId + '/users/').send([])
+					.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+					    .expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
+
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse.length).to.equal(0);
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+
+			it('should replace the ValueChart\'s user list and return the new user list with status code 201', (done: MochaDone) => {
+				user.put('ValueCharts/' + chartId + '/users/').send([argileJson])
+					.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+					    .expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
+
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse.length).to.equal(1);
+							expect(valueChartResponse[0].username).to.equal('Argile');
 
 						}).end(function(err, res) {
 					        if (err) return done(err);

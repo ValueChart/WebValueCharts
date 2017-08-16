@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-26 18:27:55
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 12:17:32
+* @Last Modified time: 2017-08-16 14:10:59
 */
 
 // Import Angular Classes:
@@ -209,6 +209,22 @@ export class ValueChartHttpService {
 	}
 
 	/*
+		@param chartId - The id of the ValueChart resource to add replace the user list of. This id is provided by the server upon creating/updating a ValueChart resource.
+		@returns {Observable<User[]>} - An observable of the user list that was updated.
+		@description 	Replaces the user list of a ValueChart resource on the server.
+	*/
+	updateUsers(chartId: string, users: User[]): Observable<User[]> {
+
+		let body = JSON.stringify(users);
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.put(this.valueChartsUrl + chartId + '/users', body, options)
+			.map(((this.extractUsersData)))
+			.catch(this.handleError);
+	}
+
+	/*
 		@param chartId - The id of the ValueChart resource to add the user to. This id is provided by the server upon creating/updating a ValueChart resource.
 		@param user - The user object that is to be added to the ValueChart resource on the server.
 		@returns {Observable<User>} - An observable of a User resource that was created on the server. Should be identical to the user parameter.
@@ -291,6 +307,18 @@ export class ValueChartHttpService {
 	extractUserData = (res: Response): User => {
 		let body = res.json();
 		return this.valueChartParser.parseUser(body.data);
+	}
+
+	// This method extracts a list of user objects from the server response. The user objects do not need to be complete.
+	extractUsersData = (res: Response): User[] => {
+		let body = res.json();
+		let users = []
+
+		for (var i = 0; i < body.data.length; i++) {
+			users.push(this.valueChartParser.parseUser(body.data[i]));
+		}
+
+		return users;
 	}
 
 	// This method extracts errors from the server response.
