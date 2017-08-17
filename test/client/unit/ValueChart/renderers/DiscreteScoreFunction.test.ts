@@ -189,7 +189,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 				it('should color the score function plot elements to indicate the objective it is for', () => {
 					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('stroke'))).to.equal(_.toLower(u.objective.getColor()));
-					expect(rgbaToHex(scoreFunctionRenderer.barTops.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
+					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
 				});
 			});
 
@@ -231,7 +231,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 						let selection = d3.select(userContainer);
 
 						expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('stroke'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
-						expect(rgbaToHex(selection.selectAll('.' + defs.BAR_TOP).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
+						expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
 					});
 
 				});
@@ -252,7 +252,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 							let selection = d3.select(userContainer);
 
 							expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('stroke'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
-							expect(rgbaToHex(selection.selectAll('.' + defs.BAR_TOP).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
+							expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
 						});
 					});	
 				});	
@@ -294,7 +294,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 				it('should color the score function plot elements to indicate the objective it is for', () => {
 					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('stroke'))).to.equal(_.toLower(u.objective.getColor()));
-					expect(rgbaToHex(scoreFunctionRenderer.barTops.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
+					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
 				});
 			});
 
@@ -425,12 +425,11 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				let barSelection = d3.select(bar);
 				let score = u.scoreFunctions[i].getScore(elements[j]);
 
-				expect(+barSelection.attr(dimension)).to.equal(Math.max(u.heightScale(score), u.rendererConfig.labelOffset));
+				expect(+barSelection.attr(dimension)).to.equal(Math.max(u.heightScale(score), 2));
 
 				let barTopSelection = d3.select(barTops[j]);
 
 				expect(+barTopSelection.attr(dimension)).to.equal(u.rendererConfig.labelOffset);
-				expect(barTopSelection.attr(coordinate)).to.equal(barSelection.attr(coordinate));
 			});
 
 		});
