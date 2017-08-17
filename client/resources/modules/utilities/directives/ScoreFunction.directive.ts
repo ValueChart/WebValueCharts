@@ -162,7 +162,7 @@ export class ScoreFunctionDirective implements OnInit, DoCheck {
 					scoreFunctions: this.scoreFunctions,
 					viewOrientation: this.viewOrientation,
 					individual: this.individual
-				});
+					});
 			
 			this.previousScoreFunctions = _.cloneDeep(this.scoreFunctions);
 

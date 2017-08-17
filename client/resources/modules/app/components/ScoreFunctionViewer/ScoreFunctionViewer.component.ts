@@ -123,7 +123,7 @@ export class ScoreFunctionViewerComponent implements OnInit, OnDestroy, DoCheck 
 			this.enableInteraction = ((<any>window.opener).enableInteraction && !this.objectiveToDisplay.getDefaultScoreFunction().immutable);
 			this.individual = (<any>window.opener).individual;
 		}
-
+		
 		this.services.chartUndoRedoService = this.chartUndoRedoService;
 
 		this.previousViewType = this.viewType;
