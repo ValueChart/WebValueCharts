@@ -27,7 +27,7 @@
                 </div>
             </th>
             <th>
-                <textarea id="description-area" class="form-control objectives-table-input" rows="1" [(ngModel)]="objectiveRows[objID].desc"></textarea>
+                <textarea id="description-area" class="form-control objectives-table-input" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
             </th>
             <th>
                 <select class="form-control objectives-table-dropdown" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
