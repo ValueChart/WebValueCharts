@@ -86,7 +86,7 @@ export class UserGuardService implements CanDeactivate<any> {
 			!this.destination || 
 			this.destination.indexOf('ValueCharts/') !== -1 || 
 			this.destination.indexOf('create/') !== -1 ||
-			createPurpose === CreatePurpose.EditValueChart || createPurpose === CreatePurpose.NewValueChart) {
+			createPurpose === CreatePurpose.EditValueChart || createPurpose === CreatePurpose.NewValueChart || createPurpose === CreatePurpose.NewUser) {
 			return true;
 		} else if (!_.isEqual(currentUser, this.userRecord)) {	
 			let navigate = window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');
