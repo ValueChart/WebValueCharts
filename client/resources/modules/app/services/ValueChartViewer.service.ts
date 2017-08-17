@@ -7,14 +7,18 @@
 
 
 // Import Angular Classes:
-import { Injectable } 										from '@angular/core';
+import { Injectable, OnDestroy } 							from '@angular/core';
 
 // Import Libraries:
 import * as _												from 'lodash';
+import { Subscription }										from 'rxjs/Subscription';
 
 // Import Application Classes:
+import { UserNotificationService }							from './UserNotification.service'; 
+import { ValidationService }								from './Validation.service';
 import { ValueChartService }								from './ValueChart.service';
 import { CurrentUserService }								from './CurrentUser.service';
+import { HostService }										from './Host.service';
 
 // Import Model Classes:
 import { User }												from '../../../model/User';
@@ -40,6 +44,8 @@ export class ValueChartViewerService {
 	// This list is drawn from Kelly's 22 Colors of Maximum Contrast. White and Black, the first two colors, have been omitted. See: http://www.iscc.org/pdf/PC54_1724_001.pdf
 	public kellyColors: string[] = ['#F3C300', '#875692', '#F38400', '#A1CAF1', '#BE0032', '#C2B280', '#848482', '#008856', '#E68FAC', '#0067A5', '#F99379', '#604E97', '#F6A600', '#B3446C', '#DCD300', '#882D17', '#8DB600', '#654522', '#E25822', '#2B3D26'];
 
+	private subs: Subscription[] = []
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -49,12 +55,27 @@ export class ValueChartViewerService {
 		@description 	This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
+		private userNotificationService: UserNotificationService,
+		private hostService: HostService,
 		private currentUserService: CurrentUserService,
-		private valueChartService: ValueChartService)	{ }
+		private validationService: ValidationService,
+		private valueChartService: ValueChartService)	{ 
+
+		this.subs.push(this.hostService.userAddedSubject.subscribe(this.userAdded));
+		this.subs.push(this.hostService.userChangedSubject.subscribe(this.userChanged));
+		this.subs.push(this.hostService.userRemovedSubject.subscribe(this.userRemoved));
+		this.subs.push(this.hostService.structureChangedSubject.subscribe(this.structureChanged));
+	}
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	ngOnDestroy() {
+		this.subs.forEach((sub) => {
+			sub.unsubscribe();
+		});
+	}
 
 	// ====================== Methods for Managing Current User Role  ======================
 
@@ -188,6 +209,70 @@ export class ValueChartViewerService {
 		} else if (errors.length > 0) {
 			this.addInvalidUser(user.getUsername());
 			this.removeUserToDisplay(user.getUsername());
+		}
+	}
+
+
+
+	// ====================== Methods for Responding to ValueChart Changes ======================
+
+	userAdded = (newUser: User): void => {
+		let errors = this.validationService.validateUser(this.valueChartService.getValueChart(), newUser);
+
+		if (errors.length === 0)
+			this.addUserToDisplay(newUser);
+		else
+			this.addInvalidUser(newUser.getUsername());
+
+		this.initUserColors(this.valueChartService.getValueChart());
+
+		this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
+	}
+
+	userChanged = (updatedUser: User): void => {
+		let errors = this.validationService.validateUser(this.valueChartService.getValueChart(), updatedUser);
+
+		if (this.isUserDisplayed(updatedUser))
+			this.addUserToDisplay(updatedUser);
+
+		// If user was previously invalid, they will be valid now.
+		if (errors.length === 0) {
+			this.removeInvalidUser(updatedUser.getUsername());
+			this.addUserToDisplay(updatedUser);
+		}
+
+		this.userNotificationService.displayInfo([updatedUser.getUsername() + ' has updated their preferences']);
+	}
+
+	userRemoved = (userToDelete: string): void => {
+		this.removeUserToDisplay(userToDelete);
+		this.removeInvalidUser(userToDelete);
+
+		// Update the user role
+		if (userToDelete === this.currentUserService.getUsername() && this.userIsMember(userToDelete)) {
+			let newRole = this.isOwner() ? UserRole.Owner : UserRole.Viewer;
+			this.setUserRole(newRole);
+		}
+
+		// Delete the user from the ValueChart
+		this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
+	}
+
+	structureChanged = (valueChart: ValueChart): void => {
+		// Notify the current user of any errors in their preferences.
+		if (this.userIsMember(this.currentUserService.getUsername())) {
+			let errors = this.validationService.validateUser(valueChart, valueChart.getUser(this.currentUserService.getUsername()));
+			this.userNotificationService.displayErrors(errors);
+		}
+					
+		// Hide invalid users.
+		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
+		this.initializeUsers(this.getUsersToDisplay(), invalidUsers);
+
+		// Update the active ValueChart.
+		if (this.getActiveValueChart().getType() === ChartType.Individual) {
+			let individualChart = this.generateIndividualChart();
+			this.setActiveValueChart(individualChart);
 		}
 	}
 

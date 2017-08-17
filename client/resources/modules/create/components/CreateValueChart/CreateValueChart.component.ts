@@ -16,6 +16,7 @@ import { CurrentUserService }											from '../../../app/services/CurrentUser.
 import { ValueChartHttpService }										from '../../../app/services/ValueChartHttp.service';
 import { ValidationService }											from '../../../app/services/Validation.service';
 import { UserNotificationService }										from '../../../app/services/UserNotification.service';
+import { HostService }													from '../../../app/services/Host.service';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 										from '../../../../model/ValueChart';
@@ -51,7 +52,6 @@ export class CreateValueChartComponent implements OnInit {
 	window: any = window;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 	public loading = true;
-
 	private lockedByCreator = false; // Records whether or not the chart is locked by its creator
 
 	// ========================================================================================
@@ -69,6 +69,7 @@ export class CreateValueChartComponent implements OnInit {
 		public valueChartService: ValueChartService,
 		public creationStepsService: CreationStepsService,
 		private route: ActivatedRoute,
+		private hostService: HostService,
 		private valueChartHttpService: ValueChartHttpService,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService) { }
@@ -101,6 +102,8 @@ export class CreateValueChartComponent implements OnInit {
 					status.incomplete = true; // prevent changes to users while chart is being edited
 					this.valueChartHttpService.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 				});
+			} else {
+				this.hostService.hostGroupValueChart(this.valueChartService.getValueChart()._id)
 			}
 			
 			this.creationStepsService.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
@@ -118,7 +121,8 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnDestroy() {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();
-
+		this.hostService.endCurrentHosting();
+		
 		if (this.creationStepsService.getAutoSaveEnabled()) {
 			// Check validity of chart structure and current user's preferences. Prevent changes to users if not valid.
 			let lockedBySystem = (this.validationService.validateStructure(this.valueChartService.getValueChart()).length > 0

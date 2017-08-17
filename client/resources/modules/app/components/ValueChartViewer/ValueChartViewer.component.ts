@@ -28,7 +28,7 @@ import { ValueChartHttpService }												from '../../services/ValueChartHttp.
 import { ValidationService }													from '../../services/Validation.service';
 import { UpdateValueChartService }												from '../../services/UpdateValueChart.service';
 import { UserNotificationService }												from '../../services/UserNotification.service'; 
-import { UserGuardService }													from '../../services/UserGuard.service';
+import { UserGuardService }														from '../../services/UserGuard.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -60,7 +60,7 @@ import { ValueChartStatus }														from '../../../../types/ValueChartStatu
 @Component({
 	selector: 'ValueChartViewer',
 	templateUrl: './ValueChartViewer.template.html',
-	providers: [ ValueChartViewerService, HostService ]
+	providers: [ ValueChartViewerService ]
 })
 export class ValueChartViewerComponent implements OnInit {
 

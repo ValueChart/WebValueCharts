@@ -9,6 +9,10 @@ import { Injectable } 												from '@angular/core';
 
 // Import Libraries:
 import * as _														from 'lodash';
+import { Observable }												from 'rxjs/Observable';
+import { Subscription } 											from 'rxjs/Subscription';
+import { Subject }													from 'rxjs/Subject';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { UserNotificationService }									from './UserNotification.service'; 
@@ -51,6 +55,12 @@ export class HostService {
 	private valueChartParser: JsonValueChartParser;	// An instance of the JsonValueChartParser class used to parse data sent
 													// via the websocket.
 
+
+	public userAddedSubject: Subject<User>;
+	public userChangedSubject: Subject<User>;
+	public userRemovedSubject: Subject<string>;
+	public structureChangedSubject: Subject<ValueChart>;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -64,10 +74,15 @@ export class HostService {
 		private userNotificationService: UserNotificationService,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
-		private valueChartViewerService: ValueChartViewerService,
 		private updateValueChartService: UpdateValueChartService,
 		private validationService: ValidationService) {
+
 		this.valueChartParser = new JsonValueChartParser();
+
+		this.userAddedSubject = new Subject();
+		this.userChangedSubject = new Subject();
+		this.userRemovedSubject = new Subject();
+		this.structureChangedSubject = new Subject();
 	}
 
 	// ========================================================================================
@@ -97,6 +112,8 @@ export class HostService {
 						with the websocket.
 	*/
 	endCurrentHosting(): void {
+		if (!this.hostWebSocket)
+			return;
 		// Close the websocket. The parameter 1000 indicates that the socket was closed due to normal operation (as opposed to an error).
 		this.hostWebSocket.close(1000);
 
@@ -108,7 +125,6 @@ export class HostService {
 	hostMessageHandler = (msg: MessageEvent) => {
 
 		var hostMessage: HostMessage = JSON.parse(msg.data);	// Messages are always stringified JSON that must be parsed.
-		var errors: string[];
 
 		// Handle the message depending on its type. 
 		switch (hostMessage.type) {
@@ -124,17 +140,8 @@ export class HostService {
 					return;
 
 				this.valueChartService.getValueChart().setUser(newUser);
-
-				errors = this.validationService.validateUser(this.valueChartService.getValueChart(), newUser);
-
-				if (errors.length === 0)
-					this.valueChartViewerService.addUserToDisplay(newUser);
-				else
-					this.valueChartViewerService.addInvalidUser(newUser.getUsername());
-
-				this.valueChartViewerService.initUserColors(this.valueChartService.getValueChart());
-
-				this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
+				this.userAddedSubject.next(newUser);
+				
 				break;
 
 			// An existing user has resubmitted their preferences.
@@ -145,20 +152,7 @@ export class HostService {
 					return;
 
 				this.valueChartService.getValueChart().setUser(updatedUser);
-
-				errors = this.validationService.validateUser(this.valueChartService.getValueChart(), updatedUser);
-
-				if (this.valueChartViewerService.isUserDisplayed(updatedUser))
-					this.valueChartViewerService.addUserToDisplay(updatedUser);
-
-				// If user was previously invalid, they will be valid now.
-				if (errors.length === 0) {
-					this.valueChartViewerService.removeInvalidUser(updatedUser.getUsername());
-					this.valueChartViewerService.addUserToDisplay(updatedUser);
-				}
-
-				this.userNotificationService.displayInfo([updatedUser.getUsername() + ' has updated their preferences']);
-
+				this.userChangedSubject.next(updatedUser);
 				break;
 
 			// A user has been deleted from the ValueChart.
@@ -168,18 +162,9 @@ export class HostService {
 				let userIndex: number = this.valueChartService.getValueChart().getUsers().findIndex((user: User) => {
 					return user.getUsername() === userToDelete;
 				});
-				this.valueChartViewerService.removeUserToDisplay(userToDelete);
-				this.valueChartViewerService.removeInvalidUser(userToDelete);
-
-				// Update the user role
-				if (userToDelete === this.currentUserService.getUsername() && this.valueChartViewerService.userIsMember(userToDelete)) {
-					let newRole = this.valueChartViewerService.isOwner() ? UserRole.Owner : UserRole.Viewer;
-					this.valueChartViewerService.setUserRole(newRole);
-				}
-
-				// Delete the user from the ValueChart
 				this.valueChartService.getValueChart().getUsers().splice(userIndex, 1);
-				this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
+
+				this.userRemovedSubject.next(userToDelete);
 				break;
 
 			// The ValueChart's owner has changed its structure (i.e. the basic details, the alternatives, or the objectives)
@@ -193,7 +178,7 @@ export class HostService {
 					let changes: string[] = this.updateValueChartService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
 					
 					// Notify other users of the changes.
-					if (!this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername()))
+					if (this.currentUserService.getUsername() !== this.valueChartService.getValueChart().getCreator())
 						this.userNotificationService.displayInfo(changes);
 
 					// Update the user's preferences.
@@ -206,22 +191,7 @@ export class HostService {
 					});
 
 					this.userNotificationService.displayWarnings(warnings);
-
-					// Notify the current user of any errors in their preferences.
-					if (this.valueChartViewerService.userIsMember(this.currentUserService.getUsername())) {
-						errors = this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()));
-						this.userNotificationService.displayErrors(errors);
-					}
-								
-					// Hide invalid users.
-					let invalidUsers = this.validationService.getInvalidUsers(this.valueChartService.getValueChart());
-					this.valueChartViewerService.initializeUsers(this.valueChartViewerService.getUsersToDisplay(), invalidUsers);
-
-					// Update the active ValueChart.
-					if (this.valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual) {
-						let individualChart = this.valueChartViewerService.generateIndividualChart();
-						this.valueChartViewerService.setActiveValueChart(individualChart);
-					}
+					this.structureChangedSubject.next(this.valueChartService.getValueChart());
 				}
 				break;
 

@@ -26,6 +26,7 @@ import { UserGuardService }											from './services/UserGuard.service';
 import { UpdateValueChartService }									from './services/UpdateValueChart.service';
 import { ValidationService }										from './services/Validation.service';
 import { UserNotificationService }									from './services/UserNotification.service';
+import { HostService }												from './services/Host.service';
 
 // TODO: Does this really need to be provided here?
 import { CreationStepsService }										from '../create/services/CreationSteps.service';
@@ -63,7 +64,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuardService, JoinGuardService, UserGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService]
+	[AuthGuardService, JoinGuardService, UserGuardService, CurrentUserService, UserHttpService, ValueChartHttpService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService, HostService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.

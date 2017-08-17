@@ -108,7 +108,7 @@ export class JsonValueChartParser {
 
 			Object.assign(objective, jsonObjective);
 		}
-
+		
 		return objective;
 	}
 
@@ -130,6 +130,7 @@ export class JsonValueChartParser {
 
 	private parseAlternative(jsonAlternative: any): Alternative {
 		var alternative: Alternative = new Alternative(jsonAlternative.name, jsonAlternative.description);
+		alternative['id'] = jsonAlternative['id'];
 
 		for (var i = 0; i < jsonAlternative.objectiveValues.length; i++) {
 			alternative.setObjectiveValue(jsonAlternative.objectiveValues[i][0], jsonAlternative.objectiveValues[i][1]);
