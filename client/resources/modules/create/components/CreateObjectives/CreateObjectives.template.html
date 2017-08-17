@@ -11,7 +11,12 @@
             <th>Domain Type</th>
             <th>Domain Info</th>
             <th *ngIf="!valueChart.isIndividual()">Default Score Function</th>
-            <th *ngIf="!valueChart.isIndividual()">Admin Defined<input type="checkbox" [ngModel]="allImmutable()" (ngModelChange)="toggleAllImmutable()"/></th>
+            <th *ngIf="!valueChart.isIndividual()">
+                <div class="objectivves-table-grid"><div class="objectives-table-row">
+                    <div class="objectives-table-cell"><input type="checkbox" [ngModel]="allImmutable()" (ngModelChange)="toggleAllImmutable()"/></div>
+                    <div class="objectives-table-cell">Admin Defined</div>
+                </div></div>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -25,9 +30,9 @@
                 <input class="form-control objectives-table-input" type="text" [(ngModel)]="objectiveRows[objID].desc"/>
             </th>
             <th>
-                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
-                    <option [value]="'abstract'">parent objective</option>
-                    <option [value]="'primitive'">base objective</option>
+                <select class="form-control objectives-table-dropdown" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
+                    <option [value]="'primitive'">base</option>
+                    <option [value]="'abstract'">parent</option>
                 </select>
             </th>
             <th>
@@ -38,7 +43,7 @@
             </th> 
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
-                <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                <div *ngIf="objectiveRows[objID].type === 'primitive'" class="objectives-table-dropdown">
                     <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].initializeDefaultScoreFunction(); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
@@ -64,24 +69,26 @@
                 </div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive' 
                     && (objectiveRows[objID].dom.type === 'continuous' || objectiveRows[objID].dom.type === 'interval')">
-                    <div class="objectives-table-row">
-                        <div class="objectives-table-cell"><label class="control-label">min:</label></div>
-                        <div class="objectives-table-cell"><label class="control-label">max:</label></div>
-                        <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell"><label class="control-label">unit:</label></div>
-                        <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell"><label class="control-label">interval:</label></div>
-                    </div>
-                    <div class="objectives-table-row">
-                        <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                    <div class="objectives-table-grid">
+                        <div class="objectives-table-row">
+                            <div class="objectives-table-cell"><label class="control-label">min:</label></div>
+                            <div class="objectives-table-cell"><label class="control-label">max:</label></div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell"><label class="control-label">unit:</label></div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell"><label class="control-label">interval:</label></div>
                         </div>
-                        <div class="objectives-table-cell">
-                            <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
-                        </div>
-                        <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />  
-                        </div>
-                        <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
-                            <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                        <div class="objectives-table-row">
+                            <div class="objectives-table-cell">
+                                <input  class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = toNumber(a.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                            </div>
+                            <div class="objectives-table-cell">
+                                <input  class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = toNumber(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                            </div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
+                                <input  class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />  
+                            </div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
+                                <input  class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = toNumber(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                            </div>
                         </div>
                     </div>
                 </div>

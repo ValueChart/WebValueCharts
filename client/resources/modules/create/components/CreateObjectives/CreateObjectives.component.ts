@@ -138,7 +138,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), '', '', 0);
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), '', '', 0, 'abstract');
 			this.objectivesCount++;
 		}
 		else {
@@ -222,7 +222,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Creates a new, blank ObjectiveRow under an existing ObjectiveRow.
 	*/
 	addNewChildObjRow(parentID: string) {
-		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', parentID, this.objectiveRows[parentID].depth + 1));
+		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', parentID, this.objectiveRows[parentID].depth + 1, 'primitive', this.getNextColor()));
 		this.resetErrorMessages();
 	}
 
@@ -423,21 +423,24 @@ export class CreateObjectivesComponent implements OnInit {
 
 	/* 	
 		@returns {void}
-		@description 	Initializes color for objrow. Cycles through a list of defaults.
+		@description 	Sets color of objrow based on its type.
 	*/
 	setColor(objrow: ObjectiveRow) {
-		if (objrow.type === 'abstract') {
-			objrow.color = "";
+		objrow.color = objrow.type === 'abstract' ? '' : this.getNextColor();
+	}
+
+	/* 	
+		@returns {string}
+		@description 	Gets next available color for objrow. Cycles through a list of defaults.
+	*/
+	getNextColor(): string {
+		let assignedColors = this.objKeys().map(key => this.objectiveRows[key].color);
+		let availableColors = this.defaultColors.filter(color => assignedColors.indexOf(color) === -1);
+		while (availableColors.length === 0) { // colors will be recycled
+			this.defaultColors.forEach(color => assignedColors.splice(assignedColors.indexOf(color), 1)); // remove first instance of each color
+			availableColors = this.defaultColors.filter(color => assignedColors.indexOf(color) === -1);
 		}
-		else {
-			let assignedColors = this.objKeys().map(key => this.objectiveRows[key].color);
-			let availableColors = this.defaultColors.filter(color => assignedColors.indexOf(color) === -1);
-			while (availableColors.length === 0) { // colors will be recycled
-				this.defaultColors.forEach(color => assignedColors.splice(assignedColors.indexOf(color), 1)); // remove first instance of each color
-				availableColors = this.defaultColors.filter(color => assignedColors.indexOf(color) === -1);
-			}
-			objrow.color = availableColors[0];
-		}
+		return availableColors[0];
 	}
 
 	// ================================ Categorical Domain Methods ====================================
@@ -614,8 +617,8 @@ class ObjectiveRow {
 		this.desc = desc;
 		this.parent = parent;
 		this.depth = depth;
-		type ? this.type = type : this.type = 'abstract';
-		color ? this.color = color : this.color = "";
+		this.type = type;
+		color ? this.color = color : this.color = '';
 		dom ? this.dom = dom : this.dom = new DomainDetails('categorical');
 		defaultScoreFunction ? this.defaultScoreFunction = defaultScoreFunction : this.initializeDefaultScoreFunction();
 		this.children = [];

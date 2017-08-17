@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 12:29:28
+* @Last Modified by:   MalakronikMausi
+* @Last Modified time: 2017-08-16 17:48:23
 */
 
 /* Global Styles */
@@ -377,18 +377,28 @@ input {
 
 /* Creation workflow styles */
 
+
+.objectives-table-grid {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
 .objectives-table-row {
     display: table-row;
 }
 
 .objectives-table-cell {
     display: table-cell;
-    width: 60px;
     padding-right: 5px;
 }
 
 .objectives-table-input {
-    width: 200px !important;
+    min-width: 150px !important;
+}
+
+.objectives-table-dropdown {
+    min-width: 75px !important;
 }
 
 .tablerowselected {
@@ -396,7 +406,7 @@ input {
 }
 
 #add-category-input {
-    width: 200px !important; 
+    min-width: 100px !important;
     margin: 5px !important;
 }
 
