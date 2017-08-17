@@ -377,10 +377,9 @@ input {
 
 /* Creation workflow styles */
 
-
 .objectives-table-grid {
     display: table;
-    min-width: 150px;
+    min-width: 200px;
     max-width: 300px;
     table-layout: fixed;
 }
@@ -395,7 +394,7 @@ input {
 }
 
 .objectives-table-input {
-    min-width: 150px;
+    min-width: 100px;
     max-width: 200px;
 }
 
@@ -405,6 +404,10 @@ input {
 
 .tablerowselected {
     background-color: #D4E7F2;
+}
+
+#description-area {
+    resize: vertical;
 }
 
 #add-category-input {
