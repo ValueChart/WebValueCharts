@@ -282,16 +282,12 @@ export class UpdateValueChartService {
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
       		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
-	      		if ((obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') 
-	      			&& scoreFunction.type === 'discrete') {
-			        this.removeScoreFunctionElements(obj.getDefaultScoreFunction(), scoreFunction);
-			    }
 			    // Reset score functions in any of the following cases:
 			    //	(1) Domain type was changed from categorical/interval to continuous
 			    //	(1) Domain type was changed from  continuous to categorical/interval
 			    //	(3)	Domain type is continuous and max or min was changed
 				// It may be possible to do something more clever in the future that preserves parts of the previous score function
-			    else {
+			    if (obj.getDomainType() === 'continuous' || scoreFunction.type === 'continuous')  {
 			    	if (!_.isEqual(scoreFunction.getAllElements(), obj.getDefaultScoreFunction().getAllElements())) {
 			    		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
 			    		resetScoreFunctions.push(obj.getName());
@@ -354,22 +350,6 @@ export class UpdateValueChartService {
 	}
 
 	/*
-		@returns {void}
-		@description 	Removes non-existent domain elements from discrete score functions.
-	*/
-	removeScoreFunctionElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction) {
-		let elements = defaultScoreFunction.getAllElements();
-		var elementIterator: Iterator<number | string> = scoreFunction.getElementScoreMap().keys();
-		var iteratorElement: IteratorResult<number | string> = elementIterator.next();
-		while (iteratorElement.done === false) {
-			if (elements.indexOf(<string>iteratorElement.value) === -1) {
-            	scoreFunction.removeElement(<string>iteratorElement.value);
-          	}
-			iteratorElement = elementIterator.next();
-		}
-	}
-
-	/*
 		@returns {booleain}
 		@description 	Checks if the best/worst elements of oldScoreFunction are the same as those of the current score function.
 						Returns true iff they have changed.
@@ -417,10 +397,9 @@ export class UpdateValueChartService {
      		else {
      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
      			// Make sure score functions are complete
-		        if (this.addMissingElements(obj.getDefaultScoreFunction(), scoreFunction)) {
+		        if (this.updateScoreFunctionElements(obj.getDefaultScoreFunction(), scoreFunction)) {
 		        	completed.push(obj.getName());
 		        }
-		        this.reorderElements(obj.getDefaultScoreFunction(), scoreFunction);
      		}
      	}
      	if (completed.length > 0) {
@@ -430,33 +409,26 @@ export class UpdateValueChartService {
         return warnings;
 	}
 
-    /*
+	/*
 		@returns {boolean}
-		@description 	Inserts missing elements into score functions.
+		@description 	Updates the score function elements to be identical to the default score function elements (including order).
 						Returns true iff new elements were inserted.
 	*/
-	addMissingElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction): boolean {
+	updateScoreFunctionElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction) {
 		let completed = false;
-		let elements = defaultScoreFunction.getAllElements();
-        for (let elt of elements) {
-			if (scoreFunction.getScore(elt) === undefined) {
-				scoreFunction.setElementScore(elt, defaultScoreFunction.getScore(elt));
-				completed = true;
-			}
-        }
-        return completed;
-	}
-
-	/*
-		@description 	Sorts the score function elements to be in the same order as the default score function elements.
-	*/
-	reorderElements(defaultScoreFunction: ScoreFunction, scoreFunction: ScoreFunction) {
 		let elementScoreMap = new Map<number | string, number>();
 		let elements = defaultScoreFunction.getAllElements();
         for (let elt of elements) {
-			elementScoreMap.set(elt, scoreFunction.getScore(elt));
+        	if (scoreFunction.getScore(elt) === undefined) {
+				elementScoreMap.set(elt, defaultScoreFunction.getScore(elt));
+				completed = true;
+			}
+			else {
+				elementScoreMap.set(elt, scoreFunction.getScore(elt));
+			}	
         }
         scoreFunction.setElementScoreMap(elementScoreMap);
+        return completed;
 	}
 
 	/*

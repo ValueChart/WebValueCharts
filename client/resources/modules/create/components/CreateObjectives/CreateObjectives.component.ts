@@ -52,6 +52,7 @@ export class CreateObjectivesComponent implements OnInit {
 	// ========================================================================================
 
 	public ChartOrientation = ChartOrientation;
+	public Number = Number;
 	public ScoreFunction = ScoreFunction;
 	public services: any = {}; // Services container to pass to ScoreFunctionDirective
 
@@ -77,8 +78,7 @@ export class CreateObjectivesComponent implements OnInit {
 	colorMappings: { [color: string]: string } = {['red']: '#e41a1c', ['blue']: '#377eb8', ['green']: '#4daf4a', ['purple']: '#984ea3', ['orange']: '#ff7f00'};
 
     // Add Category modal fields:
-    categoryToAdd: string; // Category in input field of modal
-    categoriesToAdd: string[]; // Categories in modal list
+    categoryString: string = ''; // Comma-separated categories in modal textarea
 
     // Default Score Function modal fields:
     defaultScoreFunctionModalOpen = false;
@@ -131,8 +131,6 @@ export class CreateObjectivesComponent implements OnInit {
 		this.rootObjRowID = '0';
 		this.selectedObjRow = '0';
 		this.objectivesCount = 0;
-		this.categoryToAdd = '';
-		this.categoriesToAdd = [];
 		this.editing = false;
 		this.errorMessages = [];
 		this.valueChart = this.valueChartService.getValueChart();
@@ -444,78 +442,63 @@ export class CreateObjectivesComponent implements OnInit {
 
 	// ================================ Categorical Domain Methods ====================================
 
+
 	/* 	
 		@returns {void}
-		@description 	Moves category from modal input field to modal list.
+		@description 	Updates categoryString to contain the categories for the selected Objective Row.
 	*/
-	addCategory() {
-		this.categoriesToAdd.push(this.categoryToAdd);
-		this.categoryToAdd = '';
+	updateCategoryString() {
+		this.categoryString = this.objectiveRows[this.selectedObjRow].dom.categories.join(', ');
 	}
 
 	/* 	
 		@returns {void}
-		@description 	Moves categories from modal list to ObjectiveRow domain.
+		@description 	Updates the categories for the selected Objective Row based on the categoryString.
 	*/
-	addCategories() {
+	updateCategories() {
 		let editing = this.objectiveRows[this.selectedObjRow].dom.isValid();
-		for (let cat of this.categoriesToAdd) {
-			this.objectiveRows[this.selectedObjRow].dom.categories.push(cat);
-			if (editing){
-				(<DiscreteScoreFunction>this.objectiveRows[this.selectedObjRow].defaultScoreFunction).setElementScore(cat, 0.5);
-			}
-		}
-		if (!editing) {
+		let categories = this.categoryString.split(',').map(cat => cat.trim());
+		let uniqueCategories = categories.filter(function(elem, index, self) { return index === self.indexOf(elem); });
+		this.objectiveRows[this.selectedObjRow].dom.categories = uniqueCategories;
+
+		if (editing)
+			this.updateDefaultScoreFunction();
+		else
 			this.objectiveRows[this.selectedObjRow].resetDefaultScoreFunction();
-		}
-		this.categoriesToAdd = [];
+
 		this.resetErrorMessages();
 	}
 
-	/* 	
+	/*
 		@returns {void}
-		@description 	Calls addCategory() when Enter is pressed.
-						This makes it easier for the user to add many categories to modal list in sequence.
+		@description 	Updates the default score function elements to reflect the domain elements for the selected Objective Row.
 	*/
-	handleKeyPress(key: string) {
-		if (key === 'Enter') {
-			this.addCategory();
-		}
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Removes selected categories from modal list.
-	*/
-	removeSelectedCategoriesModal() {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlistmodal')[0]);
-		for (let cat of selected) {
-			this.categoriesToAdd.splice(this.categoriesToAdd.indexOf(cat), 1);
-		}
+	updateDefaultScoreFunction() {
+		let elementScoreMap = new Map<number | string, number>();
+		let elements = this.objectiveRows[this.selectedObjRow].dom.categories;
+		let defaultScoreFunction = this.objectiveRows[this.selectedObjRow].defaultScoreFunction;
+        for (let elt of elements) {
+        	if (defaultScoreFunction.getScore(elt) === undefined) {
+				elementScoreMap.set(elt, 0.5);
+			}
+			else {
+				elementScoreMap.set(elt, defaultScoreFunction.getScore(elt));
+			}	
+        }
+        defaultScoreFunction.setElementScoreMap(elementScoreMap);
 	}
 
 	/* 	
 		@returns {void}
 		@description 	Removes selected categories in main view from ObjectiveRow domain.
 	*/
-	removeSelectedCategoriesMain(objID: string) {
+	removeSelectedCategories(objID: string) {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlist' + objID)[0]);
 		for (let cat of selected) {
 			this.objectiveRows[objID].dom.removeCategory(cat);
 			this.objectiveRows[objID].defaultScoreFunction.removeElement(cat);
 		}
 		this.resetErrorMessages();
-	}
-
-	/* 	
-		@returns {string[]}
-		@description 	Gets domain categories for an ObjectiveRow.
-	*/
-	getCategories(objrow: ObjectiveRow): string[] {
-		if (objrow === undefined) {
-			return [];
-		}
-		return objrow.dom.categories;
 	}
 
 	/* 	
@@ -534,14 +517,6 @@ export class CreateObjectivesComponent implements OnInit {
 			}
 		}
 		return result;
-	}
-
-	/* 	
-		@returns {number}
-		@description 	Converts a string to a Number. This was needed because TypeScript failed to do so implicitly.
-	*/
-	toNumber(str: string): number {
-		return Number(str);
 	}
 
 	// ================================ Validation Methods ====================================

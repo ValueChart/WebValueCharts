@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-17 12:51:03
+* @Last Modified by:   MalakronikMausi
+* @Last Modified time: 2017-08-17 15:52:43
 */
 
 /* Global Styles */
@@ -416,6 +416,11 @@ input {
 
 #description-area {
     resize: vertical;
+}
+
+#category-area {
+    width: 100%;
+    resize: none;
 }
 
 #add-category-input {
