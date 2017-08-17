@@ -249,7 +249,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	protected renderDiscretePlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
-			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), u.rendererConfig.labelOffset);
+			return Math.max(u.heightScale(d.scoreFunction.getScore('' + d.element)), 2);
 		};
 
 		this.utilityBars
@@ -268,7 +268,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barTops
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.labelOffset)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - u.rendererConfig.labelOffset;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2);
 			});
 
 	}
@@ -277,8 +277,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		super.applyStyles(u);
 
 		this.utilityBars.style('stroke', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); })
+		this.utilityBars.style('fill', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); });
 		this.barLabels.style('font-size', 8);
-		this.barTops.style('fill', (d: DomainElement) => { return ((u.individual) ? u.objective.getColor() : d.color); });
 	}
 
 	/*
