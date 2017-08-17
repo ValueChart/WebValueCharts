@@ -144,8 +144,6 @@ export class CreateObjectivesComponent implements OnInit {
 		else {
 			this.editing = true;
 			let rootObjective: Objective = this.valueChart.getRootObjectives()[0];
-			rootObjective.setName(this.valueChart.getName());
-			rootObjective.setDescription(this.valueChart.getDescription());
 			this.objectiveToObjRow(rootObjective, '', 0);
 
 			// Store record of each ObjectiveRow of type "primitive"

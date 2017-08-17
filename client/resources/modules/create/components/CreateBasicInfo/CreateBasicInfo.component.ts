@@ -94,6 +94,12 @@ export class CreateBasicInfoComponent implements OnInit {
 		@description 	Checks validity of basic info of the chart.
 	*/
 	validate(): boolean {
+		// Update name and description of root Objective
+		if (this.valueChart.getAllObjectives().length > 0) {
+			let rootObjective: Objective = this.valueChart.getRootObjectives()[0];
+			rootObjective.setName(this.valueChart.getName());
+			rootObjective.setDescription(this.valueChart.getDescription());
+		}
 		this.validationTriggered = true;
 		this.setErrorMessages();
 		return this.errorMessages.length === 0;
