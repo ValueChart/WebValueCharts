@@ -20,16 +20,21 @@ import { ValueChartViewerComponent } 							from '../components/ValueChartViewer
 import { ValueChartService } 									from './ValueChart.service';
 import { CurrentUserService } 									from './CurrentUser.service';
 
+// Import Model Classes:
+import { User }													from '../../../model/User'
+
 // Import Types
 import { UserRole }												from '../../../types/UserRole';
+import { CreatePurpose }										from '../../../types/CreatePurpose'
 
 /*
-	ViewerGuardService is an Angular service that is used to control navigation away from and to the '/ValueCharts/:ValueChart/:ChartType' route.
+	UserGuardService is an Angular service that is used to control navigation away from and to the '/ValueCharts/:ValueChart/:ChartType' route.
 */
 
 @Injectable()
-export class ViewerGuardService implements CanDeactivate<ValueChartViewerComponent> {
+export class UserGuardService implements CanDeactivate<any> {
 
+	private userRecord: User;
 	private destination: string;
 
 	// ========================================================================================
@@ -54,6 +59,14 @@ export class ViewerGuardService implements CanDeactivate<ValueChartViewerCompone
 	// 									Methods
 	// ========================================================================================
 
+	getUserRecord(): User {
+		return this.userRecord;
+	}
+
+	setUserRecord(user: User): void {
+		this.userRecord = user;
+	} 
+
 	/*
 		@returns {boolean} - Whether navigation away from the deactivated route (always '/ValueCharts/:ValueChart/:ChartType') will be permitted or not.
 		@description 	Used by the Angular router to determine whether the current user will be permitted to navigate away from the ValueChart Viewer
@@ -61,16 +74,30 @@ export class ViewerGuardService implements CanDeactivate<ValueChartViewerCompone
 						This method should NEVER be called manually. Leave routing, and calling of the canDeactivate, etc. classes
 						to the Angular 2 router.
 	*/
-	canDeactivate(component: ValueChartViewerComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+	canDeactivate(component: any, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
 		let currentUser = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 		let role: UserRole = parseInt(route.queryParams['role']);
+		let createPurpose: CreatePurpose = parseInt(route.params['purpose']);
 
 		// The user is always allowed to navigate away when they are not a member of the ValueChart, if they are only viewing the ValueChart, or if they are returning to the viewer or the create workflow.
-		if (!currentUser || role === UserRole.Viewer || role === UserRole.Owner || !this.destination || this.destination.indexOf('ValueCharts/') !== -1 || this.destination.indexOf('create/') !== -1) {
+		if (!currentUser || 
+			role === UserRole.Viewer || 
+			role === UserRole.Owner || 
+			!this.destination || 
+			this.destination.indexOf('ValueCharts/') !== -1 || 
+			this.destination.indexOf('create/') !== -1 ||
+			createPurpose === CreatePurpose.EditValueChart || createPurpose === CreatePurpose.NewValueChart) {
 			return true;
-		} else if (!_.isEqual(currentUser, component.userRecord)) {	
-			return window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');
+		} else if (!_.isEqual(currentUser, this.userRecord)) {	
+			let navigate = window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');
+			
+			if (navigate) {
+				this.userRecord = null;
+			}
+
+			return navigate;
 		} else {
+			this.userRecord = null;
 			return true;
 		}
 	}

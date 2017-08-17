@@ -15,6 +15,7 @@ import { UserNotificationService }                  from '../../../app/services/
 import { ChartUndoRedoService }                     from '../../../ValueChart/services/ChartUndoRedo.service';
 import { ScoreFunctionDirective }										from '../../../utilities/directives/ScoreFunction.directive';
 import { RendererScoreFunctionUtility }							from '../../../ValueChart/utilities/RendererScoreFunction.utility';
+import { UserGuardService }                         from '../../../app/services/UserGuard.service';
 
 // Import Model Classes:
 import { ValueChart } 													    from '../../../../model/ValueChart';
@@ -84,7 +85,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
     private validationService: ValidationService,
-    private userNotificationService: UserNotificationService) { }
+    private userNotificationService: UserNotificationService,
+    private userGuardService: UserGuardService) { }
 
   // ========================================================================================
   //                   Methods
@@ -118,6 +120,11 @@ export class CreateScoreFunctionsComponent implements OnInit {
       newUser = true;
     }
     this.user = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
+
+    // Record the current user object if no record exists yet.
+    if (!this.userGuardService.getUserRecord()) {
+      this.userGuardService.setUserRecord(_.cloneDeep(this.user))
+    }
 
     // Initialize latest defaults and best/worst outcomes
     this.initialBestOutcomes = {};

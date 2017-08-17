@@ -74,7 +74,7 @@ export class CreateValueChartComponent implements OnInit {
 		private userNotificationService: UserNotificationService) { }
 
 	// ========================================================================================
-	// 									Methods
+	// 									definMethods
 	// ========================================================================================
 
 	// ================================ Life-cycle Methods ====================================
@@ -94,9 +94,7 @@ export class CreateValueChartComponent implements OnInit {
 
 			if (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart) {
 				this.creationStepsService.setAutoSaveEnabled(true);
-			}
-			
-			else if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
+			} else if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
 				this.creationStepsService.setAutoSaveEnabled(true);
 				this.valueChartHttpService.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
 					this.lockedByCreator = !status.userChangesPermitted; 

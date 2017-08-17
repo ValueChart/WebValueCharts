@@ -17,6 +17,8 @@ import { CreateScoreFunctionsComponent }		from './components/CreateScoreFunction
 import { CreateWeightsComponent }				from './components/CreateWeights/CreateWeights.component';
 
 import { AuthGuardService }						from '../app/services/AuthGuard.service';
+import { UserGuardService }						from '../app/services/UserGuard.service';
+
 import { CreationGuardService }					from './services/CreationGuard.service';
 
 /*
@@ -37,8 +39,8 @@ const creationRoutes: Routes = [
 			{ path: 'BasicInfo', component: CreateBasicInfoComponent, canActivate: [CreationGuardService] },
 			{ path: 'Objectives', component: CreateObjectivesComponent, canActivate: [CreationGuardService] },
 			{ path: 'Alternatives', component: CreateAlternativesComponent, canActivate: [CreationGuardService] },
-			{ path: 'ScoreFunctions', component: CreateScoreFunctionsComponent, canActivate: [CreationGuardService] },
-			{ path: 'Weights', component: CreateWeightsComponent, canActivate: [CreationGuardService] }
+			{ path: 'ScoreFunctions', component: CreateScoreFunctionsComponent, canActivate: [CreationGuardService], canDeactivate: [UserGuardService] },
+			{ path: 'Weights', component: CreateWeightsComponent, canActivate: [CreationGuardService], canDeactivate: [UserGuardService] }
 		]
 	}
 ];

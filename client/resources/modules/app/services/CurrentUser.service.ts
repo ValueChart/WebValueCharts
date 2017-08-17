@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-15 18:28:22
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-06 09:52:46
+* @Last Modified time: 2017-08-16 17:18:45
 */
 
 // Import Angular Classes:
@@ -26,7 +26,6 @@ export class CurrentUserService {
 
 	private username: string; 				// The username of the current user.
 	private loggedIn: boolean;				// Whether or not the current user is logged in.
-
 
 	// ========================================================================================
 	// 									Constructor
@@ -59,4 +58,5 @@ export class CurrentUserService {
 	isLoggedIn(): boolean {
 		return this.loggedIn;
 	}
+
 }

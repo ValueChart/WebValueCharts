@@ -31,6 +31,7 @@ export class ValueChartService {
 	private valueChart: ValueChart;
 	private status: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };
 
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -61,6 +62,7 @@ export class ValueChartService {
 	valueChartIsDefined(): boolean {
 		return !_.isNil(this.valueChart);
 	}
+
 
 	getStatus(): ValueChartStatus {
 		return this.status;

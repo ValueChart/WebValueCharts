@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-06-03 10:00:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 12:27:10
+* @Last Modified time: 2017-08-16 17:18:14
 */
 
 // Import Angular Classes:
@@ -28,6 +28,7 @@ import { ValueChartHttpService }												from '../../services/ValueChartHttp.
 import { ValidationService }													from '../../services/Validation.service';
 import { UpdateValueChartService }												from '../../services/UpdateValueChart.service';
 import { UserNotificationService }												from '../../services/UserNotification.service'; 
+import { UserGuardService }													from '../../services/UserGuard.service';
 import { ChartUndoRedoService }													from '../../../ValueChart/services/ChartUndoRedo.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
@@ -69,7 +70,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	public ChartType = ChartType;
 	public UserRole = UserRole;
-	public userRecord: User;
 
 	public routeSubscription: Subscription;
 
@@ -109,7 +109,8 @@ export class ValueChartViewerComponent implements OnInit {
 		private hostService: HostService,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService,
-		private updateValueChartService: UpdateValueChartService) { }
+		private updateValueChartService: UpdateValueChartService,
+		private userGuardService: UserGuardService) { }
 
 	// ========================================================================================
 	// 									Methods
@@ -172,7 +173,11 @@ export class ValueChartViewerComponent implements OnInit {
 	initializeViewer(type: ChartType): void {
 		let valueChart = this.valueChartService.getValueChart();
 		let currentUser = valueChart.getUser(this.currentUserService.getUsername());
-		this.userRecord = _.cloneDeep(currentUser);
+		
+		// Save the initial user object for change detection.
+		if (!this.userGuardService.getUserRecord()) {
+			this.userGuardService.setUserRecord(_.cloneDeep(currentUser));
+		}
 
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
 		this.valueChartViewerService.initializeUsers(valueChart.getUsers(), invalidUsers);
@@ -353,7 +358,7 @@ export class ValueChartViewerComponent implements OnInit {
 		if (userRole == UserRole.Owner || userRole == UserRole.OwnerAndParticipant) {
 			// Update the ValueChart.
 			this.valueChartHttpService.updateValueChartStructure(this.valueChartService.getValueChart()).subscribe(
-				(result: ValueChart) => { this.userNotificationService.displaySuccesses(['Save successful']); },
+				(result: ValueChart) => {  },
 				(error: any) => {
 					// Handle any errors here.
 					this.userNotificationService.displayWarnings(['Saving Failed.']);
@@ -385,7 +390,8 @@ export class ValueChartViewerComponent implements OnInit {
 				// User added/updated!
 				(user: User) => {
 					this.userNotificationService.displaySuccesses(['Save successful']);
-					this.userRecord = _.cloneDeep(user);
+					// Save the updated user object for change detection.
+					this.userGuardService.setUserRecord(_.cloneDeep(currentUser));
 
 					if (this.valueChartViewerService.getUserRole() === UserRole.UnsavedParticipant) {
 						let newRole = (this.valueChartViewerService.userIsCreator(this.currentUserService.getUsername())) ? UserRole.OwnerAndParticipant : UserRole.Participant;

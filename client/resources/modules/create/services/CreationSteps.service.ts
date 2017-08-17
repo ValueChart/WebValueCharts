@@ -202,9 +202,7 @@ export class CreationStepsService {
 		@description 	Navigates to ValueChartViewer.
 	*/
 	navigateToViewer() {
-		this.valueChartService.setValueChart(this.valueChartService.getValueChart());
 		window.onpopstate = () => { };
-		(<any>window).destination = '/view/ValueChart';
 		let chartType = this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) ? ChartType.Individual : ChartType.Group;
 		if (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.valueChartService.getValueChart().getCreator() === this.currentUserService.getUsername()) {
 			this.router.navigate(['ValueCharts', this.valueChartService.getValueChart().getFName(), chartType], { queryParams: { password: this.valueChartService.getValueChart().password, role: UserRole.OwnerAndParticipant } });		
