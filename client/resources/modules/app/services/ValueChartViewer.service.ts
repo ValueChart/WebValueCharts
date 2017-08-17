@@ -226,7 +226,8 @@ export class ValueChartViewerService {
 
 		this.initUserColors(this.valueChartService.getValueChart());
 
-		this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
+		if (this.userRole !== UserRole.UnsavedParticipant)
+			this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
 	}
 
 	userChanged = (updatedUser: User): void => {
@@ -241,7 +242,8 @@ export class ValueChartViewerService {
 			this.addUserToDisplay(updatedUser);
 		}
 
-		this.userNotificationService.displayInfo([updatedUser.getUsername() + ' has updated their preferences']);
+		if (this.userRole !== UserRole.UnsavedParticipant)
+			this.userNotificationService.displayInfo([updatedUser.getUsername() + ' has updated their preferences']);
 	}
 
 	userRemoved = (userToDelete: string): void => {
@@ -254,8 +256,8 @@ export class ValueChartViewerService {
 			this.setUserRole(newRole);
 		}
 
-		// Delete the user from the ValueChart
-		this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
+		if (this.userRole !== UserRole.UnsavedParticipant)
+			this.userNotificationService.displayInfo([userToDelete + ' has left the ValueChart']);
 	}
 
 	structureChanged = (valueChart: ValueChart): void => {
