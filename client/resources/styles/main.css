@@ -380,7 +380,8 @@ input {
 
 .objectives-table-grid {
     display: table;
-    width: 100%;
+    min-width: 150px;
+    max-width: 300px;
     table-layout: fixed;
 }
 
@@ -394,11 +395,12 @@ input {
 }
 
 .objectives-table-input {
-    min-width: 150px !important;
+    min-width: 150px;
+    max-width: 200px;
 }
 
 .objectives-table-dropdown {
-    min-width: 75px !important;
+    min-width: 75px;
 }
 
 .tablerowselected {

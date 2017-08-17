@@ -102,7 +102,7 @@
             <th *ngIf="!valueChart.isIndividual()">
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <div><input [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" type="checkbox"/></div>
+                    <div><input [disabled]="disableEditDefaultScoreFunction(objID)" [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" (ngModelChange)="resetErrorMessages()" type="checkbox"/></div>
                 </div>
             </th>       
         </tr>                  
