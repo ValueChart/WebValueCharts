@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 16:34:28
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 15:29:51
+* @Last Modified time: 2017-08-16 16:58:49
 */
 
 // Import Model Classes:
@@ -18,8 +18,8 @@ import { ContinuousScoreFunction } 		from './ContinuousScoreFunction';
 import { Memento }				from './Memento';
 
 // Import Utilities:
-import *	as Formatter		from '../modules/utilities/classes/Formatter';
-
+import * as Formatter		from '../modules/utilities/classes/Formatter';
+import * as _ 				from 'lodash';
 
 /*
 	A PrimitiveObjective is a criteria used to evaluate Alternatives in a decision that cannot, or should not, be broken down 
@@ -62,7 +62,7 @@ export class PrimitiveObjective implements Objective {
 		this.name = name;
 		this.description = description;
 		this.objectiveType = 'primitive';
-		this.id = Formatter.nameToID(this.name);
+		this.id = _.uniqueId(Formatter.nameToID(this.name) + '_');
 	}
 
 	// ========================================================================================
@@ -80,7 +80,6 @@ export class PrimitiveObjective implements Objective {
 
 	setName(name: string): void {
 		this.name = name;
-		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

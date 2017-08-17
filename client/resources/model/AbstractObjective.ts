@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-24 17:33:12
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 15:29:01
+* @Last Modified time: 2017-08-16 16:58:50
 */
 
 import { Objective } 			from './Objective';
@@ -10,9 +10,9 @@ import { PrimitiveObjective }	from './PrimitiveObjective';
 import { Domain } 				from './Domain';
 
 import { Memento }				from './Memento';
-import *	as Formatter		from '../modules/utilities/classes/Formatter';
+import * as Formatter			from '../modules/utilities/classes/Formatter';
 
-
+import * as _ 					from 'lodash'
 
 /*
 	A abstract objective is a criteria used to evaluate alternatives in a decision that can be broken down into further criteria.
@@ -51,7 +51,7 @@ export class AbstractObjective implements Objective {
 		this.description = description;
 		this.objectiveType = 'abstract';
 		this.subObjectives = [];
-		this.id = Formatter.nameToID(this.name);
+		this.id = _.uniqueId(Formatter.nameToID(this.name) + '_');
 	}
 
 
@@ -69,7 +69,6 @@ export class AbstractObjective implements Objective {
 
 	setName(name: string): void {
 		this.name = name;
-		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

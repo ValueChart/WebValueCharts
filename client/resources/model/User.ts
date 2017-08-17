@@ -2,12 +2,14 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-10 11:39:54
+* @Last Modified time: 2017-08-16 16:59:51
 */
 
 import { WeightMap } 			from './WeightMap';
 import { ScoreFunctionMap }		from './ScoreFunctionMap';
+import * as Formatter			from '../modules/utilities/classes/Formatter';
 
+import * as _ 					from 'lodash'
 /*
 	This class is used to represent a single user's decision preferences for a ValueChart. It uses a instance of the WeighMap class to store 
 	a user's weight assignments to objectives, and it uses an instance of the ScoreFunctionMap class to store users ScoreFunctions for objectives.
@@ -21,6 +23,7 @@ export class User {
 	// 									Fields
 	// ========================================================================================
 
+	private id: string;
 	private username: string;						// These username of the user who created the preferences.
 	public color: string = "#000000";				// The color assigned to the user's preferences in a ValueChart.
 
@@ -44,11 +47,17 @@ export class User {
 		} else {
 			this.username = "";
 		}
+
+		this.id = _.uniqueId(Formatter.nameToID(this.username) + '_');
 	}
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+
+	getId(): string {
+		return this.id;
+	}
 
 	getUsername(): string {
 		return this.username;

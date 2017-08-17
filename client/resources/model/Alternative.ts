@@ -2,12 +2,12 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 16:41:41
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2016-09-22 20:35:14
+* @Last Modified time: 2017-08-16 16:58:49
 */
 
 // Import Utility Classes:
-import *	as Formatter																	from '../modules/utilities/classes/Formatter';
-
+import * as Formatter			from '../modules/utilities/classes/Formatter';
+import * as _					from 'lodash';
 
 /*
 	This class is the data representation of a decision option in a ValueChart. It uses an internal map object to associate 
@@ -43,7 +43,7 @@ export class Alternative {
 		this.name = name;
 		this.description = description;
 		this.objectiveValues = new Map<string, string | number>();
-		this.id = Formatter.nameToID(this.name);
+		this.id = _.uniqueId(Formatter.nameToID(this.name) + '_');
 	}
 
 	// ========================================================================================
@@ -60,7 +60,6 @@ export class Alternative {
 
 	setName(name: string): void {
 		this.name = name;
-		this.id = Formatter.nameToID(this.name);
 	}
 
 	getDescription(): string {

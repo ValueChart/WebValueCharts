@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-31 15:56:29
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-16 14:45:29
+* @Last Modified time: 2017-08-16 17:09:17
 */
 // Import Node Libraries:
 import { expect }												from 'chai';
@@ -281,53 +281,6 @@ describe('XmlLegacyValueChartParser', () => {
 
 		});
 	});
-
-
-	describe('parseValueChart(xmlString: string)', () => {
-		var objectives: PrimitiveObjective[];
-		var alternativeElements: Element[];
-		var objectiveElements: Element;
-		var objectiveColors: any;
-
-		before(function() {
-			var tempValueChart: ValueChart = new ValueChart('', '', '');
-			tempValueChart.setRootObjectives(valueChartParser.parseObjectives((<any>xmlDocument.querySelector('Criteria')).children));
-			objectives = tempValueChart.getAllPrimitiveObjectives();
-			objectiveElements = (<any>xmlDocument.querySelector('Criteria')).children[0];
-
-			alternativeElements = (<any> xmlDocument.querySelector('Alternatives')).children;
-
-			objectiveColors = {
-				'area': 'rgb(1, 102, 94)',
-				'skytrain-distance': 'rgb(103, 169, 207)',
-				'size': 'rgb(103, 0, 13)',
-				'internet-access': 'rgb(227, 26, 28)',
-				'rate': 'rgb(254, 196, 79)'
-			};
-		})
-		
-		it('should parse the xml (in string form) to produce a complete ValueChart', () => {
-			var valueChart: ValueChart = valueChartParser.parseValueChart(xmlDocument);
-			var user: User = valueChartParser.parseUser(xmlDocument, objectives);
-			var alternatives: Alternative[] = valueChartParser.parseAlternatives(alternativeElements, objectives);
-			var rootObjectives: Objective[] = valueChartParser.parseObjectives([objectiveElements]);
-
-			expect(valueChart.getName()).to.equal('Hotel');
-			expect(valueChart.getAlternatives()).to.deep.equal(alternatives);
-			expect(valueChart.getUsers()[0]).to.deep.equal(user);
-			expect(valueChart.getRootObjectives()).to.have.length(1);
-			expect(valueChart.getRootObjectives()[0].getName()).to.equal('Hotel');
-
-			var primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
-
-			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-				expect(objective.getColor()).to.equal(objectiveColors[objective.getName()]);
-			});
-
-		});
-
-	});
-
 });
 
 
