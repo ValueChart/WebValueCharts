@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2017-08-16 17:48:23
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2017-08-17 12:26:08
 */
 
 /* Global Styles */
@@ -286,6 +286,10 @@ a.upload {
 }
 
 .objective-alternative-label {
+    font-size: 22px;
+}
+
+.objective-domain-label {
     font-size: 20px;
 }
 

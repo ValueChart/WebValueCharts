@@ -173,8 +173,6 @@ export class ObjectiveChartRenderer {
 		// This is true for any situation where we need to remove and then add new elements to an existing selection.
 		this.rowOutlines = rowOutlinesContainer.selectAll('.' + ObjectiveChartDefinitions.ROW_OUTLINE);	// Update the row outlines field.
 
-
-
 		var updateRowContainers = rowsContainer.selectAll('.' + ObjectiveChartDefinitions.ROW)
 			.data(u.rowData);
 
@@ -254,15 +252,16 @@ export class ObjectiveChartRenderer {
 
 		this.weightOutlines = this.cells.selectAll('.' + ObjectiveChartDefinitions.WEIGHT_OUTLINE);
 
+		this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL).remove();
 		var updateDomainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL)
 			.data((d: CellData) => { return [d]; });
 
-		// Update domain labels to conform to the data.
 		updateDomainLabels.exit().remove();
+		// Update domain labels to conform to the data.
 		updateDomainLabels.enter().append('text')
 			.classed(ObjectiveChartDefinitions.DOMAIN_LABEL, true);
 
-		this.domainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);		
+		this.domainLabels = this.cells.selectAll('.' + ObjectiveChartDefinitions.DOMAIN_LABEL);	
 	}
 
 
