@@ -41,18 +41,18 @@
 			</div>
 			<div *ngIf="canSave()">
 				<div class="form-group valuechart-toolbar-group pull-left">
-					<button class="btn btn-success" (click)="save()">
+					<button class="btn btn-success" (click)="save()" [disabled]="_.isEqual(userGuardService.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
 					Save
 					</button>
 				</div>
 			</div>	
 			<div class="form-group valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
+				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
 				Redo
 				</button>
 			</div>
 			<div class="form-group valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [class.disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
+				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
 				Undo
 				</button>
 			</div>

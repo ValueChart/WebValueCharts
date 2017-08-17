@@ -70,6 +70,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	public ChartType = ChartType;
 	public UserRole = UserRole;
+	public _ = _;
 
 	public routeSubscription: Subscription;
 
@@ -103,14 +104,14 @@ export class ValueChartViewerComponent implements OnInit {
 		public valueChartService: ValueChartService,
 		public valueChartViewerService: ValueChartViewerService,
 		public currentUserService: CurrentUserService,
+		public userGuardService: UserGuardService,
 		private router: Router,
 		private route: ActivatedRoute,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService,
-		private updateValueChartService: UpdateValueChartService,
-		private userGuardService: UserGuardService) { }
+		private updateValueChartService: UpdateValueChartService) { }
 
 	// ========================================================================================
 	// 									Methods

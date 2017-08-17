@@ -20,6 +20,7 @@ import { ValueChartHttpService }												from '../../services/ValueChartHttp.
 import { UserNotificationService }												from '../../services/UserNotification.service';
 import { HostService }															from '../../services/Host.service';
 import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
+import { CurrentUserService }													from '../../services/CurrentUser.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 
@@ -77,6 +78,7 @@ export class DetailBoxComponent implements OnInit {
 
 
 	constructor(
+		private currentUserService: CurrentUserService,
 		private userNotificationService: UserNotificationService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
