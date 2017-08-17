@@ -7,7 +7,7 @@ import * as _																from 'lodash';
 import '../../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ValueChartService }											from '../../../app/services/ValueChart.service';
+import { ValueChartService }												from '../../../app/services/ValueChart.service';
 import { CreationStepsService }												from '../../services/CreationSteps.service';
 import { CurrentUserService }												from '../../../app/services/CurrentUser.service';
 import { ValueChartHttpService }											from '../../../app/services/ValueChartHttp.service';
@@ -16,6 +16,7 @@ import { ValidationService }												from '../../../app/services/Validation.s
 // Import Model Classes:
 import { ValueChart, ChartType } 											from '../../../../model/ValueChart';
 import { User }																from '../../../../model/User';
+import { Objective }														from '../../../../model/Objective';
 
 /*
 	This component defines the UI controls for defining the basic info for a ValueChart (name, description, and password).
