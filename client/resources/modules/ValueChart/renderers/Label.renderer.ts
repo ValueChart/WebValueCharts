@@ -513,11 +513,8 @@ export class LabelRenderer {
 		var width: number
 		var height: number;
 		var weightOffset: number = 0;
-		var el: d3.Selection<any, any, any, any>;
 		var objective: PrimitiveObjective;
 		var objectiveWeight: number;
-		var dimensionOneTransform: number;
-		var dimensionTwoTransform: number;
 
 		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
 

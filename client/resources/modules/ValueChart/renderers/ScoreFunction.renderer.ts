@@ -44,6 +44,8 @@ export abstract class ScoreFunctionRenderer {
 	// 									Fields
 	// ========================================================================================
 
+	private minimumDimension: number = 50;
+
 	protected domainSize: number;							// The number of domain elements the score function needs to plot.
 	protected objective: PrimitiveObjective;				// The primitive objective this renderer is creating a plot for.
 	protected scoreFunctionData: ScoreFunctionData[];		// The data that this class is rendering.
@@ -63,6 +65,8 @@ export abstract class ScoreFunctionRenderer {
 	public domainAxis: d3.Selection<any, any, any, any>;
 	public unitsLabel: d3.Selection<any, any, any, any>;
 	public utilityAxisContainer: d3.Selection<any, any, any, any>;
+
+	public clickToExpandText: d3.Selection<any, any, any, any>;
 
 	public lastRendererUpdate: ScoreFunctionUpdate;
 	protected numUsers: number;
@@ -88,7 +92,9 @@ export abstract class ScoreFunctionRenderer {
 		AXES_CONTAINER: 'scorefunction-axes-container',
 		UTILITY_AXIS_CONTAINER: 'scorefunction-utility-axis',
 		DOMAIN_AXIS: 'scorefunction-domain-axis',
-		UNITS_LABEL: 'scorefunction-units-label'
+		UNITS_LABEL: 'scorefunction-units-label',
+		EXPAND_TEXT: 'scorefunction-expand-text'
+
 	};
 
 	// ========================================================================================
@@ -193,6 +199,13 @@ export abstract class ScoreFunctionRenderer {
 			.classed(ScoreFunctionRenderer.defs.PLOT_ELEMENTS_CONTAINER, true)
 			.classed('scorefunction-' + objectiveId + '-plot-elements-container', true);
 
+		this.clickToExpandText = this.rootContainer.append('text')
+			.classed(ScoreFunctionRenderer.defs.EXPAND_TEXT, true)
+			.attr('id', (d: DomainElement) => {
+				return 'scorefunction-' + u.objective.getId() + '-expand-text';
+			})
+			.text('Double Click to Expand');
+
 		this.createPlot(u, this.plotElementsContainer, this.domainLabelContainer);
 	}
 
@@ -284,7 +297,8 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	protected renderScoreFunction(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.domainSize = u.scoreFunctionData.length > 0 ? u.scoreFunctionData[0].elements.length : 0;
-
+		this.toggleDisplay(u);
+		
 		// Give the plot outline the correct dimensions.
 		this.plotOutline
 			.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize - 1)
@@ -294,6 +308,14 @@ export abstract class ScoreFunctionRenderer {
 
 		if (updateDimensionOne)
 			this.renderAxesDimensionOne(u);
+
+		if (u.viewOrientation == ChartOrientation.Vertical) {
+			this.clickToExpandText.attr(u.rendererConfig.coordinateOne, 0)
+			this.clickToExpandText.attr(u.rendererConfig.coordinateTwo, u.rendererConfig.dimensionTwoSize / 2);
+		} else {
+			this.clickToExpandText.attr(u.rendererConfig.coordinateOne, u.rendererConfig.dimensionOneSize / 2)
+			this.clickToExpandText.attr(u.rendererConfig.coordinateTwo, 0);
+		}
 
 		this.renderPlot(u, updateDimensionOne);
 	}
@@ -396,10 +418,18 @@ export abstract class ScoreFunctionRenderer {
 	*/
 	protected abstract renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void; 
 
-
-
 	protected abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
 
+
+	protected toggleDisplay(u: ScoreFunctionUpdate): void {
+		if (u.rendererConfig.dimensionOneSize < this.minimumDimension || u.rendererConfig.dimensionTwoSize < this.minimumDimension) {
+			this.plotContainer.style('display', 'none');
+			this.clickToExpandText.style('display', 'block');
+		} else {
+			this.plotContainer.style('display', 'block');
+			this.clickToExpandText.style('display', 'none');
+		}
+	}
 
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		this.domainAxis

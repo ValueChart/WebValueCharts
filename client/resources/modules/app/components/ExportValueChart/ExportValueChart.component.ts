@@ -42,7 +42,7 @@ export class ExportValueChartComponent implements OnInit {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChartXmlEncoder: XmlValueChartEncoder;
+	private xmlValueChartEncoder: XmlValueChartEncoder;
 	private valueChartStringURL: string;
 
 	private downloadLink: HTMLElement;
@@ -69,7 +69,7 @@ export class ExportValueChartComponent implements OnInit {
 						method rather than in the constructor.
 	*/
 	ngOnInit() {
-		this.valueChartXmlEncoder = new XmlValueChartEncoder();
+		this.xmlValueChartEncoder = new XmlValueChartEncoder();
 		this.downloadLink = <HTMLElement> document.querySelector('#download-value-chart');
 	}
 
@@ -95,7 +95,7 @@ export class ExportValueChartComponent implements OnInit {
 			return;
 
 		// Obtain a XML string for the user defined weights in the given ValueChart. 
-		var valueChartString: string = this.valueChartXmlEncoder.encodeValueChart(valueChart);
+		var valueChartString: string = this.xmlValueChartEncoder.encodeValueChart(valueChart);
 		// Convert the string into a blob. We must do this before we can create a download URL for the XML string.
 		var valueChartBlob: Blob = new Blob([valueChartString], { type: 'text/xml' });
 

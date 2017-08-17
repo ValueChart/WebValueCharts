@@ -28,7 +28,7 @@ import { DiscreteScoreFunction } 								from '../../../../client/resources/mode
 // Import Test Data: 
 import { HotelChartData }										from '../../../testData/HotelChartData';
 
-describe('ValueChartXMlEncoder', () => {
+describe('XmlValueCHartEncoder', () => {
 
 	var valueChartParser: XmlValueChartParser;
 	var xmlDocParser: DOMParser;
@@ -37,7 +37,7 @@ describe('ValueChartXMlEncoder', () => {
 	var xmlDocument: Document;
 	var valueChart: ValueChart;
 
-	var valueChartXmlEncoder: XmlValueChartEncoder;
+	var xmlValueChartEncoder: XmlValueChartEncoder;
 
 	before(function() {
 		valueChartParser = new XmlValueChartParser();
@@ -47,7 +47,7 @@ describe('ValueChartXMlEncoder', () => {
 		xmlDocument = xmlDocParser.parseFromString(HotelChartData, 'application/xml');
 		valueChart = valueChartParser.parseValueChart(xmlDocument);
 
-		valueChartXmlEncoder = new XmlValueChartEncoder();
+		xmlValueChartEncoder = new XmlValueChartEncoder();
 	});
 
 	describe('convertScoreFunctionIntoElement(scoreFunction: ScoreFunction, objectiveName: string, xmlDocument: XMLDocument): Element', () => {
@@ -62,7 +62,7 @@ describe('ValueChartXMlEncoder', () => {
 			});	
 
 			it('should convert the ScoreFunction into XML that is identical to the source XML when serialized', () => {
-				var rateScoreFunctionElement: Element = valueChartXmlEncoder.convertScoreFunctionIntoElement(rateScoreFunction, 'rate', xmlDocument, false);
+				var rateScoreFunctionElement: Element = xmlValueChartEncoder.convertScoreFunctionIntoElement(rateScoreFunction, 'rate', xmlDocument, false);
 				expect(xmlSerializer.serializeToString(rateScoreFunctionElement)).to.equal(rateScoreFunctionXMLString);
 			});
 
@@ -79,7 +79,7 @@ describe('ValueChartXMlEncoder', () => {
 			});	
 
 			it('should convert the ScoreFunction into XML that is identical to the source XML when serialized', () => {
-				var rateScoreFunctionElement: Element = valueChartXmlEncoder.convertScoreFunctionIntoElement(internetAccessScoreFuction, 'internet-access', xmlDocument, false);
+				var rateScoreFunctionElement: Element = xmlValueChartEncoder.convertScoreFunctionIntoElement(internetAccessScoreFuction, 'internet-access', xmlDocument, false);
 				expect(xmlSerializer.serializeToString(rateScoreFunctionElement)).to.equal(internetAccessScoreFunctionXMLString);
 			});	
 		});
@@ -95,7 +95,7 @@ describe('ValueChartXMlEncoder', () => {
 		});
 
 		it('should convert the ScoreFunctionMap into XML that is identical to the source XML when serialized', () => {
-			var scoreFunctionMapElement: Element = valueChartXmlEncoder.convertScoreFunctionMapIntoElement(scoreFunctionMap, xmlDocument);
+			var scoreFunctionMapElement: Element = xmlValueChartEncoder.convertScoreFunctionMapIntoElement(scoreFunctionMap, xmlDocument);
 			expect(xmlSerializer.serializeToString(scoreFunctionMapElement)).to.equal(scoreFunctionMapXMLString);
 		});
 	});
@@ -110,7 +110,7 @@ describe('ValueChartXMlEncoder', () => {
 		});
 
 		it('should convert the WeightMap into XML that is identical to the source XML when serialized', () => {
-			var weightMapElement: Element = valueChartXmlEncoder.convertWeightMapIntoElement(weightMap, xmlDocument);
+			var weightMapElement: Element = xmlValueChartEncoder.convertWeightMapIntoElement(weightMap, xmlDocument);
 			expect(xmlSerializer.serializeToString(weightMapElement)).to.equal(weightMapXMLString);
 		});
 	});
@@ -125,7 +125,7 @@ describe('ValueChartXMlEncoder', () => {
 		});
 
 		it('should convert the User into XML that is identical to the source XML when serialized', () => {
-			var userElement: Element = valueChartXmlEncoder.convertUsersIntoElement([user], xmlDocument);
+			var userElement: Element = xmlValueChartEncoder.convertUsersIntoElement([user], xmlDocument);
 			expect(xmlSerializer.serializeToString(userElement)).to.equal(userXMLString);
 		});
 	});
@@ -140,7 +140,7 @@ describe('ValueChartXMlEncoder', () => {
 		});
 
 		it('should convert the Alternative into XML that is identical to the source XML when serialized', () => {
-			var alternativesElement: Element = valueChartXmlEncoder.convertAlternativesIntoElement(alternatives, xmlDocument);
+			var alternativesElement: Element = xmlValueChartEncoder.convertAlternativesIntoElement(alternatives, xmlDocument);
 			expect(xmlSerializer.serializeToString(alternativesElement)).to.equal(alternativesXMLString);
 		});
 	});
@@ -160,7 +160,7 @@ describe('ValueChartXMlEncoder', () => {
 			});
 
 			it('should convert the domain into XML that is identical to the source XML when serialized', () => {
-				var domainElement: Element = valueChartXmlEncoder.convertDomainIntoElement(rateDomain, xmlDocument);
+				var domainElement: Element = xmlValueChartEncoder.convertDomainIntoElement(rateDomain, xmlDocument);
 				expect(xmlSerializer.serializeToString(domainElement)).to.equal(rateDomainXMLString);
 			});
 		});
@@ -178,7 +178,7 @@ describe('ValueChartXMlEncoder', () => {
 			});
 
 			it('should convert the domain into XML that is identical to the source XML when serialized', () => {
-				var domainElement: Element = valueChartXmlEncoder.convertDomainIntoElement(areaDomain, xmlDocument);
+				var domainElement: Element = xmlValueChartEncoder.convertDomainIntoElement(areaDomain, xmlDocument);
 				expect(xmlSerializer.serializeToString(domainElement)).to.equal(areaDomainXMLString);
 			});
 		});
@@ -199,7 +199,7 @@ describe('ValueChartXMlEncoder', () => {
 			});
 
 			it('should convert the Objective into XML that is identical to the source XML when serialized', () => {
-				var areaObjectiveElement: Element = valueChartXmlEncoder.convertObjectiveIntoElement(areaObjective, xmlDocument, true);
+				var areaObjectiveElement: Element = xmlValueChartEncoder.convertObjectiveIntoElement(areaObjective, xmlDocument, true);
 				expect(xmlSerializer.serializeToString(areaObjectiveElement)).to.equal(areaObjectiveXMLString);
 			});
 		});
@@ -217,7 +217,7 @@ describe('ValueChartXMlEncoder', () => {
 			});
 
 			it('should convert the Objective into XML that is identical to the source XML when serialized', () => {
-				var locationObjectiveElement: Element = valueChartXmlEncoder.convertObjectiveIntoElement(locationObjective, xmlDocument, true);
+				var locationObjectiveElement: Element = xmlValueChartEncoder.convertObjectiveIntoElement(locationObjective, xmlDocument, true);
 				expect(xmlSerializer.serializeToString(locationObjectiveElement)).to.equal(locationObjectiveXMLString);
 			});
 		});
@@ -231,7 +231,7 @@ describe('ValueChartXMlEncoder', () => {
 		});
 
 		it('should convert the ValueChart into XML that is identical to the source XML when serialized', () => {
-			var valueChartElement: Element = valueChartXmlEncoder.convertValueChartIntoElement(valueChart, xmlDocument);
+			var valueChartElement: Element = xmlValueChartEncoder.convertValueChartIntoElement(valueChart, xmlDocument);
 			expect(xmlSerializer.serializeToString(valueChartElement)).to.equal(valueChartXMLString);
 		});
 	});

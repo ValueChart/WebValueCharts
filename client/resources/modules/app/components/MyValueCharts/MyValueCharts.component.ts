@@ -78,7 +78,7 @@ export class MyValueChartsComponent implements OnInit {
 	*/
 	constructor(
 		private router: Router,
-		private valueChartXmlEncoder: XmlValueChartEncoder,
+		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private currentUserService: CurrentUserService,
 		public valueChartService: ValueChartService,
 		private userHttpService: UserHttpService,
@@ -266,7 +266,7 @@ export class MyValueChartsComponent implements OnInit {
 			return;
 		
 		// Obtain a CSV string for the user defined weights in the given ValueChart. 
-		var weightString: string = this.valueChartXmlEncoder.encodeUserWeights(valueChart);
+		var weightString: string = this.xmlValueChartEncoder.encodeUserWeights(valueChart);
 		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
 		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
 
