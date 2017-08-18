@@ -166,7 +166,7 @@ export class UpdateValueChartService {
 	}
 
 	compareObjectives(a: Objective, b: Objective): boolean {
-		(<any>a)['id'] = b.getId();
+		(<any>b)['id'] = a.getId();
 
 		if (a.objectiveType === 'primitive' || b.objectiveType === 'primitive')
 			return _.isEqual(a, b);

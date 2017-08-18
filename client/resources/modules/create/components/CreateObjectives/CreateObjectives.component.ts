@@ -164,6 +164,7 @@ export class CreateObjectivesComponent implements OnInit {
 	ngOnDestroy() {
 		// Convert temporary structures to ValueChart structures
 		this.valueChart.setRootObjectives([this.objRowToObjective(this.objectiveRows[this.rootObjRowID])]);
+		console.log(this.valueChart.getRootObjectives());
 		if (this.editing) {
 			this.updateValueChartService.cleanUpAlternatives(this.valueChart);
 			for (let user of this.valueChart.getUsers()) {
