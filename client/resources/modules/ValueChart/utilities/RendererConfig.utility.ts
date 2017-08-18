@@ -33,6 +33,7 @@ export class RendererConfigUtility {
 
 
 	private offset: number = 10;
+	private userSize: number = 50;
 
 	// ========================================================================================
 	// 									Constructor
@@ -104,9 +105,15 @@ export class RendererConfigUtility {
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			u.x = u.width;
 			u.y = u.height + this.offset;
+
+			if (!u.viewConfig.scaleAlternatives) 
+				u.width = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
 		} else {
 			u.x = 0;
 			u.y = u.height;
+
+			if (!u.viewConfig.scaleAlternatives) 
+				u.height = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
 		}
 
 		return u;
@@ -132,15 +139,21 @@ export class RendererConfigUtility {
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			let maxHeight = u.height;
 			let height = u.height / u.maximumWeightMap.getWeightTotal(); 
-			u.x = u.width;
 			u.y = maxHeight - height; 
 			u.height = height;
+			u.x = u.width;
+
+			if (!u.viewConfig.scaleAlternatives) 
+				u.width = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
 		} else {
 			let maxWidth = u.width;
 			let width = u.width / u.maximumWeightMap.getWeightTotal(); 
 			u.x = u.width; 
-			u.y = u.height;
 			u.width = width;
+			u.y = u.height;
+
+			if (!u.viewConfig.scaleAlternatives) 
+				u.height = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
 		}
 
 		 return u;

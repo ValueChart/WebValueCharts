@@ -37,6 +37,7 @@ describe('RendererConfigUtility', () => {
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,

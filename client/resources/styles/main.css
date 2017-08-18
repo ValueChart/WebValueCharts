@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2017-08-17 15:52:43
+* @Last Modified by:   aaronpmishkin
+* @Last Modified time: 2017-08-18 12:37:57
 */
 
 /* Global Styles */
@@ -145,8 +145,6 @@ a.upload {
 
 .svg-content-valuechart {
     position: absolute;
-    height: 75%;
-    width: 95%;
     top: 14rem;
     left: 5%;
 }

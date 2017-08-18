@@ -85,6 +85,7 @@ export class ChangeDetectionService {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart.getUsers(), this.valueChartRecord.getUsers());
 		var chartTypeChanged: boolean = !_.isEqual(valueChart.getType(), this.chartTypeRecord);
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
+		var scaleAlternativesChanged: boolean = this.viewConfigRecord.scaleAlternatives !== viewConfig.scaleAlternatives;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
 
 		if (valueChartChanged)
@@ -92,7 +93,7 @@ export class ChangeDetectionService {
 
 		this.chartTypeRecord = _.clone(valueChart.getType());
 
-		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scoreFunctionDisplayChanged || renderRequired;
+		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scaleAlternativesChanged || scoreFunctionDisplayChanged || renderRequired;
 	}
 
 	detectStructuralChanges(valueChart: ValueChart, usersToDisplay: User[]): boolean {
@@ -115,13 +116,14 @@ export class ChangeDetectionService {
 		@description 	Compares the current width and height against saved records to determined if they have changed since the last comparison.
 						This method is separate from detectChanges because width/height changes must be handled differently form changes that simply require re-rendering.
 	*/
-	detectWidthHeightChanges(width: number, height: number): boolean {
+	detectWidthHeightChanges(width: number, height: number, viewConfig: ViewConfig): boolean {
 		var widthHeightChanges: boolean = this.widthRecord !== width || this.heightRecord !== height;
+		var scaleAlternativesChanged: boolean = this.viewConfigRecord.scaleAlternatives !== viewConfig.scaleAlternatives;
 
 		this.widthRecord = _.clone(width);
 		this.heightRecord = _.clone(height);
 
-		return widthHeightChanges;
+		return widthHeightChanges || scaleAlternativesChanged;
 	}
 
 	/*

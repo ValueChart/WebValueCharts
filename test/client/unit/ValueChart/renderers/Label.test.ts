@@ -146,6 +146,7 @@ var chartUndoRedoStub = {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,

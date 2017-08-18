@@ -50,6 +50,7 @@ describe('ChangeDetectionService', () => {
 		usersToDisplay = hotelChart.getUsers();
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,

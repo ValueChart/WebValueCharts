@@ -133,6 +133,7 @@ describe('ValueChartDirective', () => {
 	beforeEach(() => {
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -237,6 +238,7 @@ describe('ValueChartDirective', () => {
 			hotelChart = parser.parseValueChart(valueChartDocument);
 
 			viewConfig = {
+    scaleAlternatives: false,
 				viewOrientation: ChartOrientation.Vertical,
 				displayScoreFunctions: false,
 				displayTotalScores: false,
@@ -307,6 +309,7 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
@@ -358,6 +361,7 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
@@ -648,6 +652,7 @@ describe('ValueChartDirective', () => {
 
 			it('should re-render the valueChart in the new view orientation', () => {
 				viewerStub.viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: true,
 					displayTotalScores: false,

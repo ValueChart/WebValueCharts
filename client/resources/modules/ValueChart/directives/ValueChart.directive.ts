@@ -50,6 +50,7 @@ import { ScoreFunction }														from '../../../model/ScoreFunction';
 // Import Types:
 import { RowData, CellData, LabelData, RendererUpdate }							from '../../../types/RendererData.types';
 import { ViewConfig, InteractionConfig }										from '../../../types/Config.types';
+import { ChartOrientation }														from '../../../types/Config.types';
 
 @Directive({
 	selector: 'ValueChart',
@@ -186,6 +187,29 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.defaultChartComponentHeight = (this.height * this.CHART_COMPONENT_RATIO);
 	}
 
+	setViewportSize(): void {
+		this.el.attr('width', '95%');
+		this.el.attr('height', '75%');
+
+		let currentViewport = (<any> this.el.node()).getBoundingClientRect();
+
+		if (!this.viewConfig.scaleAlternatives) {
+			if (this.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+				let width = (<any> this.el.select('.label-root-container').node()).getBoundingClientRect().width + 10;
+				width += (<any> this.el.select('.alternative-box').node()).getBoundingClientRect().width * this.valueChart.getAlternatives().length;
+				
+				if (width > currentViewport.width)
+					this.el.attr('width', width);
+			} else {
+				let height = (<any> this.el.select('.label-root-container').node()).getBoundingClientRect().height + 10;
+				height += (<any> this.el.select('.alternative-box').node()).getBoundingClientRect().height * this.valueChart.getAlternatives().length;
+				
+				if (height > currentViewport.height)
+					this.el.attr('height', height);
+			}
+		}
+	}
+
 	/*
 		@returns {void}
 		@description	Creates the ValueChart for the first time. It creates the SVG element that will contain the ValueChart, and then uses 
@@ -198,6 +222,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			.classed('ValueChart svg-content-valuechart', true)
 			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
+			
+		this.el.attr('width', '95%');
+		this.el.attr('height', '75%');
 
 		this.chartElement.emit(this.el);
 
@@ -281,17 +308,20 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay, structuralUpdate: false });
 		}
 
+		if (this.changeDetectionService.detectWidthHeightChanges(this.width, this.height, this.viewConfig)) {
+			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
+			this.calculateDefaultComponentSize();
+			this.setViewportSize();
+
+			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });
+			this.interactionSubject.next(this.interactionConfig);
+		}
+
 		if (this.changeDetectionService.detectViewConfigChanges(this.viewConfig))
 			this.viewConfigSubject.next(this.viewConfig);
 
 		if (this.changeDetectionService.detectInteractionConfigChanges(this.interactionConfig))
 			this.interactionSubject.next(this.interactionConfig);
 
-		if (this.changeDetectionService.detectWidthHeightChanges(this.width, this.height)) {
-			this.el.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height);
-			this.calculateDefaultComponentSize();
-			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay });
-			this.interactionSubject.next(this.interactionConfig);
-		}
 	}
 }

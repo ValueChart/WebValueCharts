@@ -27,8 +27,14 @@
 							</ul>
 						</li>
 						<li>
+							<a href="javascript:void(0)" (click)="setScaleAlternatives(!config.scaleAlternatives)">
+								Scale Alternatives
+								<span *ngIf="config.scaleAlternatives" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
 							<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!config.displayScoreFunctions)">
-								Utility Graphs
+								Score Functions
 								<span *ngIf="config.displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
 							</a>
 						</li>

@@ -16,6 +16,7 @@ export interface InteractionConfig {
 
 export interface ViewConfig {
 	viewOrientation: ChartOrientation;
+	scaleAlternatives: boolean;
 	displayScoreFunctions: boolean;
 	displayDomainValues: boolean;
 	displayScales: boolean;
