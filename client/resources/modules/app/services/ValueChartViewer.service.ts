@@ -273,7 +273,10 @@ export class ValueChartViewerService {
 					
 		// Hide invalid users.
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
-		this.initializeUsers(this.getUsersToDisplay(), invalidUsers);
+
+		_.remove(this.usersToDisplay, user => invalidUsers.indexOf(user.getUsername()) !== -1);
+		this.setInvalidUsers(invalidUsers);
+		this.initUserColors(valueChart);
 
 		// Update the active ValueChart.
 		if (this.getActiveValueChart().getType() === ChartType.Individual) {
