@@ -130,12 +130,14 @@ export class HomeComponent {
 			(valueChart: ValueChart) => {
 				$('#chart-credentials-modal').modal('hide');
 				if (this.validateChartForJoining(valueChart)) {
-					this.valueChartService.setValueChart(valueChart);	
+					this.valueChartService.setValueChart(valueChart);
+					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.Participant : UserRole.UnsavedParticipant;
+
 					if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
-			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.UnsavedParticipant }});
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: role }});
 			  		}
 			  		else {
-			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.UnsavedParticipant }});
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: role }});
 			  		}
 				}
 			},
