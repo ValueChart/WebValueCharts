@@ -21,6 +21,7 @@ import { UserNotificationService }												from '../../services/UserNotificat
 import { HostService }															from '../../services/Host.service';
 import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
 import { CurrentUserService }													from '../../services/CurrentUser.service';
+import { ValueChartService }													from '../../services/ValueChart.service';
 import { RenderEventsService }													from '../../../ValueChart/services/RenderEvents.service';
 
 
@@ -82,6 +83,7 @@ export class DetailBoxComponent implements OnInit {
 		private userNotificationService: UserNotificationService,
 		private valueChartHttpService: ValueChartHttpService,
 		private hostService: HostService,
+		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService) { }
 
 	// ========================================================================================
@@ -158,6 +160,30 @@ export class DetailBoxComponent implements OnInit {
 			err => {
 				this.userNotificationService.displayErrors([userToDelete.getUsername() + ' could not be deleted']);
 			});
+	}
+
+	moveUserUp(user: User, currentIndex: number): void {
+		let users = this.valueChartService.getValueChart().getUsers();
+		if (currentIndex - 1 == -1)
+			return;
+
+		let temp = users[currentIndex - 1];
+		users[currentIndex - 1] = user;
+		users[currentIndex] = temp;
+
+		this.valueChartViewerService.sortUsersToDisplay();
+	}
+
+	moveUserDown(user: User, currentIndex: number): void {
+		let users = this.valueChartService.getValueChart().getUsers();
+		if (currentIndex + 1 == users.length)
+			return;
+
+		let temp = users[currentIndex + 1];
+		users[currentIndex + 1] = user;
+		users[currentIndex] = temp;
+
+		this.valueChartViewerService.sortUsersToDisplay();
 	}
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.

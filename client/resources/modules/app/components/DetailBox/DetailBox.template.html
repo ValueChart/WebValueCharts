@@ -65,6 +65,12 @@
 				<h5 class="remove-user">
 					{{user.getUsername()}}
 					<span *ngIf="!valueChart.isIndividual()">
+						<a href="javascript:void(0)" (click)="moveUserUp(user, i)">
+							<span class="glyphicon glyphicon-chevron-up"></span>
+						</a>
+						<a href="javascript:void(0)" (click)="moveUserDown(user, i)">
+							<span class="glyphicon glyphicon-chevron-down"></span>
+						</a>
 						<span class="pull-right"><input [disabled]="user.getUsername() !== currentUserService.getUsername()" type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
 						<button *ngIf="enableManagement" class="pull-right btn btn-danger btn-xxs" (click)="displayRemoveUser(user)">Remove</button>
 						<input class="pull-right" type="checkbox" [disabled]="valueChartViewerService.isUserInvalid(user.getUsername())" [checked]="valueChartViewerService.isUserDisplayed(user)" (change)="changeDisplayedUsers(user, $event)">

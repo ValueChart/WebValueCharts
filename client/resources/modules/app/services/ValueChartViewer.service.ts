@@ -161,6 +161,10 @@ export class ValueChartViewerService {
 			this.usersToDisplay[userIndex] = newUser;
 		}
 
+		this.sortUsersToDisplay();
+	}
+
+	sortUsersToDisplay(): void {
 		let indices: any = {};
 		this.valueChartService.getValueChart().getUsers().forEach((user, i) => { indices[user.getUsername()] = i; });
 
