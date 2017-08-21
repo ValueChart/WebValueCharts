@@ -8,7 +8,7 @@
 // Import Angular Classes
 import { Injectable } 												from '@angular/core';
 
-// d3
+// Import Libraries:
 import * as d3 														from 'd3';
 import { Subject }													from 'rxjs/Subject';
 
@@ -24,6 +24,7 @@ import { Alternative }												from '../../../model/Alternative';
 import { ScoreFunctionMap }											from '../../../model/ScoreFunctionMap';
 import { ScoreFunction }											from '../../../model/ScoreFunction';
 
+// Import Types:
 import { RowData, CellData, UserScoreData, RendererConfig }			from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'

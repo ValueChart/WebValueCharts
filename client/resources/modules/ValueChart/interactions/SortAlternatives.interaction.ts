@@ -101,7 +101,7 @@ export class SortAlternativesInteraction {
 	constructor(
 		private rendererService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService) { 
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE, this.changeAlternativesOrder);
+			this.chartUndoRedoService.undoRedoSubject.subscribe(this.changeAlternativesOrder);
  	}	
 
 	// ========================================================================================
@@ -366,7 +366,8 @@ export class SortAlternativesInteraction {
 		}
 	}
 
-	changeAlternativesOrder = (alternativesRecord: AlternativesRecord) => {
-		this.lastRendererUpdate.valueChart.setAlternatives(alternativesRecord.alternatives);
+	changeAlternativesOrder = (message: {type: string, data: AlternativesRecord}) => {
+		if (message.type === this.chartUndoRedoService.ALTERNATIVE_ORDER_CHANGE)
+			this.lastRendererUpdate.valueChart.setAlternatives(message.data.alternatives);
 	}
 }

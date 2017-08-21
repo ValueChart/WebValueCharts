@@ -11,6 +11,7 @@ import { Injectable } 														from '@angular/core';
 // Import Libraries:
 import * as d3 																from 'd3';
 import * as _ 																from 'lodash';
+import { Subject }															from 'rxjs/Subject';
 
 // Import Model Classes:
 import { ValueChart }														from '../../../model/ValueChart';
@@ -30,7 +31,7 @@ import { ObjectivesRecord }													from '../../../types/Record.types';
 /*
 	This class implements change tracking for implementing undo/redo functionality for individual ValueCharts. ChartUndoRedoService
 	does NOT handle the changes caused by undoing or redoing. Instead, it tracks the changes in state caused by these actions, and informs
-	any subscribing classes of these state changes through d3 event emitters. It is the responsibility of these subscribing classes
+	any subscribing classes of these state changes through RxJS subjects. It is the responsibility of the subscribers
 	to properly update the ValueChart's state. Similarly, it is the responsibility of any classes that are going to change the ValueChart's
 	state to inform this class of those changes BEFORE they happen.
 	
@@ -60,7 +61,7 @@ export class ChartUndoRedoService {
 	private undoStateRecords: Memento[];
 	private redoStateRecords: Memento[];
 
-	public undoRedoDispatcher: d3.Dispatch<any>;
+	public undoRedoSubject: Subject<{ type: string, data: Memento}>;
 
 	// ========================================================================================
 	// 									Constructor
@@ -77,12 +78,8 @@ export class ChartUndoRedoService {
 		this.undoStateRecords = [];
 		this.redoStateRecords = [];
 
-		// Create a custom event dispatcher, with one event for each kind of change.
-		this.undoRedoDispatcher = d3.dispatch(
-			this.SCORE_FUNCTION_CHANGE,
-			this.WEIGHT_MAP_CHANGE,
-			this.ALTERNATIVE_ORDER_CHANGE,
-			this.OBJECTIVES_CHANGE);
+		// Create a new Subject that will be used to dispatch undo/redo messages to any listening services.
+		this.undoRedoSubject = new Subject();
 	}
 
 	// ========================================================================================
@@ -209,7 +206,7 @@ export class ChartUndoRedoService {
 		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
 
 		// Dispatch the ScoreFunctionChange event, notifying any listeners and passing the scoreFunctionRecord as a parameter.
-		this.undoRedoDispatcher.call(this.SCORE_FUNCTION_CHANGE, {}, scoreFunctionRecord);
+		this.undoRedoSubject.next({ type: this.SCORE_FUNCTION_CHANGE, data: scoreFunctionRecord });
 	}
 
 	private weightMapChange(weightMapRecord: WeightMap, valueChart: ValueChart, stateRecords: Memento[]): void {
@@ -219,21 +216,21 @@ export class ChartUndoRedoService {
 		var currentWeightMap: WeightMap = valueChart.getUsers()[0].getWeightMap();
 		stateRecords.push(currentWeightMap);
 
-		this.undoRedoDispatcher.call(this.WEIGHT_MAP_CHANGE, {}, weightMapRecord);
+		this.undoRedoSubject.next({ type: this.WEIGHT_MAP_CHANGE, data: weightMapRecord });
 	}
 
 	private alternativeOrderChange(alternativeOrderRecord: AlternativesRecord, valueChart: ValueChart, stateRecords: Memento[]): void {
 		var alternatives: Alternative[] = valueChart.getAlternatives();
 		stateRecords.push(new AlternativesRecord(alternatives));
 
-		this.undoRedoDispatcher.call(this.ALTERNATIVE_ORDER_CHANGE, {}, alternativeOrderRecord);
+		this.undoRedoSubject.next({ type: this.ALTERNATIVE_ORDER_CHANGE, data: alternativeOrderRecord });
 	}
 
 	private objectivesChange(objectivesRecord: ObjectivesRecord, valueChart: ValueChart, stateRecords: Memento[]): void {
 		var currentObjectives: Objective[] = valueChart.getRootObjectives();
 		stateRecords.push(new ObjectivesRecord(currentObjectives));
 
-		this.undoRedoDispatcher.call(this.OBJECTIVES_CHANGE, {}, objectivesRecord);
+		this.undoRedoSubject.next({ type: this.OBJECTIVES_CHANGE, data: objectivesRecord });
 	}
 
 }

@@ -82,7 +82,7 @@ export class ReorderObjectivesInteraction {
 	constructor(
 		private rendererService: RendererService,
 		private chartUndoRedoService: ChartUndoRedoService) { 
-			this.chartUndoRedoService.undoRedoDispatcher.on(this.chartUndoRedoService.OBJECTIVES_CHANGE, this.changeRowOrder);
+			this.chartUndoRedoService.undoRedoSubject.subscribe(this.changeRowOrder);
 	}
 
 
@@ -284,11 +284,13 @@ export class ReorderObjectivesInteraction {
 		return rootObjectives;
 	}
 
-	changeRowOrder = (objectivesRecord: ObjectivesRecord) => {
-		this.lastRendererUpdate.valueChart.setRootObjectives(objectivesRecord.rootObjectives);
-		this.lastRendererUpdate.labelData[0] = undefined;
+	changeRowOrder = (message: {type: string, data: ObjectivesRecord}) => {
+		if (message.type === this.chartUndoRedoService.OBJECTIVES_CHANGE) {
+			this.lastRendererUpdate.valueChart.setRootObjectives(message.data.rootObjectives);
+			this.lastRendererUpdate.labelData[0] = undefined;
 
-		this.reorderSubject.next(true);
+			this.reorderSubject.next(true);
+		}
 	}
 
 }

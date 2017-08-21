@@ -14,6 +14,16 @@ import { HttpModule } 							from '@angular/http';
 // Import Application Classes:
 import { ValueChartDirective }					from './directives/ValueChart.directive';
 
+/*
+	This is the ValueChart module declaration. It creates the ValueChart module, imports whatever modules it depends on, registers
+	the components that belong to it, registers required providers, and defines the component that should be bootstrapped.
+	The ValueChart module comprises the ValueChart visualization and the renderers, services, utilities, and interactions required to display,
+	updated, and interact with it. It exports the ValueChartDirect, which is used by other modules to create and display ValueChart visualizations.
+
+	Notice that the ValueChart module has no router because it does not have any associated routes. The module is a wrapper around the 
+	ValueChart directive and its ecosystem; it is not an application in of itself.
+*/
+
 @NgModule({
 	imports: [ 
 		CommonModule,

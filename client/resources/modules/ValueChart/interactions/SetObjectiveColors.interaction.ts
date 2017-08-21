@@ -80,9 +80,9 @@ export class SetObjectiveColorsInteraction {
 	*/
 	private handleColorChange = (eventObject: Event) => {
 		var targetObjective: PrimitiveObjective = (<any> d3.select(<any> eventObject.target).datum()).objective;
-		var colorPicker = <HTMLElement> document.querySelector('#primitiveObjective-color-picker');
+		var colorPicker = <any> document.querySelector('#primitiveObjective-color-picker');
 		
-		colorPicker.removeEventListener('change');	// Remove any old listeners from the color picker.
+		colorPicker.removeAllListeners();	// Remove any old listeners from the color picker.
 
 		// Attach a listener to the change event that fires when the value of the color picker changes. Note that this event fires
 		// whenever the value of the color picker changes, NOT when the user makes a decision and closes the color picker.

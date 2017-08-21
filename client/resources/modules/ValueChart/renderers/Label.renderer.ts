@@ -8,7 +8,7 @@
 // Import Angular Classes:
 import { Injectable } 												from '@angular/core';
 
-// Import libraries:
+// Import Libraries:
 import * as d3 														from 'd3';
 import * as _														from 'lodash';
 import { Subject }													from 'rxjs/Subject';
@@ -43,12 +43,11 @@ import { ScoreFunction }											from '../../../model/ScoreFunction';
 import { WeightMap }												from '../../../model/WeightMap';
 
 // Import Types:
-import {RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
+import { RowData, CellData, LabelData, RendererConfig }				from '../../../types/RendererData.types';
 import { RendererUpdate }											from '../../../types/RendererData.types';
 import { DomainElement, ScoreFunctionData } 						from '../../../types/RendererData.types';
 import { InteractionConfig, ViewConfig }							from '../../../types/Config.types'
 import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
-
 import { SortAlternativesType, ChartOrientation }					from '../../../types/Config.types';
 
 // This class renders a ValueChart's hierarchical objective structure into labels for an objective chart. Each objective is rendered into a 
@@ -63,23 +62,26 @@ export class LabelRenderer {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: RendererUpdate;
-	public reordered: boolean = false; 
+	public lastRendererUpdate: RendererUpdate;							// The most recent RendererUpdate message that the LabelRenderer has received.
+	public reordered: boolean = false; 									// A boolean flag indicating whether or not the objectives have been reordered since the last time they were rendered.
 
-	// d3 Selections. Note that that not many are saved because of the recursive creation and rendering strategy that this class uses.
 	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the Label area.
 	public labelSpaceOutline: d3.Selection<any, any, any, any>;			// The 'rect' element that is the outline of the label area.
-	public labelContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the hierarchical label structure.
-	public labelSelections: any = {};
+	public labelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the hierarchical label structure.
+	public labelSelections: any = {};									// The dictionary style object used to cache d3 selections of sibling labels - 
+																		// labels generated from the objectives with the same abstract objective as their parent.
+																		// The selections are indexed by the parent's id.
 
-	private labelWidth: number;								// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
-															// space that the label area is rendered in.
+	private labelWidth: number;											// The min of the labels, calculated based on the maximum depth of the objective hierarchy and the amount of 
+																		// space that the label area is rendered in.
 
-	private scoreFunctionSubjects: any = {};
-	private scoreFunctionViewSubject: Subject<boolean> = new Subject();
-	private scoreFunctionInteractionSubject: Subject<any> = new Subject();
+	private scoreFunctionSubjects: any = {};							// The dictionary-style object of subjects used notify ScoreFunctionRenderers to re-render the score function plots.
+																		// The subjects are indexed by PrimitiveObjective IDs.
+	private scoreFunctionViewSubject: Subject<boolean> = new Subject();		// The subject used to notify ScoreFunctionRenderers of view configuration changes.
+	private scoreFunctionInteractionSubject: Subject<any> = new Subject();	// The subject used to notify ScoreFunctionRenderers of interaction configuration changes.
 
-	private viewOrientation: ChartOrientation;
+	private viewOrientation: ChartOrientation;							// The current view orientation that the label area has been rendered in.
+																		// This is cached for internal change detection purposes.
 
 
 	// ========================================================================================

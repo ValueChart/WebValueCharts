@@ -295,8 +295,8 @@ export class ValueChartViewerComponent implements OnInit {
 	updateUndoRedo(undoRedoService: ChartUndoRedoService): void {
 		this.undoRedoService = undoRedoService;
 
-		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
-		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
+		undoRedoService.undoRedoSubject.subscribe(this.currentUserScoreFunctionChange);
+		undoRedoService.undoRedoSubject.subscribe(this.currentUserWeightMapChange);
 	}
 
 	/* 	
@@ -516,11 +516,13 @@ export class ValueChartViewerComponent implements OnInit {
 		this.undoRedoService.redo(this.valueChartViewerService.getActiveValueChart());
 	}
 
-	currentUserScoreFunctionChange = (scoreFunctionRecord: ScoreFunctionRecord) => {
-		this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getScoreFunctionMap().setObjectiveScoreFunction(scoreFunctionRecord.objectiveName, scoreFunctionRecord.scoreFunction);
+	currentUserScoreFunctionChange = (message: {type: string, data: ScoreFunctionRecord}) => {
+		if (message.type === this.undoRedoService.SCORE_FUNCTION_CHANGE)
+			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getScoreFunctionMap().setObjectiveScoreFunction(message.data.objectiveName, message.data.scoreFunction);
 	}
 
-	currentUserWeightMapChange = (weightMapRecord: WeightMap) => {
-		this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).setWeightMap(weightMapRecord);
+	currentUserWeightMapChange = (message: {type: string, data: WeightMap}) => {
+		if (message.type === this.undoRedoService.WEIGHT_MAP_CHANGE)
+			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).setWeightMap(message.data);
 	}
 }
