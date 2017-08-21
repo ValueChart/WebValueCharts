@@ -109,21 +109,31 @@ export class LabelRenderer {
 	// ========================================================================================
 
 
+	/*
+		@param update - The RendererUpdate message sent to the LabelRenderer to initiate a re-rendering of the label area.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the rendering pipeline and thus controls how and when the 
+						label area is rendered. 
+	*/
 	public valueChartChanged = (update: RendererUpdate) => {		
 		this.lastRendererUpdate = update;
 
+		// If the root container is not defined, then the label area has never been rendered. We must create the label space for the first time.
 		if (this.rootContainer == undefined) {
 			this.createLabelSpace(update);
 		}
 
+		// If the reordered flag is set or the update is structural, createLabels must be called in order to update the SVG structure of the label area.
 		if (this.reordered || update.structuralUpdate) {
 			this.createLabels(update, update.labelData, this.labelContainer);
 		}
 
+		// Update the interactions, render the label space, and then apply the styles to the label space.
 		this.updateInteractions(update);
 		this.renderLabelSpace(update, update.labelData);
 		this.applyStyles(update);
 
+		// If the SVG elements needed to be updated or the orientation changed, then the interactions must also be updated.
 		if (this.reordered || update.structuralUpdate || this.viewOrientation != update.viewConfig.viewOrientation) {
 			this.interactionsChanged(update.interactionConfig);
 			this.reordered = false;
@@ -132,6 +142,12 @@ export class LabelRenderer {
 		}
 	}
 
+	/*
+		@param interactionConfig - The interactionConfig message sent to the LabelRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						label area interactions are turned on and off.
+	*/
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.resizeWeightsInteraction.togglePump(interactionConfig.pumpWeights, this.rootContainer.node().querySelectorAll('.' + LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL), this.lastRendererUpdate);
 		this.resizeWeightsInteraction.toggleDragToResizeWeights(interactionConfig.weightResizeType, this.rootContainer, this.lastRendererUpdate);
@@ -143,16 +159,34 @@ export class LabelRenderer {
 		this.scoreFunctionInteractionSubject.next({ expandScoreFunctions: true, adjustScoreFunctions: this.lastRendererUpdate.interactionConfig.adjustScoreFunctions });
 	}
 
+	/*
+		@param viewConfig - The viewConfig message sent to the LabelRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the view configuration pipeline and thus controls how and when the 
+						label area view options are turned on and off.
+	*/
 	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.scoreFunctionViewSubject.next(viewConfig.displayScoreFunctionValueLabels);
 		this.toggleDisplayScoreFunctions(viewConfig.displayScoreFunctions);
 		this.renderLabelSpace(this.lastRendererUpdate, this.lastRendererUpdate.labelData);
 	}
 
+	/*
+		@param reordered - Whether or not the ValueChart's objectives have been reordered. If they have, then the label area will have a structural update
+							next rendering cycle.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the ReorderObjectivesInteraction that indicate whether or not the user has
+						changed the order of any objectives.
+	*/
 	public handleObjectivesReordered = (reordered: boolean) => {
 		this.reordered = reordered;
 	}
 
+	/*
+		@param u - The most recent RendererUpdate message.
+		@returns {void}
+		@description	Update the lastRendererUpdate fields of the interactions associated with the LabelRenderer with the most recent RendererUpdate message.
+	*/
 	public updateInteractions = (u: RendererUpdate) => {
 		this.resizeWeightsInteraction.lastRendererUpdate = u;
 		this.reorderObjectivesInteraction.lastRendererUpdate = u;
@@ -160,10 +194,7 @@ export class LabelRenderer {
 	}
 
 	/*
-		@param el - The element that is will be used as the parent of the summary chart.
-		@param labelData - The data that labels are going to represent. Note that this data has a recursive (or nested) structure.
-		@param objectiveData - The list of primitive objectives in the ValueChart. This is used to render the score function plots.
-		@param enableInteraction - 
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@returns {void}
 		@description 	Creates the base containers and all elements for the labels of a ValueChart. It should be called when creating the labels for the first time
 						and when rebuilding them. The label area's recursive structure means that when objectives are added/deleted, or the order of objectives is changed,
@@ -195,7 +226,7 @@ export class LabelRenderer {
 
 
 	/*
-		@param el - The root container for the entire label area.
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelContainer - The container for the labels to be created. It is either: 1) this.labelContainer, or 2) The container of an already created label.
 		@param labelData - The data for the new labels to create. Note that this data has a recursive (or nested) structure.
 		@param parentName - Either the name of the parent objective of the label to be created, or LabelDefinitions.ROOT_CONTAINER_NAME if the objective is the root objective.
@@ -295,14 +326,10 @@ export class LabelRenderer {
 	}
 
 
-	// TODO <@aaron>: update this methods description.
 	/*
-		@param width - The width of the area to render the label space in. This is NOT the width of the label to be rendered.
-		@param height - The height of the area to render the label space in. This is NOT the height of the label to be rendered.
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelData - The data for the labels to be updated and then displayed. Note that this data has a recursive (or nested) structure.
 		@param parentName - The name of the label root container. Should almost alway be LabelDefinitions.ROOT_CONTAINER_NAME.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
-		@param objectives - The collection of primitive objectives in the ValueChart. Used for rendering score function plots.
 		@returns {void}
 		@description 	Updates the data behind the labels using the renderLabels method. This method is mainly used to handle changes to user assigned objective weights.
 						It should NOT be used to render the label space for the first time, or to render it in a different orientation. This is what renderLabelSpace is for.
@@ -323,10 +350,10 @@ export class LabelRenderer {
 	}
 
 	/*
-		@param labelSpaces - The containers ('g' elements) of the labels to be rendered. These labels should be siblings (ie. child labels of the same parent).
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelData - The data for the labels that are being rendered.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
-		@param isDataUpdate - Whether the method should update the data underlying the labels. If true, this method will update each label's data before rendering it. This allows the weights of labels to be updated in response to user changes.
+		@param parentName - The id of the objective whose label is the parent of the labels rendered by this method. That is, the id of the objective whose label data
+							is the parent of the label data rendered by this method.
 		@returns {void}
 		@description 	Recursively positions and styles labels and their child labels until the hierarchy is fully parsed. This method can be used to update the data behind the
 						labels as well, allowing it to either update, or simply render the a label and its children. Note that this method should generally NOT
@@ -372,9 +399,9 @@ export class LabelRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelOutlines - The selection of 'rect' elements that act as the outlines for a set of sibling labels.
 		@param weightOffsets - An array of weight offsets that map to the elements in the selection of label outlines. This is array is used to determine the position of sibling labels relative to each other.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description 	Positions and styles the outlines of a set of sibling labels. 
 	*/
@@ -391,9 +418,10 @@ export class LabelRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelTexts - The selection of 'text' elements that act as the label text for a set of sibling labels.
 		@param weightOffsets - An array of weight offsets that map to the elements in the selection of label outlines. This is array is used to determine the position of sibling labels relative to each other.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
+		@param parentName - The id of the objective whose label is the parent of the label whose text is rendered by this method.
 		@returns {void}
 		@description 	Positions and styles the label text of a set of sibling labels. This includes rendering the name, weight (in percentage points), and best and worst elements.
 	*/
@@ -431,9 +459,9 @@ export class LabelRenderer {
 	}
 
 	/*
-		@param labelTexts - The selection of 'line' elements that act as the dividers between a set of sibling labels.
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
+		@param labelDividers - The selection of 'line' elements that are to be rendered into label dividers.
 		@param weightOffsets - An array of weight offsets that map to the elements in the selection of label outlines. This is array is used to determine the position of sibling labels relative to each other.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description 	Positions and styles the dividers between a set of sibling labels. These dividers are used to implement clicking and dragging to change objective weights, and are the click targets.
 	*/
@@ -453,36 +481,38 @@ export class LabelRenderer {
 	}
 
 	/*
-		@param scoreFunctionContainer - The 'g' element that will be used to contain all the score function plots.
-		@param data - The collection of primitive objectives in the ValueChart. It is important that the order of this 
-					collection is the same as the ordering of primitive objectives in the labelData used to construct 
-					and render the label space to insure that score function plots are matched to correct labels.
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
+		@param labelContainer - The 'g' element that contains the label whose ScoreFunction is to be created.
+		@param objective - The PrimitveObjective for which to create a ScoreFunction plot.
 		@returns {void}
-		@description 	Creates a score function plot for each Primitive Objective in the ValueChart using one ScoreFunctionRenderer for each plot.
+		@description 	Creates a score function plot for the input PrimitiveObjective a instance of ScoreFunctionRenderer.
 	*/
 	private createScoreFunction(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
 		this.labelSelections[objective.getId()] = {};
 		
 		labelContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).remove();
 
+		// Create a container for the score function plot.
 		var scoreFunction = labelContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION)
 			.data([objective]).enter().append('g')
 			.classed(LabelDefinitions.SCORE_FUNCTION, true)
 			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; });
 
+		// Cache the score function plot container selection using the id of corresponding PrimitiveObjective.
 		this.labelSelections[objective.getId()].scoreFunction = scoreFunction;
 
+		// Instantiate the correct ScoreFunctionRenderer.
 		var renderer: ScoreFunctionRenderer
-
 		if (objective.getDomainType() === 'categorical' || objective.getDomainType() === 'interval')
 			renderer = new DiscreteScoreFunctionRenderer(this.chartUndoRedoService);
 		else
 			renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 
+		// Cache the renderer instance under the Primitive Objective ID.
 		this.labelSelections[objective.getId()].renderer = renderer;
 
+		// Create a new Subject that will be used to pass renderer updates to the ScoreFunctionRenderer.
 		var scoreFunctionSubject = new Subject();
-
 		scoreFunctionSubject.map((sfU: ScoreFunctionUpdate) => { 
 			sfU.el = scoreFunction;
 			sfU.objective = objective;
@@ -492,20 +522,21 @@ export class LabelRenderer {
 			.map(this.rendererScoreFunctionUtility.produceViewConfig)
 			.subscribe(renderer.scoreFunctionChanged);
 
+		// Cache the subject associated with the new ScoreFunctionPlot.
 		this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
 		this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
 		this.scoreFunctionInteractionSubject.map((interactionConfig: any) => { return { adjustScoreFunctions: (interactionConfig.adjustScoreFunctions && !objective.getDefaultScoreFunction().immutable), expandScoreFunctions: interactionConfig.expandScoreFunctions }; })
 				.subscribe(renderer.interactionConfigChanged);
 
+		// Render the Score Function for the first time. This is required to create the SVG elements/structure of the ScoreFunction plot.
 		this.renderScoreFunction(u, objective, this.scoreFunctionSubjects[objective.getId()], scoreFunction);
 	}
 
 	/*
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
-		@param scoreFunctionContainer - The 'g' element that contains all the score function plots to be rendered.
-		@param data - The collection of primitive objectives in the ValueChart. It is important that the order of this 
-					collection is the same as the ordering of primitive objectives in the labelData used to construct 
-					and render the label space to insure that score function plots are matched to correct labels.
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
+		@param objective - The PrimitveObjective whose ScoreFunction plot is to be rendered.
+		@param scoreFunctionSubject - The Subject associated with the ScoreFunction plot that is going to be rendered. This is used to send the RendererUpdate message.
+		@param scoreFunctionContainer - The 'g' element that contains the ScoreFunction plot.
 		@returns {void}
 		@description 	Uses the ScoreFunctionRenderer and its subclasses to position and give widths + heights to the score functions created by the createScoreFunctions method.
 	*/
@@ -550,7 +581,12 @@ export class LabelRenderer {
 
 		this.scoreFunctionViewSubject.next(u.viewConfig.displayScoreFunctionValueLabels);
 	}
-
+	/*
+		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
+		@returns {void}
+		@description 	Apply the styles the elements of the label area. Note that this only applies styles which actively depend on the value of the RendererUpdate.
+						Other style are applied using CSS classes.
+	*/
 	private applyStyles(u: RendererUpdate): void {
 		this.rootContainer.selectAll('.' + LabelDefinitions.SUBCONTAINER_OUTLINE)
 			.style('fill', 'white')
@@ -570,6 +606,11 @@ export class LabelRenderer {
 		}
 	}
 
+	/*
+		@param displayScoreFunctionPlots - whether or no ScoreFunction plots should be displayed.
+		@returns {void}
+		@description 	Toggles ScoreFunctionPlots on or off by showing/hiding them using 'display'. This should is called automatically whenever the viewConfig changes.
+	*/
 	private toggleDisplayScoreFunctions(displayScoreFunctions: boolean): void {
 		if (displayScoreFunctions) {
 			this.rootContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).style('display', 'block');

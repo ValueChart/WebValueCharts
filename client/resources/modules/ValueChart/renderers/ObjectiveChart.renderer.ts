@@ -46,25 +46,25 @@ export class ObjectiveChartRenderer {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;								// The most recent RendererUpdate message that the LabelRenderer has received.
 
 	// Constants for use in rendering the summary chart.
 	private USER_SCORE_SPACING: number = 10; // The spacing between user score bars, in pixels.
 
 	// d3 Selections:
 	public chart: d3.Selection<any, any, any, any>;							// The 'g' element that contains all the elements making up the objective chart.
-	public rowOutlinesContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains all the row outline elements
-	public rowOutlines: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements that are used outline each row.
+	public rowOutlinesContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains all the row outline elements
+	public rowOutlines: d3.Selection<any, any, any, any>;					// The selection of all 'rect' elements that are used outline each row.
 	public rowsContainer: d3.Selection<any, any, any, any>;					// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any, any, any, any>;								// The selection of 'g' elements s.t. each element is a row container.
-	public alternativeLabelsContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the alternative labels.
+	public rows: d3.Selection<any, any, any, any>;							// The selection of 'g' elements s.t. each element is a row container.
+	public alternativeLabelsContainer: d3.Selection<any, any, any, any>;	// The 'g' element that contains the alternative labels.
 	public alternativeLabels: d3.Selection<any, any, any, any>;				// The selection of all 'text' elements s.t. each element is used to label each alternative in the ValueChart.
 	public cells: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a cell container used to contain .
-	public userScores: d3.Selection<any, any, any, any>;						// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public weightOutlines: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
-	public domainLabels: d3.Selection<any, any, any, any>;			// The selection of 'text' elements used to label what domain element each cell represents.
+	public userScores: d3.Selection<any, any, any, any>;					// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public weightOutlines: d3.Selection<any, any, any, any>;				// The selection of 'rect' elements that are used to outline user utility bars to indicate maximum possible scores in a group ValueChart. 
+	public domainLabels: d3.Selection<any, any, any, any>;					// The selection of 'text' elements used to label what domain element each cell represents.
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any, any, any, any>;					// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
+	public alternativeBoxes: d3.Selection<any, any, any, any>;				// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc. 
 
 	// ========================================================================================
 	// 									Constructor
@@ -84,38 +84,63 @@ export class ObjectiveChartRenderer {
 	// 									Methods
 	// ========================================================================================
 
+	/*
+		@param update - The RendererUpdate message sent to the ObjectiveChart to initiate a re-rendering of the objectives breakdown.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the rendering pipeline and thus controls how and when the 
+						objective chart is rendered. 
+	*/
 	public valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 		
+		// If the base element of the Objective Chart is undefined, then it has not yet been rendered. We must create SVG elements for the first time.
 		if (this.chart == undefined) {
 			this.createObjectiveChart(update);
 		}
 
-
+		// If the RendererUpdate is a structural update, then update the SVG elements making up the Objective Chart.
 		if (update.structuralUpdate) {
 			this.createObjectiveRows(update, this.rowsContainer, this.rowOutlinesContainer, this.alternativeBoxesContainer, this.alternativeLabelsContainer);
 			this.toggleDomainLabels(update.viewConfig.displayDomainValues);
 		}
 
+		// Update the lastRendererUpdate values in the attached interaction classes and render the Objective Chart.
 		this.updateInteractions(update);
 		this.renderObjectiveChart(update);
 	}
 
+	/*
+		@param interactionConfig - The interactionConfig message sent to the ObjectiveChartRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						objective chart interactions are turned on and off.
+	*/
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes, this.lastRendererUpdate);
 	}
 
+	/*
+		@param viewConfig - The viewConfig message sent to the ObjectiveChartRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the view configuration pipeline and thus controls how and when the 
+						objective chart view options are turned on and off.
+	*/
 	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleDomainLabels(viewConfig.displayDomainValues);
 	}
 
+
+	/*
+		@param u - The most recent RendererUpdate message.
+		@returns {void}
+		@description	Update the lastRendererUpdate fields of the interactions associated with the ObjectiveChartRenderer with the most recent RendererUpdate message.
+	*/
 	public updateInteractions = (u: RendererUpdate) => {
 		this.sortAlternativesInteraction.lastRendererUpdate = u;
 	}
 
 	/*
-		@param el - The element that to be used as the parent of the objective chart.
-		@param rows - The data that the objective chart is going to represent. Must be of the type RowData.
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@returns {void}
 		@description	Creates the base containers and elements for the objective Chart of a ValueChart. It should be called when
 						creating an objective chart for the first time, but not when updating as the basic framework of the chart never needs to be
@@ -145,15 +170,15 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@param rowsContainer - The 'g' element that will contain/contains the row elements for the objective chart. 
 		@param rowOutlinesContainer - The 'g' element that will contain/contains the 'rect' elements used to outline each row.
 		@param boxesContainer - The 'g' element that contains the transparent 'rect' elements placed on top of each alternative in the objective chart in order to intercept clicks for dragging, etc.
 		@param alternativeLabelsContainer - The 'g' element that contains the 'text' elements used to label each alternative in the ValueChart.
-		@param rows - The data to be used when constructing/updating the rows.
 		@returns {void}
 		@description	Creates/Updates the individual rows that make up the summary chart. One row is created for each primitive objective in the ValueChart. 
 						It also creates the cells cell in each row, and users score bars in each cell through a call to createObjectiveCells. It will remove any
-						rows that are no longer have an associated element in the rows parameter, and add rows if rows contains new elements. It also will add/remove
+						rows that are no longer have an associated element in the u.rows parameter, and add rows if rows contains new elements. It also will add/remove
 						cells and user score bars via createObjectiveCell. ONLY this method should be used to add/remove rows, cells, and user score bars to objective chart
 						when objectives, alternatives, or user are added/removed from the ValueChart. createObjectiveRows should NOT be manually called.
 	*/
@@ -265,16 +290,11 @@ export class ObjectiveChartRenderer {
 	}
 
 
-	// TODO <@aaron> : Update the description for this method.
-
 	/*
-		@param width - The width the objective chart should be rendered in. Together with height this parameter determines the size of the objective chart.
-		@param height - The height the objective chart should be rendered in. Together with width this parameter determines the size of the objective chart. 
-		@param rows - The data that the objective chart is intended to display.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@returns {void}
 		@description	Updates the data underlying the objective chart, and then positions and gives widths + heights to the elements created by the createObjectiveChart method.
-						It should be used to update the objective chart when the data underlying the it (rows) has changed, and the appearance of the objective chart needs to be updated to reflect
+						It should be used to update the objective chart when the data underlying the it (u.rows) has changed, and the appearance of the objective chart needs to be updated to reflect
 						this change. It should NOT be used to initially render the objective chart, or change the view orientation of the objective chart. Use renderObjectiveChart for this purpose.
 	*/
 	private renderObjectiveChart(u: RendererUpdate): void {
@@ -316,6 +336,7 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@param rowOutlines - The selection of 'rect' elements that outline the rows to be rendered.
 		@param rows - The selection of 'g' elements that are the rows to be rendered. These elements should contain more 'g' elements that are the cells to be rendered. 
 		@param alternativeLabels - The selection of 'text' elements for labeling alternatives. There should be one text element per alternative.
@@ -323,7 +344,6 @@ export class ObjectiveChartRenderer {
 		@param cells - The selection of 'g' elements that contain the user score 'rect' elements. There should be one 'g' element for each alternative in the ValueChart.
 		@param userScores - The selection of 'rect' elements that are the user scores to be rendered.	
 		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements created by createObjectiveRows. Unlike in the summary chart we directly 
 						position the row containers here because the positions of the scores (and therefore row containers) are are absolute. (no stacking).
@@ -369,10 +389,10 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@param cells - The selection of 'g' elements that contain the user score 'rect' elements. There should be one 'g' element for each alternative in the ValueChart.
 		@param userScores - The selection of 'rect' elements that are the user scores to be rendered.	
 		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements created by createObjectiveCells.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
@@ -404,8 +424,8 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@param userScores - The selection of 'rect' elements that are the user scores to be rendered.	
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements to 'rect' elements used to display user score bars in the objective chart.
 						Note that this method should NOT be called manually. updateObjectiveChart or renderObjectiveChart should called to re-render objective rows.
@@ -436,8 +456,8 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@param weightOutlines - The selection of 'rect' elements that are the weight outlines to be rendered for each user score in the summary chart.	
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements to 'rect' elements used to user weight outlines in the objective chart. These outlines are only
 						displayed for group ValueCharts.
@@ -474,6 +494,7 @@ export class ObjectiveChartRenderer {
 
 
 	/*
+		@param u - The most recent RendererUpdate message that the ObjectiveChartRenderer has received.
 		@returns {void}
 		@description	Display or hide the weight outlines depending on the whether the ValueChart is a group or individual chart.
 	*/
@@ -486,8 +507,9 @@ export class ObjectiveChartRenderer {
 	}
 
 	/*
+		@param displayDomainValues - Whether or not to display domain values on top of the objective chart cells.
 		@returns {void}
-		@description	Display or hide the domain labels for cells depending on the value of the displayDomainValues attribute on the ValueChartDirective.
+		@description	Display or hide the domain labels for cells depending on the value of the displayDomainValues parameter.
 	*/
 	private toggleDomainLabels(displayDomainValues: boolean): void {
 		if (displayDomainValues) {

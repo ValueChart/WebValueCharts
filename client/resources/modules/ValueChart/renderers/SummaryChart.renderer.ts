@@ -47,25 +47,26 @@ export class SummaryChartRenderer {
 	// ========================================================================================
 
 	// Constants for use in rendering the summary chart.
-	private USER_SCORE_SPACING: number = 10;				// The spacing between user score bars, in pixels.
+	private USER_SCORE_SPACING: number = 10;							// The spacing between user score bars, in pixels.
 
-	public lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;							// The most recent RendererUpdate message that the SummaryChartRenderer has received.
+
 
 	// d3 Selections:
 	public chart: d3.Selection<any, any, any, any>;						// The 'g' element that contains all the elements making up the summary chart.
-	public outline: d3.Selection<any, any, any, any>;						// The 'rect' element that outlines the summary chart.
+	public outline: d3.Selection<any, any, any, any>;					// The 'rect' element that outlines the summary chart.
 	public rowsContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the rows that make up the summary chart. Each row is composed of the all user scores for one PrimitiveObjective's alternative consequences. (ie. the container of all row containers.)
-	public rows: d3.Selection<any, any, any, any>;							// The selection of all 'g' elements s.t. each element is a row container.
+	public rows: d3.Selection<any, any, any, any>;						// The selection of all 'g' elements s.t. each element is a row container.
 	public cells: d3.Selection<any, any, any, any>;						// The selection of all 'g' elements s.t. each element is a cell container.
-	public userScores: d3.Selection<any, any, any, any>;					// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
-	public scoreTotalsContainer: d3.Selection<any, any, any, any>;			// The 'g' element that holds the containers for user score text elements.
-	public scoreTotalsSubContainers: d3.Selection<any, any, any, any>;		// The selection of 'g' elements that hold the user score text elements. There is one container per cell.
-	public scoreTotals: d3.Selection<any, any, any, any>;					// The selection of 'text' elements used to display the total utility of each alternative for each user.
-	public averageLinesContainer: d3.Selection<any, any, any, any>;
-	public averageLines: d3.Selection<any, any, any, any>;
-	public utilityAxisContainer: d3.Selection<any, any, any, any>;			// The 'g' element that holds the optional utility (y) axis that can be displayed to the left of the summary chart. 
+	public userScores: d3.Selection<any, any, any, any>;				// The selection of all 'rect' elements s.t. each element is one user's score 'bar' for one objective.
+	public scoreTotalsContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the containers for user score text elements.
+	public scoreTotalsSubContainers: d3.Selection<any, any, any, any>;	// The selection of 'g' elements that hold the user score text elements. There is one container per cell.
+	public scoreTotals: d3.Selection<any, any, any, any>;				// The selection of 'text' elements used to display the total utility of each alternative for each user.
+	public averageLinesContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the average score lines for the Summary Chart.
+	public averageLines: d3.Selection<any, any, any, any>;				// The selection of 'line' elements making up the average score lines for the Summary Chart.
+	public utilityAxisContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the optional utility (y) axis that can be displayed to the left of the summary chart. 
 	public alternativeBoxesContainer: d3.Selection<any, any, any, any>;	// The 'g' element that holds the alternative boxes.
-	public alternativeBoxes: d3.Selection<any, any, any, any>;				// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
+	public alternativeBoxes: d3.Selection<any, any, any, any>;			// The selection of transparent 'rect' elements that are placed on top of each alternative in the summary chart. They are used to implement dragging, etc.
 
 	// Misc. Fields:
 	private summaryChartScale: any;							// The linear scale used to translate utilities into pixels for determining bar heights and positions. 
@@ -88,31 +89,56 @@ export class SummaryChartRenderer {
 	// 									Methods
 	// ========================================================================================
 
+	/*
+		@param update - The RendererUpdate message sent to the SummaryCharRenderer to initiate a re-rendering of the Summary Chart.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the rendering pipeline and thus controls how and when the 
+						summary chart is rendered. 
+	*/
 	public valueChartChanged = (update: RendererUpdate) => {
 		this.lastRendererUpdate = update;
 
+		// If the base element of the summary chart is undefined, it has never been rendered and the SVG elements must be created for the first time.
 		if (this.chart == undefined) {
 			this.createSummaryChart(update);
 		}
-
+		// If the RendererUpdate is a structural update, then update the SVG elements making up the Summary Chart.
 		if (update.structuralUpdate) {
 			this.createSummaryChartRows(update, this.rowsContainer, this.alternativeBoxesContainer, this.scoreTotalsContainer);
 		}
 
+		// Update the lastRendererUpdate values in the attached interaction classes and render the Summary Chart.
 		this.updateInteractions(update);
 		this.renderSummaryChart(update);
 	}
 
+	/*
+		@param interactionConfig - The interactionConfig message sent to the SummaryChartRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						summary chart interactions are turned on and off.
+	*/
 	public interactionsChanged = (interactionConfig: InteractionConfig) => {
 		this.sortAlternativesInteraction.toggleAlternativeSorting(interactionConfig.sortAlternatives, this.alternativeBoxes, this.lastRendererUpdate);
 	}
 
+	/*
+		@param viewConfig - The viewConfig message sent to the SummaryChartRenderer to update the InteractionConfig.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the view configuration pipeline and thus controls how and when the 
+						summary chart view options are turned on and off.
+	*/
 	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.toggleUtilityAxis(viewConfig.displayScales);
 		this.toggleScoreTotals(viewConfig.displayTotalScores);
 		this.toggleAverageLines(viewConfig.displayAverageScoreLines);
 	}
 
+	/*
+		@param u - The most recent RendererUpdate message.
+		@returns {void}
+		@description	Update the lastRendererUpdate fields of the interactions associated with the SummaryChartRenderer with the most recent RendererUpdate message.
+	*/
 	public updateInteractions = (u: RendererUpdate) => {
 		this.sortAlternativesInteraction.lastRendererUpdate = u;
 	}
@@ -120,8 +146,7 @@ export class SummaryChartRenderer {
 
 
 	/*
-		@param el - The element that is will be used as the parent of the summary chart.
-		@param rows - The data that the summary chart is going to represent. Must be of the type RowData.
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@returns {void}
 		@description 	Creates the base containers and all elements for the Alternative Summary Chart of a ValueChart. It should be called when
 						creating a summary chart for the first time, but not when updating as the basic framework of the chart never needs to be
@@ -163,10 +188,10 @@ export class SummaryChartRenderer {
 
 
 	/*
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@param rowsContainer - The 'g' element that contains/will contain the rows of the summary chart.
 		@param boxesContainer - The 'g' element that contains/will contain the alternatives boxes (these are transparent boxes above each alternative used to implement dragging, etc).
 		@param scoreTotalsContainer - The 'g' element that contains/will contain the score total subcontainers.
-		@param rows - The data to be used when constructing/updating the rows.
 		@returns {void}
 		@description 	Creates or updates the individual row (and cell) elements that make up the summary chart. There is one row for each primitive objective in the ValueChart, with
 						the rows stacked on each other in order to create a stacked bar chart. It can create all of the summary chart rows for the first time, as well as update the summary 
@@ -266,16 +291,11 @@ export class SummaryChartRenderer {
 		this.userScores = this.cells.selectAll('.' + SummaryChartDefinitions.USER_SCORE);
 	}
 
-	// TODO <@aaron>: Update this method description.
-
 	/*
-		@param width - The width the summary chart should be rendered in. Together with height this parameter determines the size of the summary chart.
-		@param height - The height the summary chart should be rendered in. Together with width this parameter determines the size of the summary chart. 
-		@param rows - The data that the summary chart is intended to display.
-		@param viewConfig - The view configuration object for the ValueChart that is being rendered. Contains the viewOrientation property.
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@returns {void}
 		@description	Updates the data underlying the summary chart, and then positions and gives widths + heights to the elements created by the createSummaryChart method.
-						It should be used to update the summary chart when the data underlying the it (rows) has changed, and the appearance of the summary chart needs to be updated to reflect
+						It should be used to update the summary chart when the data underlying the it (u.rows) has changed, and the appearance of the summary chart needs to be updated to reflect
 						this change. It should NOT be used to initially render the summary chart, or change the view orientation of the summary chart. Use renderSummaryChart for this purpose.
 
 	*/
@@ -328,7 +348,7 @@ export class SummaryChartRenderer {
 	}
 
 	/*
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@returns {void}
 		@description	Renders the utility axis of the summary chart. Note that this will not override toggleUtilityAxis, which should
 						be used to change the visibility of the utility axis. 
@@ -357,11 +377,13 @@ export class SummaryChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@params alternativeBoxes -  The selection of 'rect' elements to be rendered as alternatives boxes on top of each alternative's column.
+		#params scoreSubContainers - the selection of 'g' elements that contain the score total text elements.
 		@params scoreTotals -  The selection of score totals to be rendered. This should be a selection of 'text' elements.
 		@params cells - The selection of 'g' elements that make up the summary chart cells to be rendered. Each cell should have one user score per user.
 		@params userScores - The selection of 'rect' user scores to be rendered. There should be one user score per alternative per user.
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
+		@params averageLines - The selection of 'line' elements making up the average score lines for the Summary Chart.
 		@returns {void}
 		@description	Positions and gives widths + heights to the elements created by createSummaryChartRows. Note that it does not position the row 
 						containers because the positions of the scores (and therefore row containers) is not absolute, but depends on the heights of other user scores.
@@ -414,9 +436,8 @@ export class SummaryChartRenderer {
 
 
 	/*
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.		@returns {void}
 		@param scoreTotals - The selection of text elements being used as score totals. There should be one text element per user per alternative.
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
-		@returns {void}
 		@description	Positions and assigns the proper text to the summary chart's score labels that are displayed above each user's stacked bar 
 						for each alternative. Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should 
 						called to re-render objective rows.
@@ -445,6 +466,7 @@ export class SummaryChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.
 		@returns {void}
 		@description	Changes the color of the score total label for the best alternative for each user to be red. This should 
 						be exactly one highlighted score total label per user.
@@ -476,10 +498,9 @@ export class SummaryChartRenderer {
 	}
 
 	/*
+		@param u - The most recent RendererUpdate message that the SummaryChartRenderer has received.		@returns {void}
 		@param cells - The selection of cells that are to be rendered. Each cell should have one user score per user.
 		@param userScores - The selection of userScores that are to be rendered. There should be one user score per alternative per user.
-		@param viewConfig - The viewConfiguration object for the ValueChart that is being rendered. Contains the viewOrientation property.
-		@returns {void}
 		@description	This function positions and gives widths + heights to the elements created by createSummaryChartCells. 
 						Note that this method should NOT be called manually. updateSummaryChart or renderSummaryChart should 
 						called to re-render objective rows.
@@ -526,8 +547,9 @@ export class SummaryChartRenderer {
 	}
 
 	/*
+		@param displayScales - whether or not to display the scale for the utility axis of the summary chart plot.
 		@returns {void}
-		@description	Display or hide the utility axis depending on the value of the displayScales attribute on the ValueChartDirective.
+		@description	Display or hide the utility axis depending on the value of the displayScales input.
 	*/
 	private toggleUtilityAxis(displayScales: boolean): void {
 		if (displayScales) {
@@ -538,8 +560,9 @@ export class SummaryChartRenderer {
 	}
 
 	/*
+		@param displayTotalScores - whether or not to display score totals.
 		@returns {void}
-		@description	Display or hide the score totals depending on the value of the displayTotalScores attribute on the ValueChartDirective.
+		@description	Display or hide the score totals depending on the value of the displayTotalScores input.
 	*/
 	private toggleScoreTotals(displayTotalScores: boolean): void {
 		if (displayTotalScores) {
@@ -549,6 +572,11 @@ export class SummaryChartRenderer {
 		}
 	}
 
+	/*
+		@param displayAverageScoreLines - whether or not to display average score lines.
+		@returns {void}
+		@description	Display or hide the average score lines depending on the value of the displayAverageScoreLines input.
+	*/
 	private toggleAverageLines(displayAverageScoreLines: boolean): void {
 		if (displayAverageScoreLines) {
 			this.averageLinesContainer.style('display', 'block');

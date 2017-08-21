@@ -15,13 +15,14 @@ import '../../utilities/rxjs-operators';
 @Injectable()
 export class RenderEventsService {
 
-	summaryChartDispatcher: Subject<number>;
+	summaryChartDispatcher: Subject<number>;		// The Subject used to notify observers of SummaryChartRenderer events.
 
-	objectiveChartDispatcher: Subject<number>;
+	objectiveChartDispatcher: Subject<number>;		// The Subject used to notify observers of ObjectiveChartRenderer events.
 
-	labelsDispatcher: Subject<number>;
+	labelsDispatcher: Subject<number>;				// The Subject used to notify observers of LabelRenderer events.
 
-	rendersCompleted: Observable<number>; 
+	rendersCompleted: Observable<number>; 			// An observable that accumulates the total number of render events issued by all three
+													// renderer subjects. Initial renderering has been completed if this accumulated number is greater than 3.
 
 	constructor() {
 		this.summaryChartDispatcher = new Subject();
@@ -31,5 +32,4 @@ export class RenderEventsService {
 		this.rendersCompleted = Observable.merge(this.summaryChartDispatcher, this.objectiveChartDispatcher, this.labelsDispatcher)
 			.scan((acc, one) => acc + one, 0);
 	}
-
 }
