@@ -72,6 +72,8 @@ export class ValueChartViewerComponent implements OnInit {
 	public UserRole = UserRole;
 	public _ = _;
 
+	public loading: boolean = true;
+
 	public routeSubscription: Subscription;
 
 	public valueChartWidth: number;
@@ -87,8 +89,6 @@ export class ValueChartViewerComponent implements OnInit {
 	// ValueChart Configuration:
 	public viewConfig: ViewConfig = <any> {};
 	public interactionConfig: InteractionConfig = <any> {};
-
-	public loading: boolean = true;
 
 
 	// ========================================================================================
@@ -125,7 +125,7 @@ export class ValueChartViewerComponent implements OnInit {
 		@returns {void}
 		@description 	Initializes the ValueChartViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
 						Calling ngOnInit should be left to Angular. Do not call it manually. All initialization logic for this component should be put in this
-					method rather than in the constructor. Be aware that Angular will NOT call ngOnInit again if the a user navigates to the ValueChartViewer
+						method rather than in the constructor. Be aware that Angular will NOT call ngOnInit again if the a user navigates to the ValueChartViewer
 						from the ValueChartViewer as the component is reused instead of being created again.
 	*/
 	ngOnInit() {
@@ -148,6 +148,8 @@ export class ValueChartViewerComponent implements OnInit {
 				this.valueChartViewerService.setUserRole(role);
 
 				if (this.loading) {
+					// If the ValueChart in the ValueChartService is not define,
+					// then fetch the ValueChart from the server using the URL parameters.
 					if (!this.valueChartService.valueChartIsDefined()) {
 						this.valueChartHttpService.getValueChartByName(fname, password)
 							.subscribe(valueChart => {
@@ -163,14 +165,44 @@ export class ValueChartViewerComponent implements OnInit {
 
 			});
 
+		// Subscribe to the route parameters so that the type of ValueChart being viewed changes when the parameters change.
 		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType'], this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())) });
 
+		// Initialize automatic resizing of the ValueChart when the window is resized.
 		this.resizeValueChart();
 		$(window).resize((eventObjective: Event) => {
 			this.resizeValueChart();
 		});
 	}
 
+
+	/* 	
+		@returns {void}
+		@description 	Destroys the ValueChartViewer. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
+						requires that a different component is displayed in the router-outlet.
+	*/
+	ngOnDestroy() {
+
+		if (this.hostService.hostWebSocket) {
+			this.hostService.endCurrentHosting();
+		}
+
+		// Destroy the ValueChart manually to prevent memory leaks.
+		$('ValueChart').remove();
+	}
+
+
+	// ================================ Setup Methods ====================================
+
+
+	/* 	
+		@param type - The type of the ValueChart to display.
+		@returns {void}
+		@description	Initializes the ValueChartViewer to display a ValueChart for the first time. This saves a copy of the user to 
+						userGuardService (which is used to determine if the user has made changes to their preferences), initializes
+						the valueChartViewerService's usersToDisplay and invalidUsers lists, prints error messages to current user,
+						and hosts the current ValueChart.
+	*/
 	initializeViewer(type: ChartType): void {
 		let valueChart = this.valueChartService.getValueChart();
 		let currentUser = valueChart.getUser(this.currentUserService.getUsername());
@@ -195,13 +227,23 @@ export class ValueChartViewerComponent implements OnInit {
 		this.hostValueChart();
 	}
 
+	/* 	
+		@param type - The type of the ValueChart to display.
+		@param currentUser - The user object from the ValueChart that is being viewed that is associated with the current user.
+		@returns {void}
+		@description	Changes the type of ValueChart displayed by the ValueChartViewer to be the given type. 
+						If the type is individual and the current ValueChart is a group chart, then a new ValueChart
+						containing ONLY the current user is created and displayed. If the type is group, then the ValueChart
+						from the ValueChartService is displayed. Note that this assumes that the "baseValueChart" from the 
+						ValueChartService is a group ValueChart.
+	*/
 	setValueChartTypeToView(type: ChartType, currentUser: User) {
 		if (type == ChartType.Individual) {
 
 			let individualChart = this.valueChartViewerService.generateIndividualChart();
 			this.valueChartViewerService.setActiveValueChart(individualChart);
 
-			// TODO:<aaron> Clean this up.
+			// There is no hiding/showing users in an individual chart, so set the usersToDisplay to be the user in the ValueChart.
 			this.usersToDisplay = this.valueChartViewerService.getActiveValueChart().getUsers();
 		} else {
 			let baseValueChart = this.valueChartService.getValueChart();
@@ -212,48 +254,70 @@ export class ValueChartViewerComponent implements OnInit {
 				this.valueChartViewerService.updateInvalidUser(currentUser, errors)
 			}
 
+			// Group ValueCharts have hiding/showing users, so set the usersToDisplay to be the array in valueChartViewerService,
+			// which is connected to the user details box.
 			this.usersToDisplay = this.valueChartViewerService.getUsersToDisplay();
 		}
 
+		// Change the URL parameters to reflect the type of ValueChart being viewed.
 		this.router.navigate(['ValueCharts', this.valueChartViewerService.getActiveValueChart().getFName(), type], { queryParamsHandling: "merge" });
 	}
 
-	updateView(viewConfig: ViewConfig) {
+	// ================================ Event Handlers for Component/Directive Outputs ====================================
+
+	/* 	
+		@param viewConfig - the new view configuration for the ValueChartDirective.
+		@returns {void}
+		@description Sets the view configuration field as a response to an event emitted by the ViewOptionsComponent.
+					 This updates the view configuration of the ValueChartDirective automatically via Angular's binding system.
+	*/
+	updateView(viewConfig: ViewConfig): void {
 		this.viewConfig = viewConfig;
 	}
 
-	updateInteractions(interactionConfig: InteractionConfig) {
+	/* 	
+		@param interactionConfig - the new interaction configuration for the ValueChartDirective.
+		@returns {void}
+		@description Sets the interaction configuration field as a response to an event emitted by the InteractionOptionsComponent.
+					 This updates the interaction configuration of the ValueChartDirective automatically via Angular's binding system.
+	*/
+	updateInteractions(interactionConfig: InteractionConfig): void {
 		this.interactionConfig = interactionConfig;
 	}
 
-	updateUndoRedo(undoRedoService: ChartUndoRedoService) {
+	/* 	
+		@param undoRedoService - the UndoRedoService instantiated by the ValueChartDirective and used by the directive's ecosystem.
+		@returns {void}
+		@description Sets the current undoRedoService to be instance used by the ValueChartDirective and its ecosystem. This allows
+					 the ValueChartViewer and other components to use the "proper" instance of the UndoRedoService using the same dependency
+					 injection provider as the ValueChartDirective. The goal here is decoupling the ValueChartDirective from the ValueChartViewerService. 
+	*/
+	updateUndoRedo(undoRedoService: ChartUndoRedoService): void {
 		this.undoRedoService = undoRedoService;
 
 		undoRedoService.undoRedoDispatcher.on(undoRedoService.SCORE_FUNCTION_CHANGE, this.currentUserScoreFunctionChange);
 		undoRedoService.undoRedoDispatcher.on(undoRedoService.WEIGHT_MAP_CHANGE, this.currentUserWeightMapChange);
 	}
 
-	updateChartElement(chartElement: d3.Selection<any, any, any, any>) {
+	/* 	
+		@param chartElement - the base SVG element of that the ValueChartDirective uses to render the ValueChart visualization.
+		@returns {void}
+		@description Sets the chartElement field to be the base element emitted by the ValueChartDirective. This allows
+					 the ValueChartViewer to have access to the visualization's parent element without directing interacting with the DOM.
+	*/
+	updateChartElement(chartElement: d3.Selection<any, any, any, any>): void {
 		this.chartElement = chartElement;
 	}
 
-	updateRenderEvents(renderEvents: RenderEventsService) {
-		this.renderEvents = renderEvents;
-	}
-
 	/* 	
+		@param renderEvents - the RenderEventsService instance used by the ValueChartDirective to signal when rendering has completed.
 		@returns {void}
-		@description 	Destroys the ValueChartViewer. ngOnDestroy is only called ONCE by Angular when the user navigates to a route which
-						requires that a different component is displayed in the router-outlet.
+		@description Sets the renderEventsService field to be the service instance used by the ValueChartDirective ecosystem.
+					 This allows the ValueChartDirective to listen to render events without having the same service provider as the 
+					 ValueChartDirective. 
 	*/
-	ngOnDestroy() {
-
-		if (this.hostService.hostWebSocket) {
-			this.hostService.endCurrentHosting();
-		}
-
-		// Destroy the ValueChart manually to prevent memory leaks.
-		$('ValueChart').remove();
+	updateRenderEvents(renderEvents: RenderEventsService): void {
+		this.renderEvents = renderEvents;
 	}
 
 	/* 	
@@ -267,7 +331,7 @@ export class ValueChartViewerComponent implements OnInit {
 	}
 
 
-	// TODO <@aaron>: Cleanup these methods.
+	// ================================ Helper Methods for Determining Permissions ====================================
 
 	/* 	
 		@returns {boolean}
@@ -300,10 +364,12 @@ export class ValueChartViewerComponent implements OnInit {
 		return this.valueChartViewerService.isParticipant() || this.valueChartViewerService.getUserRole() == UserRole.Owner;
 	}
 
-  /*   
-    @returns {void}
-    @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
-  */
+
+
+	/*   
+	  @returns {void}
+	  @description   Rescales all ScoreFunctions so that the worst and best outcomes have scores of 0 and 1 respectively.
+	*/
 	rescaleScoreFunctions(): void {
 		let currentUser: User = this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername());
 		let rescaled: boolean = false;
@@ -318,6 +384,11 @@ export class ValueChartViewerComponent implements OnInit {
 		}
 	}
 
+	/*   
+	  @returns {void}
+	  @description   Navigate to the Create workflow to edit the current user's preferences. Note that this should only be called
+	  				 if the current user is a member of the ValueChart being viewed.
+	*/
   	editPreferences(): void {	
   		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
   			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: this.valueChartViewerService.getUserRole() }});
@@ -328,6 +399,11 @@ export class ValueChartViewerComponent implements OnInit {
 		
   	}
 
+  	/*   
+  	  @returns {void}
+  	  @description   Navigate to the Create workflow to edit the current ValueChart. Note that this should only be called
+  	  				 if the current user is the owner of the ValueChart being viewed.
+  	*/
   	editValueChart(): void {
   		this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: this.valueChartViewerService.getUserRole() } });
   	}
@@ -413,6 +489,12 @@ export class ValueChartViewerComponent implements OnInit {
 		}		
 	}
 
+	/* 	
+		@param userChangesPermitted - whether or not the owner of the ValueChart will permit users to save changes to their preferences.
+		@returns {void}
+		@description 	Sets whether or not members of the ValueChart (including the owner if they are a member) will be allowed to save
+						changes to their preferences to the server. 
+	*/
 	setUserChangesAccepted(userChangesPermitted: any): void {
 		this.valueChartService.getStatus().userChangesPermitted = userChangesPermitted;
 
@@ -423,8 +505,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 	}
 
-
-	// TODO <@aaron>: Move the Undo/Redo functionality to its own component.
 
 	// ================================ Undo/Redo ====================================
 

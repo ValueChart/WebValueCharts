@@ -32,8 +32,8 @@ export class RendererConfigUtility {
 	// ========================================================================================
 
 
-	private offset: number = 10;
-	private userSize: number = 50;
+	private offset: number = 10;				// The size of the offset/gap between the summary chart and the objective chart.
+	private userSize: number = 50;				// The width (height if horizontal orientation) of each user's score bar when scaleAlternatives is false.
 
 	// ========================================================================================
 	// 									Constructor
@@ -52,12 +52,11 @@ export class RendererConfigUtility {
 	// ========================================================================================
 
 	/*
-		@param viewConfig - The current viewConfig object for the ValueChartDirective.
-		@param viewOrientation - The current viewOrientation of the ValueChartDirective.
-		@param componentWidth - The width to that the ValueChartComponents are to be rendered with. Note that this currently does not support different widths for different components.
-		@param componentHeight - The height to that the ValueChartComponents are to be rendered with. Note that this currently does not support different heights for different components.
-		@returns {void}
+		@param u - the RendererUpdate object for which to create a renderer configuration. 
+		@returns {RendererUpdate}
 		@description	This function configures the variables used for height, width, x, and y attributes of SVG elements during the rendering of the ValueChart.
+						Together, these variables constitute a RendererConfig object that specifies the dimensions and positions of the visualization elements.
+						Note that this method is almost always used as a part of the rendering pipeline created in the ValueChartDirective.
 						The height and width attributes of SVG elements should be set using dimensionOne, and dimensionTwo.
 						The x and y positions should be set using coordinateOne and coordinateTwo. 
 						This insures that when the orientation of the graph changes, the x and y, and height, and width attributes are switched. 
@@ -99,8 +98,19 @@ export class RendererConfigUtility {
 		return u;
 	}
 
+	/*
+		@param u - the RendererUpdate object that will be customized to the ObjectiveChart visualization.
+		@returns {RendererUpdate}
+		@description This methods modifies the dimension and location fields (ie. height, width, and y, x) of the input
+					 RendererUpdate object to suit the ObjectiveChart part of the visualization.
+					 This method is almost always called as a part of the ValueChartDirective's rendering pipeline.
+					 Notice that this method is where width (height if in horizontal orientation) of the objective chart is
+					 set to depend only on the number of alternatives and users IF the visualization is not being scaled to fit 
+					 in the view port.
+	*/
 	produceObjectiveChartConfig = (u: RendererUpdate): RendererUpdate => {
-		u = _.clone(u);
+		u = _.clone(u);	// The RendererUpdate must be copied so that it is not the same reference as the RendererUpdates for the
+						// other visualization elements (label area, summary chart).
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			u.x = u.width;
@@ -119,8 +129,16 @@ export class RendererConfigUtility {
 		return u;
 	}
 
+	/*
+		@param u - the RendererUpdate object that will be customized to the Label area visualization.
+		@returns {RendererUpdate}
+		@description This methods modifies the dimension and location fields (ie. height, width, and y, x) of the input
+					 RendererUpdate object to suit the Label area part of the visualization.
+					 This method is almost always called as a part of the ValueChartDirective's rendering pipeline.
+	*/
 	produceLabelConfig = (u: RendererUpdate): RendererUpdate => {
-		u = _.clone(u);
+		u = _.clone(u); // The RendererUpdate must be copied so that it is not the same reference as the RendererUpdates for the
+						// other visualization elements.
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			u.x = 0;
@@ -133,8 +151,21 @@ export class RendererConfigUtility {
 		return u;
 	}
 
+	/*
+		@param u - the RendererUpdate object that will be customized to the SummaryChart visualization.
+		@returns {RendererUpdate}
+		@description This methods modifies the dimension and location fields (ie. height, width, and y, x) of the input
+					 RendererUpdate object to suit the SummaryChart part of the visualization.
+					 This method is almost always called as a part of the ValueChartDirective's rendering pipeline.
+					 Notice that this method is where width (height if in horizontal orientation) of the objective chart is
+					 set to depend only on the number of alternatives and users IF the visualization is not being scaled to fit 
+					 in the view port.
+					 Also notice that this is where the height of the summary chart is scaled to preserve the utility scale
+					 if there are multiple users to display.
+	*/
 	produceSummaryChartConfig = (u: RendererUpdate): RendererUpdate => {
-		u = _.clone(u); 
+		u = _.clone(u); // The RendererUpdate must be copied so that it is not the same reference as the RendererUpdates for the
+						// other visualization elements.
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			let maxHeight = u.height;

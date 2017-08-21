@@ -28,16 +28,10 @@ import { RendererUpdate }									from '../../../types/RendererData.types';
 
 import { ChartOrientation }									from '../../../types/Config.types';
 /*
-	This class contains and exposes ValueChart data formatted to work with the ValueChartDirective's 
-	renderer classes. It contains methods for converting the active ValueChart into a format suitable for d3, 
-	and for updating this data in response to user actions. Special care must be taken when using this class to insure
-	that the formatted information in rowData and labelData fields is kept consistent with the active ValueChart stored
-	in ValueChartService. Unexpected and undefined behavior can happen if rowData or labelData ceases to share the
-	same User, ScoreFunction, or WeightMap references as the ValueChartService's active ValueChart object. 
-
-	The data in this class should NOT be exposed to any classes outside of the ValueChartDirective's "environment" of
-	services, renderers, and interactions. It is specifically intended expose the ValueChartDirective's active ValueChart to
-	these classes to ease creation and rendering of a ValueChart visualization.
+	This class contains methods for converting a RendererUpdate message into a format suitable for d3.
+	The produceMaximumWeightMap, produceRowData, and produceLabelData methods provide a mechanism for creating
+	and attachning maximumWieightMaps, RowData, and LabelData from and to RendererUpdate objects. These method are 
+	usually not called manually; instead they are used as a part of a rendering pipeline that is created in ValueChartDirective.
 */
 
 @Injectable()
@@ -48,6 +42,7 @@ export class RendererDataUtility {
 	// ========================================================================================
 
 	private labelData: LabelData[];			// Data from the active ValueChart formatted to work with the LabelRenderer classes.
+											// The labelData are cached here in order to improve rendering performance.
 
 	// ========================================================================================
 	// 									Constructor
@@ -64,13 +59,13 @@ export class RendererDataUtility {
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
-
-	// TODO <@aaron>: update this output type of this method.
-
 	
 	/*
-		@returns {RendererUpdate} 
-		@description	
+		@param u - the RendererUpdate object used to produce a maximumWeightMap.
+		@returns {RendererUpdate}
+		@description Produces a WeightMap made up of the maximum user assigned weights for each PrimitiveObjective.
+					 This maximum WeightMap is then attached the input RendererUpdate, u, which is returned.
+					 This method is generally used as a part of the rendering pipeline created in ValueChartDirective.
 	*/
 	public produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
 		// Return the default WeightMap if there are no users.
@@ -87,12 +82,26 @@ export class RendererDataUtility {
 		return u;
 	}
 
+	/*
+		@param u - the RendererUpdate object used to produce rowData.
+		@returns {RendererUpdate}
+		@description Produces rowData using the input RendererUpdate object.
+					 The rowData is then attached to the the input RendererUpdate, u, which is returned.
+					 This method is generally used as a part of the rendering pipeline created in ValueChartDirective.
+	*/
 	public produceRowData = (u: RendererUpdate) => {
 		u.rowData = this.generateRowData(u);;
 		this.computeStackedBarOffsets(u);
 		return u;
 	}
 
+	/*
+		@param u - the RendererUpdate object used to produce labelData.
+		@returns {RendererUpdate}
+		@description Produces labelData using the input RendererUpdate object.
+					 The labelData is then attached to the the input RendererUpdate, u, which is returned.
+					 This method is generally used as a part of the rendering pipeline created in ValueChartDirective.
+	*/
 	public produceLabelData = (u: RendererUpdate) => {
 		// Re-generate the label data if it is undefined, or if the root labelDatum is undefined.
 		if (!this.labelData || !this.labelData[0] || u.structuralUpdate) {
@@ -110,6 +119,7 @@ export class RendererDataUtility {
 
 	// ================================ Data Creation and Update Methods  ====================================
 	/*
+		@param u - THe rendererUpdate object from which to generate the maximumWeightMap.
 		@returns {WeightMap} - A WeightMap where each objective weight is the maximum weight assigned to that objective by any user in chart.
 		@description	Iterates over the ValueChart's collection of users to determine the maximum weight assigned to each primitive objective
 						by any user. These maximum weights are then inserted into a new WeightMap, the so called maximum WeightMap. If there is only
@@ -145,10 +155,9 @@ export class RendererDataUtility {
 
 
 	/*
+		@param u - The rendererUpdate object from which to generate the LabelData.
 		@returns {void} 
-		@description	Generates the LabelData from the active ValueChart in the ValueChartService and assigns it to the rowData field. This method can be used
-						to either generate the LabelData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
-						by regenerating the data.
+		@description	Generates the LabelData from the input RendererUpdate object and assigns it to the labelData field of the service.
 	*/
 	private generateLabelData(u: RendererUpdate): void {
 		this.labelData = [];
@@ -159,10 +168,9 @@ export class RendererDataUtility {
 	}
 
 	/*
-		@returns {void} 
-		@description	Generates the RowData from the active ValueChart in the ValueChartService and assigns it to the labelData field. This method can be used
-						to either generate the RowData for the first time or to handle structural change to the ValueChart (adding/deleting objectives, alternatives, users)
-						by regenerating the data.
+		@param u - The rendererUpdate object from which to generate the RowData.
+		@returns {rowData}
+		@description	Generates the RowData from the input RendererUpdate object and returns it. 
 	*/
 	private generateRowData(u: RendererUpdate): RowData[] {
 		var weightOffset: number = 0;
@@ -180,6 +188,12 @@ export class RendererDataUtility {
 		return rowData;
 	}
 
+	/*
+		@param u - The rendererUpdate object from which to generate the CellData.
+		@param objective - the objective for which the cell data is to be created.
+		@returns {void} 
+		@description	Generates the CellData for the given objective and from the input RendererUpdate object and then returns it.
+	*/
 	private generateCellData(u: RendererUpdate, objective: PrimitiveObjective): CellData[] {
 		var users: User[] = u.usersToDisplay;
 
