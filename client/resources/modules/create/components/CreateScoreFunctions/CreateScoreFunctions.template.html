@@ -23,6 +23,7 @@
                     <button type="button" class="btn btn-default" [disabled]="!latestDefaults[selectedObjective]" (click)="resetScoreFunction()">Reset</button>
                 </div>
             </div>
+            <div id="objective-description">{{getObjectiveByName(selectedObjective).getDescription()}}</div>
         </div> 
         <div class="col-xs-offset-3">
             <ScoreFunction 

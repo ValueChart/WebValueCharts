@@ -136,7 +136,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, this.valueChart.getName(), this.valueChart.getDescription(), '', 0, 'abstract');
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, '', this.valueChart.getName(), this.valueChart.getDescription(), '', 0, 'abstract');
 			this.objectivesCount++;
 		}
 		else {
@@ -220,7 +220,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Creates a new, blank ObjectiveRow under an existing ObjectiveRow.
 	*/
 	addNewChildObjRow(parentID: string) {
-		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', parentID, this.objectiveRows[parentID].depth + 1, 'primitive', this.getNextColor()));
+		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', '', parentID, this.objectiveRows[parentID].depth + 1, 'primitive', this.getNextColor()));
 		this.resetErrorMessages();
 	}
 
@@ -307,38 +307,61 @@ export class CreateObjectivesComponent implements OnInit {
 	objRowToObjective(objrow: ObjectiveRow): Objective {
 		let obj: Objective;
 		if (objrow.type === 'primitive') {
-			obj = new PrimitiveObjective(objrow.name, objrow.desc);
-			let dom: Domain;
-			if (objrow.dom.type === 'categorical') {
-				dom = new CategoricalDomain(true);
-				for (let cat of objrow.dom.categories) {
-					(<CategoricalDomain>dom).addElement(cat);
-				}
-			}
-			else if (objrow.dom.type === 'interval') {
-				dom = new IntervalDomain(objrow.dom.min, objrow.dom.max, objrow.dom.interval);
-			}
-			else {
-				if (objrow.dom.unit) {
-					dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max, objrow.dom.unit);
-				}
-				else {
-					dom = new ContinuousDomain(objrow.dom.min, objrow.dom.max);
-				}				
-			}
-			(<PrimitiveObjective>obj).setDomain(dom);
+			obj = objrow.objid === '' ? new PrimitiveObjective('', '') : this.getObjectiveById(objrow.objid);
+			obj.setName(objrow.name);
+			obj.setDescription(objrow.desc);
+			(<PrimitiveObjective>obj).setDomain(this.domainDetailsToDomain(objrow.dom));
 			(<PrimitiveObjective>obj).setColor(objrow.color);
 			if (!this.valueChart.isIndividual()) {
 				(<PrimitiveObjective>obj).setDefaultScoreFunction(objrow.defaultScoreFunction);
 			}	
 		}
 		else {
-			obj = new AbstractObjective(objrow.name, objrow.desc);
+			obj = objrow.objid === '' ? new AbstractObjective('', '') : this.getObjectiveById(objrow.objid);
+			obj.setName(objrow.name);
+			obj.setDescription(objrow.desc);
+			let subObjectives: Objective[] = [];
 			for (let child of objrow.children) {
-				(<AbstractObjective>obj).addSubObjective(this.objRowToObjective(this.objectiveRows[child]));
+				subObjectives.push(this.objRowToObjective(this.objectiveRows[child]));
 			}
+			(<AbstractObjective>obj).setDirectSubObjectives(subObjectives);
 		}
 		return obj;
+	}
+
+	getObjectiveById(id: string): Objective {
+		for (let obj of this.valueChartService.getValueChart().getAllObjectives()) {
+			if (obj.getId() === id) {
+				return obj;
+			}
+		}
+		throw "Objective not found";
+	}
+
+	/* 	
+		@returns {Objective}
+		@description 	Converts a DomainDetails object into a Domain.
+	*/
+	domainDetailsToDomain(domDets: DomainDetails): Domain {
+		let dom: Domain;
+		if (domDets.type === 'categorical') {
+			dom = new CategoricalDomain(true);
+			for (let cat of domDets.categories) {
+				(<CategoricalDomain>dom).addElement(cat);
+			}
+		}
+		else if (domDets.type === 'interval') {
+			dom = new IntervalDomain(domDets.min, domDets.max, domDets.interval);
+		}
+		else {
+			if (domDets.unit) {
+				dom = new ContinuousDomain(domDets.min, domDets.max, domDets.unit);
+			}
+			else {
+				dom = new ContinuousDomain(domDets.min, domDets.max);
+			}				
+		}
+		return dom;
 	}
 
 	/* 	
@@ -348,7 +371,7 @@ export class CreateObjectivesComponent implements OnInit {
 	objectiveToObjRow(obj: Objective, parentID: string, depth: number) {
 		let objrow: ObjectiveRow;
 		if (obj.objectiveType === 'abstract') {
-			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getName(), obj.getDescription(), parentID, depth, 'abstract');
+			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getId(), obj.getName(), obj.getDescription(), parentID, depth, 'abstract');
 			this.addObjRow(parentID, objrow);
 			for (let child of (<AbstractObjective>obj).getDirectSubObjectives()) {
 				this.objectiveToObjRow(child, objrow.id, objrow.depth + 1);
@@ -360,7 +383,7 @@ export class CreateObjectivesComponent implements OnInit {
 			if (this.colorMappings[color] !== undefined) 
 				color = this.colorMappings[color];
 
-			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getName(), obj.getDescription(), parentID, depth, 'primitive', color,
+			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getId(), obj.getName(), obj.getDescription(), parentID, depth, 'primitive', color,
 				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()), (<PrimitiveObjective>obj).getDefaultScoreFunction());
 			this.addObjRow(parentID, objrow);
 		}
@@ -575,6 +598,7 @@ export class CreateObjectivesComponent implements OnInit {
 */
 class ObjectiveRow {
 	id: string;
+	objid: string; // the id of the corresponding objective object (if it exists)
 	name: string;
 	desc: string;
 	parent: string;
@@ -586,8 +610,9 @@ class ObjectiveRow {
 	defaultScoreFunction: ScoreFunction;
 	latestDefault: string; // Track latest selection in default dropdown
 
-	constructor(id: string, name: string, desc: string, parent: string, depth: number, type?: string, color?: string, dom?: DomainDetails, defaultScoreFunction?: ScoreFunction) {
+	constructor(id: string, objid: string, name: string, desc: string, parent: string, depth: number, type?: string, color?: string, dom?: DomainDetails, defaultScoreFunction?: ScoreFunction) {
 		this.id = id;
+		this.objid = objid;
 		this.name = name;
 		this.desc = desc;
 		this.parent = parent;
@@ -638,7 +663,7 @@ class ObjectiveRow {
 
 	copy(): ObjectiveRow {
 		let domCopy = this.dom.copy();
-		return new ObjectiveRow(this.id, this.name, this.desc, this.parent, this.depth, this.type, this.color, domCopy, this.defaultScoreFunction);
+		return new ObjectiveRow(this.id, this.objid, this.name, this.desc, this.parent, this.depth, this.type, this.color, domCopy, this.defaultScoreFunction);
 	}
 }
 
