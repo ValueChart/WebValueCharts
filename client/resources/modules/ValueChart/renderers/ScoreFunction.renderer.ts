@@ -52,28 +52,33 @@ export abstract class ScoreFunctionRenderer {
 	protected enableInteraction: boolean;					// Whether or not the score functions may be adjusted
 
 	// d3 Selections:
-	public rootContainer: d3.Selection<any, any, any, any>;				// The 'g' element that is the root container of the score function plot.
-	public outlineContainer: d3.Selection<any, any, any, any>;
+	public rootContainer: d3.Selection<any, any, any, any>;					// The 'g' element that is the root container of the score function plot.
+	public outlineContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'rect' element which outlines the score function plot.
 	public plotOutline: d3.Selection<any, any, any, any>;					// The 'rect' element that is used to outline the score function plot
-	public plotContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the plot itself.
+	public plotContainer: d3.Selection<any, any, any, any>;					// The 'g' element that contains the plot itself.
 	public domainLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the labels for each domain element. 
 	public domainLabels: d3.Selection<any, any, any, any>;					// The selection of 'text' elements s.t. each element is a label for one domain element.
-	public plotElementsContainer: d3.Selection<any, any, any, any>;		// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
+	public plotElementsContainer: d3.Selection<any, any, any, any>;			// The 'g' element that holds the elements making up the plot, like points and fit lines, or bars.
 	public userContainers: d3.Selection<any, any, any, any>;				// The selection of 'g' elements s.t. each element is a container for the plot elements of one user.
-	public axisContainer: d3.Selection<any, any, any, any>;				// The 'g' element that conntains the y and x axis.
+	public axisContainer: d3.Selection<any, any, any, any>;					// The 'g' element that conntains the y and x axis.
 
-	public domainAxis: d3.Selection<any, any, any, any>;
-	public unitsLabel: d3.Selection<any, any, any, any>;
-	public utilityAxisContainer: d3.Selection<any, any, any, any>;
+	public domainAxis: d3.Selection<any, any, any, any>;					// The domain (dimension 1) axis of the score function plot.
+	public unitsLabel: d3.Selection<any, any, any, any>;					// The 'text' element used as a units label for the domain axis of the score function plot.
+	public utilityAxisContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the utility (dimension 2) axis of the score function plot.
 
-	public clickToExpandText: d3.Selection<any, any, any, any>;
+	public clickToExpandText: d3.Selection<any, any, any, any>;				// The 'text' element that is shown when the score function plot is too small to render properly.
 
-	public lastRendererUpdate: ScoreFunctionUpdate;
-	protected numUsers: number;
+	public lastRendererUpdate: ScoreFunctionUpdate;							// The most recent ScoreFunctionUpdate received by the Renderer.
+	protected numUsers: number;												// The current number of users whose score functions are displayed in the score function plot.
+																			// This is saved for internal change detection purposes.
 	protected viewOrientation: ChartOrientation;
 
-	public adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;
-	public expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
+	// The interactions are local instances rather than dependency injected globals
+	// like the other Renderer classes. This is because there are usually many score function plots
+	// rendered at the same time and each requires it's own interaction instance. Note that this is very
+	// different from, say, the objective chart, of which there is only ever one copy.
+	public adjustScoreFunctionInteraction: AdjustScoreFunctionInteraction;	// The instance of the AdjustScoreFunctionInteraction class used by the Renderer to implement interactivity.
+	public expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;	// The instance of the ExpandScoreFunctionInteraction class used by the Renderer to implement double clicking to expand the score function.
 
 	// class name definitions for SVG elements that are created by this renderer.
 	public static defs = {
@@ -117,12 +122,24 @@ export abstract class ScoreFunctionRenderer {
 	// ========================================================================================
 
 
+	/*
+		@param update - The ScoreFunctionUpdate message sent to the LabelRenderer to initiate a re-rendering of the score function.
+						This message is almost always dispatched from the labelRenderer or the ScoreFunctionDirective in response to
+						a message from the ValueChartDirective (first case) or a change in the Directive's inputs (second case). 
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the rendering pipeline and thus controls how and when the 
+						label area is rendered. 
+	*/
 	public scoreFunctionChanged = (update: ScoreFunctionUpdate) => {
+		// Check to see if this update is going to require re-rendering the first dimension of the score function plot.
+		// Rendering the first dimension is expensive and usually not required - most updates are caused by changing user
+		// weights or score functions and only require re-rendering the second dimension.
 		if (this.lastRendererUpdate)
 			var dimensionOneChanged = this.lastRendererUpdate.rendererConfig.dimensionOneSize !== update.rendererConfig.dimensionOneSize;
 		
 		this.lastRendererUpdate = update;
 
+		// If the root container is undefined, then the score function has never been rendered and needs to be constructed for the first time.
 		if (this.rootContainer == undefined) {
 			this.createScoreFunction(update);
 			this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation));
@@ -131,6 +148,7 @@ export abstract class ScoreFunctionRenderer {
 			return;
 		}
 
+		// The plot structure (SVG elements) must be updated if the number of users has changed.
 		if (this.numUsers != update.scoreFunctions.length) {
 			this.createPlot(update, this.plotElementsContainer, this.domainLabelContainer);
 		}
@@ -138,6 +156,7 @@ export abstract class ScoreFunctionRenderer {
 		this.updateInteractions(update);
 		this.renderScoreFunction(update, (this.numUsers != update.scoreFunctions.length || this.viewOrientation != update.viewOrientation || dimensionOneChanged));
 
+		// If the update requires updating the styles, then do so.
 		if (update.styleUpdate) {
 			this.applyStyles(update);
 		}
@@ -146,22 +165,41 @@ export abstract class ScoreFunctionRenderer {
 		this.viewOrientation = update.viewOrientation;
 	}
 
+	/*
+		@param displayScoreFunctionValueLabels - whether or not score function value labels should be displayed. These labels show exactly what
+												 utility is assigned to each rendered domain element.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the view config pipeline and thus controls how and when the 
+						score function view options are turned on and off.
+	*/
 	public viewConfigChanged = (displayScoreFunctionValueLabels: boolean) => {
 		this.toggleValueLabels(displayScoreFunctionValueLabels);		
 	}
 
+	/*
+		@param interactionConfig - The interactionConfig message sent to the ScoreFunctionRenderer to update interaction settings.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						score function interactions are turned on and off.
+	*/
 	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Update the lastRendererUpdate fields of the interactions associated with the ScoreFunctionRenderer with the most recent ScoreFunctionUpdate message.
+						It is critical to the correct operation of the interaction classes that these fields remain synched with lastRendererUpdate field
+						in the ScoreFunctionRenderer instance.
+	*/
 	public updateInteractions = (u: ScoreFunctionUpdate) => {
 		this.expandScoreFunctionInteraction.lastRendererUpdate = u;
 		this.adjustScoreFunctionInteraction.lastRendererUpdate = u;
 	}
 
 	/*
-		@param el - The element that to be used as the parent of the objective chart.
-		@param objective - The objective for which the score function plot is going to be created.
+		@param u - The most recent ScoreFunctionUpdate message.
 		@returns {void}
 		@description 	Creates the base containers and elements for a score function plot. It should be called as the first step of creating a score function plot.
 						sub classes of this class should call createScoreFunction before creating any of their specific elements.
@@ -245,10 +283,9 @@ export abstract class ScoreFunctionRenderer {
 
 
 	/*
+		@param u - The most recent ScoreFunctionUpdate message.
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. These are 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
-		@param objective - The objective for which the score function plot is going to be created.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	Creates the user containers, which will contain each user's plot elements, and the domain labels for the domain element axis. 
 						DiscreteScoreFunction and ContinuousScoreFunction extend this method in order to create the additional SVG elements they need.
@@ -285,15 +322,14 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	/*
-		@param objective - The objective for which the score function plot is going to be created.
-		@param width - The width of the area in which to render the score function plot.
-		@param height - The height of the area in which to render the score function plot.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param u - The most recent ScoreFunctionUpdate message.
+		@param updateDimensionOne - Whether or not this (re)-rendering of the score function plot should also resize/position the first dimension of
+									the plot elements. The first dimension is x if vertical orientation, y otherwise.
 		@returns {void}
-		@description	Initializes the view configuration for the score function plot, and then positions + styles its elements. This method should be used 
+		@description	Positions + styles the elements making up the score function plot. This method should be used 
 						whenever the score function plot needs to be rendered for the first time, or when updated in response to changes to users' ScoreFunctions.
-						View configuration must be done here because this class intentionally avoids using the renderConfigService class. It uses calls to the
-						render plot method (which is overwritten by subclasses), and the renderAxesDimensionTwo to render the different parts of the score function plot.
+						It uses calls to the render plot method (which is overwritten by subclasses), renderAxesDimensionTwo, and renderAxesDimensionOne
+						to render the different parts of the score function plot.
 	*/
 	protected renderScoreFunction(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.domainSize = u.scoreFunctionData.length > 0 ? u.scoreFunctionData[0].elements.length : 0;
@@ -306,9 +342,11 @@ export abstract class ScoreFunctionRenderer {
 
 		this.renderAxesDimensionTwo(u);
 
+		// Render the first dimension of the utility and domain axes if we need to.
 		if (updateDimensionOne)
 			this.renderAxesDimensionOne(u);
 
+		// Position the text elements that are shown when the score function does not have enough space to render.
 		if (u.viewOrientation == ChartOrientation.Vertical) {
 			this.clickToExpandText.attr(u.rendererConfig.coordinateOne, 0)
 			this.clickToExpandText.attr(u.rendererConfig.coordinateTwo, u.rendererConfig.dimensionTwoSize / 2);
@@ -320,6 +358,17 @@ export abstract class ScoreFunctionRenderer {
 		this.renderPlot(u, updateDimensionOne);
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Positions the first coordinate and sizes the first dimension of elements making up the
+						domain and utility axes of the score function plot. This method should only be called when
+						there is a renderer update that actually requires reposition/sizing the first dimension of these
+						elements since this is a fairly costly operation. Changes of this form include:
+							- A new user is added to the plot, or a user is removed from the plot.
+							- The width of the area the plot will be rendered in has changed.
+							- The domain elements rendered in th plot have changed.
+	*/
 	protected renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		// Position the domain axis.
 		this.domainAxis
@@ -344,11 +393,11 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	/*
-		@param axisContainer - The 'g' element that the axes elements are in.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param u - The most recent ScoreFunctionUpdate message.
 		@returns {void}
-		@description	Positions and styles the elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
-						the axes elements should be done as part of a call to renderScoreFunction instead.
+		@description	Positions and sizes the second coordinate/dimension elements of both the domain (y) and utility axes (x). This method should NOT be called manually. Rendering
+						the axes elements should be done as part of a call to renderScoreFunction instead. Most re-rendering cycles
+						only require calling this function (not rednerAxesDimensionOne). 
 	*/
 	protected renderAxesDimensionTwo(u: ScoreFunctionUpdate): void {
 
@@ -406,11 +455,9 @@ export abstract class ScoreFunctionRenderer {
 	}
 
 	/*
-		@param domainLabels - The selection 'text' elements used to label the domain axis.
-		@param plotElementsContainer - The 'g' element that contains the userContainers elements.
-		@param objective - The objective for which the score function plot is being rendered.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param u - The most recent ScoreFunctionUpdate message.
+		@param updateDimensionOne - Whether or not this (re)-rendering of the score function plot should also resize/position the first dimension of
+									the plot elements. The first dimension is x if vertical orientation, y otherwise.
 		@returns {void}
 		@description	Positions and styles the elements created by createPlot. Like createPlot, it is extended by DiscreteScoreFunction and ContinuousScoreFunction in order
 						to render their specific elements. This method should NOT be called manually. Instead it should be called as a part of calling renderScoreFunction to re-render
@@ -421,6 +468,12 @@ export abstract class ScoreFunctionRenderer {
 	protected abstract toggleValueLabels(displayScoreFunctionValueLabels: boolean): void;
 
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Toggles whether or not the ScoreFunction will actually be displayed based on the size of the area it has been given
+						to render in. The plot will not render properly if the area is too small (less than 50px X 50px) and so should not be displayed.
+	*/
 	protected toggleDisplay(u: ScoreFunctionUpdate): void {
 		if (u.rendererConfig.dimensionOneSize < this.minimumDimension || u.rendererConfig.dimensionTwoSize < this.minimumDimension) {
 			this.plotContainer.style('display', 'none');
@@ -431,6 +484,12 @@ export abstract class ScoreFunctionRenderer {
 		}
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Apply styles to the score function plot that depend on values given in the ScoreFunctionUpdate message.
+						Styles that can be computed statically are applied through CSS classes instead of here.
+	*/
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		this.domainAxis
 			.style('stroke-width', 1)

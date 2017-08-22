@@ -43,7 +43,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	// d3 Selections:
 	public pointsContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'circle' elements used as points in the scatter plot.
-	public plottedPoints: d3.Selection<any, any, any, any>;				// The 'circle' elements used as points in the scatter plot.
+	public plottedPoints: d3.Selection<any, any, any, any>;					// The 'circle' elements used as points in the scatter plot.
 	public linesContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'line' elements used as fitlines between points in the scatter plot. 
 	public fitLines: d3.Selection<any, any, any, any>;						// The 'line' elements used as fitlines between points in the scatter plot. 
 	public pointLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the 'text' elements used to labels points in the scatter plot with their scores.
@@ -81,16 +81,21 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// ========================================================================================
 
 
+	/*
+		@param interactionConfig - The interactionConfig message sent to the ScoreFunctionRenderer to update interaction settings.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						score function interactions are turned on and off.
+	*/
 	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.plottedPoints, this.lastRendererUpdate)
 	}
 
 	/*
+		@param u - The most recent ScoreFunctionUpdate message.
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. The user containers are the 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
-		@param objective - The objective for which the score function plot is going to be created.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	This method overrides the createPlot method in ScoreFunctionRenderer in order to create ContinuousScoreFunction specific elements, 
 						like points and fitlines for the scatter plot that is used to represent element scores. This method should NOT be called manually. Instead, 
@@ -147,10 +152,10 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
+		@param u - The most recent ScoreFunctionUpdate message.
 		@param pointsContainer - The 'g' element that is intended to contain the 'circle' elements used as points in the scatter plot.
 		@oaram linesContainer - The 'g' element that is intended to contain the 'line' elements used as fitlines in the scatter plot.
 		@param labelsContainer - The 'g' element that is intended to contain the labels for the bars. 
-		@param objective - The objective for which the score function plot is going to be created.
 		@returns {void}
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
@@ -209,12 +214,12 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
-		@param objective - The objective for which the score function plot is being rendered.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param u - The most recent ScoreFunctionUpdate message.
+		@param updateDimensionOne - Whether or not this (re-)rendering of the score function plot should also resize/position the first dimension of
+									the plot elements. The first dimension is x if vertical orientation, y otherwise.
 		@returns {void}
 		@description	This method positions and styles the ContinuousScoreFunction specific elements of the score function plot. Specifically, it renders the points, fitlines, and point labels
-						of the scatter plot.nThis method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
+						of the scatter plot. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
 	*/
 	protected renderPlot(u: ScoreFunctionUpdate, updateDimensionOne: boolean): void {
 		this.userContainers.data(u.scoreFunctionData);
@@ -240,6 +245,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	This method positions and sizes the first coordinate/dimension of the ContinuousScoreFunction specific elements of the score function plot. 
+						Specifically, it renders the points, fitlines, and point labels of the scatter plot. This method should NOT be called manually. Instead it 
+						should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
+	*/
 	protected renderContinuousPlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var pointRadius = u.rendererConfig.labelOffset / 2.5;
 		var pointOffset = 3;
@@ -259,6 +271,13 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne + '2', (d: DomainElement, i: number) => { return this.calculatePlotElementCoordinateOne(d, i + 1) - pointOffset; });
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	This method positions and sizes the second coordinate/dimension of the ContinuousScoreFunction specific elements of the score function plot. 
+						Specifically, it renders the points, fitlines, and point labels of the scatter plot. This method should NOT be called manually. Instead it 
+						should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
+	*/
 	protected renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
@@ -284,6 +303,12 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 			});
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Apply styles to the score function plot that depend on values given in the ScoreFunctionUpdate message.
+						Styles that can be computed statically are applied through CSS classes instead of here.
+	*/
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 

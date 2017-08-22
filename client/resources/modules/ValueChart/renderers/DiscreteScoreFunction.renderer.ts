@@ -49,8 +49,8 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	public barContainer: d3.Selection<any, any, any, any>;				// The 'g' element that contains the 'rect' elements used as bars in the plot.
 	public utilityBars: d3.Selection<any, any, any, any>;				// The selection of 'rect' elements used as bars in the plot. There should be one per user per domain element. 
 	public barTops: d3.Selection<any, any, any, any>;					// The selection of 'rect' elements used as the filled tops of bars in the plot. These are for implementing clicking and dragging to change a score function.
-	public barLabelContainer: d3.Selection<any, any, any, any>;		// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
-	public barLabels: d3.Selection<any, any, any, any>;				// The selection of 'text' elements used as score labels for bars.
+	public barLabelContainer: d3.Selection<any, any, any, any>;			// The 'g' element that contains the text labels used to indicate what exact height (score) a bar has.
+	public barLabels: d3.Selection<any, any, any, any>;					// The selection of 'text' elements used as score labels for bars.
 
 
 	// class name definitions for SVG elements that are created by this renderer.
@@ -76,7 +76,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		super(chartUndoRedoService);
 	}
 
-
+	/*
+		@param interactionConfig - The interactionConfig message sent to the ScoreFunctionRenderer to update interaction settings.
+		@returns {void}
+		@description	This method is used as the observer/handler of messages from the interactions pipeline and thus controls how and when the 
+						score function interactions are turned on and off.
+	*/
 	public interactionConfigChanged = (interactionConfig: any) => {
 		this.expandScoreFunctionInteraction.toggleExpandScoreFunction(interactionConfig.expandScoreFunctions, this.rootContainer.node().querySelectorAll('.' + ScoreFunctionRenderer.defs.PLOT_OUTLINE), this.lastRendererUpdate);
 		this.adjustScoreFunctionInteraction.toggleDragToChangeScore(interactionConfig.adjustScoreFunctions, this.barTops, this.lastRendererUpdate)
@@ -88,10 +93,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	// ========================================================================================
 
 	/*
+		@param u - The most recent ScoreFunctionUpdate message.
 		@param plotElementsContainer - The 'g' element that is intended to contain the user containers. The user containers are the 'g' elements that will contain the parts of each users plot (bars/points).
 		@param domainLabelContainer - The 'g' element that is intended to contain the labels for the domain (x) axis. 
-		@param objective - The objective for which the score function plot is going to be created.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
 		@returns {void}
 		@description 	This method overrides the createPlot method in ScoreFunctionRenderer in order to create DiscreteScoreFunction specific elements, 
 						like bars for the bar chart that is used to represent element scores. This method should NOT be called manually. Instead, 
@@ -133,9 +137,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
+		@param u - The most recent ScoreFunctionUpdate message.
 		@param barsContainer - The 'g' element that is intended to contain the 'rect' elements that are bars in the plot.
 		@param labelsContainer - The 'g' element that is intended to contain the labels for the bars. 
-		@param objective - The objective for which the score function plot is going to be created.
 		@returns {void}
 		@description 	Creates the SVG elements and containers specific to a discrete score function plot. This is mainly the bars, bar tops, and bar labels of the bar graph.
 						This method should NOT be called manually. Use createScoreFunction to create the entire plot instead.
@@ -186,6 +190,17 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.barTops = barsContainer.selectAll('.' + DiscreteScoreFunctionRenderer.defs.BAR_TOP);
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Positions the first coordinate and sizes the first dimension of elements making up the
+						domain and utility axes of the score function plot. This method should only be called when
+						there is a renderer update that actually requires reposition/sizing the first dimension of these
+						elements since this is a fairly costly operation. Changes of this form include:
+							- A new user is added to the plot, or a user is removed from the plot.
+							- The width of the area the plot will be rendered in has changed.
+							- The domain elements rendered in th plot have changed.
+	*/
 	protected renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		super.renderAxesDimensionOne(u);
 
@@ -201,9 +216,9 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
-		@param objective - The objective for which the score function plot is being rendered.
-		@param scoreFunctionData - The correctly formatted data for underlying the points/bars of the score function plot. This format allows the plot to show multiple users' score functions.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param u - The most recent ScoreFunctionUpdate message.
+		@param updateDimensionOne - Whether or not this (re-)rendering of the score function plot should also resize/position the first dimension of
+									the plot elements. The first dimension is x if vertical orientation, y otherwise.
 		@returns {void}
 		@description	This method positions and styles the DiscreteScoreFunction specific elements of the score function plot. Specifically, it renders the bars, bar tops, and bar labels
 						of the bar chart. This method should NOT be called manually. Instead it should be used as a part of calling renderScoreFunction to re-render
@@ -223,6 +238,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		}
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	This method positions and sizes the first coordinate/dimension of the DiscreteScoreFunction specific elements of the score function plot. 
+						Specifically, it renders the bars, bar tops, and bar labels of the bar chart. This method should NOT be called manually. Instead it 
+						should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
+	*/
 	protected renderDiscretePlotDimensionOne(u: ScoreFunctionUpdate): void {
 		var barWidth: number = ((u.rendererConfig.dimensionOneSize / this.domainSize) / u.scoreFunctionData.length) / 2;
 
@@ -246,6 +268,13 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			.attr(u.rendererConfig.coordinateOne, this.calculatePlotElementCoordinateOne);
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	This method positions and sizes the second coordinate/dimension of the DiscreteScoreFunction specific elements of the score function plot. 
+						Specifically, it renders the bars, bar tops, and bar labels of the bar chart. This method should NOT be called manually. Instead it 
+						should be used as a part of calling renderScoreFunction to re-render the entire score function plot.
+	*/
 	protected renderDiscretePlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculateBarDimensionTwo = (d: DomainElement) => {
@@ -273,6 +302,12 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 
 	}
 
+	/*
+		@param u - The most recent ScoreFunctionUpdate message.
+		@returns {void}
+		@description	Apply styles to the score function plot that depend on values given in the ScoreFunctionUpdate message.
+						Styles that can be computed statically are applied through CSS classes instead of here.
+	*/
 	protected applyStyles(u: ScoreFunctionUpdate): void {
 		super.applyStyles(u);
 
@@ -282,7 +317,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 	}
 
 	/*
-		@param enableDragging - A boolean value indicating whether or not to display the  score labels.
+		@param displayScoreFunctionValueLabels - A boolean value indicating whether or not to display the score labels.
 		@returns {void}
 		@description	This method toggles the visibility of score labels next to the bars in the bar chart.
 	*/
