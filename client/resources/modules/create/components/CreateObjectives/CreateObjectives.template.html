@@ -4,33 +4,33 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Color</th>
-            <th>Domain Type</th>
-            <th>Domain Info</th>
-            <th *ngIf="!valueChart.isIndividual()">Default Score Function</th>
+            <th><div class="objectives-table-name-column">Name</div></th>
+            <th><div class="objectives-table-description-column">Description</div></th>
+            <th><div class="objectives-table-dropdown-column">Type</div></th>
+            <th><div class="objectives-table-small-column">Color</div></th>
+            <th><div class="objectives-table-dropdown-column">Domain Type</div></th>
+            <th><div class="objectives-table-domaininfo-column">Domain Info</div></th>
+            <th *ngIf="!valueChart.isIndividual()"><div class="objectives-table-small-column">Default Score Function</div></th>
             <th *ngIf="!valueChart.isIndividual()">
-                <div class="objectivves-table-grid"><div class="objectives-table-row">
-                    <div class="objectives-table-cell"><input type="checkbox" [ngModel]="allImmutable()" (ngModelChange)="toggleAllImmutable()"/></div>
-                    <div class="objectives-table-cell">Admin Defined</div>
-                </div></div>
+                <div class="objectives-table-small-column objectives-table-grid-row">
+                    <div class="objectives-table-grid-cell"><input type="checkbox" [ngModel]="allImmutable()" (ngModelChange)="toggleAllImmutable()"/></div>
+                    <div class="objectives-table-grid-cell">Admin Defined</div>
+                </div>
             </th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{tablerowselected:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
+        <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objectivestableselectedrow:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
             <th>
                 <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control objectives-table-input" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
+                <input class="form-control" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
                 </div>
             </th>
             <th>
-                <textarea id="description-area" class="form-control objectives-table-input" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
+                <textarea class="form-control objectives-table-textarea" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
             </th>
             <th>
-                <select class="form-control objectives-table-dropdown" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
+                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
                     <option [value]="'primitive'">base</option>
                     <option [value]="'abstract'">parent</option>
                 </select>
@@ -38,12 +38,12 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <span class="pull-right"><input type="color" [(ngModel)]="objectiveRows[objID].color"></span>
+                <input type="color" [(ngModel)]="objectiveRows[objID].color">
                 </div>
             </th> 
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
-                <div *ngIf="objectiveRows[objID].type === 'primitive'" class="objectives-table-dropdown">
+                <div *ngIf="objectiveRows[objID].type === 'primitive'">
                     <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].initializeDefaultScoreFunction(); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
@@ -70,23 +70,23 @@
                 <div *ngIf="objectiveRows[objID].type === 'primitive' 
                     && (objectiveRows[objID].dom.type === 'continuous' || objectiveRows[objID].dom.type === 'interval')">
                     <div class="objectives-table-grid">
-                        <div class="objectives-table-row">
-                            <div class="objectives-table-cell"><label class="control-label">min:</label></div>
-                            <div class="objectives-table-cell"><label class="control-label">max:</label></div>
-                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell"><label class="control-label">unit:</label></div>
-                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell"><label class="control-label">interval:</label></div>
+                        <div class="objectives-table-grid-row">
+                            <div class="objectives-table-grid-cell"><label class="control-label">min:</label></div>
+                            <div class="objectives-table-grid-cell"><label class="control-label">max:</label></div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-grid-cell"><label class="control-label">unit:</label></div>
+                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-grid-cell"><label class="control-label">interval:</label></div>
                         </div>
-                        <div class="objectives-table-row">
-                            <div class="objectives-table-cell">
+                        <div class="objectives-table-grid-row">
+                            <div class="objectives-table-grid-cell">
                                 <input class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = Number(a.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                             </div>
-                            <div class="objectives-table-cell">
+                            <div class="objectives-table-grid-cell">
                                 <input class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = Number(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                             </div>
-                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-cell">
+                            <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-grid-cell">
                                 <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />  
                             </div>
-                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-cell">
+                            <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-grid-cell">
                                 <input class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = Number(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
                             </div>
                         </div>
@@ -102,7 +102,7 @@
             <th *ngIf="!valueChart.isIndividual()">
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <div><input [disabled]="disableEditDefaultScoreFunction(objID)" [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" (ngModelChange)="resetErrorMessages()" type="checkbox"/></div>
+                    <div><input type="checkbox" [disabled]="disableEditDefaultScoreFunction(objID)" [(ngModel)]="objectiveRows[objID].defaultScoreFunction.immutable" (ngModelChange)="resetErrorMessages()"/></div>
                 </div>
             </th>       
         </tr>                  
@@ -128,7 +128,7 @@
             <div class="modal-body">
                 <form role="form">
                     <div><label class="control-label">Enter the categories, separated by commas.</label></div>
-                    <div><textarea class="form-control" id="category-area" name="catstring" rows="3" [(ngModel)]="categoryString"></textarea></div>
+                    <div><textarea class="form-control" id="categories-input" name="categories-input" rows="3" [(ngModel)]="categoryString"></textarea></div>
                 </form>
             </div>           
             <div class="modal-footer">
@@ -150,7 +150,7 @@
             </div>     
             <div *ngIf="defaultScoreFunctionModalOpen" class="modal-body">
                 <div class="input-group">
-                    <select class="form-control select-objective-control" id="default-function-dropdown" [(ngModel)]="objectiveRows[selectedObjRow].latestDefault" (ngModelChange)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">
+                    <select class="form-control score-function-dropdown" [(ngModel)]="objectiveRows[selectedObjRow].latestDefault" (ngModelChange)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">
                         <option value="{{ScoreFunction.FLAT}}">Flat</option>
                         <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
                         <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>

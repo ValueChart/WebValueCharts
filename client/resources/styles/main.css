@@ -381,66 +381,76 @@ input {
     border-radius:6px 0 6px 6px;
 }
 
-/* Creation workflow styles */
+/* Creation workflow styles - Objectives and Alternatives */
+
+.objectives-table-name-column {
+    min-width: 150px;
+}
+
+.objectives-table-description-column {
+    min-width: 100px;
+}
+
+.objectives-table-domaininfo-column {
+    min-width: 200px;
+}
+
+.objectives-table-dropdown-column {
+    min-width: 75px;
+}
+
+.objectives-table-small-column {
+    min-width: 30px;
+}
 
 .objectives-table-grid {
     display: table;
-    min-width: 200px;
-    max-width: 300px;
     table-layout: fixed;
 }
 
-.objectives-table-row {
+.objectives-table-grid-row {
     display: table-row;
 }
 
-.objectives-table-cell {
+.objectives-table-grid-cell {
     display: table-cell;
     padding-right: 5px;
 }
 
-.objectives-table-input {
-    min-width: 100px;
-    max-width: 200px;
-}
-
-.objectives-table-dropdown {
-    min-width: 75px;
-}
-
-.tablerowselected {
+.objectivestableselectedrow { /* has to be one word */
     background-color: #D4E7F2;
 }
 
-#description-area {
-    resize: vertical;
-}
-
-#category-area {
+#categories-input {
     width: 100%;
     resize: none;
 }
 
-#add-category-input {
-    min-width: 100px !important;
-    margin: 5px !important;
+.alternatives-table-name-column {
+    min-width: 100px;
 }
 
-#score-function-dropdown {
-    width: 245px; 
-    margin-right: 5px;
+.alternatives-table-description-column {
+    min-width: 50px;
 }
 
-#default-function-dropdown {
-    width: 245px; 
-    margin-right: 5px;
+.alternatives-table-outcome-column {
+    min-width: 65px;
 }
 
-.select-objective-control {
+
+/* Creation workflow styles - Score Functions and Weights */
+
+#score-function-controls {
     margin-left: 20px;
 }
 
-#objective-description{
+.score-function-dropdown {
+    width: 200px !important; 
+    margin-right: 5px !important;
+}
+
+#objective-description {
     margin-top: 20px;
 }
 

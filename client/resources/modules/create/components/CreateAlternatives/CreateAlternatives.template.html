@@ -5,9 +5,9 @@
     <thead>
       <tr>
         <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
-        <th>Name</th>
-        <th>Description</th>
-        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">{{getColumnHeader(obj)}}</th>
+        <th><div class="alternatives-table-name-column">Name</div></th>
+        <th><div class="alternatives-table-description-column">Description</div></th>
+        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()"><div class="alternatives-table-outcome-column">{{getColumnHeader(obj)}}</div></th>
       </tr>
     </thead>
     <tbody>
