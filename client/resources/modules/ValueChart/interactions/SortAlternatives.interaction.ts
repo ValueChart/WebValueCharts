@@ -64,9 +64,9 @@ export class SortAlternativesInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;				// The most recent RendererUpdate message sent to either the SummaryChartRenderer or the ObjectiveChartRenderer.
 	private originalAlternativeOrder: AlternativesRecord;	// A record of the original alternative order. This is used by the SortAlternativesInteraction
-																// class to reset the alternative order.
+															// class to reset the alternative order.
 
 	private clicks: Observable<any>;
 	private onClick: Subscription;
@@ -117,6 +117,9 @@ export class SortAlternativesInteraction {
 
 	/*
 		@param sortingType - The type of sorting to enable. Must be one of 'objective', 'alphabet', 'manual', 'reset', or 'none'.
+		@param alternativeBoxes - The selection of alternative boxes from either the summary chart or the objective chart. These boxes
+								 are the receivers of the click and drag events used to manually sort alternatives.
+		@param rendererUpdate - The most recent RendererUpdate message.
 		@returns {void}
 		@description 	Toggles the active type of alternative sorting. Sorting types 'alphabet', and 'reset' immediate sort the
 						alternative order while 'objective', and 'manual' are user drive. Type 'none' simply turns off all sorting.
@@ -145,7 +148,9 @@ export class SortAlternativesInteraction {
 	}
 
 	/*
-		@param enable - Whether or not to enable clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective.
+		@param enableSorting - Whether or not to enable clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective.
+		@param labelRootContainer - The root container of the label area. This should be obtained from the LabelRenderer.
+		@param rendererUpdate - The most recent renderer update message.
 		@returns {void}
 		@description 	Toggles the clicking on objective labels to sort alternatives by the scores assigned to their consequences for that objective. This method
 						uses the sortByObjective anonymous function defined below to handle the actual sorting. Sorting by objectives is managed by the LabelRenderer.
@@ -174,7 +179,9 @@ export class SortAlternativesInteraction {
 	}
 
 	/*
-		@param enable - Whether or not to enable clicking and dragging alternatives to change their order.
+		@param enableSorting - Whether or not to enable clicking and dragging alternatives to change their order.
+		@param alternativeBoxes - The selection of alternative boxes from either the summary chart or the objective chart. These boxes
+								 are the receivers of the click and drag events used to manually sort alternatives.
 		@returns {void}
 		@description 	Toggles the clicking and dragging alternatives to change their order. Please see ReorderObjectivesInteraction
 						for a well commented implementation of clicking and dragging.
@@ -358,6 +365,8 @@ export class SortAlternativesInteraction {
 		});
 	}
 
+	// The method insures that only one Alternative record is created per Sorting action. This is necessary since the SortAlternativesInteraction
+	// is attached to multiple Renderer classes and its event handlers can be triggered more than once for the same action.
 	removeUnnecessaryRecords = () => {
 		var lastRecord = (<AlternativesRecord> this.chartUndoRedoService.getNewestRecord());
 

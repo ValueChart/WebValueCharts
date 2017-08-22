@@ -19,6 +19,13 @@ import { DomainElement }											from '../../../types/RendererData.types';
 import { ScoreFunctionUpdate, ScoreFunctionConfig }					from '../../../types/RendererData.types';
 import { ChartOrientation }											from '../../../types/Config.types';
 
+/*
+	This class contains all the logic for adjusting user ScoreFunctions by implementing interactions for the ScoreFunction plots. 
+	For discrete ScoreFunction plots, the tops of the bars in the bar chart are made dragable when the interaction is turned on.
+	This allows them to be moved up and down and thus permits adjusting the discrete score function.
+	For continuous ScoreFunction plots, the so-called "knots" become tragable. This allows the user to create/adjust a piecewise linear function
+	that expresses their scorefunction.
+*/
 
 
 @Injectable()
@@ -28,8 +35,8 @@ export class AdjustScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: ScoreFunctionUpdate;
-	public adjustScoreFunctions: boolean;
+	public lastRendererUpdate: ScoreFunctionUpdate;				// The most recent ScoreFunctionUpdate object.
+	public adjustScoreFunctions: boolean;						// Whether or not the ScoreFunctions should be adjustable/interactive.
 
 	// ========================================================================================
 	// 									Constructor
@@ -48,13 +55,13 @@ export class AdjustScoreFunctionInteraction {
 
 
 	/*
-		@param enableDragging - Whether dragging to alter a user's score function should be enabled. 
-		@param objective - The objective for which the score function plot is being rendered.
-		@param viewOrientation - The orientation of the score function plot. Must be either 'vertical', or 'horizontal'.
+		@param adjustScoreFunctions - Whether dragging to alter a user's score function should be enabled. 
+		@param chartElements - The selection of chart elements that will become (or stop being) dragable depending on the value of adjustScoreFunctions.
+		@param rendererUpdate - The most recent ScoreFunctionUpdate object. 
 		@returns {void}
 		@description	This method toggles the interaction that allows clicking and dragging on scatter plot points to alter a user's score function.
 	*/
-	toggleDragToChangeScore(adjustScoreFunctions: boolean, selection: d3.Selection<any, any, any, any>, rendererUpdate: ScoreFunctionUpdate): void {
+	toggleDragToChangeScore(adjustScoreFunctions: boolean, chartElement: d3.Selection<any, any, any, any>, rendererUpdate: ScoreFunctionUpdate): void {
 		this.lastRendererUpdate = rendererUpdate;
 		this.adjustScoreFunctions = adjustScoreFunctions;
 
@@ -70,10 +77,10 @@ export class AdjustScoreFunctionInteraction {
 		}
 
 		// Set the drag listeners on the point elements.
-		selection.call(dragToResizeScores);
+		chartElement.call(dragToResizeScores);
 
 		// Set the cursor style for the points to indicate that they are drag-able (if dragging was enabled).
-		selection.style('cursor', () => {
+		chartElement.style('cursor', () => {
 			if (!adjustScoreFunctions) {
 				return 'auto';
 			} else {

@@ -45,11 +45,11 @@ export class ExpandScoreFunctionInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: ScoreFunctionUpdate;
+	public lastRendererUpdate: ScoreFunctionUpdate;										// The most recent ScoreFunctionUpdate object.
 	public enableExpanding: boolean;
 
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
-																					// route that the pop-up window will navigate to when it is opened.
+																						// route that the pop-up window will navigate to when it is opened.
 
 	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';	// The options string for the pop-up window.
 
@@ -78,6 +78,8 @@ export class ExpandScoreFunctionInteraction {
 
 	/*
 		@param enableExpanding - Whether or not to enable double clicking on a ScoreFunction plot to expand it into a pop-up window.
+		@param scoreFunctionPlots - A list of the root elements of the ScoreFunction plots. 
+		@param rendererUpdate - The most recent ScoreFunctionUpdate Object. 
 		@returns {void}
 		@description 	Toggles double clicking on a ScoreFunction plot to expand it into a pop-up window. 
 	*/

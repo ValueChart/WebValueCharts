@@ -55,7 +55,8 @@ export class ResizeWeightsInteraction {
 	// ========================================================================================
 	// 									Fields
 	// ========================================================================================
-	public lastRendererUpdate: RendererUpdate;
+	public lastRendererUpdate: RendererUpdate;		// The most recent RendererUpdate message; obtained from the LabelRenderer when toggles weight resizing/pump on and off.
+													// It is crucial that this field remain in sync with the RendererUpdate field in the LabelRenderer class.  
 
 	private resizeType: WeightResizeType; // The type of Weight Resizing that is currently enabled. 
 
@@ -81,6 +82,8 @@ export class ResizeWeightsInteraction {
 
 	/*
 		@param pumpType - The type of pump interaction. Must be one of: 'increase', 'decrease', or 'none'.
+		@param primitiveObjectiveLabels - the list of label elements for which pump is to be toggled.
+		@param RendererUpdate - the most recent RendererUpdate message. 
 		@returns {void}
 		@description 	Toggles the Pump interaction for modifying user assigned weights. A pumpType of 'increase' turns on
 						clicking on primitive objective labels to increase the objective's weight by one percent. A pumpType of 
@@ -148,6 +151,9 @@ export class ResizeWeightsInteraction {
 
 	/*
 		@param resizeType - The type of weight resize interaction. Must be one of: 'neighbor', 'siblings', or 'none'.
+		@param labelRootContainer - A d3 selection of the label root container from the label renderer. 
+									This is used to access the label divides for which weight resizing is to be toggled.
+		@rendererUpdate - The most recent RendererUpdate. 
 		@returns {void}
 		@description 	Toggles the drag interaction for modifying use assigned objective weights. A resizeType of 'neighbor' turns on
 						dragging the divider between two objective labels to modify the weights of ONLY those objectives. A 

@@ -44,7 +44,8 @@ export class ReorderObjectivesInteraction {
 	// 									Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: RendererUpdate;	
+	public lastRendererUpdate: RendererUpdate;			// The most recent RendererUpdate object. It is critical that this field remain
+														// synchronized with the RendererUpdate field in the LabelRenderer class.
 
 	private labelRootContainer: d3.Selection<any,any,any,any>;
 
@@ -92,6 +93,8 @@ export class ReorderObjectivesInteraction {
 
 	/*
 		@param enableReordering - Whether or not to enable dragging to reorder objectives.
+		@param labelRootContainer - The root container of the label area; should be obtained from the LabelRenderer.
+		@rendererUpdate - the most recent RendererUpdate object.
 		@returns {void}
 		@description 	Toggles clicking and dragging labels in the label area to reorder objectives. Both abstract and primitive objectives
 						can be reordered via label dragging when the user interaction is enabled. Dragging is implemented using d3's dragging 
