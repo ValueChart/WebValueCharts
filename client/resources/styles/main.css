@@ -1,8 +1,8 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-08-18 12:37:57
+* @Last Modified by:   MalakronikMausi
+* @Last Modified time: 2017-08-22 02:23:25
 */
 
 /* Global Styles */
@@ -385,22 +385,27 @@ input {
 
 .objectives-table-name-column {
     min-width: 150px;
+    max-width: 250px;
 }
 
 .objectives-table-description-column {
-    min-width: 100px;
+    min-width: 150px;
+    max-width: 250px;
 }
 
 .objectives-table-domaininfo-column {
-    min-width: 200px;
+    min-width: 175px;
+    max-width: 250px;
 }
 
 .objectives-table-dropdown-column {
     min-width: 75px;
+    max-width: 150px;
 }
 
 .objectives-table-small-column {
     min-width: 30px;
+    max-width: 50px;
 }
 
 .objectives-table-grid {
@@ -415,6 +420,10 @@ input {
 .objectives-table-grid-cell {
     display: table-cell;
     padding-right: 5px;
+}
+
+.objectives-table-textarea {
+    resize: vertical;
 }
 
 .objectivestableselectedrow { /* has to be one word */
@@ -446,7 +455,7 @@ input {
 }
 
 .score-function-dropdown {
-    width: 200px !important; 
+    width: 245px !important; 
     margin-right: 5px !important;
 }
 
