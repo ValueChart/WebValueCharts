@@ -41,7 +41,7 @@
 			</div>
 			<div *ngIf="canSave()">
 				<div class="form-group valuechart-toolbar-group pull-left">
-					<button class="btn btn-success" (click)="save()" [disabled]="_.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
+					<button class="btn btn-success" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
 					Save
 					</button>
 				</div>
