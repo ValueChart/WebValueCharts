@@ -18,7 +18,7 @@ import { ContinuousScoreFunction } 		from './ContinuousScoreFunction';
 import { Memento }				from './Memento';
 
 // Import Utilities:
-import * as Formatter		from '../app/utilities';
+import * as Formatter		from '../app/utilities/Formatter';
 import * as _ 				from 'lodash';
 
 /*

@@ -5,6 +5,5 @@
 * @Last Modified time: 2017-05-16 23:06:24
 */
 
-export { HostHttp }                          from './http/Host.http';
 export { UserHttp }                          from './http/User.http';
 export { ValueChartHttp }                    from './http/ValueChart.http';

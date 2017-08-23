@@ -15,7 +15,7 @@ import * as d3 																	from 'd3';
 import * as _																	from 'lodash';
 import { Subscription }															from 'rxjs/Subscription';
 import { Observable }															from 'rxjs/Observable';
-import '../../utilities';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartDirective }													from '../../../ValueChartVis';
@@ -25,12 +25,12 @@ import { RenderEventsService }													from '../../../ValueChartVis';
 import { ValueChartService }													from '../../services';
 import { CurrentUserService }													from '../../services';
 import { ValueChartViewerService }												from '../../services';
-import { HostHttp }																from '../../http';
-import { ValueChartHttp }														from '../../http';
+import { HostService }															from '../../services';
 import { ValidationService }													from '../../services';
 import { UpdateValueChartService }												from '../../services';
 import { UserNotificationService }												from '../../services';
 import { UserGuard }															from '../../guards';
+import { ValueChartHttp }														from '../../http';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 												from '../../../model';
@@ -108,7 +108,7 @@ export class ValueChartViewerComponent implements OnInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private valueChartHttp: ValueChartHttp,
-		private hostHttp: HostHttp,
+		private hostService: HostService,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService,
 		private updateValueChartService: UpdateValueChartService) { }
@@ -183,8 +183,8 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	ngOnDestroy() {
 
-		if (this.hostHttp.hostWebSocket) {
-			this.hostHttp.endCurrentHosting();
+		if (this.hostService.hostWebSocket) {
+			this.hostService.endCurrentHosting();
 		}
 
 		// Destroy the ValueChart manually to prevent memory leaks.
@@ -413,11 +413,11 @@ export class ValueChartViewerComponent implements OnInit {
 	/* 	
 		@returns {void}
 		@description 	Hosts the current ValueChart, causing the server to send messages to the client whenever a user joins/modifies/leaves
-						the current ValueChart. These messages are handled automatically by the HostHttp and ValueChartDirective's change detection.
+						the current ValueChart. These messages are handled automatically by the HostService and ValueChartDirective's change detection.
 						This method should NEVER be called by a user that is joining an existing ValueChart. 
 	*/
 	hostValueChart(): void {
-		this.hostHttp.hostGroupValueChart(this.valueChartViewerService.getActiveValueChart()._id);
+		this.hostService.hostGroupValueChart(this.valueChartViewerService.getActiveValueChart()._id);
 	}
 
 

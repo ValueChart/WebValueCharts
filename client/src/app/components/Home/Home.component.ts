@@ -21,7 +21,7 @@ import { UserNotificationService }						from '../../services';
 import { ValueChart, ChartType }						from '../../../model';
 
 // Import Utility Classes:
-import * as Formatter									from '../../utilities';
+import * as Formatter									from '../../utilities/Formatter';
 
 // Import Types
 import { UserRole }										from '../../../types';

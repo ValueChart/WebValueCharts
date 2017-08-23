@@ -18,10 +18,10 @@ import { ContinuousScoreFunction }												from './ContinuousScoreFunction';
 import { DiscreteScoreFunction }												from './DiscreteScoreFunction';
 
 // Import Utility Classes:
-import * as Formatter															from '../app/utilities';
+import * as Formatter															from '../app/utilities/Formatter';
 
 // Import Libraries:
-import * as _												from 'lodash';
+import * as _																	from 'lodash';
 
 
 /*

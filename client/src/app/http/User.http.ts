@@ -5,7 +5,7 @@
 * @Last Modified time: 2017-06-13 11:35:21
 */
 
-import '../utilities';
+import '../utilities/rxjs-operators';
 
 import { Injectable } 												from '@angular/core';
 import { Http, Response } 											from '@angular/http';

@@ -3,7 +3,7 @@ import { Component, OnInit }											from '@angular/core';
 import { NgClass } 														from '@angular/common';
 import { Observable }     												from 'rxjs/Observable';
 import { Subscriber }     												from 'rxjs/Subscriber';
-import '../../utilities';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { CreationStepsService }											from '../../services';
@@ -15,7 +15,7 @@ import { ValidationService }											from '../../services';
 import { ChartUndoRedoService }                     					from '../../../ValueChartVis';
 import { ScoreFunctionDirective }										from '../../../ValueChartVis';
 import { RendererScoreFunctionUtility }									from '../../../ValueChartVis';
-import *	as Formatter												from '../../utilities';
+import *	as Formatter												from '../../utilities/Formatter';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../model';

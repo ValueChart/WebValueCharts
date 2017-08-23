@@ -2,7 +2,7 @@
 import { Injectable } 										from '@angular/core';
 
 // Import Application Classes:
-import *	as Formatter									from '../utilities';
+import *	as Formatter									from '../utilities/Formatter';
 
 // Import Model Classes:
 import { ValueChart, ChartType }							from '../../model';

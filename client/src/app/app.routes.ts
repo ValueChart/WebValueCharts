@@ -26,6 +26,7 @@ import { CreateWeightsComponent }									from './components/CreateWeights/Creat
 	// Services:
 import { ValueChartHttp }											from './http/ValueChart.http';
 import { UserHttp }													from './http/User.http';
+import { HostService }												from './services/Host.service';
 import { CurrentUserService }										from './services/CurrentUser.service';
 import { ValueChartService }										from './services/ValueChart.service';
 import { AuthGuard }												from './guards/Auth.guard';
@@ -36,7 +37,6 @@ import { UpdateValueChartService }									from './services/UpdateValueChart.ser
 import { ValidationService }										from './services/Validation.service';
 import { UserNotificationService }									from './services/UserNotification.service';
 import { CreationStepsService }										from './services/CreationSteps.service';
-import { HostHttp }													from './http/Host.http';
 
 
 /*
@@ -85,7 +85,7 @@ const routes: Routes = [
 // Export the providers necessary for the router to be used in the AppModule. Any class that must be provided for the routes to work should 
 // be included here. Note that this does not include components, which do not require providers.
 export const APP_ROUTER_PROVIDERS = [
-	[AuthGuard, JoinGuard, UserGuard, CreationGuard, CurrentUserService, UserHttp, ValueChartHttp, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService, HostHttp]
+	[AuthGuard, JoinGuard, UserGuard, CreationGuard, HostService, UserHttp, ValueChartHttp, CurrentUserService, ValueChartService, CreationStepsService, UpdateValueChartService, ValidationService, UserNotificationService]
 ];
 
 // Export the router itself. This is registered as the applications router in the AppModule.

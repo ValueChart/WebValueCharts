@@ -9,8 +9,8 @@
 import { Injectable } 										from '@angular/core'
 
 import * as _ 												from 'lodash';
-@Injectable()
 
+@Injectable()
 export class UserNotificationService {
 
 

@@ -7,7 +7,7 @@
 
 import { WeightMap } 			from './WeightMap';
 import { ScoreFunctionMap }		from './ScoreFunctionMap';
-import * as Formatter			from '../app/utilities';
+import * as Formatter			from '../app/utilities/Formatter';
 
 import * as _ 					from 'lodash'
 /*

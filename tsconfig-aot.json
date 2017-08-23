@@ -12,7 +12,7 @@
   },
 
   "files": [
-    "client/modules/app/app.module.ts",
+    "client/src/app/app.module.ts",
     "client/main.production.ts"
   ],  
   "angularCompilerOptions": {

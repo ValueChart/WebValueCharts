@@ -16,7 +16,7 @@ import { ApplicationRef } 											from '@angular/core';
 import { XMLValueChartParserService } 								from '../../services';
 import { CurrentUserService }										from '../../services';
 import { ValueChartService }										from '../../services';
-import { UserHttp }											from '../../http';
+import { UserHttp }													from '../../http';
 import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }										from '../../utilities';
 

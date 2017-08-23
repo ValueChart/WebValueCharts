@@ -3,7 +3,7 @@ import { Component, OnInit }										    from '@angular/core';
 import * as _                                       from 'lodash';
 import { Observable }                               from 'rxjs/Observable';
 import { Subscriber }                               from 'rxjs/Subscriber';
-import '../../utilities';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { CreationStepsService }                     from '../../services';

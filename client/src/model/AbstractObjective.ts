@@ -10,7 +10,7 @@ import { PrimitiveObjective }	from './PrimitiveObjective';
 import { Domain } 				from './Domain';
 
 import { Memento }				from './Memento';
-import * as Formatter			from '../app/utilities';
+import * as Formatter			from '../app/utilities/Formatter';
 
 import * as _ 					from 'lodash'
 

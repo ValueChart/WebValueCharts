@@ -2,7 +2,7 @@
 import { Component, OnInit }											from '@angular/core';
 import { Observable }     												from 'rxjs/Observable';
 import { Subscriber }     												from 'rxjs/Subscriber';
-import '../../utilities';
+import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
 import { ValueChartService }											from '../../services';

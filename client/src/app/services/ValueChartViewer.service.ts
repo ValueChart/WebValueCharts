@@ -18,7 +18,7 @@ import { UserNotificationService }							from './UserNotification.service';
 import { ValidationService }								from './Validation.service';
 import { ValueChartService }								from './ValueChart.service';
 import { CurrentUserService }								from './CurrentUser.service';
-import { HostHttp }											from '../http';
+import { HostService }										from './Host.service';
 
 // Import Model Classes:
 import { User }												from '../../model';
@@ -56,15 +56,15 @@ export class ValueChartViewerService {
 	*/
 	constructor(
 		private userNotificationService: UserNotificationService,
-		private hostHttp: HostHttp,
+		private hostService: HostService,
 		private currentUserService: CurrentUserService,
 		private validationService: ValidationService,
 		private valueChartService: ValueChartService)	{ 
 
-		this.subs.push(this.hostHttp.userAddedSubject.subscribe(this.userAdded));
-		this.subs.push(this.hostHttp.userChangedSubject.subscribe(this.userChanged));
-		this.subs.push(this.hostHttp.userRemovedSubject.subscribe(this.userRemoved));
-		this.subs.push(this.hostHttp.structureChangedSubject.subscribe(this.structureChanged));
+		this.subs.push(this.hostService.userAddedSubject.subscribe(this.userAdded));
+		this.subs.push(this.hostService.userChangedSubject.subscribe(this.userChanged));
+		this.subs.push(this.hostService.userRemovedSubject.subscribe(this.userRemoved));
+		this.subs.push(this.hostService.structureChangedSubject.subscribe(this.structureChanged));
 	}
 
 	// ========================================================================================

@@ -10,7 +10,7 @@ import { Injectable }    												from '@angular/core';
 import { CanDeactivate, CanActivate, NavigationStart, NavigationEnd  }	from '@angular/router';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot} 			from '@angular/router';
 import { Observable }    												from 'rxjs/Observable';
-import '../utilities';
+import '../utilities/rxjs-operators';
 
 
 // Import Application Classes:

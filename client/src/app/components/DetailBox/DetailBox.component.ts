@@ -16,9 +16,9 @@ import { Subscription }															from 'rxjs/Subscription';
 // Import Application Classes:
 import { ObjectiveChartDefinitions }											from '../../../ValueChartVis';
 
-import { ValueChartHttp }												from '../../http';
+import { ValueChartHttp }														from '../../http';
+import { HostService }															from '../../services';
 import { UserNotificationService }												from '../../services';
-import { HostHttp }															from '../../http';
 import { ValueChartViewerService }												from '../../services';
 import { CurrentUserService }													from '../../services';
 import { ValueChartService }													from '../../services';
@@ -82,7 +82,7 @@ export class DetailBoxComponent implements OnInit {
 		private currentUserService: CurrentUserService,
 		private userNotificationService: UserNotificationService,
 		private valueChartHttp: ValueChartHttp,
-		private hostHttp: HostHttp,
+		private hostService: HostService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService) { }
 
@@ -145,7 +145,7 @@ export class DetailBoxComponent implements OnInit {
 	removeUser(userToDelete: User): void {
 		this.valueChartHttp.deleteUser(this.valueChart._id, userToDelete.getUsername())
 			.subscribe(username => {
-				if (!this.hostHttp.hostWebSocket) { 	// Handle the deleted user manually.
+				if (!this.hostService.hostWebSocket) { 	// Handle the deleted user manually.
 
 					var userIndex: number = this.valueChart.getUsers().findIndex((user: User) => {
 						return user.getUsername() === userToDelete.getUsername();

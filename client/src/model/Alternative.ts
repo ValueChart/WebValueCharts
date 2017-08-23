@@ -6,7 +6,7 @@
 */
 
 // Import Utility Classes:
-import * as Formatter			from '../app/utilities';
+import * as Formatter			from '../app/utilities/Formatter';
 import * as _					from 'lodash';
 
 /*

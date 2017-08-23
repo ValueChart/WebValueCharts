@@ -18,7 +18,7 @@ import { ValueChartHttp }						from '../../http';
 import { ValidationService }							from '../../services';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }							from '../../utilities';
-import * as Formatter									from '../../utilities';
+import * as Formatter									from '../../utilities/Formatter';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../model';

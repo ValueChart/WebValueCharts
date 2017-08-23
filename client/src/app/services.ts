@@ -5,6 +5,7 @@
 * @Last Modified time: 2017-05-16 23:06:24
 */
 
+export { HostService }                       from './services/Host.service';
 export { CreationStepsService }              from './services/CreationSteps.service' 
 export { CurrentUserService }                from './services/CurrentUser.service' 
 export { UpdateValueChartService }           from './services/UpdateValueChart.service' 

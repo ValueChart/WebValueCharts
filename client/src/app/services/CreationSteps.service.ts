@@ -2,7 +2,7 @@
 import { Injectable } 							from '@angular/core';
 import { Router }								from '@angular/router';
 import { Observable }     						from 'rxjs/Observable';
-import '../utilities';
+import '../utilities/rxjs-operators';
 
 // Import Libraries: 
 import * as _ 									from 'lodash';

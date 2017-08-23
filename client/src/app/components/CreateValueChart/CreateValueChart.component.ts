@@ -4,7 +4,7 @@ import { Router, ActivatedRoute }										from '@angular/router';
 import { Observable }     												from 'rxjs/Observable';
 import { Subscriber }     												from 'rxjs/Subscriber';
 import { Subject }														from 'rxjs/Subject';
-import '../../utilities';
+import '../../utilities/rxjs-operators';
 
 import * as _ 															from 'lodash';
 
@@ -15,8 +15,8 @@ import { ValueChartService }											from '../../services';
 import { CurrentUserService }											from '../../services';
 import { ValidationService }											from '../../services';
 import { UserNotificationService }										from '../../services';
+import { HostService }													from '../../services';
 import { ValueChartHttp }												from '../../http';
-import { HostHttp }														from '../../http';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 										from '../../../model';
@@ -69,7 +69,7 @@ export class CreateValueChartComponent implements OnInit {
 		public valueChartService: ValueChartService,
 		public creationStepsService: CreationStepsService,
 		private route: ActivatedRoute,
-		private hostHttp: HostHttp,
+		private hostService: HostService,
 		private valueChartHttp: ValueChartHttp,
 		private validationService: ValidationService,
 		private userNotificationService: UserNotificationService) { }
@@ -103,7 +103,7 @@ export class CreateValueChartComponent implements OnInit {
 					this.valueChartHttp.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 				});
 			} else {
-				this.hostHttp.hostGroupValueChart(this.valueChartService.getValueChart()._id)
+				this.hostService.hostGroupValueChart(this.valueChartService.getValueChart()._id)
 			}
 			
 			this.creationStepsService.valueChartCopy = _.cloneDeep(this.valueChartService.getValueChart());
@@ -121,7 +121,7 @@ export class CreateValueChartComponent implements OnInit {
 	ngOnDestroy() {
 		// Un-subscribe from the url parameters before the component is destroyed to prevent a memory leak.
 		this.sub.unsubscribe();
-		this.hostHttp.endCurrentHosting();
+		this.hostService.endCurrentHosting();
 		
 		if (this.creationStepsService.getAutoSaveEnabled()) {
 			// Check validity of chart structure and current user's preferences. Prevent changes to users if not valid.
