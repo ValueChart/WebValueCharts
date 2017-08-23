@@ -6,7 +6,7 @@
 */
 
 // Import CategoricalDomain, the class to be tested.
-import { CategoricalDomain } from '../../../../client/resources/model/CategoricalDomain';
+import { CategoricalDomain } from '../../../../client/src/model';
 
 import { expect }				from 'chai';
 

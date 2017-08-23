@@ -5,9 +5,9 @@
 * @Last Modified time: 2017-05-03 15:10:48
 */
 
-import { PrimitiveObjective } 		from '../../../../client/resources/model/PrimitiveObjective';
-import { CategoricalDomain } 		from '../../../../client/resources/model/CategoricalDomain';
-import { ContinuousDomain } 		from '../../../../client/resources/model/ContinuousDomain';
+import { PrimitiveObjective } 		from '../../../../client/src/model';
+import { CategoricalDomain } 		from '../../../../client/src/model';
+import { ContinuousDomain } 		from '../../../../client/src/model';
 
 
 import { expect }					from 'chai';

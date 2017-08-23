@@ -5,7 +5,7 @@
 * @Last Modified time: 2017-05-03 15:10:51
 */
 
-import { DiscreteScoreFunction } 		from '../../../../client/resources/model/DiscreteScoreFunction';
+import { DiscreteScoreFunction } 		from '../../../../client/src/model';
 
 
 import { expect }						from 'chai';

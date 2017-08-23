@@ -10,14 +10,14 @@ import { expect } 								from 'chai';
 import * as request								from 'supertest';
 
 // Import Utility Classes:
-import { JsonValueChartParser }					from '../../../client/resources/modules/utilities/classes/JsonValueChart.parser';
+import { JsonValueChartParser }					from '../../../client/src/app/utilities/JsonValueChart.parser';
 
 // Import Model Classes:
-import { ValueChart }							from '../../../client/resources/model/ValueChart';
-import { Alternative }							from '../../../client/resources/model/Alternative';
-import { User }									from '../../../client/resources/model/User';
-import { WeightMap }							from '../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap }						from '../../../client/resources/model/ScoreFunctionMap';
+import { ValueChart }							from '../../../client/src/model';
+import { Alternative }							from '../../../client/src/model';
+import { User }									from '../../../client/src/model';
+import { WeightMap }							from '../../../client/src/model';
+import { ScoreFunctionMap }						from '../../../client/src/model';
 
 
 // Import Test Data:

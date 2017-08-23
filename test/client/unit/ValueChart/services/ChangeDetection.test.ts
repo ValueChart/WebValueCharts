@@ -16,17 +16,17 @@ import { expect }							from 'chai';
 import { HotelChartData }					from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { ChangeDetectionService }			from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
-import { XmlValueChartParser }				from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { ChangeDetectionService }			from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }				from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }						from '../../../../../client/resources/model/ValueChart';
-import { User }								from '../../../../../client/resources/model/User';
-import { AbstractObjective }				from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }						from '../../../../../client/src/model';
+import { User }								from '../../../../../client/src/model';
+import { AbstractObjective }				from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }	from '../../../../../client/resources/types/Config.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }	from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 describe('ChangeDetectionService', () => {
 

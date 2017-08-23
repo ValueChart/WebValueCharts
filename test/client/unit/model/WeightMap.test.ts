@@ -5,8 +5,8 @@
 * @Last Modified time: 2017-05-03 15:10:44
 */
 
-import { WeightMap } 			from '../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective } 	from '../../../../client/resources/model/PrimitiveObjective';
+import { WeightMap } 			from '../../../../client/src/model';
+import { PrimitiveObjective } 	from '../../../../client/src/model';
 
 import { expect }				from 'chai';
 

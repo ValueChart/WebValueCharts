@@ -60,7 +60,7 @@ typings
 
 ### Generated JS Files ###
 
-client/resources/**/*.js
+client/**/*.js
 client/**/*.js
 client/main.js
 client/rxjs-operators.js

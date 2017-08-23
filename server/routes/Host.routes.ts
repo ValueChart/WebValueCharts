@@ -12,7 +12,7 @@ var timers = require('timers');
 // Import Utilities:
 import { HostEventEmitter, hostEventEmitter } 		from '../utilities/HostEventEmitters';
 import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
-import { HostMessage, MessageType}					from '../../client/resources/types/HostMessage';
+import { HostMessage, MessageType}					from '../../client/src/types';
 
 
 /*

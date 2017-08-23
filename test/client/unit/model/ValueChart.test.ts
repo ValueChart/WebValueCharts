@@ -6,13 +6,13 @@
 */
 
 
-import { ValueChart } 			from '../../../../client/resources/model/ValueChart';
-import { Alternative } 			from '../../../../client/resources/model/Alternative';
-import { User } 				from '../../../../client/resources/model/User';
-import { Objective } 			from '../../../../client/resources/model/Objective';
-import { PrimitiveObjective } 	from '../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective } 	from '../../../../client/resources/model/AbstractObjective';
-import { WeightMap }			from '../../../../client/resources/model/WeightMap';
+import { ValueChart } 			from '../../../../client/src/model';
+import { Alternative } 			from '../../../../client/src/model';
+import { User } 				from '../../../../client/src/model';
+import { Objective } 			from '../../../../client/src/model';
+import { PrimitiveObjective } 	from '../../../../client/src/model';
+import { AbstractObjective } 	from '../../../../client/src/model';
+import { WeightMap }			from '../../../../client/src/model';
 
 
 import { expect }				from 'chai';

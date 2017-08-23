@@ -5,11 +5,11 @@
 * @Last Modified time: 2017-05-03 15:10:48
 */
 
-import { ScoreFunctionMap } 			from '../../../../client/resources/model/ScoreFunctionMap';
-import { ScoreFunction } 				from '../../../../client/resources/model/ScoreFunction';
-import { PrimitiveObjective } 			from '../../../../client/resources/model/PrimitiveObjective';
-import { DiscreteScoreFunction } 		from '../../../../client/resources/model/DiscreteScoreFunction';
-import { ContinuousScoreFunction } 		from '../../../../client/resources/model/ContinuousScoreFunction';
+import { ScoreFunctionMap } 			from '../../../../client/src/model';
+import { ScoreFunction } 				from '../../../../client/src/model';
+import { PrimitiveObjective } 			from '../../../../client/src/model';
+import { DiscreteScoreFunction } 		from '../../../../client/src/model';
+import { ContinuousScoreFunction } 		from '../../../../client/src/model';
 	
 import { expect }						from 'chai';
 

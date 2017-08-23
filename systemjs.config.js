@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-19 11:43:59
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-05-28 17:15:27
+* @Last Modified time: 2017-08-23 12:42:44
 */
 
 // =========================================================================================================================================
@@ -52,10 +52,11 @@
         	defaultExtension: 'js',
         	meta: {
           		'./*.js': {
-            		loader: 'systemjs-angular-loader.js'
-          		}
-        	},
-        	main:'main.js'
+            		loader: 'systemjs-angular-loader.js',
+                    format: "cjs"
+                }
+            },
+            main:'main.js',
       	},
       	'rxjs': {
         	defaultExtension: 'js'

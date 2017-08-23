@@ -25,43 +25,43 @@ import { BestPaperChartData }												from '../../../../testData/BestPaper';
 import { randomizeUserWeights, randomizeAllUserScoreFunctions } 			from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { ValueChartDirective } 												from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
+import { ValueChartDirective } 												from '../../../../../client/src/ValueChartVis';
 
 // Services:
-import { RenderEventsService } 												from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { RendererService } 													from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService } 											from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ChangeDetectionService } 											from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
+import { RenderEventsService } 												from '../../../../../client/src/ValueChartVis';
+import { RendererService } 													from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService } 											from '../../../../../client/src/ValueChartVis';
+import { ChangeDetectionService } 											from '../../../../../client/src/ValueChartVis';
 // Renderers:
-import { ObjectiveChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
-import { LabelRenderer } 													from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
-import { ScoreFunctionRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
+import { ObjectiveChartRenderer } 											from '../../../../../client/src/ValueChartVis';
+import { SummaryChartRenderer } 											from '../../../../../client/src/ValueChartVis';
+import { LabelRenderer } 													from '../../../../../client/src/ValueChartVis';
+import { ScoreFunctionRenderer } 											from '../../../../../client/src/ValueChartVis';
 // Utilities
-import { RendererDataUtility } 												from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererConfigUtility } 											from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererScoreFunctionUtility } 									from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
+import { RendererDataUtility } 												from '../../../../../client/src/ValueChartVis';
+import { RendererConfigUtility } 											from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility } 									from '../../../../../client/src/ValueChartVis';
 // Interactions
-import { ReorderObjectivesInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
-import { ResizeWeightsInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
+import { ReorderObjectivesInteraction } 									from '../../../../../client/src/ValueChartVis';
+import { ResizeWeightsInteraction } 										from '../../../../../client/src/ValueChartVis';
+import { SortAlternativesInteraction } 										from '../../../../../client/src/ValueChartVis';
+import { SetObjectiveColorsInteraction } 									from '../../../../../client/src/ValueChartVis';
+import { ExpandScoreFunctionInteraction } 									from '../../../../../client/src/ValueChartVis';
 
-import { XmlValueChartParser } 											from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { XmlValueChartParser } 											from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart } 														from '../../../../../client/resources/model/ValueChart';
-import { User } 															from '../../../../../client/resources/model/User';
+import { ValueChart } 														from '../../../../../client/src/model';
+import { User } 															from '../../../../../client/src/model';
 
 // Import Definitions
-import { LabelDefinitions } 												from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions } 												from '../../../../../client/src/ValueChartVis';
 
 // Import Types
-import { ViewConfig, InteractionConfig } 									from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate } 													from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData } 											from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig } 									from '../../../../../client/src/types';
+import { RendererUpdate } 													from '../../../../../client/src/types';
+import { RowData, UserScoreData } 											from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 @Component({
@@ -131,6 +131,8 @@ describe('ValueChartDirective', () => {
 	var fixture: ComponentFixture<ViewerStub>;
 
 	beforeEach(() => {
+
+		TestBed.resetTestingModule();
 
 		viewConfig = {
     scaleAlternatives: false,

@@ -11,11 +11,11 @@ import * as _											from 'lodash';
 
 
 // Import Model Classes:
-import { Objective }									from '../../client/resources/model/Objective';
-import { User }											from '../../client/resources/model/User';
-import { WeightMap }									from '../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../client/resources/model/AbstractObjective';
+import { Objective }									from '../../client/src/model';
+import { User }											from '../../client/src/model';
+import { WeightMap }									from '../../client/src/model';
+import { PrimitiveObjective }							from '../../client/src/model';
+import { AbstractObjective }							from '../../client/src/model';
 
 
 

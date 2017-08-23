@@ -6,8 +6,8 @@
 */
 
 
-import { Alternative }			from '../../../../client/resources/model/Alternative';
-import { PrimitiveObjective }	from '../../../../client/resources/model/PrimitiveObjective';
+import { Alternative }			from '../../../../client/src/model';
+import { PrimitiveObjective }	from '../../../../client/src/model';
 
 
 import { expect }				from 'chai';

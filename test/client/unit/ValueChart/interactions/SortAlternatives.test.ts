@@ -21,27 +21,27 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService }								from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }								from '../../../../../client/src/ValueChartVis';
+import { SortAlternativesInteraction }					from '../../../../../client/src/ValueChartVis';
 
-import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions }								from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { Alternative }									from '../../../../../client/resources/model/Alternative';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AlternativesRecord }							from '../../../../../client/resources/types/Record.types';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { Alternative }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AlternativesRecord }							from '../../../../../client/src/types';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, SortAlternativesType }		from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { ChartOrientation, SortAlternativesType }		from '../../../../../client/src/types';
 
 
 describe('SortAlternativesInteraction', () => {

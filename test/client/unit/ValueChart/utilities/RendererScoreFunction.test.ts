@@ -22,23 +22,23 @@ import { HotelChartData }								from '../../../../testData/HotelChartData';
 import { randomizeUserScoreFunction }					from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { DomainElement, ScoreFunctionData }				from '../../../../../client/resources/types/RendererData.types'; 
-import { ScoreFunctionDataSummary }						from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ScoreFunctionUpdate }							from '../../../../../client/src/types';
+import { DomainElement, ScoreFunctionData }				from '../../../../../client/src/types';
+import { ScoreFunctionDataSummary }						from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 describe('RendererScoreFunctionUtility', () => {

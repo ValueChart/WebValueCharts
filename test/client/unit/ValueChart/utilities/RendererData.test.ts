@@ -16,22 +16,22 @@ import { expect }										from 'chai';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, LabelData, CellData, UserScoreData }	from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { RowData, LabelData, CellData, UserScoreData }	from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 describe('RendererDataUtility', () => {

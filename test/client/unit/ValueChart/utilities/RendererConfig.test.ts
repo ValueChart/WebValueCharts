@@ -11,15 +11,15 @@ import { DebugElement }    								from '@angular/core';
 import { expect }										from 'chai';
 
 // Import Application Classes:
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
+import { RendererConfigUtility }						from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes:
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
+import { WeightMap }									from '../../../../../client/src/model';
 
 // Import Types:
-import { ViewConfig }									from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate, RendererConfig }				from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ViewConfig }									from '../../../../../client/src/types';
+import { RendererUpdate, RendererConfig }				from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 describe('RendererConfigUtility', () => {

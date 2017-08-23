@@ -23,27 +23,27 @@ import { randomizeUserScoreFunction, rgbaToHex }		from '../../../../utilities/Te
 
 
 // Import Application Classes:
-import { DiscreteScoreFunctionRenderer }				from '../../../../../client/resources/modules/ValueChart/renderers/DiscreteScoreFunction.renderer';
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { DiscreteScoreFunctionRenderer }				from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
 
-import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
+import { AdjustScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
 
-import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ScoreFunctionUpdate }							from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 @Component({
@@ -92,6 +92,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		height = 100;
 		width = 100;
 
+		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			providers: [ 
 				RendererScoreFunctionUtility,

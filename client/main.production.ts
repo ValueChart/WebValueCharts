@@ -21,6 +21,6 @@ if (!/localhost/.test(document.location.host)) {
 
 
 import { platformBrowser }    from '@angular/platform-browser';
-import { AppModuleNgFactory } from '../aot/client/resources/modules/app/app.module.ngfactory';
+import { AppModuleNgFactory } from '../aot/client/src/app/app.module.ngfactory';
 
 platformBrowser().bootstrapModuleFactory(AppModuleNgFactory);

@@ -9,21 +9,21 @@
 import { expect }												from 'chai';
 
 // Import Application Classes:
-import { XmlValueChartParser }									from '../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { XmlValueChartParser }									from '../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes:
-import { ValueChart }											from '../../../../client/resources/model/ValueChart';
-import { Alternative }											from '../../../../client/resources/model/Alternative';
-import { User } 												from '../../../../client/resources/model/User';
-import { Objective } 											from '../../../../client/resources/model/Objective';
-import { PrimitiveObjective } 									from '../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective } 									from '../../../../client/resources/model/AbstractObjective';
-import { CategoricalDomain }									from '../../../../client/resources/model/CategoricalDomain';
-import { ContinuousDomain }										from '../../../../client/resources/model/ContinuousDomain';
-import { WeightMap } 											from '../../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap } 									from '../../../../client/resources/model/ScoreFunctionMap';
-import { ContinuousScoreFunction } 								from '../../../../client/resources/model/ContinuousScoreFunction';
-import { DiscreteScoreFunction } 								from '../../../../client/resources/model/DiscreteScoreFunction';
+import { ValueChart }											from '../../../../client/src/model';
+import { Alternative }											from '../../../../client/src/model';
+import { User } 												from '../../../../client/src/model';
+import { Objective } 											from '../../../../client/src/model';
+import { PrimitiveObjective } 									from '../../../../client/src/model';
+import { AbstractObjective } 									from '../../../../client/src/model';
+import { CategoricalDomain }									from '../../../../client/src/model';
+import { ContinuousDomain }										from '../../../../client/src/model';
+import { WeightMap } 											from '../../../../client/src/model';
+import { ScoreFunctionMap } 									from '../../../../client/src/model';
+import { ContinuousScoreFunction } 								from '../../../../client/src/model';
+import { DiscreteScoreFunction } 								from '../../../../client/src/model';
 
 // Import Test Data:
 import { HotelChartData }										from '../../../testData/HotelChartData';

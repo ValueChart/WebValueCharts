@@ -23,31 +23,31 @@ import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from 
 
 
 // Import Application Classes:
-import { SummaryChartRenderer }							from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { RenderEventsService }							from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
+import { SummaryChartRenderer }							from '../../../../../client/src/ValueChartVis';
+import { RendererConfigUtility }						from '../../../../../client/src/ValueChartVis';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { RenderEventsService }							from '../../../../../client/src/ValueChartVis';
+import { SortAlternativesInteraction }					from '../../../../../client/src/ValueChartVis';
 
-import { XmlValueChartParser }							from '../../../../../client/resources/modules/utilities/classes/XmlValueChart.parser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { SummaryChartDefinitions }						from '../../../../../client/resources/modules/ValueChart/definitions/SummaryChart.definitions';
+import { SummaryChartDefinitions }						from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
+import { ValueChart, ChartType }						from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { RowData, UserScoreData }						from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 
@@ -120,6 +120,7 @@ var renderEventsServiceStub = {
 		height = 100;
 		width = 100;
 
+		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			providers: [ 
 				RendererService, 
