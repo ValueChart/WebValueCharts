@@ -26,9 +26,8 @@ import { ObjectiveChartDefinitions }								from '../definitions';
 import { LabelDefinitions }											from '../definitions';
 
 // Import Model Classes:
-import { Objective }												from '../../model';
-import { PrimitiveObjective }										from '../../model';
-import { AbstractObjective }										from '../../model';
+import { Objective, PrimitiveObjective, AbstractObjective }			from '../../model';
+import { User }														from '../../model';
 import { Alternative }												from '../../model';
 
 import { RowData, CellData, LabelData, RendererConfig }				from '../../types';
@@ -322,15 +321,17 @@ export class SortAlternativesInteraction {
 		// Generate an array of indexes according to the number of cells in each row.
 		var alternativeScores: any = {};
 
-		objectivesToReorderBy.forEach((objective: Objective) => {
-			var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-			var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(objective.getName());
-			
-			alternatives.forEach((alternative: Alternative) => {
-				if (alternativeScores[alternative.getName()] == undefined) 
-					alternativeScores[alternative.getName()] = 0;
+		this.lastRendererUpdate.usersToDisplay.forEach((user: User) => {
+			objectivesToReorderBy.forEach((objective: Objective) => {
+				var scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+				var weight: number = user.getWeightMap().getObjectiveWeight(objective.getName());
+				
+				alternatives.forEach((alternative: Alternative) => {
+					if (alternativeScores[alternative.getName()] == undefined) 
+						alternativeScores[alternative.getName()] = 0;
 
-				alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getName())) * weight);
+					alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getName())) * weight);
+				});
 			});
 		});
 
