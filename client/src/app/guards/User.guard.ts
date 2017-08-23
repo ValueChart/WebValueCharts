@@ -10,15 +10,15 @@ import { Injectable }    										from '@angular/core';
 import { CanDeactivate, CanActivate, NavigationStart }			from '@angular/router';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } 	from '@angular/router';
 import { Observable }    										from 'rxjs/Observable';
-import '../utilities/rxjs-operators';
+import '../utilities';
 
 // Import Libraries:
 import * as _													from 'lodash';
 
 // Import Application Classes:
-import { ValueChartViewerComponent } 							from '../components/ValueChartViewer/ValueChartViewer.component';
-import { ValueChartService } 									from '../services/ValueChart.service';
-import { CurrentUserService } 									from '../services/CurrentUser.service';
+import { ValueChartViewerComponent } 							from '../components';
+import { ValueChartService } 									from '../services';
+import { CurrentUserService } 									from '../services';
 
 // Import Model Classes:
 import { User }													from '../../model';

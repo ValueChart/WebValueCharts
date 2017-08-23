@@ -15,10 +15,10 @@ import { Subject }													from 'rxjs/Subject';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes
-import { RendererService } 											from '../services/Renderer.service';
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { RendererService } 											from '../services';
+import { ChartUndoRedoService }										from '../services';
 
-import { LabelDefinitions }											from '../definitions/Label.definitions';
+import { LabelDefinitions }											from '../definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../model';

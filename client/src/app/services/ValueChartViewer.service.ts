@@ -18,7 +18,7 @@ import { UserNotificationService }							from './UserNotification.service';
 import { ValidationService }								from './Validation.service';
 import { ValueChartService }								from './ValueChart.service';
 import { CurrentUserService }								from './CurrentUser.service';
-import { HostHttp }											from '../http/Host.http';
+import { HostHttp }											from '../http';
 
 // Import Model Classes:
 import { User }												from '../../model';

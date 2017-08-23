@@ -14,11 +14,11 @@ import * as d3 											from 'd3';
 import * as _											from 'lodash';
 
 // Import Application Classes
-import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }							from '../services';
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
 
-import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }				from '../interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }				from '../interactions';
+import { AdjustScoreFunctionInteraction }				from '../interactions';
 
 // Import Model Classes:
 import { ValueChart }									from '../../model';

@@ -12,7 +12,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes: 
-import { RendererScoreFunctionUtility }								from '../utilities/RendererScoreFunction.utility';
+import { RendererScoreFunctionUtility }								from '../utilities';
 
 // Import Model Classes:
 import { Objective }												from '../../model';

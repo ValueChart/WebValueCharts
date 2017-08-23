@@ -4,14 +4,14 @@ import { Observable }     													from 'rxjs/Observable';
 import { Subscriber }     													from 'rxjs/Subscriber';
 import * as _																from 'lodash';
 
-import '../../utilities/rxjs-operators';
+import '../../utilities';
 
 // Import Application Classes:
-import { ValueChartService }												from '../../services/ValueChart.service';
-import { CreationStepsService }												from '../../services/CreationSteps.service';
-import { CurrentUserService }												from '../../services/CurrentUser.service';
-import { ValidationService }												from '../../services/Validation.service';
-import { ValueChartHttp }													from '../../http/ValueChart.http';
+import { ValueChartService }												from '../../services';
+import { CreationStepsService }												from '../../services';
+import { CurrentUserService }												from '../../services';
+import { ValidationService }												from '../../services';
+import { ValueChartHttp }													from '../../http';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 											from '../../../model';

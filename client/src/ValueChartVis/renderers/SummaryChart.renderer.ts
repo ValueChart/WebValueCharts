@@ -13,10 +13,10 @@ import * as d3 														from 'd3';
 import { Subject }													from 'rxjs/Subject';
 
 // Import Application Classes:
-import { RendererService } 											from '../services/Renderer.service';
-import { RenderEventsService }										from '../services/RenderEvents.service';
-import { SummaryChartDefinitions }									from '../definitions/SummaryChart.definitions';
-import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
+import { RendererService } 											from '../services';
+import { RenderEventsService }										from '../services';
+import { SummaryChartDefinitions }									from '../definitions';
+import { SortAlternativesInteraction }								from '../interactions';
 
 // Import Model Classes:
 import { User }														from '../../model';

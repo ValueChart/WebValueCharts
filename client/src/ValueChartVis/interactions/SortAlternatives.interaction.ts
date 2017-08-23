@@ -18,12 +18,12 @@ import { Subscription }												from 'rxjs/Subscription';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes
-import { RendererService } 											from '../services/Renderer.service';
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { RendererService } 											from '../services';
+import { ChartUndoRedoService }										from '../services';
 
-import { SummaryChartDefinitions }									from '../definitions/SummaryChart.definitions';
-import { ObjectiveChartDefinitions }								from '../definitions/ObjectiveChart.definitions';
-import { LabelDefinitions }											from '../definitions/Label.definitions';
+import { SummaryChartDefinitions }									from '../definitions';
+import { ObjectiveChartDefinitions }								from '../definitions';
+import { LabelDefinitions }											from '../definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../model';

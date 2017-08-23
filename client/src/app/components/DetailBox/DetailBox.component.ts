@@ -16,12 +16,12 @@ import { Subscription }															from 'rxjs/Subscription';
 // Import Application Classes:
 import { ObjectiveChartDefinitions }											from '../../../ValueChartVis';
 
-import { ValueChartHttp }												from '../../http/ValueChart.http';
-import { UserNotificationService }												from '../../services/UserNotification.service';
-import { HostHttp }															from '../../http/Host.http';
-import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
-import { CurrentUserService }													from '../../services/CurrentUser.service';
-import { ValueChartService }													from '../../services/ValueChart.service';
+import { ValueChartHttp }												from '../../http';
+import { UserNotificationService }												from '../../services';
+import { HostHttp }															from '../../http';
+import { ValueChartViewerService }												from '../../services';
+import { CurrentUserService }													from '../../services';
+import { ValueChartService }													from '../../services';
 import { RenderEventsService }													from '../../../ValueChartVis';
 
 

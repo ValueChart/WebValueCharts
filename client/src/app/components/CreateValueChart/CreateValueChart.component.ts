@@ -4,19 +4,19 @@ import { Router, ActivatedRoute }										from '@angular/router';
 import { Observable }     												from 'rxjs/Observable';
 import { Subscriber }     												from 'rxjs/Subscriber';
 import { Subject }														from 'rxjs/Subject';
-import '../../utilities/rxjs-operators';
+import '../../utilities';
 
 import * as _ 															from 'lodash';
 
 // Import Application Classes:
-import { CreationStepsService }											from '../../services/CreationSteps.service';
-import { UpdateValueChartService }										from '../../services/UpdateValueChart.service';
-import { ValueChartService }											from '../../services/ValueChart.service';
-import { CurrentUserService }											from '../../services/CurrentUser.service';
-import { ValidationService }											from '../../services/Validation.service';
-import { UserNotificationService }										from '../../services/UserNotification.service';
-import { ValueChartHttp }												from '../../http/ValueChart.http';
-import { HostHttp }														from '../../http/Host.http';
+import { CreationStepsService }											from '../../services';
+import { UpdateValueChartService }										from '../../services';
+import { ValueChartService }											from '../../services';
+import { CurrentUserService }											from '../../services';
+import { ValidationService }											from '../../services';
+import { UserNotificationService }										from '../../services';
+import { ValueChartHttp }												from '../../http';
+import { HostHttp }														from '../../http';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 										from '../../../model';

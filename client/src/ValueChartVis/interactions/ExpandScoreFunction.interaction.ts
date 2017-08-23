@@ -15,8 +15,8 @@ import { Subscription } 											from 'rxjs/Subscription';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
-import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
+import { ChartUndoRedoService }										from '../services';
+import { ScoreFunctionRenderer }									from '../renderers';
 
 // Import Model Classes:
 import { User }														from '../../model';

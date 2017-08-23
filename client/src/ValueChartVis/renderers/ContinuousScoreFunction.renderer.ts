@@ -14,10 +14,10 @@ import * as d3 											from 'd3';
 
 // Import Application Classes:
 import { ScoreFunctionRenderer }						from './ScoreFunction.renderer';
-import { ChartUndoRedoService }							from '../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }							from '../services';
 
-import { ExpandScoreFunctionInteraction }				from '../interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }				from '../interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }				from '../interactions';
+import { AdjustScoreFunctionInteraction }				from '../interactions';
 
 // Import Model Classes:
 import { Objective }									from '../../model';

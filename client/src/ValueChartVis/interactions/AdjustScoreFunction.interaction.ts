@@ -12,7 +12,7 @@ import { Injectable } 												from '@angular/core';
 import * as d3 														from 'd3';
 
 // Import Application Classes
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }										from '../services';
 
 // Import Types
 import { DomainElement }											from '../../types';

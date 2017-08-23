@@ -10,18 +10,18 @@ import { Component }									from '@angular/core';
 import { Router }										from '@angular/router';
 
 // Import Application Classes:
-import { XMLValueChartParserService } 					from '../../services/XMLValueChartParser.service';
-import { CurrentUserService }							from '../../services/CurrentUser.service';
-import { ValueChartService }							from '../../services/ValueChart.service';
-import { ValueChartHttp }						from '../../http/ValueChart.http';
-import { ValidationService }							from '../../services/Validation.service';
-import { UserNotificationService }						from '../../services/UserNotification.service';
+import { XMLValueChartParserService } 					from '../../services';
+import { CurrentUserService }							from '../../services';
+import { ValueChartService }							from '../../services';
+import { ValueChartHttp }						from '../../http';
+import { ValidationService }							from '../../services';
+import { UserNotificationService }						from '../../services';
 
 // Import Model Classes:
 import { ValueChart, ChartType }						from '../../../model';
 
 // Import Utility Classes:
-import * as Formatter									from '../../utilities/Formatter';
+import * as Formatter									from '../../utilities';
 
 // Import Types
 import { UserRole }										from '../../../types';

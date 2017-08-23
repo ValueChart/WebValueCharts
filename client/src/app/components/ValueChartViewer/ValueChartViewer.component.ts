@@ -15,22 +15,22 @@ import * as d3 																	from 'd3';
 import * as _																	from 'lodash';
 import { Subscription }															from 'rxjs/Subscription';
 import { Observable }															from 'rxjs/Observable';
-import '../../utilities/rxjs-operators';
+import '../../utilities';
 
 // Import Application Classes:
 import { ValueChartDirective }													from '../../../ValueChartVis';
-
-import { ValueChartService }													from '../../services/ValueChart.service';
-import { CurrentUserService }													from '../../services/CurrentUser.service';
-import { ValueChartViewerService }												from '../../services/ValueChartViewer.service';
-import { HostHttp }															from '../../http/Host.http';
-import { ValueChartHttp }												from '../../http/ValueChart.http';
-import { ValidationService }													from '../../services/Validation.service';
-import { UpdateValueChartService }												from '../../services/UpdateValueChart.service';
-import { UserNotificationService }												from '../../services/UserNotification.service'; 
-import { UserGuard }														from '../../guards/User.guard';
 import { ChartUndoRedoService }													from '../../../ValueChartVis';
 import { RenderEventsService }													from '../../../ValueChartVis';
+
+import { ValueChartService }													from '../../services';
+import { CurrentUserService }													from '../../services';
+import { ValueChartViewerService }												from '../../services';
+import { HostHttp }																from '../../http';
+import { ValueChartHttp }														from '../../http';
+import { ValidationService }													from '../../services';
+import { UpdateValueChartService }												from '../../services';
+import { UserNotificationService }												from '../../services';
+import { UserGuard }															from '../../guards';
 
 // Import Model Classes:
 import { ValueChart, ChartType } 												from '../../../model';

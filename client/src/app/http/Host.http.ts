@@ -12,16 +12,16 @@ import * as _														from 'lodash';
 import { Observable }												from 'rxjs/Observable';
 import { Subscription } 											from 'rxjs/Subscription';
 import { Subject }													from 'rxjs/Subject';
-import '../utilities/rxjs-operators';
+import '../utilities';
 
 // Import Application Classes:
-import { UserNotificationService }									from '../services/UserNotification.service'; 
-import { CurrentUserService }										from '../services/CurrentUser.service';
-import { ValueChartService }										from '../services/ValueChart.service';
-import { ValueChartViewerService }									from '../services/ValueChartViewer.service';
-import { ValidationService }										from '../services/Validation.service';
-import { UpdateValueChartService }									from '../services/UpdateValueChart.service';
-import { JsonValueChartParser }										from '../utilities/JsonValueChart.parser';
+import { UserNotificationService }									from '../services';
+import { CurrentUserService }										from '../services';
+import { ValueChartService }										from '../services';
+import { ValueChartViewerService }									from '../services';
+import { ValidationService }										from '../services';
+import { UpdateValueChartService }									from '../services';
+import { JsonValueChartParser }										from '../utilities';
 
 // Import Model Classes:
 import { ValueChart, ChartType }									from '../../model';

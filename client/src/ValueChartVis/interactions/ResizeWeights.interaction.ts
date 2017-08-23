@@ -17,9 +17,9 @@ import { Subscription } 											from 'rxjs/Subscription';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }										from '../services';
 
-import { LabelDefinitions }											from '../definitions/Label.definitions';
+import { LabelDefinitions }											from '../definitions';
 
 // Import Model Classes:
 import { Objective }												from '../../model';

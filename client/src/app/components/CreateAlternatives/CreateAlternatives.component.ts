@@ -2,13 +2,13 @@
 import { Component, OnInit }											from '@angular/core';
 import { Observable }     												from 'rxjs/Observable';
 import { Subscriber }     												from 'rxjs/Subscriber';
-import '../../utilities/rxjs-operators';
+import '../../utilities';
 
 // Import Application Classes:
-import { ValueChartService }											from '../../services/ValueChart.service';
-import { CreationStepsService }											from '../../services/CreationSteps.service';
-import { ValidationService }											from '../../services/Validation.service';
-import *	as Formatter												from '../../utilities/Formatter';
+import { ValueChartService }											from '../../services';
+import { CreationStepsService }											from '../../services';
+import { ValidationService }											from '../../services';
+import *	as Formatter												from '../../utilities';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../model';

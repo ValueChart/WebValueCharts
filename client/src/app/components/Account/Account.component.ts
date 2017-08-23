@@ -10,8 +10,8 @@ import { OnInit }													from '@angular/core';
 import { Router }													from '@angular/router';
 
 // Application classes
-import { CurrentUserService }										from '../../services/CurrentUser.service';
-import { UserHttp }											from '../../http/User.http';
+import { CurrentUserService }										from '../../services';
+import { UserHttp }											from '../../http';
 
 /*
 	This component implements the My Account page. It allows authenticated (i.e. signed in) users to modify their 

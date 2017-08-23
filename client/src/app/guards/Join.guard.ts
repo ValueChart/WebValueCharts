@@ -10,9 +10,9 @@ import { Injectable }     														from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot }    	from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService }													from '../services/CurrentUser.service';
-import { ValueChartService }													from '../services/ValueChart.service';
-import { ValueChartHttp }														from '../http/ValueChart.http';
+import { CurrentUserService }													from '../services';
+import { ValueChartService }													from '../services';
+import { ValueChartHttp }														from '../http';
 
 import { UserRole }																from '../../types';
 

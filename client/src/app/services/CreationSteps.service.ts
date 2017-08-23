@@ -2,7 +2,7 @@
 import { Injectable } 							from '@angular/core';
 import { Router }								from '@angular/router';
 import { Observable }     						from 'rxjs/Observable';
-import '../utilities/rxjs-operators';
+import '../utilities';
 
 // Import Libraries: 
 import * as _ 									from 'lodash';
@@ -12,7 +12,7 @@ import { ValueChartService }					from './ValueChart.service';
 import { CurrentUserService }					from './CurrentUser.service';
 import { ValidationService }					from './Validation.service';
 import { UserNotificationService }				from './UserNotification.service';
-import { ValueChartHttp }						from '../http/ValueChart.http';
+import { ValueChartHttp }						from '../http';
 
 // Import Types
 import { UserRole }								from '../../types';

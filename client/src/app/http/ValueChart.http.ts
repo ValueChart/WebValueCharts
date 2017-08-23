@@ -10,10 +10,10 @@ import { Injectable } 												from '@angular/core';
 import { Http, Response } 											from '@angular/http';
 import { Headers, RequestOptions } 									from '@angular/http';
 import { Observable }     											from 'rxjs/Observable';
-import '../utilities/rxjs-operators';
+import '../utilities';
 
 // IMport Application Classes: 
-import { JsonValueChartParser }										from '../utilities/JsonValueChart.parser';
+import { JsonValueChartParser }										from '../utilities';
 
 // Import Model Classes:
 import { ValueChart }												from '../../model';

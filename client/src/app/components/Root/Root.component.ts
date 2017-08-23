@@ -13,12 +13,12 @@ import { ApplicationRef } 											from '@angular/core';
 
 
 // Import Application Classes:
-import { XMLValueChartParserService } 								from '../../services/XMLValueChartParser.service';	
-import { CurrentUserService }										from '../../services/CurrentUser.service';
-import { ValueChartService }										from '../../services/ValueChart.service';
-import { UserHttp }											from '../../http/User.http';
+import { XMLValueChartParserService } 								from '../../services';
+import { CurrentUserService }										from '../../services';
+import { ValueChartService }										from '../../services';
+import { UserHttp }											from '../../http';
 import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
-import { XmlValueChartEncoder }										from '../../utilities/XmlValueChart.encoder';
+import { XmlValueChartEncoder }										from '../../utilities';
 
 
 /*

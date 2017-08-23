@@ -3,16 +3,16 @@ import { Component, OnInit }										    from '@angular/core';
 import * as _                                       from 'lodash';
 import { Observable }                               from 'rxjs/Observable';
 import { Subscriber }                               from 'rxjs/Subscriber';
-import '../../utilities/rxjs-operators';
+import '../../utilities';
 
 // Import Application Classes:
-import { CreationStepsService }                     from '../../services/CreationSteps.service';
-import { UpdateValueChartService }                  from '../../services/UpdateValueChart.service';
-import { ValueChartService }                        from '../../services/ValueChart.service';
-import { CurrentUserService }                       from '../../services/CurrentUser.service';
-import { ValidationService }                        from '../../services/Validation.service';
-import { UserNotificationService }                  from '../../services/UserNotification.service';
-import { UserGuard }                                from '../../guards/User.guard';
+import { CreationStepsService }                     from '../../services';
+import { UpdateValueChartService }                  from '../../services';
+import { ValueChartService }                        from '../../services';
+import { CurrentUserService }                       from '../../services';
+import { ValidationService }                        from '../../services';
+import { UserNotificationService }                  from '../../services';
+import { UserGuard }                                from '../../guards';
 import { ChartUndoRedoService }                     from '../../../ValueChartVis';
 import { ScoreFunctionDirective }                   from '../../../ValueChartVis';
 import { RendererScoreFunctionUtility }             from '../../../ValueChartVis';

@@ -11,14 +11,14 @@ import { Router }										from '@angular/router';
 import { OnInit }										from '@angular/core';
 
 // Import Application Classes:
-import { CurrentUserService }							from '../../services/CurrentUser.service';
-import { ValueChartService }							from '../../services/ValueChart.service';
-import { UserHttp }								from '../../http/User.http';
-import { ValueChartHttp }						from '../../http/ValueChart.http';
-import { ValidationService }							from '../../services/Validation.service';
+import { CurrentUserService }							from '../../services';
+import { ValueChartService }							from '../../services';
+import { UserHttp }								from '../../http';
+import { ValueChartHttp }						from '../../http';
+import { ValidationService }							from '../../services';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
-import { XmlValueChartEncoder }							from '../../utilities/XmlValueChart.encoder';
-import * as Formatter									from '../../utilities/Formatter';
+import { XmlValueChartEncoder }							from '../../utilities';
+import * as Formatter									from '../../utilities';
 
 // Import Model Classes:
 import { ValueChart }									from '../../../model';

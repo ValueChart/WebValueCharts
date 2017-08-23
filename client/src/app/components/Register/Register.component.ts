@@ -10,8 +10,8 @@ import { Component }										from '@angular/core';
 import { Router, NavigationExtras }							from '@angular/router';
 
 // Import Application Classes:
-import { CurrentUserService }								from '../../services/CurrentUser.service';
-import { UserHttp }											from '../../http/User.http';
+import { CurrentUserService }								from '../../services';
+import { UserHttp }											from '../../http';
 
 // Import Types
 import { UserRole }											from '../../../types';

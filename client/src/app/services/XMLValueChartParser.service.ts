@@ -8,8 +8,8 @@
 import { Injectable } 															from '@angular/core';
 
 // Import Utility Classes
-import { XmlLegacyValueChartParser }											from '../utilities/XmlLegacyValueChart.parser';
-import { XmlValueChartParser }													from '../utilities/XmlValueChart.parser';
+import { XmlLegacyValueChartParser }											from '../utilities';
+import { XmlValueChartParser }													from '../utilities';
 
 // Import Model Classes:
 import { ValueChart }															from '../../model';

@@ -13,7 +13,7 @@ import * as d3 														from 'd3';
 import { Subject }													from 'rxjs/Subject';
 
 // Import Application Classes:
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
+import { ChartUndoRedoService }										from '../services';
 
 // Import Model Classes:
 import { Objective }												from '../../model';
@@ -23,8 +23,8 @@ import { ContinuousScoreFunction }									from '../../model';
 import { DiscreteScoreFunction }									from '../../model';
 import { ContinuousDomain }											from '../../model';
 
-import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }							from '../interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }							from '../interactions';
+import { AdjustScoreFunctionInteraction }							from '../interactions';
 
 import { DomainElement, ScoreFunctionData } 						from '../../types';
 import { RendererUpdate }											from '../../types';

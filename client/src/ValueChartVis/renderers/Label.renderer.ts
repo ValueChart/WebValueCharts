@@ -15,22 +15,22 @@ import { Subject }													from 'rxjs/Subject';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes:
-import { RenderEventsService }										from '../services/RenderEvents.service';
-import { RendererService } 											from '../services/Renderer.service';
-import { ChartUndoRedoService }										from '../services/ChartUndoRedo.service';
-import { ScoreFunctionRenderer }									from '../renderers/ScoreFunction.renderer';
-import { DiscreteScoreFunctionRenderer }							from '../renderers/DiscreteScoreFunction.renderer';
-import { ContinuousScoreFunctionRenderer }							from '../renderers/ContinuousScoreFunction.renderer';
+import { RenderEventsService }										from '../services';
+import { RendererService } 											from '../services';
+import { ChartUndoRedoService }										from '../services';
+import { ScoreFunctionRenderer }									from '../renderers';
+import { DiscreteScoreFunctionRenderer }							from '../renderers';
+import { ContinuousScoreFunctionRenderer }							from '../renderers';
 
-import { LabelDefinitions }											from '../definitions/Label.definitions';
+import { LabelDefinitions }											from '../definitions';
 
-import { RendererScoreFunctionUtility }								from '../utilities/RendererScoreFunction.utility';
+import { RendererScoreFunctionUtility }								from '../utilities';
 
-import { ResizeWeightsInteraction }									from '../interactions/ResizeWeights.interaction';
-import { SetObjectiveColorsInteraction }							from '../interactions/SetObjectiveColors.interaction';
-import { ReorderObjectivesInteraction }								from '../interactions/ReorderObjectives.interaction';
-import { ExpandScoreFunctionInteraction }							from '../interactions/ExpandScoreFunction.interaction';
-import { SortAlternativesInteraction }								from '../interactions/SortAlternatives.interaction';
+import { ResizeWeightsInteraction }									from '../interactions';
+import { SetObjectiveColorsInteraction }							from '../interactions';
+import { ReorderObjectivesInteraction }								from '../interactions';
+import { ExpandScoreFunctionInteraction }							from '../interactions';
+import { SortAlternativesInteraction }								from '../interactions';
 
 // Import Model Classes:
 import { ValueChart, ChartType }									from '../../model';

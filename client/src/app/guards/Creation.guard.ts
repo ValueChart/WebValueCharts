@@ -10,12 +10,12 @@ import { Injectable }    												from '@angular/core';
 import { CanDeactivate, CanActivate, NavigationStart, NavigationEnd  }	from '@angular/router';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot} 			from '@angular/router';
 import { Observable }    												from 'rxjs/Observable';
-import '../utilities/rxjs-operators';
+import '../utilities';
 
 
 // Import Application Classes:
-import { CreateValueChartComponent } 							from '../components/CreateValueChart/CreateValueChart.component';
-import { CreationStepsService }									from '../services/CreationSteps.service';
+import { CreateValueChartComponent } 							from '../components';
+import { CreationStepsService }									from '../services';
 
 // Import Types
 import { CreatePurpose }										from '../../types';

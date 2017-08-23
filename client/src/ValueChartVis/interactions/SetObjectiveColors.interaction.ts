@@ -15,8 +15,8 @@ import { Subscription }				 											from 'rxjs/Subscription';
 import '../../app/utilities/rxjs-operators';
 
 // Import Application Classes:
-import { ChangeDetectionService }												from '../services/ChangeDetection.service';
-import { LabelDefinitions }														from '../definitions/Label.definitions';
+import { ChangeDetectionService }												from '../services';
+import { LabelDefinitions }														from '../definitions';
 
 // Import Model Classes: 
 import { PrimitiveObjective }													from '../../model';
