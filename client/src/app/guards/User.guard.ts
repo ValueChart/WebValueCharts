@@ -28,7 +28,10 @@ import { UserRole }												from '../../types';
 import { CreatePurpose }										from '../../types';
 
 /*
-	UserGuard is an Angular service that is used to control navigation away from and to the '/ValueCharts/:ValueChart/:ChartType' route.
+	UserGuard is an Angular service that is used to control navigation away from and to the '/ValueCharts/:ValueChart/:ChartType' route
+	and the /create/:purpose/ScoreFunctions + /create/:purpose/Weights routes when the purpose of editing preferences.
+	Essentially, the main function of this guard is to prevent users from navigating away from the create workflow
+	or the ValueChartViewer when they have unsaved preferences.
 */
 
 @Injectable()

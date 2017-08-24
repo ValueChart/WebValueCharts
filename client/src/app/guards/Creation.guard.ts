@@ -21,7 +21,10 @@ import { CreationStepsService }									from '../services';
 import { CreatePurpose }										from '../../types';
 
 /*
-	CreationGuard is an Angular service that is used to control navigation away from and to the '/create/:purpose' route.
+	CreationGuard is an Angular service that is used to control navigation away from and to the '/create/:purpose/:stage' route
+	in the case where the purpose is creating a ValueChart. This is distinct from the user guard. This class is used to
+	determine if a user wants to discard to save a new ValueChart when leaving the create workflow. In comparison, the user guard
+	is used to warn users that unsaved preferences changes will be lost due to navigation when leaving the create workflow or the viewer.
 */
 
 @Injectable()
