@@ -195,49 +195,36 @@ export class ValueChart {
 		return primitiveObjectives;
 	}
 
-	getAllAbstractObjectives(): AbstractObjective[] {
-		let abstractObjectives: AbstractObjective[] = [];
-		for (let objective of this.getAllObjectives()) {
-			if (objective.objectiveType === "abstract") {
-				abstractObjectives.push(<AbstractObjective> objective);
-			}
-		}
-		return abstractObjectives;
-	}
-
-	/*
-		@returns {string[]} - An array of the names of all objectives in the ValueChart. This array is NOT ordered.	
-		@description	Parses the ValueChart's hierarchical objective structure to find every objective's name.
+	/*   
+		@returns {PrimitiveObjective[]}
+		@description   Returns Objectives whose default score functions are mutable.
 	*/
-	getAllObjectivesByName(): string[] {
-		var primObj: string[] = [];
-		for (var obj of this.getAllObjectives()) {
-			primObj.push(obj.getName());
-		}
-		return primObj;
-	}
-
-	/*
-		@returns {string[]} - An array of the names of all primitive objectives in the ValueChart. This array is NOT ordered.	
-		@description	Parses the ValueChart's hierarchical objective structure to find every primitive objective's name.
-						This method is surprisingly useful considering WeightMaps, ScoreFunctionMaps, and alternatives use
-						objective names as keys.
-	*/
-	getAllPrimitiveObjectivesByName(): string[] {
-		var primObj: string[] = [];
-		for (var obj of this.getAllPrimitiveObjectives()) {
-			primObj.push(obj.getName());
-		}
-		return primObj;
+	getMutableObjectives(): PrimitiveObjective[] {
+		return this.getAllPrimitiveObjectives().filter(obj => !obj.getDefaultScoreFunction().immutable);
 	}
 
 	/*   
-	@returns {void}
-	@description   Return names of Objectives whose default score functions are mutable.
+		@returns {string[]}
+		@description   Returns map from Objective ids to names.
 	*/
-	getMutableObjectives() {
-		let mutableObjectives = this.getAllPrimitiveObjectives().filter(obj => !obj.getDefaultScoreFunction().immutable);
-		return mutableObjectives.map(obj => obj.getName());
+	public getObjectiveIdToNameMap(): {[objID: string]: string} {
+		let objectiveMap: {[objID: string]: string} = {};
+		for (let obj of this.getAllPrimitiveObjectives()) {
+			objectiveMap[obj.getId()] = obj.getName();
+		}
+		return objectiveMap;
+	}
+
+	/*   
+		@returns {string[]}
+		@description   Returns map from Objective names to ids.
+	*/
+	public getObjectiveNameToIdMap(): {[objName: string]: string} {
+		let objectiveMap: {[objName: string]: string} = {};
+		for (let obj of this.getAllPrimitiveObjectives()) {
+			objectiveMap[obj.getName()] = obj.getId();
+		}
+		return objectiveMap;
 	}
 
 	// Alternative Related Methods:
@@ -273,7 +260,7 @@ export class ValueChart {
 		var alternativeValues: { value: (string | number), alternative: Alternative }[] = [];
 
 		this.alternatives.forEach((alternative: Alternative) => {
-			alternativeValues.push({ value: alternative.getObjectiveValue(objective.getName()), alternative: alternative });
+			alternativeValues.push({ value: alternative.getObjectiveValue(objective.getId()), alternative: alternative });
 		});
 
 		return alternativeValues;
@@ -344,7 +331,7 @@ export class ValueChart {
 				this.initializeDefaultWeightMap((<AbstractObjective>obj).getDirectSubObjectives(), weightMap, weight);
 			}
 			else {
-				weightMap.setObjectiveWeight(obj.getName(), weight);			
+				weightMap.setObjectiveWeight(obj.getId(), weight);			
 			}
 		}
 	}

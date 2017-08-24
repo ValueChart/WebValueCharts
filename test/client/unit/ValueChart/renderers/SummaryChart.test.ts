@@ -428,8 +428,8 @@ var renderEventsServiceStub = {
 				(<any> cell.querySelectorAll('.' + SummaryChartDefinitions.USER_SCORE)).forEach((userScore: SVGElement) => {
 					let selection = d3.select(userScore);
 					let datum: UserScoreData = <any> selection.datum();
-					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getName()).getScore(datum.value);
-					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getId()).getScore(datum.value);
+					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getId());
 
 					scale.domain([0, datum.user.getWeightMap().getWeightTotal()]);
 

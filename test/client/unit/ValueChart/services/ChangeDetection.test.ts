@@ -158,7 +158,7 @@ describe('ChangeDetectionService', () => {
 			var bill = new User('Bill');
 			hotelChart.setUser(bill);
 
-			var area = hotelChart.getAllPrimitiveObjectives()[0].getName();
+			var area = hotelChart.getAllPrimitiveObjectives()[0].getId();
 			expect(hotelChart.getUsers()[0].getWeightMap().getObjectiveWeight(area)).to.equal(0.2);
 			hotelChart.getUsers()[0].getWeightMap().setObjectiveWeight(area, 0.3);
 			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;

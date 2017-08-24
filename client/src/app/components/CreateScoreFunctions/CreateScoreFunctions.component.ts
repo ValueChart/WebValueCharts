@@ -106,7 +106,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.valueChartService.getValueChart().getMutableObjectives()[0];
+    this.selectedObjective = this.valueChartService.getValueChart().getMutableObjectives()[0].getName();
     this.latestDefaults = {};
 
     // Initialize user
@@ -129,10 +129,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
     // Initialize latest defaults and best/worst outcomes
     this.initialBestOutcomes = {};
     this.initialWorstOutcomes = {};
-    for (let objName of this.valueChartService.getValueChart().getMutableObjectives()) {
-      this.initialBestOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
-      this.initialWorstOutcomes[objName] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
-      this.latestDefaults[objName] = "default";
+    for (let obj of this.valueChartService.getValueChart().getMutableObjectives()) {
+      this.initialBestOutcomes[obj.getName()] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()).bestElement;
+      this.initialWorstOutcomes[obj.getName()] = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()).worstElement;
+      this.latestDefaults[obj.getName()] = "default";
     }
 
     if (!newUser) {
@@ -148,10 +148,10 @@ export class CreateScoreFunctionsComponent implements OnInit {
   ngOnDestroy() {
     // Clear weight map if best or worst outcome has changed
     if (this.user.getWeightMap().getWeightTotal() > 0) {
-      for (let objName of this.valueChartService.getValueChart().getMutableObjectives()) {
-        let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).bestElement;
-        let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName).worstElement;
-        if (newBestOutcome !== this.initialBestOutcomes[objName] || newWorstOutcome !== this.initialWorstOutcomes[objName]) {
+      for (let obj of this.valueChartService.getValueChart().getMutableObjectives()) {
+        let newBestOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()).bestElement;
+        let newWorstOutcome = this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()).worstElement;
+        if (newBestOutcome !== this.initialBestOutcomes[obj.getName()] || newWorstOutcome !== this.initialWorstOutcomes[obj.getName()]) {
           this.userNotificationService.displayWarnings([this.updateValueChartService.BEST_WORST_OUTCOME_CHANGED]);
           break;
         }
@@ -167,7 +167,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
                    (Currently called when user clicks "Next" button next to dropdown).
   */
   advanceSelectedObjective() {
-    let primObjs: string[] = this.valueChartService.getValueChart().getMutableObjectives();
+    let primObjs: string[] = this.valueChartService.getValueChart().getMutableObjectives().map(obj => obj.getName());
     let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
     let nextIndex: number = selectedIndex + 1;
     if (nextIndex >= primObjs.length) {
@@ -186,14 +186,14 @@ export class CreateScoreFunctionsComponent implements OnInit {
   resetScoreFunction() {
     let obj: PrimitiveObjective = <PrimitiveObjective>this.getObjectiveByName(this.selectedObjective);
     if (this.latestDefaults[this.selectedObjective] === 'default') {
-      this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective).setElementScoreMap(_.cloneDeep(obj.getDefaultScoreFunction().getElementScoreMap()));
+      this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()).setElementScoreMap(_.cloneDeep(obj.getDefaultScoreFunction().getElementScoreMap()));
     }
     else if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
       let elements = (<CategoricalDomain | IntervalDomain>obj.getDomain()).getElements();
-      (<DiscreteScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective)).initialize(this.latestDefaults[this.selectedObjective], elements);
+      (<DiscreteScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())).initialize(this.latestDefaults[this.selectedObjective], elements);
     }
     else {
-      (<ContinuousScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.selectedObjective)).initialize(this.latestDefaults[this.selectedObjective]);
+      (<ContinuousScoreFunction>this.user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())).initialize(this.latestDefaults[this.selectedObjective]);
     }
   }
 

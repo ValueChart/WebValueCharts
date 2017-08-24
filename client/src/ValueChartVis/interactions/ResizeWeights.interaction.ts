@@ -120,7 +120,7 @@ export class ResizeWeightsInteraction {
 		// Calculate the correct weight increment.
 		var totalWeight: number = currentUser.getWeightMap().getWeightTotal();
 		var labelDatum: LabelData = <any> d3.select(<any> eventObject.target).datum();
-		var previousWeight: number = currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getName());
+		var previousWeight: number = currentUser.getWeightMap().getObjectiveWeight(labelDatum.objective.getId());
 		
 		if ((<any>eventObject).pumpType === PumpType.Increase) {
 			let pumpAmount = (0.01 * totalWeight) / ((1 - 0.01) - (previousWeight / totalWeight));
@@ -136,11 +136,11 @@ export class ResizeWeightsInteraction {
 			let incrementAmount = (-1 * decrimentAmount) / (primitiveObjectives.length - 1);
 
 			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-				if (objective.getName() === labelDatum.objective.getName())
-					currentUser.getWeightMap().setObjectiveWeight(objective.getName(), previousWeight + decrimentAmount);
+				if (objective.getId() === labelDatum.objective.getId())
+					currentUser.getWeightMap().setObjectiveWeight(objective.getId(), previousWeight + decrimentAmount);
 				else {
-					let oldWeight = currentUser.getWeightMap().getObjectiveWeight(objective.getName());
-					currentUser.getWeightMap().setObjectiveWeight(objective.getName(), oldWeight + incrementAmount);
+					let oldWeight = currentUser.getWeightMap().getObjectiveWeight(objective.getId());
+					currentUser.getWeightMap().setObjectiveWeight(objective.getId(), oldWeight + incrementAmount);
 				}					
 			});
 
@@ -288,7 +288,7 @@ export class ResizeWeightsInteraction {
 	*/
 	private incrementObjectiveWeight(labelDatum: LabelData, weightMap: WeightMap, newWeight: number, weightIncrement: number, maxWeight: number): void {
 		if (labelDatum.objective.objectiveType === 'primitive') {
-			weightMap.setObjectiveWeight(labelDatum.objective.getName(), newWeight);		
+			weightMap.setObjectiveWeight(labelDatum.objective.getId(), newWeight);		
 		} else {
 			var labelData = labelDatum.subLabelData;
 			this.incrementChildrenWeights(labelData, weightMap, weightIncrement, maxWeight);

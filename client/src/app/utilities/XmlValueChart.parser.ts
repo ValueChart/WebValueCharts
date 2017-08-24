@@ -68,10 +68,7 @@ export class XmlValueChartParser {
 		if (descriptionElement)
 			valueChartDescription = descriptionElement.innerHTML;
 
-		var usersParentElement: Element = valueChartElement.querySelector('Users');
-		var users: User[] = this.parseUsers(usersParentElement);
-
-		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator, users);
+		var valueChart: ValueChart = new ValueChart(valueChartName, valueChartDescription, valueChartCreator);
 		valueChart.password = valueChartElement.getAttribute('password');
 		let type = (valueChartElement.getAttribute('type') === 'individual') ? ChartType.Individual : ChartType.Group;
 		valueChart.setType(type);
@@ -84,6 +81,9 @@ export class XmlValueChartParser {
 
 		valueChart.setRootObjectives(this.parseObjectives(objectivesParentElement));
 		valueChart.setAlternatives(this.parseAlternatives(alternativesParentElement, valueChart.getAllPrimitiveObjectives()));
+
+		var usersParentElement: Element = valueChartElement.querySelector('Users');
+		valueChart.setUsers(this.parseUsers(usersParentElement, valueChart.getObjectiveNameToIdMap()));
 
 		return valueChart;
 	}
@@ -222,7 +222,7 @@ export class XmlValueChartParser {
  				if (correspondingObjective.getDomainType() === 'continuous')
  					domainValue = +domainValue;
 
-				alternative.setObjectiveValue(objectiveName, domainValue);
+				alternative.setObjectiveValue(correspondingObjective.getId(), domainValue);
 			}
 
 			alternatives.push(alternative);
@@ -233,13 +233,14 @@ export class XmlValueChartParser {
 
 	/*
 		@param usersParentElement - The <Users> element from the ValueChart's XML document. This element contains all of the ValueChart's users as children.
+		@param nameToIdMap - A map from Objective names to ids.
 		@returns {User[]}	- An array of User objects constructed from the children of The <Users> element.
 		@description	Parses a <Users> element from a ValueChart's XML document to obtain the array of Users belonging to the ValueChart.
 						This method will parse the ScoreFunctionMap, WeightMap, and ScoreFunctions of each <User> element that is a 
 						child of the provided <Users> element to produce complete user objects.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	public parseUsers(usersParentElement: Element): User[] {
+	public parseUsers(usersParentElement: Element, nameToIdMap: {[objName: string]: string}): User[] {
 		if (!usersParentElement)
 			return; 
 
@@ -255,10 +256,10 @@ export class XmlValueChartParser {
 			user.color = userElement.getAttribute('color');
 
 			let weightsParentElement = userElement.querySelector('Weights');
-			user.setWeightMap(this.parseWeightMap((weightsParentElement)))
+			user.setWeightMap(this.parseWeightMap(weightsParentElement, nameToIdMap));
 
 			let scoreFunctionsParentElement = userElement.querySelector('ScoreFunctions');
-			user.setScoreFunctionMap(this.parseScoreFunctionMap(scoreFunctionsParentElement));
+			user.setScoreFunctionMap(this.parseScoreFunctionMap(scoreFunctionsParentElement, nameToIdMap));
 
 			users.push(user);
 		}
@@ -268,11 +269,12 @@ export class XmlValueChartParser {
 
 	/*
 		@param weightsParentElement - The <Weights> element for one user in a ValueChart's XML document. This element contains all of a user's weights as child elements.
+		@param nameToIdMap - A map from Objective names to ids.
 		@returns {WeightMap}	- A WeightMap object created from the <Weight> elements that are children of the provided weightsParentElement.
 		@description	Parses a <Weights> element from a ValueChart's XML document to obtain a WeightMap.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	public parseWeightMap(weightsParentElement: Element): WeightMap {
+	public parseWeightMap(weightsParentElement: Element, nameToIdMap: {[objName: string]: string}): WeightMap {
 		if (!weightsParentElement)
 			return; 
 
@@ -285,7 +287,7 @@ export class XmlValueChartParser {
 			let objectiveName: string = weightElement.getAttribute('objective');
 			let weight: number = +weightElement.getAttribute('value');
 
-			weightMap.setObjectiveWeight(objectiveName, weight);
+			weightMap.setObjectiveWeight(nameToIdMap[objectiveName], weight);
 		}
 
 		return weightMap;
@@ -293,12 +295,13 @@ export class XmlValueChartParser {
 
 	/*
 		@param scoreFunctionsParentElement - The <ScoreFunctions> element for one user in a ValueChart's XML document. This element contains all of a user's score functions as child elements.
+		@param nameToIdMap - A map from Objective names to ids.
 		@returns {ScoreFunctionMap}	- A ScoreFunctionMap object created by parsing the provided scoreFunctionsParentElement.
 		@description	Parses a <ScoreFunctions> element from a ValueChart's XML document to obtain a ScoreFunctionMap. Note that the ScoreFunctions within
 						the map are parsed as a part of this methods execution.
 						Note that this method should NEVER be called manually. All parsing should be initiated using parseValueChart.
 	*/
-	public parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap {
+	public parseScoreFunctionMap(scoreFunctionsParentElement: Element, nameToIdMap: {[objName: string]: string}): ScoreFunctionMap {
 		if (!scoreFunctionsParentElement)
 			return;
 
@@ -312,7 +315,7 @@ export class XmlValueChartParser {
 			let objectiveName: string = scoreFunctionElement.getAttribute('objective');
 			let scoreFunction: ScoreFunction = this.parseScoreFunction(scoreFunctionElement);
 
-			scoreFunctionMap.setObjectiveScoreFunction(objectiveName, scoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(nameToIdMap[objectiveName], scoreFunction);
 		}
 
 		return scoreFunctionMap;

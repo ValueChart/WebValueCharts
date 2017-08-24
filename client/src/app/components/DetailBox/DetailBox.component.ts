@@ -111,7 +111,7 @@ export class DetailBoxComponent implements OnInit {
 
 		this.valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective, index: number) => {
 			this.alternativeObjectives[index] = objective.getName();
-			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getName());
+			this.alternativeObjectiveValues[index] = alternative.getObjectiveValue(objective.getId());
 		});
 
 	}

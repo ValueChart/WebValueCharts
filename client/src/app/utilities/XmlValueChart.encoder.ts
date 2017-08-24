@@ -93,7 +93,7 @@ export class XmlValueChartEncoder {
 		valueChart.getUsers().forEach((user: User) => {
 			csvOutput = csvOutput + user.getUsername() + ',';	// Add the user's username to the CSV string in the first column.
 			primitiveObjectives.forEach((objective: PrimitiveObjective) => {
-				csvOutput = csvOutput + user.getWeightMap().getNormalizedObjectiveWeight(objective.getName()) + ',';	// Add the user's weights.
+				csvOutput = csvOutput + user.getWeightMap().getNormalizedObjectiveWeight(objective.getId()) + ',';	// Add the user's weights.
 			});
 			csvOutput = csvOutput + '\n'; // Add a return line character after each user's row.
 		});
@@ -138,11 +138,10 @@ export class XmlValueChartEncoder {
 		});
 
 		// Encode the alternatives.
-		chartStructureElement.appendChild(this.convertAlternativesIntoElement(valueChart.getAlternatives(), xmlDocument));
-
+		chartStructureElement.appendChild(this.convertAlternativesIntoElement(valueChart.getAlternatives(), xmlDocument, valueChart.getObjectiveIdToNameMap()));
 
 		// Encode the users.
-		valueChartElement.appendChild(this.convertUsersIntoElement(valueChart.getUsers(), xmlDocument));
+		valueChartElement.appendChild(this.convertUsersIntoElement(valueChart.getUsers(), xmlDocument, valueChart.getObjectiveIdToNameMap()));
 
 		return valueChartElement;
 	}
@@ -216,22 +215,23 @@ export class XmlValueChartEncoder {
 		@param alternatives - The array of Alternative objects that are to be encoded as XML elements.
 		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
 								new elements. It is NOT modified.
+		@param idToNameMap - A map from Objective ids to names.
 		@returns {Element} - An XML element that is a parent of the XML elements representing the provided Alternative objects.
 		@description	Encodes an array of Alternatives objects as XML elements. 
 	*/
-	public convertAlternativesIntoElement(alternatives: Alternative[], xmlDocument: XMLDocument): Element {
+	public convertAlternativesIntoElement(alternatives: Alternative[], xmlDocument: XMLDocument, idToNameMap: {[objID: string]: string}): Element {
 		var alternativesParentElement: Element = xmlDocument.createElement('Alternatives');
 
 		alternatives.forEach((alternative: Alternative) => {
 			let alternativeElement = xmlDocument.createElement('Alternative');
 			alternativeElement.setAttribute('name', alternative.getName());
 
-			let objectiveValuePairs: { objectiveName: string, value: string | number }[] = alternative.getAllObjectiveValuePairs();
+			let objectiveValuePairs: { objectiveId: string, value: string | number }[] = alternative.getAllObjectiveValuePairs();
 
-			objectiveValuePairs.forEach((pair: { objectiveName: string, value: string | number }) => {
+			objectiveValuePairs.forEach((pair: { objectiveId: string, value: string | number }) => {
 				let alternativeValueElement: Element = xmlDocument.createElement('AlternativeValue');
 
-				alternativeValueElement.setAttribute('objective', pair.objectiveName);
+				alternativeValueElement.setAttribute('objective', idToNameMap[pair.objectiveId]);
 				alternativeValueElement.setAttribute('value', '' + pair.value);
 
 				alternativeElement.appendChild(alternativeValueElement);
@@ -251,11 +251,12 @@ export class XmlValueChartEncoder {
 		@param alternatives - The array of User objects that are to be encoded as XML elements.
 		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
 								new elements. It is NOT modified.
+		@param idToNameMap - A map from Objective ids to names.
 		@returns {Element} - An XML element that is a parent of the XML elements representing the provided User objects.
 		@description	Encodes an array of User objects as XML elements. This method encodes each Users WeightMap, ScoreFunctionMap and ScoreFunctions
 						as a part of its execution.
 	*/
-	public convertUsersIntoElement(users: User[], xmlDocument: XMLDocument): Element {
+	public convertUsersIntoElement(users: User[], xmlDocument: XMLDocument, idToNameMap: {[objID: string]: string}): Element {
 		var usersParentElement: Element = xmlDocument.createElement('Users');
 
 		users.forEach((user: User) => {
@@ -264,8 +265,8 @@ export class XmlValueChartEncoder {
 			if (user.color) {
 				userElement.setAttribute('color', user.color);
 			}
-			userElement.appendChild(this.convertWeightMapIntoElement(user.getWeightMap(), xmlDocument));				// Encode the User's WeightMap.
-			userElement.appendChild(this.convertScoreFunctionMapIntoElement(user.getScoreFunctionMap(), xmlDocument));  // Encode the User's ScoreFunctionMap (and all their ScoreFunctions).
+			userElement.appendChild(this.convertWeightMapIntoElement(user.getWeightMap(), xmlDocument, idToNameMap));	// Encode the User's WeightMap.
+			userElement.appendChild(this.convertScoreFunctionMapIntoElement(user.getScoreFunctionMap(), xmlDocument, idToNameMap));  // Encode the User's ScoreFunctionMap (and all their ScoreFunctions).
 
 			usersParentElement.appendChild(userElement);
 		});
@@ -277,10 +278,11 @@ export class XmlValueChartEncoder {
 		@param weightMap - The WeightMap object that is to be encoded as an XML element.
 		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
 								new elements. It is NOT modified.
+		@param idToNameMap - A map from Objective ids to names.
 		@returns {Element} - An XML element that represents the given WeightMap. 
 		@description	Encodes a WeightMap object as an XML element.
 	*/
-	public convertWeightMapIntoElement(weightMap: WeightMap, xmlDocument: XMLDocument): Element {
+	public convertWeightMapIntoElement(weightMap: WeightMap, xmlDocument: XMLDocument, idToNameMap: {[objID: string]: string}): Element {
 		var weightsParentElement: Element = xmlDocument.createElement('Weights');
 
 		var map: Map<string, number> = weightMap.getInternalWeightMap();
@@ -290,7 +292,7 @@ export class XmlValueChartEncoder {
 
 		while (iteratorElement.done === false) {
 			let weightElement: Element = xmlDocument.createElement('Weight');
-			weightElement.setAttribute('objective', iteratorElement.value);
+			weightElement.setAttribute('objective', idToNameMap[iteratorElement.value]);
 			weightElement.setAttribute('value', '' + weightMap.getNormalizedObjectiveWeight(iteratorElement.value));
 
 			weightsParentElement.appendChild(weightElement);
@@ -304,16 +306,17 @@ export class XmlValueChartEncoder {
 		@param scoreFunctionMap - The ScoreFunctionMap object that is to be encoded as an XML element.
 		@param xmlDocument - The XML document that is going to represent the ValueChart to encode. This is required by the method to create
 								new elements. It is NOT modified.
+		@param idToNameMap - A map from Objective ids to names.
 		@returns {Element} - An XML element that represents the given ScoreFunctionMap. 
 		@description	Encodes a ScoreFunctionMap object as an XML element.
 	*/
-	public convertScoreFunctionMapIntoElement(scoreFunctionMap: ScoreFunctionMap, xmlDocument: XMLDocument): Element {
+	public convertScoreFunctionMapIntoElement(scoreFunctionMap: ScoreFunctionMap, xmlDocument: XMLDocument, idToNameMap: {[objID: string]: string}): Element {
 		var scoreFunctionsParentElement: Element = xmlDocument.createElement('ScoreFunctions');
 
 		var scoreFunctionKeyPairs: { key: string, scoreFunction: ScoreFunction }[] = scoreFunctionMap.getAllKeyScoreFunctionPairs();
 
 		scoreFunctionKeyPairs.forEach((pair: { key: string, scoreFunction: ScoreFunction }) => {
-			let scoreFunctionElement = this.convertScoreFunctionIntoElement(pair.scoreFunction, pair.key, xmlDocument, false);
+			let scoreFunctionElement = this.convertScoreFunctionIntoElement(pair.scoreFunction, idToNameMap[pair.key], xmlDocument, false);
 			scoreFunctionsParentElement.appendChild(scoreFunctionElement);
 		});
 

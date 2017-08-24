@@ -50,15 +50,15 @@ export class ObjectivesRecord implements Memento {
 
 export class ScoreFunctionRecord implements Memento {
 
-	public objectiveName: string;
+	public objectiveId: string;
 	public scoreFunction: ScoreFunction;
 
-	constructor(objectiveName: string, scoreFunction: ScoreFunction) {
-		this.objectiveName = objectiveName;
+	constructor(objectiveId: string, scoreFunction: ScoreFunction) {
+		this.objectiveId = objectiveId;
 		this.scoreFunction = scoreFunction.getMemento();
 	}
 
 	getMemento(): ScoreFunctionRecord {
-		return new ScoreFunctionRecord(this.objectiveName, this.scoreFunction);
+		return new ScoreFunctionRecord(this.objectiveId, this.scoreFunction);
 	}
 }

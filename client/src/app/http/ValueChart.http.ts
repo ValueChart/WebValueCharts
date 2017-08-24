@@ -195,7 +195,6 @@ export class ValueChartHttp {
 			.catch(this.handleError);
 	}
 
-
 	getValueChartStatus(chartId: string): Observable<any> {
 		return this.http.get(this.valueChartsUrl + chartId + '/status')
 			.map(this.extractData)
@@ -221,37 +220,6 @@ export class ValueChartHttp {
 
 		return this.http.put(this.valueChartsUrl + chartId + '/users', body, options)
 			.map(((this.extractUsersData)))
-			.catch(this.handleError);
-	}
-
-	/*
-		@param chartId - The id of the ValueChart resource to add the user to. This id is provided by the server upon creating/updating a ValueChart resource.
-		@param user - The user object that is to be added to the ValueChart resource on the server.
-		@returns {Observable<User>} - An observable of a User resource that was created on the server. Should be identical to the user parameter.
-		@description 	Adds a new user to a ValueChart resource on the server. This method should NOT be used if the user 
-						is already part of the ValueChart. Use the updateUser method for this purpose.
-	*/
-	addUserToChart(chartId: string, user: User): Observable<User> {
-		let body = JSON.stringify(user);
-		let headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({ headers: headers });
-
-		return this.http.post(this.valueChartsUrl + chartId + '/users', body, options)
-			.map(this.extractUserData)
-			.catch(this.handleError);
-	}
-
-	/*
-		@param chartId - The id of the ValueChart resource to be retrieved. This id is provided by the server upon creating/updating a ValueChart resource.
-		@param password - The password of the ValueChart to be retrieved. The client must have the correct password to be allowed to retrieve the ValueChart.
-		@param username - The username of the user whose ValueChart preferences should be included. 
-		@returns {Observable<boolean>} - An observable of the ValueChart that was requested. 
-		@description 	Queries the server to retrieve a copy of the ValueChart resource with the given id and password.
-						Only the data for the specified user will be included.
-	*/
-	getUser(chartId: string, username: string): Observable<User> {
-		return this.http.get(this.valueChartsUrl + chartId + '/users/' + username)
-			.map(this.extractUserData)
 			.catch(this.handleError);
 	}
 

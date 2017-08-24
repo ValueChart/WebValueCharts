@@ -183,7 +183,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				let objective = u.valueChart.getAllPrimitiveObjectives()[0];
 				let aaron = u.valueChart.getUsers()[0];
-				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName());
+				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId());
 
 				let labelDatum: LabelData = { objective: objective, weight: previousWeight, depth: null, depthOfChildren: 0, subLabelData: null }
 
@@ -195,7 +195,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				resizeWeightsInteraction['onPump'](event);
 
-				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName())).to.equal(previousWeight - 0.01);
+				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId())).to.equal(previousWeight - 0.01);
 			});
 		});
 
@@ -205,7 +205,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				let objective = u.valueChart.getAllPrimitiveObjectives()[0];
 				let aaron = u.valueChart.getUsers()[0];
-				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName());
+				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId());
 
 				let labelDatum: LabelData = { objective: objective, weight: previousWeight, depth: null, depthOfChildren: 0, subLabelData: null }
 
@@ -218,7 +218,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				resizeWeightsInteraction['onPump'](event);
 
-				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName())).to.equal(previousWeight + 0.01);
+				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId())).to.equal(previousWeight + 0.01);
 			});
 		});
 	});
@@ -258,8 +258,8 @@ describe('ResizeWeightsInteraction', () => {
 												// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, 0.02, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + 0.02);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldAboveSiblingWeight - 0.02)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + 0.02);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldAboveSiblingWeight - 0.02)
 					});
 				});
 
@@ -275,8 +275,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, oldAboveSiblingWeight + 0.05, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(0)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(0)
 					});
 				});
 			});
@@ -294,8 +294,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, -0.02, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight - 0.02);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldAboveSiblingWeight + 0.02)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight - 0.02);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldAboveSiblingWeight + 0.02)
 					});
 				});
 
@@ -312,8 +312,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, -oldBelowSiblingWeight - 0.05, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(0);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight)
 					});
 				});
 			});
@@ -338,10 +338,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + 0.02);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + 0.02);
 						expect(u.labelData[0].subLabelData[1].weight).to.equal(oldAboveSiblingWeight - 0.02)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.equal(oldChildWeightOne - 0.01);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.equal(oldChildWeightTwo - 0.01);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.equal(oldChildWeightOne - 0.01);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.equal(oldChildWeightTwo - 0.01);
 					});
 				});
 
@@ -362,10 +362,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.be.approximately(oldBelowSiblingWeight + oldAboveSiblingWeight, 0.00001);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.be.approximately(oldBelowSiblingWeight + oldAboveSiblingWeight, 0.00001);
 						expect(u.labelData[0].subLabelData[1].weight).to.equal(0)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.equal(0);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.equal(0);
 					});
 				});
 			});
@@ -388,10 +388,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight - 0.02);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight - 0.02);
 						expect(u.labelData[0].subLabelData[1].weight).to.be.approximately(oldAboveSiblingWeight + 0.02, 0.00001)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.be.approximately(oldChildWeightOne + 0.01, 0.00001);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.be.approximately(oldChildWeightTwo + 0.01, 0.00001);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.be.approximately(oldChildWeightOne + 0.01, 0.00001);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.be.approximately(oldChildWeightTwo + 0.01, 0.00001);
 					});
 				});
 			});

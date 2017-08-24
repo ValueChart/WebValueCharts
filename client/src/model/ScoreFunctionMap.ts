@@ -91,15 +91,15 @@ export class ScoreFunctionMap {
 		return keys;
 	}
 
-	getObjectiveScoreFunction(objectiveName: string): ScoreFunction {
-		return this.scoreFunctions.get(objectiveName);
+	getObjectiveScoreFunction(objectiveId: string): ScoreFunction {
+		return this.scoreFunctions.get(objectiveId);
 	}
 
-	setObjectiveScoreFunction(objectiveName: string, ScoreFunction: ScoreFunction): void {
-		this.scoreFunctions.set(objectiveName, ScoreFunction);
+	setObjectiveScoreFunction(objectiveId: string, ScoreFunction: ScoreFunction): void {
+		this.scoreFunctions.set(objectiveId, ScoreFunction);
 	}
 
-	removeObjectiveScoreFunction(objectiveName: string): void {
-		this.scoreFunctions.delete(objectiveName);
+	removeObjectiveScoreFunction(objectiveId: string): void {
+		this.scoreFunctions.delete(objectiveId);
 	}
 }

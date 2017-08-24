@@ -77,20 +77,22 @@ describe('XmlValueChartParser', () => {
 	describe('parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap', () => {
 		var scoreFunctionsParentElement: Element;
 		var primitiveObjectiveNames: string[];
+		var nameToIdMap: {[objName: string]: string} = {};
 
 		before(function() {
 			scoreFunctionsParentElement = xmlDocument.querySelector('ScoreFunctions');
 			primitiveObjectiveNames = ['area', 'internet-access', 'rate', 'skytrain-distance', 'size'];
+			primitiveObjectiveNames.forEach(objName => nameToIdMap[objName] = objName);
 		});
 
 		it('should parse ALL of the ScoreFuctions from the XML document', () => {
-			var scoreFunctionMap: ScoreFunctionMap = valueChartParser.parseScoreFunctionMap(scoreFunctionsParentElement);
+			var scoreFunctionMap: ScoreFunctionMap = valueChartParser.parseScoreFunctionMap(scoreFunctionsParentElement, nameToIdMap);
 
 			expect(scoreFunctionMap.getAllScoreFunctions()).to.have.length(5);
 		});
 
 		it('should map one ScoreFunction to each PrimitiveObjective in the ValueChart', () => {
-			var scoreFunctionMap: ScoreFunctionMap = valueChartParser.parseScoreFunctionMap(scoreFunctionsParentElement);
+			var scoreFunctionMap: ScoreFunctionMap = valueChartParser.parseScoreFunctionMap(scoreFunctionsParentElement, nameToIdMap);
 
 			primitiveObjectiveNames.forEach((objectiveName: string) => {
 				expect(scoreFunctionMap.getObjectiveScoreFunction(objectiveName)).to.not.be.undefined;
@@ -101,14 +103,16 @@ describe('XmlValueChartParser', () => {
 	describe('parseWeightMap(weightsParentElement: Element): WeightMap', () => {
 		var weightsParentElement: Element;
 		var objectiveWeights: any[];
+		var nameToIdMap: {[objName: string]: string} = {};
 		
 		before(function() {	
 			weightsParentElement = xmlDocument.querySelector('Weights');
 			objectiveWeights = [{objectiveName: 'area', weight: 0.2}, {objectiveName: 'internet-access', weight: 0.1}, {objectiveName: 'rate', weight: 0.3}, {objectiveName: 'skytrain-distance', weight: 0.2}, {objectiveName: 'size', weight: 0.2}];
+			objectiveWeights.forEach(objWeight => nameToIdMap[objWeight.objectiveName] = objWeight.objectiveName);
 		});
 
 		it('should parse all of the weight tags, and map the correct weight to each objective in the ValueChart', () => {
-			var weightMap: WeightMap = valueChartParser.parseWeightMap(weightsParentElement);
+			var weightMap: WeightMap = valueChartParser.parseWeightMap(weightsParentElement, nameToIdMap);
 
 			objectiveWeights.forEach((objectiveWeight: any) => {
 				expect(weightMap.getObjectiveWeight(objectiveWeight.objectiveName)).to.equal(objectiveWeight.weight);
@@ -120,25 +124,27 @@ describe('XmlValueChartParser', () => {
 		var usersParentElement: Element;
 		var objectiveWeights: any[];
 		var primitiveObjectiveNames: string[];
+		var nameToIdMap: {[objName: string]: string} = {};
 
 		before(function() {
 			usersParentElement = xmlDocument.querySelector('Users');
 			objectiveWeights = [{objectiveName: 'area', weight: 0.2}, {objectiveName: 'internet-access', weight: 0.1}, {objectiveName: 'rate', weight: 0.3}, {objectiveName: 'skytrain-distance', weight: 0.2}, {objectiveName: 'size', weight: 0.2}];
 			primitiveObjectiveNames = ['area', 'internet-access', 'rate', 'skytrain-distance', 'size'];
+			primitiveObjectiveNames.forEach(objName => nameToIdMap[objName] = objName);
 		});	
 
 		it('should parse the correct number of users from the XML document', () => {
-			var users: User[] = valueChartParser.parseUsers(usersParentElement);
+			var users: User[] = valueChartParser.parseUsers(usersParentElement, nameToIdMap);
 			expect(users).to.have.length(1);
 		});
 
 		it('should parse the users name from the XML document', () => {
-			var user: User = valueChartParser.parseUsers(usersParentElement)[0];
+			var user: User = valueChartParser.parseUsers(usersParentElement, nameToIdMap)[0];
 			expect(user.getUsername()).to.equal('Aaron Mishkin');
 		});
 
 		it('should correctly parse each users WeightMap, and ScoreFunctionmap from the XMl document', () => {
-			var user: User = valueChartParser.parseUsers(usersParentElement)[0];
+			var user: User = valueChartParser.parseUsers(usersParentElement, nameToIdMap)[0];
 
 			objectiveWeights.forEach((objectiveWeight: any) => {
 				expect(user.getWeightMap().getObjectiveWeight(objectiveWeight.objectiveName)).to.equal(objectiveWeight.weight);
@@ -280,7 +286,7 @@ describe('XmlValueChartParser', () => {
 					expect(alternatives[i].getName()).to.equal(alternativeValues[i].alternativeName);
 
 					alternativeValues[i].objectiveValues.forEach((objectiveValue: any) => {
-						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal(objectiveValue.value);
+						expect(alternatives[i].getObjectiveValue(valueChart.getObjectiveNameToIdMap()[objectiveValue.objectiveName])).to.equal(objectiveValue.value);
 					});
 				}
 			});

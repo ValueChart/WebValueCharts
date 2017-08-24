@@ -39,25 +39,25 @@ describe('ScoreFunctionMap', () => {
 
 		context('when there are no Objective-ScoreFunction pairs in the ScoreFunctionMap', () => {
 			it('should return undefined for any Objective', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.be.undefined;
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.be.undefined;
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.be.undefined;
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.be.undefined;
 			});
 		});
 
 		context('when there are Objective-ScoreFunction pairs in the ScoreFunctionMap', () => {
 
 			before(function() {
-				scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-				scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
 			});
 
 			it('should return undefined for an Objective that is not in the ScoreFunctionMap', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(elevation.getName())).to.be.undefined;
+				expect(scoreFunctionMap.getObjectiveScoreFunction(elevation.getId())).to.be.undefined;
 			});
 
 			it('should return a ScoreFunction for an Objective that is in the ScoreFunctionMap', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.deep.equal(continuousScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.deep.equal(continuousScoreFunction);
 			});
 		});
 	});
@@ -72,9 +72,9 @@ describe('ScoreFunctionMap', () => {
 			});
 
 			it('should insert the Objective into the map, and assign it a weight at the same time', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.be.undefined;
-				scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.be.undefined;
+				scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
 			});
 		});
 
@@ -83,14 +83,14 @@ describe('ScoreFunctionMap', () => {
 			before(function() {
 				scoreFunctionMap = new ScoreFunctionMap();
 
-				scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
 			});
 
 			it('should insert the Objective into the map without affecting the other Objective-ScoreFunction pairs', () => {
-				scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
 
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.deep.equal(continuousScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.deep.equal(continuousScoreFunction);
 			});
 		});
 
@@ -99,13 +99,13 @@ describe('ScoreFunctionMap', () => {
 			before(function() {
 				scoreFunctionMap = new ScoreFunctionMap();
 				
-				scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-				scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
 			});
 
 			it('should overwrite the old ScoreFunction with the new one', () => {
-				scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
+				scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
 			});
 		});
 	});
@@ -114,27 +114,27 @@ describe('ScoreFunctionMap', () => {
 
 		beforeEach(function() {
 			scoreFunctionMap = new ScoreFunctionMap();
-			scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-			scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
 		});
 
 		context('when the Objective-ScoreFunction pair to remove is not part of the ScoreFunctionMap', () => {
 			it('should not do anything', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.deep.equal(continuousScoreFunction);
-				scoreFunctionMap.removeObjectiveScoreFunction(elevation.getName());
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.deep.equal(continuousScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.deep.equal(continuousScoreFunction);
+				scoreFunctionMap.removeObjectiveScoreFunction(elevation.getId());
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.deep.equal(continuousScoreFunction);
 			});
 		});
 
 		context('when the Objective-ScoreFunction pair to remove is part of the ScoreFunctionMap', () => {
 			it('should remove the objective weight', () => {
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.deep.equal(continuousScoreFunction);
-				scoreFunctionMap.removeObjectiveScoreFunction(distance.getName());
-				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getName())).to.deep.equal(discreteScoreFunction);
-				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getName())).to.be.undefined;
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.deep.equal(continuousScoreFunction);
+				scoreFunctionMap.removeObjectiveScoreFunction(distance.getId());
+				expect(scoreFunctionMap.getObjectiveScoreFunction(weather.getId())).to.deep.equal(discreteScoreFunction);
+				expect(scoreFunctionMap.getObjectiveScoreFunction(distance.getId())).to.be.undefined;
 			});
 		});
 	});
@@ -143,9 +143,9 @@ describe('ScoreFunctionMap', () => {
 
 		beforeEach(function() {
 			scoreFunctionMap = new ScoreFunctionMap();
-			scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-			scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
-			scoreFunctionMap.setObjectiveScoreFunction(elevation.getName(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(elevation.getId(), continuousScoreFunction);
 		});
 
 		it('should retrieve an array of all the ScoreFunctions stored within the ScoreFunctionMap', () => {
@@ -164,9 +164,9 @@ describe('ScoreFunctionMap', () => {
 
 		beforeEach(function() {
 			scoreFunctionMap = new ScoreFunctionMap();
-			scoreFunctionMap.setObjectiveScoreFunction(weather.getName(), discreteScoreFunction);
-			scoreFunctionMap.setObjectiveScoreFunction(distance.getName(), continuousScoreFunction);
-			scoreFunctionMap.setObjectiveScoreFunction(elevation.getName(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(weather.getId(), discreteScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(distance.getId(), continuousScoreFunction);
+			scoreFunctionMap.setObjectiveScoreFunction(elevation.getId(), continuousScoreFunction);
 		});
 
 		it('should retrieve an array of all the ScoreFunctions along with their corresponding objective names stored within the ScoreFunctionMap', () => {
@@ -174,9 +174,9 @@ describe('ScoreFunctionMap', () => {
 
 			expect(scoreFunctions).to.have.length(3);
 
-			expect(scoreFunctions[0]).to.deep.equal({key: weather.getName(), scoreFunction: discreteScoreFunction });
-			expect(scoreFunctions[1]).to.deep.equal({key: distance.getName(), scoreFunction: continuousScoreFunction });
-			expect(scoreFunctions[2]).to.deep.equal({key: elevation.getName(), scoreFunction: continuousScoreFunction });
+			expect(scoreFunctions[0]).to.deep.equal({key: weather.getId(), scoreFunction: discreteScoreFunction });
+			expect(scoreFunctions[1]).to.deep.equal({key: distance.getId(), scoreFunction: continuousScoreFunction });
+			expect(scoreFunctions[2]).to.deep.equal({key: elevation.getId(), scoreFunction: continuousScoreFunction });
 		});
 	});
 

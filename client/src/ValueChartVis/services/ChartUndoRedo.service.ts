@@ -111,7 +111,7 @@ export class ChartUndoRedoService {
 	}
 
 	public saveScoreFunctionRecord(scoreFunction: ScoreFunction, objective: PrimitiveObjective): void {
-		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getName(), scoreFunction);
+		var scoreFunctionRecord: ScoreFunctionRecord = new ScoreFunctionRecord(objective.getId(), scoreFunction);
 		
 		// The change is exactly the same as the last recorded state, so do nothing.
 		if (_.isEqual(this.undoStateRecords[this.undoStateRecords.length - 1], scoreFunctionRecord))
@@ -202,8 +202,8 @@ export class ChartUndoRedoService {
 		if (!valueChart.getUsers()[0])
 			return;
 
-		var currentScoreFunction: ScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveName);
-		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveName, currentScoreFunction));
+		var currentScoreFunction: ScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(scoreFunctionRecord.objectiveId);
+		stateRecords.push(new ScoreFunctionRecord(scoreFunctionRecord.objectiveId, currentScoreFunction));
 
 		// Dispatch the ScoreFunctionChange event, notifying any listeners and passing the scoreFunctionRecord as a parameter.
 		this.undoRedoSubject.next({ type: this.SCORE_FUNCTION_CHANGE, data: scoreFunctionRecord });

@@ -323,14 +323,14 @@ export class SortAlternativesInteraction {
 
 		this.lastRendererUpdate.usersToDisplay.forEach((user: User) => {
 			objectivesToReorderBy.forEach((objective: Objective) => {
-				var scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
-				var weight: number = user.getWeightMap().getObjectiveWeight(objective.getName());
+				var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(objective.getId());
 				
 				alternatives.forEach((alternative: Alternative) => {
 					if (alternativeScores[alternative.getName()] == undefined) 
 						alternativeScores[alternative.getName()] = 0;
 
-					alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getName())) * weight);
+					alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getId())) * weight);
 				});
 			});
 		});

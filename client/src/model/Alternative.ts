@@ -26,7 +26,7 @@ export class Alternative {
 	private name: string;									// The name of the Alternative
 	private id: string;										// The name of the Alternative formatted for use as a HTML id.
 	private description: string;							// The description of the alternative.
-	private objectiveValues: Map<string, string | number>;	// The internal Map objective used to match consequences to the name of the associated PrimitiveObjective.
+	private objectiveValues: Map<string, string | number>;	// The internal Map objective used to match consequences to the id of the associated PrimitiveObjective.
 
 	// ========================================================================================
 	// 									Constructor
@@ -70,23 +70,23 @@ export class Alternative {
 		this.description = description;
 	}
 
-	getObjectiveValue(objectiveName: string): string | number {
-		return this.objectiveValues.get(objectiveName);
+	getObjectiveValue(objectiveId: string): string | number {
+		return this.objectiveValues.get(objectiveId);
 	}
 
 	/*
-		@returns {{ objectiveName: string, value: string | number }[]} - The collection of the Alternative's consequence paired with the associated objective's name.
-		@description	Iterates over the objectiveValues to return an array of objective names paired with the Alternative's 
+		@returns {{ objectiveId: string, value: string | number }[]} - The collection of the Alternative's consequence paired with the associated objective's id.
+		@description	Iterates over the objectiveValues to return an array of objective ids paired with the Alternative's 
 						consequence for that objective.
 	*/
-	getAllObjectiveValuePairs(): { objectiveName: string, value: string | number }[] {
-		var objectiveValuePairs: { objectiveName: string, value: string | number }[] = [];
+	getAllObjectiveValuePairs(): { objectiveId: string, value: string | number }[] {
+		var objectiveValuePairs: { objectiveId: string, value: string | number }[] = [];
 
 		var mapIterator: Iterator<string> = this.objectiveValues.keys();
 		var iteratorElement: IteratorResult<string> = mapIterator.next();
 
 		while (iteratorElement.done === false) {
-			objectiveValuePairs.push({ objectiveName: iteratorElement.value, value: this.objectiveValues.get(iteratorElement.value) });
+			objectiveValuePairs.push({ objectiveId: iteratorElement.value, value: this.objectiveValues.get(iteratorElement.value) });
 			iteratorElement = mapIterator.next();
 		}
 
@@ -107,11 +107,11 @@ export class Alternative {
 		return objectiveKeys;
 	}
 
-	setObjectiveValue(objectiveName: string, value: string | number): void {
-		this.objectiveValues.set(objectiveName, value);
+	setObjectiveValue(objectiveId: string, value: string | number): void {
+		this.objectiveValues.set(objectiveId, value);
 	}
 
-	removeObjective(objectiveName: string): void {
-		this.objectiveValues.delete(objectiveName);
+	removeObjective(objectiveId: string): void {
+		this.objectiveValues.delete(objectiveId);
 	}
 }

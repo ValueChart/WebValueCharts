@@ -253,7 +253,7 @@ export class ValidationService {
 		@description 	Returns true iff every Objective has a name that isn't the empty string.
 	*/
 	allObjectivesHaveNames(valueChart: ValueChart): boolean{
-		return valueChart.getAllObjectivesByName().indexOf("") === -1;
+		return valueChart.getAllObjectives().map(obj => obj.getName()).indexOf("") === -1;
 	}
 
 	/* 	
@@ -261,7 +261,7 @@ export class ValidationService {
 		@description 	Returns true iff all Objective names are unique after converting to ID format.
 	*/
 	allObjectiveNamesUnique(valueChart: ValueChart): boolean {
-		let formattedNames = valueChart.getAllObjectivesByName().map(x => Formatter.nameToID(x));
+		let formattedNames = valueChart.getAllObjectives().map(obj => obj.getName()).map(x => Formatter.nameToID(x));
 		return formattedNames.length === (new Set(formattedNames).size);
 	}	
 
@@ -273,7 +273,7 @@ export class ValidationService {
 	invalidObjectiveNames(valueChart: ValueChart): string[] {
 		let objectives = [];
 		let regex = new RegExp("^[\\s\\w-,.]*$");
-		for (let name of valueChart.getAllObjectivesByName()) {
+		for (let name of valueChart.getAllObjectives().map(obj => obj.getName())) {
 			if (name.search(regex) === -1) {
 				objectives.push(name);
 			}
@@ -531,9 +531,9 @@ export class ValidationService {
 		let alternatives = [];
 		for (let alt of valueChart.getAlternatives()) {
 			let objectives: string[] = [];
-			for (let objname of valueChart.getAllPrimitiveObjectivesByName()) {
-				if (alt.getObjectiveValue(objname) === undefined) {
-					objectives.push(objname);
+			for (let obj of valueChart.getAllPrimitiveObjectives()) {
+				if (alt.getObjectiveValue(obj.getId()) === undefined) {
+					objectives.push(obj.getName());
 				}
 			}
 			if (objectives.length > 0) {
@@ -553,7 +553,7 @@ export class ValidationService {
 		for (let alt of valueChart.getAlternatives()) {
 			let objectives = [];
 			for (let obj of valueChart.getAllPrimitiveObjectives()) {
-				let objValue = alt.getObjectiveValue(obj.getName());
+				let objValue = alt.getObjectiveValue(obj.getId());
 				if (objValue !== undefined) {
 					if (obj.getDomainType() === 'continuous') {
 						let dom: ContinuousDomain = <ContinuousDomain>obj.getDomain();
@@ -652,9 +652,9 @@ export class ValidationService {
 	missingScoreFunctions(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
-		for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-			if (scoreFunctionMap === undefined || scoreFunctionMap.getObjectiveScoreFunction(objName) === undefined) {
-				objectives.push(objName);
+		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+			if (scoreFunctionMap === undefined || scoreFunctionMap.getObjectiveScoreFunction(obj.getId()) === undefined) {
+				objectives.push(obj.getName());
 			}
 		}
 		return objectives;
@@ -671,7 +671,7 @@ export class ValidationService {
 		if (scoreFunctionMap) {
 			for (let obj of valueChart.getAllPrimitiveObjectives()) {
 				if (obj.getDomainType() === 'categorical' || obj.getDomainType() === 'interval') {
-					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getName());
+					let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getId());
 					if (scoreFunction) {
 						let elements = [] ;
 						for (let elt of (<CategoricalDomain>obj.getDomain()).getElements()) {
@@ -697,11 +697,11 @@ export class ValidationService {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
 		if (scoreFunctionMap) {
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(objName);
+			for (let obj of valueChart.getAllPrimitiveObjectives()) {
+				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getId());
 				if (scoreFunction) {	
 					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
-	      				objectives.push(objName);
+	      				objectives.push(obj.getName());
 	      			}
       			}
 			}
@@ -735,9 +735,9 @@ export class ValidationService {
 	missingWeights(valueChart: ValueChart, user: User): string[] {
 		let weightMap = user.getWeightMap();
 		let objectives = [];
-		for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-			if (weightMap === undefined || weightMap.getObjectiveWeight(objName) === undefined) {
-				objectives.push(objName);
+		for (let obj of valueChart.getAllPrimitiveObjectives()) {
+			if (weightMap === undefined || weightMap.getObjectiveWeight(obj.getId()) === undefined) {
+				objectives.push(obj.getName());
 			}
 		}
 		return objectives;
@@ -748,7 +748,7 @@ export class ValidationService {
 		@description 	Returns true iff weights for user sum to 1 within margin of error.
 	*/
 	invalidWeightSum(valueChart: ValueChart, user: User): boolean {
-		let error = 1e-8 * valueChart.getAllPrimitiveObjectivesByName().length;
+		let error = 1e-8 * valueChart.getAllPrimitiveObjectives().length;
 		let weightMap = user.getWeightMap();
 		if (weightMap && (weightMap.getWeightTotal() < 1 - error || weightMap.getWeightTotal() > 1 + error)) {
 			return true;
@@ -765,9 +765,9 @@ export class ValidationService {
 		let objectives = [];
 		let weightMap = user.getWeightMap();
 		if (weightMap) {
-			for (let objName of valueChart.getAllPrimitiveObjectivesByName()) {
-				if (weightMap.getObjectiveWeight(objName) < 0 || weightMap.getObjectiveWeight(objName) > 1) {
-					objectives.push(objName);
+			for (let obj of valueChart.getAllPrimitiveObjectives()) {
+				if (weightMap.getObjectiveWeight(obj.getId()) < 0 || weightMap.getObjectiveWeight(obj.getId()) > 1) {
+					objectives.push(obj.getName());
 				}
 			}
 		}
