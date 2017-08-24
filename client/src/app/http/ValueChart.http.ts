@@ -20,16 +20,16 @@ import { ValueChart }												from '../../model';
 import { User }														from '../../model';
 
 // Import Types: 
-import { HostMessage, MessageType }									from '../../types';
+import { HostMessage, MessageType, ValueChartStatus }				from '../../types';
 
 
 
 /*
 	This class contains methods used to interact with ValueChart resources stored by the server.
 	It should be used anytime the client needs to retrieve, alter or delete ValueCharts, users within 
-	a ValueChart, or the structure of a ValueChart. Note that the observables return by the methods of 
-	this class MUST be subscribed to for those methods' http requests to be made. Read more about
-	observables here: https://github.com/Reactive-Extensions/RxJS.
+	a ValueChart, the structure of a ValueChart, or the ValueChart's status object. Note that the 
+	observables return by the methods of this class MUST be subscribed to for those methods' http 
+	requests to be made. Read more about observables here: https://github.com/Reactive-Extensions/RxJS.
 
 	The methods in this class are used to access the endpoints defined in ValueChart.routes.ts
 	and ValueChartUsers.routes.ts.
@@ -184,7 +184,17 @@ export class ValueChartHttp {
 			.catch(this.handleError);
 	}
 
-	setValueChartStatus(status: any): Observable<any> {
+	/*
+		@param status - the new status object for the ValueChart. 
+		@returns {Observable<ValueChart>} - An observable of the ValueChart status that was set.
+		@description 	Sets the status of an existing ValueChart. The status controls whether or
+						not users are allowed to submit preferences, if the ValueChart is considered
+						complete, etc. Note that the ValueChart does not have to exist to create
+						a status object, but it will not be meaningful without a corresponding ValueChart.
+						This method is idempotent and can be used both to create a ValueChart status
+						for the first time and to update an existing ValueChart status.
+	*/
+	setValueChartStatus(status: ValueChartStatus): Observable<any> {
 		let body = JSON.stringify(status);
 		let headers = new Headers({ 'Content-Type': 'application/json' });
 		let options = new RequestOptions({ headers: headers });
@@ -195,12 +205,22 @@ export class ValueChartHttp {
 			.catch(this.handleError);
 	}
 
-	getValueChartStatus(chartId: string): Observable<any> {
+	/*
+		@returns {Observable<ValueChart>} - An observable of the ValueChart status for the ValueChart 
+											with the given database ID.
+		@description 	Retrieves the status of the ValueChart with the given database ID.
+	*/
+	getValueChartStatus(chartId: string): Observable<ValueChartStatus> {
 		return this.http.get(this.valueChartsUrl + chartId + '/status')
 			.map(this.extractData)
 			.catch(this.handleError);
 	}
 
+	/*
+		@returns {Observable<ValueChart>} - An observable of a message confirming the successful deletion of the status document.
+		@description 	Deletes the status of the ValueChart with the given database ID.
+						Note that this method is idempotent.
+	*/
 	deleteValueChartStatus(chartId: string): Observable<any> {
 		return this.http.delete(this.valueChartsUrl + chartId + '/status')
 			.map(this.extractBody)
