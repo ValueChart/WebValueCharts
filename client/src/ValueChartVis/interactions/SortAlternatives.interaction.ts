@@ -323,8 +323,8 @@ export class SortAlternativesInteraction {
 
 		this.lastRendererUpdate.usersToDisplay.forEach((user: User) => {
 			objectivesToReorderBy.forEach((objective: Objective) => {
-				var scoreFunction = this.lastRendererUpdate.valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
-				var weight: number = this.lastRendererUpdate.maximumWeightMap.getObjectiveWeight(objective.getId());
+				var scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				var weight: number = user.getWeightMap().getObjectiveWeight(objective.getId());
 				
 				alternatives.forEach((alternative: Alternative) => {
 					if (alternativeScores[alternative.getName()] == undefined) 
