@@ -77,7 +77,7 @@ describe('XmlValueChartParser', () => {
 	describe('parseScoreFunctionMap(scoreFunctionsParentElement: Element): ScoreFunctionMap', () => {
 		var scoreFunctionsParentElement: Element;
 		var primitiveObjectiveNames: string[];
-		var nameToIdMap: {[objName: string]: string};
+		var nameToIdMap: {[objName: string]: string} = {};
 
 		before(function() {
 			scoreFunctionsParentElement = xmlDocument.querySelector('ScoreFunctions');
@@ -103,7 +103,7 @@ describe('XmlValueChartParser', () => {
 	describe('parseWeightMap(weightsParentElement: Element): WeightMap', () => {
 		var weightsParentElement: Element;
 		var objectiveWeights: any[];
-		var nameToIdMap: {[objName: string]: string};
+		var nameToIdMap: {[objName: string]: string} = {};
 		
 		before(function() {	
 			weightsParentElement = xmlDocument.querySelector('Weights');
@@ -124,7 +124,7 @@ describe('XmlValueChartParser', () => {
 		var usersParentElement: Element;
 		var objectiveWeights: any[];
 		var primitiveObjectiveNames: string[];
-		var nameToIdMap: {[objName: string]: string};
+		var nameToIdMap: {[objName: string]: string} = {};
 
 		before(function() {
 			usersParentElement = xmlDocument.querySelector('Users');
@@ -286,7 +286,7 @@ describe('XmlValueChartParser', () => {
 					expect(alternatives[i].getName()).to.equal(alternativeValues[i].alternativeName);
 
 					alternativeValues[i].objectiveValues.forEach((objectiveValue: any) => {
-						expect(alternatives[i].getObjectiveValue(objectiveValue.objectiveName)).to.equal(objectiveValue.value);
+						expect(alternatives[i].getObjectiveValue(valueChart.getObjectiveNameToIdMap()[objectiveValue.objectiveName])).to.equal(objectiveValue.value);
 					});
 				}
 			});
