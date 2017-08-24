@@ -18,7 +18,8 @@ import { ValueChartStatus }									from '../../types';
 
 /*
 	This class stores a ValueChart and exposes this state to any component, directive, or service in the application
-	that requires it. It also provides utility methods for retrieving specific data from a ValueChart object.
+	that requires it. Often this ValueChart is referred to as the "base" ValueChart since it constitutes the master
+	copy of the ValueChart. This is as opposed to the ValueChartViewer service which stores the "active" ValueChart.
 */
 
 @Injectable()
@@ -28,8 +29,8 @@ export class ValueChartService {
 	// 									Fields
 	// ========================================================================================
 
-	private valueChart: ValueChart;
-	private status: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };
+	private valueChart: ValueChart;				// The "base" ValueChart.
+	private status: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };	// The status of the ValueChart.
 
 
 	// ========================================================================================

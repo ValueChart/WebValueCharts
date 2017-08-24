@@ -35,7 +35,8 @@ import { UserRole }													from '../../types';
 /*
 	This class contains all the methods require to host a ValueChart. A hosted ValueChart is a ValueChart
 	that other users, on different clients, can join and submit their preferences to. A hosted ValueChart
-	is automatically updated whenever a user joins, leaves, or changes their preferences. 
+	is automatically updated whenever a user joins, leaves, or changes their preferences. It is also updated
+	when the ValueChart's owner changes structural aspects of the ValueChart (eg. alternatives, objectives or basic details).
 
 	This class can open and maintain a websocket connection with the server that is used to send and 
 	receive messages about the state of a hosted ValueChart and its users. All the functionality for 
