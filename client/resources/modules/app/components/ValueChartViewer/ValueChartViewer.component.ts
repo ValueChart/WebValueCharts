@@ -373,8 +373,8 @@ export class ValueChartViewerComponent implements OnInit {
 	rescaleScoreFunctions(): void {
 		let currentUser: User = this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername());
 		let rescaled: boolean = false;
-		for (let objName of this.valueChartViewerService.getActiveValueChart().getAllPrimitiveObjectivesByName()) {
-			let scoreFunction = currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+		for (let objId of this.valueChartViewerService.getActiveValueChart().getAllPrimitiveObjectives().map(obj => obj.getId())) {
+			let scoreFunction = currentUser.getScoreFunctionMap().getObjectiveScoreFunction(objId);
 			if (scoreFunction.rescale()) {
 				rescaled = true;
 			}
@@ -518,7 +518,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	currentUserScoreFunctionChange = (message: {type: string, data: ScoreFunctionRecord}) => {
 		if (message.type === this.undoRedoService.SCORE_FUNCTION_CHANGE)
-			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getScoreFunctionMap().setObjectiveScoreFunction(message.data.objectiveName, message.data.scoreFunction);
+			this.valueChartViewerService.getActiveValueChart().getUser(this.currentUserService.getUsername()).getScoreFunctionMap().setObjectiveScoreFunction(message.data.objectiveId, message.data.scoreFunction);
 	}
 
 	currentUserWeightMapChange = (message: {type: string, data: WeightMap}) => {

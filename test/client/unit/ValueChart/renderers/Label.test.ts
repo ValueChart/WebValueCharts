@@ -553,7 +553,7 @@ var chartUndoRedoStub = {
 
 				checkRenderedLabels(u, selection, objectives[i].getId(), (<AbstractObjective> objectives[i]).getDirectSubObjectives(), dimension); 
 			} else {
-				let weight = u.maximumWeightMap.getObjectiveWeight(objectives[i].getName());
+				let weight = u.maximumWeightMap.getObjectiveWeight(objectives[i].getId());
 				expect(+outline.attr(dimension)).to.equal(Math.max(u.rendererConfig.dimensionTwoScale(weight) - 2, 0));
 			}
 		});
@@ -567,7 +567,7 @@ var chartUndoRedoStub = {
 		scoreFunctionsOutlines.nodes().forEach((outline: SVGElement) => {
 			let selection = d3.select(outline);
 			let objective: PrimitiveObjective = <any> selection.datum();
-			let weight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
+			let weight = u.maximumWeightMap.getObjectiveWeight(objective.getId());
 			if (expectEqual)
 				expect(+selection.attr(dimension)).to.equal(u.rendererConfig.dimensionTwoScale(weight));	
 			else 

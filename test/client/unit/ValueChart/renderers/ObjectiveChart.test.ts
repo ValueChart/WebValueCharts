@@ -252,7 +252,7 @@ var renderEventsServiceStub = {
 					objectiveChartRenderer.weightOutlines.nodes().forEach((weightOutline: Element) => {
 						let selection = d3.select(weightOutline);
 						let datum = (<UserScoreData> selection.datum());
-						let weight = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+						let weight = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getId());
 
 						let height: number = u.rendererConfig.dimensionTwoScale(weight);
 
@@ -455,8 +455,8 @@ var renderEventsServiceStub = {
 				(<any> cell.querySelectorAll('.' + ObjectiveChartDefinitions.USER_SCORE)).forEach((userScore: SVGElement) => {
 					let selection = d3.select(userScore);
 					let datum: UserScoreData = <any> selection.datum();
-					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getName()).getScore(datum.value);
-					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getId()).getScore(datum.value);
+					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getId());
 
 					if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 						expect(selection.attr('height')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());

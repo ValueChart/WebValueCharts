@@ -134,7 +134,7 @@ export class HostService {
 
 			// A new user has joined the hosted ValueChart. 
 			case MessageType.UserAdded:
-				let newUser: User = this.valueChartParser.parseUser(hostMessage.data);
+				let newUser: User = this.valueChartParser.parseUser(hostMessage.data, this.valueChartService.getValueChart().getObjectiveNameToIdMap());
 
 				if (newUser.getUsername() === this.currentUserService.getUsername())
 					return;
@@ -146,7 +146,7 @@ export class HostService {
 
 			// An existing user has resubmitted their preferences.
 			case MessageType.UserChanged:
-				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data);
+				let updatedUser: User = this.valueChartParser.parseUser(hostMessage.data, this.valueChartService.getValueChart().getObjectiveNameToIdMap());
 
 				if (updatedUser.getUsername() === this.currentUserService.getUsername())
 					return;

@@ -23,12 +23,12 @@
         </th>
         <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
             <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
-                <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(), t.value); resetErrorMessages()">
+                <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getId())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getId(), t.value); resetErrorMessages()">
                     <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
                 </select>
             </div>
             <div *ngIf="obj.getDomain().type === 'continuous'">
-                <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getName())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getName(),toNumber(m.value)); resetErrorMessages()"/>
+                <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getId())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getId(),toNumber(m.value)); resetErrorMessages()"/>
             </div>   
         </th>
       </tr>

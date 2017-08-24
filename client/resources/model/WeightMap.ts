@@ -12,7 +12,7 @@ import { PrimitiveObjective } 			from './PrimitiveObjective';
 
 
 /*
-	This class is the representation of user assigned objective weights in a ValueChart. A Map object that associates objective names with their
+	This class is the representation of user assigned objective weights in a ValueChart. A Map object that associates objective ids with their
 	assigned weights serves as the core of this class and the storage place of user weights. The class providers method that expand the functionality
 	of the built-in Map class to provide weight normalization, consistent tracking of the weight total, and retrieving all objective weights in a
 	specific order. This class should be used whenever information about user assigned waits needs to be recorded or represented. 
@@ -25,7 +25,7 @@ export class WeightMap implements Memento {
 	// ========================================================================================
 
 
-	private weights: Map<string, number>;		// The internal map object used to associate objective names with their assigned weight.
+	private weights: Map<string, number>;		// The internal map object used to associate objective ids with their assigned weight.
 	private weightTotal: number;				// The total of all weights in the weights objective. This total is used for normalization.
 
 
@@ -130,7 +130,7 @@ export class WeightMap implements Memento {
 	getObjectiveWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var orderedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i].getName());
+			orderedWeights[i] = this.getObjectiveWeight(orderedObjectives[i].getId());
 		}
 
 		return orderedWeights
@@ -147,7 +147,7 @@ export class WeightMap implements Memento {
 	getNormalizedWeights(orderedObjectives: PrimitiveObjective[]): number[] {
 		var normalizedWeights: number[] = [];
 		for (var i: number = 0; i < orderedObjectives.length; i++) {
-			normalizedWeights[i] = this.weights.get(orderedObjectives[i].getName()) / this.weightTotal;
+			normalizedWeights[i] = this.weights.get(orderedObjectives[i].getId()) / this.weightTotal;
 		}
 
 		return normalizedWeights;

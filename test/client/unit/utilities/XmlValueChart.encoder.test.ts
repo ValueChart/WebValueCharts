@@ -57,7 +57,7 @@ describe('XmlValueCHartEncoder', () => {
 			var rateScoreFunctionXMLString: string;
 			
 			before(function() {
-				rateScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction('rate');
+				rateScoreFunction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(valueChart.getObjectiveNameToIdMap()['rate']);
 				rateScoreFunctionXMLString = '<ScoreFunction objective="rate" type="continuous"><Score value="1" domain-element="100"/><Score value="0.75" domain-element="125"/><Score value="0.5" domain-element="150"/><Score value="0.25" domain-element="175"/><Score value="0" domain-element="200"/></ScoreFunction>';
 			});	
 
@@ -74,7 +74,7 @@ describe('XmlValueCHartEncoder', () => {
 			var internetAccessScoreFunctionXMLString: string;
 			
 			before(function() {
-				internetAccessScoreFuction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction('internet-access');
+				internetAccessScoreFuction = valueChart.getUsers()[0].getScoreFunctionMap().getObjectiveScoreFunction(valueChart.getObjectiveNameToIdMap()['internet-access']);
 				internetAccessScoreFunctionXMLString = '<ScoreFunction objective="internet-access" type="discrete"><Score value="0" domain-element="none"/><Score value="1" domain-element="highspeed"/><Score value="0.5" domain-element="lowspeed"/></ScoreFunction>';
 			});	
 
@@ -95,7 +95,7 @@ describe('XmlValueCHartEncoder', () => {
 		});
 
 		it('should convert the ScoreFunctionMap into XML that is identical to the source XML when serialized', () => {
-			var scoreFunctionMapElement: Element = xmlValueChartEncoder.convertScoreFunctionMapIntoElement(scoreFunctionMap, xmlDocument);
+			var scoreFunctionMapElement: Element = xmlValueChartEncoder.convertScoreFunctionMapIntoElement(scoreFunctionMap, xmlDocument, valueChart.getObjectiveIdToNameMap());
 			expect(xmlSerializer.serializeToString(scoreFunctionMapElement)).to.equal(scoreFunctionMapXMLString);
 		});
 	});
@@ -110,7 +110,7 @@ describe('XmlValueCHartEncoder', () => {
 		});
 
 		it('should convert the WeightMap into XML that is identical to the source XML when serialized', () => {
-			var weightMapElement: Element = xmlValueChartEncoder.convertWeightMapIntoElement(weightMap, xmlDocument);
+			var weightMapElement: Element = xmlValueChartEncoder.convertWeightMapIntoElement(weightMap, xmlDocument, valueChart.getObjectiveIdToNameMap());
 			expect(xmlSerializer.serializeToString(weightMapElement)).to.equal(weightMapXMLString);
 		});
 	});
@@ -125,7 +125,7 @@ describe('XmlValueCHartEncoder', () => {
 		});
 
 		it('should convert the User into XML that is identical to the source XML when serialized', () => {
-			var userElement: Element = xmlValueChartEncoder.convertUsersIntoElement([user], xmlDocument);
+			var userElement: Element = xmlValueChartEncoder.convertUsersIntoElement([user], xmlDocument, valueChart.getObjectiveIdToNameMap());
 			expect(xmlSerializer.serializeToString(userElement)).to.equal(userXMLString);
 		});
 	});
@@ -140,7 +140,7 @@ describe('XmlValueCHartEncoder', () => {
 		});
 
 		it('should convert the Alternative into XML that is identical to the source XML when serialized', () => {
-			var alternativesElement: Element = xmlValueChartEncoder.convertAlternativesIntoElement(alternatives, xmlDocument);
+			var alternativesElement: Element = xmlValueChartEncoder.convertAlternativesIntoElement(alternatives, xmlDocument, valueChart.getObjectiveIdToNameMap());
 			expect(xmlSerializer.serializeToString(alternativesElement)).to.equal(alternativesXMLString);
 		});
 	});

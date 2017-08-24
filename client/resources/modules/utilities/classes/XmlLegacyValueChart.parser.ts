@@ -182,7 +182,7 @@ export class XmlLegacyValueChartParser {
 		objectives.forEach((objective: PrimitiveObjective) => {
 			var objectiveElement = xmlDocument.querySelector('Criterion[name="' + objective.getName() + '"]');
 			// The + here allows quick conversion from string to number
-			user.getWeightMap().setObjectiveWeight(objective.getName(), +objectiveElement.getAttribute('weight'));
+			user.getWeightMap().setObjectiveWeight(objective.getId(), +objectiveElement.getAttribute('weight'));
 			var domainElement: any = objectiveElement.querySelector('Domain');
 
 			var scoreFunction: ScoreFunction;
@@ -204,7 +204,7 @@ export class XmlLegacyValueChartParser {
 				scoreFunction.setElementScore(x, y);
 			}
 
-			user.getScoreFunctionMap().setObjectiveScoreFunction(objective.getName(), scoreFunction);
+			user.getScoreFunctionMap().setObjectiveScoreFunction(objective.getId(), scoreFunction);
 		});
 
 		return user;
@@ -245,7 +245,7 @@ export class XmlLegacyValueChartParser {
 					mappedValue = +mappedValue;
 				}
 
-				alternative.setObjectiveValue(objectiveToMap.getName(), mappedValue);
+				alternative.setObjectiveValue(objectiveToMap.getId(), mappedValue);
 			}
 			alternatives.push(alternative);
 		}

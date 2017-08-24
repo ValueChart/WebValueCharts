@@ -40,8 +40,8 @@ export class CreateWeightsComponent implements OnInit {
 	// ========================================================================================
 
 	user: User;
-	rankedObjectives: string[]; // Objectives that have already been ranked
-    isRanked: { [objName: string]: boolean; }; // Indicates whether each Objective has been ranked
+	rankedObjectives: PrimitiveObjective[]; // Objectives that have already been ranked
+    isRanked: { [objId: string]: boolean; }; // Indicates whether each Objective has been ranked
     updateWeights: boolean = false; // Indicates whether or not the weights should be computed and set on validate or destroy.
     						  		  // True if user changes weights in any way (clicking on a row or clicking "Reset Weights").
     						  		  // This is to ensure that previously-made adjustments to weights are preserved.
@@ -99,22 +99,22 @@ export class CreateWeightsComponent implements OnInit {
 
 		// If weight map is empty, set all Objectives to unranked
 		if (this.user.getWeightMap().getWeightTotal() === 0) {
-			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
-				this.isRanked[obj] = false;
+			for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
+				this.isRanked[obj.getId()] = false;
 			}
 		}
 		// Weights have already been set by the user
 		else {
-			let objectives: string[] = this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName();
-			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(this.valueChartService.getValueChart().getAllPrimitiveObjectives());
+			let objectives: PrimitiveObjective[] = this.valueChartService.getValueChart().getAllPrimitiveObjectives();
+			let weights: number[] = this.user.getWeightMap().getObjectiveWeights(objectives);
 			let pairs = objectives.map(function(e, i) { return [objectives[i], weights[i]]; });
 			let sortedPairs = pairs.sort(this.compareObjectivesByWeight);
 			for (let pair of sortedPairs) {
 				if (pair[1] === undefined) {
-					this.isRanked[pair[0]] = false;
+					this.isRanked[(<PrimitiveObjective>pair[0]).getId()] = false;
 				}
 				else {
-					this.rankObjective(<string>pair[0], false);
+					this.rankObjective(<PrimitiveObjective>pair[0], false);
 				}
 			}
 			this.validate();
@@ -157,7 +157,7 @@ export class CreateWeightsComponent implements OnInit {
 						Returns 1 if the first is ranked above the second, 0 if they are ranked the same (should never happen), and -1 otherwise.
 						This is used to sort the ranked Objectives table.
 	*/
-	compareObjectivesByWeight(pair1: [string, number], pair2: [string, number]): number {
+	compareObjectivesByWeight(pair1: [PrimitiveObjective, number], pair2: [PrimitiveObjective, number]): number {
 		if (pair1[1] < pair2[1]) {
 			return 1;
 		}
@@ -173,12 +173,12 @@ export class CreateWeightsComponent implements OnInit {
 		@returns {string or number}
 		@description 	Gets best Alternative outcome for Objective. Used to fill the Best Outcome column.
 	*/
-	getBestOutcome(objName: string): string | number {
+	getBestOutcome(objId: string): string | number {
 		let bestOutcome;
 		let bestOutcomeScore = 0;
-		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
 		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
-			let outcome = alt.getObjectiveValue(objName);
+			let outcome = alt.getObjectiveValue(objId);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore > bestOutcomeScore) {
 				bestOutcome = outcome;
@@ -186,7 +186,7 @@ export class CreateWeightsComponent implements OnInit {
 			}
 		}
 		if (bestOutcome === undefined) {
-			bestOutcome = this.getWorstOutcome(objName);
+			bestOutcome = this.getWorstOutcome(objId);
 		}
 		return bestOutcome;
 	}
@@ -195,12 +195,12 @@ export class CreateWeightsComponent implements OnInit {
 		@returns {string or number}
 		@description 	Gets worst Alternative outcome for Objective. Used to fill the Worst Outcome column.
 	*/
-	getWorstOutcome(objName: string): string | number {
+	getWorstOutcome(objId: string): string | number {
 		let worstOutcome;
 		let worstOutcomeScore = 1;
-		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objName);
+		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
 		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
-			let outcome = alt.getObjectiveValue(objName);
+			let outcome = alt.getObjectiveValue(objId);
 			let outcomeScore = scoreFunction.getScore(outcome);
 			if (outcomeScore < worstOutcomeScore) {
 				worstOutcome = outcome;
@@ -208,7 +208,7 @@ export class CreateWeightsComponent implements OnInit {
 			}
 		}
 		if (worstOutcome === undefined) {
-			worstOutcome = this.getBestOutcome(objName);
+			worstOutcome = this.getBestOutcome(objId);
 		}
 		return worstOutcome;
 	}
@@ -226,12 +226,12 @@ export class CreateWeightsComponent implements OnInit {
 
 	/* 	
 		@returns {PrimitiveObjective[]}
-		@description 	Gets names of all PrimitiveObjectives that haven't been ranked. 
+		@description 	Gets all PrimitiveObjectives that haven't been ranked. 
 	*/
 	getUnrankedObjectives(): PrimitiveObjective[] {
 		let unrankedObjectives: PrimitiveObjective[] = [];
 		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
-			if (!this.isRanked[obj.getName()]) {
+			if (!this.isRanked[obj.getId()]) {
 				unrankedObjectives.push(obj);
 			}
 		}
@@ -244,9 +244,9 @@ export class CreateWeightsComponent implements OnInit {
 						Its rank is its index in rankedObjectives.
 						Parameter 'clicked' indicates whether or not this was called by a user clicking on a row
 	*/
-	rankObjective(primObj: string, clicked: boolean) {
-		this.rankedObjectives.push(primObj);
-		this.isRanked[primObj] = true;
+	rankObjective(obj: PrimitiveObjective, clicked: boolean) {
+		this.rankedObjectives.push(obj);
+		this.isRanked[obj.getId()] = true;
 		if (clicked) {
 			this.updateWeights = true;
 		}
@@ -257,8 +257,8 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Clears current ranking and sets all Objectives to unranked.
 	*/
 	resetRanks() {
-		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectivesByName()) {
-			this.isRanked[obj] = false;
+		for (let obj of this.valueChartService.getValueChart().getAllPrimitiveObjectives()) {
+			this.isRanked[obj.getId()] = false;
 		}
 		this.rankedObjectives = [];
 		this.updateWeights = true;
@@ -276,7 +276,7 @@ export class CreateWeightsComponent implements OnInit {
 		let numObjectives = this.valueChartService.getValueChart().getAllPrimitiveObjectives().length;
 		for (let obj of this.rankedObjectives) {
 			let weight = this.computeSum(rank, numObjectives) / numObjectives;
-			weights.setObjectiveWeight(obj, weight);
+			weights.setObjectiveWeight(obj.getId(), weight);
 			rank++;
 		}
 		return weights;

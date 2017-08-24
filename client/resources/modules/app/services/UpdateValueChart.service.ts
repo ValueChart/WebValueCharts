@@ -26,7 +26,7 @@ export class UpdateValueChartService {
 	// ========================================================================================
 
 	public CREATOR_CHANGED: string = "The ValueChart owner has been changed to: ";
-	public DESCRPTION_CHANGED: string = "The ValueChart's description has been changed to: ";
+	public DESCRIPTION_CHANGED: string = "The ValueChart's description has been changed to: ";
 	public NAME_CHANGED: string = "The ValueChart's name has been changed to: ";
 	public PASSWORD_CHANGED: string = "The ValueChart's password has been changed to: ";
 	public TYPE_CHANGED: string = "The type of the ValueChart has been changed to: ";
@@ -81,7 +81,7 @@ export class UpdateValueChartService {
 
 		if (oldStructure.getDescription() !== newStructure.getDescription()) {
 			oldStructure.setDescription(newStructure.getDescription());
-			changeList.push(this.DESCRPTION_CHANGED + newStructure.getDescription());
+			changeList.push(this.DESCRIPTION_CHANGED + newStructure.getDescription());
 		}
 
 		if (oldStructure.getName() !== newStructure.getName()) {
@@ -109,11 +109,11 @@ export class UpdateValueChartService {
 		var newObjectives = newStructure.getAllObjectives();
 		var oldObjectives = oldStructure.getAllObjectives();
 
-		// Get all alternatives in newStructure that are different from those in oldStructure. 
+		// Get all objectives in newStructure that are different from those in oldStructure. 
 		var differences = _.differenceWith(newObjectives, oldObjectives, this.compareObjectives);
 		
 		differences.forEach((objective: Objective) => {
-			let oldIndex = _.findIndex(oldObjectives, ['name', objective.getName()]);
+			let oldIndex = _.findIndex(oldObjectives, ['id', objective.getId()]);
 
 			if (oldIndex === -1) {	// Was the objective in the old structure?
 				changeList.push(this.OBJECTIVE_ADDED + objective.getName());
@@ -122,8 +122,8 @@ export class UpdateValueChartService {
 			}
 		});
 
-		// Get all objectives in the oldStructure that are not in the new structure (by the 'name' property).
-		var deletedObjectives = _.differenceBy(oldObjectives, newObjectives, 'name');
+		// Get all objectives in the oldStructure that are not in the new structure (by the 'id' property).
+		var deletedObjectives = _.differenceBy(oldObjectives, newObjectives, 'id');
 		deletedObjectives.forEach((objective: Objective) => {
 			changeList.push(this.OBJECTIVE_REMOVED + objective.getName());
 		});
@@ -145,19 +145,19 @@ export class UpdateValueChartService {
 		var differences = _.differenceWith(newAlternatives, oldAlternatives, this.compareAlternatives);
 		
 		differences.forEach((alternative: Alternative) => {
-			if (_.findIndex(oldAlternatives, ['name', alternative.getName()]) === -1)		// Was the alternative in the old structure?
+			if (_.findIndex(oldAlternatives, ['id', alternative.getId()]) === -1)		// Was the alternative in the old structure?
 				changeList.push(this.ALTERNATIVE_ADDED + alternative.getName());
 			else
 				changeList.push(this.ALTERNATIVE_CHANGED + alternative.getName());
 		});
 
-		// Get all alternatives in the oldStructure that are not in the new structure (by the 'name' property).
-		var deletedAlternatives = _.differenceBy(oldAlternatives, newAlternatives, 'name');
+		// Get all alternatives in the oldStructure that are not in the new structure (by the 'id' property).
+		var deletedAlternatives = _.differenceBy(oldAlternatives, newAlternatives, 'id');
 		deletedAlternatives.forEach((alternative: Alternative) => {
 			changeList.push(this.ALTERNATIVE_REMOVED + alternative.getName());
 		});
 
-		if (differences.length == 0 && deletedAlternatives.length == 0 && !_.isEqual(newAlternatives, oldAlternatives))
+		if (differences.length == 0 && deletedAlternatives.length == 0 && !_.isEqual(newAlternatives.map(alt => alt.getId()), oldAlternatives.map(alt => alt.getId())))
 			changeList.push(this.ALTERNATIVES_REORDERED);
 
 		oldStructure.setAlternatives(newStructure.getAlternatives());
@@ -166,8 +166,6 @@ export class UpdateValueChartService {
 	}
 
 	compareObjectives(a: Objective, b: Objective): boolean {
-		(<any>b)['id'] = a.getId();
-
 		if (a.objectiveType === 'primitive' || b.objectiveType === 'primitive')
 			return _.isEqual(a, b);
 		else {
@@ -178,8 +176,8 @@ export class UpdateValueChartService {
 			(<AbstractObjective> bCopy).setDirectSubObjectives([]);
 
 			let fieldsSame = _.isEqual(aCopy, bCopy);	// Check if the immediate properties are the same.
-			// Check (by name) to see if the children are the same.
-			let childrenSame = _.differenceBy((<AbstractObjective> a).getDirectSubObjectives(), (<AbstractObjective> b).getDirectSubObjectives(), 'name').length === 0;
+			// Check (by id) to see if the children are the same.
+			let childrenSame = _.differenceBy((<AbstractObjective> a).getDirectSubObjectives(), (<AbstractObjective> b).getDirectSubObjectives(), 'id').length === 0;
 
 			return fieldsSame && childrenSame;
 		}
@@ -220,11 +218,11 @@ export class UpdateValueChartService {
 		@description 	 Removes Alternative entries for Objectives that are not in the chart.
 	*/
 	removeAlternativeEntries(primitiveObjectives: PrimitiveObjective[], alternatives: Alternative[]) {
-		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+		let objIds = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getId(); });
 
 		for (let alt of alternatives) {
 			for (let key of alt.getObjectiveKeys()) {
-				if (objNames.indexOf(key) === -1) {
+				if (objIds.indexOf(key) === -1) {
 					alt.removeObjective(key);
 				}
 			}
@@ -242,21 +240,21 @@ export class UpdateValueChartService {
 			for (let alt of alternatives) {
 				if (obj.getDomainType() === "continuous") {
 					let dom = <ContinuousDomain>obj.getDomain();
-					let altVal: number = Number(alt.getObjectiveValue(obj.getName()));
+					let altVal: number = Number(alt.getObjectiveValue(obj.getId()));
 					if (isNaN(altVal) || altVal < dom.getMinValue() || altVal > dom.getMaxValue()) {
-						alt.removeObjective(obj.getName());
+						alt.removeObjective(obj.getId());
 					}
 					else {
-						alt.setObjectiveValue(obj.getName(), altVal);
+						alt.setObjectiveValue(obj.getId(), altVal);
 					}		
 				}
 				else {
-					let altVal: string = String(alt.getObjectiveValue(obj.getName()));
+					let altVal: string = String(alt.getObjectiveValue(obj.getId()));
 					if ((<CategoricalDomain>obj.getDomain()).getElements().indexOf(altVal) === -1) {
-						alt.removeObjective(obj.getName());
+						alt.removeObjective(obj.getId());
 					}
 					else {
-						alt.setObjectiveValue(obj.getName(), altVal);
+						alt.setObjectiveValue(obj.getId(), altVal);
 					}
 				}
 			}
@@ -280,8 +278,8 @@ export class UpdateValueChartService {
 		this.removeScoreFunctions(primitiveObjectives, user);
 		this.removeWeights(primitiveObjectives, user);
 		for (let obj of valueChart.getAllPrimitiveObjectives()) {
-      		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())) {
-      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
+      		if (user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())) {
+      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId());
 			    // Reset score functions in any of the following cases:
 			    //	(1) Domain type was changed from categorical/interval to continuous
 			    //	(1) Domain type was changed from  continuous to categorical/interval
@@ -289,11 +287,11 @@ export class UpdateValueChartService {
 				// It may be possible to do something more clever in the future that preserves parts of the previous score function
 			    if (obj.getDomainType() === 'continuous' || scoreFunction.type === 'continuous')  {
 			    	if (!_.isEqual(scoreFunction.getAllElements(), obj.getDefaultScoreFunction().getAllElements())) {
-			    		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
+			    		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getId(), _.cloneDeep(obj.getDefaultScoreFunction()));
 			    		resetScoreFunctions.push(obj.getName());
 			    	}
 			    }
-			    if (this.checkBestWorstChanged(scoreFunction, user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName()))) {
+			    if (this.checkBestWorstChanged(scoreFunction, user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()))) {
 			    	bestWorstChanged = true;
       			}
       		}
@@ -316,10 +314,10 @@ export class UpdateValueChartService {
 		@description 	Removes score functions for Objectives that are not in the chart.
 	*/
 	removeScoreFunctions(primitiveObjectives: PrimitiveObjective[], user: User) {
-		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+		let objIds = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getId(); });
 
 		for (let key of user.getScoreFunctionMap().getAllScoreFunctionKeys()) {
-			if (objNames.indexOf(key) === -1) {
+			if (objIds.indexOf(key) === -1) {
 				user.getScoreFunctionMap().removeObjectiveScoreFunction(key);
 			}
 		}
@@ -330,7 +328,7 @@ export class UpdateValueChartService {
 		@description 	Removes weights for Objectives that are not in the chart.
 	*/
 	removeWeights(primitiveObjectives: PrimitiveObjective[], user: User) {
-		let objNames = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getName(); });
+		let objIds = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getId(); });
 		let error = 1e-8 * primitiveObjectives.length;
 		let renormalize = user.getWeightMap().getWeightTotal() > 1 - error && user.getWeightMap().getWeightTotal() < 1 + error;
 
@@ -338,7 +336,7 @@ export class UpdateValueChartService {
 		var iteratorElement: IteratorResult<string> = elementIterator.next();
 		var size = 0;
 		while (iteratorElement.done === false) {
-			if (objNames.indexOf(<string>iteratorElement.value) === -1) {
+			if (objIds.indexOf(<string>iteratorElement.value) === -1) {
             	user.getWeightMap().removeObjectiveWeight(<string>iteratorElement.value);
           	}
 			iteratorElement = elementIterator.next();
@@ -390,12 +388,12 @@ export class UpdateValueChartService {
 		for (let obj of primitiveObjectives) {
 			// Make sure there is a score function for every Objective (initialized to default)
 			// Also, set immutable score functions to be an exact replica of the default
-      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName())
+      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())
       			|| obj.getDefaultScoreFunction().immutable) {
-        		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getName(), _.cloneDeep(obj.getDefaultScoreFunction()));
+        		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getId(), _.cloneDeep(obj.getDefaultScoreFunction()));
      		}
      		else {
-     			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getName());
+     			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId());
      			// Make sure score functions are complete
 		        if (this.updateScoreFunctionElements(obj.getDefaultScoreFunction(), scoreFunction)) {
 		        	completed.push(obj.getName());
@@ -440,8 +438,8 @@ export class UpdateValueChartService {
 
 		let addedWeights = [];
 		for (let obj of primitiveObjectives) {
-      		if (user.getWeightMap().getObjectiveWeight(obj.getName()) === undefined) {
-      			user.getWeightMap().setObjectiveWeight(obj.getName(), 0.0);
+      		if (user.getWeightMap().getObjectiveWeight(obj.getId()) === undefined) {
+      			user.getWeightMap().setObjectiveWeight(obj.getId(), 0.0);
       			addedWeights.push(obj.getName())
       		}
       	}

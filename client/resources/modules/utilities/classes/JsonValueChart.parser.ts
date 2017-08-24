@@ -69,17 +69,20 @@ export class JsonValueChartParser {
 				valueChart.addRootObjective(this.parseObjective(JsonValueChart.rootObjectives[i]));
 			}
 		}
+		
+		var nameToIdMap = valueChart.getObjectiveNameToIdMap();
+
 		if (JsonValueChart.alternatives !== undefined) {
 			// Parse Alternatives
 			for (var i = 0; i < JsonValueChart.alternatives.length; i++) {
-				valueChart.addAlternative(this.parseAlternative(JsonValueChart.alternatives[i]));
+				valueChart.addAlternative(this.parseAlternative(JsonValueChart.alternatives[i], nameToIdMap));
 			}	
 		}
 
 		// Parse Users if they are defined.
 		if (JsonValueChart.users !== undefined) {
 			for (var i = 0; i < JsonValueChart.users.length; i++) {
-				valueChart.setUser(this.parseUser(JsonValueChart.users[i]));
+				valueChart.setUser(this.parseUser(JsonValueChart.users[i], nameToIdMap));
 			}
 		} else {
 			JsonValueChart.users = [];
@@ -128,12 +131,19 @@ export class JsonValueChartParser {
 		return domain;
 	}
 
-	private parseAlternative(jsonAlternative: any): Alternative {
+	private parseAlternative(jsonAlternative: any, nameToIdMap: {[objName: string]: string}): Alternative {
 		var alternative: Alternative = new Alternative(jsonAlternative.name, jsonAlternative.description);
 		alternative['id'] = jsonAlternative['id'];
 
 		for (var i = 0; i < jsonAlternative.objectiveValues.length; i++) {
-			alternative.setObjectiveValue(jsonAlternative.objectiveValues[i][0], jsonAlternative.objectiveValues[i][1]);
+			var key = jsonAlternative.objectiveValues[i][0];
+			
+			// TODO: remove this check after database migration. It is needed for backward compatibility only.
+			if (nameToIdMap[key]) { // if this is defined, then the key is the name 
+				key = nameToIdMap[key]; // set key to be the Objective ID instead of the name
+			}
+
+			alternative.setObjectiveValue(key, jsonAlternative.objectiveValues[i][1]);
 		}
 
 		return alternative;
@@ -141,21 +151,22 @@ export class JsonValueChartParser {
 
 	/*
 		@param jsonUser - A JSON representation of a ValueChart User. 
+		@param nameToIdMap - A map from Objective names to ids.
 		@returns {User}	- A User object parsed from the JSON representation provided. 
 		@description	Parses a User from a JSON representation and into the proper class instances so that it can be used by the 
 						application. This method can be used to parse Users sent in responses from the WebValueCharts server.
 	*/
-	public parseUser(jsonUser: any): User {
+	public parseUser(jsonUser: any, nameToIdMap?: {[objName: string]: string}): User {
 		var user: User = new User(jsonUser.username);
 
 		// Parse the weight map if it is defined.
 		if (jsonUser.weightMap !== undefined) {
-			jsonUser.weightMap = this.parseWeightMap(jsonUser.weightMap);
+			jsonUser.weightMap = this.parseWeightMap(jsonUser.weightMap, nameToIdMap);
 		}
 
 		// Parse the score function map if it is defined.
 		if (jsonUser.scoreFunctionMap !== undefined) {
-			jsonUser.scoreFunctionMap = this.parseScoreFunctionMap(jsonUser.scoreFunctionMap);
+			jsonUser.scoreFunctionMap = this.parseScoreFunctionMap(jsonUser.scoreFunctionMap, nameToIdMap);
 		}
 
 		Object.assign(user, jsonUser);
@@ -163,21 +174,35 @@ export class JsonValueChartParser {
 		return user;
 	}
 
-	private parseWeightMap(jsonWeightMap: any): WeightMap {
+	private parseWeightMap(jsonWeightMap: any, nameToIdMap: {[objName: string]: string}): WeightMap {
 		var weightMap: WeightMap = new WeightMap();
 
 		for (var i = 0; i < jsonWeightMap.weights.length; i++) {
-			weightMap.setObjectiveWeight(jsonWeightMap.weights[i][0], jsonWeightMap.weights[i][1]);
+			var key = jsonWeightMap.weights[i][0];
+			
+			// TODO: remove this check after database migration. It is needed for backward compatibility only.
+			if (nameToIdMap && nameToIdMap[key] !== undefined) { // if this is defined, then the key is the name 
+				key = nameToIdMap[key]; // set key to be the Objective ID instead of the name
+			}
+
+			weightMap.setObjectiveWeight(key, jsonWeightMap.weights[i][1]);
 		}
 
 		return weightMap;
 	}
 
-	private parseScoreFunctionMap(jsonScoreFunctionMap: any): ScoreFunctionMap {
+	private parseScoreFunctionMap(jsonScoreFunctionMap: any, nameToIdMap: {[objName: string]: string}): ScoreFunctionMap {
 		var scoreFunctionMap: ScoreFunctionMap = new ScoreFunctionMap();
 
 		for (var i = 0; i < jsonScoreFunctionMap.scoreFunctions.length; i++) {
-			scoreFunctionMap.setObjectiveScoreFunction(jsonScoreFunctionMap.scoreFunctions[i][0], this.parseScoreFunction(jsonScoreFunctionMap.scoreFunctions[i][1]));
+			var key = jsonScoreFunctionMap.scoreFunctions[i][0];
+			
+			// TODO: remove this check after database migration. It is needed for backward compatibility only.
+			if (nameToIdMap && nameToIdMap[key] !== undefined) { // if this is defined, then the key is the name 
+				key = nameToIdMap[key]; // set key to be the Objective ID instead of the name
+			}
+
+			scoreFunctionMap.setObjectiveScoreFunction(key, this.parseScoreFunction(jsonScoreFunctionMap.scoreFunctions[i][1]));
 		}
 		return scoreFunctionMap;
 	}
@@ -199,7 +224,4 @@ export class JsonValueChartParser {
 
 		return scoreFunction;
 	}
-
-
-
 }

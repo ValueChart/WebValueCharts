@@ -146,7 +146,7 @@ export class RendererDataUtility {
 
 
 			for (var i = 0; i < primitiveObjectives.length; i++) {
-				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getName(), combinedWeights[i]);
+				maximumWeightMap.setObjectiveWeight(primitiveObjectives[i].getId(), combinedWeights[i]);
 			}
 		}
 
@@ -182,7 +182,7 @@ export class RendererDataUtility {
 				weightOffset: weightOffset,
 				cells: this.generateCellData(u, objective)
 			});
-			weightOffset += u.maximumWeightMap.getObjectiveWeight(objective.getName());
+			weightOffset += u.maximumWeightMap.getObjectiveWeight(objective.getId());
 		});
 
 		return rowData;
@@ -234,7 +234,7 @@ export class RendererDataUtility {
 
 			labelData = { 'objective': objective, 'weight': weight, 'subLabelData': children, 'depth': depth, 'depthOfChildren': maxDepthOfChildren + 1 };
 		} else if (objective.objectiveType === 'primitive') {
-			labelData = { 'objective': objective, 'weight': u.maximumWeightMap.getObjectiveWeight(objective.getName()), 'depth': depth, 'depthOfChildren': 0 };
+			labelData = { 'objective': objective, 'weight': u.maximumWeightMap.getObjectiveWeight(objective.getId()), 'depth': depth, 'depthOfChildren': 0 };
 		}
 
 		return labelData;
@@ -279,8 +279,8 @@ export class RendererDataUtility {
 						previousWeightedScore = 0;
 					} else {
 						let previousUserScore = rowDataCopy[i - 1].cells[j].userScores[k];
-						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getName());
-						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getName());
+						let scoreFunction: ScoreFunction = previousUserScore.user.getScoreFunctionMap().getObjectiveScoreFunction(previousUserScore.objective.getId());
+						previousWeightedScore = scoreFunction.getScore(previousUserScore.value) * previousUserScore.user.getWeightMap().getObjectiveWeight(previousUserScore.objective.getId());
 						previousOffset = previousUserScore.offset;
 					}
 
@@ -298,7 +298,7 @@ export class RendererDataUtility {
 				labelDatum.weight += subLabelDatum.weight;
 			});
 		} else {
-			labelDatum.weight = u.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getName());
+			labelDatum.weight = u.maximumWeightMap.getObjectiveWeight(labelDatum.objective.getId());
 		}
 	}
 }

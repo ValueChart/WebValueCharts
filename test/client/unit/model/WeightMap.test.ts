@@ -40,27 +40,27 @@ describe('WeightMap', () => {
 
 		context('when there are no Objective-weights pairs in the WeightMap', () => {
 			it('should return undefined for any Objective', () => {
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.be.undefined;
-				expect(weightMap.getObjectiveWeight(elevation.getName())).to.be.undefined;
-				expect(weightMap.getObjectiveWeight(temperature.getName())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(elevation.getId())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(temperature.getId())).to.be.undefined;
 			});
 		});
 
 		context('when there are Objective-weights pairs in the WeightMap', () => {
 
 			before(function() {
-				weightMap.setObjectiveWeight(weather.getName(), 2);
-				weightMap.setObjectiveWeight(humidity.getName(), 1);
+				weightMap.setObjectiveWeight(weather.getId(), 2);
+				weightMap.setObjectiveWeight(humidity.getId(), 1);
 			});
 
 			it('should return undefined for an Objective that is not in the WeightMap', () => {
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.be.undefined;
-				expect(weightMap.getObjectiveWeight(elevation.getName())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(elevation.getId())).to.be.undefined;
 			});
 
 			it('should return a (unormalized) weight for an Objective that is in the WeightMap', () => {
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(2);
-				expect(weightMap.getObjectiveWeight(humidity.getName())).to.equal(1);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(2);
+				expect(weightMap.getObjectiveWeight(humidity.getId())).to.equal(1);
 			});
 		});
 	});
@@ -75,10 +75,10 @@ describe('WeightMap', () => {
 			});
 
 			it('should insert the Objective into the map, and assign it a weight at the same time', () => {
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.be.undefined;
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.be.undefined;
 				expect(weightMap.getWeightTotal()).to.equal(0);
-				weightMap.setObjectiveWeight(weather.getName(), 0.5);
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(0.5);
+				weightMap.setObjectiveWeight(weather.getId(), 0.5);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(0.5);
 				expect(weightMap.getWeightTotal()).to.equal(0.5);
 			});
 		});
@@ -87,14 +87,14 @@ describe('WeightMap', () => {
 
 			before(function() {
 				weightMap = new WeightMap();
-				weightMap.setObjectiveWeight(weather.getName(), 0.5);
+				weightMap.setObjectiveWeight(weather.getId(), 0.5);
 			});
 
 			it('should insert the Objective-weight pair into the map without affecting the other Objective-weight pairs', () => {
 				expect(weightMap.getWeightTotal()).to.equal(0.5);
-				weightMap.setObjectiveWeight(distance.getName(), 10);
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(0.5);
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.equal(10);
+				weightMap.setObjectiveWeight(distance.getId(), 10);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(0.5);
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.equal(10);
 				expect(weightMap.getWeightTotal()).to.equal(10.5);
 			});
 		});
@@ -103,14 +103,14 @@ describe('WeightMap', () => {
 
 			before(function() {
 				weightMap = new WeightMap();
-				weightMap.setObjectiveWeight(weather.getName(), 0.5);
-				weightMap.setObjectiveWeight(distance.getName(), 10);
+				weightMap.setObjectiveWeight(weather.getId(), 0.5);
+				weightMap.setObjectiveWeight(distance.getId(), 10);
 			});
 
 			it('should overwrite the old weight with the new one', () => {
 				expect(weightMap.getWeightTotal()).to.equal(10.5);
-				weightMap.setObjectiveWeight(weather.getName(), 3);
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(3);
+				weightMap.setObjectiveWeight(weather.getId(), 3);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(3);
 				expect(weightMap.getWeightTotal()).to.equal(13);
 			});
 		});
@@ -120,30 +120,30 @@ describe('WeightMap', () => {
 
 		beforeEach(function() {
 			weightMap = new WeightMap();
-			weightMap.setObjectiveWeight(weather.getName(), 3);
-			weightMap.setObjectiveWeight(distance.getName(), 10);
+			weightMap.setObjectiveWeight(weather.getId(), 3);
+			weightMap.setObjectiveWeight(distance.getId(), 10);
 		});
 
 		context('when the Objective-weight pair to remove is NOT in the WeightMap', () => {
 			it('should not do anything', () => {
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(3);
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.equal(10);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(3);
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.equal(10);
 				expect(weightMap.getWeightTotal()).to.equal(13);
-				weightMap.removeObjectiveWeight(elevation.getName());
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(3);
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.equal(10);
+				weightMap.removeObjectiveWeight(elevation.getId());
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(3);
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.equal(10);
 				expect(weightMap.getWeightTotal()).to.equal(13);
 			});
 		});
 
 		context('when the Objective-weight pair to remove is in the WeightMap', () => {
 			it('should remove the Objective weight', () => {
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(3);
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.equal(10);
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(3);
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.equal(10);
 				expect(weightMap.getWeightTotal()).to.equal(13);
-				weightMap.removeObjectiveWeight(distance.getName());
-				expect(weightMap.getObjectiveWeight(weather.getName())).to.equal(3);
-				expect(weightMap.getObjectiveWeight(distance.getName())).to.be.undefined;
+				weightMap.removeObjectiveWeight(distance.getId());
+				expect(weightMap.getObjectiveWeight(weather.getId())).to.equal(3);
+				expect(weightMap.getObjectiveWeight(distance.getId())).to.be.undefined;
 				expect(weightMap.getWeightTotal()).to.equal(3);
 			});
 		});
@@ -153,7 +153,7 @@ describe('WeightMap', () => {
 
 		before(function() {
 			weightMap = new WeightMap();
-			weightMap.setObjectiveWeight(weather.getName(), 3);
+			weightMap.setObjectiveWeight(weather.getId(), 3);
 		});
 
 		context('when there is only one objective weight in the WeightMap', () => {
@@ -165,10 +165,10 @@ describe('WeightMap', () => {
 		context('when more objective weights are added to the WeightMap', () => {
 
 			before(function() {
-				weightMap.setObjectiveWeight(distance.getName(), 10);
-				weightMap.setObjectiveWeight(elevation.getName(), 5)
-				weightMap.setObjectiveWeight(temperature.getName(), 1)
-				weightMap.setObjectiveWeight(humidity.getName(), 10);
+				weightMap.setObjectiveWeight(distance.getId(), 10);
+				weightMap.setObjectiveWeight(elevation.getId(), 5)
+				weightMap.setObjectiveWeight(temperature.getId(), 1)
+				weightMap.setObjectiveWeight(humidity.getId(), 10);
 			});
 
 			it('should return the correct weight total', () => {
@@ -180,8 +180,8 @@ describe('WeightMap', () => {
 		context('when objective weights are changed', () => {
 
 			before(function() {
-				weightMap.setObjectiveWeight(temperature.getName(), 6)
-				weightMap.setObjectiveWeight(humidity.getName(), 0.5);
+				weightMap.setObjectiveWeight(temperature.getId(), 6)
+				weightMap.setObjectiveWeight(humidity.getId(), 0.5);
 			});
 
 			it('should return the correct weight total', () => {
@@ -192,7 +192,7 @@ describe('WeightMap', () => {
 		context('when objective weights are removed', () => {
 
 			before(function() {
-				weightMap.removeObjectiveWeight(temperature.getName());
+				weightMap.removeObjectiveWeight(temperature.getId());
 			});
 
 			it('should return the correct weight total', () => {
@@ -207,11 +207,11 @@ describe('WeightMap', () => {
 
 		before(function() {
 			weightMap = new WeightMap();
-			weightMap.setObjectiveWeight(weather.getName(), 3);
-			weightMap.setObjectiveWeight(distance.getName(), 5);
-			weightMap.setObjectiveWeight(elevation.getName(), 2);
-			weightMap.setObjectiveWeight(temperature.getName(), 1);
-			weightMap.setObjectiveWeight(humidity.getName(), 2);
+			weightMap.setObjectiveWeight(weather.getId(), 3);
+			weightMap.setObjectiveWeight(distance.getId(), 5);
+			weightMap.setObjectiveWeight(elevation.getId(), 2);
+			weightMap.setObjectiveWeight(temperature.getId(), 1);
+			weightMap.setObjectiveWeight(humidity.getId(), 2);
 
 			weightTotal = 3 + 5 + 2 + 1 + 2;
 		});
@@ -230,21 +230,21 @@ describe('WeightMap', () => {
 
 		before(function() {
 			weightMap = new WeightMap();
-			weightMap.setObjectiveWeight(weather.getName(), 3);
-			weightMap.setObjectiveWeight(distance.getName(), 5);
-			weightMap.setObjectiveWeight(elevation.getName(), 2);
-			weightMap.setObjectiveWeight(temperature.getName(), 1);
-			weightMap.setObjectiveWeight(humidity.getName(), 2);
+			weightMap.setObjectiveWeight(weather.getId(), 3);
+			weightMap.setObjectiveWeight(distance.getId(), 5);
+			weightMap.setObjectiveWeight(elevation.getId(), 2);
+			weightMap.setObjectiveWeight(temperature.getId(), 1);
+			weightMap.setObjectiveWeight(humidity.getId(), 2);
 
 			weightTotal = 3 + 5 + 2 + 1 + 2;
 		});
 
 		it('should retrieve properly normalied weights', () => {
-			expect(weightMap.getNormalizedObjectiveWeight(weather.getName())).to.be.closeTo(3 / weightTotal, roundingError); // This should be the weight for weather.
-			expect(weightMap.getNormalizedObjectiveWeight(distance.getName())).to.be.closeTo(5 / weightTotal, roundingError); // This should be the weight for distance.
-			expect(weightMap.getNormalizedObjectiveWeight(elevation.getName())).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for elevation.
-			expect(weightMap.getNormalizedObjectiveWeight(temperature.getName())).to.be.closeTo(1 / weightTotal, roundingError); // This should be the weight for temperature.
-			expect(weightMap.getNormalizedObjectiveWeight(humidity.getName())).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for humidity.		
+			expect(weightMap.getNormalizedObjectiveWeight(weather.getId())).to.be.closeTo(3 / weightTotal, roundingError); // This should be the weight for weather.
+			expect(weightMap.getNormalizedObjectiveWeight(distance.getId())).to.be.closeTo(5 / weightTotal, roundingError); // This should be the weight for distance.
+			expect(weightMap.getNormalizedObjectiveWeight(elevation.getId())).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for elevation.
+			expect(weightMap.getNormalizedObjectiveWeight(temperature.getId())).to.be.closeTo(1 / weightTotal, roundingError); // This should be the weight for temperature.
+			expect(weightMap.getNormalizedObjectiveWeight(humidity.getId())).to.be.closeTo(2 / weightTotal, roundingError); // This should be the weight for humidity.		
 		});
 	});
 
@@ -253,11 +253,11 @@ describe('WeightMap', () => {
 
 		before(function() {
 			weightMap = new WeightMap();
-			weightMap.setObjectiveWeight(weather.getName(), 3);
-			weightMap.setObjectiveWeight(distance.getName(), 5);
-			weightMap.setObjectiveWeight(elevation.getName(), 2);
-			weightMap.setObjectiveWeight(temperature.getName(), 1);
-			weightMap.setObjectiveWeight(humidity.getName(), 2);
+			weightMap.setObjectiveWeight(weather.getId(), 3);
+			weightMap.setObjectiveWeight(distance.getId(), 5);
+			weightMap.setObjectiveWeight(elevation.getId(), 2);
+			weightMap.setObjectiveWeight(temperature.getId(), 1);
+			weightMap.setObjectiveWeight(humidity.getId(), 2);
 		});
 
 		context('when the desired order is the same as the order Objective-weight pairs are in', () => {
@@ -306,11 +306,11 @@ describe('WeightMap', () => {
 
 			before(function() {
 				weightMap = new WeightMap();
-				weightMap.setObjectiveWeight(weather.getName(), 3);
-				weightMap.setObjectiveWeight(distance.getName(), 5);
-				weightMap.setObjectiveWeight(elevation.getName(), 2);
-				weightMap.setObjectiveWeight(temperature.getName(), 1);
-				weightMap.setObjectiveWeight(humidity.getName(), 2);
+				weightMap.setObjectiveWeight(weather.getId(), 3);
+				weightMap.setObjectiveWeight(distance.getId(), 5);
+				weightMap.setObjectiveWeight(elevation.getId(), 2);
+				weightMap.setObjectiveWeight(temperature.getId(), 1);
+				weightMap.setObjectiveWeight(humidity.getId(), 2);
 
 				objectiveOrder = [weather, distance, elevation, temperature, humidity];
 
@@ -334,11 +334,11 @@ describe('WeightMap', () => {
 		context('when the sum of the weights is exactly 1', () => {
 
 			before(function() {
-				weightMap.setObjectiveWeight(weather.getName(), .1);
-				weightMap.setObjectiveWeight(distance.getName(), .4);
-				weightMap.setObjectiveWeight(elevation.getName(), .2);
-				weightMap.setObjectiveWeight(temperature.getName(), .2);
-				weightMap.setObjectiveWeight(humidity.getName(), .1);
+				weightMap.setObjectiveWeight(weather.getId(), .1);
+				weightMap.setObjectiveWeight(distance.getId(), .4);
+				weightMap.setObjectiveWeight(elevation.getId(), .2);
+				weightMap.setObjectiveWeight(temperature.getId(), .2);
+				weightMap.setObjectiveWeight(humidity.getId(), .1);
 
 				objectiveOrder = [temperature, distance, humidity, weather, elevation];
 			});
@@ -357,11 +357,11 @@ describe('WeightMap', () => {
 
 		context('when the sum of the weights is less than 1', () => {
 			before(function() {
-				weightMap.setObjectiveWeight(weather.getName(), .05);
-				weightMap.setObjectiveWeight(distance.getName(), .1);
-				weightMap.setObjectiveWeight(elevation.getName(), .2);
-				weightMap.setObjectiveWeight(temperature.getName(), .3);
-				weightMap.setObjectiveWeight(humidity.getName(), .2);
+				weightMap.setObjectiveWeight(weather.getId(), .05);
+				weightMap.setObjectiveWeight(distance.getId(), .1);
+				weightMap.setObjectiveWeight(elevation.getId(), .2);
+				weightMap.setObjectiveWeight(temperature.getId(), .3);
+				weightMap.setObjectiveWeight(humidity.getId(), .2);
 
 				objectiveOrder = [distance, temperature, humidity, weather, elevation];
 

@@ -7,7 +7,7 @@
                 <label class="control-label">Select Objective:</label>
                 <div class="input-group">
                     <select class="form-control score-function-dropdown" [(ngModel)]="selectedObjective">
-                        <option *ngFor="let obj of valueChartService.getValueChart().getMutableObjectives()" [value]="obj">{{obj}}</option>
+                        <option *ngFor="let obj of valueChartService.getValueChart().getMutableObjectives()" [value]="obj.getName()">{{obj.getName()}}</option>
                     </select>
                     <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
                         Next
@@ -27,7 +27,7 @@
         </div> 
         <div class="col-xs-offset-3">
             <ScoreFunction 
-                [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(selectedObjective)]"
+                [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(getObjectiveByName(selectedObjective).getId())]"
                 [colors]="[user.color]"
                 [objective]="getObjectiveByName(selectedObjective)"
                 [width]="440"

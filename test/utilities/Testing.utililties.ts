@@ -21,7 +21,7 @@ import { AbstractObjective }							from '../../client/resources/model/AbstractOb
 
 export var randomizeUserWeights = (user: User, objectives: PrimitiveObjective[]): User => {
 	objectives.forEach((objective: PrimitiveObjective) => {
-		user.getWeightMap().setObjectiveWeight(objective.getName(), _.random(0,1));
+		user.getWeightMap().setObjectiveWeight(objective.getId(), _.random(0,1));
 	});
 
 	return user;

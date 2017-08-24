@@ -451,7 +451,7 @@ export class LabelRenderer {
 			.text((d: LabelData) => {
 				var bestWorstText = '';
 				if (d.objective.objectiveType === 'primitive' && u.valueChart.getType() === ChartType.Individual && u.usersToDisplay[0]) {
-					var scoreFunction = u.usersToDisplay[0].getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getName());
+					var scoreFunction = u.usersToDisplay[0].getScoreFunctionMap().getObjectiveScoreFunction(d.objective.getId());
 					bestWorstText = '\n [ best: ' + scoreFunction.bestElement + ', worst: ' + scoreFunction.worstElement + ' ]';
 				}
 				return bestWorstText;
@@ -549,7 +549,7 @@ export class LabelRenderer {
 		var objective: PrimitiveObjective;
 		var objectiveWeight: number;
 
-		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
+		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getId());
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			width = this.labelWidth;
@@ -563,7 +563,7 @@ export class LabelRenderer {
 		var colors: string[] = [];
 
 		u.usersToDisplay.forEach((user: User) => {
-			scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()));
+			scoreFunctions.push(user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()));
 			colors.push(user.color);
 		});
 

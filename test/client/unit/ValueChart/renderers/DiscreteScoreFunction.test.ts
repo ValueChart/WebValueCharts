@@ -120,7 +120,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		aaron = hotelChart.getUsers()[0];
 		aaron.color = "#0000FF";
 
-		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 
 
 		u = {
@@ -130,7 +130,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 			height: height,
 			width: width,
 			rendererConfig: null,
-			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())],
+			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())],
 			objective: objective,
 			colors: [aaron.color],
 			heightScale: null,
@@ -204,7 +204,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 					hotelChart.setUser(bob);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					u.colors = [aaron.color, bob.color];
 					u.individual = false;
 
@@ -263,7 +263,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				before(function() {
 					bob = randomizeUserScoreFunction(bob, u.objective);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	
@@ -278,7 +278,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 			context('when the number of users is reduced to be one again', () => {
 				before(function() {
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 					u.colors = [aaron.color];
 					u.individual = true;
 
@@ -325,7 +325,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		context('when the view orientation is set to be horizontal', () => {
 
 			before(function() {
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color];
 
 				u.viewOrientation = ChartOrientation.Horizontal;
@@ -404,7 +404,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		scoreFunctionRenderer.userContainers.nodes().forEach((userContainer: SVGAElement, i: number) => {
 			let bars = d3.select(userContainer).selectAll('.' + defs.BAR).nodes();
 			let barTops = d3.select(userContainer).selectAll('.' + defs.BAR_TOP).nodes();
-			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()).getAllElements().length;
+			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()).getAllElements().length;
 			expect(bars).to.have.length(numberOfDomainElements);
 			expect(barTops).to.have.length(numberOfDomainElements);
 

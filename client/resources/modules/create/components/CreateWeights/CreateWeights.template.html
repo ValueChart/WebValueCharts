@@ -10,10 +10,10 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let obj of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(obj.getName(),true); resetErrorMessages()">
+        <tr *ngFor="let obj of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(obj, true); resetErrorMessages()">
             <th>{{obj.getName()}}</th>
-            <th class="worst-outcome">{{getWorstOutcome(obj.getName()) + getUnitString(obj)}}</th>
-            <th class="best-outcome">{{getBestOutcome(obj.getName()) + getUnitString(obj)}}</th>
+            <th class="worst-outcome">{{getWorstOutcome(obj.getId()) + getUnitString(obj)}}</th>
+            <th class="best-outcome">{{getBestOutcome(obj.getId()) + getUnitString(obj)}}</th>
         </tr>
     </tbody>
 </table>
@@ -25,9 +25,9 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let objName of rankedObjectives; let rank = index">
+        <tr *ngFor="let obj of rankedObjectives; let rank = index">
             <th>{{rank + 1}}</th>
-            <th>{{objName}}</th>
+            <th>{{obj.getName()}}</th>
         </tr>
     </tbody>
 </table>

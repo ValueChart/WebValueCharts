@@ -74,7 +74,7 @@ describe('RendererScoreFunctionUtility', () => {
 		aaron = hotelChart.getUsers()[0];
 		aaron.color = "#0000FF";
 
-		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 
 
 		u = {
@@ -111,7 +111,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when there is one score function (ie. there is one user in the ValueChart', () => {
 
 			before(function() {
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color];
 			
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -130,7 +130,7 @@ describe('RendererScoreFunctionUtility', () => {
 					oldReference = u.scoreFunctionData
 
 					aaron = randomizeUserScoreFunction(aaron, u.objective);
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 				});
@@ -179,7 +179,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 				oldReference = u.scoreFunctionData;
 
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color, bob.color];
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -198,9 +198,9 @@ describe('RendererScoreFunctionUtility', () => {
 
 			before(function() {
 				u.objective = hotelChart.getAllPrimitiveObjectives()[1];
-				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()).getAllElements();
+				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()).getAllElements();
 
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color, bob.color];
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -281,7 +281,7 @@ describe('RendererScoreFunctionUtility', () => {
 				scoreFunctions = [];
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 
-				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 			});
 
 
@@ -293,7 +293,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when is one score function (ie. there is one user in the ValueChart)', () => {
 			before(function() {
 				objective = hotelChart.getAllPrimitiveObjectives()[0];
-				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())];
+				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())];
 
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 			});
@@ -306,7 +306,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when there are two score functions (ie. there are two users in the ValueChart)', () => {
 			before(function() {
 				objective = hotelChart.getAllPrimitiveObjectives()[0];
-				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())];
+				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())];
 
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 			});
