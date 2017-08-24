@@ -11,7 +11,6 @@ import { OnInit, EventEmitter }													from '@angular/core';
 
 // Import Libraries:
 import * as d3 																	from 'd3';
-import { Subscription }															from 'rxjs/Subscription';
 
 // Import Application Classes:
 import { ObjectiveChartDefinitions }											from '../../../ValueChartVis';
@@ -34,6 +33,14 @@ import { Alternative } 															from '../../../model';
 // Import Types:
 import { ViewConfig, InteractionConfig, ChartOrientation }						from '../../../types';
 
+/*
+	The DetailBox component implements a UI widget for displaying a ValueChart's basic details, alternatives, and user list.
+	It also implement several important interactions and management options for a ValueChart. These are:
+		- Deleting, hiding, and reordering users.
+		- Viewing alternative details.
+		- Viewing a ValueCharts's basic details and generating invitation links.
+	This component is currently only used by the ValueChartViewer.
+*/
 
 @Component({
 	selector: 'DetailBox',
@@ -48,15 +55,13 @@ export class DetailBoxComponent implements OnInit {
 	// ========================================================================================
 
 	// Inputs
-	@Input() valueChart: ValueChart;
-	@Input() chartElement: d3.Selection<any, any, any, any>;
-	@Input() enableManagement: boolean
-	@Input() viewConfig: ViewConfig;
-	@Input() showUsers: boolean;
-	@Input() width: number;
-	@Input() height: number;
-
-	private subscription: Subscription;
+	@Input() valueChart: ValueChart;								// The ValueChart whose details the DetailBox should display.
+	@Input() chartElement: d3.Selection<any, any, any, any>;		// The base element of the ValueChart's visualization. This is required to link alternative labels to the DetailBox.
+	@Input() enableManagement: boolean								// Whether or not the detail box should should management options (deleting users, etc).
+	@Input() viewConfig: ViewConfig;								// The ValueChartDirective's current viewConfig object.
+	@Input() showUsers: boolean;									// Whether or not the user list panel of the detail box should be displayed. It is usually hidden for individual ValueCharts.
+	@Input() width: number;											// The width of the detail box.
+	@Input() height: number;										// The height of the detail box.
 
 	public detailBoxAlternativeTab: string;
 	private alternativeObjectives: string[];
@@ -187,6 +192,8 @@ export class DetailBoxComponent implements OnInit {
 	}
 
 	// An anonymous function that links the alternative labels created by the ObjectiveChartRenderer to the Chart Detail box.
+	// This requires interacting with the DOM since the ValueChart visualization is abstracted away from the main application
+	// by the ValueChartDirective.
 	linkAlternativeLabelsToDetailBox = () => {
 		this.chartElement.selectAll('.' + ObjectiveChartDefinitions.ALTERNATIVE_LABEL)
 					.classed('alternative-link', true);

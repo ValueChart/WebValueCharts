@@ -14,6 +14,14 @@ import { EventEmitter }															from '@angular/core';
 import { InteractionConfig, WeightResizeType, PumpType, SortAlternativesType }	from '../../../types';
 
 
+/*
+	The InteractionOptions component implements a UI widget for toggling ValueChart Visualization interactions on and off.
+	It sets creates and outputs an InteractionConfig instance that can be directly input into the ValueChartDirective to set
+	the visualization's interaction settings.  
+
+	This component is currently only used by the ValueChartViewer.
+*/
+
 @Component({
 	selector: 'InteractionOptions',
 	templateUrl: './InteractionOptions.template.html',
@@ -21,6 +29,8 @@ import { InteractionConfig, WeightResizeType, PumpType, SortAlternativesType }	f
 })
 export class InteractionOptionsComponent implements OnInit {
 
+	// Whether or the not preference modifying interactions will be permitted. These interactions include:
+	//	- The pump tool; - resizing weights by dragging; - adjusting score functions by dragging; 
 	@Input('interactive') 
 	set setType (interactive: boolean) {
 		this.interactive = interactive;
@@ -37,10 +47,11 @@ export class InteractionOptionsComponent implements OnInit {
 		this.updateInteractionConfig(this.config);
 	};
 
-	@Output() interactionConfig = new EventEmitter<InteractionConfig>();
+	@Output() interactionConfig = new EventEmitter<InteractionConfig>();		// The event emitter that outputs a new InteractionConfig whenever 
+																				// the user interacts with the widget and changes a setting.
 	
 	public interactive: boolean;
-	public config: InteractionConfig;
+	public config: InteractionConfig;											// The internal InteractionConfig instance.
 	public WeightResizeType = WeightResizeType;
 	public PumpType = PumpType;
 	public SortAlternativesType = SortAlternativesType;

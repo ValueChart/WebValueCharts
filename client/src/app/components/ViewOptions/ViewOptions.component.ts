@@ -15,6 +15,14 @@ import { EventEmitter }															from '@angular/core';
 import { ViewConfig, ChartOrientation }											from '../../../types';
 import { ChartType }															from '../../../model';
 
+/*
+	The ViewOptions component implements a UI widget for toggling ValueChart Visualization view options on and off.
+	It sets creates and outputs a ViewConfig instance that can be directly input into the ValueChartDirective to set
+	the visualization's view settings.  
+
+	This component is currently only used by the ValueChartViewer.
+*/
+
 @Component({
 	selector: 'ViewOptions',
 	templateUrl: './ViewOptions.template.html',
