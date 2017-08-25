@@ -353,7 +353,7 @@ export class ValueChartViewerService {
 		this.removeInvalidUser(userToDelete);
 
 		// Update the user role
-		if (userToDelete === this.currentUserService.getUsername() && this.userIsMember(userToDelete)) {
+		if (userToDelete === this.currentUserService.getUsername()) {
 			let newRole = this.isOwner() ? UserRole.Owner : UserRole.Viewer;
 			this.setUserRole(newRole);
 		}
