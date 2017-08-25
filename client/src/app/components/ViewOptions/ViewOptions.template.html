@@ -39,6 +39,12 @@
 							</a>
 						</li>
 						<li>
+							<a href="javascript:void(0)" (click)="setDisplayWeightDistributions(!config.displayWeightDistributions)">
+								Weight Plots
+								<span *ngIf="config.displayWeightDistributions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
 							<a href="javascript:void(0)" (click)="setDisplayDomainValues(!config.displayDomainValues)">
 								Domain Values
 								<span *ngIf="config.displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>

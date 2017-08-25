@@ -86,13 +86,14 @@ export class ChangeDetectionService {
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scaleAlternativesChanged: boolean = this.viewConfigRecord.scaleAlternatives !== viewConfig.scaleAlternatives;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
+		var weightDistributionsDisplayChanged: boolean = this.viewConfigRecord.displayWeightDistributions !== viewConfig.displayWeightDistributions;
 
 		if (valueChartChanged)
 			this.valueChartRecord = _.cloneDeep(valueChart);
 
 		this.chartTypeRecord = _.clone(valueChart.getType());
 
-		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scaleAlternativesChanged || scoreFunctionDisplayChanged || renderRequired;
+		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scaleAlternativesChanged || scoreFunctionDisplayChanged || weightDistributionsDisplayChanged || renderRequired;
 	}
 
 	/*

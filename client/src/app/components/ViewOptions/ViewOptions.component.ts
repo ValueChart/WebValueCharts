@@ -46,6 +46,7 @@ export class ViewOptionsComponent implements OnInit {
 			viewOrientation: ChartOrientation.Vertical,
 			scaleAlternatives: true,
 			displayScoreFunctions: false,
+			displayWeightDistributions: false,
 			displayTotalScores: true,
 			displayScales: false,
 			displayDomainValues: false,
@@ -71,6 +72,11 @@ export class ViewOptionsComponent implements OnInit {
 
 	setDisplayScoreFunctions(newVal: boolean): void {
 		this.config.displayScoreFunctions = newVal;
+		this.updateViewConfig(this.config);
+	}
+
+	setDisplayWeightDistributions(newVal: boolean): void {
+		this.config.displayWeightDistributions = newVal;
 		this.updateViewConfig(this.config);
 	}
 

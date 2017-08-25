@@ -60,6 +60,29 @@ export class RendererScoreFunctionUtility {
 	// 									Methods
 	// ========================================================================================
 
+	public produceWeightDistributionData = (u: any): any => {
+		u.weights = [];
+		u.maxWeight = 0;
+		u.minWeight = 1;
+
+		u.users.forEach((user: User) => {
+			let weight = user.getWeightMap().getObjectiveWeight(u.objective.getId());
+
+			u.weights.push(weight);
+			if (weight > u.maxWeight) 
+				u.maxWeight = weight;
+
+			if (weight < u.minWeight)
+				u.minWeight = weight;
+		});
+
+		u.medianWeight = d3.median(u.weights);
+		u.firstQuartile = d3.quantile(u.weights, 0.25);
+		u.thirdQuartile = d3.quantile(u.weights, 0.75);
+
+		return u;
+	}
+
 	/*
 		@param u - The ScoreFunctionUpdate update to which the appropriate ScoreFunctionData will be attached.
 		@returns {ScoreFunctionUpdate}
@@ -107,10 +130,10 @@ export class RendererScoreFunctionUtility {
 			u.rendererConfig.dimensionTwoSize = u.height;
 
 			// Determine the positions of the two axes.
-			u.rendererConfig.domainAxisCoordinateTwo = Math.min((19 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.dimensionTwoSize - u.rendererConfig.labelOffset);
+			u.rendererConfig.independentAxisCoordinateTwo = Math.min((19 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.dimensionTwoSize - u.rendererConfig.labelOffset);
 
-			u.rendererConfig.utilityAxisMaxCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize / 20, 5);
-			u.rendererConfig.utilityAxisCoordinateOne = u.rendererConfig.labelOffset;
+			u.rendererConfig.dependentAxisCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize / 20, 5);
+			u.rendererConfig.dependentAxisCoordinateOne = u.rendererConfig.labelOffset;
 
 		} else {
 			u.rendererConfig.dimensionOne = 'height';
@@ -122,22 +145,22 @@ export class RendererScoreFunctionUtility {
 			u.rendererConfig.dimensionTwoSize = u.width;
 
 			// Determine the positions of the two axes.
-			u.rendererConfig.domainAxisCoordinateTwo = Math.max((1 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.labelOffset) + 10;
+			u.rendererConfig.independentAxisCoordinateTwo = Math.max((1 / 20) * u.rendererConfig.dimensionTwoSize, u.rendererConfig.labelOffset) + 10;
 
-			u.rendererConfig.utilityAxisMaxCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize * (19 / 20), 5);
-			u.rendererConfig.utilityAxisCoordinateOne = u.rendererConfig.labelOffset;
+			u.rendererConfig.dependentAxisCoordinateTwo = Math.max(u.rendererConfig.dimensionTwoSize * (19 / 20), 5);
+			u.rendererConfig.dependentAxisCoordinateOne = u.rendererConfig.labelOffset;
 		}
 
-		u.rendererConfig.domainAxisMaxCoordinateOne = Math.min((19 / 20) * u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionOneSize - u.rendererConfig.labelOffset);
+		u.rendererConfig.independentAxisCoordinateOne = Math.min((19 / 20) * u.rendererConfig.dimensionOneSize, u.rendererConfig.dimensionOneSize - u.rendererConfig.labelOffset);
 
 		// Configure the linear scale that translates scores into pixel units. 
 		u.heightScale = d3.scaleLinear()
 			.domain([0, 1])
 
 		if (u.viewOrientation === ChartOrientation.Vertical) {
-			u.heightScale.range([0, (u.rendererConfig.domainAxisCoordinateTwo) - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+			u.heightScale.range([0, (u.rendererConfig.independentAxisCoordinateTwo) - u.rendererConfig.dependentAxisCoordinateTwo]);
 		} else {
-			u.heightScale.range([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+			u.heightScale.range([u.rendererConfig.independentAxisCoordinateTwo, u.rendererConfig.dependentAxisCoordinateTwo]);
 		}
 
 		return u;

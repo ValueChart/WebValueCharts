@@ -372,11 +372,11 @@ export abstract class ScoreFunctionRenderer {
 	protected renderAxesDimensionOne(u: ScoreFunctionUpdate): void {
 		// Position the domain axis.
 		this.domainAxis
-			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.utilityAxisCoordinateOne)
-			.attr(u.rendererConfig.coordinateOne + '2', u.rendererConfig.domainAxisMaxCoordinateOne);
+			.attr(u.rendererConfig.coordinateOne + '1', u.rendererConfig.dependentAxisCoordinateOne)
+			.attr(u.rendererConfig.coordinateOne + '2', u.rendererConfig.independentAxisCoordinateOne);
 
 		this.unitsLabel
-			.attr(u.rendererConfig.coordinateOne, u.rendererConfig.domainAxisMaxCoordinateOne / 2);
+			.attr(u.rendererConfig.coordinateOne, u.rendererConfig.independentAxisCoordinateOne / 2);
 
 		var labelCoordinateOneOffset: number;
 
@@ -388,7 +388,7 @@ export abstract class ScoreFunctionRenderer {
 
 		// Position the domain labels along the domain (x) axis.
 		this.domainLabels
-			.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+			.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.independentAxisCoordinateOne - u.rendererConfig.dependentAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 			.text((d: DomainElement) => { return d.element; });
 	}
 
@@ -402,18 +402,18 @@ export abstract class ScoreFunctionRenderer {
 	protected renderAxesDimensionTwo(u: ScoreFunctionUpdate): void {
 
 		this.domainAxis
-			.attr(u.rendererConfig.coordinateTwo + '1', u.rendererConfig.domainAxisCoordinateTwo)
-			.attr(u.rendererConfig.coordinateTwo + '2', u.rendererConfig.domainAxisCoordinateTwo);
+			.attr(u.rendererConfig.coordinateTwo + '1', u.rendererConfig.independentAxisCoordinateTwo)
+			.attr(u.rendererConfig.coordinateTwo + '2', u.rendererConfig.independentAxisCoordinateTwo);
 
 		this.unitsLabel
-			.attr(u.rendererConfig.coordinateTwo,  u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 2);
+			.attr(u.rendererConfig.coordinateTwo,  u.rendererConfig.independentAxisCoordinateTwo + u.rendererConfig.labelOffset - 2);
 
 		var labelCoordinateTwo: number;
 
 		if (u.viewOrientation === ChartOrientation.Vertical) {
-			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo + u.rendererConfig.labelOffset - 12;
+			labelCoordinateTwo = u.rendererConfig.independentAxisCoordinateTwo + u.rendererConfig.labelOffset - 12;
 		} else {
-			labelCoordinateTwo = u.rendererConfig.domainAxisCoordinateTwo - (u.rendererConfig.labelOffset);
+			labelCoordinateTwo = u.rendererConfig.independentAxisCoordinateTwo - (u.rendererConfig.labelOffset);
 		}
 
 		this.domainLabels
@@ -430,7 +430,7 @@ export abstract class ScoreFunctionRenderer {
 			.domain([0, 1])
 
 		// Calculate the correct height of the utility axis.
-		var utilityScaleHeight: number = (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo) : (u.rendererConfig.utilityAxisMaxCoordinateTwo - u.rendererConfig.domainAxisCoordinateTwo);
+		var utilityScaleHeight: number = (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.independentAxisCoordinateTwo - u.rendererConfig.dependentAxisCoordinateTwo) : (u.rendererConfig.dependentAxisCoordinateTwo - u.rendererConfig.independentAxisCoordinateTwo);
 
 		var utilityAxis: any;
 
@@ -449,7 +449,7 @@ export abstract class ScoreFunctionRenderer {
 		// Position the axis by positioning the axis container and then create it.
 		this.utilityAxisContainer
 			.attr('transform', () => {
-				return 'translate(' + ((u.viewOrientation === ChartOrientation.Vertical) ? ((u.rendererConfig.utilityAxisCoordinateOne + 4) + ',' + (u.rendererConfig.utilityAxisMaxCoordinateTwo - .5) + ')') : ((u.rendererConfig.domainAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.utilityAxisCoordinateOne + 4) + ')'));
+				return 'translate(' + ((u.viewOrientation === ChartOrientation.Vertical) ? ((u.rendererConfig.dependentAxisCoordinateOne + 4) + ',' + (u.rendererConfig.dependentAxisCoordinateTwo - .5) + ')') : ((u.rendererConfig.independentAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.dependentAxisCoordinateOne + 4) + ')'));
 			})
 			.call(utilityAxis);
 	}
@@ -507,5 +507,5 @@ export abstract class ScoreFunctionRenderer {
 	// 			Anonymous functions that are used often enough to be made class fields
 	// ========================================================================================
 
-	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.lastRendererUpdate.rendererConfig.domainAxisMaxCoordinateOne - this.lastRendererUpdate.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + this.lastRendererUpdate.rendererConfig.labelOffset * 1.5; }
+	calculatePlotElementCoordinateOne = (d: DomainElement, i: number) => { return (((this.lastRendererUpdate.rendererConfig.independentAxisCoordinateOne - this.lastRendererUpdate.rendererConfig.dependentAxisCoordinateOne) / this.domainSize) * i) + this.lastRendererUpdate.rendererConfig.labelOffset * 1.5; }
 }

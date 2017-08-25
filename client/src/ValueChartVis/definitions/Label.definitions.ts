@@ -24,8 +24,9 @@ export class LabelDefinitions {
 
 	static LABELS_CONTAINER: string = 'label-labels-container';
 
-	static SCORE_FUNCTIONS_CONTAINER: string = 'label-scorefunction-container';
 	static SCORE_FUNCTION: string = 'label-scorefunction';
+
+	static WEIGHTS_PLOT: string = 'label-weightsplot';
 
 	constructor() { }
 }
