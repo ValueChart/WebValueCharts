@@ -38,6 +38,8 @@ export class ViewOptionsComponent implements OnInit {
 	@Input() chartType: ChartType;
 
 	public ChartOrientation = ChartOrientation;
+	public reducedInformation: boolean = false;
+	@Output() reducedInfo = new EventEmitter<boolean>();
 
 	constructor() { }
 
@@ -58,6 +60,11 @@ export class ViewOptionsComponent implements OnInit {
 
 	updateViewConfig(configObject: ViewConfig) {
 		this.viewConfig.emit(configObject);
+	}
+
+	setReducedInformation(reducedInformation: boolean): void {
+		this.reducedInformation = reducedInformation;
+		this.reducedInfo.emit(this.reducedInformation);
 	}
 
 	setOrientation(viewOrientation: ChartOrientation): void {

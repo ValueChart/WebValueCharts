@@ -224,7 +224,7 @@ export class LabelRenderer {
 			.classed(LabelDefinitions.LABELS_CONTAINER, true);
 
 		// Recursively create the labels based on the Objective structure.
-		this.labelWidth = this.calculateMinLabelWidth(u.labelData, u.rendererConfig.dimensionOneSize, u.viewConfig);
+		this.labelWidth = this.calculateMinLabelWidth(u.labelData, u.rendererConfig.dimensionOneSize, u);
 		this.createLabels(u, u.labelData, this.labelContainer);
 	}
 
@@ -346,7 +346,7 @@ export class LabelRenderer {
 
 	renderLabelSpace(u: RendererUpdate, labelData: LabelData[], parentName: string = LabelDefinitions.ROOT_CONTAINER_NAME) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u.viewConfig);
+		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		this.rootContainer
 			.attr('transform', 'translate(' + u.x + ',' + u.y + ')');
@@ -410,7 +410,8 @@ export class LabelRenderer {
 				}
 
 			} else {
-				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
+				let offset = (u.reducedInformation) ? 0 : this.labelWidth;
+				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, offset, scaledWeightOffset); // Generate the transformation.
 				this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 				
 				this.renderLabels(u, labelDatum.subLabelData, labelDatum.objective.getId());	// Render the sub labels using the data update selection.
@@ -476,6 +477,12 @@ export class LabelRenderer {
 				}
 				return bestWorstText;
 			});
+
+		if (u.reducedInformation) {
+			labelTexts.style('display', 'none');
+		} else {
+			labelTexts.style('display', 'block');
+		}
 	}
 
 	/*
@@ -724,30 +731,43 @@ export class LabelRenderer {
 
 
 	determineLabelWidth = (d: LabelData, u: RendererUpdate) => {		 // Expand the last label to fill the rest of the space.
-		var offset: number = 0;
-		offset += ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
-		offset += ((u.viewConfig.displayWeightDistributions) ? this.labelWidth : 0);
+		if (u.reducedInformation) {
+			return 0;
+		} else {
+			var offset: number = 0;
+			offset += ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
+			offset += ((u.viewConfig.displayWeightDistributions) ? this.labelWidth : 0);
 
-		var retValue = (d.depthOfChildren === 0) ?
-			(this.lastRendererUpdate.rendererConfig.dimensionOneSize - offset) - (d.depth * this.labelWidth)
-			:
-			this.labelWidth;
+			var retValue = (d.depthOfChildren === 0) ?
+				(this.lastRendererUpdate.rendererConfig.dimensionOneSize - offset) - (d.depth * this.labelWidth)
+				:
+				this.labelWidth;
 
-		return retValue;
+			return retValue;
+		}
 	};
 
-	calculateMinLabelWidth = (labelData: LabelData[], dimensionOneSize: number, viewConfig: ViewConfig) => {
-		var maxDepthOfChildren = 0;
-		labelData.forEach((labelDatum: LabelData) => {
-			if (labelDatum.depthOfChildren > maxDepthOfChildren)
-				maxDepthOfChildren = labelDatum.depthOfChildren;
-		});
+	calculateMinLabelWidth = (labelData: LabelData[], dimensionOneSize: number, u: RendererUpdate) => {
+		if (u.reducedInformation) {
+			let width = dimensionOneSize;
 
-		maxDepthOfChildren += 1;	// Add one for the root label.
-		maxDepthOfChildren += ((viewConfig.displayScoreFunctions) ? 1 : 0);
-		maxDepthOfChildren += ((viewConfig.displayWeightDistributions) ? 1 : 0);
+			if (u.viewConfig.displayScoreFunctions && u.viewConfig.displayWeightDistributions)
+				width = width / 2;
 
-		return dimensionOneSize / maxDepthOfChildren;
+			return width;
+		} else {
+			var maxDepthOfChildren = 0;
+			labelData.forEach((labelDatum: LabelData) => {
+				if (labelDatum.depthOfChildren > maxDepthOfChildren)
+					maxDepthOfChildren = labelDatum.depthOfChildren;
+			});
+
+			maxDepthOfChildren += 1;	// Add one for the root label.
+			maxDepthOfChildren += ((u.viewConfig.displayScoreFunctions) ? 1 : 0);
+			maxDepthOfChildren += ((u.viewConfig.displayWeightDistributions) ? 1 : 0);
+
+			return dimensionOneSize / maxDepthOfChildren;
+		}
 	}
 
 }

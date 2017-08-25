@@ -88,6 +88,7 @@ export interface RendererUpdate {
 	rendererConfig: RendererConfig;
 	renderRequired: { value: boolean; };
 	structuralUpdate: boolean;
+	reducedInformation: boolean;
 }
 
 /*

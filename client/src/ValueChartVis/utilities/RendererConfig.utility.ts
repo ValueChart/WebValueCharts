@@ -112,19 +112,30 @@ export class RendererConfigUtility {
 		u = _.clone(u);	// The RendererUpdate must be copied so that it is not the same reference as the RendererUpdates for the
 						// other visualization elements (label area, summary chart).
 
+
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 			u.x = u.width;
 			u.y = u.height + this.offset;
 
 			if (!u.viewConfig.scaleAlternatives) 
 				u.width = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
+			
+			if (u.reducedInformation) {
+				u.y = u.height * 2 + this.offset;
+				u.height = 0;
+			}
 		} else {
 			u.x = 0;
 			u.y = u.height;
 
 			if (!u.viewConfig.scaleAlternatives) 
 				u.height = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
+
+			if (u.reducedInformation)
+				u.x = u.width * 2;
+				u.width = 0;
 		}
+
 
 		return u;
 	}
@@ -166,28 +177,43 @@ export class RendererConfigUtility {
 	produceSummaryChartConfig = (u: RendererUpdate): RendererUpdate => {
 		u = _.clone(u); // The RendererUpdate must be copied so that it is not the same reference as the RendererUpdates for the
 						// other visualization elements.
+		var maxHeight = u.height;
+		var maxWidth = u.width;
 
 		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
-			let maxHeight = u.height;
-			let height = u.height / u.maximumWeightMap.getWeightTotal(); 
-			u.y = maxHeight - height; 
-			u.height = height;
+			if (u.reducedInformation) {
+				u.height = maxHeight * 2 + this.offset;
+				u.y = 0;
+			} else {
+				let height = u.height / u.maximumWeightMap.getWeightTotal(); 
+				u.y = maxHeight - height; 
+				u.height = height;
+
+			}
+
 			u.x = u.width;
 
 			if (!u.viewConfig.scaleAlternatives) 
 				u.width = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
+
+
 		} else {
-			let maxWidth = u.width;
-			let width = u.width / u.maximumWeightMap.getWeightTotal(); 
-			u.x = u.width; 
-			u.width = width;
+			if (u.reducedInformation) {
+				u.width = maxWidth * 2;
+				u.x = 0;
+			} else {
+				let width = u.width / u.maximumWeightMap.getWeightTotal(); 
+				u.x = u.width; 
+				u.width = width;
+			}
 			u.y = u.height;
 
 			if (!u.viewConfig.scaleAlternatives) 
 				u.height = this.userSize * u.usersToDisplay.length * u.valueChart.getAlternatives().length;
+
 		}
 
-		 return u;
+		return u;
 	}
 }
 

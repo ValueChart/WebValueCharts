@@ -6,6 +6,12 @@
 					<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="viewoptions-dropdown">
+						<li>
+							<a href="javascript:void(0)" (click)="setReducedInformation(!reducedInformation)">
+								Reduced Info
+								<span *ngIf="reducedInformation" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
 						<li class="dropdown dropdown-submenu">
 							<a href="javascript:void(0)" id="orientation-dropdown" data-toggle="dropdown"
 								aria-haspopup="true" aria-expanded="true">

@@ -213,7 +213,7 @@ export class ViolinRenderer {
 			.attr('stroke', 'black')
 			.attr('stroke-width', 1)
 			.attr(u.rendererConfig.dimensionOne, this.weightScale(u.thirdQuartile - u.firstQuartile))
-			.attr(u.rendererConfig.dimensionTwo, (u.viewOrientation === ChartOrientation.Vertical) ? this.densityScale(4.5) : this.densityScale(-4.5))
+			.attr(u.rendererConfig.dimensionTwo, Math.max((u.viewOrientation === ChartOrientation.Vertical) ? this.densityScale(4.5) : this.densityScale(-4.5), 0))
 			.attr(u.rendererConfig.coordinateOne, this.weightScale(u.firstQuartile))
 			.attr(u.rendererConfig.coordinateTwo, (u.viewOrientation === ChartOrientation.Vertical) ? this.densityScale(1.5) : this.densityScale(-1.5));
 
