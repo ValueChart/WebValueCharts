@@ -306,6 +306,7 @@ export class CreateObjectivesComponent implements OnInit {
 			obj = objrow.objid === '' ? new PrimitiveObjective('', '') : this.getObjectiveById(objrow.objid);
 			obj.setName(objrow.name);
 			obj.setDescription(objrow.desc);
+			objrow.objid = obj.getId();
 			(<PrimitiveObjective>obj).setDomain(this.domainDetailsToDomain(objrow.dom));
 			(<PrimitiveObjective>obj).setColor(objrow.color);
 			if (!this.valueChart.isIndividual()) {
@@ -316,6 +317,7 @@ export class CreateObjectivesComponent implements OnInit {
 			obj = objrow.objid === '' ? new AbstractObjective('', '') : this.getObjectiveById(objrow.objid);
 			obj.setName(objrow.name);
 			obj.setDescription(objrow.desc);
+			objrow.objid = obj.getId();
 			let subObjectives: Objective[] = [];
 			for (let child of objrow.children) {
 				subObjectives.push(this.objRowToObjective(this.objectiveRows[child]));
