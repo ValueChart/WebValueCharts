@@ -24,8 +24,11 @@ export class ViolinRenderer {
 	//                                     Fields
 	// ========================================================================================
 
-	public lastRendererUpdate: any;                     
+	private bandwidth: number = 0.08;
+	private resolution: number = 25;
+	private markerRadius: number = 2.5;
 
+	public lastRendererUpdate: any;                     
 
 	// Saved Selections:
 
@@ -38,6 +41,10 @@ export class ViolinRenderer {
 	public densityAxisContainer: d3.Selection<any, any, any, any>;
 
 	public plotElementsContainer: d3.Selection<any, any, any, any>;
+	public upperDensityLine: d3.Selection<any, any, any, any>;
+	public lowerDensityLine: d3.Selection<any, any, any, any>;
+	public medianMarker: d3.Selection<any, any, any, any>;
+	public quartileRect: d3.Selection<any, any, any, any>;
 
 	private densityScale: d3.ScaleLinear<number, number>;
 	private weightScale: d3.ScaleLinear<number, number>;
@@ -45,6 +52,10 @@ export class ViolinRenderer {
 	public static defs = {
 		PLOT: 'violin-plot-container',
 		PLOT_ELEMENTS_CONTAINER: 'violin-plot-elements-container',
+
+		PLOT_DENSITY_LINE: 'violin-density-line',
+		MEDIAN_MARKER: 'violin-median-marker',
+		QUARTILE_RECT: 'violin-quartile-rect',
 
 		OUTLINE_CONTAINER: 'violin-outline-container',
 		PLOT_OUTLINE: 'violin-plot-outline',
@@ -112,72 +123,107 @@ export class ViolinRenderer {
 			.classed(ViolinRenderer.defs.PLOT_ELEMENTS_CONTAINER, true)
 			.attr('id', 'violin-' + u.objectiveId + '-elements-container');
 
+		this.upperDensityLine = this.plotElementsContainer.append("path")
+			.classed(ViolinRenderer.defs.PLOT_DENSITY_LINE, true);
 
-		this.createPlot(u);
+		this.lowerDensityLine = this.plotElementsContainer.append("path")
+			.classed(ViolinRenderer.defs.PLOT_DENSITY_LINE, true);
+
+		this.quartileRect = this.plotElementsContainer.append('rect')
+			.classed(ViolinRenderer.defs.QUARTILE_RECT, true);
+
+		this.medianMarker = this.plotElementsContainer.append('circle')
+			.classed(ViolinRenderer.defs.MEDIAN_MARKER, true);
 	}
 
-	private createPlot(u: any): void {
-
-		this.createViolinPlotElements(u);
-	}
-
-
-	private createViolinPlotElements(u: any) {
-
-	}
 
 	renderViolinPlot(u: any) {
+
+		this.plotElementsContainer.attr('transform', 'translate(' + ((u.viewOrientation === ChartOrientation.Vertical) ? ((u.rendererConfig.dependentAxisCoordinateOne + 4) + ',' + (u.rendererConfig.dependentAxisCoordinateTwo - .5) + ')') : ((u.rendererConfig.independentAxisCoordinateTwo - .5) + ', ' + (u.rendererConfig.dependentAxisCoordinateOne + 4) + ')')));
 
 		this.plotOutline.attr(u.rendererConfig.dimensionOne, u.rendererConfig.dimensionOneSize)
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.dimensionTwoSize);
 
 		// Create the new Scale for use creating the weight axis.
 		this.weightScale = d3.scaleLinear()
-			.domain([0, u.maxWeight]);
+			.domain([0, 1]);
 
 		// Create the new Scale for use creating the density axis.
 		this.densityScale = d3.scaleLinear()
-			.domain([-1, 1])		// Note sure what the density maximum is...
+			.domain([-7.5, 7.5]);
 
 		var weightScaleWidth: number = u.rendererConfig.independentAxisCoordinateOne - u.rendererConfig.dependentAxisCoordinateOne;
 		var densityScaleHeight: number = (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.independentAxisCoordinateTwo - u.rendererConfig.dependentAxisCoordinateTwo) : (u.rendererConfig.dependentAxisCoordinateTwo - u.rendererConfig.independentAxisCoordinateTwo);
 
+		let density = this.kernelDensityEstimator(this.kernelEpanechnikov(this.bandwidth), this.weightScale.ticks(this.resolution))(u.weights);
+		density.splice(0,0,[0,0]);
+		var line: d3.Line<any>;
+		var mirrorLine: d3.Line<any>;
+		
 		// The range of the scale must be inverted for the vertical axis because pixels coordinates set y to increase downwards, rather than upwards as normal.
 		if (u.viewOrientation === ChartOrientation.Vertical) {
-			this.weightScale.range([weightScaleWidth, 0]);
+			this.weightScale.range([0, weightScaleWidth]);
 			this.densityScale.range([densityScaleHeight, 0]);
+			line = d3.line()
+				.curve(d3.curveBasis)
+				.x((d) => { return this.weightScale(d[0]); })
+				.y((d) => { return this.densityScale(d[1]); });
+
+		    mirrorLine = d3.line()
+				.curve(d3.curveBasis)
+				.x((d) => { return this.weightScale(d[0]); })
+				.y((d) => { return this.densityScale(-1 * d[1]); });
+
 		} else {
 			this.weightScale.range([0, weightScaleWidth]);
 			this.densityScale.range([0, densityScaleHeight]);
+			line = d3.line()
+					.curve(d3.curveBasis)
+					.y((d) => { return this.weightScale(d[0]); })
+					.x((d) => { return this.densityScale(d[1]); });
+
+		    mirrorLine = d3.line()
+					.curve(d3.curveBasis)
+					.y((d) => { return this.weightScale(d[0]); })
+					.x((d) => { return this.densityScale(-1 * d[1]); });
 		}
 
-		let density = this.kernelDensityEstimator(this.kernelEpanechnikov(7), this.weightScale.ticks(40))(u.weights);
-
-		console.log(density, u.weights);
-
-		this.plotElementsContainer.append("path")
+		this.upperDensityLine
 		      .datum(density)
-		      .attr("fill", "none")
-		      .attr("stroke", "#000")
+		      .attr("fill", u.objective.getColor())
+		      .attr("stroke", u.objective.getColor())
+		      .attr("fill-opacity", 0.5)
 		      .attr("stroke-width", 1.5)
 		      .attr("stroke-linejoin", "round")
-		      .attr("d",  d3.line()
-		          .curve(d3.curveBasis)
-		          .x((d) => { return this.weightScale(d[0]); })
-		          .y((d) => { return this.densityScale(d[1]); }));
+		      .attr("d",  line);
 
-		this.plotElementsContainer.append("path")
+		this.lowerDensityLine
 		      .datum(density)
-		      .attr('transform', 'scale(1, -1)')
-		      .attr("fill", "none")
-		      .attr("stroke", "#000")
+		      .attr("fill", u.objective.getColor())
+		      .attr("stroke", u.objective.getColor())
+		      .attr("fill-opacity", 0.5)
 		      .attr("stroke-width", 1.5)
 		      .attr("stroke-linejoin", "round")
-		      .attr("d",  d3.line()
-		          .curve(d3.curveBasis)
-		          .x((d) => { return this.weightScale(d[0]); })
-		          .y((d) => { return this.densityScale(d[1]); }));
+		      .attr("d",  mirrorLine);
 
+
+		this.quartileRect
+			.attr('fill', 'grey')
+			.attr('fill-opacity', 0.4)
+			.attr('stroke', 'black')
+			.attr('stroke-width', 1)
+			.attr(u.rendererConfig.dimensionOne, this.weightScale(u.thirdQuartile - u.firstQuartile))
+			.attr(u.rendererConfig.dimensionTwo, (u.viewOrientation === ChartOrientation.Vertical) ? this.densityScale(4.5) : this.densityScale(-4.5))
+			.attr(u.rendererConfig.coordinateOne, this.weightScale(u.firstQuartile))
+			.attr(u.rendererConfig.coordinateTwo, (u.viewOrientation === ChartOrientation.Vertical) ? this.densityScale(1.5) : this.densityScale(-1.5));
+
+		this.medianMarker
+			.attr('fill', 'white')
+			.attr('stroke', 'black')
+			.attr('stroke-width', 1)
+			.attr('r', this.markerRadius)
+			.attr('c' + u.rendererConfig.coordinateOne, this.weightScale(u.medianWeight))
+			.attr('c' + u.rendererConfig.coordinateTwo, this.densityScale(0));
 
 		this.renderWeightAxis(u);
 		this.renderDensityAxis(u);
@@ -200,7 +246,10 @@ export class ViolinRenderer {
 			weightAxis = d3.axisLeft(this.weightScale);
 		}
 
-		weightAxis.ticks(4);
+		if (u.viewOrientation === ChartOrientation.Vertical)
+			weightAxis.ticks(4);
+		else
+			weightAxis.ticks(1);
 
 		// Position the axis by positioning the axis container and then create it.
 		this.weightAxisContainer
@@ -227,7 +276,7 @@ export class ViolinRenderer {
 			densityAxis = d3.axisTop(this.densityScale);
 		}
 
-		densityAxis.ticks(4);
+		densityAxis.ticks(0);
 
 		// Position the axis by positioning the axis container and then create it.
 		this.densityAxisContainer

@@ -76,13 +76,15 @@ export class RendererScoreFunctionUtility {
 				u.minWeight = weight;
 		});
 
+		u.weights.sort((a:number, b:number) => a - b);
+
 		u.medianWeight = d3.median(u.weights);
 		u.firstQuartile = d3.quantile(u.weights, 0.25);
 		u.thirdQuartile = d3.quantile(u.weights, 0.75);
 
 		return u;
 	}
-
+	
 	/*
 		@param u - The ScoreFunctionUpdate update to which the appropriate ScoreFunctionData will be attached.
 		@returns {ScoreFunctionUpdate}
