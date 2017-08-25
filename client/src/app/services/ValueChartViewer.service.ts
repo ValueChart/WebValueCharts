@@ -215,17 +215,12 @@ export class ValueChartViewerService {
 		let valueChart = this.valueChartService.getValueChart();
 
 		this.usersToDisplay = _.clone(users.filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
-		this.setUsersToDisplay(this.usersToDisplay);
 		this.setInvalidUsers(invalidUsers);
 		this.initUserColors(valueChart);
 	}
 
 	getUsersToDisplay(): User[] {
 		return this.usersToDisplay;
-	}
-
-	setUsersToDisplay(users: User[]): void {
-		this.usersToDisplay = users;
 	}
 
 	setInvalidUsers(usernames: string[]): void {
@@ -306,8 +301,6 @@ export class ValueChartViewerService {
 		}
 	}
 
-
-
 	// ====================== Methods for Responding to ValueChart Changes ======================
 
 	/*   
@@ -384,8 +377,12 @@ export class ValueChartViewerService {
 					
 		// Hide invalid users.
 		let invalidUsers = this.validationService.getInvalidUsers(valueChart);
-
 		_.remove(this.usersToDisplay, user => invalidUsers.indexOf(user.getUsername()) !== -1);
+
+		// Show valid users (that were previously invalid).
+		this.invalidUsers.filter(previouslyInvalidUser => invalidUsers.indexOf(previouslyInvalidUser) === -1).forEach(
+			nowValidUser => this.addUserToDisplay(this.activeValueChart.getUser(nowValidUser)));
+		
 		this.setInvalidUsers(invalidUsers);
 		this.initUserColors(valueChart);
 

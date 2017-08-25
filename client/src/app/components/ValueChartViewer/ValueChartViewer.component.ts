@@ -251,7 +251,7 @@ export class ValueChartViewerComponent implements OnInit {
 			
 			if (currentUser) {
 				let errors = this.validationService.validateUser(baseValueChart, currentUser);
-				this.valueChartViewerService.updateInvalidUser(currentUser, errors)
+				this.valueChartViewerService.updateInvalidUser(currentUser, errors);
 			}
 
 			// Group ValueCharts have hiding/showing users, so set the usersToDisplay to be the array in valueChartViewerService,
