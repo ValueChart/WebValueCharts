@@ -12,6 +12,8 @@ import { Injectable }                                                from '@angu
 import * as d3                                                       from 'd3';
 import * as _                                                        from 'lodash';
 
+// Import Model Classes:
+import { User }														from '../../model';
 
 // Import Types:
 import { ChartOrientation }											from '../../types';
@@ -26,7 +28,7 @@ export class ViolinRenderer {
 
 	private bandwidth: number = 0.08;
 	private resolution: number = 25;
-	private markerRadius: number = 2.5;
+	private markerRadius: number = 3;
 
 	public lastRendererUpdate: any;                     
 
@@ -46,6 +48,8 @@ export class ViolinRenderer {
 	public medianMarker: d3.Selection<any, any, any, any>;
 	public quartileRect: d3.Selection<any, any, any, any>;
 
+	public userPoints: d3.Selection<any, any, any, any>;
+
 	private densityScale: d3.ScaleLinear<number, number>;
 	private weightScale: d3.ScaleLinear<number, number>;
 
@@ -56,6 +60,7 @@ export class ViolinRenderer {
 		PLOT_DENSITY_LINE: 'violin-density-line',
 		MEDIAN_MARKER: 'violin-median-marker',
 		QUARTILE_RECT: 'violin-quartile-rect',
+		USER_POINT: 'violin-user-point',
 
 		OUTLINE_CONTAINER: 'violin-outline-container',
 		PLOT_OUTLINE: 'violin-plot-outline',
@@ -86,6 +91,10 @@ export class ViolinRenderer {
 		
 		if (this.plot === undefined) {
 			this.createViolin(update);
+		}
+
+		if (update.structuralUpdate) {
+			this.createUserPoints(update);
 		}
 
 
@@ -134,6 +143,20 @@ export class ViolinRenderer {
 
 		this.medianMarker = this.plotElementsContainer.append('circle')
 			.classed(ViolinRenderer.defs.MEDIAN_MARKER, true);
+
+		this.createUserPoints(u)
+	}
+
+	private createUserPoints(u: any): void {
+		var updateUserPoints = this.plotElementsContainer.selectAll('.' + ViolinRenderer.defs.USER_POINT)
+			.data(u.users);
+
+		// Update cells to conform to the data.
+		updateUserPoints.exit().remove();
+		updateUserPoints.enter().append('circle')
+			.classed(ViolinRenderer.defs.USER_POINT, true);
+
+		this.userPoints = this.plotElementsContainer.selectAll('.' + ViolinRenderer.defs.USER_POINT);
 	}
 
 
@@ -188,10 +211,16 @@ export class ViolinRenderer {
 					.x((d) => { return this.densityScale(-1 * d[1]); });
 		}
 
+		var color: string;
+		if (u.users.length === 1)
+			color = u.objective.getColor();
+		else
+			color = 'light-grey';
+
 		this.upperDensityLine
 		      .datum(density)
-		      .attr("fill", u.objective.getColor())
-		      .attr("stroke", u.objective.getColor())
+		      .attr("fill", color)
+		      .attr("stroke", color)
 		      .attr("fill-opacity", 0.5)
 		      .attr("stroke-width", 1.5)
 		      .attr("stroke-linejoin", "round")
@@ -199,8 +228,8 @@ export class ViolinRenderer {
 
 		this.lowerDensityLine
 		      .datum(density)
-		      .attr("fill", u.objective.getColor())
-		      .attr("stroke", u.objective.getColor())
+		      .attr("fill", color)
+		      .attr("stroke", color)
 		      .attr("fill-opacity", 0.5)
 		      .attr("stroke-width", 1.5)
 		      .attr("stroke-linejoin", "round")
@@ -221,12 +250,23 @@ export class ViolinRenderer {
 			.attr('fill', 'white')
 			.attr('stroke', 'black')
 			.attr('stroke-width', 1)
-			.attr('r', this.markerRadius)
+			.attr('r', this.markerRadius * 2)
 			.attr('c' + u.rendererConfig.coordinateOne, this.weightScale(u.medianWeight))
 			.attr('c' + u.rendererConfig.coordinateTwo, this.densityScale(0));
 
+		this.renderUserPoints(u);
 		this.renderWeightAxis(u);
 		this.renderDensityAxis(u);
+	}
+
+	private renderUserPoints(u: any): void {
+		this.userPoints
+			.attr('r', this.markerRadius)
+			.attr('c' + u.rendererConfig.coordinateOne, (d: User, i: number) => { return this.weightScale(d.getWeightMap().getObjectiveWeight(u.objective.getId())); })
+			.attr('c' + u.rendererConfig.coordinateTwo, this.densityScale(0))
+			.attr('fill', (d: User, i: number) => { return d.color })
+			.attr('stroke', (d: User, i: number) => { return d.color })
+			.attr('stroke-width', 1);
 	}
 
 

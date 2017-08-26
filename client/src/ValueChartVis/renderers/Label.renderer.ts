@@ -568,6 +568,7 @@ export class LabelRenderer {
 				width: width,
 				height: height, 
 				users: u.usersToDisplay,
+				structuralUpdate: u.structuralUpdate,
 				viewOrientation: u.viewConfig.viewOrientation
 			});
 	}
