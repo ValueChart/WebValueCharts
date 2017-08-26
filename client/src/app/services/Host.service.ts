@@ -176,7 +176,7 @@ export class HostService {
 
 				// Update the ValueChart if the structure has been changed by the owner and there are no errors in the new structure.
 				if (this.validationService.validateStructure(newStructure).length === 0 && !_.isEqual(newStructure, this.valueChartService.getValueChart())) { 
-					let changes: string[] = this.updateValueChartService.updateValueChart(this.valueChartService.getValueChart(), newStructure);
+					let changes: string[] = this.updateValueChartService.getValueChartChanges(this.valueChartService.getValueChart(), newStructure);
 					
 					// Notify other users of the changes.
 					if (this.currentUserService.getUsername() !== this.valueChartService.getValueChart().getCreator())

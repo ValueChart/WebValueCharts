@@ -15,7 +15,10 @@ import { ScoreFunction }									from '../../model';
 import { DiscreteScoreFunction }							from '../../model';
 
 /*
-	This class provides methods to update the ValueChart model to align with the Objectives.
+	This class provides two types of methods:
+		1. Check for differences between an old and new chart structure and generate messages describing these changes. 
+		   (These are used to notify users of changes to the chart when it is updated by the creator.)
+		2. Update the ValueChart alternatives and preferences to align with the objectives.
 */
 
 @Injectable()
@@ -61,17 +64,17 @@ export class UpdateValueChartService {
 	// ========================================================================================
 
 
-	updateValueChart(oldStructure: ValueChart, newStructure: ValueChart): string[] {
+	getValueChartChanges(oldStructure: ValueChart, newStructure: ValueChart): string[] {
 		var changeList: string[] = [];
 
-		changeList = changeList.concat(this.updateBasicDetails(oldStructure, newStructure));
-		changeList = changeList.concat(this.updateObjectives(oldStructure, newStructure));
-		changeList = changeList.concat(this.updateAlternatives(oldStructure, newStructure));
+		changeList = changeList.concat(this.getBasicDetailsChanges(oldStructure, newStructure));
+		changeList = changeList.concat(this.getObjectivesChanges(oldStructure, newStructure));
+		changeList = changeList.concat(this.getAlternativesChanges(oldStructure, newStructure));
 
 		return changeList;
 	}
 
-	updateBasicDetails(oldStructure: ValueChart, newStructure: ValueChart): string[] {
+	getBasicDetailsChanges(oldStructure: ValueChart, newStructure: ValueChart): string[] {
 		var changeList: string[] = [];
 
 		if (oldStructure.getCreator() !== newStructure.getCreator()) {
@@ -104,7 +107,7 @@ export class UpdateValueChartService {
 		return changeList;
 	}
 
-	updateObjectives(oldStructure: ValueChart, newStructure: ValueChart): string[] {
+	getObjectivesChanges(oldStructure: ValueChart, newStructure: ValueChart): string[] {
 		var changeList: string[] = [];
 		var newObjectives = newStructure.getAllObjectives();
 		var oldObjectives = oldStructure.getAllObjectives();
@@ -136,7 +139,7 @@ export class UpdateValueChartService {
 		return changeList;
 	}
 
-	updateAlternatives(oldStructure: ValueChart, newStructure: ValueChart): string[] {
+	getAlternativesChanges(oldStructure: ValueChart, newStructure: ValueChart): string[] {
 		var changeList: string[] = [];
 		var newAlternatives = newStructure.getAlternatives();
 		var oldAlternatives = oldStructure.getAlternatives();
@@ -271,7 +274,6 @@ export class UpdateValueChartService {
 	*/
 	cleanUpUserPreferences(valueChart: ValueChart, user: User): string[] {
 		let warnings: string[] = [];
-
 		let primitiveObjectives: PrimitiveObjective[] = valueChart.getAllPrimitiveObjectives();
 		let resetScoreFunctions = [];
 		let bestWorstChanged = false;
@@ -304,9 +306,7 @@ export class UpdateValueChartService {
     		warnings.push((this.BEST_WORST_OUTCOME_CHANGED));
     	}
 
-        warnings = warnings.concat(this.completePreferences(primitiveObjectives, user));
-
-        return warnings;
+        return warnings.concat(this.completePreferences(primitiveObjectives, user));
 	}
 
 	/*
@@ -315,7 +315,6 @@ export class UpdateValueChartService {
 	*/
 	removeScoreFunctions(primitiveObjectives: PrimitiveObjective[], user: User) {
 		let objIds = primitiveObjectives.map((objective: PrimitiveObjective) => { return objective.getId(); });
-
 		for (let key of user.getScoreFunctionMap().getAllScoreFunctionKeys()) {
 			if (objIds.indexOf(key) === -1) {
 				user.getScoreFunctionMap().removeObjectiveScoreFunction(key);
@@ -332,9 +331,9 @@ export class UpdateValueChartService {
 		let error = 1e-8 * primitiveObjectives.length;
 		let renormalize = user.getWeightMap().getWeightTotal() > 1 - error && user.getWeightMap().getWeightTotal() < 1 + error;
 
-		var elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
-		var iteratorElement: IteratorResult<string> = elementIterator.next();
-		var size = 0;
+		let elementIterator: Iterator<string> = user.getWeightMap().getInternalWeightMap().keys();
+		let iteratorElement: IteratorResult<string> = elementIterator.next();
+		let size = 0;
 		while (iteratorElement.done === false) {
 			if (objIds.indexOf(<string>iteratorElement.value) === -1) {
             	user.getWeightMap().removeObjectiveWeight(<string>iteratorElement.value);
@@ -383,14 +382,18 @@ export class UpdateValueChartService {
 	*/
 	completeScoreFunctions(primitiveObjectives: PrimitiveObjective[], user: User): string[] {
 		let warnings: string[] = [];
-
 		let completed = [];
+		let reset = [];
 		for (let obj of primitiveObjectives) {
 			// Make sure there is a score function for every Objective (initialized to default)
-			// Also, set immutable score functions to be an exact replica of the default
-      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())
-      			|| obj.getDefaultScoreFunction().immutable) {
+      		if (!user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId())) {
         		user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getId(), _.cloneDeep(obj.getDefaultScoreFunction()));
+     		}
+     		// Set immutable score functions to be an exact replica of the default
+     		else if (obj.getDefaultScoreFunction().immutable
+     			&& !_.isEqual(user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId()), obj.getDefaultScoreFunction())) {
+     				user.getScoreFunctionMap().setObjectiveScoreFunction(obj.getId(), _.cloneDeep(obj.getDefaultScoreFunction()));
+     				reset.push(obj.getName());
      		}
      		else {
      			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId());
@@ -400,10 +403,12 @@ export class UpdateValueChartService {
 		        }
      		}
      	}
+     	if (reset.length > 0) {
+    		warnings.push(this.SCORE_FUNCTIONS_RESET + reset.join(", "));
+    	}
      	if (completed.length > 0) {
         	warnings.push(this.NEW_SCORE_FUNCTION_ELEMENTS + completed.join(", "));
         }
-
         return warnings;
 	}
 
