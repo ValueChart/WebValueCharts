@@ -51,7 +51,7 @@ export class ExpandScoreFunctionInteraction {
 	private SCORE_FUNCTION_ROUTE: string = document.baseURI + 'scoreFunction/plot';		// The route that is matched to the ScoreFunctionViewer. This is the
 																						// route that the pop-up window will navigate to when it is opened.
 
-	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=600,height=600';	// The options string for the pop-up window.
+	private WINDOW_OPTIONS: string = 'menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,width=620,height=600';	// The options string for the pop-up window.
 
 	public popUpRef: any;		// A class field used to reference the active pop-up window.
 	
