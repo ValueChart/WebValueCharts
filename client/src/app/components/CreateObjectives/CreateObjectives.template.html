@@ -44,7 +44,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].constructDefaultScoreFunction(); resetErrorMessages()">
+                    <select class="form-control" #t [ngModel]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].changeDomType(t.value); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
                         <option [value]="'interval'">interval</option>
@@ -58,11 +58,11 @@
                     <div class="form-group">
                         <div class="form-group">
                             <SELECT class="form-control" [name]="'catlist' + objID" size="3" MULTIPLE>
-                            <OPTION *ngFor="let opt of objectiveRows[objID].dom.categories">{{opt}}
+                            <OPTION *ngFor="let opt of objectiveRows[objID].dom.elements">{{opt}}
                             </SELECT>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#categories-modal" (click)="selectedObjRow=objID; updateCategoryString()">{{objectiveRows[objID].dom.categories.length > 0 ? 'Edit' : 'Add'}}</button>
+                            <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#categories-modal" (click)="selectedObjRow=objID; updateCategoryString()">{{objectiveRows[objID].dom.elements.length > 0 ? 'Edit' : 'Add'}}</button>
                             <button type="button" class="btn btn-sm btn-default" (click)="removeSelectedCategories(objID)">Delete</button>
                         </div>
                     </div>

@@ -354,7 +354,7 @@ export class CreateObjectivesComponent implements OnInit {
 		let dom: Domain;
 		if (domDets.type === 'categorical') {
 			dom = new CategoricalDomain(true);
-			for (let cat of domDets.categories) {
+			for (let cat of domDets.elements) {
 				(<CategoricalDomain>dom).addElement(cat);
 			}
 		}
@@ -400,7 +400,7 @@ export class CreateObjectivesComponent implements OnInit {
 		let domDets: DomainDetails = new DomainDetails(dom.type);
 		if (dom.type === 'categorical') {
 			for (let cat of (<CategoricalDomain>dom).getElements()) {
-				domDets.categories.push(cat);
+				domDets.elements.push(cat);
 			}
 		}
 		else if (dom.type === 'continuous') {
@@ -424,7 +424,7 @@ export class CreateObjectivesComponent implements OnInit {
 		@description 	Updates categoryString to contain the categories for the selected Objective Row.
 	*/
 	updateCategoryString() {
-		this.categoryString = this.objectiveRows[this.selectedObjRow].dom.categories.join(', ');
+		this.categoryString = this.objectiveRows[this.selectedObjRow].dom.elements.join(', ');
 	}
 
 	/* 	
@@ -435,7 +435,7 @@ export class CreateObjectivesComponent implements OnInit {
 		let editing = this.objectiveRows[this.selectedObjRow].dom.isValid();
 		let categories = this.categoryString.split(',').map(cat => cat.trim());
 		let uniqueCategories = categories.filter(function(elem, index, self) { return index === self.indexOf(elem); });
-		this.objectiveRows[this.selectedObjRow].dom.categories = uniqueCategories;
+		this.objectiveRows[this.selectedObjRow].dom.elements = uniqueCategories;
 
 		if (editing)
 			this.updateCategoricalDefaultScoreFunction();
@@ -451,7 +451,7 @@ export class CreateObjectivesComponent implements OnInit {
 	*/
 	updateCategoricalDefaultScoreFunction() {
 		let elementScoreMap = new Map<number | string, number>();
-		let elements = this.objectiveRows[this.selectedObjRow].dom.categories;
+		let elements = this.objectiveRows[this.selectedObjRow].dom.elements;
 		let defaultScoreFunction = this.objectiveRows[this.selectedObjRow].defaultScoreFunction;
         for (let elt of elements) {
         	if (defaultScoreFunction.getScore(elt) === undefined) {
@@ -472,7 +472,7 @@ export class CreateObjectivesComponent implements OnInit {
 	removeSelectedCategories(objID: string) {
 		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlist' + objID)[0]);
 		for (let cat of selected) {
-			this.objectiveRows[objID].dom.removeCategory(cat);
+			this.objectiveRows[objID].dom.removeElement(cat);
 			this.objectiveRows[objID].defaultScoreFunction.removeElement(cat);
 		}
 		this.resetErrorMessages();
@@ -574,10 +574,10 @@ class ObjectiveRow {
 		this.type = type;
 		color ? this.color = color : this.color = '';
 		dom ? this.dom = dom : this.dom = new DomainDetails('categorical');
-		defaultScoreFunction ? this.defaultScoreFunction = defaultScoreFunction : this.constructDefaultScoreFunction();
 		this.children = [];
 		this.latestDefault = ScoreFunction.FLAT;
 		this.defaultScoreFunctionModified = false;
+		defaultScoreFunction ? this.defaultScoreFunction = defaultScoreFunction : this.constructDefaultScoreFunction();
 	}
 
 	addChild(child: string) {
@@ -589,6 +589,14 @@ class ObjectiveRow {
         this.children.splice(i, 1);
 	}
 
+	changeDomType(newType: string) {
+		let oldType = this.dom.type;
+		this.dom.type = newType;
+		if (!(oldType === 'interval' && this.dom.type === 'categorical')) {
+			this.constructDefaultScoreFunction();
+		}
+	}
+
 	constructDefaultScoreFunction() {
 		let scoreFunction;
 		if (this.dom.type === 'categorical' || this.dom.type === 'interval') {
@@ -598,16 +606,16 @@ class ObjectiveRow {
 			scoreFunction = new ContinuousScoreFunction(this.dom.min, this.dom.max);
 		}
 		this.defaultScoreFunction = scoreFunction;
-		this.latestDefault = ScoreFunction.FLAT;
 		this.initializeDefaultScoreFunction(false);
 	}
 
 	initializeDefaultScoreFunction(userTriggered: boolean) {
 		if (this.dom.type === 'categorical') {
-			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.categories);
+			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.elements);
 		}
 		else if (this.dom.type === 'interval') {
-			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.calculateIntervalDomainElements());
+			this.dom.initializeIntervalDomainElements();
+			(<DiscreteScoreFunction>this.defaultScoreFunction).initialize(this.latestDefault, this.dom.elements);
 		}
 		else {
 			(<ContinuousScoreFunction>this.defaultScoreFunction).setMinDomainValue(this.dom.min);
@@ -631,7 +639,7 @@ class ObjectiveRow {
 */
 class DomainDetails {
 	type: string;
-	categories: string[];
+	elements: string[];
 	min: number;
 	max: number;
 	interval: number;
@@ -639,30 +647,29 @@ class DomainDetails {
 
 	constructor(type: string) {
 		this.type = type;
-		this.categories = [];
+		this.elements = [];
 	}
 
-	removeCategory(cat: string) {
-		let i = this.categories.indexOf(cat);
-        this.categories.splice(i, 1);
+	removeElement(cat: string) {
+		let i = this.elements.indexOf(cat);
+        this.elements.splice(i, 1);
 	}
 
-	calculateIntervalDomainElements(): string[] {
-		let elements: string[] = [];
+	initializeIntervalDomainElements() {
+		this.elements = [];
 		if (this.interval > 0) {
 			let currentElement: number = this.min;
 			while (currentElement < this.max) {
-				elements.push('' + currentElement);
+				this.elements.push('' + currentElement);
 				currentElement += this.interval;
 			}
-			elements.push('' + this.max);
+			this.elements.push('' + this.max);
 		}
-		return elements;
 	}
 
 	isValid(): boolean {
 		if (this.type === 'categorical') {
-			return this.categories.length > 1;
+			return this.elements.length > 1;
 		}
 		else if (this.min !== undefined && !isNaN(this.min) && this.max !== undefined && !isNaN(this.max) && this.min < this.max) {
 			return (this.type === 'continuous' || (this.interval > 0 && (this.max - this.min) % this.interval === 0));
@@ -672,7 +679,7 @@ class DomainDetails {
 
 	copy(): DomainDetails {
 		let domCopy = new DomainDetails(this.type);
-		domCopy.categories = this.categories.slice();
+		domCopy.elements = this.elements.slice();
 		domCopy.min = this.min;
 		domCopy.max = this.max;
 		domCopy.interval = this.interval;
