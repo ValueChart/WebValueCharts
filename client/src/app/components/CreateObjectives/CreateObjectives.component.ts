@@ -15,7 +15,6 @@ import { ValidationService }											from '../../services';
 import { ChartUndoRedoService }                     					from '../../../ValueChartVis';
 import { ScoreFunctionDirective }										from '../../../ValueChartVis';
 import { RendererScoreFunctionUtility }									from '../../../ValueChartVis';
-import *	as Formatter												from '../../utilities/Formatter';
 
 // Import Model Classes:
 import { ValueChart } 													from '../../../model';
@@ -33,6 +32,10 @@ import { ContinuousScoreFunction }										from '../../../model';
 
 // Import Types:
 import { ChartOrientation }                         					from '../../../types';
+
+// Import Utilities:
+import *	as Formatter												from '../../utilities/Formatter';
+import * as _ 															from 'lodash';
 
 /*
 	This component defines the UI controls for creating and editing the Objective structure of a ValueChart.
@@ -388,6 +391,7 @@ export class CreateObjectivesComponent implements OnInit {
 		else {
 			objrow = new ObjectiveRow(String(this.objectivesCount), obj.getId(), obj.getName(), obj.getDescription(), parentID, depth, 'primitive', (<PrimitiveObjective>obj).getColor(),
 				this.domainToDomainDetails((<PrimitiveObjective>obj).getDomain()), (<PrimitiveObjective>obj).getDefaultScoreFunction());
+			objrow.latestDefault = this.getClosestDefault(<PrimitiveObjective>obj);
 			this.addObjRow(parentID, objrow);
 		}
 	}
@@ -415,6 +419,38 @@ export class CreateObjectivesComponent implements OnInit {
 			domDets.initializeIntervalDomainElements();
 		}
 		return domDets;
+	}
+
+	/* 	
+		@returns {string}
+		@description 	Returns the type of default (flat, positive linear, or negative linear) that is most similar to the current default score function.
+	*/
+	getClosestDefault(obj: PrimitiveObjective): string {
+		let flatDiff = this.getDifference(obj.getInitialScoreFunction(ScoreFunction.FLAT), obj.getDefaultScoreFunction());
+		let poslinDiff = this.getDifference(obj.getInitialScoreFunction(ScoreFunction.POSLIN), obj.getDefaultScoreFunction());
+		let neglinDiff = this.getDifference(obj.getInitialScoreFunction(ScoreFunction.NEGLIN), obj.getDefaultScoreFunction());
+		if (flatDiff <= poslinDiff && flatDiff <= neglinDiff) {
+			return ScoreFunction.FLAT;
+		}
+		else {
+			return poslinDiff <= neglinDiff ? ScoreFunction.POSLIN : ScoreFunction.NEGLIN;
+		}
+	}
+
+	/* 	
+		@returns {number}
+		@description 	Returns the sum of the absolute difference between the element scores of two score functions.
+						(Assumes the score function elements are the same.)
+	*/
+	getDifference(funcA: ScoreFunction, funcB: ScoreFunction) {
+		if (!_.isEqual(funcA.getAllElements(), funcB.getAllElements())) {
+			throw "Score function elements are not the same.";
+		}
+		let diff = 0;
+		for (let elt of funcA.getAllElements()) {
+			diff = diff + Math.abs(funcA.getScore(elt) - funcB.getScore(elt));
+		}
+		return diff;
 	}
 
 	// ================================ Categorical Domain Methods ====================================
