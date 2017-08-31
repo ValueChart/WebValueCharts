@@ -284,7 +284,7 @@ export class UpdateValueChartService {
       			let scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(obj.getId());
 			    // Reset score functions in any of the following cases:
 			    //	(1) Domain type was changed from categorical/interval to continuous
-			    //	(1) Domain type was changed from  continuous to categorical/interval
+			    //	(2) Domain type was changed from  continuous to categorical/interval
 			    //	(3)	Domain type is continuous and max or min was changed
 				// It may be possible to do something more clever in the future that preserves parts of the previous score function
 			    if (obj.getDomainType() === 'continuous' || scoreFunction.type === 'continuous')  {

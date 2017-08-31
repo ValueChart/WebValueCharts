@@ -412,6 +412,7 @@ export class CreateObjectivesComponent implements OnInit {
 			domDets.min = (<IntervalDomain>dom).getMinValue();
 			domDets.max = (<IntervalDomain>dom).getMaxValue();
 			domDets.interval = (<IntervalDomain>dom).getInterval();
+			domDets.initializeIntervalDomainElements();
 		}
 		return domDets;
 	}
