@@ -67,6 +67,7 @@ a.upload {
     overflow: hidden;
     margin: 10px;
 }
+
 .file-upload input.upload {
     position: absolute;
     top: -13px;
@@ -428,6 +429,11 @@ input {
 
 .objectivestableselectedrow { /* has to be one word */
     background-color: #D4E7F2;
+}
+
+.objectivestableboldbutton {
+    font-weight: bold !important;
+    border-color: black !important;
 }
 
 #categories-input {

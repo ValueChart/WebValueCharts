@@ -44,7 +44,7 @@
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].initializeDefaultScoreFunction(); resetErrorMessages()">
+                    <select class="form-control" [(ngModel)]="objectiveRows[objID].dom.type" (ngModelChange)="objectiveRows[objID].constructDefaultScoreFunction(); resetErrorMessages()">
                         <option [value]="'categorical'">categorical</option>
                         <option [value]="'continuous'">continuous</option>
                         <option [value]="'interval'">interval</option>
@@ -78,16 +78,16 @@
                         </div>
                         <div class="objectives-table-grid-row">
                             <div class="objectives-table-grid-cell">
-                                <input class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = Number(a.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                                <input class="form-control" type="text" #a pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.min" (ngModelChange)="objectiveRows[objID].dom.min = Number(a.value); objectiveRows[objID].initializeDefaultScoreFunction(false); resetErrorMessages()" maxlength="100" />
                             </div>
                             <div class="objectives-table-grid-cell">
-                                <input class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = Number(b.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                                <input class="form-control" type="text" #b pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.max" (ngModelChange)="objectiveRows[objID].dom.max = Number(b.value); objectiveRows[objID].initializeDefaultScoreFunction(false); resetErrorMessages()" maxlength="100" />
                             </div>
                             <div *ngIf="objectiveRows[objID].dom.type === 'continuous'" class="objectives-table-grid-cell">
                                 <input class="form-control" type="text" [(ngModel)]="objectiveRows[objID].dom.unit" maxlength="100" />  
                             </div>
                             <div *ngIf="objectiveRows[objID].dom.type === 'interval'" class="objectives-table-grid-cell">
-                                <input class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = Number(c.value); objectiveRows[objID].resetDefaultScoreFunction(); resetErrorMessages()" maxlength="100" />
+                                <input class="form-control" type="text" #c pattern= "[0-9]" [ngModel]="objectiveRows[objID].dom.interval" (ngModelChange)="objectiveRows[objID].dom.interval = Number(c.value); objectiveRows[objID].initializeDefaultScoreFunction(false); resetErrorMessages()" maxlength="100" />
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
             <th *ngIf="!valueChart.isIndividual()">
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
                 <div *ngIf="objectiveRows[objID].type === 'primitive'">
-                    <div><button class="btn btn-sm btn-default" [disabled]="disableEditDefaultScoreFunction(objID)" (click)="selectedObjRow=objID; defaultScoreFunctionModalOpen=true" data-toggle="modal" data-target="#default-score-function-modal">Edit</button></div>
+                    <div><button class="btn btn-sm btn-default" [ngClass]="{objectivestableboldbutton: objectiveRows[objID].defaultScoreFunctionModified && !disableEditDefaultScoreFunction(objID)}" [disabled]="disableEditDefaultScoreFunction(objID)" (click)="objectiveRows[objID].defaultScoreFunctionModified = false; selectedObjRow=objID; defaultScoreFunctionModalOpen=true" data-toggle="modal" data-target="#default-score-function-modal">Edit</button></div>
                 </div>
             </th>
             <th *ngIf="!valueChart.isIndividual()">
@@ -150,12 +150,12 @@
             </div>     
             <div *ngIf="defaultScoreFunctionModalOpen" class="modal-body">
                 <div class="input-group">
-                    <select class="form-control score-function-dropdown" [(ngModel)]="objectiveRows[selectedObjRow].latestDefault" (ngModelChange)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">
+                    <select class="form-control score-function-dropdown" [(ngModel)]="objectiveRows[selectedObjRow].latestDefault" (ngModelChange)="objectiveRows[selectedObjRow].initializeDefaultScoreFunction(true)">
                         <option value="{{ScoreFunction.FLAT}}">Flat</option>
                         <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
                         <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>
                     </select>
-                    <button type="button" class="btn btn-default" (click)="objectiveRows[selectedObjRow].resetDefaultScoreFunction()">Reset</button>
+                    <button type="button" class="btn btn-default" (click)="objectiveRows[selectedObjRow].initializeDefaultScoreFunction(true)">Reset</button>
                 </div>
                 <ScoreFunction 
                     [scoreFunctions]="[objectiveRows[selectedObjRow].defaultScoreFunction]"
