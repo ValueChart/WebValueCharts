@@ -149,7 +149,8 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 				var promises: any[] = [];
 
 				docs.forEach((doc: any) => {
-					promises.push(statusCollection.findOne({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
+
+					promises.push(statusCollection.find({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
 						if (err) 
 							res.status(400).json({ data: err});
 						else if (status)
@@ -197,7 +198,7 @@ usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: 
 				var promises: any[] = [];
 
 				docs.forEach((doc: any) => {
-					promises.push(statusCollection.findOne({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
+					promises.push(statusCollection.find({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
 						if (err) 
 							res.status(400).json({ data: err});
 						else if (status)

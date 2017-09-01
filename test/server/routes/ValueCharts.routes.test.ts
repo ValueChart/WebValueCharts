@@ -533,7 +533,7 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
-		context('attempting to add/remove/change users when lockedByCreator is false', () => {
+		context('attempting to add/remove/change users when lockedByCreator is true', () => {
 			var argile: User;
 			var argileJson: any;
 
@@ -545,7 +545,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
+					.send({ chartId: chartId, lockedByCreator: true, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);

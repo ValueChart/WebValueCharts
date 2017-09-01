@@ -11,8 +11,11 @@ import * as Passport 								from 'passport';
 import { Strategy }									from 'passport-local';
 import * as monk									from 'monk';
 
+import { dbAddress }								from '../db.address';
+
+
 // Load the database.
-var db: monk.Monk = monk('wvc:wvc@192.168.2.100:27000/web-valuecharts');
+var db: monk.Monk = monk(dbAddress);
 
 var localRegistration = (username: string, password: string, req: express.Request) => {
 
