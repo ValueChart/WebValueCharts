@@ -340,12 +340,12 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
+				.send({ chartId: chartId, lockedByCreator: true, lockedBySystem: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(201)
 				.expect((res: request.Response) => {
-					expect(res.body.data.userChangesPermitted).to.be.false;
+					expect(res.body.data.lockedByCreator).to.be.true;
 				}).end(function(err, res) {
 			        if (err) return done(err);
 			        done();
@@ -354,12 +354,12 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+				.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(200)
 				.expect((res: request.Response) => {
-					expect(res.body.data.userChangesPermitted).to.be.true;
+					expect(res.body.data.lockedByCreator).to.be.false;
 				}).end(function(err, res) {
 			        if (err) return done(err);
 			        done();
@@ -533,7 +533,7 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
-		context('attempting to add/remove/change users when userChangesPermitted is false', () => {
+		context('attempting to add/remove/change users when lockedByCreator is false', () => {
 			var argile: User;
 			var argileJson: any;
 
@@ -545,7 +545,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -592,7 +592,7 @@ describe('ValueCharts Routes', () => {
 
 			after(function(done: MochaDone) {
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -601,7 +601,7 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
-		context('attempting to add/remove/change users when incomplete is true', () => {
+		context('attempting to add/remove/change users when lockedBySystem is true', () => {
 			var argile: User;
 			var argileJson: any;
 
@@ -613,7 +613,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: true })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: true })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -660,7 +660,7 @@ describe('ValueCharts Routes', () => {
 
 			after(function(done: MochaDone) {
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);

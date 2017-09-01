@@ -30,7 +30,7 @@ export class ValueChartService {
 	// ========================================================================================
 
 	private valueChart: ValueChart;				// The "base" ValueChart.
-	private status: ValueChartStatus = <any> { userChangesPermitted: true, incomplete: false };	// The status of the ValueChart.
+	private status: ValueChartStatus = <any> { lockedByCreator: false, lockedBySystem: false };	// The status of the ValueChart.
 
 
 	// ========================================================================================

@@ -16,12 +16,12 @@
 					<ExportValueChart></ExportValueChart>
 			</div>
 			<div *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartService.getStatus().userChangesPermitted">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartService.getStatus().lockedByCreator">
 					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
 					Lock Chart
 					</button>
 				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartService.getStatus().userChangesPermitted">
+				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartService.getStatus().lockedByCreator">
 					<button class="btn btn-success" (click)="setUserChangesAccepted(true)">
 					Unlock Chart
 					</button>

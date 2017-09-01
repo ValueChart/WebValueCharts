@@ -30,7 +30,9 @@ import { passport }									from './server/utilities/auth';
 var webValueCharts: express.Application = express();
 
 // Retrieve the database via the connection url. "development" is the username and "BackEndConstruction" is the password.
-var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
+var db: monk.Monk = monk('wvc:wvc@192.168.2.100:27000/web-valuecharts');
+
+console.log(db);
 
 // Require express websocket (an express implementation of the WebSocket protocol) and call its initialization function.
 // This function attaches the WebScoket methods (ws for example) to the express instance we are using.

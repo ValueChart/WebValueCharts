@@ -12,7 +12,7 @@ import { Strategy }									from 'passport-local';
 import * as monk									from 'monk';
 
 // Load the database.
-var db: monk.Monk = monk('mongodb://development:BackEndConstruction@ds021915.mlab.com:21915/web-valuecharts');
+var db: monk.Monk = monk('wvc:wvc@192.168.2.100:27000/web-valuecharts');
 
 var localRegistration = (username: string, password: string, req: express.Request) => {
 

@@ -14,6 +14,9 @@ import * as passport 						from 'passport';
 
 export var usersRoutes: express.Router = express.Router();
 
+import { ValueChartStatus }							from '../../client/src/types';
+
+
 // Create new User by posting to the list of Users. The passport local-signup strategy does the actual creation. See Auth.ts for more information.
 usersRoutes.post('/', passport.authenticate('local-signup'), function(req: express.Request, res: express.Response) {
 		
@@ -146,11 +149,11 @@ usersRoutes.get('/:user/OwnedValueCharts', function(req: express.Request, res: e
 				var promises: any[] = [];
 
 				docs.forEach((doc: any) => {
-					promises.push(statusCollection.findOne({ fname: doc.fname }, function(err: Error, status: any) {
+					promises.push(statusCollection.findOne({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
 						if (err) 
 							res.status(400).json({ data: err});
 						else if (status)
-							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: status.incomplete, userChangesPermitted: status.userChangesPermitted });
+							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, lockedBySystem: status.lockedBySystem, lockedByCreator: status.lockedByCreator });
 					}));
 				});
 
@@ -194,11 +197,11 @@ usersRoutes.get('/:user/JoinedValueCharts', function(req: express.Request, res: 
 				var promises: any[] = [];
 
 				docs.forEach((doc: any) => {
-					promises.push(statusCollection.findOne({ fname: doc.fname }, function(err: Error, status: any) {
+					promises.push(statusCollection.findOne({ chartId: doc._id }, function(err: Error, status: ValueChartStatus) {
 						if (err) 
 							res.status(400).json({ data: err});
 						else if (status)
-							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, incomplete: status.incomplete, userChangesPermitted: status.userChangesPermitted });
+							vcSummaries.push({ _id: doc._id, name: doc.name, description: doc.description, numUsers: doc.users.length, numAlternatives: doc.alternatives.length, password: doc.password, lockedBySystem: status.lockedBySystem, lockedByCreator: status.lockedByCreator });
 					}));
 				});
 

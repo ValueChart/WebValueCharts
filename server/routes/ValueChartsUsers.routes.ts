@@ -16,6 +16,7 @@ import * as _ 										from 'lodash';
 import { HostEventEmitter, hostEventEmitter }		from '../utilities/HostEventEmitters';
 import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
 
+import { ValueChartStatus }							from '../../client/src/types';
 
 export var valueChartUsersRoutes: express.Router = express.Router();
 
@@ -106,14 +107,14 @@ valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Respo
 	var identifier: string = (<any> req).identifier
 
 	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
-	statusCollection.findOne({ chartId: identifier }, (err: Error, doc: any) => {
+	statusCollection.findOne({ chartId: identifier }, (err: Error, doc: ValueChartStatus) => {
 		// If the host connection is active, and user changes are not being accepted.
-		if (doc && !doc.userChangesPermitted) {
+		if (doc && doc.lockedByCreator) {
 			res.status(403)
 				.send('User changes are disabled by the chart owner.');
 		} 
 		// If the host connection is active, but the chart is incomplete/invalid.
-		else if (doc && doc.incomplete) {
+		else if (doc && doc.lockedBySystem) {
 			res.status(403)
 				.send('User changes rejected. The chart is not valid.');
 		}

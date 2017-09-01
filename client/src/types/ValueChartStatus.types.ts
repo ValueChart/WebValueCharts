@@ -6,8 +6,7 @@
 */
 
 export interface ValueChartStatus {
-	userChangesPermitted: boolean;
-	incomplete: boolean;
+	lockedByCreator: boolean;
+	lockedBySystem: boolean;
 	chartId: string;
-	fname: string;
 }

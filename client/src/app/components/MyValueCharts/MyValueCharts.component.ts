@@ -116,8 +116,8 @@ export class MyValueChartsComponent implements OnInit {
 						}
 
 					if (chartSummary._id === status.chartId) {
-						chartSummary.incomplete = status.incomplete;
-						chartSummary.userChangesPermitted = status.userChangesPermitted;
+						chartSummary.lockedBySystem = status.lockedBySystem;
+						chartSummary.lockedByCreator = status.lockedByCreator;
 					}
 				});
 			});
@@ -275,7 +275,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	getStatusText(valueChartSummary: any): string {
-		if (valueChartSummary.incomplete) {
+		if (valueChartSummary.lockedBySystem) {
 			return 'Incomplete';
 		} else {
 			return 'Complete';
@@ -283,7 +283,7 @@ export class MyValueChartsComponent implements OnInit {
 	}
 
 	getChangesPermittedText(valueChartSummary: any): string {
-		if (valueChartSummary.userChangesPermitted && !valueChartSummary.incomplete) {
+		if (!valueChartSummary.lockedByCreator && !valueChartSummary.lockedBySystem) {
 			return 'Allowed';
 		} else {
 			return 'Prevented';
