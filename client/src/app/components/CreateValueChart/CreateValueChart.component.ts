@@ -52,7 +52,7 @@ export class CreateValueChartComponent implements OnInit {
 	window: any = window;
 	navigationResponse: Subject<boolean> = new Subject<boolean>();
 	public loading = true;
-	private lockedByCreator = true; // Records whether or not the chart is locked by its creator
+	private lockedByCreator = false; // Records whether or not the chart is locked by its creator
 
 	// ========================================================================================
 	// 									Constructor
@@ -98,7 +98,7 @@ export class CreateValueChartComponent implements OnInit {
 			} else if (this.creationStepsService.getCreationPurpose() === CreatePurpose.EditValueChart) {	
 				this.creationStepsService.setAutoSaveEnabled(true);
 				this.valueChartHttp.getValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
-					this.lockedByCreator = !status.lockedByCreator; 
+					this.lockedByCreator = status.lockedByCreator; 
 					status.lockedBySystem = true; // prevent changes to users while chart is being edited
 					this.valueChartHttp.setValueChartStatus(status).subscribe( (newStatus) => { this.valueChartService.setStatus(newStatus); });
 				});
@@ -129,7 +129,7 @@ export class CreateValueChartComponent implements OnInit {
 				|| (this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername()) && this.validationService.validateUser(this.valueChartService.getValueChart(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())).length > 0 ));
 			
 			let status: ValueChartStatus = <any> {};
-			status.lockedByCreator = !this.lockedByCreator;
+			status.lockedByCreator = this.lockedByCreator;
 			status.lockedBySystem = lockedBySystem;
 			status.chartId = this.valueChartService.getValueChart()._id;
 			this.valueChartService.setStatus(status);
