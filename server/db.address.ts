@@ -6,4 +6,4 @@
 * @Last Modified time: 2017-01-03 14:02:27
 */
 
-export var dbAddress = 'wvc:wvc@192.168.2.100:27000/web-valuecharts';
+export var dbAddress = 'wvc:wvc@valuecharts.cs.ubc.ca:27000/web-valuecharts';
