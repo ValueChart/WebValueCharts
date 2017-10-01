@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-28 15:25:42
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-22 15:07:06
+* @Last Modified time: 2017-08-16 14:44:58
 */
 
 // Import Testing Resources:
@@ -25,43 +25,43 @@ import { BestPaperChartData }												from '../../../../testData/BestPaper';
 import { randomizeUserWeights, randomizeAllUserScoreFunctions } 			from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { ValueChartDirective } 												from '../../../../../client/resources/modules/ValueChart/directives/ValueChart.directive';
+import { ValueChartDirective } 												from '../../../../../client/src/ValueChartVis';
 
 // Services:
-import { RenderEventsService } 												from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { RendererService } 													from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService } 											from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ChangeDetectionService } 											from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
+import { RenderEventsService } 												from '../../../../../client/src/ValueChartVis';
+import { RendererService } 													from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService } 											from '../../../../../client/src/ValueChartVis';
+import { ChangeDetectionService } 											from '../../../../../client/src/ValueChartVis';
 // Renderers:
-import { ObjectiveChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
-import { SummaryChartRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/SummaryChart.renderer';
-import { LabelRenderer } 													from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
-import { ScoreFunctionRenderer } 											from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
+import { ObjectiveChartRenderer } 											from '../../../../../client/src/ValueChartVis';
+import { SummaryChartRenderer } 											from '../../../../../client/src/ValueChartVis';
+import { LabelRenderer } 													from '../../../../../client/src/ValueChartVis';
+import { ScoreFunctionRenderer } 											from '../../../../../client/src/ValueChartVis';
 // Utilities
-import { RendererDataUtility } 												from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererConfigUtility } 											from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererScoreFunctionUtility } 									from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
+import { RendererDataUtility } 												from '../../../../../client/src/ValueChartVis';
+import { RendererConfigUtility } 											from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility } 									from '../../../../../client/src/ValueChartVis';
 // Interactions
-import { ReorderObjectivesInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
-import { ResizeWeightsInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
-import { SortAlternativesInteraction } 										from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
-import { SetObjectiveColorsInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
-import { ExpandScoreFunctionInteraction } 									from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
+import { ReorderObjectivesInteraction } 									from '../../../../../client/src/ValueChartVis';
+import { ResizeWeightsInteraction } 										from '../../../../../client/src/ValueChartVis';
+import { SortAlternativesInteraction } 										from '../../../../../client/src/ValueChartVis';
+import { SetObjectiveColorsInteraction } 									from '../../../../../client/src/ValueChartVis';
+import { ExpandScoreFunctionInteraction } 									from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser } 											from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser } 											from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart } 														from '../../../../../client/resources/model/ValueChart';
-import { User } 															from '../../../../../client/resources/model/User';
+import { ValueChart } 														from '../../../../../client/src/model';
+import { User } 															from '../../../../../client/src/model';
 
 // Import Definitions
-import { LabelDefinitions } 												from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions } 												from '../../../../../client/src/ValueChartVis';
 
 // Import Types
-import { ViewConfig, InteractionConfig } 									from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate } 													from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData } 											from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig } 									from '../../../../../client/src/types';
+import { RendererUpdate } 													from '../../../../../client/src/types';
+import { RowData, UserScoreData } 											from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 @Component({
@@ -122,7 +122,7 @@ describe('ValueChartDirective', () => {
 	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 
 	var aaron: User;
@@ -132,7 +132,10 @@ describe('ValueChartDirective', () => {
 
 	beforeEach(() => {
 
+		TestBed.resetTestingModule();
+
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -232,11 +235,12 @@ describe('ValueChartDirective', () => {
 	describe('createValueChart(): void', () => {
 
 		before(function() {
-			parser = new WebValueChartsParser();
+			parser = new XmlValueChartParser();
 			var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 			hotelChart = parser.parseValueChart(valueChartDocument);
 
 			viewConfig = {
+    scaleAlternatives: false,
 				viewOrientation: ChartOrientation.Vertical,
 				displayScoreFunctions: false,
 				displayTotalScores: false,
@@ -302,11 +306,12 @@ describe('ValueChartDirective', () => {
 		context('when all of the directive\'s input parameters are held constant (ie. no changes are made to the inputs)', () => {
 
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
@@ -353,11 +358,12 @@ describe('ValueChartDirective', () => {
 		context('when the input ValueChart is modified', () => {
 
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
@@ -418,7 +424,7 @@ describe('ValueChartDirective', () => {
 			context('when an existing user\'s score functions are changed', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -465,7 +471,7 @@ describe('ValueChartDirective', () => {
 			context('when a new user is added to the ValueChart', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -513,7 +519,7 @@ describe('ValueChartDirective', () => {
 
 			context('when a user is deleted from the ValueChart (leaving it with no users)', () => {
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -561,7 +567,7 @@ describe('ValueChartDirective', () => {
 			context('when a user is deleted from the ValueChart (when it has many users)', () => {
 
 				before(function() {
-					parser = new WebValueChartsParser();
+					parser = new XmlValueChartParser();
 					var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 					hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -612,7 +618,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the view orientation of the ValueChart is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -638,7 +644,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the view configuration is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -648,6 +654,7 @@ describe('ValueChartDirective', () => {
 
 			it('should re-render the valueChart in the new view orientation', () => {
 				viewerStub.viewConfig = {
+    scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: true,
 					displayTotalScores: false,
@@ -673,7 +680,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the interaction configuration is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -699,7 +706,7 @@ describe('ValueChartDirective', () => {
 
 		context('when the width and/or height of the ValueChart is changed', () => {
 			before(function() {
-				parser = new WebValueChartsParser();
+				parser = new XmlValueChartParser();
 				var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 				hotelChart = parser.parseValueChart(valueChartDocument);
 

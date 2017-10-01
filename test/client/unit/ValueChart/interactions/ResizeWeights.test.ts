@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 13:53:05
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:27:21
+* @Last Modified time: 2017-08-16 14:44:56
 */
 
 // Import Testing Resources:
@@ -21,28 +21,28 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ResizeWeightsInteraction }						from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
+import { ResizeWeightsInteraction }						from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions }								from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { Alternative }									from '../../../../../client/resources/model/Alternative';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AlternativesRecord }							from '../../../../../client/resources/types/Record.types';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { Alternative }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AlternativesRecord }							from '../../../../../client/src/types';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { LabelData }									from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { LabelData }									from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, PumpType }	from '../../../../../client/src/types';
 
 
 describe('ResizeWeightsInteraction', () => {
@@ -52,7 +52,7 @@ describe('ResizeWeightsInteraction', () => {
 	var resizeWeightsInteraction: ResizeWeightsInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 
@@ -68,11 +68,12 @@ describe('ResizeWeightsInteraction', () => {
 		resizeWeightsInteraction = TestBed.get(ResizeWeightsInteraction);
 
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -182,7 +183,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				let objective = u.valueChart.getAllPrimitiveObjectives()[0];
 				let aaron = u.valueChart.getUsers()[0];
-				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName());
+				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId());
 
 				let labelDatum: LabelData = { objective: objective, weight: previousWeight, depth: null, depthOfChildren: 0, subLabelData: null }
 
@@ -194,7 +195,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				resizeWeightsInteraction['onPump'](event);
 
-				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName())).to.equal(previousWeight - 0.01);
+				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId())).to.equal(previousWeight - 0.01);
 			});
 		});
 
@@ -204,7 +205,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				let objective = u.valueChart.getAllPrimitiveObjectives()[0];
 				let aaron = u.valueChart.getUsers()[0];
-				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName());
+				let previousWeight = aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId());
 
 				let labelDatum: LabelData = { objective: objective, weight: previousWeight, depth: null, depthOfChildren: 0, subLabelData: null }
 
@@ -217,7 +218,7 @@ describe('ResizeWeightsInteraction', () => {
 
 				resizeWeightsInteraction['onPump'](event);
 
-				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getName())).to.equal(previousWeight + 0.01);
+				expect(aaron.getWeightMap().getNormalizedObjectiveWeight(objective.getId())).to.equal(previousWeight + 0.01);
 			});
 		});
 	});
@@ -257,8 +258,8 @@ describe('ResizeWeightsInteraction', () => {
 												// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, 0.02, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + 0.02);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldAboveSiblingWeight - 0.02)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + 0.02);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldAboveSiblingWeight - 0.02)
 					});
 				});
 
@@ -274,8 +275,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, oldAboveSiblingWeight + 0.05, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(0)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(0)
 					});
 				});
 			});
@@ -293,8 +294,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, -0.02, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight - 0.02);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldAboveSiblingWeight + 0.02)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight - 0.02);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldAboveSiblingWeight + 0.02)
 					});
 				});
 
@@ -311,8 +312,8 @@ describe('ResizeWeightsInteraction', () => {
 						// 1 is the index of the lower sibling in the siblings array.
 						resizeWeightsInteraction['resizeNeighbors'](belowSibling, 1, -oldBelowSiblingWeight - 0.05, weightMap, siblings);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(0);
-						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getName())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight)
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(aboveSibling.objective.getId())).to.equal(oldBelowSiblingWeight + oldAboveSiblingWeight)
 					});
 				});
 			});
@@ -337,10 +338,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight + 0.02);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight + 0.02);
 						expect(u.labelData[0].subLabelData[1].weight).to.equal(oldAboveSiblingWeight - 0.02)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.equal(oldChildWeightOne - 0.01);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.equal(oldChildWeightTwo - 0.01);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.equal(oldChildWeightOne - 0.01);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.equal(oldChildWeightTwo - 0.01);
 					});
 				});
 
@@ -361,10 +362,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.be.approximately(oldBelowSiblingWeight + oldAboveSiblingWeight, 0.00001);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.be.approximately(oldBelowSiblingWeight + oldAboveSiblingWeight, 0.00001);
 						expect(u.labelData[0].subLabelData[1].weight).to.equal(0)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.equal(0);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.equal(0);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.equal(0);
 					});
 				});
 			});
@@ -387,10 +388,10 @@ describe('ResizeWeightsInteraction', () => {
 
 						u = rendererDataUtility.produceLabelData(u);
 
-						expect(weightMap.getObjectiveWeight(belowSibling.objective.getName())).to.equal(oldBelowSiblingWeight - 0.02);
+						expect(weightMap.getObjectiveWeight(belowSibling.objective.getId())).to.equal(oldBelowSiblingWeight - 0.02);
 						expect(u.labelData[0].subLabelData[1].weight).to.be.approximately(oldAboveSiblingWeight + 0.02, 0.00001)
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getName())).to.be.approximately(oldChildWeightOne + 0.01, 0.00001);
-						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getName())).to.be.approximately(oldChildWeightTwo + 0.01, 0.00001);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[0].objective.getId())).to.be.approximately(oldChildWeightOne + 0.01, 0.00001);
+						expect(weightMap.getObjectiveWeight(u.labelData[0].subLabelData[1].subLabelData[1].objective.getId())).to.be.approximately(oldChildWeightTwo + 0.01, 0.00001);
 					});
 				});
 			});

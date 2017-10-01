@@ -5,9 +5,9 @@
 * @Last Modified time: 2017-05-03 15:10:54
 */
 
-import { AbstractObjective } 	from '../../../../client/resources/model/AbstractObjective';
-import { PrimitiveObjective } 	from '../../../../client/resources/model/PrimitiveObjective';
-import { Objective } 			from '../../../../client/resources/model/Objective';
+import { AbstractObjective } 	from '../../../../client/src/model';
+import { PrimitiveObjective } 	from '../../../../client/src/model';
+import { Objective } 			from '../../../../client/src/model';
 
 import { expect }				from 'chai';
 

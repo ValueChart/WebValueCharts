@@ -11,18 +11,18 @@ import * as _											from 'lodash';
 
 
 // Import Model Classes:
-import { ValueChart }									from '../../client/resources/model/ValueChart';
-import { Objective }									from '../../client/resources/model/Objective';
-import { User }											from '../../client/resources/model/User';
-import { WeightMap }									from '../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../client/src/model';
+import { Objective }									from '../../client/src/model';
+import { User }											from '../../client/src/model';
+import { WeightMap }									from '../../client/src/model';
+import { PrimitiveObjective }							from '../../client/src/model';
+import { AbstractObjective }							from '../../client/src/model';
 
 
 
 export var randomizeUserWeights = (user: User, valueChart: ValueChart): User => {
 	valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
-		user.getWeightMap().setObjectiveWeight(objective.getName(), _.round(_.random(true), 3));
+		user.getWeightMap().setObjectiveWeight(objective.getId(), _.round(_.random(true), 3));
 	});
 
 	user.getWeightMap().normalize();
@@ -31,7 +31,7 @@ export var randomizeUserWeights = (user: User, valueChart: ValueChart): User => 
 };
 
 export var randomizeUserScoreFunction = (user: User, objective: PrimitiveObjective): User => {
-	let	scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName());
+	let	scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
 	let elements = scoreFunction.getAllElements();
 
 	elements.forEach((element) => {

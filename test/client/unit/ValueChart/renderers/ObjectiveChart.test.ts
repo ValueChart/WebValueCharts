@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 12:44:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:30:39
+* @Last Modified time: 2017-08-16 14:44:54
 */
 
 // Import Testing Resources:
@@ -23,31 +23,31 @@ import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from 
 
 
 // Import Application Classes:
-import { ObjectiveChartRenderer }						from '../../../../../client/resources/modules/ValueChart/renderers/ObjectiveChart.renderer';
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { RenderEventsService }							from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
+import { ObjectiveChartRenderer }						from '../../../../../client/src/ValueChartVis';
+import { RendererConfigUtility }						from '../../../../../client/src/ValueChartVis';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { RenderEventsService }							from '../../../../../client/src/ValueChartVis';
+import { SortAlternativesInteraction }					from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { ObjectiveChartDefinitions }					from '../../../../../client/resources/modules/ValueChart/definitions/ObjectiveChart.definitions';
+import { ObjectiveChartDefinitions }					from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
+import { ValueChart, ChartType }						from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { RowData, UserScoreData }						from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 
@@ -85,7 +85,7 @@ var renderEventsServiceStub = {
 	var objectiveChartRenderer: ObjectiveChartRenderer;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 	var aaron: User;
@@ -93,11 +93,14 @@ var renderEventsServiceStub = {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		TestBed.resetTestingModule();
+
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -251,7 +254,7 @@ var renderEventsServiceStub = {
 					objectiveChartRenderer.weightOutlines.nodes().forEach((weightOutline: Element) => {
 						let selection = d3.select(weightOutline);
 						let datum = (<UserScoreData> selection.datum());
-						let weight = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+						let weight = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getId());
 
 						let height: number = u.rendererConfig.dimensionTwoScale(weight);
 
@@ -454,8 +457,8 @@ var renderEventsServiceStub = {
 				(<any> cell.querySelectorAll('.' + ObjectiveChartDefinitions.USER_SCORE)).forEach((userScore: SVGElement) => {
 					let selection = d3.select(userScore);
 					let datum: UserScoreData = <any> selection.datum();
-					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getName()).getScore(datum.value);
-					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getName());
+					let score: number = datum.user.getScoreFunctionMap().getObjectiveScoreFunction(datum.objective.getId()).getScore(datum.value);
+					let weight: number = datum.user.getWeightMap().getObjectiveWeight(datum.objective.getId());
 
 					if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
 						expect(selection.attr('height')).to.equal(u.rendererConfig.dimensionTwoScale(score * weight).toString());

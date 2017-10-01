@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-02 10:49:47
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 17:18:29
+* @Last Modified time: 2017-08-16 14:21:33
 */
 
 // Import Libraries and Express Middleware:
@@ -10,13 +10,61 @@ import * as express 								from 'express';
 import * as path 									from 'path';
 import * as MongoDB 								from 'mongodb';
 import * as Monk 									from 'monk';
+import * as _ 										from 'lodash';
 
 // Import Application Classes:
 import { HostEventEmitter, hostEventEmitter }		from '../utilities/HostEventEmitters';
 import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
 
+import { ValueChartStatus }							from '../../client/src/types';
 
 export var valueChartUsersRoutes: express.Router = express.Router();
+
+// Replace the ValueChart's users with the given list of users.
+valueChartUsersRoutes.put('/', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var valueChartCollection: Monk.Collection = (<any> req).db.get('ValueCharts');
+	var identifier: string = (<any> req).identifier
+	var username: string = req.params.username;
+
+	// Locate the ValueChart that the desired user belongs to.
+	valueChartCollection.findOne({ _id: identifier }, function (err: Error, doc: any) {
+		if (err) {
+			res.status(400)
+				.json({ data: err });
+		} else if (doc) {
+
+			let deletedUsers = _.differenceBy(doc.users, req.body, 'username');
+			let newUsers = _.differenceBy(req.body, doc.users, 'username');
+
+			deletedUsers.forEach((user: any) => {
+				// Notify any clients hosting this ValueChart that a user has been added.
+				hostEventEmitter.emit(HostEventEmitter.USER_REMOVED_EVENT + '-' + identifier, user.username);
+			});
+
+			newUsers.forEach((user: any) => {
+				// Notify any clients hosting this ValueChart  a user has been added.
+				hostEventEmitter.emit(HostEventEmitter.USER_ADDED_EVENT + '-' + identifier, user);
+			});
+
+			// Update the user list with the request body.
+			doc.users = req.body;
+
+			// Update the ValueChart resource in the database.
+			valueChartCollection.update({ _id: identifier }, (doc), [], function(err: Error, savedDoc: any) {
+				if (err) {
+					res.status(400)
+						.json({ data: err });
+				} else {
+					res.location('/ValueCharts/' + identifier + '/users' + req.body.username)
+						.status(201)
+						.json({ data: req.body });
+				}
+			});
+		} else {
+			res.sendStatus(404);	// The ValueChart the user is supposed to belong to does not exist. Return status 404: Not Found.
+		}
+	});
+});
 
 // Retrieve a specific user from a ValueChart's list of users using their username as the identifier. 
 valueChartUsersRoutes.get('/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -59,14 +107,14 @@ valueChartUsersRoutes.all('*', function(req: express.Request, res: express.Respo
 	var identifier: string = (<any> req).identifier
 
 	var statusCollection: Monk.Collection = (<any> req).db.get('ValueChartStatuses');
-	statusCollection.findOne({ chartId: identifier }, (err: Error, doc: any) => {
+	statusCollection.findOne({ chartId: identifier }, (err: Error, doc: ValueChartStatus) => {
 		// If the host connection is active, and user changes are not being accepted.
-		if (doc && !doc.userChangesPermitted) {
+		if (doc && doc.lockedByCreator) {
 			res.status(403)
 				.send('User changes are disabled by the chart owner.');
 		} 
 		// If the host connection is active, but the chart is incomplete/invalid.
-		else if (doc && doc.incomplete) {
+		else if (doc && doc.lockedBySystem) {
 			res.status(403)
 				.send('User changes rejected. The chart is not valid.');
 		}

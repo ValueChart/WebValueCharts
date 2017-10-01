@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-06-02 17:39:11
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:27:12
+* @Last Modified time: 2017-08-16 14:44:57
 */
 
 // Import Testing Resources:
@@ -21,29 +21,29 @@ import * as _											from 'lodash';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
-import { ReorderObjectivesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
+import { ReorderObjectivesInteraction }					from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions }								from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { Alternative }									from '../../../../../client/resources/model/Alternative';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
-import { AlternativesRecord }							from '../../../../../client/resources/types/Record.types';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { Alternative }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
+import { AlternativesRecord }							from '../../../../../client/src/types';
 
 // Import Types
-import { ViewConfig }									from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { LabelData }									from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ViewConfig }									from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { LabelData }									from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 describe('ReorderObjectivesInteraction', () => {
@@ -53,7 +53,7 @@ describe('ReorderObjectivesInteraction', () => {
 	var reorderObjectivesInteraction: ReorderObjectivesInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var viewConfig: ViewConfig;
 	var u: RendererUpdate;
 
@@ -69,11 +69,12 @@ describe('ReorderObjectivesInteraction', () => {
 		reorderObjectivesInteraction = TestBed.get(ReorderObjectivesInteraction);
 
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    		scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,

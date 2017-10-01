@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-23 14:55:18
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:31:34
+* @Last Modified time: 2017-08-16 14:44:54
 */
 
 // Import Testing Resources:
@@ -23,41 +23,41 @@ import { HotelChartData }								from '../../../../testData/HotelChartData';
 import { randomizeUserWeights, randomizeAllUserScoreFunctions, rgbaToHex }	from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { LabelRenderer }								from '../../../../../client/resources/modules/ValueChart/renderers/Label.renderer';
-import { ScoreFunctionRenderer }						from '../../../../../client/resources/modules/ValueChart/renderers/ScoreFunction.renderer';
+import { LabelRenderer }								from '../../../../../client/src/ValueChartVis';
+import { ScoreFunctionRenderer }						from '../../../../../client/src/ValueChartVis';
 
-import { RendererConfigUtility }						from '../../../../../client/resources/modules/ValueChart/utilities/RendererConfig.utility';
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { RendererService }								from '../../../../../client/resources/modules/ValueChart/services/Renderer.service';
-import { RenderEventsService }							from '../../../../../client/resources/modules/ValueChart/services/RenderEvents.service';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { RendererConfigUtility }						from '../../../../../client/src/ValueChartVis';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { RendererService }								from '../../../../../client/src/ValueChartVis';
+import { RenderEventsService }							from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
 
-import { SortAlternativesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/SortAlternatives.interaction';
-import { ResizeWeightsInteraction }						from '../../../../../client/resources/modules/ValueChart/interactions/ResizeWeights.interaction';
-import { SetObjectiveColorsInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/SetObjectiveColors.interaction';
-import { ReorderObjectivesInteraction }					from '../../../../../client/resources/modules/ValueChart/interactions/ReorderObjectives.interaction';
-import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
+import { SortAlternativesInteraction }					from '../../../../../client/src/ValueChartVis';
+import { ResizeWeightsInteraction }						from '../../../../../client/src/ValueChartVis';
+import { SetObjectiveColorsInteraction }				from '../../../../../client/src/ValueChartVis';
+import { ReorderObjectivesInteraction }					from '../../../../../client/src/ValueChartVis';
+import { ExpandScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Definitions Classes:
-import { LabelDefinitions }								from '../../../../../client/resources/modules/ValueChart/definitions/Label.definitions';
+import { LabelDefinitions }								from '../../../../../client/src/ValueChartVis';
 
 // Import Model Classes
-import { ValueChart, ChartType }						from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart, ChartType }						from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { LabelData }									from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { LabelData }									from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 
@@ -133,7 +133,7 @@ var chartUndoRedoStub = {
 	var labelRenderer: LabelRenderer;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
 	var aaron: User;
@@ -141,11 +141,12 @@ var chartUndoRedoStub = {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -167,6 +168,7 @@ var chartUndoRedoStub = {
 		height = 100;
 		width = 100;
 
+		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			providers: [ 
 				RendererService, 
@@ -552,7 +554,7 @@ var chartUndoRedoStub = {
 
 				checkRenderedLabels(u, selection, objectives[i].getId(), (<AbstractObjective> objectives[i]).getDirectSubObjectives(), dimension); 
 			} else {
-				let weight = u.maximumWeightMap.getObjectiveWeight(objectives[i].getName());
+				let weight = u.maximumWeightMap.getObjectiveWeight(objectives[i].getId());
 				expect(+outline.attr(dimension)).to.equal(Math.max(u.rendererConfig.dimensionTwoScale(weight) - 2, 0));
 			}
 		});
@@ -566,7 +568,7 @@ var chartUndoRedoStub = {
 		scoreFunctionsOutlines.nodes().forEach((outline: SVGElement) => {
 			let selection = d3.select(outline);
 			let objective: PrimitiveObjective = <any> selection.datum();
-			let weight = u.maximumWeightMap.getObjectiveWeight(objective.getName());
+			let weight = u.maximumWeightMap.getObjectiveWeight(objective.getId());
 			if (expectEqual)
 				expect(+selection.attr(dimension)).to.equal(u.rendererConfig.dimensionTwoScale(weight));	
 			else 

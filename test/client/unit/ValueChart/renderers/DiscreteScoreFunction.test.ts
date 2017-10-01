@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:06:35
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 12:32:48
+* @Last Modified time: 2017-08-16 14:44:55
 */
 
 // Import Testing Resources:
@@ -23,27 +23,27 @@ import { randomizeUserScoreFunction, rgbaToHex }		from '../../../../utilities/Te
 
 
 // Import Application Classes:
-import { DiscreteScoreFunctionRenderer }				from '../../../../../client/resources/modules/ValueChart/renderers/DiscreteScoreFunction.renderer';
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { DiscreteScoreFunctionRenderer }				from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
 
-import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
+import { AdjustScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ScoreFunctionUpdate }							from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 @Component({
@@ -75,7 +75,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number;
 	var u: ScoreFunctionUpdate;
 	var aaron: User;
@@ -85,13 +85,14 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 	before(function() {
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		height = 100;
 		width = 100;
 
+		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			providers: [ 
 				RendererScoreFunctionUtility,
@@ -120,7 +121,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		aaron = hotelChart.getUsers()[0];
 		aaron.color = "#0000FF";
 
-		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 
 
 		u = {
@@ -130,7 +131,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 			height: height,
 			width: width,
 			rendererConfig: null,
-			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())],
+			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())],
 			objective: objective,
 			colors: [aaron.color],
 			heightScale: null,
@@ -189,7 +190,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 				it('should color the score function plot elements to indicate the objective it is for', () => {
 					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('stroke'))).to.equal(_.toLower(u.objective.getColor()));
-					expect(rgbaToHex(scoreFunctionRenderer.barTops.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
+					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
 				});
 			});
 
@@ -204,7 +205,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 					hotelChart.setUser(bob);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					u.colors = [aaron.color, bob.color];
 					u.individual = false;
 
@@ -231,7 +232,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 						let selection = d3.select(userContainer);
 
 						expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('stroke'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
-						expect(rgbaToHex(selection.selectAll('.' + defs.BAR_TOP).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
+						expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
 					});
 
 				});
@@ -252,7 +253,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 							let selection = d3.select(userContainer);
 
 							expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('stroke'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
-							expect(rgbaToHex(selection.selectAll('.' + defs.BAR_TOP).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
+							expect(rgbaToHex(selection.selectAll('.' + defs.BAR).style('fill'))).to.equal(_.toLower(hotelChart.getUsers()[i].color));
 						});
 					});	
 				});	
@@ -263,7 +264,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				before(function() {
 					bob = randomizeUserScoreFunction(bob, u.objective);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	
@@ -278,7 +279,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 			context('when the number of users is reduced to be one again', () => {
 				before(function() {
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 					u.colors = [aaron.color];
 					u.individual = true;
 
@@ -294,7 +295,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 
 				it('should color the score function plot elements to indicate the objective it is for', () => {
 					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('stroke'))).to.equal(_.toLower(u.objective.getColor()));
-					expect(rgbaToHex(scoreFunctionRenderer.barTops.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
+					expect(rgbaToHex(scoreFunctionRenderer.utilityBars.style('fill'))).to.equal(_.toLower(u.objective.getColor()))
 				});
 			});
 
@@ -325,7 +326,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		context('when the view orientation is set to be horizontal', () => {
 
 			before(function() {
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color];
 
 				u.viewOrientation = ChartOrientation.Horizontal;
@@ -404,7 +405,7 @@ describe('DiscreteScoreFunctionRenderer', () => {
 		scoreFunctionRenderer.userContainers.nodes().forEach((userContainer: SVGAElement, i: number) => {
 			let bars = d3.select(userContainer).selectAll('.' + defs.BAR).nodes();
 			let barTops = d3.select(userContainer).selectAll('.' + defs.BAR_TOP).nodes();
-			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()).getAllElements().length;
+			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()).getAllElements().length;
 			expect(bars).to.have.length(numberOfDomainElements);
 			expect(barTops).to.have.length(numberOfDomainElements);
 
@@ -425,12 +426,11 @@ describe('DiscreteScoreFunctionRenderer', () => {
 				let barSelection = d3.select(bar);
 				let score = u.scoreFunctions[i].getScore(elements[j]);
 
-				expect(+barSelection.attr(dimension)).to.equal(Math.max(u.heightScale(score), u.rendererConfig.labelOffset));
+				expect(+barSelection.attr(dimension)).to.equal(Math.max(u.heightScale(score), 2));
 
 				let barTopSelection = d3.select(barTops[j]);
 
 				expect(+barTopSelection.attr(dimension)).to.equal(u.rendererConfig.labelOffset);
-				expect(barTopSelection.attr(coordinate)).to.equal(barSelection.attr(coordinate));
 			});
 
 		});

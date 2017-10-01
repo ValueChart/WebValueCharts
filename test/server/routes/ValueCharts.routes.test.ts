@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-27 15:49:06
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 11:54:40
+* @Last Modified time: 2017-08-16 14:46:11
 */
 
 // Require Node Libraries:
@@ -10,14 +10,14 @@ import { expect } 								from 'chai';
 import * as request								from 'supertest';
 
 // Import Utility Classes:
-import { JsonValueChartParser }					from '../../../client/resources/modules/utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }					from '../../../client/src/app/utilities/JsonValueChart.parser';
 
 // Import Model Classes:
-import { ValueChart }							from '../../../client/resources/model/ValueChart';
-import { Alternative }							from '../../../client/resources/model/Alternative';
-import { User }									from '../../../client/resources/model/User';
-import { WeightMap }							from '../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap }						from '../../../client/resources/model/ScoreFunctionMap';
+import { ValueChart }							from '../../../client/src/model';
+import { Alternative }							from '../../../client/src/model';
+import { User }									from '../../../client/src/model';
+import { WeightMap }							from '../../../client/src/model';
+import { ScoreFunctionMap }						from '../../../client/src/model';
 
 
 // Import Test Data:
@@ -340,12 +340,12 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is false', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
+				.send({ chartId: chartId, lockedByCreator: true, lockedBySystem: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(201)
 				.expect((res: request.Response) => {
-					expect(res.body.data.userChangesPermitted).to.be.false;
+					expect(res.body.data.lockedByCreator).to.be.true;
 				}).end(function(err, res) {
 			        if (err) return done(err);
 			        done();
@@ -354,12 +354,12 @@ describe('ValueCharts Routes', () => {
 
 		it('should send a message to the client confirming the new status is true', (done: MochaDone) => {
 			user.put('ValueCharts/' + chartId + '/status')
-				.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+				.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 				.set('Accept', 'application/json')
 				.expect('Content-Type', /json/)
 				.expect(200)
 				.expect((res: request.Response) => {
-					expect(res.body.data.userChangesPermitted).to.be.true;
+					expect(res.body.data.lockedByCreator).to.be.false;
 				}).end(function(err, res) {
 			        if (err) return done(err);
 			        done();
@@ -391,6 +391,44 @@ describe('ValueCharts Routes', () => {
 
 							expect(valueChartResponse).to.not.be.undefined;
 							expect(valueChartResponse.username).to.equal('Argile');
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+		});
+
+		describe('Method: Put', () => {
+			
+			it('should replace the ValueChart\'s user list and return the new user list with status code 201', (done: MochaDone) => {
+				user.put('ValueCharts/' + chartId + '/users/').send([])
+					.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+					    .expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
+
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse.length).to.equal(0);
+
+						}).end(function(err, res) {
+					        if (err) return done(err);
+					        done();
+					    });
+			});
+
+			it('should replace the ValueChart\'s user list and return the new user list with status code 201', (done: MochaDone) => {
+				user.put('ValueCharts/' + chartId + '/users/').send([argileJson])
+					.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+						.expect(201)
+					    .expect((res: request.Response) => {
+							var valueChartResponse = res.body.data;
+
+							expect(valueChartResponse).to.not.be.undefined;
+							expect(valueChartResponse.length).to.equal(1);
+							expect(valueChartResponse[0].username).to.equal('Argile');
 
 						}).end(function(err, res) {
 					        if (err) return done(err);
@@ -495,7 +533,7 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
-		context('attempting to add/remove/change users when userChangesPermitted is false', () => {
+		context('attempting to add/remove/change users when lockedByCreator is true', () => {
 			var argile: User;
 			var argileJson: any;
 
@@ -507,7 +545,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: false, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: true, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -554,7 +592,7 @@ describe('ValueCharts Routes', () => {
 
 			after(function(done: MochaDone) {
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -563,7 +601,7 @@ describe('ValueCharts Routes', () => {
 			});
 		});
 
-		context('attempting to add/remove/change users when incomplete is true', () => {
+		context('attempting to add/remove/change users when lockedBySystem is true', () => {
 			var argile: User;
 			var argileJson: any;
 
@@ -575,7 +613,7 @@ describe('ValueCharts Routes', () => {
 				argileJson = JSON.parse(JSON.stringify(argile));
 
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: true })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: true })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);
@@ -622,7 +660,7 @@ describe('ValueCharts Routes', () => {
 
 			after(function(done: MochaDone) {
 				user.put('ValueCharts/' + chartId + '/status')
-					.send({ chartId: chartId, userChangesPermitted: true, incomplete: false })
+					.send({ chartId: chartId, lockedByCreator: false, lockedBySystem: false })
 					.set('Accept', 'application/json')
 					.end(function(err, res) {
 				        if (err) return done(err);

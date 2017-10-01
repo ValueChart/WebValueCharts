@@ -1,0 +1,44 @@
+<h4>Add Alternatives</h4>
+<input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteAlternatives()" />
+<input class="btn btn-default btn-lg pull-right" type="button" value="Add Alternative" (click)="addEmptyAlternative()" />
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
+        <th><div class="alternatives-table-name-column">Name</div></th>
+        <th><div class="alternatives-table-description-column">Description</div></th>
+        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()"><div class="alternatives-table-outcome-column">{{getColumnHeader(obj)}}</div></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let altID of altKeys()">
+        <th>
+            <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
+        </th>
+        <th>
+            <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value); resetErrorMessages()"/>
+        </th>
+        <th>
+            <input class="form-control" type="text" #d [ngModel]="alternatives[altID].getDescription()" (ngModelChange)="alternatives[altID].setDescription(d.value)"/>
+        </th>
+        <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()">
+            <div *ngIf="obj.getDomain().type === 'categorical' || obj.getDomain().type === 'interval'">
+                <select class="form-control" #t [ngModel]="alternatives[altID].getObjectiveValue(obj.getId())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getId(), t.value); resetErrorMessages()">
+                    <option *ngFor="let opt of obj.getDomain().getElements()" [value]="opt">{{opt}}</option>
+                </select>
+            </div>
+            <div *ngIf="obj.getDomain().type === 'continuous'">
+                <input class="form-control" type="text" pattern= "[0-9]" #m [ngModel]="alternatives[altID].getObjectiveValue(obj.getId())" (ngModelChange)="alternatives[altID].setObjectiveValue(obj.getId(),toNumber(m.value)); resetErrorMessages()"/>
+            </div>   
+        </th>
+      </tr>
+    </tbody>
+</table>
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
+</div>

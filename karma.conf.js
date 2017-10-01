@@ -72,7 +72,7 @@ module.exports = function(config) {
       { pattern: testingBase + '**/*.js', included: false, watched: false },
       { pattern: 'test/testData/**.js', included: false, watched: false },
       { pattern: 'test/utilities/**.js', included: false, watched: false },
-      'client/resources/styles/main.css',
+      'client/styles/main.css',
 
       // Asset (HTML & CSS) paths loaded via Angular's component compiler
       // (these paths need to be rewritten, see proxies section)

@@ -1,0 +1,20 @@
+<div>
+	<div class="score-function-title flex-row">
+		<h3>Score Function for: {{objectiveToDisplay.getName()}}</h3>
+	</div>
+	<ScoreFunction 
+		[scoreFunctions]="scoreFunctions"
+        [colors]="colors"
+        [objective]="objectiveToDisplay"
+        [width]="375"
+        [height]="300"
+        [viewOrientation]="ChartOrientation.Vertical"
+        [services]="services"
+        [individual]="individual"
+        [enableInteraction]="enableInteraction">
+		<svg class="svg-content-valuechart score-function-viewer" viewBox="0 -10, 375, 310" preserveAspectRatio="xMinYMin meet">
+			<g class="expanded-score-function"></g>
+			<g class="score-distribution-plot"></g>
+		</svg>
+	</ScoreFunction>  
+</div>

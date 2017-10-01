@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-18 10:21:27
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:25:48
+* @Last Modified time: 2017-08-16 14:44:53
 */
 
 // Import Testing Resources:
@@ -16,22 +16,22 @@ import { expect }							from 'chai';
 import { HotelChartData }					from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { ChangeDetectionService }			from '../../../../../client/resources/modules/ValueChart/services/ChangeDetection.service';
-import { WebValueChartsParser }				from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { ChangeDetectionService }			from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }				from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }						from '../../../../../client/resources/model/ValueChart';
-import { User }								from '../../../../../client/resources/model/User';
-import { AbstractObjective }				from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }						from '../../../../../client/src/model';
+import { User }								from '../../../../../client/src/model';
+import { AbstractObjective }				from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }	from '../../../../../client/resources/types/Config.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }	from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 describe('ChangeDetectionService', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var changeDetectionService: ChangeDetectionService;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var usersToDisplay: User[];
@@ -43,13 +43,14 @@ describe('ChangeDetectionService', () => {
 
 		changeDetectionService = TestBed.get(ChangeDetectionService);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		usersToDisplay = hotelChart.getUsers();
 
 		viewConfig = {
+    		scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -157,7 +158,7 @@ describe('ChangeDetectionService', () => {
 			var bill = new User('Bill');
 			hotelChart.setUser(bill);
 
-			var area = hotelChart.getAllPrimitiveObjectives()[0].getName();
+			var area = hotelChart.getAllPrimitiveObjectives()[0].getId();
 			expect(hotelChart.getUsers()[0].getWeightMap().getObjectiveWeight(area)).to.equal(0.2);
 			hotelChart.getUsers()[0].getWeightMap().setObjectiveWeight(area, 0.3);
 			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
@@ -184,9 +185,9 @@ describe('ChangeDetectionService', () => {
 	describe('detectWidthHeightChanges(width: number, height: number): boolean', () => {
 		it('should detect that the height/width are different when they are modified from the recorded values', () => {
 			height = 20;
-			expect(changeDetectionService.detectWidthHeightChanges(width, height)).to.be.true;
+			expect(changeDetectionService.detectWidthHeightChanges(width, height, viewConfig)).to.be.true;
 			width = 45;
-			expect(changeDetectionService.detectWidthHeightChanges(width, height)).to.be.true;
+			expect(changeDetectionService.detectWidthHeightChanges(width, height, viewConfig)).to.be.true;
 		});
 
 		it('should create an updated record of the width and height after detecting changes', () => {
@@ -196,7 +197,7 @@ describe('ChangeDetectionService', () => {
 			expect(changeDetectionService.widthRecord).to.not.equal(width);
 			expect(changeDetectionService.heightRecord).to.not.equal(height);
 
-			expect(changeDetectionService.detectWidthHeightChanges(width, height)).to.be.true;
+			expect(changeDetectionService.detectWidthHeightChanges(width, height, viewConfig)).to.be.true;
 
 			expect(changeDetectionService.widthRecord).to.equal(width);
 			expect(changeDetectionService.heightRecord).to.equal(height);
@@ -204,7 +205,7 @@ describe('ChangeDetectionService', () => {
 
 		it('should not detect changes to the height and width when they are the same as the recorded values', () => {
 			width = 10;
-			expect(changeDetectionService.detectWidthHeightChanges(width, height)).to.be.false;
+			expect(changeDetectionService.detectWidthHeightChanges(width, height, viewConfig)).to.be.false;
 		});
 	});
 

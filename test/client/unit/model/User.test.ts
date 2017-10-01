@@ -6,9 +6,9 @@
 */
 
 
-import { User } 				from '../../../../client/resources/model/User';
-import { WeightMap } 			from '../../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap } 	from '../../../../client/resources/model/ScoreFunctionMap';
+import { User } 				from '../../../../client/src/model';
+import { WeightMap } 			from '../../../../client/src/model';
+import { ScoreFunctionMap } 	from '../../../../client/src/model';
 
 // import { expect }				from 'chai';
 

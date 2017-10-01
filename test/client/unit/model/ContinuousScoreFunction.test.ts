@@ -5,7 +5,7 @@
 * @Last Modified time: 2017-05-03 15:10:52
 */
 
-import { ContinuousScoreFunction } 		from '../../../../client/resources/model/ContinuousScoreFunction';
+import { ContinuousScoreFunction } 		from '../../../../client/src/model';
 
 
 import { expect }						from 'chai';

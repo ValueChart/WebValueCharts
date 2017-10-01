@@ -1,0 +1,73 @@
+<div class="form-group valuechart-toolbar-group pull-right">
+				<div class="dropdown"  id="viewoptions-menu">
+					<button class="btn btn-default dropdown-toggle" type="button" id="viewoptions-dropdown" data-toggle="dropdown"
+					aria-haspopup="true" aria-expanded="true">
+					View Options
+					<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="viewoptions-dropdown">
+						<li class="dropdown dropdown-submenu">
+							<a href="javascript:void(0)" id="orientation-dropdown" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="true">
+								Chart Orientation
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="orientation-dropdown">
+								<li [class.disabled]="config.viewOrientation === ChartOrientation.Vertical">
+									<a href="javascript:void(0)" (click)="setOrientation(ChartOrientation.Vertical)">
+										Vertical
+										<span *ngIf="config.viewOrientation === ChartOrientation.Vertical" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+								<li [class.disabled]="config.viewOrientation === ChartOrientation.Horizontal">
+									<a href="javascript:void(0)" (click)="setOrientation(ChartOrientation.Horizontal)">
+										Horizontal
+										<span *ngIf="config.viewOrientation === ChartOrientation.Horizontal" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setScaleAlternatives(!config.scaleAlternatives)">
+								Scale Alternatives
+								<span *ngIf="config.scaleAlternatives" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setDisplayScoreFunctions(!config.displayScoreFunctions)">
+								Score Functions
+								<span *ngIf="config.displayScoreFunctions" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setDisplayDomainValues(!config.displayDomainValues)">
+								Domain Values
+								<span *ngIf="config.displayDomainValues" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setDisplayScales(!config.displayScales)">
+								Utility Scale
+								<span *ngIf="config.displayScales" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setDisplayTotalScores(!config.displayTotalScores)">
+								Total Scores
+								<span *ngIf="config.displayTotalScores" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li *ngIf="chartType === ChartType.Group">
+							<a href="javascript:void(0)" (click)="setDisplayAverageScoreLines(!config.displayAverageScoreLines)">
+								Score Averages
+								<span *ngIf="config.displayAverageScoreLines" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" (click)="setDisplayScoreFunctionValueLabels(!config.displayScoreFunctionValueLabels)">
+								Score Labels
+								<span *ngIf="config.displayScoreFunctionValueLabels" class="glyphicon glyphicon-ok pull-right" aria-hidden="true"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>

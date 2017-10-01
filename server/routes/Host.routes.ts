@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-08-22 21:25:20
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-23 17:18:00
+* @Last Modified time: 2017-08-16 12:15:29
 */
 
 // Import Libraries and Middleware:
@@ -12,7 +12,7 @@ var timers = require('timers');
 // Import Utilities:
 import { HostEventEmitter, hostEventEmitter } 		from '../utilities/HostEventEmitters';
 import { HostConnectionStatus, hostConnections }	from '../utilities/HostConnections';
-import { HostMessage, MessageType}					from '../../client/resources/types/HostMessage';
+import { HostMessage, MessageType}					from '../../client/src/types';
 
 
 /*
@@ -94,7 +94,7 @@ var initEventListeners = (chartId: string, ws: any): any[] => {
 	};
 
 	var structureChangedListener = (valueChart: any) => {
-		console.log('User changed event detected');
+		console.log('Structure changed event detected');
 		ws.send(JSON.stringify({ type: MessageType.StructureChanged, data: valueChart, chartId: chartId }));
 	}
 

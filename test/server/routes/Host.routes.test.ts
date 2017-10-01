@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-07-30 13:47:40
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-06-09 16:26:16
+* @Last Modified time: 2017-08-16 14:46:11
 */
 
 // Require Node Libraries:
@@ -13,17 +13,17 @@ import { expect } 								from 'chai';
 import * as request								from 'supertest';
 
 // Import Utility Classes:
-import { JsonValueChartParser }					from '../../../client/resources/modules/utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }					from '../../../client/src/app/utilities/JsonValueChart.parser';
 
 // Import Model Classes:
-import { ValueChart }							from '../../../client/resources/model/ValueChart';
-import { Alternative }							from '../../../client/resources/model/Alternative';
-import { User }									from '../../../client/resources/model/User';
-import { WeightMap }							from '../../../client/resources/model/WeightMap';
-import { ScoreFunctionMap }						from '../../../client/resources/model/ScoreFunctionMap';
+import { ValueChart }							from '../../../client/src/model';
+import { Alternative }							from '../../../client/src/model';
+import { User }									from '../../../client/src/model';
+import { WeightMap }							from '../../../client/src/model';
+import { ScoreFunctionMap }						from '../../../client/src/model';
 
 // Import Types:
-import { HostMessage,  MessageType}				from '../../../client/resources/types/HostMessage';
+import { HostMessage,  MessageType}				from '../../../client/src/types';
 
 // Import Test Data:
 import { JsonGroupHotel }						from '../../testData/ValueChartsData';

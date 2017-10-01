@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-02 09:48:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-07 17:14:19
+* @Last Modified time: 2017-08-31 17:49:49
 */
 
 // Import gulp packages:
@@ -21,6 +21,7 @@ var	merge = 		require("merge2"),
 	del = 			require("del"),
 	emitStream = 	require("emit-stream"),
 	Server = 		require("karma").Server;
+	rename = 		require("gulp-rename");
 
 // Retrieve the protractor and webdriver objects from gulp-
 var webdriver_standalone = pt.webdriver_standalone;
@@ -104,9 +105,13 @@ serverTests = function() {
 // runTests is a wrapper that starts up a local server before executing
 // the passed-in function and then shuts the server down afterwards.
 runTests = function(tests) {
+	gulp.src('./server/db.address.js').pipe(rename('db.prod.js')).pipe(gulp.dest('./server'));
+	gulp.src('./server/db.test.js').pipe(rename('db.address.js')).pipe(gulp.dest('./server'));
+
 	var serverStream = startServer();
 
 	return tests().once('end', () => {
+
 		console.log('Shutting down local server.');
 		serverStream.emit('quit');			
 		process.exit();

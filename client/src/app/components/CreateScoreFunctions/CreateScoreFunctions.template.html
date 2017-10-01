@@ -1,0 +1,53 @@
+<h4>Define Score Functions</h4>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-4">
+            <div id="score-function-controls">
+                <label class="control-label">Select Objective:</label>
+                <div class="input-group">
+                    <select class="form-control score-function-dropdown" [(ngModel)]="selectedObjective">
+                        <option *ngFor="let obj of valueChartService.getValueChart().getMutableObjectives()" [value]="obj.getName()">{{obj.getName()}}</option>
+                    </select>
+                    <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
+                        Next
+                    </button>
+                </div>
+                <label class="control-label">Select Predefined:</label>
+                <div class="input-group">
+                    <select class="form-control score-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
+                        <option value="default">Default</option>
+                        <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
+                        <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>
+                    </select>
+                    <button type="button" class="btn btn-default" [disabled]="!latestDefaults[selectedObjective]" (click)="resetScoreFunction()">Reset</button>
+                </div>
+            </div>
+            <div id="objective-description">{{getObjectiveByName(selectedObjective).getDescription()}}</div>
+        </div> 
+        <div class="col-xs-offset-3">
+            <ScoreFunction 
+                [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(getObjectiveByName(selectedObjective).getId())]"
+                [colors]="[user.color]"
+                [objective]="getObjectiveByName(selectedObjective)"
+                [width]="440"
+                [height]="300"
+                [viewOrientation]="ChartOrientation.Vertical"
+                [services]="services"
+                [individual]="true"
+                [enableInteraction]="true">
+                <svg class="svg-content-createvaluechart" viewBox="0 0, 440, 300" preserveAspectRatio="xMinYMin meet">
+                    <g class="expanded-score-function"></g>
+                </svg>
+            </ScoreFunction>  
+        </div> 
+    </div>
+</div>
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
+</div>

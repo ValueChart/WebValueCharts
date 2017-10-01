@@ -1,0 +1,41 @@
+<h4>Set Priorities</h4>
+<label class="control-label">{{getPrioritiesText()}}</label>
+<input class="btn btn-default btn-lg pull-right" type="button" value="Reset Ranks" (click)="resetRanks(); resetErrorMessages()" />
+<table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>Objective</th>
+        <th>Worst Outcome</th>
+        <th>Best Outcome</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let obj of getUnrankedObjectives()" class="clickable-row" (click)="rankObjective(obj, true); resetErrorMessages()">
+            <th>{{obj.getName()}}</th>
+            <th class="worst-outcome">{{getWorstOutcome(obj.getId()) + getUnitString(obj)}}</th>
+            <th class="best-outcome">{{getBestOutcome(obj.getId()) + getUnitString(obj)}}</th>
+        </tr>
+    </tbody>
+</table>
+<table class="table">
+    <thead>
+      <tr>
+        <th>Ranking</th>
+        <th>Objective</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let obj of rankedObjectives; let rank = index">
+            <th>{{rank + 1}}</th>
+            <th>{{obj.getName()}}</th>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Error Messages -->
+<div *ngIf="validationTriggered">
+    <div *ngFor="let message of errorMessages" 
+                 class="alert alert-danger">
+              {{message}}
+    </div>
+</div>

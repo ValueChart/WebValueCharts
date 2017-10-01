@@ -318,7 +318,9 @@ describe('Users Routes', () => {
 						.expect('Content-Type', /json/)
 						.expect(200)
 						.expect((res: request.Response) => {
+
 							var response = res.body.data;
+							console.log(response);
 							expect(response).to.not.be.undefined;
 							expect(response.length).not.equal(0);
 

@@ -6,7 +6,7 @@
 */
 
 
-import { ContinuousDomain } 	from "../../../../client/resources/model/ContinuousDomain";
+import { ContinuousDomain } 	from "../../../../client/src/model";
 
 import { expect }				from 'chai';
 

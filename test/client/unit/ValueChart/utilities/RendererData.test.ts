@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-19 15:13:45
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-08 16:32:37
+* @Last Modified time: 2017-08-16 14:44:52
 */
 
 // Import Testing Resources:
@@ -16,28 +16,28 @@ import { expect }										from 'chai';
 import { HotelChartData }								from '../../../../testData/HotelChartData';
 
 // Import Application Classes:
-import { RendererDataUtility }							from '../../../../../client/resources/modules/ValueChart/utilities/RendererData.utility';
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { RendererDataUtility }							from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { RendererUpdate }								from '../../../../../client/resources/types/RendererData.types';
-import { RowData, LabelData, CellData, UserScoreData }	from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { RendererUpdate }								from '../../../../../client/src/types';
+import { RowData, LabelData, CellData, UserScoreData }	from '../../../../../client/src/types';
+import { ChartOrientation, WeightResizeType, SortAlternativesType, PumpType }	from '../../../../../client/src/types';
 
 
 describe('RendererDataUtility', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var rendererDataUtility: RendererDataUtility;
 	var width: number, height: number, interactionConfig: InteractionConfig, viewConfig: ViewConfig;
 	var u: RendererUpdate;
@@ -51,11 +51,12 @@ describe('RendererDataUtility', () => {
 
 		rendererDataUtility = TestBed.get(RendererDataUtility);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
+    scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -100,19 +101,21 @@ describe('RendererDataUtility', () => {
 		bob = new User('Bob');
 		var bobsWeights = new WeightMap();
 
-		bobsWeights.setObjectiveWeight('area', 0.1);
-		bobsWeights.setObjectiveWeight('skytrain-distance', 0.1);
-		bobsWeights.setObjectiveWeight('size', 0.4);
-		bobsWeights.setObjectiveWeight('internet-access', 0.1);
-		bobsWeights.setObjectiveWeight('rate', 0.3);
+		var nameToIdMap = u.valueChart.getObjectiveNameToIdMap();
+
+		bobsWeights.setObjectiveWeight(nameToIdMap['area'], 0.1);
+		bobsWeights.setObjectiveWeight(nameToIdMap['skytrain-distance'], 0.1);
+		bobsWeights.setObjectiveWeight(nameToIdMap['size'], 0.4);
+		bobsWeights.setObjectiveWeight(nameToIdMap['internet-access'], 0.1);
+		bobsWeights.setObjectiveWeight(nameToIdMap['rate'], 0.3);
 
 		bob.setWeightMap(bobsWeights);
 
 		var bobsScoreFunctions = u.valueChart.getUsers()[0].getScoreFunctionMap();
-		bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('nightlife', 1);
-		bobsScoreFunctions.getObjectiveScoreFunction('area').setElementScore('airport', 0);
-		bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('none', 1);
-		bobsScoreFunctions.getObjectiveScoreFunction('internet-access').setElementScore('highspeed', 0);
+		bobsScoreFunctions.getObjectiveScoreFunction(nameToIdMap['area']).setElementScore('nightlife', 1);
+		bobsScoreFunctions.getObjectiveScoreFunction(nameToIdMap['area']).setElementScore('airport', 0);
+		bobsScoreFunctions.getObjectiveScoreFunction(nameToIdMap['internet-access']).setElementScore('none', 1);
+		bobsScoreFunctions.getObjectiveScoreFunction(nameToIdMap['internet-access']).setElementScore('highspeed', 0);
 
 		bob.setScoreFunctionMap(bobsScoreFunctions);
 	});
@@ -129,14 +132,14 @@ describe('RendererDataUtility', () => {
 			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the two users to that objective', () => {
 				u.valueChart.setUser(bob);
 				u.usersToDisplay = u.valueChart.getUsers();
-
 				var maximumWeightMap = rendererDataUtility['generateMaximumWeightMap'](u);
+				var nameToIdMap = u.valueChart.getObjectiveNameToIdMap();
 
-				expect(maximumWeightMap.getObjectiveWeight('area')).to.equal(0.2);
-				expect(maximumWeightMap.getObjectiveWeight('skytrain-distance')).to.equal(0.2);
-				expect(maximumWeightMap.getObjectiveWeight('size')).to.equal(0.4);
-				expect(maximumWeightMap.getObjectiveWeight('internet-access')).to.equal(0.1);
-				expect(maximumWeightMap.getObjectiveWeight('rate')).to.equal(0.3);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['area'])).to.equal(0.2);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['skytrain-distance'])).to.equal(0.2);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['size'])).to.equal(0.4);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['internet-access'])).to.equal(0.1);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['rate'])).to.equal(0.3);
 			});
 		});
 
@@ -146,15 +149,15 @@ describe('RendererDataUtility', () => {
 			it('should produce a WeightMap where each objective weight is the maximum of the weights assigned by the three users to that objective', () => {
 				u.valueChart.setUser(bob);
 				u.usersToDisplay = u.valueChart.getUsers();
-
 				max = new User('Max');
 				var maxsWeights = new WeightMap();
+				var nameToIdMap = u.valueChart.getObjectiveNameToIdMap();
 
-				maxsWeights.setObjectiveWeight('area', 0.8);
-				maxsWeights.setObjectiveWeight('skytrain-distance', 0.05);
-				maxsWeights.setObjectiveWeight('size', 0.05);
-				maxsWeights.setObjectiveWeight('internet-access', 0.05);
-				maxsWeights.setObjectiveWeight('rate', 0.05);
+				maxsWeights.setObjectiveWeight(nameToIdMap['area'], 0.8);
+				maxsWeights.setObjectiveWeight(nameToIdMap['skytrain-distance'], 0.05);
+				maxsWeights.setObjectiveWeight(nameToIdMap['size'], 0.05);
+				maxsWeights.setObjectiveWeight(nameToIdMap['internet-access'], 0.05);
+				maxsWeights.setObjectiveWeight(nameToIdMap['rate'], 0.05);
 
 				max.setWeightMap(maxsWeights);
 
@@ -163,11 +166,11 @@ describe('RendererDataUtility', () => {
 
 				var maximumWeightMap = rendererDataUtility['generateMaximumWeightMap'](u);
 
-				expect(maximumWeightMap.getObjectiveWeight('area')).to.equal(0.8);
-				expect(maximumWeightMap.getObjectiveWeight('skytrain-distance')).to.equal(0.2);
-				expect(maximumWeightMap.getObjectiveWeight('size')).to.equal(0.4);
-				expect(maximumWeightMap.getObjectiveWeight('internet-access')).to.equal(0.1);
-				expect(maximumWeightMap.getObjectiveWeight('rate')).to.equal(0.3);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['area'])).to.equal(0.8);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['skytrain-distance'])).to.equal(0.2);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['size'])).to.equal(0.4);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['internet-access'])).to.equal(0.1);
+				expect(maximumWeightMap.getObjectiveWeight(nameToIdMap['rate'])).to.equal(0.3);
 			});
 		});
 	});
@@ -246,8 +249,8 @@ describe('RendererDataUtility', () => {
 							cell.userScores.forEach((userScore: UserScoreData, k: number) => {
 								expect(userScore.offset).to.equal(offsets[k][j]);
 
-								var score = userScore.user.getScoreFunctionMap().getObjectiveScoreFunction(userScore.objective.getName()).getScore(userScore.value);
-								var weight = userScore.user.getWeightMap().getObjectiveWeight(userScore.objective.getName());
+								var score = userScore.user.getScoreFunctionMap().getObjectiveScoreFunction(userScore.objective.getId()).getScore(userScore.value);
+								var weight = userScore.user.getWeightMap().getObjectiveWeight(userScore.objective.getId());
 
 								offsets[k][j] += (weight * score);
 							});
@@ -276,8 +279,8 @@ describe('RendererDataUtility', () => {
 							cell.userScores.forEach((userScore: UserScoreData, k: number) => {
 								expect(userScore.offset).to.equal(offsets[k][j]);
 
-								var score = userScore.user.getScoreFunctionMap().getObjectiveScoreFunction(userScore.objective.getName()).getScore(userScore.value);
-								var weight = userScore.user.getWeightMap().getObjectiveWeight(userScore.objective.getName());
+								var score = userScore.user.getScoreFunctionMap().getObjectiveScoreFunction(userScore.objective.getId()).getScore(userScore.value);
+								var weight = userScore.user.getWeightMap().getObjectiveWeight(userScore.objective.getId());
 
 								offsets[k][j] += (weight * score);
 							});
@@ -313,7 +316,7 @@ describe('RendererDataUtility', () => {
 
 						expect(labelDatum.weight).to.equal(weightTotal);
 					} else {
-						expect(labelDatum.weight).to.equal(aaron.getWeightMap().getObjectiveWeight(objective.getName()));
+						expect(labelDatum.weight).to.equal(aaron.getWeightMap().getObjectiveWeight(objective.getId()));
 					}
 
 					return labelDatum.weight;
@@ -346,7 +349,7 @@ describe('RendererDataUtility', () => {
 
 						expect(labelDatum.weight).to.equal(weightTotal);
 					} else {
-						expect(labelDatum.weight).to.equal(u.maximumWeightMap.getObjectiveWeight(objective.getName()));
+						expect(labelDatum.weight).to.equal(u.maximumWeightMap.getObjectiveWeight(objective.getId()));
 					}
 
 					return labelDatum.weight;

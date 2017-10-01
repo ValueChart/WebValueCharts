@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-25 10:27:17
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 12:31:49
+* @Last Modified time: 2017-08-16 14:44:55
 */
 
 // Import Testing Resources:
@@ -23,30 +23,30 @@ import { randomizeUserScoreFunction, rgbaToHex }		from '../../../../utilities/Te
 
 
 // Import Application Classes:
-import { ContinuousScoreFunctionRenderer }				from '../../../../../client/resources/modules/ValueChart/renderers/ContinuousScoreFunction.renderer';
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { ChartUndoRedoService }							from '../../../../../client/resources/modules/ValueChart/services/ChartUndoRedo.service';
+import { ContinuousScoreFunctionRenderer }				from '../../../../../client/src/ValueChartVis';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { ChartUndoRedoService }							from '../../../../../client/src/ValueChartVis';
 
-import { ExpandScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/ExpandScoreFunction.interaction';
-import { AdjustScoreFunctionInteraction }				from '../../../../../client/resources/modules/ValueChart/interactions/AdjustScoreFunction.interaction';
+import { ExpandScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
+import { AdjustScoreFunctionInteraction }				from '../../../../../client/src/ValueChartVis';
 
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
-import { ContinuousDomain }								from '../../../../../client/resources/model/ContinuousDomain';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
+import { ContinuousDomain }								from '../../../../../client/src/model';
 
 // Import Types
-import { ViewConfig, InteractionConfig }				from '../../../../../client/resources/types/Config.types';
-import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { RowData, UserScoreData }						from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ViewConfig, InteractionConfig }				from '../../../../../client/src/types';
+import { ScoreFunctionUpdate }							from '../../../../../client/src/types';
+import { RowData, UserScoreData }						from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 @Component({
@@ -78,7 +78,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	var expandScoreFunctionInteraction: ExpandScoreFunctionInteraction;
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var width: number, height: number;
 	var u: ScoreFunctionUpdate;
 	var aaron: User;
@@ -87,8 +87,9 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	var elements: (number | string)[];
 
 	before(function() {
+		TestBed.resetTestingModule();
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -123,7 +124,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 		aaron = hotelChart.getUsers()[0];
 		aaron.color = "#0000FF";
 
-		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 
 
 		u = {
@@ -133,7 +134,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 			height: height,
 			width: width,
 			rendererConfig: null,
-			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())],
+			scoreFunctions: [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())],
 			objective: objective,
 			colors: [aaron.color],
 			heightScale: null,
@@ -207,7 +208,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 
 					hotelChart.setUser(bob);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					u.colors = [aaron.color, bob.color];
 					u.individual = false;
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -262,7 +263,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 				before(function() {
 					bob = randomizeUserScoreFunction(bob, u.objective);
 
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())]
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())]
 					
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 					u = rendererScoreFunctionUtility.produceViewConfig(u);	
@@ -277,7 +278,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 
 			context('when the number of users is reduced to be one again', () => {
 				before(function() {
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 					u.colors = [aaron.color];
 					u.individual = true;
 
@@ -323,7 +324,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 		context('when the view orientation is set to be horizontal', () => {
 
 			before(function() {
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color];
 
 				u.viewOrientation = ChartOrientation.Horizontal;
@@ -401,7 +402,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 		scoreFunctionRenderer.userContainers.nodes().forEach((userContainer: SVGAElement, i: number) => {
 			let points = d3.select(userContainer).selectAll('.' + defs.POINT).nodes();
 			let fitLines = d3.select(userContainer).selectAll('.' + defs.FITLINE).nodes();
-			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()).getAllElements().length;
+			let numberOfDomainElements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()).getAllElements().length;
 			expect(points).to.have.length(numberOfDomainElements);
 			expect(fitLines).to.have.length(numberOfDomainElements - 1);
 		});

@@ -5,7 +5,7 @@
 * @Last Modified time: 2017-05-03 15:10:50
 */
 
-import { IntervalDomain } 		from '../../../../client/resources/model/IntervalDomain';
+import { IntervalDomain } 		from '../../../../client/src/model';
 
 import { expect }				from 'chai';
 

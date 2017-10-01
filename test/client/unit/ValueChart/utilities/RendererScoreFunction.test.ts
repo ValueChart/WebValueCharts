@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-26 14:49:33
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-18 12:34:05
+* @Last Modified time: 2017-08-16 14:44:51
 */
 
 // Import Testing Resources:
@@ -22,29 +22,29 @@ import { HotelChartData }								from '../../../../testData/HotelChartData';
 import { randomizeUserScoreFunction }					from '../../../../utilities/Testing.utilities';
 
 // Import Application Classes:
-import { RendererScoreFunctionUtility }					from '../../../../../client/resources/modules/ValueChart/utilities/RendererScoreFunction.utility';
-import { WebValueChartsParser }							from '../../../../../client/resources/modules/utilities/classes/WebValueChartsParser';
+import { RendererScoreFunctionUtility }					from '../../../../../client/src/ValueChartVis';
+import { XmlValueChartParser }							from '../../../../../client/src/app/utilities/XmlValueChart.parser';
 
 // Import Model Classes
-import { ValueChart }									from '../../../../../client/resources/model/ValueChart';
-import { Objective }									from '../../../../../client/resources/model/Objective';
-import { User }											from '../../../../../client/resources/model/User';
-import { ScoreFunction }								from '../../../../../client/resources/model/ScoreFunction';
-import { WeightMap }									from '../../../../../client/resources/model/WeightMap';
-import { PrimitiveObjective }							from '../../../../../client/resources/model/PrimitiveObjective';
-import { AbstractObjective }							from '../../../../../client/resources/model/AbstractObjective';
+import { ValueChart }									from '../../../../../client/src/model';
+import { Objective }									from '../../../../../client/src/model';
+import { User }											from '../../../../../client/src/model';
+import { ScoreFunction }								from '../../../../../client/src/model';
+import { WeightMap }									from '../../../../../client/src/model';
+import { PrimitiveObjective }							from '../../../../../client/src/model';
+import { AbstractObjective }							from '../../../../../client/src/model';
 
 // Import Types
-import { ScoreFunctionUpdate }							from '../../../../../client/resources/types/RendererData.types';
-import { DomainElement, ScoreFunctionData }				from '../../../../../client/resources/types/RendererData.types'; 
-import { ScoreFunctionDataSummary }						from '../../../../../client/resources/types/RendererData.types';
-import { ChartOrientation }								from '../../../../../client/resources/types/Config.types';
+import { ScoreFunctionUpdate }							from '../../../../../client/src/types';
+import { DomainElement, ScoreFunctionData }				from '../../../../../client/src/types';
+import { ScoreFunctionDataSummary }						from '../../../../../client/src/types';
+import { ChartOrientation }								from '../../../../../client/src/types';
 
 
 describe('RendererScoreFunctionUtility', () => {
 
 	var hotelChart: ValueChart;
-	var parser: WebValueChartsParser;
+	var parser: XmlValueChartParser;
 	var rendererScoreFunctionUtility: RendererScoreFunctionUtility;
 	var width: number, height: number;
 	var u: ScoreFunctionUpdate;
@@ -60,7 +60,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 		rendererScoreFunctionUtility = TestBed.get(RendererScoreFunctionUtility);
 
-		parser = new WebValueChartsParser();
+		parser = new XmlValueChartParser();
 		var valueChartDocument = new DOMParser().parseFromString(HotelChartData, 'application/xml');
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
@@ -74,7 +74,7 @@ describe('RendererScoreFunctionUtility', () => {
 		aaron = hotelChart.getUsers()[0];
 		aaron.color = "#0000FF";
 
-		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+		elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 
 
 		u = {
@@ -111,7 +111,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when there is one score function (ie. there is one user in the ValueChart', () => {
 
 			before(function() {
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color];
 			
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -130,7 +130,7 @@ describe('RendererScoreFunctionUtility', () => {
 					oldReference = u.scoreFunctionData
 
 					aaron = randomizeUserScoreFunction(aaron, u.objective);
-					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+					u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 
 					u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
 				});
@@ -179,7 +179,7 @@ describe('RendererScoreFunctionUtility', () => {
 
 				oldReference = u.scoreFunctionData;
 
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color, bob.color];
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -198,9 +198,9 @@ describe('RendererScoreFunctionUtility', () => {
 
 			before(function() {
 				u.objective = hotelChart.getAllPrimitiveObjectives()[1];
-				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()).getAllElements();
+				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()).getAllElements();
 
-				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getName())];
+				u.scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(u.objective.getId())];
 				u.colors = [aaron.color, bob.color];
 
 				u = rendererScoreFunctionUtility.produceScoreFunctionData(u);
@@ -281,7 +281,7 @@ describe('RendererScoreFunctionUtility', () => {
 				scoreFunctions = [];
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 
-				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()).getAllElements();
+				elements = aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()).getAllElements();
 			});
 
 
@@ -293,7 +293,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when is one score function (ie. there is one user in the ValueChart)', () => {
 			before(function() {
 				objective = hotelChart.getAllPrimitiveObjectives()[0];
-				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())];
+				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())];
 
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 			});
@@ -306,7 +306,7 @@ describe('RendererScoreFunctionUtility', () => {
 		context('when there are two score functions (ie. there are two users in the ValueChart)', () => {
 			before(function() {
 				objective = hotelChart.getAllPrimitiveObjectives()[0];
-				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName()), bob.getScoreFunctionMap().getObjectiveScoreFunction(objective.getName())];
+				scoreFunctions = [aaron.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId()), bob.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId())];
 
 				scoreFunctionDataSummaries = rendererScoreFunctionUtility.getAllScoreFunctionDataSummaries(objective, scoreFunctions);
 			});
