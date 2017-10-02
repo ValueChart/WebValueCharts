@@ -63,7 +63,8 @@ export class ValidationService {
 	OBJECTIVE_OUTCOMES_INVALID: string = "Objective outcomes must fall within the specified range. Please fix: ";
 	SCORE_FUNCTIONS_MISSING: string = "Please define a score function for: ";
 	SCORE_FUNCTIONS_INCOMPLETE: string = "Please complete score function for: ";
-	SCORE_FUNCTION_RANGE_INVALID: string = "Score functions must range from 0 to 1.  Please fix score functions for: ";
+	SCORE_FUNCTION_MIN_INVALID: string = "The worst outcome must have a score of 0. Please fix score functions for: ";
+	SCORE_FUNCTION_MAX_INVALID: string = "The best outcome must have a score of 1. Please fix score functions for: ";
 	WEIGHTS_MISSING: string = "Please supply weights for: ";
 	WEIGHTS_SUM_INVALID: string = "Weights must sum to 1.";
 	WEIGHTS_RANGE_INVALID: string = "Weights must be between 0 and 1. Please fix weights for: ";
@@ -637,9 +638,13 @@ export class ValidationService {
 		if (incompleteScoreFunctions.length > 0) {
 			errorMessages.push(this.SCORE_FUNCTIONS_INCOMPLETE.concat(incompleteScoreFunctions.join(', ')));
 		}
-		let invalidScoreFunctionRange = this.invalidScoreFunctionRange(valueChart, user);
-		if (invalidScoreFunctionRange.length > 0) {
-			errorMessages.push(this.SCORE_FUNCTION_RANGE_INVALID.concat(invalidScoreFunctionRange.join(', ')));
+		let invalidScoreFunctionMinimum = this.invalidScoreFunctionMinimum(valueChart, user);
+		if (invalidScoreFunctionMinimum.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTION_MIN_INVALID.concat(invalidScoreFunctionMinimum.join(', ')));
+		}
+		let invalidScoreFunctionMaximum = this.invalidScoreFunctionMaximum(valueChart, user);
+		if (invalidScoreFunctionMaximum.length > 0) {
+			errorMessages.push(this.SCORE_FUNCTION_MAX_INVALID.concat(invalidScoreFunctionMaximum.join(', ')));
 		}
 		return errorMessages;
 	}
@@ -691,16 +696,36 @@ export class ValidationService {
 
 	/* 	
 		@returns {string[]}
-		@description 	Returns names of Objectives whose score functions for user do not range from 0 to 1. 
+		@description 	Returns names of Objectives whose score functions for user do not have a minimum score of 0. 
 	*/
-	invalidScoreFunctionRange(valueChart: ValueChart, user: User): string[] {
+	invalidScoreFunctionMinimum(valueChart: ValueChart, user: User): string[] {
 		let objectives = [];
 		let scoreFunctionMap = user.getScoreFunctionMap();
 		if (scoreFunctionMap) {
 			for (let obj of valueChart.getAllPrimitiveObjectives()) {
 				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getId());
 				if (scoreFunction) {	
-					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1 || scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+					if (scoreFunction.getScore(scoreFunction.worstElement) !== 0) {
+	      				objectives.push(obj.getName());
+	      			}
+      			}
+			}
+		}
+		return objectives;
+	}
+
+	/* 	
+		@returns {string[]}
+		@description 	Returns names of Objectives whose score functions for user do not have a maximum score of 1. 
+	*/
+	invalidScoreFunctionMaximum(valueChart: ValueChart, user: User): string[] {
+		let objectives = [];
+		let scoreFunctionMap = user.getScoreFunctionMap();
+		if (scoreFunctionMap) {
+			for (let obj of valueChart.getAllPrimitiveObjectives()) {
+				let scoreFunction = scoreFunctionMap.getObjectiveScoreFunction(obj.getId());
+				if (scoreFunction) {	
+					if (scoreFunction.getScore(scoreFunction.bestElement) !== 1) {
 	      				objectives.push(obj.getName());
 	      			}
       			}
