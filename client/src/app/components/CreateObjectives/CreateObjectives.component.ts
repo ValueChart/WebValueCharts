@@ -316,7 +316,10 @@ export class CreateObjectivesComponent implements OnInit {
 	objRowToObjective(objrow: ObjectiveRow): Objective {
 		let obj: Objective;
 		if (objrow.type === 'primitive') {
-			obj = objrow.objid === '' ? new PrimitiveObjective('', '') : this.getObjectiveById(objrow.objid);
+			obj = this.getObjectiveById(objrow.objid);
+			if (obj === undefined) {
+				obj = new PrimitiveObjective('', ''); 
+			}
 			obj.setName(objrow.name);
 			obj.setDescription(objrow.desc);
 			objrow.objid = obj.getId();
@@ -327,7 +330,10 @@ export class CreateObjectivesComponent implements OnInit {
 			}	
 		}
 		else {
-			obj = objrow.objid === '' ? new AbstractObjective('', '') : this.getObjectiveById(objrow.objid);
+			obj = this.getObjectiveById(objrow.objid);
+			if (obj === undefined) {
+				obj = new AbstractObjective('', ''); 
+			}
 			obj.setName(objrow.name);
 			obj.setDescription(objrow.desc);
 			objrow.objid = obj.getId();
@@ -346,7 +352,7 @@ export class CreateObjectivesComponent implements OnInit {
 				return obj;
 			}
 		}
-		throw "Objective not found";
+		return undefined;
 	}
 
 	/* 	
