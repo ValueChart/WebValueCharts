@@ -429,8 +429,9 @@ export class ValueChartViewerComponent implements OnInit {
 	save(): void {
 		let userRole = this.valueChartViewerService.getUserRole();
 		
-		if (this.valueChartViewerService.isParticipant())
-			this.submitPreferences()
+		if (this.valueChartViewerService.isParticipant() && 
+			!_.isEqual(this.userGuard.getUserRecord(), this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())))
+			this.submitPreferences();
 		
 		if (userRole == UserRole.Owner || userRole == UserRole.OwnerAndParticipant) {
 			// Update the ValueChart.
