@@ -7,7 +7,7 @@
                 </div>
                 <div class="form-group">
                     <a class="btn btn-success btn-lg pull-left" [routerLink]="['/home']">Home</a>
-                    <input *ngIf="!hidePreviousButton()" class="btn btn-success btn-lg pull-left" type="button" value="<< Previous Stage" [disabled]="disablePreviousButton()" (click)="router.navigate(['create', creationStepsService.getCreationPurpose(), creationStepsService.getPreviousStep(creationStepsService.step)], { queryParamsHandling: 'merge' })" />
+                    <input *ngIf="!hidePreviousButton()" class="btn btn-success btn-lg pull-left" type="button" value="<< Previous Stage" (click)="router.navigate(['create', creationStepsService.getCreationPurpose(), creationStepsService.getPreviousStep(creationStepsService.step)], { queryParamsHandling: 'merge' })" />
                     <input class="btn btn-primary btn-lg pull-right" type="button" value="View Chart" [disabled]="!enableViewChartButton()" (click)="creationStepsService.viewChart()" />
                     <input *ngIf="creationStepsService.step !== creationStepsService.PRIORITIES" class="btn btn-success btn-lg pull-right" type="button" [value]="nextButtonText()" (click)="router.navigate(['create', creationStepsService.getCreationPurpose(), creationStepsService.getNextStep(creationStepsService.step)], { queryParamsHandling: 'merge' })" />
                 </div>

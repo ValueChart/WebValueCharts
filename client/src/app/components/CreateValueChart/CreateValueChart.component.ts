@@ -141,26 +141,16 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {boolean}
-		@description 	Disable previous button if:
-						(1) on the first step
-						(2) on Preferences step and the user is joining the chart or editing preferences
-	*/
-	disablePreviousButton(): boolean {
-		return (this.creationStepsService.step === this.creationStepsService.BASICS
-   			|| (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.creationStepsService.getCreationPurpose() === CreatePurpose.NewUser)
-            || (this.creationStepsService.step === this.creationStepsService.PREFERENCES && this.creationStepsService.getCreationPurpose() === CreatePurpose.EditUser));
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Do not show previous button at all if:
-						(1) the user is joining the chart or editing preferences AND
-						(2) there are no mutable objectives 
-						In this case, there is only one step - Priorities.
+		@description 	Do not show previous button if:
+						(1) on the first step OR
+						(2) the user is joining the chart or editing preferences AND
+							(a) on the Preferences step OR
+							(b) there are no mutable objectives (in this case, there is only one step - Priorities)
 	*/
 	hidePreviousButton(): boolean {
-		return ((this.creationStepsService.getCreationPurpose() === CreatePurpose.NewUser || this.creationStepsService.getCreationPurpose() === CreatePurpose.EditUser)
-			&&  this.valueChartService.getValueChart().getMutableObjectives().length === 0);
+		return (this.creationStepsService.step === this.creationStepsService.BASICS
+   			|| ((this.creationStepsService.getCreationPurpose() === CreatePurpose.NewUser || this.creationStepsService.getCreationPurpose() === CreatePurpose.EditUser)
+            && (this.creationStepsService.step === this.creationStepsService.PREFERENCES || this.valueChartService.getValueChart().getMutableObjectives().length === 0)));
 	}
 
 	/* 	
