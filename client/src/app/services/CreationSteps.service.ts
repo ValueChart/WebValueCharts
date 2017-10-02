@@ -316,7 +316,7 @@ export class CreationStepsService {
 	deleteValueChart(valueChart: ValueChart): void {
 		if (valueChart._id) {
 			this.valueChartHttp.deleteValueChart(valueChart._id)
-				.subscribe(status => { this.userNotificationService.displayErrors(['ValueChart deleted'])});
+				.subscribe(status => { this.userNotificationService.displaySuccesses(['ValueChart deleted'])});
 		}
 	}
 
