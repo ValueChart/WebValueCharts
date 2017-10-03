@@ -89,6 +89,7 @@ export class CreateValueChartComponent implements OnInit {
 
 		this.creationStepsService.step = window.location.pathname.split('/').slice(-1)[0];
 		this.creationStepsService.setAutoSaveEnabled(false);
+		this.creationStepsService.visitedScoreFunctions = [];
 
 		this.sub = this.route.params.subscribe(params => { 
 			this.creationStepsService.setCreationPurpose(parseInt(params['purpose']));
