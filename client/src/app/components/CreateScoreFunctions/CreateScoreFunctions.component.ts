@@ -81,7 +81,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   constructor(
     public valueChartService: ValueChartService,
-    private creationStepsService: CreationStepsService,
+    public creationStepsService: CreationStepsService,
     private updateValueChartService: UpdateValueChartService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
