@@ -36,7 +36,6 @@ export class CreateAlternativesComponent implements OnInit {
 
 	// Alternative row fields:
     alternatives: { [altID: string]: Alternative; }; // It is necessary to track Alternatives by ID since their names may not be unique
-    isSelected: { [altID: string]: boolean; }; // Specifies whether the row corresponding to each Alternative is currently selected
     alternativesCount: number; // Incremented every time an Alternative is added, but never decremented; used to generate unique IDs for Alternatives
 
     // Validation fields:
@@ -76,7 +75,6 @@ export class CreateAlternativesComponent implements OnInit {
         });
         this.valueChart = this.valueChartService.getValueChart();
 		this.alternatives = {};
-		this.isSelected = {};
 		this.alternativesCount = 0;
 		this.errorMessages = [];
 
@@ -154,50 +152,17 @@ export class CreateAlternativesComponent implements OnInit {
 	*/
 	addEmptyAlternative() {
 		this.alternatives[this.alternativesCount] = new Alternative("", "");
-		this.isSelected[this.alternativesCount] = false;
 		this.alternativesCount++;
 		this.resetErrorMessages();
 	}
 
 	/* 	
 		@returns {void}
-		@description 	Deletes all selected Alternatives
+		@description 	Deletes an Alternative
 	*/
-	deleteAlternatives() {
-		for (let key of this.altKeys()) {
-			if (this.isSelected[key]) {
-				delete this.alternatives[key];
-				delete this.isSelected[key];
-			}
-		}
+	deleteAlternative(altID: string) {
+		delete this.alternatives[altID];
 		this.resetErrorMessages();
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Returns true iff all Alternatives are selected.
-	*/
-	allSelected(): boolean {
-		if (this.altKeys().length === 0) {
-			return false;
-		}
-		for (let key of this.altKeys()) {
-			if (!this.isSelected[key]) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Deselects all Alternatives if all are selected, selects all otherwise.
-	*/
-	toggleSelectAll() {
-		let allSelected = this.allSelected();
-		for (let key of this.altKeys()) {
-			this.isSelected[key] = !allSelected;
-		}
 	}
 
 	/* 	

@@ -1,12 +1,20 @@
 <h4>Add Objectives</h4>
-<input class="btn btn-default btn-lg pull-right" type="button" value="Delete" [disabled]="disableDelete()" (click)="deleteObjRow(selectedObjRow)" />
-<input class="btn btn-default btn-lg pull-right" type="button" value="Add Child" [disabled]="disableAddChild()" (click)="addNewChildObjRow(selectedObjRow)" />
-<table class="table table-bordered">
+<table class="table table-bordered table-responsive">
     <thead>
         <tr>
+            <th><div class="objectives-table-small-column">
+            <div class="dropdown">
+                <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:void(0)" (click)="addNewChildObjRow('0', false)">Add Objective</a></li>
+                    <li><a href="javascript:void(0)" (click)="addNewChildObjRow('0', true)">Add Objective Group</a></li>
+                </ul>
+            </div>
+            </div></th>
             <th><div class="objectives-table-name-column">Name</div></th>
             <th><div class="objectives-table-description-column">Description</div></th>
-            <th><div class="objectives-table-dropdown-column">Type</div></th>
             <th><div class="objectives-table-small-column">Color</div></th>
             <th><div class="objectives-table-dropdown-column">Domain Type</div></th>
             <th><div class="objectives-table-domaininfo-column">Domain Info</div></th>
@@ -20,20 +28,31 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let objID of getFlattenedObjectiveRows()" [ngClass]="{objectivestableselectedrow:objID === selectedObjRow}" class="clickable-row" (click)="selectedObjRow=objID">
+        <tr *ngFor="let objID of getFlattenedObjectiveRows()">
             <th>
-                <div [style.margin-left]="objectiveRows[objID].depth + 'cm'">
-                <input class="form-control" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
+                <div [style.margin-left]="objectiveRows[objID].depth - 1 + 'cm'">
+                <div *ngIf="objectiveRows[objID].type === 'abstract'" class="dropdown">
+                    <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:void(0)" (click)="addNewChildObjRow(objID, false)">Add Sub-Objective</a></li>
+                        <li><a href="javascript:void(0)" (click)="addNewChildObjRow(objID, true)">Add Sub-Group</a></li>
+                        <li><a href="javascript:void(0)" (click)="deleteObjRow(objID)">Delete Group</a></li>
+                    </ul>
+                </div>
+                <div *ngIf="objectiveRows[objID].type === 'primitive'">
+                    <button type="button" class="btn btn-xs transparent-button" (click)="deleteObjRow(objID)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
                 </div>
             </th>
             <th>
-                <textarea class="form-control objectives-table-textarea" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
+                <input class="form-control" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
             </th>
             <th>
-                <select class="form-control" [(ngModel)]="objectiveRows[objID].type" [disabled]="objectiveRows[objID].children.length > 0" (ngModelChange)="setColor(objectiveRows[objID]); resetErrorMessages()">
-                    <option [value]="'primitive'">base</option>
-                    <option [value]="'abstract'">parent</option>
-                </select>
+                <textarea class="form-control objectives-table-textarea" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
             </th>
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>
@@ -57,13 +76,12 @@
                     && objectiveRows[objID].dom.type === 'categorical' ">
                     <div class="form-group">
                         <div class="form-group">
-                            <SELECT class="form-control" [name]="'catlist' + objID" size="3" MULTIPLE>
+                            <SELECT class="form-control" [name]="'catlist' + objID" size="3" MULTIPLE READONLY>
                             <OPTION *ngFor="let opt of objectiveRows[objID].dom.elements">{{opt}}
                             </SELECT>
                         </div>
                         <div class="form-group">
                             <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#categories-modal" (click)="selectedObjRow=objID; updateCategoryString()">{{objectiveRows[objID].dom.elements.length > 0 ? 'Edit' : 'Add'}}</button>
-                            <button type="button" class="btn btn-sm btn-default" (click)="removeSelectedCategories(objID)">Delete</button>
                         </div>
                     </div>
                 </div>

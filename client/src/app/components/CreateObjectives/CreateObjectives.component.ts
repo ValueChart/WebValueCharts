@@ -125,14 +125,13 @@ export class CreateObjectivesComponent implements OnInit {
 
 		this.objectiveRows = {};
 		this.rootObjRowID = '0';
-		this.selectedObjRow = '0';
 		this.objectivesCount = 0;
 		this.editing = false;
 		this.errorMessages = [];
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, '', this.valueChart.getName(), this.valueChart.getDescription(), '', 0, 'abstract');
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, '', this.valueChart.getName(), 'This is the root Objective. It represents the whole decision problem.', '', 0, 'abstract');
 			this.objectivesCount++;
 		}
 		else {
@@ -177,8 +176,11 @@ export class CreateObjectivesComponent implements OnInit {
 		@returns {void}
 		@description 	Creates a new, blank ObjectiveRow under an existing ObjectiveRow.
 	*/
-	addNewChildObjRow(parentID: string) {
-		this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', '', parentID, this.objectiveRows[parentID].depth + 1, 'primitive', this.getNextColor()));
+	addNewChildObjRow(parentID: string, isGroup: boolean) {
+		if (isGroup)
+			this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', '', parentID, this.objectiveRows[parentID].depth + 1, 'abstract'));
+		else
+			this.addObjRow(parentID, new ObjectiveRow(String(this.objectivesCount), '', '', '', parentID, this.objectiveRows[parentID].depth + 1, 'primitive', this.getNextColor()));
 		this.resetErrorMessages();
 	}
 
@@ -208,24 +210,7 @@ export class CreateObjectivesComponent implements OnInit {
 			this.deleteObjRow(child);
 		}
 		delete this.objectiveRows[objID];
-		this.selectedObjRow = '';
 		this.resetErrorMessages();
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Used by "Add Child" button. Returns true if no row is selected or a primitive objective row is selected.
-	*/
-	disableAddChild(): boolean {
-		return (this.selectedObjRow === '' || this.objectiveRows[this.selectedObjRow].type === 'primitive');
-	}
-
-	/* 	
-		@returns {boolean}
-		@description 	Used by "Delete" button. Returns true if no row is selected or the root is selected.
-	*/
-	disableDelete(): boolean {
-		return (this.selectedObjRow === '' || this.selectedObjRow === this.rootObjRowID);
 	}
 
 	/* 	
@@ -304,7 +289,8 @@ export class CreateObjectivesComponent implements OnInit {
 	*/
 	flattenObjectiveRows(ObjectiveRowIDs: string[], flattened: string[]) {
 		for (let objID of ObjectiveRowIDs) {
-			flattened.push(objID);
+			if (objID !== '0')
+				flattened.push(objID);
 			this.flattenObjectiveRows(this.objectiveRows[objID].children, flattened);
 		}
 	}
@@ -506,19 +492,6 @@ export class CreateObjectivesComponent implements OnInit {
 			}	
         }
         defaultScoreFunction.setElementScoreMap(elementScoreMap);
-	}
-
-	/* 	
-		@returns {void}
-		@description 	Removes selected categories in main view from ObjectiveRow domain.
-	*/
-	removeSelectedCategories(objID: string) {
-		let selected = this.getSelectedValues(<HTMLSelectElement>document.getElementsByName('catlist' + objID)[0]);
-		for (let cat of selected) {
-			this.objectiveRows[objID].dom.removeElement(cat);
-			this.objectiveRows[objID].defaultScoreFunction.removeElement(cat);
-		}
-		this.resetErrorMessages();
 	}
 
 	/* 	
