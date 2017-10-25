@@ -169,19 +169,45 @@ export class CreateValueChartComponent implements OnInit {
 
 	/* 	
 		@returns {string}
-		@description 	 Return text for 'Next' button. Differs only at last step.
+		@description 	 Return text for 'Next' button.
 	*/
 	nextButtonText(): string {
-		let text = 'Next Stage >>';
-		if (!this.valueChartService.getValueChart().isIndividual() && this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
-			if (!this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername())) {
-				text = 'Add Preferences >>';
-			}
+		if (this.creationStepsService.step === this.creationStepsService.BASICS) {
+			return "Define Objectives >>";
+		}
+		else if (this.creationStepsService.step === this.creationStepsService.OBJECTIVES) {
+			return "Define Alteratives >>";
+		}
+		else if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
+			if (this.valueChartService.getValueChart().isIndividual() || this.valueChartService.getValueChart().isMember(this.currentUserService.getUsername())) {
+				return "Define Score Functions >>";
+			} 
 			else {
-				text = 'Edit Preferences >>';
+				return 'Join Chart >>';
 			}
 		}
-		return text;
+		else {
+			return "Define Weights >>";
+		}
+	}
+
+	/* 	
+		@returns {string}
+		@description 	 Return text for 'Previous' button.
+	*/
+	previousButtonText(): string {
+		if (this.creationStepsService.step === this.creationStepsService.OBJECTIVES) {
+			return "<< Define Chart Basics";
+		}
+		else if (this.creationStepsService.step === this.creationStepsService.ALTERNATIVES) {
+			return "<< Define Objectives";
+		}
+		else if (this.creationStepsService.step === this.creationStepsService.PREFERENCES) {
+			return "<< Define Alternatives";
+		}
+		else {
+			return "<< Define Score Functions";
+		}
 	}
 
 	/* 	
