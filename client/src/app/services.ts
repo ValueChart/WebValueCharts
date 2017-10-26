@@ -14,3 +14,4 @@ export { ValidationService }                 from './services/Validation.service
 export { ValueChartService }                 from './services/ValueChart.service' 
 export { ValueChartViewerService }           from './services/ValueChartViewer.service' 
 export { XMLValueChartParserService }        from './services/XMLValueChartParser.service' 
+export { PreferenceLearningService }		 from './services/PreferenceLearning.service'
