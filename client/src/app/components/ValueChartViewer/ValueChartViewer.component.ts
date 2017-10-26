@@ -18,12 +18,12 @@ import { Observable }															from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
-import { PreferenceLearningService }											from '../../services/PreferenceLearning.service';
 
 import { ValueChartDirective }													from '../../../ValueChartVis';
 import { ChartUndoRedoService }													from '../../../ValueChartVis';
 import { RenderEventsService }													from '../../../ValueChartVis';
 
+import { PreferenceLearningService }											from '../../services';
 import { ValueChartService }													from '../../services';
 import { CurrentUserService }													from '../../services';
 import { ValueChartViewerService }												from '../../services';
@@ -92,6 +92,7 @@ export class ValueChartViewerComponent implements OnInit {
 	public viewConfig: ViewConfig = <any> {};
 	public interactionConfig: InteractionConfig = <any> {};
 
+	public alternativeIndex: number = 0;
 
 	// ========================================================================================
 	// 									Constructor
@@ -511,7 +512,13 @@ export class ValueChartViewerComponent implements OnInit {
 	// ================================ Preference Learning ====================================	
 
 	sampleNewAlternative(): void {
-		this.preferenceLearningService.sampleNewAlternative();
+		this.preferenceLearningService.sampleNewAlternative(this.alternativeIndex);
+		this.alternativeIndex++;
+	}
+
+	sampleNewAlternativePair(): void {
+		this.preferenceLearningService.sampleNewAlternative(this.alternativeIndex);
+		this.alternativeIndex += 2;
 	}
 
 	// ================================ Undo/Redo ====================================
