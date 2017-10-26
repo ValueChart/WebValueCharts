@@ -60,64 +60,60 @@ export class PreferenceLearningService {
 	// 									Methods
 	// ========================================================================================
 
-
-
-
-
 	/*
 		@param chartId - The Id of the ValueChart that is to be hosted. This MUST be the id returned by the server after creating a ValueChart resource (see ValueChartHttpService).
 		@returns {WebSocket} - The websocket that is being used to send and receive messages from the server about the hosted ValueChart. 
 		@description 	Initiates hosting a ValueChart by opening a websocket connection with the server. The hosted ValueChart will
 						dynamically update as users submit their preferences.
 	*/
-	// initPreferenceLearning(): WebSocket {
-	// 	// Open the websocket connection. Note websockets use the ws protocol rather than http(s).
-	// 	this.connection = new WebSocket('ws://localhost:8080/ws');
-	// 	this.connection.onmessage = this.messageHandler;
-	// 	return this.connection;
-	// }
+	initPreferenceLearning(): WebSocket {
+		// Open the websocket connection. Note websockets use the ws protocol rather than http(s).
+		this.connection = new WebSocket('ws://localhost:8080/ws');
+		this.connection.onmessage = this.messageHandler;
+		return this.connection;
+	}
 
-	// messageHandler = (msg: MessageEvent) => {
-	// 	var result = JSON.parse(msg.data);
+	messageHandler = (msg: MessageEvent) => {
+		var result = JSON.parse(msg.data);
 
-	// 	if (result.event === 'connected') {
-	// 		let names = _.map(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), (objective: PrimitiveObjective) => objective.getName());
-	// 		let message = { "jsonrpc": "2.0", "method": "init_experiment", "data": { "username": this.currentUserService.getUsername(), "col_names": names }, "id": 1 }
-	// 		this.connection.send(JSON.stringify(message))
-	// 	} else if (result.data && result.data.alternative) {
-	// 		if (result.data.alternatives) {
-	// 			var alternatives: Alternative[] = [];
-	// 			JSON.parse(result.data.alternatives).forEach((alternative: Alternative) => {
-	// 				alternatives.push(this.valueChartParser.parseAlternative(alternative, {}));
-	// 			});
+		if (result.event === 'connected') {
+			let names = _.map(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), (objective: PrimitiveObjective) => objective.getName());
+			let message = { "jsonrpc": "2.0", "method": "init_experiment", "data": { "username": this.currentUserService.getUsername(), "col_names": names }, "id": 1 }
+			this.connection.send(JSON.stringify(message))
+		} else if (result.data && result.data.alternative) {
+			if (result.data.alternatives) {
+				var alternatives: Alternative[] = [];
+				JSON.parse(result.data.alternatives).forEach((alternative: Alternative) => {
+					alternatives.push(this.valueChartParser.parseAlternative(alternative, {}));
+				});
 
-	// 			this.valueChartService.getValueChart().setAlternatives(alternatives);
-	// 			this.valueChartViewerService.getActiveValueChart().setAlternatives(alternatives);
-	// 			this.userNotificationService.displayInfo(['Two new alternatives have been added to the ValueChart']);
-	// 		} else if (result.data.alternative) {
-	// 			let alternative = this.valueChartParser.parseAlternative(JSON.parse(result.data.alternative), {})
-	// 			this.valueChartService.getValueChart().addAlternative(alternative);
-	// 			this.valueChartViewerService.getActiveValueChart().addAlternative(alternative);
-	// 			this.userNotificationService.displayInfo(['A new Alternative has been added to the ValueChart']);
-	// 		}
-	// 	}
-	// } 
+				this.valueChartService.getValueChart().setAlternatives(alternatives);
+				this.valueChartViewerService.getActiveValueChart().setAlternatives(alternatives);
+				this.userNotificationService.displayInfo(['Two new alternatives have been added to the ValueChart']);
+			} else if (result.data.alternative) {
+				let alternative = this.valueChartParser.parseAlternative(JSON.parse(result.data.alternative), {})
+				this.valueChartService.getValueChart().addAlternative(alternative);
+				this.valueChartViewerService.getActiveValueChart().addAlternative(alternative);
+				this.userNotificationService.displayInfo(['A new Alternative has been added to the ValueChart']);
+			}
+		}
+	} 
 
-	// sampleNewAlternative(index: number) {
-	// 	var valueChart = this.valueChartService.getValueChart();
-	// 	var user = valueChart.getUser(this.currentUserService.getUsername());
-	// 	var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
-	// 	var message = { "jsonrpc": "2.0", "method": "sample_alternative", "data": { "username": user.getUsername(), "current_weights": weights, "index": index }, "id": 1 }
-	// 	this.connection.send(JSON.stringify(message))
-	// }
+	sampleNewAlternative(index: number) {
+		var valueChart = this.valueChartService.getValueChart();
+		var user = valueChart.getUser(this.currentUserService.getUsername());
+		var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
+		var message = { "jsonrpc": "2.0", "method": "sample_alternative", "data": { "username": user.getUsername(), "current_weights": weights, "index": index }, "id": 1 }
+		this.connection.send(JSON.stringify(message))
+	}
 
-	// sampleNewAlternativePair(indices: number[]) {
-	// 	var valueChart = this.valueChartService.getValueChart();
-	// 	var user = valueChart.getUser(this.currentUserService.getUsername());
-	// 	var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
-	// 	var message = { "jsonrpc": "2.0", "method": "sample_pair", "data": { "username": user.getUsername(), "current_weights": weights, "indices": indices }, "id": 1 }
-	// 	this.connection.send(JSON.stringify(message))
-	// }
+	sampleNewAlternativePair(indices: number[]) {
+		var valueChart = this.valueChartService.getValueChart();
+		var user = valueChart.getUser(this.currentUserService.getUsername());
+		var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
+		var message = { "jsonrpc": "2.0", "method": "sample_pair", "data": { "username": user.getUsername(), "current_weights": weights, "indices": indices }, "id": 1 }
+		this.connection.send(JSON.stringify(message))
+	}
 
 	// computeScore(user: User, alternative: Alternative): number {
 	// 	var score = 0
