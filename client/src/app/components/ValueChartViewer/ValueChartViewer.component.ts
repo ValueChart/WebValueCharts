@@ -91,6 +91,7 @@ export class ValueChartViewerComponent implements OnInit {
 	public interactionConfig: InteractionConfig = <any> {};
 	public reducedInformation: boolean = false;
 
+	public alternativeIndex: number = 0;
 
 	// ========================================================================================
 	// 									Constructor

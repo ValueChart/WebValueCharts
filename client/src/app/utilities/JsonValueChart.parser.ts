@@ -131,7 +131,9 @@ export class JsonValueChartParser {
 		return domain;
 	}
 
-	private parseAlternative(jsonAlternative: any, nameToIdMap: {[objName: string]: string}): Alternative {
+	public parseAlternative(jsonAlternative: any, nameToIdMap: {[objName: string]: string}): Alternative {
+		console.log(jsonAlternative);
+
 		var alternative: Alternative = new Alternative(jsonAlternative.name, jsonAlternative.description);
 		alternative['id'] = jsonAlternative['id'];
 

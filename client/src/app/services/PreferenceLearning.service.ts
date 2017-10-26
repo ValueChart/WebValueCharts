@@ -5,7 +5,7 @@
 * @Last Modified time: 2017-08-08 15:24:26
 */
 
-import { Injectable }                                               	  from '@angular/core';
+import { Injectable }                                               	from '@angular/core';
 
 // Import Libraries:
 import * as _															from 'lodash';
@@ -13,13 +13,15 @@ import * as _															from 'lodash';
 // Import Application Classes:
 import { UserNotificationService }										from './UserNotification.service'; 
 import { ValueChartService }											from './ValueChart.service';
+import { CurrentUserService }											from './CurrentUser.service';
 import { ValueChartViewerService }										from './ValueChartViewer.service';
-import { JsonValueChartParser }											from '../../utilities/classes/JsonValueChartParser';
+import { JsonValueChartParser }											from '../utilities';
 
 // Import Model Classes:
-import { ValueChart, ChartType }										from '../../../model/ValueChart';
-import { User }															from '../../../model/User';
-import { Alternative }													from '../../../model/Alternative';
+import { ValueChart, ChartType }										from '../../model/ValueChart';
+import { User }															from '../../model/User';
+import { Alternative }													from '../../model/Alternative';
+import { PrimitiveObjective }											from '../../model/PrimitiveObjective';
 
 
 @Injectable()
@@ -47,6 +49,7 @@ export class PreferenceLearningService {
 						This constructor will be called automatically when Angular constructs an instance of this class prior to dependency injection.
 	*/
 	constructor(
+		private currentUserService: CurrentUserService,
 		private userNotificationService: UserNotificationService,
 		private valueChartService: ValueChartService,
 		private valueChartViewerService: ValueChartViewerService) {
@@ -72,47 +75,54 @@ export class PreferenceLearningService {
 
 	messageHandler = (msg: MessageEvent) => {
 		var result = JSON.parse(msg.data);
+
 		if (result.event === 'connected') {
-			let valueChart = this.valueChartService.getValueChart();
-			let message = { "jsonrpc": "2.0", "method": "init_value_chart", "data": { "json_chart": valueChart }, "id": 1 }
+			let names = _.map(this.valueChartService.getValueChart().getAllPrimitiveObjectives(), (objective: PrimitiveObjective) => objective.getName());
+			let message = { "jsonrpc": "2.0", "method": "init_experiment", "data": { "username": this.currentUserService.getUsername(), "col_names": names }, "id": 1 }
 			this.connection.send(JSON.stringify(message))
 		} else if (result.data && result.data.alternative) {
-			let alternative = this.valueChartParser.parseAlternative(result.data.alternative[0])
-			this.valueChartService.getValueChart().addAlternative(alternative);
-			this.valueChartViewerService.getActiveValueChart().addAlternative(alternative);
-			this.userNotificationService.displayInfo(['A new Alternative has been sucessfully added to the ValueChart']);
+			if (result.data.alternatives) {
+				var alternatives: Alternative[] = [];
+				JSON.parse(result.data.alternatives).forEach((alternative: Alternative) => {
+					alternatives.push(this.valueChartParser.parseAlternative(alternative, {}));
+				});
+
+				this.valueChartService.getValueChart().setAlternatives(alternatives);
+				this.valueChartViewerService.getActiveValueChart().setAlternatives(alternatives);
+				this.userNotificationService.displayInfo(['Two new alternatives have been added to the ValueChart']);
+			} else if (result.data.alternative) {
+				let alternative = this.valueChartParser.parseAlternative(JSON.parse(result.data.alternative), {})
+				this.valueChartService.getValueChart().addAlternative(alternative);
+				this.valueChartViewerService.getActiveValueChart().addAlternative(alternative);
+				this.userNotificationService.displayInfo(['A new Alternative has been added to the ValueChart']);
+			}
 		}
 	} 
 
-	sampleNewAlternative() {
+	sampleNewAlternative(index: number) {
 		var valueChart = this.valueChartService.getValueChart();
-		var user = valueChart.getUsers()[0];
-		var alternatives = valueChart.getAlternatives();
-
-		if (!this.scores) {
-			this.scores = []
-			alternatives.forEach((alternative: Alternative) => {
-				this.scores.push(this.computeScore(user, alternative));
-			});
-		} else if (this.scores.length < alternatives.length) {
-			this.scores.push(this.computeScore(user, alternatives[alternatives.length - 1]));
-		}
-
-
-		var message = { "jsonrpc": "2.0", "method": "sample_alternative", "data": { "chart_name": valueChart.getName(), "alternatives": alternatives, "scores": this.scores }, "id": 1 }
-
+		var user = valueChart.getUser(this.currentUserService.getUsername());
+		var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
+		var message = { "jsonrpc": "2.0", "method": "sample_alternative", "data": { "username": user.getUsername(), "current_weights": weights, "index": index }, "id": 1 }
 		this.connection.send(JSON.stringify(message))
 	}
 
-
-	computeScore(user: User, alternative: Alternative): number {
-		var score = 0
-		alternative.getAllObjectiveValuePairs().forEach((pair: {objectiveName: string, value: (string | number)}) => {
-			score += user.getScoreFunctionMap().getObjectiveScoreFunction(pair.objectiveName).getScore(pair.value) * user.getWeightMap().getObjectiveWeight(pair.objectiveName);
-		});
-
-		return score;
+	sampleNewAlternativePair(indices: number[]) {
+		var valueChart = this.valueChartService.getValueChart();
+		var user = valueChart.getUser(this.currentUserService.getUsername());
+		var weights = user.getWeightMap().getNormalizedWeights(valueChart.getAllPrimitiveObjectives())
+		var message = { "jsonrpc": "2.0", "method": "sample_pair", "data": { "username": user.getUsername(), "current_weights": weights, "indices": indices }, "id": 1 }
+		this.connection.send(JSON.stringify(message))
 	}
+
+	// computeScore(user: User, alternative: Alternative): number {
+	// 	var score = 0
+	// 	alternative.getAllObjectiveValuePairs().forEach((pair: {objectiveName: string, value: (string | number)}) => {
+	// 		score += user.getScoreFunctionMap().getObjectiveScoreFunction(pair.objectiveName).getScore(pair.value) * user.getWeightMap().getObjectiveWeight(pair.objectiveName);
+	// 	});
+
+	// 	return score;
+	// }
 
 
 }
