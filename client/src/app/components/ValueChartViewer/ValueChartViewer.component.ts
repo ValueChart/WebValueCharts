@@ -465,7 +465,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.userNotificationService.displayErrors(errors);
 		} else {
 			this.rescaleScoreFunctions();
-
+			this.valueChartViewerService.initUserColors(this.valueChartService.getValueChart());
 			// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 			// that has been retrieved from the server.
 			this.valueChartHttp.updateUser(this.valueChartViewerService.getActiveValueChart()._id, currentUser)
