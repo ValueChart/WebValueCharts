@@ -51,6 +51,7 @@ describe('ChangeDetectionService', () => {
 
 		viewConfig = {
     		scaleAlternatives: false,
+    		displayWeightDistributions: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -72,7 +73,7 @@ describe('ChangeDetectionService', () => {
 		height = 10;
 		width = 10;
 
-		changeDetectionService.startChangeDetection(hotelChart, width, height, viewConfig, interactionConfig, usersToDisplay);
+		changeDetectionService.startChangeDetection(hotelChart, width, height, viewConfig, interactionConfig, false, usersToDisplay);
 	});
 
 
@@ -161,23 +162,23 @@ describe('ChangeDetectionService', () => {
 			var area = hotelChart.getAllPrimitiveObjectives()[0].getId();
 			expect(hotelChart.getUsers()[0].getWeightMap().getObjectiveWeight(area)).to.equal(0.2);
 			hotelChart.getUsers()[0].getWeightMap().setObjectiveWeight(area, 0.3);
-			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false, false)).to.be.true;
 		});
 
 		it('should return true when the "renderRequired" parameter is true', () => {
-			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.false;
-			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, true)).to.be.true;
+			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false, false)).to.be.false;
+			expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false, true)).to.be.true;
 		});
 
 		context('when the view orientation and or score function display settings have been changed', () => {
 			it('should detect the changes in view orientation', () => {
 				viewConfig.viewOrientation = ChartOrientation.Horizontal;
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false, false)).to.be.true;
 			});
 
 			it('should detect the changes in score function display', () => {
 				viewConfig.displayScoreFunctions = true;
-				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false)).to.be.true;
+				expect(changeDetectionService.detectChanges(hotelChart, viewConfig, interactionConfig, false, false)).to.be.true;
 			});		
 		});
 	});

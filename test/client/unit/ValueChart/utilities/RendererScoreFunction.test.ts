@@ -54,6 +54,8 @@ describe('RendererScoreFunctionUtility', () => {
 	var elements: (string | number)[];
 
 	before(function() {
+		TestBed.resetTestingModule();
+		
 		TestBed.configureTestingModule({
 			providers: [ RendererScoreFunctionUtility ]
 		});

@@ -75,6 +75,7 @@ describe('ReorderObjectivesInteraction', () => {
 
 		viewConfig = {
     		scaleAlternatives: false,
+    		displayWeightDistributions: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -86,6 +87,7 @@ describe('ReorderObjectivesInteraction', () => {
 
 		u = {
 			el: null,
+			reducedInformation: false,
 			valueChart: hotelChart,
 			usersToDisplay: hotelChart.getUsers(),
 			viewConfig: viewConfig,

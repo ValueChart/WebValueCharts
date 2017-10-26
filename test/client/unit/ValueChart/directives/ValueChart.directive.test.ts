@@ -135,7 +135,8 @@ describe('ValueChartDirective', () => {
 		TestBed.resetTestingModule();
 
 		viewConfig = {
-    scaleAlternatives: false,
+    		scaleAlternatives: false,
+    		displayWeightDistributions: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -240,8 +241,9 @@ describe('ValueChartDirective', () => {
 			hotelChart = parser.parseValueChart(valueChartDocument);
 
 			viewConfig = {
-    scaleAlternatives: false,
+   				scaleAlternatives: false,
 				viewOrientation: ChartOrientation.Vertical,
+				displayWeightDistributions: false,
 				displayScoreFunctions: false,
 				displayTotalScores: false,
 				displayScales: false,
@@ -311,7 +313,8 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
-    scaleAlternatives: false,
+    				scaleAlternatives: false,
+    				displayWeightDistributions: false,
 					viewOrientation: ChartOrientation.Vertical,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
@@ -363,8 +366,9 @@ describe('ValueChartDirective', () => {
 				hotelChart = parser.parseValueChart(valueChartDocument);
 
 				viewConfig = {
-    scaleAlternatives: false,
+    				scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
+					displayWeightDistributions: false,
 					displayScoreFunctions: false,
 					displayTotalScores: false,
 					displayScales: false,
@@ -654,8 +658,9 @@ describe('ValueChartDirective', () => {
 
 			it('should re-render the valueChart in the new view orientation', () => {
 				viewerStub.viewConfig = {
-    scaleAlternatives: false,
+    				scaleAlternatives: false,
 					viewOrientation: ChartOrientation.Vertical,
+					displayWeightDistributions: false,
 					displayScoreFunctions: true,
 					displayTotalScores: false,
 					displayScales: true,
@@ -765,7 +770,7 @@ describe('ValueChartDirective', () => {
 
 		// Check score function updates:
 		u.valueChart.getAllPrimitiveObjectives().forEach((objective) => {
-			let scoreFunctionRenderer: ScoreFunctionRenderer = labelRenderer.labelSelections[objective.getId()].renderer;
+			let scoreFunctionRenderer: ScoreFunctionRenderer = labelRenderer.labelSelections[objective.getId() + '-scorefunction'].renderer;
 
 			expect(scoreFunctionRenderer.lastRendererUpdate).to.deep.equal(scoreFunctionRenderer.adjustScoreFunctionInteraction.lastRendererUpdate);
 			expect(scoreFunctionRenderer.lastRendererUpdate).to.deep.equal(scoreFunctionRenderer.expandScoreFunctionInteraction.lastRendererUpdate);

@@ -73,8 +73,9 @@ describe('ResizeWeightsInteraction', () => {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-    scaleAlternatives: false,
+    		scaleAlternatives: false,
 			viewOrientation: ChartOrientation.Vertical,
+			displayWeightDistributions: false,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
 			displayScales: false,
@@ -99,6 +100,7 @@ describe('ResizeWeightsInteraction', () => {
 			el: null,
 			valueChart: hotelChart,
 			usersToDisplay: hotelChart.getUsers(),
+			reducedInformation: false,
 			viewConfig: viewConfig,
 			interactionConfig: interactionConfig,
 			renderRequired: { value: false },
