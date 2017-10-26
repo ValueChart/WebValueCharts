@@ -56,13 +56,14 @@
 				Undo
 				</button>
 			</div>
-			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
+			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
 			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<div>
 		<ValueChart
 		[valueChart]="valueChartViewerService.getActiveValueChart()"
+		[reducedInformation]="reducedInformation"
 		[width]="valueChartWidth"
 		[height]="valueChartHeight"
 		[viewConfig]="viewConfig"

@@ -21,6 +21,7 @@ import { ChartUndoRedoService }										from '../services';
 import { ScoreFunctionRenderer }									from '../renderers';
 import { DiscreteScoreFunctionRenderer }							from '../renderers';
 import { ContinuousScoreFunctionRenderer }							from '../renderers';
+import { ViolinRenderer }											from '../renderers';
 
 import { LabelDefinitions }											from '../definitions';
 
@@ -79,6 +80,8 @@ export class LabelRenderer {
 																		// The subjects are indexed by PrimitiveObjective IDs.
 	private scoreFunctionViewSubject: Subject<boolean> = new Subject();		// The subject used to notify ScoreFunctionRenderers of view configuration changes.
 	private scoreFunctionInteractionSubject: Subject<any> = new Subject();	// The subject used to notify ScoreFunctionRenderers of interaction configuration changes.
+
+	private weightsPlotSubjects: any = {};
 
 	private viewOrientation: ChartOrientation;							// The current view orientation that the label area has been rendered in.
 																		// This is cached for internal change detection purposes.
@@ -168,6 +171,7 @@ export class LabelRenderer {
 	public viewConfigChanged = (viewConfig: ViewConfig) => {
 		this.scoreFunctionViewSubject.next(viewConfig.displayScoreFunctionValueLabels);
 		this.toggleDisplayScoreFunctions(viewConfig.displayScoreFunctions);
+		this.toggleDisplayWeightsPlots(viewConfig.displayWeightDistributions);
 		this.renderLabelSpace(this.lastRendererUpdate, this.lastRendererUpdate.labelData);
 	}
 
@@ -220,7 +224,7 @@ export class LabelRenderer {
 			.classed(LabelDefinitions.LABELS_CONTAINER, true);
 
 		// Recursively create the labels based on the Objective structure.
-		this.labelWidth = this.calculateMinLabelWidth(u.labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
+		this.labelWidth = this.calculateMinLabelWidth(u.labelData, u.rendererConfig.dimensionOneSize, u);
 		this.createLabels(u, u.labelData, this.labelContainer);
 	}
 
@@ -304,9 +308,12 @@ export class LabelRenderer {
 
 		// Call createLabels on the children of each AbstractObjective in labelData. This is how the hierarchical structure is "parsed".
 		labelData.forEach((labelDatum: LabelData) => {
-				var container = u.el.select('#label-' + labelDatum.objective.getId() + '-container');
+			var container = u.el.select('#label-' + labelDatum.objective.getId() + '-container');
+
 			if (labelDatum.subLabelData) {
 				container.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).remove();								// Delete any score functions attached to this container.
+				container.selectAll('.' + LabelDefinitions.WEIGHTS_PLOT).remove();
+
 				this.createLabels(u, labelDatum.subLabelData,container , labelDatum.objective.getId());
 			} else {
 				container.selectAll('.' + LabelDefinitions.LABEL_SUBCONTAINER).remove();
@@ -318,10 +325,12 @@ export class LabelRenderer {
 					.classed(LabelDefinitions.PRIMITIVE_OBJECTIVE_LABEL, true);
 				
 				this.createScoreFunction(u, container, <PrimitiveObjective> labelDatum.objective);
+				this.createWeightsPlot(u, container, <PrimitiveObjective> labelDatum.objective);
 			}
 
 		});
 
+		this.toggleDisplayWeightsPlots(this.lastRendererUpdate.viewConfig.displayWeightDistributions);
 		this.toggleDisplayScoreFunctions(this.lastRendererUpdate.viewConfig.displayScoreFunctions);
 	}
 
@@ -337,7 +346,7 @@ export class LabelRenderer {
 
 	renderLabelSpace(u: RendererUpdate, labelData: LabelData[], parentName: string = LabelDefinitions.ROOT_CONTAINER_NAME) {
 		// Calculate the width of the labels that are going to be created based on width of the area available, and the greatest depth of the Objective Hierarchy
-		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u.viewConfig.displayScoreFunctions);
+		this.labelWidth = this.calculateMinLabelWidth(labelData, u.rendererConfig.dimensionOneSize, u);
 		// Position the root container for the label area. This positions all of its child elements as well.
 		this.rootContainer
 			.attr('transform', 'translate(' + u.x + ',' + u.y + ')');
@@ -381,16 +390,28 @@ export class LabelRenderer {
 			let scaledWeightOffset: number = u.rendererConfig.dimensionTwoScale(weightOffsets[index]); // Determine the y (or x) offset for this label's children based on its weight offset.
 			
 			if (labelDatum.depthOfChildren === 0) {	// This label has no child labels.
-				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.determineLabelWidth(labelDatum, u), scaledWeightOffset); // Generate the transformation.
-				this.labelSelections[labelDatum.objective.getId()].scoreFunction.attr('transform', labelTransform)
-			
+				let offset = this.determineLabelWidth(labelDatum, u);
+				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, offset, scaledWeightOffset); // Generate the transformation.
+				this.labelSelections[labelDatum.objective.getId() + '-scorefunction'].scoreFunction.attr('transform', labelTransform)
+
 				// ONLY render the Score Functions if they are being displayed.
 				if (u.viewConfig.displayScoreFunctions) {
-					this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId()], this.labelSelections[labelDatum.objective.getId()].scoreFunction);
+					offset += this.labelWidth;
+					this.renderScoreFunction(u, <PrimitiveObjective> labelDatum.objective, this.scoreFunctionSubjects[labelDatum.objective.getId() + '-scorefunction'], this.labelSelections[labelDatum.objective.getId() + '-scorefunction'].scoreFunction);
+				}
+
+
+
+				labelTransform = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, offset, scaledWeightOffset); // Generate the transformation.
+				this.labelSelections[labelDatum.objective.getId() + '-weightsplot'].weightsPlot.attr('transform', labelTransform)
+
+				if (u.viewConfig.displayWeightDistributions) {
+					this.renderWeightsPlot(u, <PrimitiveObjective> labelDatum.objective, this.weightsPlotSubjects[labelDatum.objective.getId() + '-weightsplot'], this.labelSelections[labelDatum.objective.getId() + '-weightsplot'].weightsPlot);
 				}
 
 			} else {
-				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, this.labelWidth, scaledWeightOffset); // Generate the transformation.
+				let offset = (u.reducedInformation) ? 0 : this.labelWidth;
+				let labelTransform: string = this.rendererService.generateTransformTranslation(u.viewConfig.viewOrientation, offset, scaledWeightOffset); // Generate the transformation.
 				this.labelSelections[labelDatum.objective.getId()].labelContainers.attr('transform', labelTransform); // Apply the transformation to the sub label containers who are children of this label so that they inherit its position.
 				
 				this.renderLabels(u, labelDatum.subLabelData, labelDatum.objective.getId());	// Render the sub labels using the data update selection.
@@ -410,7 +431,7 @@ export class LabelRenderer {
 			.attr(u.rendererConfig.dimensionOne, (d, i) => { return this.determineLabelWidth(d, u); })
 			.attr(u.rendererConfig.coordinateOne, 0)									// Have to set CoordinateOne to be 0, or when we re-render in a different orientation the switching of the width and height can cause an old value to be retained
 			.attr(u.rendererConfig.dimensionTwo, (d: LabelData, i: number) => {
-				return Math.max(u.rendererConfig.dimensionTwoScale(d.weight) - 2, 0);					// Determine the height (or width) as a function of the weight
+				return Math.max(u.rendererConfig.dimensionTwoScale(d.weight) - 2, 0);	// Determine the height (or width) as a function of the weight
 			})
 			.attr(u.rendererConfig.coordinateTwo, ((d: LabelData, i: number) => {
 				return u.rendererConfig.dimensionTwoScale(weightOffsets[i]);			// Determine the y position (or x) offset from the top of the containing 'g' as function of the combined weights of the previous objectives. 
@@ -456,6 +477,12 @@ export class LabelRenderer {
 				}
 				return bestWorstText;
 			});
+
+		if (u.reducedInformation) {
+			labelTexts.style('display', 'none');
+		} else {
+			labelTexts.style('display', 'block');
+		}
 	}
 
 	/*
@@ -480,6 +507,72 @@ export class LabelRenderer {
 			.attr(u.rendererConfig.coordinateTwo + '2', calculateDimensionTwoOffset);
 	}
 
+
+	private createWeightsPlot(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
+		this.labelSelections[objective.getId() + '-weightsplot'] = {};
+		
+		labelContainer.selectAll('.' + LabelDefinitions.WEIGHTS_PLOT).remove();
+
+		// Create a container for the weights distribution plot.
+		var weightsPlot = labelContainer.selectAll('.' + LabelDefinitions.WEIGHTS_PLOT)
+			.data([objective]).enter().append('g')
+			.classed(LabelDefinitions.WEIGHTS_PLOT, true)
+			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-weightsplot'; });
+
+		// Cache the weights distribution plot container selection using the id of corresponding PrimitiveObjective.
+		this.labelSelections[objective.getId() + '-weightsplot'].weightsPlot = weightsPlot;
+
+		var renderer: ViolinRenderer = new ViolinRenderer();
+
+		// Cache the renderer instance under the Primitive Objective ID.
+		this.labelSelections[objective.getId() + '-weightsplot'].renderer = renderer;
+
+		// Create a new Subject that will be used to pass renderer updates to the ScoreFunctionRenderer.
+		var weightsPlotSubject = new Subject();
+		weightsPlotSubject.map((update: any) => { 
+			update.el = weightsPlot;
+			update.objective = objective;
+			
+			return update;
+		}).map(this.rendererScoreFunctionUtility.produceWeightDistributionData)
+			.map(this.rendererScoreFunctionUtility.produceViewConfig)
+			.subscribe(renderer.weightsPlotChanged);
+
+		// Cache the subject associated with the new ScoreFunctionPlot.
+		this.weightsPlotSubjects[objective.getId() + '-weightsplot'] = weightsPlotSubject;
+
+
+		// Render the Score Function for the first time. This is required to create the SVG elements/structure of the ScoreFunction plot.
+		this.renderWeightsPlot(u, objective, this.weightsPlotSubjects[objective.getId() + '-weightsplot'], weightsPlot);
+	}
+
+	private renderWeightsPlot(u: RendererUpdate, objective: PrimitiveObjective, weightsPlotSubject: Subject<any>, weightsPlotContainer: d3.Selection<any, any, any, any>): void {
+		var width: number
+		var height: number;
+		var weightOffset: number = 0;
+		var objective: PrimitiveObjective;
+		var objectiveWeight: number;
+
+		objectiveWeight = u.maximumWeightMap.getObjectiveWeight(objective.getId());
+
+		if (u.viewConfig.viewOrientation === ChartOrientation.Vertical) {
+			width = this.labelWidth;
+			height = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
+		} else {
+			width = this.lastRendererUpdate.rendererConfig.dimensionTwoScale(objectiveWeight);
+			height = this.labelWidth;
+		}
+
+		weightsPlotSubject.next(
+			{ 
+				width: width,
+				height: height, 
+				users: u.usersToDisplay,
+				structuralUpdate: u.structuralUpdate,
+				viewOrientation: u.viewConfig.viewOrientation
+			});
+	}
+
 	/*
 		@param u - The most recent RendererUpdate message received by the LabelRenderer. 
 		@param labelContainer - The 'g' element that contains the label whose ScoreFunction is to be created.
@@ -488,7 +581,7 @@ export class LabelRenderer {
 		@description 	Creates a score function plot for the input PrimitiveObjective a instance of ScoreFunctionRenderer.
 	*/
 	private createScoreFunction(u: RendererUpdate, labelContainer: d3.Selection<any, any, any, any>, objective: PrimitiveObjective): void {
-		this.labelSelections[objective.getId()] = {};
+		this.labelSelections[objective.getId() + '-scorefunction'] = {};
 		
 		labelContainer.selectAll('.' + LabelDefinitions.SCORE_FUNCTION).remove();
 
@@ -499,7 +592,7 @@ export class LabelRenderer {
 			.attr('id', (d: PrimitiveObjective) => { return 'label-' + d.getId() + '-scorefunction'; });
 
 		// Cache the score function plot container selection using the id of corresponding PrimitiveObjective.
-		this.labelSelections[objective.getId()].scoreFunction = scoreFunction;
+		this.labelSelections[objective.getId() + '-scorefunction'].scoreFunction = scoreFunction;
 
 		// Instantiate the correct ScoreFunctionRenderer.
 		var renderer: ScoreFunctionRenderer
@@ -509,7 +602,7 @@ export class LabelRenderer {
 			renderer = new ContinuousScoreFunctionRenderer(this.chartUndoRedoService);
 
 		// Cache the renderer instance under the Primitive Objective ID.
-		this.labelSelections[objective.getId()].renderer = renderer;
+		this.labelSelections[objective.getId() + '-scorefunction'].renderer = renderer;
 
 		// Create a new Subject that will be used to pass renderer updates to the ScoreFunctionRenderer.
 		var scoreFunctionSubject = new Subject();
@@ -523,13 +616,13 @@ export class LabelRenderer {
 			.subscribe(renderer.scoreFunctionChanged);
 
 		// Cache the subject associated with the new ScoreFunctionPlot.
-		this.scoreFunctionSubjects[objective.getId()] = scoreFunctionSubject;
+		this.scoreFunctionSubjects[objective.getId() + '-scorefunction'] = scoreFunctionSubject;
 		this.scoreFunctionViewSubject.subscribe(renderer.viewConfigChanged);
 		this.scoreFunctionInteractionSubject.map((interactionConfig: any) => { return { adjustScoreFunctions: (interactionConfig.adjustScoreFunctions && !objective.getDefaultScoreFunction().immutable), expandScoreFunctions: interactionConfig.expandScoreFunctions }; })
 				.subscribe(renderer.interactionConfigChanged);
 
 		// Render the Score Function for the first time. This is required to create the SVG elements/structure of the ScoreFunction plot.
-		this.renderScoreFunction(u, objective, this.scoreFunctionSubjects[objective.getId()], scoreFunction);
+		this.renderScoreFunction(u, objective, this.scoreFunctionSubjects[objective.getId() + '-scorefunction'], scoreFunction);
 	}
 
 	/*
@@ -619,6 +712,19 @@ export class LabelRenderer {
 		}
 	}
 
+	/*
+		@param displayScoreFunctionPlots - whether or no ScoreFunction plots should be displayed.
+		@returns {void}
+		@description 	Toggles ScoreFunctionPlots on or off by showing/hiding them using 'display'. This should is called automatically whenever the viewConfig changes.
+	*/
+	private toggleDisplayWeightsPlots(displayWeightsPlots: boolean): void {
+		if (displayWeightsPlots) {
+			this.rootContainer.selectAll('.' + LabelDefinitions.WEIGHTS_PLOT).style('display', 'block');
+		} else {
+			this.rootContainer.selectAll('.' + LabelDefinitions.WEIGHTS_PLOT).style('display', 'none');
+		}
+	}
+
 
 	// ========================================================================================
 	// 				Anonymous functions that are used enough to be made class fields
@@ -626,25 +732,43 @@ export class LabelRenderer {
 
 
 	determineLabelWidth = (d: LabelData, u: RendererUpdate) => {		 // Expand the last label to fill the rest of the space.
-		var scoreFunctionOffset: number = ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
-		var retValue = (d.depthOfChildren === 0) ?
-			(this.lastRendererUpdate.rendererConfig.dimensionOneSize - scoreFunctionOffset) - (d.depth * this.labelWidth)
-			:
-			this.labelWidth;
+		if (u.reducedInformation) {
+			return 0;
+		} else {
+			var offset: number = 0;
+			offset += ((u.viewConfig.displayScoreFunctions) ? this.labelWidth : 0);
+			offset += ((u.viewConfig.displayWeightDistributions) ? this.labelWidth : 0);
 
-		return retValue;
+			var retValue = (d.depthOfChildren === 0) ?
+				(this.lastRendererUpdate.rendererConfig.dimensionOneSize - offset) - (d.depth * this.labelWidth)
+				:
+				this.labelWidth;
+
+			return retValue;
+		}
 	};
 
-	calculateMinLabelWidth = (labelData: LabelData[], dimensionOneSize: number, displayScoreFunctions: boolean) => {
-		var maxDepthOfChildren = 0;
-		labelData.forEach((labelDatum: LabelData) => {
-			if (labelDatum.depthOfChildren > maxDepthOfChildren)
-				maxDepthOfChildren = labelDatum.depthOfChildren;
-		});
+	calculateMinLabelWidth = (labelData: LabelData[], dimensionOneSize: number, u: RendererUpdate) => {
+		if (u.reducedInformation) {
+			let width = dimensionOneSize;
 
-		maxDepthOfChildren += ((displayScoreFunctions) ? 2 : 1);
+			if (u.viewConfig.displayScoreFunctions && u.viewConfig.displayWeightDistributions)
+				width = width / 2;
 
-		return dimensionOneSize / maxDepthOfChildren;
+			return width;
+		} else {
+			var maxDepthOfChildren = 0;
+			labelData.forEach((labelDatum: LabelData) => {
+				if (labelDatum.depthOfChildren > maxDepthOfChildren)
+					maxDepthOfChildren = labelDatum.depthOfChildren;
+			});
+
+			maxDepthOfChildren += 1;	// Add one for the root label.
+			maxDepthOfChildren += ((u.viewConfig.displayScoreFunctions) ? 1 : 0);
+			maxDepthOfChildren += ((u.viewConfig.displayWeightDistributions) ? 1 : 0);
+
+			return dimensionOneSize / maxDepthOfChildren;
+		}
 	}
 
 }
