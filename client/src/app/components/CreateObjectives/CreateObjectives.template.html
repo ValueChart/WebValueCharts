@@ -52,7 +52,7 @@
                 <input class="form-control" type="text" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].name" (ngModelChange)="resetErrorMessages()"/>
             </th>
             <th>
-                <textarea class="form-control objectives-table-textarea" rows="1" [disabled]="objID === rootObjRowID" [(ngModel)]="objectiveRows[objID].desc"></textarea>
+                <textarea class="form-control objectives-table-textarea" rows="1" [(ngModel)]="objectiveRows[objID].desc"></textarea>
             </th>
             <th>
                 <div *ngIf="objectiveRows[objID].type === 'abstract'">---</div>

@@ -131,7 +131,7 @@ export class CreateObjectivesComponent implements OnInit {
 		this.valueChart = this.valueChartService.getValueChart();
 
 		if (this.valueChart.getAllObjectives().length === 0) {
-			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, '', this.valueChart.getName(), 'This is the root Objective. It represents the whole decision problem.', '', 0, 'abstract');
+			this.objectiveRows[this.rootObjRowID] = new ObjectiveRow(this.rootObjRowID, '', this.valueChart.getName(), this.valueChart.getDescription(), '', 0, 'abstract');
 			this.objectivesCount++;
 		}
 		else {
