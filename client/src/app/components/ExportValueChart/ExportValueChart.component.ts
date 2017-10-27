@@ -26,7 +26,7 @@ import { ValueChart }										from '../../../model';
 	selector: 'ExportValueChart',
 	template: `
 				<div class="export-value-chart">
-					<a class="btn btn-default" id="download-value-chart"
+					<a class="btn btn-default" id="download-value-chart" style="width: 90%;"
 						[class.disabled]="!valueChartService.valueChartIsDefined()" 
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
