@@ -84,7 +84,8 @@ describe('SortAlternativesInteraction', () => {
 			rowData: null,
 			labelData: null,
 			rendererConfig: null,
-			structuralUpdate: null
+			structuralUpdate: null,
+			reducedInformation: false
 		}
 
 		u = rendererDataUtility.produceMaximumWeightMap(u);

@@ -41,7 +41,7 @@
 					</li>
 					<li>
 						<button class="btn btn-success" style="width: 90%;" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
-							Save
+							{{valueChartViewerService.isOwner() ? "Save" : "Save to Group Chart"}}
 						</button>
 					</li>
 				</ul>
@@ -56,35 +56,35 @@
 				Undo
 				</button>
 			</div>
-			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
+			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
 			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
-		<div>
-			<ValueChart
-			[valueChart]="valueChartViewerService.getActiveValueChart()"
-			[width]="valueChartWidth"
-			[height]="valueChartHeight"
-			[viewConfig]="viewConfig"
-			[interactionConfig]="interactionConfig"
-			[usersToDisplay]="usersToDisplay"
-			(chartElement)="updateChartElement($event)"
-			(undoRedo)="updateUndoRedo($event)"
-			(renderEvents)="updateRenderEvents($event)">
-			</ValueChart>
-		</div>
-		<div>
-			<DetailBox 
-			[valueChart]="valueChartViewerService.getActiveValueChart()"
-			[enableManagement]="valueChartViewerService.isOwner()" 
-			[showUsers]="!valueChartService.getValueChart().isIndividual()"
-			[viewConfig]="viewConfig" 
-			[height]="valueChartHeight / 4" 
-			[width]="valueChartWidth / 3.1"
-			[renderEventsService]="renderEvents"
-			[chartElement]="chartElement">
-			</DetailBox>
-		</div>
+	<div>
+		<ValueChart
+		[valueChart]="valueChartViewerService.getActiveValueChart()"
+		[reducedInformation]="reducedInformation"
+		[width]="valueChartWidth"
+		[height]="valueChartHeight"
+		[viewConfig]="viewConfig"
+		[interactionConfig]="interactionConfig"
+		[usersToDisplay]="usersToDisplay"
+		(chartElement)="updateChartElement($event)"
+		(undoRedo)="updateUndoRedo($event)"
+		(renderEvents)="updateRenderEvents($event)">
+		</ValueChart>
+	</div>
+	<div>
+		<DetailBox 
+		[valueChart]="valueChartViewerService.getActiveValueChart()"
+		[enableManagement]="valueChartViewerService.isOwner()" 
+		[showUsers]="!valueChartService.getValueChart().isIndividual()"
+		[viewConfig]="viewConfig" 
+		[height]="valueChartHeight / 4" 
+		[width]="valueChartWidth / 3.1"
+		[renderEventsService]="renderEvents"
+		[chartElement]="chartElement">
+		</DetailBox>
 	</div>
 	<NotificationModal
 	[display]="validationMessage.length > 0"

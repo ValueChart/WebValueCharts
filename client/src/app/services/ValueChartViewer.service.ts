@@ -216,7 +216,6 @@ export class ValueChartViewerService {
 
 		this.usersToDisplay = _.clone(users.filter(user => invalidUsers.indexOf(user.getUsername()) === -1));
 		this.setInvalidUsers(invalidUsers);
-		this.initUserColors(valueChart);
 	}
 
 	getUsersToDisplay(): User[] {
@@ -316,8 +315,6 @@ export class ValueChartViewerService {
 		else
 			this.addInvalidUser(newUser.getUsername());
 
-		this.initUserColors(this.valueChartService.getValueChart());
-
 		if (this.userRole !== UserRole.UnsavedParticipant)
 			this.userNotificationService.displayInfo([newUser.getUsername() + ' has joined the ValueChart']);
 	}
@@ -384,7 +381,6 @@ export class ValueChartViewerService {
 			nowValidUser => this.addUserToDisplay(this.activeValueChart.getUser(nowValidUser)));
 		
 		this.setInvalidUsers(invalidUsers);
-		this.initUserColors(valueChart);
 
 		// Update the active ValueChart.
 		if (this.getActiveValueChart().getType() === ChartType.Individual) {

@@ -212,7 +212,7 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 			labelCoordinateOneOffset = (1.5 * u.rendererConfig.labelOffset) + 5;
 		}
 
-		this.domainLabels.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.domainAxisMaxCoordinateOne - u.rendererConfig.utilityAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
+		this.domainLabels.attr(u.rendererConfig.coordinateOne, (d: DomainElement, i: number) => { return (((u.rendererConfig.independentAxisCoordinateOne - u.rendererConfig.dependentAxisCoordinateOne) / this.domainSize) * i) + labelCoordinateOneOffset; }) // Position the domain labels at even intervals along the axis.
 	}
 
 	/*
@@ -284,20 +284,20 @@ export class DiscreteScoreFunctionRenderer extends ScoreFunctionRenderer {
 		this.utilityBars
 			.attr(u.rendererConfig.dimensionTwo, calculateBarDimensionTwo)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.domainAxisCoordinateTwo;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.independentAxisCoordinateTwo - calculateBarDimensionTwo(d) : u.rendererConfig.independentAxisCoordinateTwo;
 			});
 
 		this.barLabels
 			.text((d: any, i: number) => {
 				return Math.round(100 * d.scoreFunction.getScore(d.element)) / 100;
 			}).attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
+				return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.independentAxisCoordinateTwo - calculateBarDimensionTwo(d)) - 2 : calculateBarDimensionTwo(d) + 30;
 			});
 
 		this.barTops
 			.attr(u.rendererConfig.dimensionTwo, u.rendererConfig.labelOffset)
 			.attr(u.rendererConfig.coordinateTwo, (d: DomainElement) => {
-				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.domainAxisCoordinateTwo - calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2) : u.rendererConfig.domainAxisCoordinateTwo + calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2);
+				return (u.viewOrientation === ChartOrientation.Vertical) ? u.rendererConfig.independentAxisCoordinateTwo - calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2) : u.rendererConfig.independentAxisCoordinateTwo + calculateBarDimensionTwo(d) - (u.rendererConfig.labelOffset / 2);
 			});
 
 	}

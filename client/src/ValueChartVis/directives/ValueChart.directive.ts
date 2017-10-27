@@ -84,6 +84,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	@Input() private viewConfig: ViewConfig = <any>{};						// Configuration options for view settings;
 	@Input() private interactionConfig: InteractionConfig = <any>{};		// Configuration options for user interactions.
 
+	@Input() private reducedInformation: boolean = true;
+
 	// Chart Outputs:
 	@Output() chartElement: EventEmitter<d3.Selection<any, any, any, any>> = new EventEmitter();	// Output the parent SVG element of the visualization so that external modules may interact with it.
 	@Output() undoRedo: EventEmitter<ChartUndoRedoService> = new EventEmitter();					// Output the ChartUndoRedoService so that external modules may interface with it.
@@ -154,7 +156,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		this.calculateDefaultComponentSize();
 
 		// Initialize Change Detection:
-		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig, this.usersToDisplay);
+		this.changeDetectionService.startChangeDetection(this.valueChart, this.width, this.height, this.viewConfig, this.interactionConfig, this.reducedInformation, this.usersToDisplay);
 
 		this.valueChartSubject 	= new Subject();
 		this.interactionSubject = new Subject();
@@ -243,8 +245,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			 u.width = this.defaultChartComponentWidth;
 			 u.viewConfig = this.viewConfig;
 			 u.interactionConfig = this.interactionConfig;
-			 u.renderRequired = this.renderRequired 
-
+			 u.renderRequired = this.renderRequired;
+			 u.reducedInformation = this.reducedInformation;
 			 return u;
 		}).map(this.rendererDataUtility.produceMaximumWeightMap)	// Attach the maximumWeightMap to the RendererUpdate using a map.
 			.map(this.rendererDataUtility.produceRowData)			// Attach the rowData to the RendererUpdate using a map.
@@ -332,7 +334,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		//		- a change in the rendering orientation.
 		// 		- a change in alternative scaling (i.e. from fitting to the window size to fixed size)
 		// 		- a change in whether or not score functions are displayed.
-		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.renderRequired.value)) {
+		if (this.changeDetectionService.detectChanges(this.valueChart, this.viewConfig, this.interactionConfig, this.reducedInformation, this.renderRequired.value)) {
 
 			this.renderRequired.value = false;
 			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay, structuralUpdate: false });

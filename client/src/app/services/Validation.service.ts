@@ -42,7 +42,7 @@ export class ValidationService {
 	PASSWORD_MISSING: string = "Chart must have a password.";
 	PASSWORD_INVALID: string = "Chart password may not contain spaces."
 	TYPE_INVALID: string = "Individual charts may only contain preferences for the creator.";
-	NO_PRIMITIVE_OBJECTIVES: string = "The chart must have at least one base Objective.";
+	NO_PRIMITIVE_OBJECTIVES: string = "The chart must have at least one basic Objective.";
 	OBJECTIVE_NAMES_MISSING: string = "Every Objective must have a name.";
 	OBJECTIVE_NAMES_NOT_UNIQUE: string = "Objective names must be unique.";
 	OBJECTIVE_NAMES_INVALID: string = "The following Objective names contain disallowed characters: ";

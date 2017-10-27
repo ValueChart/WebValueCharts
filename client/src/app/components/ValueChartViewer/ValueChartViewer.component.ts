@@ -89,6 +89,7 @@ export class ValueChartViewerComponent implements OnInit {
 	// ValueChart Configuration:
 	public viewConfig: ViewConfig = <any> {};
 	public interactionConfig: InteractionConfig = <any> {};
+	public reducedInformation: boolean = false;
 
 
 	// ========================================================================================
@@ -285,6 +286,10 @@ export class ValueChartViewerComponent implements OnInit {
 		this.interactionConfig = interactionConfig;
 	}
 
+	updateReducedInfo(reducedInformation: boolean): void {
+		this.reducedInformation = reducedInformation;
+	}
+
 	/* 	
 		@param undoRedoService - the UndoRedoService instantiated by the ValueChartDirective and used by the directive's ecosystem.
 		@returns {void}
@@ -460,7 +465,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.userNotificationService.displayErrors(errors);
 		} else {
 			this.rescaleScoreFunctions();
-
+			this.valueChartViewerService.initUserColors(this.valueChartService.getValueChart());
 			// The ValueChart ID should always be defined at this point since we are joining an EXISTING chart
 			// that has been retrieved from the server.
 			this.valueChartHttp.updateUser(this.valueChartViewerService.getActiveValueChart()._id, currentUser)

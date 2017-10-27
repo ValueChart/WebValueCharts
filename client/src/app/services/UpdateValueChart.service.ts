@@ -178,11 +178,7 @@ export class UpdateValueChartService {
 			(<AbstractObjective> aCopy).setDirectSubObjectives([]);
 			(<AbstractObjective> bCopy).setDirectSubObjectives([]);
 
-			let fieldsSame = _.isEqual(aCopy, bCopy);	// Check if the immediate properties are the same.
-			// Check (by id) to see if the children are the same.
-			let childrenSame = _.differenceBy((<AbstractObjective> a).getDirectSubObjectives(), (<AbstractObjective> b).getDirectSubObjectives(), 'id').length === 0;
-
-			return fieldsSame && childrenSame;
+			return _.isEqual(aCopy, bCopy);	// Check if the immediate properties are the same.
 		}
 	}
 

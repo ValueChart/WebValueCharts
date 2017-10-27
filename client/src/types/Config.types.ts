@@ -18,6 +18,7 @@ export interface ViewConfig {
 	viewOrientation: ChartOrientation;
 	scaleAlternatives: boolean;
 	displayScoreFunctions: boolean;
+	displayWeightDistributions: boolean;
 	displayDomainValues: boolean;
 	displayScales: boolean;
 	displayTotalScores: boolean;

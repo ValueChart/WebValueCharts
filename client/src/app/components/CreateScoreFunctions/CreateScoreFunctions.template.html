@@ -6,16 +6,13 @@
             <div id="score-function-controls">
                 <label class="control-label">Select Objective:</label>
                 <div class="input-group">
-                    <select class="form-control score-function-dropdown" [(ngModel)]="selectedObjective">
-                        <option *ngFor="let obj of valueChartService.getValueChart().getMutableObjectives()" [value]="obj.getName()">{{obj.getName()}}</option>
+                    <select class="form-control score-function-select" size="10" MULTIPLE [(ngModel)]="selectedObjective" (ngModelChange)="creationStepsService.visitedScoreFunctions.push(selectedObjective)">
+                        <option *ngFor="let obj of valueChartService.getValueChart().getAllPrimitiveObjectives()" [ngClass]="{immutable: getScoreFunctionForObjective(obj.getName()).immutable, unvisited: isUnvisited(obj.getName())}" [value]="obj.getName()">{{getScoreFunctionForObjective(obj.getName()).immutable ? obj.getName() + ' (fixed)' : obj.getName()}}</option>
                     </select>
-                    <button type="button" class="btn btn-default" (click)="advanceSelectedObjective()">
-                        Next
-                    </button>
                 </div>
                 <label class="control-label">Select Predefined:</label>
                 <div class="input-group">
-                    <select class="form-control score-function-dropdown" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
+                    <select class="form-control score-function-select" [disabled]="getScoreFunctionForObjective(selectedObjective).immutable" [(ngModel)]="latestDefaults[selectedObjective]" (ngModelChange)="resetScoreFunction(); resetErrorMessages()">
                         <option value="default">Default</option>
                         <option value="{{ScoreFunction.POSLIN}}">Positive Linear</option>
                         <option value="{{ScoreFunction.NEGLIN}}">Negative Linear</option>
@@ -27,7 +24,7 @@
         </div> 
         <div class="col-xs-offset-3">
             <ScoreFunction 
-                [scoreFunctions]="[user.getScoreFunctionMap().getObjectiveScoreFunction(getObjectiveByName(selectedObjective).getId())]"
+                [scoreFunctions]="[getScoreFunctionForObjective(selectedObjective)]"
                 [colors]="[user.color]"
                 [objective]="getObjectiveByName(selectedObjective)"
                 [width]="440"
@@ -35,7 +32,7 @@
                 [viewOrientation]="ChartOrientation.Vertical"
                 [services]="services"
                 [individual]="true"
-                [enableInteraction]="true">
+                [enableInteraction]="!getScoreFunctionForObjective(selectedObjective).immutable">
                 <svg class="svg-content-createvaluechart" viewBox="0 0, 440, 300" preserveAspectRatio="xMinYMin meet">
                     <g class="expanded-score-function"></g>
                 </svg>
