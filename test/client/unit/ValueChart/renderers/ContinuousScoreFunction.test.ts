@@ -442,7 +442,7 @@ describe('ContinuousScoreFunctionRenderer', () => {
 	};
 
 	var calculatePointCoordinateTwo = (u: ScoreFunctionUpdate, score: number, coordinate: string) => {
-		return (coordinate == 'y') ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(score) : u.heightScale(score);
+		return (coordinate == 'y') ? (u.rendererConfig.independentAxisCoordinateTwo) - u.heightScale(score) : u.heightScale(score);
 	};
 
 	var checkRenderedAxes = (u: ScoreFunctionUpdate) => {

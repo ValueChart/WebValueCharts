@@ -98,7 +98,8 @@ var renderEventsServiceStub = {
 		hotelChart = parser.parseValueChart(valueChartDocument);
 
 		viewConfig = {
-    scaleAlternatives: false,
+    		scaleAlternatives: false,
+    		displayWeightDistributions: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -160,7 +161,8 @@ var renderEventsServiceStub = {
 			rowData: null,
 			labelData: null,
 			rendererConfig: null,
-			structuralUpdate: null
+			structuralUpdate: null,
+			reducedInformation: false
 		}
 
 		aaron = hotelChart.getUsers()[0];

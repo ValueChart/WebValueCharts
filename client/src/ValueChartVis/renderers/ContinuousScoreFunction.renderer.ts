@@ -281,7 +281,7 @@ export class ContinuousScoreFunctionRenderer extends ScoreFunctionRenderer {
 	protected renderContinuousPlotDimensionTwo(u: ScoreFunctionUpdate): void {
 		// Assign this function to a variable because it is used multiple times. This is cleaner and faster than creating multiple copies of the same anonymous function.
 		var calculatePointCoordinateTwo = (d: DomainElement) => {
-			return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.domainAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
+			return (u.viewOrientation === ChartOrientation.Vertical) ? (u.rendererConfig.independentAxisCoordinateTwo) - u.heightScale(d.scoreFunction.getScore(+d.element)) : u.heightScale(d.scoreFunction.getScore(+d.element));
 		};
 
 		this.plottedPoints

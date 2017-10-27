@@ -68,8 +68,15 @@ export class RendererDataUtility {
 					 This method is generally used as a part of the rendering pipeline created in ValueChartDirective.
 	*/
 	public produceMaximumWeightMap = (u: RendererUpdate): RendererUpdate => {
+		if (u.reducedInformation) {
+			u.maximumWeightMap = u.valueChart.getDefaultWeightMap();
+			let objectives = u.valueChart.getAllPrimitiveObjectives();
+			objectives.forEach((objective: PrimitiveObjective) => {
+				u.maximumWeightMap.setObjectiveWeight(objective.getId(), 1 / objectives.length);
+			});
+		}
 		// Return the default WeightMap if there are no users.
-		if (u.usersToDisplay.length == 0)
+		else if (u.usersToDisplay.length == 0)
 			u.maximumWeightMap = u.valueChart.getDefaultWeightMap();
 		// If there is only one user then the maximum WeightMap is that user's WeightMap
 		else if (u.usersToDisplay.length == 1) {

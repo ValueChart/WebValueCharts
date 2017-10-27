@@ -1,10 +1,10 @@
 <h4>Add Alternatives</h4>
-<input class="btn btn-default btn-lg pull-right" type="button" value="Delete" (click)="deleteAlternatives()" />
-<input class="btn btn-default btn-lg pull-right" type="button" value="Add Alternative" (click)="addEmptyAlternative()" />
 <table class="table table-bordered">
     <thead>
       <tr>
-        <th><input type="checkbox" [ngModel]="allSelected()" (ngModelChange)="toggleSelectAll()"/></th>
+        <th><button type="button" class="btn btn-xs btn-success" (click)="addEmptyAlternative()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button></th>
         <th><div class="alternatives-table-name-column">Name</div></th>
         <th><div class="alternatives-table-description-column">Description</div></th>
         <th *ngFor="let obj of valueChart.getAllPrimitiveObjectives()"><div class="alternatives-table-outcome-column">{{getColumnHeader(obj)}}</div></th>
@@ -13,7 +13,9 @@
     <tbody>
       <tr *ngFor="let altID of altKeys()">
         <th>
-            <input type="checkbox" #t [(ngModel)]="isSelected[altID]" name="{{altID}}" />
+           <button type="button" class="btn btn-xs transparent-button" (click)="deleteAlternative(altID)">
+            <span class="glyphicon glyphicon-remove"></span>
+            </button>
         </th>
         <th>
             <input class="form-control" type="text" #n [ngModel]="alternatives[altID].getName()" (ngModelChange)="alternatives[altID].setName(n.value); resetErrorMessages()"/>

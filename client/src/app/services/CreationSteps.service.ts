@@ -58,6 +58,9 @@ export class CreationStepsService {
 	// Copy of the current ValueChart. This is used to determine if there are changes which should be autosaved.
 	public valueChartCopy: ValueChart;
 
+	// List of visited score functions. Used to keep track of which score functions have been inspected between steps.
+	public visitedScoreFunctions: string[] = [];
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================

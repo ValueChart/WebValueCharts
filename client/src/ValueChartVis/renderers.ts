@@ -12,3 +12,4 @@ export { LabelRenderer }                         from "./renderers/Label.rendere
 export { ObjectiveChartRenderer }                from "./renderers/ObjectiveChart.renderer";
 export { SummaryChartRenderer }                  from "./renderers/SummaryChart.renderer";
 export { ScoreDistributionChartRenderer }        from "./renderers/ScoreDistributionChart.renderer";
+export { ViolinRenderer }                        from "./renderers/Violin.renderer";

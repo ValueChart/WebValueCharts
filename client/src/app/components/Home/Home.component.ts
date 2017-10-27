@@ -134,10 +134,10 @@ export class HomeComponent {
 					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.Participant : UserRole.UnsavedParticipant;
 
 					if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
-			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: role }});
+			  			this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: role }});
 			  		}
 			  		else {
-			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: role }});
+			  			this.router.navigate(['create', CreatePurpose.NewUser, 'Weights'], { queryParams: { role: role }});
 			  		}
 				}
 			},

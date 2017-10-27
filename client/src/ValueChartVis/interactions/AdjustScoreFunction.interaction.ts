@@ -95,7 +95,7 @@ export class AdjustScoreFunctionInteraction {
 		// Convert the y position of the mouse into a score by using the inverse of the scale used to convert scores into y positions:
 		if (this.lastRendererUpdate.viewOrientation === ChartOrientation.Vertical) {
 			// Subtract the event y form the offset to obtain the y value measured from the bottom of the plot.
-			score = this.lastRendererUpdate.heightScale.invert(this.lastRendererUpdate.rendererConfig.domainAxisCoordinateTwo - (<any>d3.event)[this.lastRendererUpdate.rendererConfig.coordinateTwo]);
+			score = this.lastRendererUpdate.heightScale.invert(this.lastRendererUpdate.rendererConfig.independentAxisCoordinateTwo - (<any>d3.event)[this.lastRendererUpdate.rendererConfig.coordinateTwo]);
 		} else {
 			// No need to do anything with offsets here because x is already left to right.
 			score = this.lastRendererUpdate.heightScale.invert((<any>d3.event)[this.lastRendererUpdate.rendererConfig.coordinateTwo]);

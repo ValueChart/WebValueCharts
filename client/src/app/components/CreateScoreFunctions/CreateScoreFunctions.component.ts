@@ -34,6 +34,7 @@ import { WeightMap }                                from '../../../model';
 
 // Import Types:
 import { ChartOrientation }                         from '../../../types';
+import { CreatePurpose }                            from '../../../types';
 
 
 /*
@@ -80,7 +81,7 @@ export class CreateScoreFunctionsComponent implements OnInit {
   */
   constructor(
     public valueChartService: ValueChartService,
-    private creationStepsService: CreationStepsService,
+    public creationStepsService: CreationStepsService,
     private updateValueChartService: UpdateValueChartService,
     private rendererScoreFunctionUtility: RendererScoreFunctionUtility,
     private currentUserService: CurrentUserService,
@@ -106,7 +107,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     });
     this.services.chartUndoRedoService = new ChartUndoRedoService();
     this.services.rendererScoreFunctionUtility = this.rendererScoreFunctionUtility;
-    this.selectedObjective = this.valueChartService.getValueChart().getMutableObjectives()[0].getName();
+    this.selectedObjective = this.valueChartService.getValueChart().getAllPrimitiveObjectives()[0].getName();
+    this.creationStepsService.visitedScoreFunctions.push(this.selectedObjective);
     this.latestDefaults = {};
 
     // Initialize user
@@ -159,23 +161,6 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
   }
 
-  // ================================ Objective Selection Methods ====================================
-
-  /*   
-    @returns {void}
-    @description   Changes selected Objective to next in list.
-                   (Currently called when user clicks "Next" button next to dropdown).
-  */
-  advanceSelectedObjective() {
-    let primObjs: string[] = this.valueChartService.getValueChart().getMutableObjectives().map(obj => obj.getName());
-    let selectedIndex: number = primObjs.indexOf(this.selectedObjective);
-    let nextIndex: number = selectedIndex + 1;
-    if (nextIndex >= primObjs.length) {
-      nextIndex = 0;
-    }
-    this.selectedObjective = primObjs[nextIndex];
-  }
-
   // ================================ Default Function Selection Methods ====================================
 
   /*   
@@ -209,6 +194,8 @@ export class CreateScoreFunctionsComponent implements OnInit {
     return this.errorMessages.length === 0;
   }
 
+  // ================================ Helper Methods ====================================
+
    /*   
     @returns {void}
     @description   Resets error messages if validation has already been triggered.
@@ -228,4 +215,15 @@ export class CreateScoreFunctionsComponent implements OnInit {
     }
     throw "Objective not found";
   }
+
+  public getScoreFunctionForObjective(objName: string): ScoreFunction {
+    return this.user.getScoreFunctionMap().getObjectiveScoreFunction(this.getObjectiveByName(objName).getId());
+  }
+
+  // Apply unvisited styles to objective in select list if it is mutable, has not been visisted yet, 
+  // and the user is creating a new chart or joining (i.e., it is their first time through)
+  public isUnvisited(objName: string): boolean {
+    return (!this.getScoreFunctionForObjective(objName).immutable && this.creationStepsService.visitedScoreFunctions.indexOf(objName) === -1
+      && (this.creationStepsService.getCreationPurpose() === CreatePurpose.NewValueChart || this.creationStepsService.getCreationPurpose() === CreatePurpose.NewUser));
+  } 
 }

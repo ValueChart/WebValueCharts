@@ -36,10 +36,9 @@ export class PrimitiveObjective implements Objective {
 	// ========================================================================================
 
 
-	public objectiveType: string;					// The type of objective. This must always be 'primitive';
-	public scoreFunctionFixed: boolean 				// True if defaultScoreFunction is common to all users and cannot be customized.
-	private name: string;							// The name of the objective. This field is ALWAYS used as the key for Alternatives, WeightMaps, and ScoreFunctionMaps. NEVER use id.
-	private id: string;								// The id of the objective. This is for use as an HTML id ONLY, and is formatted from the name field specifically for this purpose. 
+	public objectiveType: string;					// The type of objective. This must always be 'primitive'.
+	private name: string;							// The name of the objective.
+	private id: string;								// The id of the objective. This field is used as the key for Alternatives, WeightMaps, and ScoreFunctionMaps. 
 	private description: string;					// The description of the objective.
 	private color: string;							// The color of the objective in a ValueChart.
 	private domain: Domain;							// The domain of the objective. 

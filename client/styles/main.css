@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2017-08-22 10:33:01
+* @Last Modified time: 2017-10-22 19:41:29
 */
 
 /* Global Styles */
@@ -427,10 +427,6 @@ input {
     resize: vertical;
 }
 
-.objectivestableselectedrow { /* has to be one word */
-    background-color: #D4E7F2;
-}
-
 .objectivestableboldbutton {
     font-weight: bold !important;
     border-color: black !important;
@@ -453,15 +449,27 @@ input {
     min-width: 65px;
 }
 
+.transparent-button {
+    background-color:transparent !important;
+}
+
 /* Creation workflow styles - Score Functions and Weights */
 
 #score-function-controls {
     margin-left: 20px;
 }
 
-.score-function-dropdown {
+.score-function-select {
     width: 245px !important; 
     margin-right: 5px !important;
+}
+
+.immutable {
+    color: #A9A9A9;
+}
+
+.unvisited {
+    font-weight: bold;
 }
 
 #objective-description {

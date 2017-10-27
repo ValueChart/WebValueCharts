@@ -34,6 +34,7 @@ export class ChangeDetectionService {
 	public widthRecord: number;										// Copy of the previous width. It should equal the width in ValueChartDirective unless a change has taken place.
 	public heightRecord: number;									// Copy of the previous height. It should equal the height in ValueChartDirective unless a change has taken place.
 	public usersToDisplayRecord: User[];							// Copy of the previous list of users to be rendered in the visualization. This is distinct from valueChartRecord.getUsers();
+	public reducedInformationRecord: boolean;
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -59,7 +60,7 @@ export class ChangeDetectionService {
 		@description	Creates deep copies of the inputs to the ValueChartDirective and saves them into class fields. It should be used to initiate
 						change detection and must be called before the change detection methods in this class. 
 	*/
-	startChangeDetection(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig, usersToDisplay: User[]): void {
+	startChangeDetection(valueChart: ValueChart, width: number, height: number, viewConfig: ViewConfig, interactionConfig: InteractionConfig, reducedInformation: boolean, usersToDisplay: User[]): void {
 		this.valueChartRecord = _.cloneDeep(valueChart);
 		this.widthRecord = _.clone(width);
 		this.heightRecord = _.clone(height);
@@ -67,6 +68,7 @@ export class ChangeDetectionService {
 		this.viewConfigRecord = _.cloneDeep(viewConfig);
 		this.interactionConfigRecord = _.cloneDeep(interactionConfig);
 		this.usersToDisplayRecord = _.cloneDeep(usersToDisplay);
+		this.reducedInformationRecord = _.clone(reducedInformation);
 	}
 
 	
@@ -80,19 +82,22 @@ export class ChangeDetectionService {
 						if detectChanges has not yet been called. startChangeDetection should be used to initialize change detection before using this method.
 						detectChanges should be used to detect changes that require an entire re-rendering of the ValueChart. 
 	*/
-	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, renderRequired: boolean): boolean {
+	detectChanges(valueChart: ValueChart, viewConfig: ViewConfig, interactionConfig: InteractionConfig, reducedInformation: boolean, renderRequired: boolean): boolean {
 		var valueChartChanged: boolean =  !_.isEqual(valueChart.getUsers(), this.valueChartRecord.getUsers());
 		var chartTypeChanged: boolean = !_.isEqual(valueChart.getType(), this.chartTypeRecord);
 		var viewOrientationChanged: boolean = this.viewConfigRecord.viewOrientation !== viewConfig.viewOrientation;
 		var scaleAlternativesChanged: boolean = this.viewConfigRecord.scaleAlternatives !== viewConfig.scaleAlternatives;
 		var scoreFunctionDisplayChanged: boolean = this.viewConfigRecord.displayScoreFunctions !== viewConfig.displayScoreFunctions;
+		var weightDistributionsDisplayChanged: boolean = this.viewConfigRecord.displayWeightDistributions !== viewConfig.displayWeightDistributions;
+		var reducedInformationChanged: boolean = this.reducedInformationRecord != reducedInformation;
 
 		if (valueChartChanged)
 			this.valueChartRecord = _.cloneDeep(valueChart);
 
 		this.chartTypeRecord = _.clone(valueChart.getType());
+		this.reducedInformationRecord = _.clone(reducedInformation)
 
-		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scaleAlternativesChanged || scoreFunctionDisplayChanged || renderRequired;
+		return valueChartChanged || chartTypeChanged || viewOrientationChanged || scaleAlternativesChanged || scoreFunctionDisplayChanged || weightDistributionsDisplayChanged || reducedInformationChanged || renderRequired;
 	}
 
 	/*

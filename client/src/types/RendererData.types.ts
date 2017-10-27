@@ -88,6 +88,7 @@ export interface RendererUpdate {
 	rendererConfig: RendererConfig;
 	renderRequired: { value: boolean; };
 	structuralUpdate: boolean;
+	reducedInformation: boolean;
 }
 
 /*
@@ -137,10 +138,10 @@ export interface ScoreFunctionConfig {
 	coordinateTwo: string;
 	dimensionOneSize: number;
 	dimensionTwoSize: number;
-	domainAxisCoordinateTwo: number;					// The y coordinate of the x-axis in the plot
-	utilityAxisMaxCoordinateTwo: number;				// The y coordinate of the top of the y-axis
-	utilityAxisCoordinateOne: number;					// The x coordinate of the y-axis in the plot.
-	domainAxisMaxCoordinateOne: number; 				// The x coordinate of the rightmost end of the x-axis.
+	independentAxisCoordinateTwo: number;					// The y coordinate of the x-axis in the plot
+	dependentAxisCoordinateTwo: number;				// The y coordinate of the top of the y-axis
+	dependentAxisCoordinateOne: number;					// The x coordinate of the y-axis in the plot.
+	independentAxisCoordinateOne: number; 				// The x coordinate of the rightmost end of the x-axis.
 	labelOffset: number;
 }
 		

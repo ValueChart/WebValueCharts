@@ -37,7 +37,8 @@ describe('RendererConfigUtility', () => {
 		rendererConfigUtility = TestBed.get(RendererConfigUtility);
 
 		viewConfig = {
-    scaleAlternatives: false,
+    		scaleAlternatives: false,
+    		displayWeightDistributions: false,
 			viewOrientation: ChartOrientation.Vertical,
 			displayScoreFunctions: false,
 			displayTotalScores: false,
@@ -65,7 +66,8 @@ describe('RendererConfigUtility', () => {
 			rowData: null,
 			labelData: null,
 			rendererConfig: null,
-			structuralUpdate: null
+			structuralUpdate: null,
+			reducedInformation: false
 		}
 
 		u.maximumWeightMap['weightTotal'] = 1;

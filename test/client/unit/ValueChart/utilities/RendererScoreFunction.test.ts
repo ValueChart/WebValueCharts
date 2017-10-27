@@ -54,6 +54,8 @@ describe('RendererScoreFunctionUtility', () => {
 	var elements: (string | number)[];
 
 	before(function() {
+		TestBed.resetTestingModule();
+		
 		TestBed.configureTestingModule({
 			providers: [ RendererScoreFunctionUtility ]
 		});
@@ -237,7 +239,7 @@ describe('RendererScoreFunctionUtility', () => {
 			it('should configure the heightScale so that the domain is [0, 1], and the range is [0, height]', () => {
 				expect(u.heightScale.domain()).to.deep.equal([0, 1]);
 
-				expect(u.heightScale.range()).to.deep.equal([0, u.rendererConfig.domainAxisCoordinateTwo - u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+				expect(u.heightScale.range()).to.deep.equal([0, u.rendererConfig.independentAxisCoordinateTwo - u.rendererConfig.dependentAxisCoordinateTwo]);
 			});
 		});
 
@@ -263,7 +265,7 @@ describe('RendererScoreFunctionUtility', () => {
 			it('should configure the heightScale so that the domain is [0, 1], and the range is [0, height]', () => {
 				expect(u.heightScale.domain()).to.deep.equal([0, 1]);
 
-				expect(u.heightScale.range()).to.deep.equal([u.rendererConfig.domainAxisCoordinateTwo, u.rendererConfig.utilityAxisMaxCoordinateTwo]);
+				expect(u.heightScale.range()).to.deep.equal([u.rendererConfig.independentAxisCoordinateTwo, u.rendererConfig.dependentAxisCoordinateTwo]);
 			});
 		});
 
