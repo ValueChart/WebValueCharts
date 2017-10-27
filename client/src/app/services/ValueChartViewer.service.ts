@@ -411,4 +411,8 @@ export class ValueChartViewerService {
 		});
 	}
 
+	isChartEdited(username: string): boolean {
+		return true;
+	}
+
 }

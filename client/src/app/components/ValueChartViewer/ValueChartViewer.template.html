@@ -40,7 +40,7 @@
 						</button>
 					</li>
 					<li>
-						<button class="btn btn-success" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
+						<button class="btn btn-success" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isChartEdited() && !valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
 							Save
 						</button>
 					</li>
