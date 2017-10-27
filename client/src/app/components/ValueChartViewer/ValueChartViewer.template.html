@@ -30,7 +30,7 @@
 						</button>
 					</li>
 					<li>
-						<button class="btn btn-primary" *ngIf="canViewGroupChart() && alueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
+						<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
 							View Individual Chart
 						</button>
 					</li>
