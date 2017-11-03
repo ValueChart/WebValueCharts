@@ -1,39 +1,46 @@
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #002145; margin-bottom: 50;">
+	<div class="container-fluid" id="navfluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-left"><img height="90" width="90" src="client/images/Logo.svg"></a>
+				<h1 style="color: white" class="navbar-brand" [routerLink]="['/home']">ValueCharts</h1>
+		</div>
+		<div class="collapse navbar-collapse" id="navigationbar">
+			<ul class="nav navbar-nav" style="	border-collapse: collapse;
+												text-align: left;
+												list-style-type: none;
+												padding: 0;
+												margin : 0 !important">
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important; ">
+					<a style="color: white" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</a>
+				</li>
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-valuecharts-button" [routerLink]="['/myValueCharts']">My ValueCharts</a>
+				</li>
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</a>
+				</li>
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a style="color: white" href="/logout">Log Out</a>
+				</li>
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a style="color: white" href="/signUp">Create Account</a>
+				</li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+
+<br style="display: none">
+<br>
+<br style="display: none">
+<br>
+
 <div>
-	<div>
-		<div class="navbar navbar-default navbar-fixed-top">
-			<div class="container-fluid">
-				<div class="navbar-header col-xs-2">
-					<a class="navbar-brand" [routerLink]="['/home']">ValueCharts</a>
-				</div>
-				<ul class="nav pull-right col-xs-10">
-					<form class="form-inline center-form pull-right">
-						<div class="form-group navbar-group" *ngIf="router.url.indexOf('scoreFunction') !== -1">
-							<a class="btn btn-default" (click)="switchScoreFunctionView()">
-								{{ switchScoreFunctionViewText }}
-							</a>
-						</div>
-						<div class="form-group navbar-group" *ngIf="currentUserService.isLoggedIn()">
-							<a class="btn btn-default" [routerLink]="['/myValueCharts']" id="my-valuecharts-button">
-								My ValueCharts
-							</a>
-						</div>
-											
-						<div class="form-group navbar-group" *ngIf="currentUserService.isLoggedIn()">
-							<a class="btn btn-default" [routerLink]="['/myAccount']" id="my-account">
-								My Account
-							</a>
-						</div>
-						<div class="form-group navbar-group" *ngIf="currentUserService.getUsername()">
-							<a class="btn btn-warning" (click)="logout()" id="log-out">
-								Log Out
-							</a>
-						</div>
-					</form>
-				</ul>
-			</div>
-		</div>
-		<div>
-			<router-outlet></router-outlet>
-		</div>
-	</div>
+	<router-outlet></router-outlet>
 </div>
