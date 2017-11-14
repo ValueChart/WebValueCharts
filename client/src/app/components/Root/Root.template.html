@@ -1,3 +1,30 @@
+<style>
+	/**
+	* clear floated menu items when collapsed
+	*/
+	@media screen and (max-width: 767px) {
+		.clear-collapse{
+			clear: both;
+		}
+		.collapse-hidden{
+			display: none;
+		}
+	}
+
+	@media screen and (min-width: 768px){
+		.navbar-collapse.collapse.uncollapse-hidden{
+			display: none!important;
+		}
+	}
+
+	/**
+	* set the fore-color of text within navbar-toggle items
+	*/
+	.navbar-toggle {
+		color: #FFF;
+	}
+</style>
+
 <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #002145; margin-bottom: 50;">
 	<div class="container-fluid" id="navfluid">
 		<div class="navbar-header">
@@ -19,20 +46,72 @@
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important; ">
 					<a style="color: white" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</a>
 				</li>
+				<!--
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
 					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-valuecharts-button" [routerLink]="['/myValueCharts']">My ValueCharts</a>
 				</li>
+				-->
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
 					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</a>
 				</li>
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" href="/logout">Log Out</a>
+					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" href="/logout">Log Out</a>
 				</li>
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" href="/signUp">Create Account</a>
+					<a style="color: white" *ngIf="!currentUserService.isLoggedIn()" href="/register">Login Page</a>
+				</li>
+				<!--
+				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" (click)="createValueChart()" id="createValueChart">
+						Create a ValueChart
+					</a>
+				</li>
+				-->
+				<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a class="dropdown-toggle" style="color: white; margin-right: 5px;" href="#" data-toggle="dropdown">Create Value Chart<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+							<li>
+								<a (click)="createValueChart()" href="javascript:void(0);" id="createValueChart">
+									Create a ValueChart
+								</a>
+							</li>
+							<li>
+								<a class="file-upload"  style="margin-left: 0px;" href="javascript:void(0);" id="thumbnail-upload">
+									Import a ValueChart
+									<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
+								</a>
+							</li>
+					</ul>
+				</li>
+				<li class="dropdown" role="presentation" *ngIf="currentUserService.isLoggedIn()" style="padding-top:20px !important; padding-bottom:13px !important;">
+					<a class="dropdown-toggle" style="color: white; margin-right: 5px;" href="#" data-toggle="dropdown">Existing ValueCharts<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li>
+							<a (click)="isJoining = true" data-toggle="modal" data-target="#chart-credentials-modal">
+								Join Existing ValueChart
+							</a>
+						</li>
+						<li>
+							<a (click)="isJoining = false" data-toggle="modal" data-target="#chart-credentials-modal">
+								View Existing ValueChart
+							</a>
+						</li>
+					</ul>
 				</li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
+		<div class="navbar-collapse uncollapse-hidden collapse" *ngIf="currentUserService.isLoggedIn()" id="LanguageMenu" aria-expanded="false" style="height: 1px;">
+			<ul class="nav navbar-nav">
+					<li><a (click)="createValueChart()" id="createValueChart">New Chart</a></li>
+					<li><a href="javascript:void(0);" id="thumbnail-upload">Import Chart</a></li>
+			</ul>
+		</div>
+		<div class="navbar-collapse uncollapse-hidden collapse" id="LanguageMenu" aria-expanded="false" style="height: 1px;">
+			<ul class="nav navbar-nav">
+					<li><a (click)="createValueChart()" id="createValueChart">Join</a></li>
+					<li><a href="javascript:void(0);" id="thumbnail-upload">View</a></li>
+			</ul>
+		</div>
 	</div><!-- /.container-fluid -->
 </nav>
 

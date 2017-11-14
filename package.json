@@ -7,7 +7,8 @@
   "scripts": {
     "start": "gulp start",
     "test": "gulp test",
-    "build": "ngc -p tsconfig-aot.json && rollup -c rollup-config.js"
+    "build": "ngc -p tsconfig-aot.json && rollup -c rollup-config.js",
+    "webdriver-update": "webdriver-manager update"
   },
   "dependencies": {
     "@angular/animations": "^4.3.6",
