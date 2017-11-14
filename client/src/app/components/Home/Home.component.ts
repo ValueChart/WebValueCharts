@@ -1,21 +1,25 @@
 /*
 * @Author: aaronpmishkin
 * @Date:   2016-05-25 14:41:41
-* @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2017-07-19 16:57:22
+* @Last Modified by:   tylerjamesmalloy
+* @Last Modified time: 2017-09-13 14:31:22
 */
 
 // Import Angular Classes:
 import { Component }									from '@angular/core';
 import { Router }										from '@angular/router';
+import { OnInit }										from '@angular/core';
 
 // Import Application Classes:
 import { XMLValueChartParserService } 					from '../../services';
 import { CurrentUserService }							from '../../services';
 import { ValueChartService }							from '../../services';
-import { ValueChartHttp }						from '../../http';
+import { UserHttp }										from '../../http';
+import { ValueChartHttp }								from '../../http';
 import { ValidationService }							from '../../services';
 import { UserNotificationService }						from '../../services';
+import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
+import { XmlValueChartEncoder }							from '../../utilities';
 
 // Import Model Classes:
 import { ValueChart, ChartType }						from '../../../model';
@@ -42,7 +46,7 @@ import { singleHotel, groupHotel, waterManagement}		from '../../../../data/DemoV
 	selector: 'home',
 	templateUrl: './Home.template.html',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
 	// ========================================================================================
 	// 									Fields
@@ -63,6 +67,21 @@ export class HomeComponent {
 	public displayValidationModal = false;
 	public validationMessage: string;
 
+	public valueChartOwnerships: any[];	// The array of ValueChart summary objects belonging to the current user. These are retrieved from the server
+	// Belonging is defined as having the creator field of the ValueChart match the user's username.
+
+	public valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
+		// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
+
+	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
+		// on the client side using object URLs.	
+
+	public displayModal: boolean = false;
+	public modalActionEnabled: boolean = false;
+	public modalActionFunction: Function = () => { };
+	public modalTitle: string;
+	public modalBody: string;
+
 	// ========================================================================================
 	// 									Constructor
 	// ========================================================================================
@@ -74,17 +93,225 @@ export class HomeComponent {
 	*/
 	constructor(
 		private router: Router,
+		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private valueChartParser: XMLValueChartParserService,
 		private currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartHttp: ValueChartHttp,
 		private validationService: ValidationService,
-		private userNotificationService: UserNotificationService) { }
+		private userNotificationService: UserNotificationService,
+		private userHttp: UserHttp
+	) { }
+
 
 	// ========================================================================================
 	// 									Methods
 	// ========================================================================================
+	
+	/* 	
+		@returns {void}
+		@description 	Initializes the ValueChartViewer. ngOnInit is only called ONCE by Angular. This function is thus used for one-time initialized only. 
+						Calling ngOnInit should be left to Angular. Do not call it manually. All initialization logic for the component should be put in this
+						method rather than in the constructor.
+	*/
+	ngOnInit() {
+		//	Retrieve summary objects for all of the ValueCharts created by the current user.
+		this.userHttp.getOwnedValueCharts(this.currentUserService.getUsername())
+			.subscribe(
+			valueChartOwnerships => {
+				this.valueChartOwnerships = valueChartOwnerships;
+				if (!this.valueChartService.valueChartIsDefined())
+					return;
+				
+				let valueChart = this.valueChartService.getValueChart();
+				let status = this.valueChartService.getStatus();
 
+				// Update the summary with local (possibly more up-to-date) information.
+				this.valueChartOwnerships.forEach((chartSummary: any) => {
+					if (chartSummary._id === valueChart._id) {
+							chartSummary.name = valueChart.getName();
+							chartSummary.password = valueChart.password;
+							chartSummary.numUsers = valueChart.getUsers().length;
+						}
+
+					if (chartSummary._id === status.chartId) {
+						chartSummary.lockedBySystem = status.lockedBySystem;
+						chartSummary.lockedByCreator = status.lockedByCreator;
+					}
+				});
+			});
+
+		//	Retrieve summary objects for all of the ValueCharts the current user is a member of.
+		this.userHttp.getJoinedValueCharts(this.currentUserService.getUsername())
+			.subscribe(
+			valueChartMemberships => {
+				this.valueChartMemberships = valueChartMemberships;
+			});
+
+		this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
+	}
+
+	openValueChart(chartId: string, password: string): void {
+		password = password || '';
+		
+		this.valueChartHttp.getValueChart(chartId, password)
+			.subscribe(valueChart => {
+				
+				// Validate chart structure before proceeding.
+				// (This is a sanity check to catch any as any errors brought on by changes in validation since saving to the database.)
+				let errorMessages = this.validationService.validateStructure(valueChart);
+				if (errorMessages.length > 0) {
+					this.modalTitle = 'Validation Error';
+					this.modalBody = "Cannot view chart. Please fix the following problems:\n\n" + errorMessages.join('\n\n');
+					this.modalActionEnabled = false;
+					this.displayModal = true;
+				}
+				else {
+					this.valueChartService.setValueChart(valueChart);
+					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.OwnerAndParticipant : UserRole.Owner;
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: role } });
+				}	
+			});
+	}
+
+	editValueChart(chartId: string, password: string): void {
+		password = password || '';
+
+		this.valueChartHttp.getValueChart(chartId, password)
+			.subscribe(valueChart => {
+				this.valueChartService.setValueChart(valueChart);
+
+				this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
+			});
+	}
+
+	editPreferences(chartId: string, chartName: string, password: string): void {
+		this.valueChartHttp.getValueChart(Formatter.nameToID(chartName), password)
+			.subscribe(valueChart => {
+				// Validate chart structure before proceeding.
+				// (This is a sanity check to catch any as any errors brought on by changes in validation since saving to the database.)
+				if (this.validationService.validateStructure(valueChart).length > 0) {
+					this.modalTitle = 'Validation Error';
+					this.modalBody = "Cannot edit preferences. There are problems with this chart that can only be fixed by the owner.";
+					this.modalActionEnabled = false;
+					this.displayModal = true;
+				}
+				else {
+					this.valueChartService.setValueChart(valueChart);
+			  		if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'ScoreFunctions'], { queryParams: { role: UserRole.Participant }});
+			  		}
+			  		else {
+			  			this.router.navigate(['create', CreatePurpose.EditUser, 'Weights'], { queryParams: { role: UserRole.Participant }});
+			  		}
+				}
+			});
+	}
+
+	displayLeaveChart(chartId: string, chartPassword: string): void {
+		this.setValueChart(chartId, chartPassword);
+
+		this.modalTitle = 'Leave ValueChart';
+		this.modalBody = 'Are you sure you want to leave this ValueChart?';
+		this.modalActionEnabled = true;
+		this.modalActionFunction = this.leaveValueChart.bind(this, chartId);
+		this.displayModal = true;
+	}
+
+	leaveValueChart(chartId: string): void {
+		this.valueChartHttp.deleteUser(chartId, this.currentUserService.getUsername())
+			.subscribe(username => {
+				let index: number = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
+					return valueChartSummary._id === chartId;
+				});
+				this.valueChartMemberships.splice(index, 1);
+		});
+	}
+
+	displayDeleteChart(chartId: string, chartPassword: string): void {
+		this.setValueChart(chartId, chartPassword);
+
+		this.modalTitle = 'Delete ValueChart';
+		this.modalBody = 'Are you sure you want to permanently delete this ValueChart?';
+		this.modalActionEnabled = true;
+		this.modalActionFunction = this.deleteValueChart.bind(this, chartId);
+		this.displayModal = true;
+	}
+
+	deleteValueChart(chartId: string): void {
+
+		this.valueChartHttp.deleteValueChart(chartId)
+			.subscribe(status => {
+				let index: number = this.valueChartOwnerships.findIndex((valueChartSummary: any) => {
+					return valueChartSummary._id === chartId;
+				});
+				this.valueChartOwnerships.splice(index, 1);
+
+				index = this.valueChartMemberships.findIndex((valueChartSummary: any) => {
+					return valueChartSummary._id === chartId;
+				});
+				this.valueChartMemberships.splice(index, 1);
+			});
+		
+		console.log("here doing something")
+
+		this.valueChartHttp.deleteValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
+			// Do nothing;
+			console.log("here not deleting")
+		});
+	}
+
+	setValueChart(chartId: string, password: string): void {
+		this.valueChartHttp.getValueChart(chartId, password)
+			.subscribe(valueChart => {
+				this.valueChartService.setValueChart(valueChart);
+			});
+	}
+
+	getValueChartName(): string {
+		if (this.valueChartService.valueChartIsDefined()) {
+			return this.valueChartService.getValueChart().getFName() + 'UserWeights.csv';
+		} else {
+			return '';
+		}
+	}
+
+	exportUserWeights() {
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
+
+		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
+		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
+	}
+
+	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {
+		if (valueChart === undefined)
+			return;
+		
+		// Obtain a CSV string for the user defined weights in the given ValueChart. 
+		var weightString: string = this.xmlValueChartEncoder.encodeUserWeights(valueChart);
+		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
+		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
+
+		// Create and return a unique download URL for the CSV string.
+		return URL.createObjectURL(weightsBlob);
+	}
+
+	getStatusText(valueChartSummary: any): string {
+		if (valueChartSummary.lockedBySystem) {
+			return 'Incomplete';
+		} else {
+			return 'Complete';
+		}
+	}
+
+	getChangesPermittedText(valueChartSummary: any): string {
+		if (!valueChartSummary.lockedByCreator && !valueChartSummary.lockedBySystem) {
+			return 'Allowed';
+		} else {
+			return 'Prevented';
+		}
+	}
 	
 	/*
 		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.

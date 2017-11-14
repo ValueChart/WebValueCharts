@@ -13,8 +13,8 @@ import { OnInit }										from '@angular/core';
 // Import Application Classes:
 import { CurrentUserService }							from '../../services';
 import { ValueChartService }							from '../../services';
-import { UserHttp }								from '../../http';
-import { ValueChartHttp }						from '../../http';
+import { UserHttp }										from '../../http';
+import { ValueChartHttp }								from '../../http';
 import { ValidationService }							from '../../services';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }							from '../../utilities';

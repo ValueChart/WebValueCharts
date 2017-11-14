@@ -20,6 +20,13 @@ import { UserHttp }													from '../../http';
 import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }										from '../../utilities';
 
+// Import Model Classes:
+import { ValueChart, ChartType }									from '../../../model';
+
+// Import Types
+import { UserRole }										from '../../../types';
+import { CreatePurpose }								from '../../../types';
+
 
 /*
 	The root component is the base component of the application. It is the only component that is always displayed
@@ -143,6 +150,13 @@ export class RootComponent implements OnInit {
 			this.switchScoreFunctionViewText = 'Score Distributions';
 		}
 
+	}
+
+	createValueChart(): void {
+		var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
+		valueChart.setType(ChartType.Individual); 
+		this.valueChartService.setValueChart(valueChart);
+		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 	}
 
 }
