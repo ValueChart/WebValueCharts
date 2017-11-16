@@ -228,7 +228,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
-		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	/* 	
@@ -512,6 +511,25 @@ export class ValueChartViewerComponent implements OnInit {
 			this.userNotificationService.displayWarnings([messageString]);
 		});
 
+	}
+	
+	// ================================ Preference Learning ====================================	
+
+	sampleNewAlternative(): void {
+		var valueChart = this.valueChartService.getValueChart();
+		var username = this.currentUserService.getUsername();
+		var objectives = valueChart.getAllPrimitiveObjectives();
+		var user = valueChart.getUser(username);
+
+		this.valueChartHttp.getNewAlternative(valueChart, user).subscribe((alternatives: Alternative[]) => {
+			var oldAlternatives = valueChart.getAlternatives();
+
+			alternatives.forEach((alternative: Alternative) => {
+				oldAlternatives.push(alternative);
+			})
+
+			valueChart.setAlternatives(oldAlternatives);
+		});
 	}
 
 	sampleNewAlternative(): void {
