@@ -33,7 +33,7 @@ export class RendererConfigUtility {
 
 
 	private offset: number = 10;				// The size of the offset/gap between the summary chart and the objective chart.
-	private userSize: number = 50;				// The width (height if horizontal orientation) of each user's score bar when scaleAlternatives is false.
+	private userSize: number = 225;				// The width (height if horizontal orientation) of each user's score bar when scaleAlternatives is false.
 
 	// ========================================================================================
 	// 									Constructor
