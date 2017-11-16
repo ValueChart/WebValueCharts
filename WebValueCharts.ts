@@ -22,6 +22,7 @@ import { indexRoutes } 								from './server/routes/Index.routes';
 import { valueChartRoutes } 						from './server/routes/ValueCharts.routes';
 import { usersRoutes }								from './server/routes/Users.routes';
 import { hostWebSocket }							from './server/routes/Host.routes';
+import { alternativesRoutes }						from './server/routes/Alternatives.routes';
 
 // Import Utilities:
 import { passport }									from './server/utilities/auth';
@@ -85,6 +86,7 @@ webValueCharts.all('*', function(req, res, next) {
 webValueCharts.use('/', indexRoutes);					// The index.html page.
 webValueCharts.use('/ValueCharts', valueChartRoutes);	// ValueCharts resource endpoints.
 webValueCharts.use('/Users', usersRoutes);				// User resource endpoints.
+webValueCharts.use('/alternatives', alternativesRoutes);
 
 // Setup the host WebScoket on the route '/host/:chart' where :chart is a chartId. See the Host.routes.ts file for more information.
 (<any>webValueCharts).ws('/host/:chart', hostWebSocket);

@@ -46,7 +46,7 @@ export class ViewOptionsComponent implements OnInit {
 	ngOnInit() {
 		this.config = {
 			viewOrientation: ChartOrientation.Vertical,
-			scaleAlternatives: true,
+			scaleAlternatives: false,
 			displayScoreFunctions: false,
 			displayWeightDistributions: false,
 			displayTotalScores: true,

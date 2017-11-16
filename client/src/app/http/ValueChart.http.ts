@@ -16,7 +16,7 @@ import '../utilities/rxjs-operators';
 import { JsonValueChartParser }										from '../utilities';
 
 // Import Model Classes:
-import { ValueChart }												from '../../model';
+import { ValueChart, Alternative }									from '../../model';
 import { User }														from '../../model';
 
 // Import Types: 
@@ -272,9 +272,24 @@ export class ValueChartHttp {
 			.catch(this.handleError);
 	}
 
+
+	getNewAlternative(valueChart: ValueChart, user: User): Observable<Alternative[]> {
+		var alternatives = valueChart.getAlternatives();
+		let body = JSON.stringify({alternatives: alternatives, user: user});
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+
+		return this.http.post("/alternatives/" + valueChart.getName() + "/" + user.getUsername(), body, options)
+			.map(this.extractAlternatives)
+			.catch(this.handleError);
+	}
+
+
+
 	// Helper Functions: 
 
-	// This method returns a server response object with making any changes. It should be sued when the response is only a string.
+	// This method returns a server response object with making any changes. It should be used when the response is only a string.
 	extractBody = (res: Response): any => {
 		return res;
 	}
@@ -283,6 +298,13 @@ export class ValueChartHttp {
 	extractData = (res: Response): ValueChart => {
 		let body = res.json();
 		return body.data || {}; // Return the body of the response, or an empty object if it is undefined.
+	}
+
+	extractAlternatives = (res: Response): Alternative[] => {
+		let body = res.json();
+		var alts: Alternative[] = [];
+		body.data.forEach((alternative: Alternative) => { alts.push(this.valueChartParser.parseAlternative(alternative, {})); })
+		return alts || []; 
 	}
 
 	// This method extracts a ValueChart object from the server response. The ValueChart does not need to be complete.

@@ -300,6 +300,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 			this.viewConfigSubject.next(this.viewConfig);
 			// Unsubscribe and set initialization to be complete.
 			this.isInitialized = true;
+			this.setViewportSize();
 		}
 	}
 
@@ -326,6 +327,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Note that this method sets the "structuralUpdate" flag to be true.
 		if (this.changeDetectionService.detectStructuralChanges(this.valueChart, this.usersToDisplay)) {
 			this.valueChartSubject.next(<any>{ valueChart: this.valueChart, usersToDisplay: this.usersToDisplay, structuralUpdate: true });
+			this.calculateDefaultComponentSize();
+			this.setViewportSize();
+			this.interactionSubject.next(this.interactionConfig);
 		}
 
 		// Detect changes to the ValueChart that require re-rendering of the visualization (but not structural changes). These include:

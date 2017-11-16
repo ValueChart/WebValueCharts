@@ -27,7 +27,7 @@
 					</button>
 				</div>
 			</div>
-			<div *ngIf="canViewGroupChart()">
+			<div *ngIf="false">
 				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartViewerService.getActiveValueChart().getType() === ChartType.Group">
 					<button class="btn btn-primary" (click)="setValueChartTypeToView(ChartType.Individual)">
 					View Individual Chart
