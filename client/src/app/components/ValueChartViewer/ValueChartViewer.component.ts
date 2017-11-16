@@ -228,7 +228,6 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
-		this.preferenceLearningService.initPreferenceLearning();
 	}
 
 	/* 	
