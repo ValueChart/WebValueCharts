@@ -55,7 +55,7 @@
 					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</a>
 				</li>
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" href="/logout">Log Out</a>
+					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="log-out" href="/logout">Log Out</a>
 				</li>
 				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
 					<a style="color: white" *ngIf="!currentUserService.isLoggedIn()" href="/register">Login Page</a>
