@@ -13,7 +13,6 @@ import * as monk									from 'monk';
 
 import { dbAddress }								from '../db.address';
 
-
 // Load the database.
 var db: monk.Monk = monk(dbAddress);
 
