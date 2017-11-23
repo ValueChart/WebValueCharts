@@ -95,7 +95,7 @@ export class HomeComponent implements OnInit {
 		private router: Router,
 		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private valueChartParser: XMLValueChartParserService,
-		private currentUserService: CurrentUserService,
+		public  currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
 		private valueChartHttp: ValueChartHttp,
 		private validationService: ValidationService,
