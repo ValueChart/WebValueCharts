@@ -43,6 +43,7 @@ describe('Register Page', () => {
 		});
 	});
 
+	/*
 	it('should logout', function() {
 
 		var logoutBtn = p.browser.element(p.By.id('log-out'));
@@ -107,6 +108,7 @@ describe('Register Page', () => {
 			expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/register');
 		});
 	});
+	*/
 
 	it('should allow users to create an account', function() {
 

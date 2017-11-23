@@ -10,7 +10,7 @@ chai.use(chaiAsPromised);
 
 // Users need to first log in before managing their accounts
 describe('My Account Page', () => {
-
+	/*
 	it('should be located at the /register resource', (done: MochaDone) => {
 		p.browser.get('http://localhost:3000');
 		expect(p.browser.getCurrentUrl()).to.eventually.equal('http://localhost:3000/register').notify(done);
@@ -223,9 +223,7 @@ describe('My Account Page', () => {
 		});
 	});
 
-
-
-	
+	*/
 });
 	
 
