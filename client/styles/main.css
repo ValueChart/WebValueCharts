@@ -22,6 +22,49 @@
     flex-direction: row;
 }
 
+/* Navigation Bar Styles */
+
+#valuecharts-navbar {
+    background-color: #002145; 
+    margin-bottom: 50;
+    text-align: center;
+}
+
+/**
+* fore-color of text within navbar-toggle items
+*/
+.navbar-toggle {
+    color: #FFF;
+}
+
+.navbar-list {
+    border-collapse: collapse;
+    float: none !important;
+    list-style-type: none;
+    padding: 0;
+    margin: 0 !important;
+}
+
+.navbar-button {
+    border: none;
+    background: none;
+    color: white;
+    font-size: 16px;
+    margin-top: 25px;
+    margin-bottom: 13px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 10px;
+}
+
+.navbar-bold {
+    font-weight: bold;
+}
+
+.navbar-dropdown-option {
+    margin: 0px !important;
+}
+
 /* Registration Page Styles */
 
 .welcome-header {
@@ -58,10 +101,6 @@ a.upload {
     display: block;
 }
 
-#my-valuecharts-button {
-    margin-left: 10px;
-}
-
 .file-upload {
     position: relative;
     overflow: hidden;
@@ -85,10 +124,6 @@ a.upload {
     justify-content: space-around !important;
 }
 
-.column {
-
-}
-
 .creation-page {
 	top: 8rem;
 }
@@ -102,16 +137,16 @@ a.upload {
 }
 
 .demo-table {
-    top: 15rem;
+    top: 5rem;
 }
 
 .my-valuecharts-header {
-    top: 10rem;
+    top: 7rem;
     position: relative;
 }
 
 .my-valuechart-memberships-header {
-    top: 15rem;
+    top: 4rem;
     position: relative;
 }
 

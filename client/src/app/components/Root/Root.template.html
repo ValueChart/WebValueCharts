@@ -16,16 +16,9 @@
 			display: none!important;
 		}
 	}
-
-	/**
-	* set the fore-color of text within navbar-toggle items
-	*/
-	.navbar-toggle {
-		color: #FFF;
-	}
 </style>
 
-<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #002145; margin-bottom: 50;">
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" id="valuecharts-navbar">
 	<div class="container-fluid" id="navfluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
@@ -33,67 +26,52 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-left"><img height="90" width="90" src="client/images/Logo.svg"></a>
-				<h1 class="navbar-brand" ><a style="color: white" [routerLink]="['/home']">ValueCharts</a></h1>
+			</button>
+			<a class="navbar-left"><img height="90" width="90" src="client/images/Logo.svg"></a>
+			<button class="navbar-button navbar-bold" [routerLink]="['/home']">Home</button>
 		</div>
 		<div class="collapse navbar-collapse" id="navigationbar">
-			<ul class="nav navbar-nav" style="	border-collapse: collapse;
-												text-align: left;
-												float: none;
-												list-style-type: none;
-												padding: 0;
-												margin : 0 !important">
-				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important; ">
-					<a style="color: white" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</a>
+			<ul class="nav navbar-nav navbar-list">
+				<li role="presentation">
+					<button class="navbar-button" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</button>
 				</li>
-				<!--
-				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-valuecharts-button" [routerLink]="['/myValueCharts']">My ValueCharts</a>
+
+				<li class="pull-right" role="presentation">
+					<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="log-out" (click)="logout()">Log Out</button>
 				</li>
-				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</a>
+				<li class="pull-right" role="presentation">
+					<button class="navbar-button navbar-bold"*ngIf="!currentUserService.isLoggedIn()" [routerLink]="['/register']">Login</button>
 				</li>
-				-->
-				<li class="pull-right" role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" id="log-out" (click)="logout()">Log Out</a>
+				<li class="pull-right" role="presentation">
+					<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</button>
 				</li>
-				<li class="pull-right" role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="!currentUserService.isLoggedIn()" href="/register">Login</a>
-				</li>
-				<!--
-				<li role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a style="color: white" *ngIf="currentUserService.isLoggedIn()" (click)="createValueChart()" id="createValueChart">
-						Create a ValueChart
-					</a>
-				</li>
-				-->
-				<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a class="dropdown-toggle" style="color: white; margin-right: 5px;" href="#" data-toggle="dropdown">Create Value Chart<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-							<li>
-								<a (click)="createValueChart()" href="javascript:void(0);" id="createValueChart">
-									Create a ValueChart
-								</a>
-							</li>
-							<li>
-								<a class="file-upload"  style="margin-left: 0px;" href="javascript:void(0);" id="thumbnail-upload">
-									Import a ValueChart
-									<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
-								</a>
-							</li>
-					</ul>
-				</li>
-				<li class="dropdown" role="presentation" *ngIf="currentUserService.isLoggedIn()" style="padding-top:20px !important; padding-bottom:13px !important;">
-					<a class="dropdown-toggle" style="color: white; margin-right: 5px;" href="#" data-toggle="dropdown">Existing ValueCharts<b class="caret"></b></a>
+
+				<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation">
+					<button class="dropdown-toggle navbar-button" data-toggle="dropdown">New ValueChart<b class="caret"></b></button>
 					<ul class="dropdown-menu">
 						<li>
-							<a (click)="isJoining = true" data-toggle="modal" data-target="#chart-credentials-modal">
+							<a (click)="createValueChart()" href="javascript:void(0);" id="createValueChart">
+								Create a ValueChart
+							</a>
+						</li>
+						<li>
+							<a class="file-upload navbar-dropdown-option" href="javascript:void(0);" id="thumbnail-upload">
+								Import a ValueChart
+								<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
+							</a>
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown" role="presentation" *ngIf="currentUserService.getUsername() !== undefined">
+					<button class="dropdown-toggle navbar-button" data-toggle="dropdown">Other Users' Charts<b class="caret"></b></button>
+					<ul class="dropdown-menu">
+						<li>
+							<a (click)="isJoining = true" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
 								Join Existing ValueChart
 							</a>
 						</li>
 						<li>
-							<a (click)="isJoining = false" data-toggle="modal" data-target="#chart-credentials-modal">
+							<a (click)="isJoining = false" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
 								View Existing ValueChart
 							</a>
 						</li>
@@ -101,18 +79,6 @@
 				</li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
-		<div class="navbar-collapse uncollapse-hidden collapse" *ngIf="currentUserService.isLoggedIn()" id="LanguageMenu" aria-expanded="false" style="height: 1px;">
-			<ul class="nav navbar-nav">
-					<li><a (click)="createValueChart()" id="createValueChart">New Chart</a></li>
-					<li><a href="javascript:void(0);" id="thumbnail-upload">Import Chart</a></li>
-			</ul>
-		</div>
-		<div class="navbar-collapse uncollapse-hidden collapse" id="LanguageMenu" aria-expanded="false" style="height: 1px;">
-			<ul class="nav navbar-nav">
-					<li><a (click)="createValueChart()" id="createValueChart">Join</a></li>
-					<li><a href="javascript:void(0);" id="thumbnail-upload">View</a></li>
-			</ul>
-		</div>
 	</div><!-- /.container-fluid -->
 </nav>
 
