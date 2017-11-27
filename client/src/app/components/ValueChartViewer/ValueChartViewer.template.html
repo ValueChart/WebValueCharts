@@ -1,9 +1,5 @@
 <div *ngIf="!loading" id="ValueChartView">
 	<input type="color" id="primitiveObjective-color-picker">
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
-<<<<<<< 475ed8c82d1ed7cd1d8278fc002d94c6e2906dee
-=======
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
 	<div class="valuechart-toolbar">
 		<form class="navbar-form col-xs-12" style="width:100%;height:60px;">
 			<div class=" valuechart-toolbar-group pull-left dropdown">
@@ -11,28 +7,12 @@
 				<span class="caret"></span></button>
 				<ul class="dropdown-menu">
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
-=======
-						<button class="btn btn-default" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
->>>>>>> formatting chat options dropdown children
 							Edit ValueChart
 						</button>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
-=======
-						<button class="btn btn-default" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
->>>>>>> formatting chat options dropdown children
 							Edit Preferences
 						</button>
 					</li>
@@ -40,60 +20,26 @@
 						<ExportValueChart></ExportValueChart>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
-=======
-						<button class="btn btn-danger" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
->>>>>>> formatting chat options dropdown children
 							Lock Chart
 						</button>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
-=======
-						<button class="btn btn-danger" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
->>>>>>> formatting chat options dropdown children
 							Unlock Chart
 						</button>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
-=======
-						<button class="btn btn-primary" *ngIf="canViewGroupChart() && alueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
->>>>>>> formatting chat options dropdown children
 							View Individual Chart
 						</button>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
-=======
-						<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-=======
-						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
->>>>>>> formatting chat options dropdown children
 							View Group Chart
 						</button>
 					</li>
 					<li>
-<<<<<<< 369e72704bbb95d7cd9ff5823d994b6a776b64fc
-<<<<<<< 465cd8ead0b64636f4aa6655176954da2078f0f2
 						<button class="btn btn-success" style="width: 90%;" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
 							{{valueChartViewerService.isOwner() ? "Save" : "Save to Group Chart"}}
 						</button>
@@ -132,96 +78,6 @@
 		(undoRedo)="updateUndoRedo($event)"
 		(renderEvents)="updateRenderEvents($event)">
 		</ValueChart>
-=======
-	<div class="valuechart-toolbar" style="z-index: 9;">
-		<form class="form-inline col-xs-12">
-			<div class="form-group valuechart-toolbar-group pull-left">
-				<button class="btn btn-default" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
-				Edit ValueChart
-				</button>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-left" >
-				<button class="btn btn-default" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
-				Edit Preferences
-				</button>
-			</div>
-			<div class="form-group valuechart-toolbar-group pull-left">
-					<ExportValueChart></ExportValueChart>
-			</div>
-			<div *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="!valueChartService.getStatus().lockedByCreator">
-					<button class="btn btn-danger" (click)="setUserChangesAccepted(false)">
-					Lock Chart
-					</button>
-				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartService.getStatus().lockedByCreator">
-					<button class="btn btn-success" (click)="setUserChangesAccepted(true)">
-					Unlock Chart
-					</button>
-				</div>
-			</div>
-			<div *ngIf="canViewGroupChart()">
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartViewerService.getActiveValueChart().getType() === ChartType.Group">
-					<button class="btn btn-primary" (click)="setValueChartTypeToView(ChartType.Individual)">
-					View Individual Chart
-					</button>
-				</div>
-				<div class="form-group valuechart-toolbar-group pull-left" *ngIf="valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual">
-					<button class="btn btn-primary" (click)="setValueChartTypeToView(ChartType.Group)">
-					View Group Chart
-					</button>
-				</div>
-=======
-						<button class="btn btn-success" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
-=======
-						<button class="btn btn-success" style="width: 90%;" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
->>>>>>> formatting chat options dropdown children
-							Save
-						</button>
-					</li>
-				</ul>
->>>>>>> moved left toolbar buttons into dropdown as per #202, fixed insuing issue that broke prior fix for  #191
-			</div>
-			<div class=" valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
-				Redo
-				</button>
-			</div>
-			<div class=" valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
-				Undo
-				</button>
-			</div>
-			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)"></ViewOptions>
-			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
-		</form>
-	</div>
-		<div>
-			<ValueChart
-			[valueChart]="valueChartViewerService.getActiveValueChart()"
-			[width]="valueChartWidth"
-			[height]="valueChartHeight"
-			[viewConfig]="viewConfig"
-			[interactionConfig]="interactionConfig"
-			[usersToDisplay]="usersToDisplay"
-			(chartElement)="updateChartElement($event)"
-			(undoRedo)="updateUndoRedo($event)"
-			(renderEvents)="updateRenderEvents($event)">
-			</ValueChart>
-		</div>
-		<div>
-			<DetailBox 
-			[valueChart]="valueChartViewerService.getActiveValueChart()"
-			[enableManagement]="valueChartViewerService.isOwner()" 
-			[showUsers]="!valueChartService.getValueChart().isIndividual()"
-			[viewConfig]="viewConfig" 
-			[height]="valueChartHeight / 4" 
-			[width]="valueChartWidth / 3.1"
-			[renderEventsService]="renderEvents"
-			[chartElement]="chartElement">
-			</DetailBox>
-		</div>
->>>>>>> merge from Issue191 branch
 	</div>
 	<div>
 		<DetailBox 

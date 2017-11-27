@@ -353,7 +353,6 @@ export class HomeComponent implements OnInit {
 						name and password.
 	*/
 	joinValueChart(chartName: string, chartPassword: string): void {
-		
 		this.valueChartHttp.getValueChart(Formatter.nameToID(chartName), chartPassword)
 			.subscribe(
 			(valueChart: ValueChart) => {
