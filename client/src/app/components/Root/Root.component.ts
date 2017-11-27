@@ -17,15 +17,21 @@ import { XMLValueChartParserService } 								from '../../services';
 import { CurrentUserService }										from '../../services';
 import { ValueChartService }										from '../../services';
 import { UserHttp }													from '../../http';
+import { ValueChartHttp }											from '../../http';
+import { ValidationService }										from '../../services';
 import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }										from '../../utilities';
+import { UserNotificationService }									from '../../services';
 
 // Import Model Classes:
 import { ValueChart, ChartType }									from '../../../model';
 
+// Import Utility Classes:
+import * as Formatter												from '../../utilities/Formatter';
+
 // Import Types
-import { UserRole }										from '../../../types';
-import { CreatePurpose }								from '../../../types';
+import { UserRole }													from '../../../types';
+import { CreatePurpose }											from '../../../types';
 
 
 /*
@@ -59,12 +65,29 @@ export class RootComponent implements OnInit {
 	// ValueChartViewer is currently displaying. 'normal' is the default value.
 	chartType: string = 'normal';
 
+	public invalidCredentials: boolean;
+	// Upload validation fields:
+	public displayValidationModal = false;
+	
+	public validationMessage: string;
+	public displayModal: boolean = false;
+	public valueChartName: string;
+	public valueChartPassword: string;
+
 	// The current chart type. Either 'Score Distributions' or 'User Scores'. This is used to keep track of the view 
 	// that the ScoreFuntionViewer is currently displaying. 'normal' is the default value.
 	private switchScoreFunctionViewText: string = 'Score Distributions';
 
+	public isJoining: boolean = false; // boolean toggle indicating whether user clicked to join or view an existing chart 
+	// this is needed so we can use the same credentials modal in both cases
+
 
 	public window: any = window;
+
+	public modalActionEnabled: boolean = false;
+	public modalActionFunction: Function = () => { };
+	public modalTitle: string;
+	public modalBody: string;
 
 
 	// ========================================================================================
@@ -83,8 +106,12 @@ export class RootComponent implements OnInit {
 	constructor(
 		public router: Router,
 		public currentUserService: CurrentUserService,
+		private valueChartParser: XMLValueChartParserService,
 		private userHttp: UserHttp,
+		private valueChartHttp: ValueChartHttp,
 		private valueChartService: ValueChartService,
+		private userNotificationService: UserNotificationService,
+		private validationService: ValidationService,
 		private applicationRef: ApplicationRef) { }
 
 
@@ -157,6 +184,171 @@ export class RootComponent implements OnInit {
 		valueChart.setType(ChartType.Individual); 
 		this.valueChartService.setValueChart(valueChart);
 		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
+	}
+
+	/*
+		@param event - A file upload event fired by the XML ValueChart file upload.
+		@returns {void}
+		@description 	Parses an uploaded XML ValueChart using the XMLValueChartParserService, and then navigates
+						to the ValueChartViewer to view it. This is called whenever the file input to the File Upload on
+						this page changes.
+	*/
+	uploadValueChart(event: Event) {
+		var xmlFile: File = (<HTMLInputElement>event.target).files[0];	// Retrieve the uploaded file from the File Input element. It will always be at index 0.
+
+		var reader: FileReader = new FileReader();
+		// Define the event handler for when file reading completes:
+		reader.onload = (fileReaderEvent: ProgressEvent) => {
+			if (event.isTrusted) {
+				var xmlString = (<FileReader>fileReaderEvent.target).result;	// Retrieve the file contents string from the file reader.
+				let valueChart = this.valueChartParser.parseValueChart(xmlString);
+				valueChart.setCreator(this.currentUserService.getUsername());	// Set the current user as the owner.
+				valueChart.setName('');											// Erase the ValueChart's name. The owner must give it a new one.
+
+				this.valueChartService.setValueChart(valueChart);
+				this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
+			}
+		};
+		// Read the file as a text string. This should be fine because ONLY XML files should be uploaded.
+		reader.readAsText(xmlFile);
+		// Reset upload file so that user can try the same file again after fixing it.
+		(<HTMLSelectElement>document.getElementsByName("file-to-upload")[0]).value = null;
+	}
+
+	/*
+		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
+		@param chartPassword - The password of the ValueChart to join. 
+		@returns {void}
+		@description 	Called when credentials modal is closed. 
+						Delegates to joinValueChart or viewValueChart based on which button was clicked.
+	*/
+	handleModalInputs(chartName: string, chartPassword: string): void {
+		if (this.isJoining) {
+			this.joinValueChart(chartName, chartPassword);
+		}
+		else {
+			this.viewValueChart(chartName, chartPassword);
+		}
+	}
+
+	/*
+		@returns {string}
+		@description 	Title for the credentials modal.
+	*/
+	getModalTitle(): string {
+		if (this.isJoining) {
+			return "Join Existing Chart";
+		}
+		else {
+			return "View Existing Chart";
+		}
+	}
+
+	getValueChartName(): string {
+		if (this.valueChartService.valueChartIsDefined()) {
+			return this.valueChartService.getValueChart().getFName() + 'UserWeights.csv';
+		} else {
+			return '';
+		}
+	}
+
+	/*
+		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
+		@param chartPassword - The password of the ValueChart to join. 
+		@returns {void}
+		@description 	Retrieves the structure of the ValueChart that matches the given credentials and directs the user into the creation workflow
+						so that they may define their preferences. Notifies the user using a banner warning if no ValueChart exists with the given
+						name and password.
+	*/
+	joinValueChart(chartName: string, chartPassword: string): void {
+		
+		this.valueChartHttp.getValueChart(Formatter.nameToID(chartName), chartPassword)
+			.subscribe(
+			(valueChart: ValueChart) => {
+				$('#chart-credentials-modal').modal('hide');
+				if (this.validateChartForJoining(valueChart)) {
+					this.valueChartService.setValueChart(valueChart);
+					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.Participant : UserRole.UnsavedParticipant;
+
+					if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
+			  			this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: role }});
+			  		}
+			  		else {
+			  			this.router.navigate(['create', CreatePurpose.NewUser, 'Weights'], { queryParams: { role: role }});
+			  		}
+				}
+			},
+			// Handle Server Errors (like not finding the ValueChart)
+			(error) => {
+				if (error === '404 - Not Found')
+					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
+			});
+	}
+
+	/*
+		@returns {boolean}
+		@description 	Validates chart structure prior to joining.
+						Returns true if it is ok for the current user to join.
+	*/
+	validateChartForJoining(valueChart: ValueChart): boolean {
+		if (valueChart.isIndividual()) {
+			this.userNotificationService.displayErrors(["The chart you are trying to join is single-user only."]);
+			return false;
+		}
+		else if (valueChart.getCreator() === this.currentUserService.getUsername()) {
+			this.userNotificationService.displayErrors(["You cannot join a chart that you own."]);
+			return false;
+		}	
+		else if (this.validationService.validateStructure(valueChart).length > 0) {
+			this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by the owner."]);
+			return false;
+		}
+		return true;
+	}
+
+	/*
+		@param chartName - The name of the ValueChart to view. This is NOT the _id field set by the server, but rather the user defined name.
+		@param chartPassword - The password of the ValueChart to join. 
+		@returns {void}
+		@description 	Retrieves the ValueChart that matches the given credentials and directs the user to the ValueChartViewerComponent to view it. 
+						Notifies the user using a banner warning if no ValueChart exists with the given name and password.
+	*/
+	viewValueChart(chartName: string, chartPassword: string): void {
+		this.valueChartHttp.getValueChartByName(Formatter.nameToID(chartName), chartPassword)
+			.subscribe(
+			(valueChart: ValueChart) => {
+
+				$('#chart-credentials-modal').modal('hide');
+				if (this.validateChartForViewing(valueChart)) {
+					this.valueChartService.setValueChart(valueChart);
+					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Viewer } });
+				}
+			},
+			// Handle Server Errors (like not finding the ValueChart)
+			(error) => {
+				if (error === '404 - Not Found')
+					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
+			});
+	}
+
+	/*
+		@returns {boolean}
+		@description 	Validates chart structure prior to viewing and gives the creator an opportunity to fix errors.
+						Returns true iff there were no validation errors.
+	*/
+	validateChartForViewing(valueChart: ValueChart): boolean {
+		let structuralErrors = this.validationService.validateStructure(valueChart); 	
+		if (structuralErrors.length > 0) {
+			if (valueChart.getCreator() !== this.currentUserService.getUsername()) {
+				this.userNotificationService.displayErrors(["Cannot join chart. There are problems with this chart that can only be fixed by its creator."]);
+			}
+			else {
+				this.validationMessage = "There are problems with this chart: \n\n" + structuralErrors.join('\n\n') + "\n\nWould you like to fix them now?";
+				this.displayValidationModal = true;
+			}
+			return false;
+		}
+		return true;
 	}
 
 }
