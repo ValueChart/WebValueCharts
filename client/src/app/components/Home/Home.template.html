@@ -3,23 +3,6 @@
 		<div class="flex-row column-container col-xs-12">
 			<form class="form-inline flex-row column-container">
 				<div class="form-group">
-					<!--
-					<a class="btn btn-success btn-lg" (click)="createValueChart()" id="createValueChart">
-						Create a ValueChart
-					</a>
-					<a class="file-upload" href="javascript:void(0);" id="thumbnail-upload">
-						<button class="btn btn-success btn-lg">
-						Import a ValueChart
-						</button>
-						<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
-					</a>
-					<button class="btn btn-success btn-lg" type="button" (click)="isJoining = true" data-toggle="modal" data-target="#chart-credentials-modal">
-						Join Existing ValueChart
-					</button>
-					<button class="btn btn-success btn-lg" type="button" (click)="isJoining = false" data-toggle="modal" data-target="#chart-credentials-modal">
-						View Existing ValueChart
-					</button>
-					-->
 					<div class="modal fade" id="chart-credentials-modal" tabindex="-1" role="dialog">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
@@ -59,8 +42,8 @@
 				</div>
 			</form>
 		</div>
-		<h2 *ngIf="currentUserService.isLoggedIn()" class="my-valuechart-memberships-header text-center">My ValueCharts</h2>
-		<div *ngIf="currentUserService.isLoggedIn()" class="col-xs-offset-1 col-xs-10 demo-table">
+		<h2 *ngIf="currentUserService.isLoggedIn()" class="my-valuechart-header text-center">My ValueCharts</h2>
+		<div *ngIf="currentUserService.isLoggedIn()" class="col-xs-offset-1 col-xs-10">
 			<div class="flex-row column-container well well-lg">
 				<table class="table table-hover">
 					<thead>
@@ -108,6 +91,7 @@
 							<td>{{chartSummary.numUsers}}</td>
 							<td>{{getStatusText(chartSummary)}}</td>
 							<td>{{ !chartSummary.lockedByCreator && !chartSummary.lockedBySystem ? 'Allowed': 'Prevented'}}</td>
+							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="openValueChart(chartSummary._id, chartSummary.password)">View</button></td>
 							<td><button class="btn btn-sm btn-default" [disabled]="getStatusText(chartSummary) === 'Incomplete'" (click)="editPreferences(chartSummary._id, chartSummary.name, chartSummary.password)">Edit Preferences</button></td>
 							<td><button class="btn btn-sm btn-default" (click)="displayLeaveChart(chartSummary._id, chartSummary.password)">Leave Chart</button></td>
 						</tr>

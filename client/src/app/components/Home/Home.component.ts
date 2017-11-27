@@ -116,7 +116,8 @@ export class HomeComponent implements OnInit {
 	*/
 	ngOnInit() {
 		//	Retrieve summary objects for all of the ValueCharts created by the current user.
-		this.userHttp.getOwnedValueCharts(this.currentUserService.getUsername())
+		if (this.currentUserService.isLoggedIn()) {
+			this.userHttp.getOwnedValueCharts(this.currentUserService.getUsername())
 			.subscribe(
 			valueChartOwnerships => {
 				this.valueChartOwnerships = valueChartOwnerships;
@@ -141,14 +142,15 @@ export class HomeComponent implements OnInit {
 				});
 			});
 
-		//	Retrieve summary objects for all of the ValueCharts the current user is a member of.
-		this.userHttp.getJoinedValueCharts(this.currentUserService.getUsername())
-			.subscribe(
-			valueChartMemberships => {
-				this.valueChartMemberships = valueChartMemberships;
-			});
+			//	Retrieve summary objects for all of the ValueCharts the current user is a member of.
+			this.userHttp.getJoinedValueCharts(this.currentUserService.getUsername())
+				.subscribe(
+				valueChartMemberships => {
+					this.valueChartMemberships = valueChartMemberships;
+				});
 
-		this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
+			this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
+		}
 	}
 
 	openValueChart(chartId: string, password: string): void {
