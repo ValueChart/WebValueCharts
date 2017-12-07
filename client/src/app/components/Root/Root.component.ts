@@ -19,7 +19,6 @@ import { ValueChartService }										from '../../services';
 import { UserHttp }													from '../../http';
 import { ValueChartHttp }											from '../../http';
 import { ValidationService }										from '../../services';
-import { ExportValueChartComponent }								from '../ExportValueChart/ExportValueChart.component';
 import { XmlValueChartEncoder }										from '../../utilities';
 import { UserNotificationService }									from '../../services';
 
