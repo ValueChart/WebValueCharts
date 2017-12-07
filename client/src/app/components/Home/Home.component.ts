@@ -19,7 +19,6 @@ import { ValueChartHttp }								from '../../http';
 import { ValidationService }							from '../../services';
 import { UserNotificationService }						from '../../services';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
-import { XmlValueChartEncoder }							from '../../utilities';
 
 // Import Model Classes:
 import { ValueChart, ChartType }						from '../../../model';
@@ -71,10 +70,7 @@ export class HomeComponent implements OnInit {
 	// Belonging is defined as having the creator field of the ValueChart match the user's username.
 
 	public valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
-		// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
-
-	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
-		// on the client side using object URLs.	
+		// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.	
 
 	public displayModal: boolean = false;
 	public modalActionEnabled: boolean = false;
@@ -93,7 +89,6 @@ export class HomeComponent implements OnInit {
 	*/
 	constructor(
 		private router: Router,
-		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private valueChartParser: XMLValueChartParserService,
 		public  currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
@@ -149,7 +144,6 @@ export class HomeComponent implements OnInit {
 					this.valueChartMemberships = valueChartMemberships;
 				});
 
-			this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
 		}
 	}
 
@@ -276,27 +270,6 @@ export class HomeComponent implements OnInit {
 		} else {
 			return '';
 		}
-	}
-
-	exportUserWeights() {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
-		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
-
-		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
-		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
-	}
-
-	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {
-		if (valueChart === undefined)
-			return;
-		
-		// Obtain a CSV string for the user defined weights in the given ValueChart. 
-		var weightString: string = this.xmlValueChartEncoder.encodeUserWeights(valueChart);
-		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
-		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
-
-		// Create and return a unique download URL for the CSV string.
-		return URL.createObjectURL(weightsBlob);
 	}
 
 	getStatusText(valueChartSummary: any): string {
