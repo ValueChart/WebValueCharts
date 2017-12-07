@@ -10,7 +10,6 @@
 			display: none;
 		}
 	}
-
 	@media screen and (min-width: 768px){
 		.navbar-collapse.collapse.uncollapse-hidden{
 			display: none!important;
@@ -18,71 +17,105 @@
 	}
 </style>
 
-<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #002145; margin-bottom: 50;">
-	<div class="flex-row column-container col-xs-12">
-	</div>
-	<div class="container-fluid" id="navfluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-left" href="http://www.cs.ubc.ca/group/iui/VALUECHARTS/"><img height="90" width="90" src="client/images/Logo.svg"></a>
-			<button class="navbar-button navbar-bold" [routerLink]="['/home']">Home</button>
+<div *ngIf="router.url !== '/scoreFunction/plot'">
+	<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" id="valuecharts-navbar">
+		<div class="container-fluid" id="navfluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-left" href="http://www.cs.ubc.ca/group/iui/VALUECHARTS/"><img height="90" width="90" src="client/images/Logo.svg"></a>
+				<button class="navbar-button navbar-bold" [routerLink]="['/home']">Home</button>
+			</div>
+			<div class="collapse navbar-collapse" id="navigationbar">
+				<ul class="nav navbar-nav navbar-list">
+					<li role="presentation">
+						<button class="navbar-button" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</button>
+					</li>
+	
+					<li class="pull-right" role="presentation">
+						<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="log-out" (click)="logout()">Log Out</button>
+					</li>
+					<li class="pull-right" role="presentation">
+						<button class="navbar-button navbar-bold"*ngIf="!currentUserService.isLoggedIn()" [routerLink]="['/register']">Login</button>
+					</li>
+					<li class="pull-right" role="presentation">
+						<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</button>
+					</li>
+	
+					<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation">
+						<button class="dropdown-toggle navbar-button" data-toggle="dropdown">New ValueChart<b class="caret"></b></button>
+						<ul class="dropdown-menu">
+							<li>
+								<a (click)="createValueChart()" href="javascript:void(0);" id="createValueChart">
+									Create a ValueChart
+								</a>
+							</li>
+							<li>
+								<a class="file-upload navbar-dropdown-option" href="javascript:void(0);" id="thumbnail-upload">
+									Import a ValueChart
+									<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="dropdown" role="presentation" *ngIf="currentUserService.getUsername() !== undefined">
+						<button class="dropdown-toggle navbar-button" data-toggle="dropdown">Other Users' Charts<b class="caret"></b></button>
+						<ul class="dropdown-menu">
+							<li>
+								<a (click)="isJoining = true" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
+									Join Existing ValueChart
+								</a>
+							</li>
+							<li>
+								<a (click)="isJoining = false" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
+									View Existing ValueChart
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>
+</div>
+
+
+
+<div class="flex-row column-container col-xs-12">
+	<form class="form-inline flex-row column-container">
+		<div class="form-group">
+			<div class="modal fade" id="export-modal" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" id="close-export-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title" id="modal-header">Export ValueChart</h4>
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-xs-offset-2 col-xs-4">
+									<ExportValueChart></ExportValueChart>
+								</div>
+								<div class="col-xs-6">
+									<a class="btn btn-default" id="download-user-weights"
+										download="{{getValueChartName()}}"
+										href="javascript:void(0)"
+										(click)="exportUserWeights()">
+										Export User Weights
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="collapse navbar-collapse" id="navigationbar">
-			<ul class="nav navbar-nav navbar-list">
-				<li role="presentation">
-					<button class="navbar-button" *ngIf="router.url.indexOf('scoreFunction') !== -1" (click)="switchScoreFunctionView()">{{ switchScoreFunctionViewText }}</button>
-				</li>
-
-				<li class="pull-right" role="presentation">
-					<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="log-out" (click)="logout()">Log Out</button>
-				</li>
-				<li class="pull-right" role="presentation">
-					<button class="navbar-button navbar-bold"*ngIf="!currentUserService.isLoggedIn()" [routerLink]="['/register']">Login</button>
-				</li>
-				<li class="pull-right" role="presentation">
-					<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</button>
-				</li>
-
-				<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation">
-					<button class="dropdown-toggle navbar-button" data-toggle="dropdown">New ValueChart<b class="caret"></b></button>
-					<ul class="dropdown-menu">
-						<li>
-							<a (click)="createValueChart()" href="javascript:void(0);" id="createValueChart">
-								Create a ValueChart
-							</a>
-						</li>
-						<li>
-							<a class="file-upload navbar-dropdown-option" href="javascript:void(0);" id="thumbnail-upload">
-								Import a ValueChart
-								<input name="file-to-upload" type="file" class="upload" (change)="uploadValueChart($event)"/>
-							</a>
-						</li>
-					</ul>
-				</li>
-				<li class="dropdown" role="presentation" *ngIf="currentUserService.getUsername() !== undefined">
-					<button class="dropdown-toggle navbar-button" data-toggle="dropdown">Other Users' Charts<b class="caret"></b></button>
-					<ul class="dropdown-menu">
-						<li>
-							<a (click)="isJoining = true" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
-								Join Existing ValueChart
-							</a>
-						</li>
-						<li>
-							<a (click)="isJoining = false" href="javascript:void(0);" data-toggle="modal" data-target="#chart-credentials-modal">
-								View Existing ValueChart
-							</a>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</div><!-- /.navbar-collapse -->
-	</div><!-- /.container-fluid -->
-</nav>
+	</form>
+</div>
 
 <div class="flex-row column-container col-xs-12">
 	<form class="form-inline flex-row column-container">
@@ -142,6 +175,7 @@
 [actionFunction]="modalActionFunction"
 (modalClosed)="displayModal = $event">
 </NotificationModal>
+
 
 <div>
 	<router-outlet></router-outlet>
