@@ -88,6 +88,9 @@ export class RootComponent implements OnInit {
 	public modalTitle: string;
 	public modalBody: string;
 
+	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
+	// on the client side using object URLs.
+
 
 	// ========================================================================================
 	// 									Constructor
@@ -105,6 +108,7 @@ export class RootComponent implements OnInit {
 	constructor(
 		public router: Router,
 		public currentUserService: CurrentUserService,
+		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private valueChartParser: XMLValueChartParserService,
 		private userHttp: UserHttp,
 		private valueChartHttp: ValueChartHttp,
@@ -132,6 +136,8 @@ export class RootComponent implements OnInit {
 		// by this window. This is specifically used by the ScoreFunctionViewerComponent.
 		(<any>window).angularAppRef = this.applicationRef;
 		(<any>window).childWindows = {};					// Initialize a map to used as storage for references to an windows created by this window.
+		
+		this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
 	}
 
 	/* 	
@@ -228,6 +234,27 @@ export class RootComponent implements OnInit {
 		else {
 			this.viewValueChart(chartName, chartPassword);
 		}
+	}
+
+	exportUserWeights() {
+		var valueChart: ValueChart = this.valueChartService.getValueChart();
+		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
+
+		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
+		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
+	}
+
+	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {
+		if (valueChart === undefined)
+			return;
+		
+		// Obtain a CSV string for the user defined weights in the given ValueChart. 
+		var weightString: string = this.xmlValueChartEncoder.encodeUserWeights(valueChart);
+		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
+		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
+
+		// Create and return a unique download URL for the CSV string.
+		return URL.createObjectURL(weightsBlob);
 	}
 
 	/*
