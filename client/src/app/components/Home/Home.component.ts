@@ -19,7 +19,6 @@ import { ValueChartHttp }								from '../../http';
 import { ValidationService }							from '../../services';
 import { UserNotificationService }						from '../../services';
 import { ExportValueChartComponent }					from '../ExportValueChart/ExportValueChart.component';
-import { XmlValueChartEncoder }							from '../../utilities';
 
 // Import Model Classes:
 import { ValueChart, ChartType }						from '../../../model';
@@ -71,10 +70,7 @@ export class HomeComponent implements OnInit {
 	// Belonging is defined as having the creator field of the ValueChart match the user's username.
 
 	public valueChartMemberships: any[];	// The array of ValueChart summary objects fthat the current user is a member of.
-		// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.
-
-	private downloadLink: HTMLElement;			// The <a> element for exporting a ValueChart as an XML file. Downloading an XML ValueChart is done entirely
-		// on the client side using object URLs.	
+		// Member of is defined as having a user in the 'users' field of the ValueChart with a username that matches the current user's username.	
 
 	public displayModal: boolean = false;
 	public modalActionEnabled: boolean = false;
@@ -93,7 +89,6 @@ export class HomeComponent implements OnInit {
 	*/
 	constructor(
 		private router: Router,
-		private xmlValueChartEncoder: XmlValueChartEncoder,
 		private valueChartParser: XMLValueChartParserService,
 		public  currentUserService: CurrentUserService,
 		private valueChartService: ValueChartService,
@@ -149,7 +144,6 @@ export class HomeComponent implements OnInit {
 					this.valueChartMemberships = valueChartMemberships;
 				});
 
-			this.downloadLink = <HTMLElement> document.querySelector('#download-user-weights');
 		}
 	}
 
@@ -278,27 +272,6 @@ export class HomeComponent implements OnInit {
 		}
 	}
 
-	exportUserWeights() {
-		var valueChart: ValueChart = this.valueChartService.getValueChart();
-		var weightsObjectUrl: string = this.convertUserWeightsIntoObjectURL(valueChart);
-
-		this.downloadLink.setAttribute('href', weightsObjectUrl);	// Set the download link on the <a> element to be the URL created for the CSV string.
-		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
-	}
-
-	convertUserWeightsIntoObjectURL(valueChart: ValueChart): string {
-		if (valueChart === undefined)
-			return;
-		
-		// Obtain a CSV string for the user defined weights in the given ValueChart. 
-		var weightString: string = this.xmlValueChartEncoder.encodeUserWeights(valueChart);
-		// Convert the string into a blob. We must do this before we can create a download URL for the CSV string.
-		var weightsBlob: Blob = new Blob([weightString], { type: 'text/xml' });
-
-		// Create and return a unique download URL for the CSV string.
-		return URL.createObjectURL(weightsBlob);
-	}
-
 	getStatusText(valueChartSummary: any): string {
 		if (valueChartSummary.lockedBySystem) {
 			return 'Incomplete';
@@ -314,22 +287,6 @@ export class HomeComponent implements OnInit {
 			return 'Prevented';
 		}
 	}
-	
-	/*
-		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
-		@param chartPassword - The password of the ValueChart to join. 
-		@returns {void}
-		@description 	Called when credentials modal is closed. 
-						Delegates to joinValueChart or viewValueChart based on which button was clicked.
-	*/
-	handleModalInputs(chartName: string, chartPassword: string): void {
-		if (this.isJoining) {
-			this.joinValueChart(chartName, chartPassword);
-		}
-		else {
-			this.viewValueChart(chartName, chartPassword);
-		}
-	}
 
 	/*
 		@returns {string}
@@ -342,39 +299,6 @@ export class HomeComponent implements OnInit {
 		else {
 			return "View Existing Chart";
 		}
-	}
-
-	/*
-		@param chartName - The name of the ValueChart to join. This is NOT the _id field set by the server, but rather the user defined name.
-		@param chartPassword - The password of the ValueChart to join. 
-		@returns {void}
-		@description 	Retrieves the structure of the ValueChart that matches the given credentials and directs the user into the creation workflow
-						so that they may define their preferences. Notifies the user using a banner warning if no ValueChart exists with the given
-						name and password.
-	*/
-	joinValueChart(chartName: string, chartPassword: string): void {
-		
-		this.valueChartHttp.getValueChart(Formatter.nameToID(chartName), chartPassword)
-			.subscribe(
-			(valueChart: ValueChart) => {
-				$('#chart-credentials-modal').modal('hide');
-				if (this.validateChartForJoining(valueChart)) {
-					this.valueChartService.setValueChart(valueChart);
-					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.Participant : UserRole.UnsavedParticipant;
-
-					if (this.valueChartService.getValueChart().getMutableObjectives().length > 0)	{
-			  			this.router.navigate(['create', CreatePurpose.NewUser, 'ScoreFunctions'], { queryParams: { role: role }});
-			  		}
-			  		else {
-			  			this.router.navigate(['create', CreatePurpose.NewUser, 'Weights'], { queryParams: { role: role }});
-			  		}
-				}
-			},
-			// Handle Server Errors (like not finding the ValueChart)
-			(error) => {
-				if (error === '404 - Not Found')
-					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
-			});
 	}
 
 	/*
@@ -400,13 +324,6 @@ export class HomeComponent implements OnInit {
 				if (error === '404 - Not Found')
 					this.invalidCredentials = true;	// Notify the user that the credentials they input are invalid.
 			});
-	}
-
-	createValueChart(): void {
-		var valueChart = new ValueChart('', '', this.currentUserService.getUsername());
-		valueChart.setType(ChartType.Individual); 
-		this.valueChartService.setValueChart(valueChart);
-		this.router.navigate(['create', CreatePurpose.NewValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
 	}
 
 	/*
@@ -497,35 +414,5 @@ export class HomeComponent implements OnInit {
 	*/
 	fixChart() {
 		this.router.navigate(['create', CreatePurpose.EditValueChart, 'BasicInfo'], { queryParams: { role: UserRole.Owner }});
-	}
-
-	/* 	
-		@returns {void}
-		@description	Save valueChart to database. valueChart_.id is the id assigned by the database.
-	*/
-	saveValueChartToDatabase(valueChart: ValueChart): void {
-		if (!valueChart._id) {
-			// Save the ValueChart for the first time.
-			this.valueChartHttp.createValueChart(valueChart)
-				.subscribe(
-				(valuechart: ValueChart) => {
-					// Set the id of the ValueChart.
-					valueChart._id = valuechart._id;
-					this.userNotificationService.displaySuccesses(['ValueChart saved']);
-				},
-				// Handle Server Errors
-				(error) => {
-					this.userNotificationService.displayErrors(['Saving failed']);
-				});
-		} else {
-			// Update the ValueChart.
-			this.valueChartHttp.updateValueChart(valueChart)
-				.subscribe(
-				(valuechart) => { this.userNotificationService.displaySuccesses(['ValueChart saved']); },
-				(error) => {
-					// Handle any errors here.
-					this.userNotificationService.displayErrors(['Saving failed']);
-				});
-		}
 	}
 }
