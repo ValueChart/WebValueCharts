@@ -11,8 +11,7 @@ import * as Passport 								from 'passport';
 import { Strategy }									from 'passport-local';
 import * as monk									from 'monk';
 
-//import { dbAddress }								from '../db.address';
-import { dbAddress }								from '../db.test';
+import { dbAddress }								from '../db.address';
 
 // Load the database.
 var db: monk.Monk = monk(dbAddress);

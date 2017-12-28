@@ -348,6 +348,7 @@ export class RootComponent implements OnInit {
 				if (this.validateChartForViewing(valueChart)) {
 					this.valueChartService.setValueChart(valueChart);
 					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: UserRole.Viewer } });
+					window.location.reload();
 				}
 			},
 			// Handle Server Errors (like not finding the ValueChart)
