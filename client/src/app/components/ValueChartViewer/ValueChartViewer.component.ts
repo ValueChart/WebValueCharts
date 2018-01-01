@@ -23,7 +23,6 @@ import { ValueChartDirective }													from '../../../ValueChartVis';
 import { ChartUndoRedoService }													from '../../../ValueChartVis';
 import { RenderEventsService }													from '../../../ValueChartVis';
 
-import { PreferenceLearningService }											from '../../services';
 import { ValueChartService }													from '../../services';
 import { CurrentUserService }													from '../../services';
 import { ValueChartViewerService }												from '../../services';
