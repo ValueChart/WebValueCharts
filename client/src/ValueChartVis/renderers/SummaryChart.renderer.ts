@@ -481,7 +481,7 @@ export class SummaryChartRenderer {
 
 		var bestTotalScoreSelections: any = {};
 		this.scoreTotals.nodes().forEach((element: Element) => {
-			if (element.nodeName === 'text') {
+			if (element && element.nodeName === 'text') {
 				let selection: d3.Selection<any, any, any, any> = d3.select(element);
 				let userScore: UserScoreData = selection.datum();
 				let scoreValue: number = this.calculateNormalizedTotalScore(userScore);
@@ -493,7 +493,8 @@ export class SummaryChartRenderer {
 		});
 
 		u.usersToDisplay.forEach((user: User) => {
-			bestTotalScoreSelections[user.getUsername()].classed(SummaryChartDefinitions.BEST_SCORE, true);
+			if (bestTotalScoreSelections[user.getUsername()])
+				bestTotalScoreSelections[user.getUsername()].classed(SummaryChartDefinitions.BEST_SCORE, true);
 		});
 	}
 
