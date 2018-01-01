@@ -110,7 +110,6 @@ export class ValueChartViewerComponent implements OnInit {
 		public userGuard: UserGuard,
 		private router: Router,
 		private route: ActivatedRoute,
-		private preferenceLearningService: PreferenceLearningService,
 		private valueChartHttp: ValueChartHttp,
 		private hostService: HostService,
 		private validationService: ValidationService,
