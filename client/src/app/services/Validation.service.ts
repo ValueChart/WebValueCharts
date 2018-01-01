@@ -450,9 +450,10 @@ export class ValidationService {
 
 	validateAlternatives(valueChart: ValueChart): string[] {
 		let errorMessages = [];
-		if (!this.hasAlternatives(valueChart)) {
-			errorMessages.push(this.NO_ALTERNATIVES);
-		}
+		// Disable validation for number of alternatives.
+		// if (!this.hasAlternatives(valueChart)) {
+		// 	errorMessages.push(this.NO_ALTERNATIVES);
+		// }
 		if (!this.allAlternativesHaveNames(valueChart)) {
 			errorMessages.push(this.ALTERNATIVE_NAMES_MISSING);
 		}

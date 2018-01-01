@@ -183,7 +183,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						objective summary charts to either fit inside the current window, or scroll outside of the window
 						depending on the view configuration option "scaleAlternatives".
 
-						Note: This method is reasonable hacky. In the case where alternatives are not scaled, it uses the bounding box
+						Note: This method is reasonably hacky. In the case where alternatives are not scaled, it uses the bounding box
 						of the already rendered summary/objective charts and label area to determine how big the base element should be.
 						Obtaining the bounding box is a slow procedure and requires the browser to perform a layout calculation. 
 						It is currently done this way because there is no simple procedure for computing the correct size of the base element
@@ -196,16 +196,23 @@ export class ValueChartDirective implements OnInit, DoCheck {
 
 		if (!this.viewConfig.scaleAlternatives) {
 			let currentViewport = (<any> this.el.node()).getBoundingClientRect();
+			let alternativeBox: Element = (<any> this.el.select('.label-root-container').node());
+			let labelContainer: Element = (<any> this.el.select('.label-root-container').node());
+
+			// Do nothing if either the alternatives or the labels aren't defined.
+			if (!alternativeBox || ! labelContainer) {
+				return;
+			}
 
 			if (this.viewConfig.viewOrientation === ChartOrientation.Vertical) {
-				let width = (<any> this.el.select('.label-root-container').node()).getBoundingClientRect().width + 10;
-				width += (<any> this.el.select('.alternative-box').node()).getBoundingClientRect().width * this.valueChart.getAlternatives().length;
+				let width = labelContainer.getBoundingClientRect().width + 10;
+				width += alternativeBox.getBoundingClientRect().width * this.valueChart.getAlternatives().length;
 				
 				if (width > currentViewport.width)
 					this.el.attr('width', width);
 			} else {
-				let height = (<any> this.el.select('.label-root-container').node()).getBoundingClientRect().height + 10;
-				height += (<any> this.el.select('.alternative-box').node()).getBoundingClientRect().height * this.valueChart.getAlternatives().length;
+				let height = labelContainer.getBoundingClientRect().height + 10;
+				height += alternativeBox.getBoundingClientRect().height * this.valueChart.getAlternatives().length;
 				
 				if (height > currentViewport.height)
 					this.el.attr('height', height);
