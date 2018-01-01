@@ -18,6 +18,7 @@ import { Observable }															from 'rxjs/Observable';
 import '../../utilities/rxjs-operators';
 
 // Import Application Classes:
+
 import { ValueChartDirective }													from '../../../ValueChartVis';
 import { ChartUndoRedoService }													from '../../../ValueChartVis';
 import { RenderEventsService }													from '../../../ValueChartVis';
@@ -60,7 +61,7 @@ import { ValueChartStatus }														from '../../../types';
 @Component({
 	selector: 'ValueChartViewer',
 	templateUrl: './ValueChartViewer.template.html',
-	providers: [ ValueChartViewerService ]
+	providers: [ ValueChartViewerService, HostService ]
 })
 export class ValueChartViewerComponent implements OnInit {
 
@@ -109,6 +110,7 @@ export class ValueChartViewerComponent implements OnInit {
 		public userGuard: UserGuard,
 		private router: Router,
 		private route: ActivatedRoute,
+		private preferenceLearningService: PreferenceLearningService,
 		private valueChartHttp: ValueChartHttp,
 		private hostService: HostService,
 		private validationService: ValidationService,
@@ -511,7 +513,7 @@ export class ValueChartViewerComponent implements OnInit {
 		});
 
 	}
-	
+
 	// ================================ Preference Learning ====================================	
 
 	sampleNewAlternative(): void {
