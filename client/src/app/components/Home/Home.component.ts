@@ -54,7 +54,9 @@ export class HomeComponent implements OnInit {
 	public UserRole = UserRole;
 	public CreatePurpose = CreatePurpose;
 
-	demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Runoff Management', type: 'Individual' }]
+	public demoValueCharts: any[] = [{ xmlString: singleHotel, name: 'Hotel Selection Problem', type: 'Individual' }, { xmlString: groupHotel, name: 'Hotel Selection Problem', type: 'Group' }, { xmlString: waterManagement, name: 'Runoff Management', type: 'Individual' }];
+
+	public experimentalValueCharts = [{ displayText: "Buying a Cell Phone", name: "Cell_Phone_Selection", password: "cell" }, { displayText: "Date Night", name: "Date_Night", password: "date" }]
 
 	public valueChartName: string;
 	public valueChartPassword: string;

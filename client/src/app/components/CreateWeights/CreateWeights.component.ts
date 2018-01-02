@@ -174,6 +174,8 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Gets best Alternative outcome for Objective. Used to fill the Best Outcome column.
 	*/
 	getBestOutcome(objId: string): string | number {
+		return "";
+
 		let bestOutcome;
 		let bestOutcomeScore = 0;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
@@ -186,7 +188,8 @@ export class CreateWeightsComponent implements OnInit {
 			}
 		}
 		if (bestOutcome === undefined) {
-			bestOutcome = this.getWorstOutcome(objId);
+			bestOutcome = "";
+			// bestOutcome = this.getWorstOutcome(objId);
 		}
 		return bestOutcome;
 	}
@@ -196,6 +199,8 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Gets worst Alternative outcome for Objective. Used to fill the Worst Outcome column.
 	*/
 	getWorstOutcome(objId: string): string | number {
+		return "";
+
 		let worstOutcome;
 		let worstOutcomeScore = 1;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
@@ -208,7 +213,8 @@ export class CreateWeightsComponent implements OnInit {
 			}
 		}
 		if (worstOutcome === undefined) {
-			worstOutcome = this.getBestOutcome(objId);
+			worstOutcome = "";
+			// worstOutcome = this.getBestOutcome(objId);
 		}
 		return worstOutcome;
 	}

@@ -40,8 +40,9 @@ var vacationAlternatives: any[] = [
 ];
 
 var dateNightAlternatives: any[] = [
-	{"name":"Superhero Movie","description":"Go to see DC Comics most recent superhero movie - Justice League - in theatres.","objectiveValues":[["_2",40],["_3","Minor"],["_4",2.5],["_5","Mild"],["_6","None"]],"id":"_13"},
-	{"name":"Ski Trip","description":"Go for an overnight ski trip in Whistler.","objectiveValues":[["_3","Major"],["_5","Very Intense"],["_6","Strenuous"],["_4",12],["_2",500]],"id":"_15"},
+	{"name":"Superhero Movie","description":"Go to see DC Comics most recent superhero movie in theatres.","objectiveValues":[["_2",40],["_3","Minor"],["_4",2.5],["_5","Mild"],["_6","None"]],"id":"_13"},
+	{"name":"Romantic Movie","description":"Go to see a romantic movie in theatres","objectiveValues":[["_2",40],["_3","Minor"],["_4",2.5],["_5","Intermediate"],["_6","None"]],"id":"_13"},
+	{"name":"Ski Trip","description":"Go for an overnight ski trip in Whistler.","objectiveValues":[["_3","Major"],["_5","Very Intense"],["_6","Strenuous"],["_4",12],["_2",500]],"id":"_100"},
 	{"name":"Victoria Trip","description":"Go for a day trip over to Victoria on Vancouver Island.","objectiveValues":[["_3","Major"],["_5","Very Intense"],["_6","Moderate"],["_2",180],["_4",12]],"id":"_16"},
 	{"name":"Fast Food","description":"Go to McDonalds for dinner.","objectiveValues":[["_2",20],["_3","Intermediate"],["_5","Dull"],["_6","None"],["_4",0.5]],"id":"_17"},
 	{"name":"3-Star Restaurant","description":"Go to an average restaurant in Vancouver for a dinner date. Not fancy, but not plain either.","objectiveValues":[["_2",95],["_3","Intermediate"],["_5","Intermediate"],["_4",2],["_6","None"]],"id":"_51"},
@@ -51,8 +52,8 @@ var dateNightAlternatives: any[] = [
 	{"name":"Day at the Beach","description":"Head to the beach for a day of fun in the sun.","objectiveValues":[["_2",0],["_3","Intermediate"],["_5","Mild"],["_4",9],["_6","Moderate"]],"id":"_55"},
 	{"name":"Day Hike","description":"Drive to the North Shore for a day hike in the mountains.","objectiveValues":[["_2",0],["_3","Intermediate"],["_4",12],["_5","Intermediate"],["_6","Strenuous"]],"id":"_83"},
 	{"name":"Seawall Walk","description":"Go for a walk along the seawall.","objectiveValues":[["_2",0],["_3","Intermediate"],["_4",2],["_5","Intense"],["_6","Mild"]],"id":"_84"},
-	{"name":"Comedy Club","description":"Head to the improv night at the local comedy club.","objectiveValues":[["_2",60],["_3","Minor"],["_4",3],["_5","Intermediate"],["_6","None"]],"id":"_85"},
-	{"name":"Coffee","description":"Grab a cup of coffee at a hipster place in Vancouver.","objectiveValues":[["_2",15],["_3","Intermediate"],["_5","Mild"],["_4",1],["_6","None"]],"id":"_86"},
+	{"name":"Comedy Club","description":"Head to the improve night at the local comedy club.","objectiveValues":[["_2",60],["_3","Minor"],["_4",3],["_5","Intermediate"],["_6","None"]],"id":"_85"},
+	{"name":"Coffee","description":"Grab a cup of coffee at a hip place in Vancouver.","objectiveValues":[["_2",15],["_3","Intermediate"],["_5","Mild"],["_4",1],["_6","None"]],"id":"_86"},
 	{"name":"Bowling","description":"Go bowling at the nearest bowling alley.","objectiveValues":[["_2",45],["_3","Minor"],["_4",1],["_5","Dull"],["_6","Moderate"]],"id":"_87"},
 	{"name":"Art Gallery","description":"Go to the Vancouver Art Gallery and see the traveling exhibits.","objectiveValues":[["_2",48],["_3","Intermediate"],["_4",2],["_5","Intermediate"],["_6","Moderate"]],"id":"_88"},
 	{"name":"Dancing","description":"Seek out the nearest club and cut some rug.","objectiveValues":[["_3","Major"],["_6","Strenuous"],["_4",3],["_5","Intense"],["_2",75]],"id":"_89"}
@@ -95,4 +96,13 @@ alternativesRoutes.post('/:chart/:username', function(req: express.Request, res:
 	res.status(200)
 		.json({ data: nextAlternatives });
 
+});
+
+alternativesRoutes.get('/:chart/all', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+	var chartname = req.params.chart;
+
+	var alternatives = problems[chartname];
+	
+	res.status(200)
+		.json({ data: alternatives });
 });

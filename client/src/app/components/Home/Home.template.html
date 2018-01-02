@@ -58,20 +58,20 @@
 			</div>
 		</div>
 		<div *ngIf="!currentUserService.isLoggedIn()" class="col-xs-offset-3 col-xs-6 demo-table">
-			<h2 class="text-center">Select a Demo ValueChart</h2>
+			<h2 class="text-center">Select a Decision</h2>
 			<div class="flex-row column-container well well-lg">
 				<table class="table table-hover">
 					<thead>
 						<th></th>
 						<th>ValueChart Name</th>
-						<th>Type</th>
+						<th>password</th>
 					</thead>
 					<tbody>
-						<tr *ngFor="let demoChart of demoValueCharts; let i = index ">
+						<tr *ngFor="let experimentChart of experimentalValueCharts; let i = index ">
 							<th score="row">{{i + 1}}</th>
-							<td>{{demoChart.name}}</td>
-							<td>{{demoChart.type}}</td>
-							<td><button class="btn btn-sm btn-default" (click)="selectDemoValueChart(demoChart)">Select</button></td>
+							<td>{{experimentChart.displayText}}</td>
+							<td>{{experimentChart.password}}</td>
+							<td><button class="btn btn-sm btn-default" (click)="editPreferences(experimentChart.name, experimentChart.name, experimentChart.password)">Select</button></td>
 						</tr>
 					</tbody>
 				</table>

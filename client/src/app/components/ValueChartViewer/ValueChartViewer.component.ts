@@ -518,7 +518,6 @@ export class ValueChartViewerComponent implements OnInit {
 	sampleNewAlternative(): void {
 		var valueChart = this.valueChartService.getValueChart();
 		var username = this.currentUserService.getUsername();
-		var objectives = valueChart.getAllPrimitiveObjectives();
 		var user = valueChart.getUser(username);
 
 		this.valueChartHttp.getNewAlternative(valueChart, user).subscribe((alternatives: Alternative[]) => {
@@ -531,6 +530,39 @@ export class ValueChartViewerComponent implements OnInit {
 			valueChart.setAlternatives(oldAlternatives);
 		});
 	}
+
+	getBestAlternative(): void {
+		var valueChart = this.valueChartService.getValueChart();
+		var username = this.currentUserService.getUsername();
+		var user = valueChart.getUser(username);
+
+		this.valueChartHttp.getAllAlternatives(valueChart).subscribe((alternatives: Alternative[]) => {
+			var alternativeScores: any = {};
+
+			valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {
+				var scoreFunction = user.getScoreFunctionMap().getObjectiveScoreFunction(objective.getId());
+				var weight: number = user.getWeightMap().getObjectiveWeight(objective.getId());
+				
+				alternatives.forEach((alternative: Alternative) => {
+					if (alternativeScores[alternative.getName()] == undefined) 
+						alternativeScores[alternative.getName()] = 0;
+
+					alternativeScores[alternative.getName()] += (scoreFunction.getScore(alternative.getObjectiveValue(objective.getId())) * weight);
+				});
+			});
+			let bestAlternative: Alternative = alternatives[0]
+
+			alternatives.forEach((alternative: Alternative) => {
+				if (alternativeScores[alternative.getName()] > alternativeScores[bestAlternative.getName()])
+					bestAlternative = alternative;
+			});
+
+
+			window.alert("Your best alternative is " + bestAlternative.getName() + "!" + bestAlternative.getDescription());
+
+			console.log(bestAlternative);
+		});
+	}	
 
 	
 	// ================================ Undo/Redo ====================================

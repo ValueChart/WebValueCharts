@@ -99,6 +99,8 @@ export class ValueChartDirective implements OnInit, DoCheck {
 	// Default Size of ValueChart components. These components are the: labels, objective chart, summary chart. 
 	private defaultChartComponentWidth: number;
 	private defaultChartComponentHeight: number;
+	private defaultViewportWidth: number;
+	private defaultViewportHeight: number;
 
 	public valueChartSubject: Subject<RendererUpdate>;				// The subject used to dispatch RendererUpdates to the Renderer classes.
 	public interactionSubject: Subject<InteractionConfig>;			// The subject used to dispatch new interactionConfigs to the Renderer classes.
@@ -190,17 +192,15 @@ export class ValueChartDirective implements OnInit, DoCheck {
 						due to the effects of the viewBox attribute.
 	*/
 	setViewportSize(): void {
-		this.el.attr('width', '95%');
-		this.el.attr('height', '75%');
-
-
 		if (!this.viewConfig.scaleAlternatives) {
+
+
 			let currentViewport = (<any> this.el.node()).getBoundingClientRect();
-			let alternativeBox: Element = (<any> this.el.select('.label-root-container').node());
 			let labelContainer: Element = (<any> this.el.select('.label-root-container').node());
+			let alternativeBox: Element = (<any> this.el.select('.alternative-box').node());
 
 			// Do nothing if either the alternatives or the labels aren't defined.
-			if (!alternativeBox || ! labelContainer) {
+			if (!alternativeBox || !labelContainer) {
 				return;
 			}
 
@@ -217,6 +217,9 @@ export class ValueChartDirective implements OnInit, DoCheck {
 				if (height > currentViewport.height)
 					this.el.attr('height', height);
 			}
+		} else {
+			this.el.attr('width', '95%');
+			this.el.attr('height', '75%');
 		}
 	}
 

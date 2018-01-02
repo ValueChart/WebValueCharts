@@ -1,68 +1,47 @@
 <div *ngIf="!loading" id="ValueChartView">
 	<input type="color" id="primitiveObjective-color-picker">
 	<div class="valuechart-toolbar">
-		<form class="navbar-form col-xs-12" style="width:100%;height:60px;">
-			<div class=" valuechart-toolbar-group pull-left dropdown">
-				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Chart Options
-				<span class="caret"></span></button>
-				<ul class="dropdown-menu">
-					<li>
-						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
-							Edit ValueChart
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-default" style="width: 90%;" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
-							Edit Preferences
-						</button>
-					</li>
-					<li>
-						<ExportValueChart></ExportValueChart>
-					</li>
-					<li>
-						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
-							Lock Chart
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
-							Unlock Chart
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
-							View Individual Chart
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-primary" style="width: 90%;" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
-							View Group Chart
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-success" style="width: 90%;" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
-							{{valueChartViewerService.isOwner() ? "Save" : "Save to Group Chart"}}
-						</button>
-					</li>
-					<li>
-						<button class="btn btn-primary" style="width: 90%;" (click)="sampleNewAlternative()">.
-						Get Alternative
-						</button>
-					</li>
-				</ul>
-			</div>
-			<div class=" valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
-				Redo
+		<form class="">
+			<div class="pull-left">
+				<button class="btn btn-default" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
+					Edit ValueChart
+				</button>
+				<button class="btn btn-default" *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
+					Edit Preferences
+				</button>
+				<!-- <ExportValueChart></ExportValueChart> -->
+				<button class="btn btn-danger" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
+					Lock Chart
+				</button>
+				<button class="btn btn-danger" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
+					Unlock Chart
+				</button>
+				<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
+					View Individual Chart
+				</button>
+<!-- 				<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
+					View Group Chart
+				</button> -->
+<!-- 				<button class="btn btn-success" *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
+					{{valueChartViewerService.isOwner() ? "Save" : "Save to Group Chart"}}
+				</button> -->
+				<button class="btn btn-primary" (click)="sampleNewAlternative()">
+				Get Alternative
+				</button>
+				<button class="btn btn-success" (click)="getBestAlternative()">
+				Make Decision
 				</button>
 			</div>
-			<div class=" valuechart-toolbar-group pull-right">
-				<button class="btn btn-default" [disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
+			<div>
+				<button class="btn btn-default pull-right" [disabled]="undoRedoService && !undoRedoService.canUndo()" (click)="undoChartChange()">
 				Undo
 				</button>
+				<button class="btn btn-default pull-right" [disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
+				Redo
+				</button>
+				<ViewOptions class="pull-right" [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
+				<InteractionOptions class="pull-right" [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 			</div>
-			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
-			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 		</form>
 	</div>
 	<div>
