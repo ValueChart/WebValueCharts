@@ -52,10 +52,10 @@
 				<div>
 					<ExportValueChart></ExportValueChart>
 				</div>
-				<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && !valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
+				<button class="btn btn-danger"  *ngIf="!isChartLocked()" (click)="setUserChangesAccepted(true)">
 					Lock Chart
 				</button>
-				<button class="btn btn-danger" style="width: 90%;" *ngIf="valueChartViewerService.isOwner() && !valueChartService.getValueChart().isIndividual() && valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
+				<button class="btn btn-danger"  *ngIf="isChartLocked()" (click)="setUserChangesAccepted(false)">
 					Unlock Chart
 				</button>
 			</div>

@@ -207,4 +207,27 @@ export class DetailBoxComponent implements OnInit {
 	getValueChartUrl(): string {
 		return document.location.origin + '/join/ValueCharts/' + this.valueChart.getFName() + '?password=' + this.valueChart.password + '&purpose=newUser';
 	}
+
+	/* 	
+		@param lockedByCreator - whether or not the owner of the ValueChart will permit users to save changes to their preferences.
+		@returns {void}
+		@description 	Sets whether or not members of the ValueChart (including the owner if they are a member) will be allowed to save
+						changes to their preferences to the server. 
+	*/
+	setUserChangesAccepted(lockedByCreator: boolean): void {
+		this.valueChartService.getStatus().lockedByCreator = lockedByCreator;
+
+		this.valueChartHttp.setValueChartStatus(this.valueChartService.getStatus()).subscribe((status) => {
+			var messageString: string = ((!lockedByCreator) ? 'ValueChart unlocked. Changes will be allowed.' : 'ValueChart locked. Changes will be prevented.');
+			this.userNotificationService.displayWarnings([messageString]);
+		});
+
+	}
+
+	isChartLocked(): boolean{
+		if(this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && this.valueChartService.getStatus().lockedByCreator){
+			return true
+		} 
+		return false 
+	}
 }
