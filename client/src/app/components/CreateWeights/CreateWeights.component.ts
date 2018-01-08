@@ -174,24 +174,9 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Gets best Alternative outcome for Objective. Used to fill the Best Outcome column.
 	*/
 	getBestOutcome(objId: string): string | number {
-		return "";
-
-		let bestOutcome;
-		let bestOutcomeScore = 0;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
-		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
-			let outcome = alt.getObjectiveValue(objId);
-			let outcomeScore = scoreFunction.getScore(outcome);
-			if (outcomeScore > bestOutcomeScore) {
-				bestOutcome = outcome;
-				bestOutcomeScore = outcomeScore;
-			}
-		}
-		if (bestOutcome === undefined) {
-			bestOutcome = "";
-			// bestOutcome = this.getWorstOutcome(objId);
-		}
-		return bestOutcome;
+
+		return scoreFunction.bestElement;
 	}
 
 	/* 	
@@ -199,24 +184,9 @@ export class CreateWeightsComponent implements OnInit {
 		@description 	Gets worst Alternative outcome for Objective. Used to fill the Worst Outcome column.
 	*/
 	getWorstOutcome(objId: string): string | number {
-		return "";
-
-		let worstOutcome;
-		let worstOutcomeScore = 1;
 		let scoreFunction: ScoreFunction = this.user.getScoreFunctionMap().getObjectiveScoreFunction(objId);
-		for (let alt of this.valueChartService.getValueChart().getAlternatives()) {
-			let outcome = alt.getObjectiveValue(objId);
-			let outcomeScore = scoreFunction.getScore(outcome);
-			if (outcomeScore < worstOutcomeScore) {
-				worstOutcome = outcome;
-				worstOutcomeScore = outcomeScore;
-			}
-		}
-		if (worstOutcome === undefined) {
-			worstOutcome = "";
-			// worstOutcome = this.getBestOutcome(objId);
-		}
-		return worstOutcome;
+
+		return scoreFunction.worstElement;
 	}
 
 	/* 	

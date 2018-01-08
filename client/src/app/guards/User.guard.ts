@@ -78,6 +78,9 @@ export class UserGuard implements CanDeactivate<any> {
 						to the Angular 2 router.
 	*/
 	canDeactivate(component: any, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+		
+		return true;
+
 		let currentUser = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 		let role: UserRole = parseInt(route.queryParams['role']);
 		let createPurpose: CreatePurpose = parseInt(route.params['purpose']);
@@ -92,7 +95,7 @@ export class UserGuard implements CanDeactivate<any> {
 			createPurpose === CreatePurpose.EditValueChart || createPurpose === CreatePurpose.NewValueChart || createPurpose === CreatePurpose.NewUser) {
 			return true;
 		} else if (!_.isEqual(currentUser, this.userRecord)) {	
-			let navigate = window.confirm('You have unsaved changes to your preferences. Are you sure that you want to leave?');
+			let navigate = window.confirm('Are you sure that you want to leave?');
 			
 			if (navigate) {
 				this.userRecord = null;

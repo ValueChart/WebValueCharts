@@ -185,7 +185,6 @@ export class ValueChartViewerComponent implements OnInit {
 						requires that a different component is displayed in the router-outlet.
 	*/
 	ngOnDestroy() {
-
 		if (this.hostService.hostWebSocket) {
 			this.hostService.endCurrentHosting();
 		}
@@ -527,6 +526,7 @@ export class ValueChartViewerComponent implements OnInit {
 				oldAlternatives.push(alternative);
 			})
 
+
 			valueChart.setAlternatives(oldAlternatives);
 		});
 	}
@@ -558,7 +558,11 @@ export class ValueChartViewerComponent implements OnInit {
 			});
 
 
-			window.alert("Your best alternative is " + bestAlternative.getName() + "!" + bestAlternative.getDescription());
+			window.alert("Your best alternative is " + bestAlternative.getName() + "! " + bestAlternative.getDescription() + "\n \n It has been added to the ValueChart.");
+
+			if (_.intersectionWith(valueChart.getAlternatives(), [bestAlternative]).length == 0) {
+				valueChart.getAlternatives().push(bestAlternative);
+			}
 
 			console.log(bestAlternative);
 		});
