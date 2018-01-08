@@ -79,8 +79,6 @@ export class UserGuard implements CanDeactivate<any> {
 	*/
 	canDeactivate(component: any, route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
 		
-		return true;
-
 		let currentUser = this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername());
 		let role: UserRole = parseInt(route.queryParams['role']);
 		let createPurpose: CreatePurpose = parseInt(route.params['purpose']);
