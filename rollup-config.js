@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2017-05-16 17:10:36
 * @Last Modified by:   aaronpmishkin
-* @Last Modified time: 2018-01-06 16:05:17
+* @Last Modified time: 2018-01-09 17:33:04
 */
 
 
@@ -29,7 +29,7 @@ export default {
       commonjs({
         include: [ 'node_modules/rxjs/**', 'node_modules/lodash/lodash.js' ],
         namedExports: {
-          './node_modules/lodash/lodash.js': [ 'remove', 'uniqueId', 'xor', 'isNumber', 'differenceWith', 'differenceBy', 'unionWith', 'isNil', 'clone', 'cloneDeep', 'isEqual', 'clamp', 'findIndex', 'random' ]
+          './node_modules/lodash/lodash.js': [ 'remove', 'uniqueId', 'xor', 'isNumber', 'differenceWith', 'differenceBy', 'unionWith', 'isNil', 'clone', 'cloneDeep', 'isEqual', 'clamp', 'findIndex', 'random', 'intersectionWith' ]
         }
       }),
       uglify()

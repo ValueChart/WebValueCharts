@@ -92,20 +92,12 @@ import * as MongoDB from 'mongodb';
 import * as Monk from 'monk';
 import * as _ from 'lodash';
 
-// Import Application Classes:
-import { HostEventEmitter, hostEventEmitter } from '../utilities/HostEventEmitters';
-import { valueChartUsersRoutes } from './ValueChartsUsers.routes';
-
 export var alternativesRoutes: express.Router = express.Router();
 
 alternativesRoutes.post('/:chart/:username', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var username = req.params.username;
 	var chartname = req.params.chart;
 
-	fs.appendFile('data/' + chartname + '_' + username + '.txt', JSON.stringify(req.body.user) + "\n", (err: any) => {
-	 	if (err) throw err;
-		console.log('The data was appended to file!');
-	});
 
 
 	var nextAlternatives: any[] = [];
@@ -118,6 +110,11 @@ alternativesRoutes.post('/:chart/:username', function(req: express.Request, res:
 		unselectedAlternatives = _.differenceBy(problems[chartname], nextAlternatives, 'name')
 		nextAlternatives.push(unselectedAlternatives[_.random(0, (unselectedAlternatives.length - 1))])
 	}
+
+	fs.appendFile('data/' + chartname + '_' + username + '.txt', "Preferences: " + JSON.stringify(req.body.user) + "\n Alternative: " + JSON.stringify(nextAlternatives) + "\n", (err: any) => {
+	 	if (err) throw err;
+		console.log('The data was appended to file!');
+	});
 
 	res.status(200)
 		.json({ data: nextAlternatives });
