@@ -227,6 +227,13 @@ export class ValueChartViewerComponent implements OnInit {
 
 		this.setValueChartTypeToView(type, currentUser);
 		this.hostValueChart();
+
+		var username = this.currentUserService.getUsername();
+		var user = valueChart.getUser(username);
+
+		this.valueChartHttp.getNewAlternative(valueChart, user).subscribe((alternatives: Alternative[]) => {
+			var oldAlternatives = valueChart.getAlternatives();
+		});
 	}
 
 	/* 	
@@ -536,7 +543,7 @@ export class ValueChartViewerComponent implements OnInit {
 		var username = this.currentUserService.getUsername();
 		var user = valueChart.getUser(username);
 
-		this.valueChartHttp.getAllAlternatives(valueChart).subscribe((alternatives: Alternative[]) => {
+		this.valueChartHttp.getAllAlternatives(valueChart, user).subscribe((alternatives: Alternative[]) => {
 			var alternativeScores: any = {};
 
 			valueChart.getAllPrimitiveObjectives().forEach((objective: PrimitiveObjective) => {

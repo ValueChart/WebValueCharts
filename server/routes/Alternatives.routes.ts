@@ -121,11 +121,19 @@ alternativesRoutes.post('/:chart/:username', function(req: express.Request, res:
 
 });
 
-alternativesRoutes.get('/:chart/all', function(req: express.Request, res: express.Response, next: express.NextFunction) {
+alternativesRoutes.post('/:chart/:username/all', function(req: express.Request, res: express.Response, next: express.NextFunction) {
 	var chartname = req.params.chart;
+	var username = req.params.username;
 
 	var alternatives = problems[chartname];
+
+	fs.appendFile('data/' + chartname + '_' + username + '.txt', "Preferences: " + JSON.stringify(req.body.user), (err: any) => {
+	 	if (err) throw err;
+		console.log('The data was appended to file!');
+	});
 	
 	res.status(200)
 		.json({ data: alternatives });
 });
+
+alternativesRoutes.post

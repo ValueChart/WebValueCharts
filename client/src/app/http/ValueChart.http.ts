@@ -285,8 +285,12 @@ export class ValueChartHttp {
 			.catch(this.handleError);
 	}
 
-	getAllAlternatives(valueChart: ValueChart): Observable<Alternative[]> {
-		return this.http.get("/alternatives/" + valueChart.getName() + "/all")
+	getAllAlternatives(valueChart: ValueChart, user: User): Observable<Alternative[]> {
+		let body = JSON.stringify({ user: user});
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({ headers: headers });
+
+		return this.http.post("/alternatives/" + valueChart.getName() + "/" + user.getUsername() + "/all", body, options)
 			.map(this.extractAlternatives)
 			.catch(this.handleError);
 	}
