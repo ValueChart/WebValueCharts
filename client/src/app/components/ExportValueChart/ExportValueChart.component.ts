@@ -26,11 +26,11 @@ import { ValueChart }										from '../../../model';
 	selector: 'ExportValueChart',
 	template: `
 				<div class="export-value-chart">
-					<a class="btn btn-default" id="download-value-chart" style="width: 90%;"
+					<a class="btn btn-default" id="download-value-chart" 
 						[class.disabled]="!valueChartService.valueChartIsDefined()" 
 						download="{{getValueChartName()}}" 
 						href="javascript:void(0)" 
-						(click)="downloadValueChart()">
+						ng-click="downloadValueChart()" >
 						Export ValueChart
 					</a>
 				</div>
@@ -87,7 +87,7 @@ export class ExportValueChartComponent implements OnInit {
 		var valueChartObjectURL: string = this.convertValueChartIntoObjectURL(valueChart);
 
 		this.downloadLink.setAttribute('href', valueChartObjectURL);		// Set the download link on the <a> element to be the URL created for the XML string.
-		$(this.downloadLink).click();									// Click the <a> element to programmatically begin the download.
+		$(this.downloadLink).click();										// Click the <a> element to programmatically begin the download.
 	}
 
 	convertValueChartIntoObjectURL(valueChart: ValueChart): string {
@@ -102,6 +102,4 @@ export class ExportValueChartComponent implements OnInit {
 		// Create an return a unique download URL for the XML string.
 		return URL.createObjectURL(valueChartBlob);
 	}
-
-
 }

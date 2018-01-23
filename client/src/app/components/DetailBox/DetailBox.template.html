@@ -1,85 +1,110 @@
-<div id="detail-box" class="detail-box" [style.left.px]="(viewConfig.viewOrientation == ChartOrientation.Vertical ? 14 : width + 64)">
-	<form class="form-inline col-xs-5" class="detail-toolbar">
-		<div class="form-group valuechart-toolbar-group pull-left">
-			<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="chart-information-header-container"
+<!-- Need to move this -->
+<style>
+	.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+		border: 0;
+	}
+
+	.btn-ubc 		{color: #002145; background-color: white;}
+	.btn-ubc:hover  {color: white; background-color: #324d6a;}
+	.btn-ubc.active {color: white; background-color:  #002145;}
+	.btn-ubc.active:hover {color: white; background-color: #002145;}
+
+</style>
+
+<div id="detail-box" class="detail-box" [style.left.px]="(viewConfig.viewOrientation == ChartOrientation.Vertical ? 14 : width + 64)">	
+	<ul class="nav nav-tabs borderless" style="margin: 10px 10px -10px 10px" id="myTab" role="tablist">
+		<li>
+			<a class="nav-link btn btn-ubc active" id="chart-information-header-container" data-toggle="tab"
 			(click)="detailBoxCurrentTab = DETAIL_BOX_CHART_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
 			<h5 id="alternative-header">Chart Details</h5>
-			</button>
-		</div>
-		<div class="form-group valuechart-toolbar-group pull-left">
-			<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="alternative-header-container"
+			</a>
+		</li>
+		<li>
+			<a class="nav-link btn btn-ubc" id="alternative-header-container" data-toggle="tab"
 			(click)="detailBoxCurrentTab = DETAIL_BOX_ALTERNATIVES_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 			<h5 id="alternative-header">{{detailBoxAlternativeTab}}</h5>
-			</button>
-		</div>
-		<div *ngIf="showUsers" class="form-group valuechart-toolbar-group pull-left">
-			<button class="btn btn-lg btn-default detail-box-tab detail-box-header" id="user-list-header-container"
+			</a>
+		</li>
+		<li *ngIf="showUsers">
+			<a class="nav-link btn btn-ubc" id="user-list-header-container" data-toggle="tab"
 			(click)="detailBoxCurrentTab = DETAIL_BOX_USERS_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
 			<h5 id="user-list-headers">User List</h5>
-			</button>
-		</div>
-	</form>
-	<div class="well well-lg" id="alternative-detail-box"
-		[style.height.px]="height"
-		[style.width.px]="width">
-		<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
-			<div>
-				<span class="col-xl-4 col-md-5"><b>Name:</b></span>
-				<span class="col-xl-8 col-md-7">{{valueChart.getName()}}</span>
-			</div>
-			<div>
-				<span class="col-xl-4 col-md-5"><b>Password:</b></span>
-				<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
-			</div>
-			<div *ngIf="enableManagement">
-				<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
-				<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
-			</div>
-		</div>
-		<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
-			<div *ngFor="let alternative of valueChart.getAlternatives()">
-				<div class="col-sm-12">
-					<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxAlternativeTab === 'Alternatives'">
-						{{alternative.getName()}}
-					</a>
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content clearfix">
+			<div class="well well-lg" id="alternative-detail-box"
+			[style.height.px]="height"
+			[style.width.px]="width">
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
+				<div>
+					<span class="col-xl-4 col-md-5"><b>Name:</b></span>
+					<span class="col-xl-8 col-md-7">{{valueChart.getName()}}</span>
 				</div>
-				<div *ngIf="detailBoxAlternativeTab === alternative.getName()">
-					<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
+				<div>
+					<span class="col-xl-4 col-md-5"><b>Password:</b></span>
+					<span class="col-xl-8 col-md-7">{{valueChart.password}}</span>
+				</div>
+				<div *ngIf="enableManagement">
+					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
+					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
+				</div>
+				<div>
+					<ExportValueChart></ExportValueChart>
+				</div>
+				<button class="btn btn-danger"  *ngIf="!isChartLocked()" (click)="setUserChangesAccepted(true)">
+					Lock Chart
+				</button>
+				<button class="btn btn-danger"  *ngIf="isChartLocked()" (click)="setUserChangesAccepted(false)">
+					Unlock Chart
+				</button>
+			</div>
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
+				<div *ngFor="let alternative of valueChart.getAlternatives()">
+					<div class="col-sm-12">
+						<a href="javascript:void(0)" (click)="expandAlternative(alternative)" *ngIf="detailBoxAlternativeTab === 'Alternatives'">
+							{{alternative.getName()}}
+						</a>
+					</div>
+					<div *ngIf="detailBoxAlternativeTab === alternative.getName()">
+						<div *ngFor="let value of alternativeObjectiveValues; let i = index ">
+							<div>
+								<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
+								<span class="col-xl-8 col-md-7">{{value}}</span>
+							</div>
+						</div>
 						<div>
-							<span class="col-xl-4 col-md-5"> <b>{{alternativeObjectives[i]}}</b></span>
-							<span class="col-xl-8 col-md-7">{{value}}</span>
+							<span class="col-xl-4 col-md-5"><b>Description</b></span>
+							<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
 						</div>
 					</div>
-					<div>
-						<span class="col-xl-4 col-md-5"><b>Description</b></span>
-						<span class="col-xl-8 col-md-7">{{alternative.getDescription()}}</span>
-					</div>
+				</div>
+				<div *ngIf="detailBoxAlternativeTab !== 'Alternatives'">
+					<button class="btn btn-default pull-right" (click)="collapseAlternative()">Back</button>
 				</div>
 			</div>
-			<div *ngIf="detailBoxAlternativeTab !== 'Alternatives'">
-				<button class="btn btn-default pull-right" (click)="collapseAlternative()">Back</button>
-			</div>
-		</div>
-		<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
-			<div *ngFor="let user of valueChart.getUsers(); let i = index ">
-				<h5 class="remove-user">
-					{{user.getUsername()}}
-					<span *ngIf="!valueChart.isIndividual()">
-						<a href="javascript:void(0)" (click)="moveUserUp(user, i)">
-							<span class="glyphicon glyphicon-chevron-up"></span>
-						</a>
-						<a href="javascript:void(0)" (click)="moveUserDown(user, i)">
-							<span class="glyphicon glyphicon-chevron-down"></span>
-						</a>
-						<span class="pull-right"><input [disabled]="user.getUsername() !== currentUserService.getUsername()" type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
-						<button *ngIf="enableManagement" class="pull-right btn btn-danger btn-xxs" (click)="displayRemoveUser(user)">Remove</button>
-						<input class="pull-right" type="checkbox" [disabled]="valueChartViewerService.isUserInvalid(user.getUsername())" [checked]="valueChartViewerService.isUserDisplayed(user)" (change)="changeDisplayedUsers(user, $event)">
-					</span>
-				</h5>
+			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">
+				<div *ngFor="let user of valueChart.getUsers(); let i = index ">
+					<h5 class="remove-user">
+						{{user.getUsername()}}
+						<span *ngIf="!valueChart.isIndividual()">
+							<a href="javascript:void(0)" (click)="moveUserUp(user, i)">
+								<span class="glyphicon glyphicon-chevron-up"></span>
+							</a>
+							<a href="javascript:void(0)" (click)="moveUserDown(user, i)">
+								<span class="glyphicon glyphicon-chevron-down"></span>
+							</a>
+							<span class="pull-right"><input [disabled]="user.getUsername() !== currentUserService.getUsername()" type="color" value="{{user.color}}" (change)="setUserColor(user, $event.target.value)"></span>
+							<button *ngIf="enableManagement" class="pull-right btn btn-danger btn-xxs" (click)="displayRemoveUser(user)">Remove</button>
+							<input class="pull-right" type="checkbox" [disabled]="valueChartViewerService.isUserInvalid(user.getUsername())" [checked]="valueChartViewerService.isUserDisplayed(user)" (change)="changeDisplayedUsers(user, $event)">
+						</span>
+					</h5>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
 <NotificationModal
 [display]="displayModal"
 [title]="'Remove User'"
