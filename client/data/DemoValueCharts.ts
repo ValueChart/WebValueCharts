@@ -245,7 +245,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 		</Alternatives>
 	</ChartStructure>
 	<Users>
-		<User name="Aaron">
+		<User name="Aaron" color="#F3C300">
 			<Weights>
 				<Weight objective="area" value="0.2"/>
 				<Weight objective="internet-access" value="0.1"/>
@@ -287,7 +287,7 @@ export var groupHotel: string = `<?xml version="1.0" encoding="UTF-8" standalone
 				</ScoreFunction>
 			</ScoreFunctions>
 		</User>
-		<User name="Samuel">
+		<User name="Samuel" color="#875692">
 			<Weights>
 				<Weight objective="area" value="0.05"/>
 				<Weight objective="internet-access" value="0.4"/>
