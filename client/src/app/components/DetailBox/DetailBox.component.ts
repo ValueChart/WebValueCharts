@@ -223,11 +223,4 @@ export class DetailBoxComponent implements OnInit {
 		});
 
 	}
-
-	isChartLocked(): boolean{
-		if(this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && this.valueChartService.getStatus().lockedByCreator){
-			return true
-		} 
-		return false 
-	}
 }

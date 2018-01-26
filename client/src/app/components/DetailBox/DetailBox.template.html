@@ -49,15 +49,15 @@
 					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
 					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
 				</div>
-				<div>
+				<div class="form-group">
+					<button class="btn btn-danger pull-left"  *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && !this.valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(true)">
+						Lock
+					</button>
+					<button class="btn btn-danger pull-left"  *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && this.valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
+						Unlock
+					</button>
 					<ExportValueChart></ExportValueChart>
 				</div>
-				<button class="btn btn-danger"  *ngIf="!isChartLocked()" (click)="setUserChangesAccepted(true)">
-					Lock Chart
-				</button>
-				<button class="btn btn-danger"  *ngIf="isChartLocked()" (click)="setUserChangesAccepted(false)">
-					Unlock Chart
-				</button>
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
 				<div *ngFor="let alternative of valueChart.getAlternatives()">

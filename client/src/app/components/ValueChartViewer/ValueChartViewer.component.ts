@@ -72,7 +72,7 @@ export class ValueChartViewerComponent implements OnInit {
 	public UserRole = UserRole;
 	public _ = _;
 
-	public loading: boolean = true;
+	public chartName: string = "";
 
 	public routeSubscription: Subscription;
 
@@ -148,26 +148,27 @@ export class ValueChartViewerComponent implements OnInit {
 				
 				this.valueChartViewerService.setUserRole(role);
 
-				if (this.loading) {
-					// If the ValueChart in the ValueChartService is not define,
+				// Is this chart being loaded for the first time?
+				if (this.chartName !== fname) {
+					// If the ValueChart in the ValueChartService is not defined,
 					// then fetch the ValueChart from the server using the URL parameters.
 					if (!this.valueChartService.valueChartIsDefined()) {
 						this.valueChartHttp.getValueChartByName(fname, password)
 							.subscribe(valueChart => {
 								this.valueChartService.setValueChart(valueChart);
 								this.initializeViewer(type);
-								this.loading = false;
+								this.chartName = fname;
 							});
 					} else {
 						this.initializeViewer(type);
-						this.loading = false;
+						this.chartName = fname;
 					}
 				}
 
 			});
 
 		// Subscribe to the route parameters so that the type of ValueChart being viewed changes when the parameters change.
-		this.route.params.subscribe(params => { if (!this.loading) this.setValueChartTypeToView(params['ChartType'], this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())) });
+		this.route.params.subscribe(params => { if (!(this.chartName === "")) this.setValueChartTypeToView(params['ChartType'], this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername())) });
 
 		// Initialize automatic resizing of the ValueChart when the window is resized.
 		this.resizeValueChart();

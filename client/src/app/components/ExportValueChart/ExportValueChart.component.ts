@@ -25,15 +25,13 @@ import { ValueChart }										from '../../../model';
 @Component({
 	selector: 'ExportValueChart',
 	template: `
-				<div class="export-value-chart">
-					<a class="btn btn-default" id="download-value-chart" 
-						[class.disabled]="!valueChartService.valueChartIsDefined()" 
-						download="{{getValueChartName()}}" 
-						href="javascript:void(0)" 
-						ng-click="downloadValueChart()" >
-						Export ValueChart
-					</a>
-				</div>
+				<a class="btn btn-default pull-left" id="download-value-chart" 
+					[class.disabled]="!valueChartService.valueChartIsDefined()" 
+					download="{{getValueChartName()}}" 
+					href="javascript:void(0)" 
+					ng-click="downloadValueChart()" >
+					Export Chart
+				</a>
 				`
 })
 export class ExportValueChartComponent implements OnInit {

@@ -47,7 +47,7 @@
 						<button class="navbar-button navbar-bold" *ngIf="currentUserService.isLoggedIn()" id="my-account" [routerLink]="['/myAccount']">My Account</button>
 					</li>
 
-					<li class="dropdown"  *ngIf="currentUserService.isLoggedIn()" role="presentation">
+					<li class="dropdown" *ngIf="currentUserService.isLoggedIn()" role="presentation">
 						<button class="dropdown-toggle navbar-button" data-toggle="dropdown">New ValueChart<b class="caret"></b></button>
 						<ul class="dropdown-menu">
 							<li>
