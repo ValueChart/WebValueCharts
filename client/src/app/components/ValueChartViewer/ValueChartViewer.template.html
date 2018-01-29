@@ -2,15 +2,12 @@
 	<input type="color" id="primitiveObjective-color-picker">
 	<div class="valuechart-toolbar">
 		<form class="navbar-form col-xs-12" style="width:100%;height:60px;">
-			<div class=" valuechart-toolbar-group pull-left">
+			<div class="valuechart-toolbar-group pull-left">
 				<button class="btn btn-default"  *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
 					Edit Chart
 				</button>
 				<button class="btn btn-default"  *ngIf="valueChartViewerService.isParticipant()" (click)="editPreferences()">
 					Edit Preferences
-				</button>
-				<button class="btn btn-success"  *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
-					{{valueChartViewerService.isOwner() ? "Save Changes" : "Submit to Group Chart"}}
 				</button>
 			</div>
 			<div class="valuechart-toolbar-group pull-right">
@@ -26,6 +23,9 @@
 			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
 			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 			<div class="valuechart-toolbar-group pull-right">
+				<button class="btn btn-success"  *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
+					{{valueChartViewerService.isOwner() ? "Save Changes" : "Submit to Group Chart"}}
+				</button>
 				<button class="btn btn-primary"  *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
 					View Group Chart
 				</button>

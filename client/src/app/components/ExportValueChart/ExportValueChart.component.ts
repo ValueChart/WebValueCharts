@@ -29,7 +29,7 @@ import { ValueChart }										from '../../../model';
 					[class.disabled]="!valueChartService.valueChartIsDefined()" 
 					download="{{getValueChartName()}}" 
 					href="javascript:void(0)" 
-					ng-click="downloadValueChart()" >
+					(click)="downloadValueChart()" >
 					Export Chart
 				</a>
 				`

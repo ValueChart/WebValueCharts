@@ -56,7 +56,6 @@
 					<button class="btn btn-danger pull-left"  *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && this.valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
 						Unlock
 					</button>
-					<ExportValueChart></ExportValueChart>
 				</div>
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">
