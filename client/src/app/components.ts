@@ -11,7 +11,6 @@ export { ScoreFunctionViewerComponent }      from './components/ScoreFunctionVie
 export { RootComponent }                     from './components/Root/Root.component';
 export { RegisterComponent }                 from './components/Register/Register.component';
 export { NotificationModalComponent }        from './components/NotificationModal/NotificationModal.component';
-export { MyValueChartsComponent }            from './components/MyValueCharts/MyValueCharts.component';
 export { InteractionOptionsComponent }       from './components/InteractionOptions/InteractionOptions.component';
 export { HomeComponent }                     from './components/Home/Home.component';
 export { ExportValueChartComponent }         from './components/ExportValueChart/ExportValueChart.component';

@@ -47,7 +47,9 @@ export class ValueChartViewerService {
 	// 									Fields
 	// ========================================================================================
 
-	private activeValueChart: ValueChart;		// The ValueChart currently displayed by the ValueChartViewer.
+	private activeValueChart: ValueChart;				// The ValueChart currently displayed by the ValueChartViewer.
+	private savedValueChartStructure: ValueChart; 		// The last saved version of the ValueChart structure (objectives and alternatives only).
+														// This is used to check for structural changes made by the owner since the last save.
 
 	private usersToDisplay: User[]; 			// Users to display in the active ValueChart. This need not be activeValueChart.users
 	private invalidUsers: string[]; 			// Usernames of users that are invalid and should not displayed in the ValueChart.
@@ -171,15 +173,36 @@ export class ValueChartViewerService {
 	}
 
 	/*   
+		@param valueChart - the ValueChart to set as the saved ValueChart structure.
+	  	@returns {void}
+	    @description	Set the savedValueChartStructure to be the ValueChart instance provided.
+	*/
+	setSavedValueChartStructure(valueChartStructure: ValueChart): void {
+		this.savedValueChartStructure = valueChartStructure;
+	}
+
+	/*   
 	  	@returns {ValueChart} - the active ValueChart instance.
 	    @description	Get the activeValueChart. This method will throw an exception if no active ValueChart
 	    				has been set.
 	*/
 	getActiveValueChart(): ValueChart {
 		if (_.isNil(this.activeValueChart))
-			throw 'ValueChart is not defined';	// The ValueChart is not define; throw an exception.
+			throw 'ValueChart is not defined';	// The ValueChart is not defined; throw an exception.
 
 		return this.activeValueChart;
+	}
+
+	/*   
+	  	@returns {ValueChart} - the saved ValueChart structure.
+	    @description	Get the savedValueChartStructure. This method will throw an exception if no ValueChart structure
+	    				has been saved.
+	*/
+	getSavedValueChartStructure(): ValueChart {
+		if (_.isNil(this.savedValueChartStructure))
+			throw 'ValueChart is not defined';	// The ValueChart is not defined; throw an exception.
+
+		return this.savedValueChartStructure;
 	}
 
 	/*   

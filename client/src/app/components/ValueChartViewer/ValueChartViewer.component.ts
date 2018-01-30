@@ -226,6 +226,7 @@ export class ValueChartViewerComponent implements OnInit {
 			this.valueChartHttp.getValueChartStatus(valueChart._id).subscribe(status => this.valueChartService.setStatus(status));
 
 		this.setValueChartTypeToView(type, currentUser);
+		this.valueChartViewerService.setSavedValueChartStructure(_.cloneDeep(this.valueChartService.getValueChart().getValueChartStructure()));
 		this.hostValueChart();
 	}
 
@@ -349,7 +350,7 @@ export class ValueChartViewerComponent implements OnInit {
 
 	/*   
 	  @returns {boolean}
-	  @description	Help function to determine whether or not the current user has access to the "View Group Chart" button.
+	  @description	Helper function to determine whether or not the current user has access to the "View Group Chart" button.
 	  				A user can view the Group Chart when: 	1) there is a group chart to view;
 															2) they have submitted their preferences to the Group Chart;
 	*/
@@ -368,6 +369,18 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	canSave(): boolean {
 		return this.valueChartViewerService.isParticipant() || this.valueChartViewerService.getUserRole() == UserRole.Owner;
+	}
+
+	/*   
+	  @returns {boolean}
+	  @description	Helper function to determine whether or not the "Save" button is enabled.
+	  				True if the current user has made changes to their preferences, or if the chart owner has made changes to the structure.
+	*/
+	saveEnabled(): boolean {
+		if (this.valueChartViewerService.isOwner() && !_.isEqual(this.valueChartViewerService.getSavedValueChartStructure(), this.valueChartService.getValueChart().getValueChartStructure())) {
+			return true;
+		}
+		return !_.isEqual(_.omit(this.userGuard.getUserRecord(), ['id']), _.omit(this.valueChartService.getValueChart().getUser(this.currentUserService.getUsername()), ['id']));
 	}
 
 
@@ -442,7 +455,7 @@ export class ValueChartViewerComponent implements OnInit {
 		if (userRole == UserRole.Owner || userRole == UserRole.OwnerAndParticipant) {
 			// Update the ValueChart.
 			this.valueChartHttp.updateValueChartStructure(this.valueChartService.getValueChart()).subscribe(
-				(result: ValueChart) => {  },
+				(result: ValueChart) => { this.valueChartViewerService.setSavedValueChartStructure(_.cloneDeep(result.getValueChartStructure())) },
 				(error: any) => {
 					// Handle any errors here.
 					this.userNotificationService.displayWarnings(['Saving Failed.']);

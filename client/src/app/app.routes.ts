@@ -11,7 +11,6 @@ import { Routes, RouterModule } 									from '@angular/router';
 	// Components:
 import { RegisterComponent }										from './components/Register/Register.component';
 import { HomeComponent }											from './components/Home/Home.component';
-import { MyValueChartsComponent }									from './components/MyValueCharts/MyValueCharts.component';
 import { AccountComponent }											from './components/Account/Account.component';
 import { ValueChartViewerComponent }								from './components/ValueChartViewer/ValueChartViewer.component';
 import { ScoreFunctionViewerComponent }								from './components/ScoreFunctionViewer/ScoreFunctionViewer.component';
@@ -61,7 +60,6 @@ const routes: Routes = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'join/ValueCharts/:ValueChart', component: RegisterComponent, canActivate: [JoinGuard] },
 	{ path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-	{ path: 'myValueCharts', component: MyValueChartsComponent, canActivate: [AuthGuard] },
 	{ path: 'myAccount', component: AccountComponent, canActivate: [AuthGuard] },
 	{ path: 'ValueCharts/:ValueChart/:ChartType', component: ValueChartViewerComponent, canActivate: [AuthGuard], canDeactivate: [UserGuard] },
 	{ path: 'scoreFunction/:ViewType', component: ScoreFunctionViewerComponent },

@@ -23,7 +23,6 @@ import { DetailBoxComponent }					from './components';
 import { ViewOptionsComponent }					from './components';
 import { InteractionOptionsComponent }			from './components';
 import { AccountComponent }						from './components';
-import { MyValueChartsComponent }				from './components';
 import { ScoreFunctionViewerComponent }			from './components';
 import { ExportValueChartComponent }			from './components';
 import { CreateValueChartComponent }			from './components';
@@ -63,7 +62,6 @@ import { ValueChartVisModule }					from '../ValueChartVis';
 		ViewOptionsComponent,
 		InteractionOptionsComponent,
 		AccountComponent,
-		MyValueChartsComponent,
 		ScoreFunctionViewerComponent,
 		ExportValueChartComponent,
 		CreateValueChartComponent,

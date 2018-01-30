@@ -164,7 +164,13 @@ export class HomeComponent implements OnInit {
 				}
 				else {
 					this.valueChartService.setValueChart(valueChart);
-					let role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.OwnerAndParticipant : UserRole.Owner;
+					let role: UserRole;
+					if (valueChart.getCreator() === this.currentUserService.getUsername()) {
+						role = valueChart.isMember(this.currentUserService.getUsername()) ? UserRole.OwnerAndParticipant : UserRole.Owner;
+					}
+					else {
+						role = UserRole.Participant;
+					}
 					this.router.navigate(['ValueCharts', valueChart.getFName(), valueChart.getType()], { queryParams: { password: valueChart.password, role: role } });
 				}	
 			});
@@ -248,12 +254,8 @@ export class HomeComponent implements OnInit {
 				});
 				this.valueChartMemberships.splice(index, 1);
 			});
-		
-		console.log("here doing something")
 
 		this.valueChartHttp.deleteValueChartStatus(this.valueChartService.getValueChart()._id).subscribe((status) => {
-			// Do nothing;
-			console.log("here not deleting")
 		});
 	}
 

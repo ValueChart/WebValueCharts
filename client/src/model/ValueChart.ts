@@ -227,6 +227,17 @@ export class ValueChart {
 		return objectiveMap;
 	}
 
+	/*   
+		@returns {ValueChart}
+		@description   Returns a shallow copy of the ValueChart containing no users.
+	*/
+	public getValueChartStructure(): ValueChart {
+		let structure = new ValueChart(this.name, this.description, this.creator);
+		structure.setAlternatives(this.alternatives);
+		structure.setRootObjectives(this.rootObjectives);
+		return structure;
+	}
+
 	// Alternative Related Methods:
 
 	getAlternatives(): Alternative[] {

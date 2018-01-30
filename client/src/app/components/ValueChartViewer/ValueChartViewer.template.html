@@ -23,14 +23,14 @@
 			<ViewOptions [chartType]="valueChartViewerService.getActiveValueChart().getType()" (viewConfig)="updateView($event)" (reducedInfo)="updateReducedInfo($event)"></ViewOptions>
 			<InteractionOptions [interactive]="canInteract()" (interactionConfig)="updateInteractions($event)"></InteractionOptions>
 			<div class="valuechart-toolbar-group pull-right">
-				<button class="btn btn-success"  *ngIf="canSave()" (click)="save()" [disabled]="!valueChartViewerService.isOwner() && _.isEqual(userGuard.getUserRecord(), valueChartService.getValueChart().getUser(currentUserService.getUsername()))">
+				<button class="btn btn-success"  *ngIf="canSave()" (click)="save()" [disabled]="!saveEnabled()">
 					{{valueChartViewerService.isOwner() ? "Save Changes" : "Submit to Group Chart"}}
 				</button>
 				<button class="btn btn-primary"  *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
 					View Group Chart
 				</button>
 				<button class="btn btn-primary"  *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
-						View Individual Chart
+					View Individual Chart
 				</button>
 			</div>
 		</form>
