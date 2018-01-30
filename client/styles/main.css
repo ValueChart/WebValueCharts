@@ -57,6 +57,11 @@
     padding: 10px;
 }
 
+.navbar-button[disabled] {
+    cursor: not-allowed !important;
+    color: silver;
+}
+
 .navbar-bold {
     font-weight: bold;
 }

@@ -218,6 +218,8 @@ export class RootComponent implements OnInit {
 		reader.readAsText(xmlFile);
 		// Reset upload file so that user can try the same file again after fixing it.
 		(<HTMLSelectElement>document.getElementsByName("file-to-upload")[0]).value = null;
+		// Close open dropdowns.
+		$('.dropdown.open .dropdown-toggle').dropdown('toggle');
 	}
 
 	/*
