@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2017-10-22 19:41:29
+* @Last Modified time: 2018-02-12 22:30:10
 */
 
 /* Global Styles */
@@ -30,9 +30,8 @@
     text-align: center;
 }
 
-/**
-* fore-color of text within navbar-toggle items
-*/
+
+/* fore-color of text within navbar-toggle items */
 .navbar-toggle {
     color: #FFF;
 }
@@ -68,6 +67,11 @@
 
 .navbar-dropdown-option {
     margin: 0px !important;
+}
+
+.navbar-form {
+    width:100%;
+    height:60px;
 }
 
 /* Registration Page Styles */
@@ -167,6 +171,11 @@ a.upload {
 
 /* Score Function Viewer Styles */
 
+.score-function-viewer-container {
+    position: relative;  
+    z-index: 1;
+}
+
 .score-function-viewer {
     top: 10rem !important;
 }
@@ -218,7 +227,7 @@ a.upload {
 }
 
 .detail-box {
-    position: absolute !important;
+    position: relative;
     top: 8rem;
     z-index: 10;
 }
