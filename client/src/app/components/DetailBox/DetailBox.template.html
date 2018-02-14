@@ -49,13 +49,8 @@
 					<span class="col-xl-4 col-md-5"><b>Invitation Link:</b></span>
 					<span class="col-xl-8 col-md-7">{{ getValueChartUrl() }}</span>
 				</div>
-				<div class="form-group">
-					<button class="btn btn-danger pull-left"  *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && !this.valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(true)">
-						Lock
-					</button>
-					<button class="btn btn-danger pull-left"  *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual() && this.valueChartService.getStatus().lockedByCreator" (click)="setUserChangesAccepted(false)">
-						Unlock
-					</button>
+				<div class="form-group" *ngIf="this.valueChartViewerService.isOwner() && !this.valueChartService.getValueChart().isIndividual()">
+					<span class="col-xl-4 col-md-5"><b>Allow other users to join</b><input id="lock-chart-checkbox" type="checkbox" [checked]="!this.valueChartService.getStatus().lockedByCreator" (change)="setUserChangesAccepted($event)"></span>
 				</div>
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_ALTERNATIVES_TAB">

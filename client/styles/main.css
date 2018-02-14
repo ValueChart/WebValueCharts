@@ -226,8 +226,12 @@ a.upload {
     stroke: #000;
 }
 
-.detail-box {
+.detail-box-container {
     position: relative;
+}
+
+.detail-box {
+    position: absolute !important;
     top: 8rem;
     z-index: 10;
 }
@@ -253,6 +257,10 @@ a.upload {
 
 .remove-user {
     margin-top: 12px;
+}
+
+#lock-chart-checkbox {
+    margin-left: 10px;
 }
 
 .toolbar-row {

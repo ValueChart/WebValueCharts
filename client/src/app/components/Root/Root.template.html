@@ -85,7 +85,6 @@
 	</nav>
 </div>
 
-
 <div class="flex-row column-container col-xs-12">
 	<form class="form-inline flex-row column-container">
 		<div class="form-group">
@@ -161,6 +160,11 @@
 	</form>
 </div>
 
+<br style="display: none">
+<br>
+<br style="display: none">
+<br>
+
 <NotificationModal
 [display]="displayModal"
 [title]="modalTitle"
@@ -171,7 +175,6 @@
 [actionFunction]="modalActionFunction"
 (modalClosed)="displayModal = $event">
 </NotificationModal>
-
 
 <div>
 	<router-outlet></router-outlet>

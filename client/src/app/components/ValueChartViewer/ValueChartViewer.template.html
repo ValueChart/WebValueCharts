@@ -1,7 +1,7 @@
 <div *ngIf="chartName" id="ValueChartView">
 	<input type="color" id="primitiveObjective-color-picker">
-	<div class="valuechart-toolbar">
-		<form class="navbar-form col-xs-12"
+	<div class="valuechart-toolbar column-container col-lg-12">
+		<form class="navbar-form">
 			<div class="valuechart-toolbar-group pull-left">
 				<button class="btn btn-default"  *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
 					Edit Chart
@@ -49,7 +49,7 @@
 		(renderEvents)="updateRenderEvents($event)">
 		</ValueChart>
 	</div>
-	<div>
+	<div class="detail-box-container">
 		<DetailBox 
 		[valueChart]="valueChartViewerService.getActiveValueChart()"
 		[enableManagement]="valueChartViewerService.isOwner()" 
