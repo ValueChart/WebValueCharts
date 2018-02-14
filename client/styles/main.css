@@ -210,9 +210,13 @@ a.upload {
 /* ValueChart Viewer Styles */
 
 .valuechart-toolbar {
-    z-index: 11;
+    z-index: 9;
     position: relative;
     top: 3.5rem;
+}
+
+.valuechart-toolbar-group {
+    margin-bottom: 4rem !important;
 }
 
 .best-score-label {
@@ -226,13 +230,10 @@ a.upload {
     stroke: #000;
 }
 
-.detail-box-container {
-    position: relative;
-}
-
 .detail-box {
     position: absolute !important;
     top: 8rem;
+    margin-top: 10px;
     z-index: 10;
 }
 
@@ -240,27 +241,17 @@ a.upload {
     overflow-y: scroll;
 }
 
-.detail-toolbar {
-    left: 2px;
-    position: relative;
+.detail-box-navtabs {
+    margin: 10px 10px -10px 10px;
 }
 
-.detail-box-tab {
-    outline: none !important;
-}
-
-.detail-box-header {
-    position: relative;
-    top: 5rem;
-    z-index: -10;
+.edit-buttons {
+    position: absolute !important;
+    top: 75rem;
 }
 
 .remove-user {
     margin-top: 12px;
-}
-
-#lock-chart-checkbox {
-    margin-left: 10px;
 }
 
 .toolbar-row {
@@ -279,6 +270,10 @@ a.upload {
 .btn-xxs {
     font-size: 9px !important;
     padding: 0px 5px !important;
+}
+
+#lock-chart-checkbox {
+    margin-left: 10px;
 }
 
 /* ValueChart SVG Styles */
@@ -375,10 +370,6 @@ input {
 .btn-success {
 	background-color: #2A692A !important;
 	border-color: #2A692A !important;
-}
-
-.valuechart-toolbar-group {
-	margin-bottom: 4rem !important;
 }
 
 .form-control {

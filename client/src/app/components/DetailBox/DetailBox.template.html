@@ -12,7 +12,7 @@
 </style>
 
 <div id="detail-box" class="detail-box" [style.left.px]="(viewConfig.viewOrientation == ChartOrientation.Vertical ? 14 : width + 64)">	
-	<ul class="nav nav-tabs borderless" style="margin: 10px 10px -10px 10px" id="myTab" role="tablist">
+	<ul class="nav nav-tabs borderless detail-box-navtabs" role="tablist">
 		<li>
 			<a class="nav-link btn btn-ubc active" id="chart-information-header-container" data-toggle="tab"
 			(click)="detailBoxCurrentTab = DETAIL_BOX_CHART_TAB" [class.active]="detailBoxCurrentTab === DETAIL_BOX_CHART_TAB">
@@ -74,7 +74,7 @@
 					</div>
 				</div>
 				<div *ngIf="detailBoxAlternativeTab !== 'Alternatives'">
-					<button class="btn btn-default pull-right" (click)="collapseAlternative()">Back</button>
+					<button class="btn pull-right" (click)="collapseAlternative()">Back</button>
 				</div>
 			</div>
 			<div *ngIf="detailBoxCurrentTab === DETAIL_BOX_USERS_TAB">

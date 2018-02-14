@@ -223,7 +223,7 @@ export class ValueChartDirective implements OnInit, DoCheck {
 		// Create the SVG base element, and set it to fit to the input width and height:
 		this.el = d3.select(this.elementRef.nativeElement).append('svg')
 			.classed('ValueChart svg-content-valuechart', true)
-			.attr('viewBox', '0 -10' + ' ' + this.width + ' ' + this.height)
+			.attr('viewBox', '0 -15' + ' ' + this.width + ' ' + this.height)
 			.attr('preserveAspectRatio', 'xMinYMin meet');
 			
 		this.el.attr('width', '95%');
