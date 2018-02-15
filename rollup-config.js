@@ -29,7 +29,7 @@ export default {
       commonjs({
         include: [ 'node_modules/rxjs/**', 'node_modules/lodash/lodash.js' ],
         namedExports: {
-          './node_modules/lodash/lodash.js': [ 'remove', 'uniqueId', 'xor', 'isNumber', 'differenceWith', 'differenceBy', 'isNil', 'clone', 'cloneDeep', 'isEqual', 'clamp', 'findIndex' ]
+          './node_modules/lodash/lodash.js': [ 'remove', 'uniqueId', 'xor', 'isNumber', 'differenceWith', 'differenceBy', 'isNil', 'clone', 'cloneDeep', 'isEqual', 'clamp', 'findIndex', 'omit']
         }
       }),
       uglify()
