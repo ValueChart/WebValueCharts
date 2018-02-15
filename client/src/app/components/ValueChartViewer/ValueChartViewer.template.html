@@ -1,6 +1,6 @@
 <div *ngIf="chartName" id="ValueChartView">
 	<input type="color" id="primitiveObjective-color-picker">
-	<div class="valuechart-toolbar column-container col-lg-12">
+	<div class="valuechart-toolbar column-container col-lg-offset-4 col-lg-8">
 		<form class="navbar-form">
 			<div class="valuechart-toolbar-group pull-right">
 				<button class="btn" [disabled]="undoRedoService && !undoRedoService.canRedo()" (click)="redoChartChange()">
@@ -19,13 +19,18 @@
 					{{valueChartViewerService.isOwner() ? "Save Changes" : "Submit to Group Chart"}}
 				</button>
 				<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Individual" (click)="setValueChartTypeToView(ChartType.Group)">
-					View Group Chart
+					Group Chart
 				</button>
 				<button class="btn btn-primary" *ngIf="canViewGroupChart() && valueChartViewerService.getActiveValueChart().getType() === ChartType.Group" (click)="setValueChartTypeToView(ChartType.Individual)">
-					View Individual Chart
+					Individual Chart
 				</button>
 			</div>
-			<div class="valuechart-toolbar-group pull-left edit-buttons">
+			
+		</form>
+	</div>
+	<div class="valuechart-toolbar column-container col-lg-4">
+		<form class="navbar-form">
+			<div class="valuechart-toolbar-group pull-left edit-buttons" [style.top]="(valueChartHeight / 2 + 70 + 'px')">
 				<button class="btn" *ngIf="valueChartViewerService.isOwner()" (click)="editValueChart()">
 					Edit Chart
 				</button>

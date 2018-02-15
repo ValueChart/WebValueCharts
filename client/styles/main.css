@@ -2,7 +2,7 @@
 * @Author: aaronpmishkin
 * @Date:   2016-05-04 12:24:53
 * @Last Modified by:   MalakronikMausi
-* @Last Modified time: 2018-02-12 22:30:10
+* @Last Modified time: 2018-02-15 12:40:02
 */
 
 /* Global Styles */
@@ -29,7 +29,6 @@
     margin-bottom: 50;
     text-align: center;
 }
-
 
 /* fore-color of text within navbar-toggle items */
 .navbar-toggle {
@@ -210,9 +209,9 @@ a.upload {
 /* ValueChart Viewer Styles */
 
 .valuechart-toolbar {
-    z-index: 9;
     position: relative;
     top: 3.5rem;
+    z-index: 10;
 }
 
 .valuechart-toolbar-group {
@@ -234,7 +233,7 @@ a.upload {
     position: absolute !important;
     top: 8rem;
     margin-top: 10px;
-    z-index: 10;
+    z-index: 9;
 }
 
 #alternative-detail-box {
@@ -247,7 +246,6 @@ a.upload {
 
 .edit-buttons {
     position: absolute !important;
-    top: 75rem;
 }
 
 .remove-user {
@@ -364,6 +362,8 @@ input {
 }
 
 .btn {
+    background-color: #E8E8E8;
+    border-color: #BEBEBE;
     margin: 5px 5px !important;
 }	
 

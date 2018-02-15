@@ -334,7 +334,7 @@ export class ValueChartViewerComponent implements OnInit {
 	*/
 	resizeValueChart(): void {
 		this.valueChartWidth = (window.innerWidth * 0.95) * 1.5;
-		this.valueChartHeight = (window.innerHeight * 0.75) * 1.5;
+		this.valueChartHeight = (window.innerHeight * 0.75) * 1.5 - 50;
 	}
 
 
